@@ -73,6 +73,29 @@ namespace ModestTree
             }
         }
 
+        public static IEnumerable<T> ReplaceOrAppend<T>(this IEnumerable<T> enumerable, Predicate<T> match, T replacement)
+        {
+            bool replaced = false;
+
+            foreach (T t in enumerable)
+            {
+                if (match(t))
+                {
+                    replaced = true;
+                    yield return replacement;
+                }
+                else
+                {
+                    yield return t;
+                }
+            }
+
+            if (!replaced)
+            {
+                yield return replacement;
+            }
+        }
+
         public static T GetSingle<T>(this object[] objectArray, bool required)
         {
             if (required)
