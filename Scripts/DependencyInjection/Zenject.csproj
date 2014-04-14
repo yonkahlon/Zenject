@@ -1,0 +1,153 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\..\CommonUnityDefines.proj" />
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch>
+          None
+      </ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch>
+  </PropertyGroup>
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{514ACA39-4B29-49C6-810C-38D61A9A8F54}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Zenject</RootNamespace>
+    <AssemblyName>Zenject</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <IntermediateOutputPath>..\..\..\obj\Zenject\</IntermediateOutputPath>
+    <BaseIntermediateOutputPath>..\..\..\obj\Zenject\</BaseIntermediateOutputPath>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\..\..\..\..\Bin\EditorSolution\</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+  </PropertyGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <ItemGroup>
+    <!-- [Files Generated] -->
+    <Compile Include="Factories\Factory.cs" />
+    <Compile Include="Factories\FactoryMethod.cs" />
+    <Compile Include="Factories\GameObjectFactory.cs" />
+    <Compile Include="Factories\GameObjectInstantiator.cs" />
+    <Compile Include="Factories\IFactory.cs" />
+    <Compile Include="Factories\IInitializable.cs" />
+    <Compile Include="Factories\InjectAttribute.cs" />
+    <Compile Include="Factories\Instantiator.cs" />
+    <Compile Include="Factories\ListFactory.cs" />
+    <Compile Include="Factories\LookupInProgressAdder.cs" />
+    <Compile Include="Factories\MonoBehaviourFactory.cs" />
+    <Compile Include="Factories\PropertiesInjecter.cs" />
+    <Compile Include="Main\Binder.cs" />
+    <Compile Include="Main\BindingConditionSetter.cs" />
+    <Compile Include="Main\CompositionRoot.cs" />
+    <Compile Include="Main\CustomScope.cs" />
+    <Compile Include="Main\DiContainer.cs" />
+    <Compile Include="Main\InstallerUtil.cs" />
+    <Compile Include="Main\ReferenceBinder.cs" />
+    <Compile Include="Main\ValueBinder.cs" />
+    <Compile Include="Misc\DependencyRootStandard.cs" />
+    <Compile Include="Misc\EntryPointInitializer.cs" />
+    <Compile Include="Misc\IDependencyRoot.cs" />
+    <Compile Include="Misc\IEntryPoint.cs" />
+    <Compile Include="Misc\IKernel.cs" />
+    <Compile Include="Misc\ITickable.cs" />
+    <Compile Include="Misc\KernelCustom.cs" />
+    <Compile Include="Misc\KernelInitializer.cs" />
+    <Compile Include="Misc\ObjectGraphVisualizer.cs" />
+    <Compile Include="Misc\ReflectionUtil.cs" />
+    <Compile Include="Misc\UnityEventManager.cs" />
+    <Compile Include="Misc\UnityKernel.cs" />
+    <Compile Include="Misc\ZenjectException.cs" />
+    <Compile Include="Misc\ZenUtil.cs" />
+    <Compile Include="Providers\GameObjectProvider.cs" />
+    <Compile Include="Providers\GameObjectSingletonProviderFromPrefab.cs" />
+    <Compile Include="Providers\GameObjectTransientProviderFromPrefab.cs" />
+    <Compile Include="Providers\MethodProvider.cs" />
+    <Compile Include="Providers\ProviderBase.cs" />
+    <Compile Include="Providers\SingletonInstanceProvider.cs" />
+    <Compile Include="Providers\SingletonProviderMap.cs" />
+    <Compile Include="Providers\TransientProvider.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <!-- [References Generated] -->
+    <Reference Include="System">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="System.XML">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="System.Core">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="System.Xml.Linq">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityEngine">
+      <HintPath>C:/Program Files (x86)/Unity/Editor/Data/Managed/UnityEngine.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityEditor">
+      <HintPath>C:/Program Files (x86)/Unity/Editor/Data/Managed/UnityEditor.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Ionic.Zip.Reduced">
+      <HintPath>..\..\AddIns\ADL SCORM\Plugins\Ionic.Zip.Reduced.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="ScormSerializer">
+      <HintPath>..\..\AddIns\ADL SCORM\Plugins\ScormSerializer.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="dfScriptLite">
+      <HintPath>..\..\AddIns\DaikonForge\DataBinding\Plugins\dfScriptLite.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="System.Xml.Linq">
+      <HintPath>..\..\AddIns\DotNet\System.Xml.Linq.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="KGFUtils.Settings">
+      <HintPath>..\..\AddIns\kolmich\KGFCore\KGFUtility\KGFUtils.Settings.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="ObjReader">
+      <HintPath>..\..\AddIns\ObjReader\ObjReader.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="TexturePacker">
+      <HintPath>..\..\AddIns\TexturePacker\TexturePacker.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Modest3d.WebsiteCommon">
+      <HintPath>..\..\AddIns\WebsiteCommon\Modest3d.WebsiteCommon.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Simple.Mocking">
+      <HintPath>..\..\Plugins\Simple.Mocking\Simple.Mocking.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="uUnit">
+      <HintPath>..\..\Plugins\uUnit\uUnit.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Moq">
+      <HintPath>Moq\Moq.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\AssertAndLogging\AssertAndLogging.csproj">
+      <Project>{b7bfe331-a460-4afd-9d3b-0913ab6507ac}</Project>
+      <Name>AssertAndLogging</Name>
+    </ProjectReference>
+  </ItemGroup>
+</Project>
