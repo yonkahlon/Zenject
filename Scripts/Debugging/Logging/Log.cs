@@ -44,6 +44,7 @@ namespace ModestTree
 
         static bool _enabled = true;
         static bool _hasInitializedStreams;
+        static bool _isLoggingFromUnity;
 
         static Log()
         {
@@ -281,14 +282,14 @@ namespace ModestTree
         {
             Assert.That(_hasInitializedStreams);
 
-            if (!Log.IsEnabled)
+            if (!Log.IsEnabled || _isLoggingFromUnity)
             {
                 return;
             }
 
             try
             {
-                Log.IsEnabled = false; // avoid infinite loops
+                _isLoggingFromUnity = true; // avoid infinite loops.  We can allow direct logs that aren't through unity however
 
                 switch (type)
                 {
@@ -328,10 +329,21 @@ namespace ModestTree
                     }
                 }
             }
+            catch (Exception e)
+            {
+                // Should never happen
+                InternalWrite(
+                    new LogMessageInfo(LogLevel.Error)
+                    {
+                        Category = "Unity",
+                        Message = "Error in logging system!",
+                        Exception = e,
+                    });
+            }
             finally
             {
                 // Use try-finally to guarantee this gets reset even in the case of an exception
-                Log.IsEnabled = true;
+                _isLoggingFromUnity = true;
             }
         }
 
@@ -358,7 +370,8 @@ namespace ModestTree
             // Add exception info to message
             {
                 var exceptionTrace = StackAnalyzer.GetStackTraceFromException(messageInfo.Exception);
-                stackTrace = new StackTrace(stackTrace.Frames.Append(exceptionTrace.Frames).ToList());
+                stackTrace = new StackTrace(
+                    exceptionTrace.Frames.Append(stackTrace.Frames).ToList());
             }
 
             return stackTrace;

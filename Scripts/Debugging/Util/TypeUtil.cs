@@ -9,6 +9,8 @@ namespace ModestTree
         // Note the fullTypeName should contain the namespace
         public static Type SearchForType(string fullTypeName)
         {
+            Assert.That(!string.IsNullOrEmpty(fullTypeName));
+
             foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
             {
                 var type = assembly.GetType(fullTypeName);
