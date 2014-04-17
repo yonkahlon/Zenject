@@ -57,7 +57,7 @@ namespace ModestTree.Zenject
         {
             var obj = (TContract)Instantiator.Instantiate(_container, _concreteType, constructorArgs);
 
-            if (typeof(IInitializable).IsAssignableFrom(typeof(TContract)))
+            if (typeof(IInitializable).IsAssignableFrom(_concreteType))
             {
                 ((IInitializable)obj).Initialize();
             }
