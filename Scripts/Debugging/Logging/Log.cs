@@ -343,7 +343,7 @@ namespace ModestTree
             finally
             {
                 // Use try-finally to guarantee this gets reset even in the case of an exception
-                _isLoggingFromUnity = true;
+                _isLoggingFromUnity = false;
             }
         }
 
