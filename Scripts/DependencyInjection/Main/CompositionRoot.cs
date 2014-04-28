@@ -4,11 +4,6 @@ using System.Linq;
 
 namespace ModestTree.Zenject
 {
-    public interface IInstaller
-    {
-        void RegisterBindings(DiContainer container);
-    }
-
     // Define this class as a component of a top-level game object, and define
     // any editor-defined components as a child.  This is necessary to guarantee that
     // UnityContext gets created first before anything that uses IoC
@@ -26,21 +21,10 @@ namespace ModestTree.Zenject
             }
         }
 
-        IEnumerable<IInstaller> FindChildInstallers()
-        {
-            return (from c in gameObject.GetComponentsInChildren<MonoBehaviour>() where typeof(IInstaller).IsAssignableFrom(c.GetType()) select ((IInstaller)(object)c));
-        }
-
         void Register()
         {
-            var installers = FindChildInstallers();
-
-            Assert.That(installers.Any(), "No installers found");
-
-            foreach (var installer in installers)
-            {
-                installer.RegisterBindings(_container);
-            }
+            // call RegisterBindings on any installers on our game object or somewhere below in the scene heirarhcy
+            BroadcastMessage("RegisterBindings", _container, SendMessageOptions.RequireReceiver);
         }
 
         void InitContainer()
@@ -57,6 +41,10 @@ namespace ModestTree.Zenject
 
         void Awake()
         {
+            // Note: This log statement is important because it is often what triggers the logging system
+            // to initialize
+            Log.Debug("Initializing Container");
+
             InitContainer();
             Register();
         }
