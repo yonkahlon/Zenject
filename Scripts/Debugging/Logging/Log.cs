@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
+using UnityEditor;
 using UnityEngine;
 
 #if !TEST_BUILD && UNITY_EDITOR
@@ -230,9 +231,6 @@ namespace ModestTree
         static void InitStreams()
         {
             Assert.That(!_hasInitializedStreams);
-#if !TEST_BUILD && UNITY_EDITOR
-            Assert.That(EditorApplication.isPlaying);
-#endif
 
             _hasInitializedStreams = true;
 
@@ -465,10 +463,6 @@ namespace ModestTree
 
         static void Write(LogMessageInfo messageInfo)
         {
-#if !TEST_BUILD && UNITY_EDITOR
-            Assert.That(EditorApplication.isPlaying, "Should not call logging from editor scripts");
-#endif
-
             if (!_hasInitializedStreams)
             {
                 InitStreams();
@@ -483,6 +477,7 @@ namespace ModestTree
 
 #if !TEST_BUILD
             // Ensure this is always the case
+            // in case other code tries to steal it
             Application.RegisterLogCallback(OnUnityLog);
 #endif
 
