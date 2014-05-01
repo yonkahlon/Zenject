@@ -53,14 +53,14 @@ namespace ModestTree.Zenject
             }
         }
 
-        // Create a new game object from a given prefab 
+        // Create a new game object from a given prefab
         // Without returning any particular monobehaviour
         public GameObject Instantiate(GameObject template, params object[] args)
         {
             var gameObj = (GameObject)GameObject.Instantiate(template);
 
             // By default parent to comp root
-            // This is good so that the entire object graph is 
+            // This is good so that the entire object graph is
             // contained underneath it, which is useful for cases
             // where you need to delete the entire object graph
             gameObj.transform.parent = _compRoot.transform;
@@ -105,7 +105,7 @@ namespace ModestTree.Zenject
             {
                 var obj = Instantiate(template);
 
-                var component = obj.GetComponent<T>();
+                var component = obj.GetComponentInChildren<T>();
                 Assert.That(component != null, "Could not find component with type '" + typeof(T) + "' when instantiating template");
 
                 return component;
