@@ -17,7 +17,7 @@ namespace ModestTree.Zenject
 
     public class BindingConditionSetter
     {
-        readonly private ProviderBase _provider;
+        readonly ProviderBase _provider;
 
         public BindingConditionSetter(ProviderBase provider)
         {
