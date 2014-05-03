@@ -28,7 +28,7 @@ namespace ModestTree.Zenject
 
         [InjectNamed("TickPriority")]
         [InjectOptional]
-        int _tickPriority = 0;
+        int? _tickPriority;
 
         int _lastWidth;
         int _lastHeight;

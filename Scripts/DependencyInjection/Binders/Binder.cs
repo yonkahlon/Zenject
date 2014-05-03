@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 namespace ModestTree.Zenject
@@ -23,7 +24,7 @@ namespace ModestTree.Zenject
             return AsMethod(c => c.Resolve<TConcrete>().Create());
         }
 
-        public BindingConditionSetter Bind(ProviderBase provider)
+        public virtual BindingConditionSetter Bind(ProviderBase provider)
         {
             _container.RegisterProvider<TContract>(provider);
             return new BindingConditionSetter(provider);

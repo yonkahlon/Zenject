@@ -56,7 +56,7 @@ namespace ModestTree.Zenject
             return Bind<IFactory<TContract>>().AsSingle<Factory<TContract, TConcrete>>();
         }
 
-        public ValueBinder<TContract> BindValue<TContract>()
+        public ValueBinder<TContract> BindValue<TContract>() where TContract : struct
         {
             return new ValueBinder<TContract>(this, _singletonMap);
         }

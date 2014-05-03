@@ -28,7 +28,7 @@ namespace ModestTree.Zenject
             return _container.Bind<TContract>();
         }
 
-        public ValueBinder<TContract> BindValue<TContract>()
+        public ValueBinder<TContract> BindValue<TContract>() where TContract : struct
         {
             _scopeContracts.Add(typeof(TContract));
             return _container.BindValue<TContract>();
