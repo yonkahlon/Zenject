@@ -2,7 +2,8 @@
 {
     public interface IEntryPoint
     {
-        int InitPriority { get; }
+        // Return null if you don't care when your initialize gets called
+        int? InitPriority { get; }
 
         void Initialize();
     }

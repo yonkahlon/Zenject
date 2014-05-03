@@ -18,7 +18,7 @@ namespace ModestTree.Zenject
             _kernel = kernel;
         }
 
-        public int InitPriority
+        public int? InitPriority
         {
             get
             {
