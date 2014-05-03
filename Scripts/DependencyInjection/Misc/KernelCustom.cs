@@ -16,6 +16,10 @@ namespace ModestTree.Zenject
         LinkedList<TickableInfo> _tasks = new LinkedList<TickableInfo>();
         List<ITickable> _queuedTasks = new List<ITickable>();
 
+        public KernelCustom()
+        {
+        }
+
         public void AddTask(ITickable task)
         {
             Assert.That(!_queuedTasks.Contains(task), "Duplicate task added to kernel with name '" + task.GetType().FullName + "'");
@@ -35,16 +39,31 @@ namespace ModestTree.Zenject
             info.IsRemoved = true;
         }
 
+        public void OnFrameStart()
+        {
+            // See above comment
+            AddQueuedTasks();
+        }
+
         public void Update(int minPriority, int maxPriority)
         {
-            AddQueuedTasks();
-
-            foreach (var taskInfo in _tasks)
+            foreach (var taskInfo in _tasks.Where(x =>
+                !x.IsRemoved &&
+                x.Tickable.TickPriority.HasValue &&
+                x.Tickable.TickPriority >= minPriority && x.Tickable.TickPriority < maxPriority))
             {
-                if (taskInfo.Tickable.TickPriority >= minPriority && taskInfo.Tickable.TickPriority < maxPriority)
-                {
-                    LogUtil.CallAndCatchExceptions(() => taskInfo.Tickable.Tick());
-                }
+                LogUtil.CallAndCatchExceptions(() => taskInfo.Tickable.Tick());
+            }
+
+            ClearRemovedTasks();
+        }
+
+        public void UpdateNullTickPriorities()
+        {
+            foreach (var taskInfo in _tasks.Where(x =>
+                !x.IsRemoved && !x.Tickable.TickPriority.HasValue))
+            {
+                LogUtil.CallAndCatchExceptions(() => taskInfo.Tickable.Tick());
             }
 
             ClearRemovedTasks();

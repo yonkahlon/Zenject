@@ -39,7 +39,7 @@ namespace ModestTree.Zenject
             private set;
         }
 
-        public int TickPriority
+        public int? TickPriority
         {
             get
             {

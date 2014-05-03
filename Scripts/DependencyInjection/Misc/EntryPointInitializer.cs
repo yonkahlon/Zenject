@@ -31,7 +31,7 @@ namespace ModestTree.Zenject
             _initializables = initializables ?? new List<IInitializable>();
         }
 
-        public int TickPriority
+        public int? TickPriority
         {
             // We need to be the first tickable that's run, since
             // initialization should always occur before any update call

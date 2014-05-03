@@ -22,7 +22,11 @@ namespace ModestTree.Zenject
 
         public void Update()
         {
+            _impl.OnFrameStart();
             _impl.Update(int.MinValue, KernelCustom.UnityLateUpdateTickPriority);
+
+            // Put Tickables that don't care about their priority after Update() and before LateUpdate()
+            _impl.UpdateNullTickPriorities();
         }
 
         public void LateUpdate()
