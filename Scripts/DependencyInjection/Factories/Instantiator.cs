@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Linq;
 
 namespace ModestTree.Zenject
 {
@@ -26,9 +27,6 @@ namespace ModestTree.Zenject
         {
             ConstructorInfo method;
             var parameterInfos = ZenUtil.GetConstructorDependencies(concreteType, out method);
-
-            // Commenting out to remove a warning, but leaving here in case it's needed in the future
-            //var injectInfos = ZenUtil.GetFieldDependencies(concreteType);
 
             var parameters = new List<object>();
             var extrasList = new List<object>(constructorArgs);
@@ -64,29 +62,29 @@ namespace ModestTree.Zenject
                         Parents = new List<Type>(container.LookupsInProgress)
                     };
 
-                    var param = container.TryResolve(paramInfo.ParameterType, context);
-
                     // Dependencies that are lists are only optional if declared as such using the inject attribute
-                    bool optional = (injectInfo == null ? false : injectInfo.Optional);
+                    bool isOptional = (injectInfo == null ? false : injectInfo.Optional);
 
-                    if (param == null)
+                    object param = null;
+
+                    if (container.HasBinding(paramInfo.ParameterType, context))
                     {
-                        // If it's a list it might map to a collection
-                        if (ReflectionUtil.IsGenericList(desiredType))
-                        {
-                            var subTypes = desiredType.GetGenericArguments();
-
-                            if (subTypes.Length == 1)
-                            {
-                                var subType = subTypes[0];
-                                param = container.ResolveMany(subType, context, optional);
-                            }
-                        }
+                        param = container.Resolve(paramInfo.ParameterType, context);
+                    }
+                    else if (ReflectionUtil.IsGenericList(desiredType))
+                    // If it's a list it might map to a collection
+                    {
+                        var subType = desiredType.GetGenericArguments().Single();
+                        param = container.ResolveMany(subType, context, isOptional);
                     }
 
-                    Assert.That(param != null || optional, () =>
+                    if (param == null && !isOptional)
+                    {
+                        throw new ZenjectResolveException(
                             "Unable to find parameter with type '" + paramInfo.ParameterType.GetPrettyName() +
                             "' while constructing '" + concreteType.GetPrettyName() + "'.\nObject graph:\n" + container.GetCurrentObjectGraph());
+                    }
+
                     parameters.Add(param);
                 }
             }
@@ -99,14 +97,18 @@ namespace ModestTree.Zenject
             }
             catch (Exception e)
             {
-                throw new ZenjectException(
+                throw new ZenjectGeneralException(
                     "Error occurred while instantiating object with type '" + concreteType.GetPrettyName() + "'", e);
             }
 
             var injecter = new PropertiesInjecter(container, extrasList);
             injecter.Inject(newObj);
 
-            Assert.IsEqual(extrasList.Count, 0, () => "Passed unnecessary parameters when constructing '" + concreteType + "'. \nObject graph:\n" + container.GetCurrentObjectGraph());
+            if (!extrasList.IsEmpty())
+            {
+                throw new ZenjectResolveException(
+                    "Passed unnecessary parameters when constructing '" + concreteType + "'. \nObject graph:\n" + container.GetCurrentObjectGraph());
+            }
 
             return newObj;
         }

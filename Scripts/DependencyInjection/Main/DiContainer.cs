@@ -97,7 +97,7 @@ namespace ModestTree.Zenject
             return ResolveMany(contract, new ResolveContext());
         }
 
-        List<object> ResolveInternal(Type contract, ResolveContext context)
+        List<object> ResolveInternalList(Type contract, ResolveContext context)
         {
             var instances = new List<object>();
 
@@ -113,6 +113,28 @@ namespace ModestTree.Zenject
             return instances;
         }
 
+        public bool HasBinding(Type contract)
+        {
+            return HasBinding(contract, new ResolveContext());
+        }
+
+        public bool HasBinding(Type contract, ResolveContext context)
+        {
+            List<ProviderBase> providers;
+
+            if (!_providers.TryGetValue(contract, out providers))
+            {
+                return false;
+            }
+
+            return providers.Where(x => x.GetCondition()(context)).HasAtLeast(1);
+        }
+
+        public bool HasBinding<TContract>()
+        {
+            return HasBinding(typeof(TContract));
+        }
+
         public object ResolveMany(Type contract, ResolveContext context)
         {
             return ResolveMany(contract, context, true);
@@ -124,7 +146,7 @@ namespace ModestTree.Zenject
 
             if (_providers.ContainsKey(contract))
             {
-                return ReflectionUtil.CreateGenericList(contract, ResolveInternal(contract, context).ToArray());
+                return ReflectionUtil.CreateGenericList(contract, ResolveInternalList(contract, context).ToArray());
             }
 
             Assert.That(optional, () =>
@@ -147,27 +169,6 @@ namespace ModestTree.Zenject
             return new List<Type> {};
         }
 
-        // Same as Resolve except returns null if it can't find it instead of asserting
-        public TContract TryResolve<TContract>()
-        {
-            return TryResolve<TContract>(new ResolveContext());
-        }
-
-        public TContract TryResolve<TContract>(ResolveContext context)
-        {
-            return (TContract) TryResolve(typeof (TContract), context);
-        }
-
-        public object TryResolve(Type contract)
-        {
-            return TryResolve(contract, new ResolveContext());
-        }
-
-        public object TryResolve(Type contract, ResolveContext context)
-        {
-            return ResolveInternal(contract, context, true);
-        }
-
         // Return single insance of requested type or assert
         public TContract Resolve<TContract>()
         {
@@ -186,14 +187,14 @@ namespace ModestTree.Zenject
 
         public object Resolve(Type contract, ResolveContext context)
         {
-            return ResolveInternal(contract, context, false);
+            return ResolveInternalSingle(contract, context, false);
         }
 
-        object ResolveInternal(Type contract, ResolveContext context, bool optional)
+        object ResolveInternalSingle(Type contract, ResolveContext context, bool optional)
         {
             // Note that different types can map to the same provider (eg. a base type to a concrete class and a concrete class to itself)
 
-            var objects = ResolveInternal(contract, context);
+            var objects = ResolveInternalList(contract, context);
 
             if (!objects.Any())
             {

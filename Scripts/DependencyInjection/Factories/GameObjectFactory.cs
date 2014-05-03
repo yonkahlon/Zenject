@@ -21,7 +21,12 @@ namespace ModestTree.Zenject
             var gameObj = _instantiator.Instantiate(_template, constructorArgs);
 
             var component = gameObj.GetComponentInChildren<TContract>();
-            Assert.That(component != null, "Could not find component '" + typeof(TContract).GetPrettyName() + "' when creating game object from prefab");
+
+            if (component == null)
+            {
+                throw new ZenjectResolveException(
+                    "Could not find component '" + typeof(TContract).GetPrettyName() + "' when creating game object from prefab");
+            }
 
             return component;
         }

@@ -89,15 +89,14 @@ namespace ModestTree.Zenject
         {
             InjectStartingMonoBehaviours();
 
-            _dependencyRoot = _container.TryResolve<IDependencyRoot>();
-
-            if (_dependencyRoot == null)
+            if (_container.HasBinding<IDependencyRoot>())
             {
-                Log.Warn("No dependency root found");
+                _dependencyRoot = _container.Resolve<IDependencyRoot>();
+                _dependencyRoot.Start();
             }
             else
             {
-                _dependencyRoot.Start();
+                Log.Warn("No dependency root found");
             }
         }
     }

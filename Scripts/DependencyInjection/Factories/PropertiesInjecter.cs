@@ -63,44 +63,43 @@ namespace ModestTree.Zenject
                     TargetInstance = injectable,
                 };
 
-                var valueObj = ResolveField(fieldInfo, context, injectInfo);
+                var valueObj = ResolveField(fieldInfo, context, injectInfo, injectable);
 
-                Assert.That(valueObj != null || injectInfo.Optional, () =>
-                        "Unable to find field with type '" + fieldInfo.FieldType +
-                        "' when injecting dependencies into '" + injectable + "'. \nObject graph:\n" + _container.GetCurrentObjectGraph());
-
-                if (valueObj != null)
-                {
-                    fieldInfo.SetValue(injectable, valueObj);
-                }
+                fieldInfo.SetValue(injectable, valueObj);
             }
         }
 
-        object ResolveField(FieldInfo fieldInfo, ResolveContext context, ZenUtil.InjectInfo injectInfo)
+        object ResolveField(
+            FieldInfo fieldInfo, ResolveContext context,
+            ZenUtil.InjectInfo injectInfo, object injectable)
         {
             var desiredType = fieldInfo.FieldType;
-            var valueObj = _container.TryResolve(desiredType, context);
 
-            if (valueObj == null)
+            if (_container.HasBinding(desiredType, context))
             {
-                // If it's a list it might map to a collection
-                if (ReflectionUtil.IsGenericList(desiredType))
-                {
-                    var subTypes = desiredType.GetGenericArguments();
-
-                    if (subTypes.Length == 1)
-                    {
-                        var subType = subTypes[0];
-
-                        // Dependencies that are lists are only optional if declared as such using the inject attribute
-                        bool optional = (injectInfo == null ? false : injectInfo.Optional);
-
-                        valueObj = _container.ResolveMany(subType, context, optional);
-                    }
-                }
+                return _container.Resolve(desiredType, context);
             }
 
-            return valueObj;
+            // Dependencies that are lists are only optional if declared as such using the inject attribute
+            bool isOptional = (injectInfo == null ? false : injectInfo.Optional);
+
+            // If it's a list it might map to a collection
+            if (ReflectionUtil.IsGenericList(desiredType))
+            {
+                var subType = desiredType.GetGenericArguments().Single();
+
+                return _container.ResolveMany(subType, context, isOptional);
+            }
+
+            if (!isOptional)
+            {
+                throw new ZenjectResolveException(
+                    "Unable to find field with type '" + fieldInfo.FieldType +
+                    "' when injecting dependencies into '" + injectable +
+                    "'. \nObject graph:\n" + _container.GetCurrentObjectGraph());
+            }
+
+            return null;
         }
     }
 }

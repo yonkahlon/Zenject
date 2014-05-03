@@ -77,7 +77,12 @@ namespace ModestTree.Zenject
             var components = gameObj.GetComponentsInChildren<MonoBehaviour>();
             foreach (var t in components)
             {
-                Assert.That(t != null, "Undefined monobehaviour in template '" + template.name + "'");
+                if (t == null)
+                {
+                    throw new ZenjectGeneralException(
+                        "Undefined monobehaviour in template '" + template.name + "'");
+                }
+
                 injecter.Inject(t);
             }
 
@@ -106,7 +111,12 @@ namespace ModestTree.Zenject
                 var obj = Instantiate(template);
 
                 var component = obj.GetComponentInChildren<T>();
-                Assert.That(component != null, "Could not find component with type '" + typeof(T) + "' when instantiating template");
+
+                if (component == null)
+                {
+                    throw new ZenjectResolveException(
+                        "Could not find component with type '" + typeof(T) + "' when instantiating template");
+                }
 
                 return component;
             }
