@@ -100,7 +100,7 @@ namespace ModestTree.Zenject
                 _creator = creator;
             }
 
-            public override void OnRemoved()
+            public override void Dispose()
             {
                 _creator.DecRefCount();
             }

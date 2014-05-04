@@ -66,6 +66,11 @@ namespace ModestTree.Zenject
             return new ReferenceBinder<TContract>(this, _singletonMap);
         }
 
+        public CustomScope CreateScope()
+        {
+            return new CustomScope(this, _singletonMap);
+        }
+
         public void RegisterProvider<TContract>(ProviderBase provider)
         {
             if (_providers.ContainsKey(typeof (TContract)))
@@ -80,6 +85,26 @@ namespace ModestTree.Zenject
             {
                 _providers.Add(typeof (TContract), new List<ProviderBase> {provider});
             }
+        }
+
+        public void UnregisterProvider(ProviderBase provider)
+        {
+            int numRemoved = 0;
+
+            foreach (var keyValue in _providers)
+            {
+                numRemoved += keyValue.Value.RemoveAll(x => x == provider);
+            }
+
+            Assert.That(numRemoved > 0, "Tried to unregister provider that was not registered");
+
+            // Remove any empty contracts
+            foreach (var contractType in _providers.Where(x => x.Value.IsEmpty()).Select(x => x.Key).ToList())
+            {
+                _providers.Remove(contractType);
+            }
+
+            provider.Dispose();
         }
 
         public List<TContract> ResolveMany<TContract>()
@@ -198,33 +223,27 @@ namespace ModestTree.Zenject
 
             if (!objects.Any())
             {
-                Assert.That(optional, () =>
-                    "Unable to resolve type '" + contract + "'. \nObject graph:\n" + GetCurrentObjectGraph());
+                if (!optional)
+                {
+                    throw new ZenjectResolveException(
+                        "Unable to resolve type '" + contract + "'. \nObject graph:\n" + GetCurrentObjectGraph());
+                }
 
                 return null;
             }
 
-            Assert.That(objects.Count == 1, () =>
-                "Found multiple matches when only one was expected for type '" + contract + "'. \nObject graph:\n" + GetCurrentObjectGraph());
-
-            return objects[0];
-        }
-
-        public void Release<TContract>()
-        {
-            Release(typeof (TContract));
-        }
-
-        public void Release(Type contract)
-        {
-            Assert.That(_providers.ContainsKey(contract));
-
-            foreach (var provider in _providers[contract])
+            if (objects.Count > 1)
             {
-                provider.OnRemoved();
+                if (!optional)
+                {
+                    throw new ZenjectResolveException(
+                        "Found multiple matches when only one was expected for type '" + contract + "'. \nObject graph:\n" + GetCurrentObjectGraph());
+                }
+
+                return null;
             }
 
-            _providers.Remove(contract);
+            return objects.First();
         }
 
         public List<Type> GetDependencyContracts<TContract>()

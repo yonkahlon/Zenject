@@ -1,7 +1,7 @@
 using System;
 namespace ModestTree.Zenject
 {
-    public abstract class ProviderBase
+    public abstract class ProviderBase : IDisposable
     {
         private BindingCondition _condition = delegate { return true; };
 
@@ -18,7 +18,7 @@ namespace ModestTree.Zenject
         public abstract object GetInstance();
         public abstract Type GetInstanceType();
 
-        public virtual void OnRemoved()
+        public virtual void Dispose()
         {
         }
     }
