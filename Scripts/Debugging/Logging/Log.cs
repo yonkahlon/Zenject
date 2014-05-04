@@ -7,7 +7,7 @@ using System.Reflection;
 using System.Text.RegularExpressions;
 using UnityEngine;
 
-#if !TEST_BUILD && UNITY_EDITOR
+#if !NOT_UNITY && UNITY_EDITOR
 using UnityEditor;
 #endif
 
@@ -49,7 +49,7 @@ namespace ModestTree
         {
             _enabled = false;
 
-#if !TEST_BUILD && UNITY_EDITOR
+#if !NOT_UNITY && UNITY_EDITOR
             InitFromEditorPrefs();
 #else
             InitFromConfig();
@@ -76,7 +76,7 @@ namespace ModestTree
             set
             {
                 _categoryFilter = value;
-#if !TEST_BUILD && UNITY_EDITOR
+#if !NOT_UNITY && UNITY_EDITOR
                 EditorPrefs.SetInt(SettingIdCategoryFilter, value);
 #endif
             }
@@ -99,7 +99,7 @@ namespace ModestTree
             set
             {
                 _minLogLevel = value;
-#if !TEST_BUILD && UNITY_EDITOR
+#if !NOT_UNITY && UNITY_EDITOR
                 EditorPrefs.SetInt(SettingIdMinLogLevel, (int)value);
 #endif
             }
@@ -114,7 +114,7 @@ namespace ModestTree
             set
             {
                 _minStackTraceLevel = value;
-#if !TEST_BUILD && UNITY_EDITOR
+#if !NOT_UNITY && UNITY_EDITOR
                 EditorPrefs.SetInt(SettingIdMinStackTraceLevel, (int)value);
 #endif
             }
@@ -136,7 +136,7 @@ namespace ModestTree
             }
         }
 
-#if !TEST_BUILD && UNITY_EDITOR
+#if !NOT_UNITY && UNITY_EDITOR
         static void InitFromEditorPrefs()
         {
             _minLogLevel = (LogLevel)EditorPrefs.GetInt(SettingIdMinLogLevel, (int)LogLevel.Info);
@@ -174,7 +174,7 @@ namespace ModestTree
             _categoryIds.Clear();
             _categoryIds.Add(UncategorizedLabel, 0);
 
-#if !TEST_BUILD && UNITY_EDITOR
+#if !NOT_UNITY && UNITY_EDITOR
             EditorPrefs.SetInt(SettingIdNumCategories, 1);
             EditorPrefs.SetInt(SettingIdCategoryFilter, _categoryFilter);
 #endif
@@ -206,7 +206,7 @@ namespace ModestTree
                 categoryNum = _categoryIds.Count;
                 _categoryIds.Add(categoryStr, categoryNum);
 
-#if !TEST_BUILD && UNITY_EDITOR
+#if !NOT_UNITY && UNITY_EDITOR
                 EditorPrefs.SetString(SettingIdCategoryLabels + categoryNum, categoryStr);
                 EditorPrefs.SetInt(SettingIdNumCategories, categoryNum+1);
 #endif
@@ -465,7 +465,7 @@ namespace ModestTree
 
         public static void EnableHijackUnityLog()
         {
-#if !TEST_BUILD
+#if !NOT_UNITY
             Application.RegisterLogCallback(OnUnityLog);
 #endif
         }

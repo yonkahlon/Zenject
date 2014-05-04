@@ -37,7 +37,7 @@ namespace ModestTree
             {
                 var xml = new XmlDocument();
 
-#if TEST_BUILD
+#if NOT_UNITY
                 // For non-unity test builds just assume it's in the starting directory
                 var path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, resourceName + ".xml");
                 xml.Load(path);
@@ -63,7 +63,7 @@ namespace ModestTree
 
         public static string GetBuildConfiguration()
         {
-#if TEST_BUILD
+#if NOT_UNITY
             return "TestBuild";
 #elif UNITY_EDITOR
             return "UnityEditor";

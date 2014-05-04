@@ -86,12 +86,12 @@ namespace ModestTree
 
                 if (frame.FileName != null)
                 {
-#if !TEST_BUILD && !UNITY_WEBPLAYER
+#if !NOT_UNITY && !UNITY_WEBPLAYER
                     if (PathUtil.IsSubPath(Application.dataPath, frame.FileName))
 #endif
                     {
                         result.Append("  (");
-#if TEST_BUILD || UNITY_WEBPLAYER
+#if NOT_UNITY || UNITY_WEBPLAYER
                         result.Append(frame.FileName);
 #else
                         result.Append(PathUtil.GetRelativePath(Application.dataPath + "/../", frame.FileName));
