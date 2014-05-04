@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 namespace ModestTree.Zenject
@@ -37,6 +38,12 @@ namespace ModestTree.Zenject
             return Bind(_singletonMap.CreateProvider<TConcrete>());
         }
 
+        public BindingConditionSetter AsSingle(Type concreteType)
+        {
+            Assert.That(concreteType.DerivesFrom(typeof(TContract)));
+            return Bind(_singletonMap.CreateProvider(concreteType));
+        }
+
         public BindingConditionSetter AsSingle<TConcrete>(TConcrete instance) where TConcrete : TContract
         {
             Assert.That(instance != null, "provided singleton instance is null");
@@ -47,14 +54,14 @@ namespace ModestTree.Zenject
         //public BindingConditionSetter AsSingleFromPrefab(GameObject template)
 
         // Note: Here we assume that the contract is a component on the given prefab
-        public BindingConditionSetter AsSingleFromPrefab<TConcrete>(GameObject template) where TConcrete : Component
+        public BindingConditionSetter AsSingleFromPrefab<TConcrete>(GameObject template) where TConcrete : Component, TContract
         {
             Assert.IsNotNull(template, "Received null template while binding type '" + typeof(TConcrete).GetPrettyName() + "'");
             return Bind(new GameObjectSingletonProviderFromPrefab<TConcrete>(_container, template));
         }
 
         // Note: Here we assume that the contract is a component on the given prefab
-        public BindingConditionSetter AsTransientFromPrefab<TConcrete>(GameObject template) where TConcrete : Component
+        public BindingConditionSetter AsTransientFromPrefab<TConcrete>(GameObject template) where TConcrete : Component, TContract
         {
             Assert.IsNotNull(template, "provided template instance is null");
             return Bind(new GameObjectTransientProviderFromPrefab<TConcrete>(_container, template));
@@ -73,12 +80,10 @@ namespace ModestTree.Zenject
         }
 
         // Creates a new game object and adds the given type as a new component on it
-        public BindingConditionSetter AsSingleGameObject<TConcrete>(string name) where TConcrete : MonoBehaviour
+        public BindingConditionSetter AsSingleGameObject<TConcrete>(string name) where TConcrete : MonoBehaviour, TContract
         {
             Assert.That(typeof(TConcrete).IsSubclassOf(typeof(MonoBehaviour)), "Expected MonoBehaviour derived type when binding type '" + typeof(TConcrete).GetPrettyName() + "'");
             return Bind(new GameObjectSingletonProvider<TConcrete>(_container, name));
         }
     }
 }
-
-

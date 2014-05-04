@@ -10,6 +10,8 @@ namespace ModestTree.Zenject
     public interface IKernel
     {
         void AddTask(ITickable task);
+        void AddTask(ITickable task, int priority);
+
         void RemoveTask(ITickable task);
     }
 }

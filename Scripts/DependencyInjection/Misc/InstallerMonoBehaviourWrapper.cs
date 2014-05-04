@@ -16,7 +16,8 @@ namespace ModestTree.Zenject
 
         public void RegisterBindings(DiContainer container)
         {
-            Assert.That(typeof(TImpl).HasAttribute<SerializableAttribute>());
+            Assert.That(typeof(TImpl).HasAttribute<SerializableAttribute>(),
+                "Installer with type '{0}' is not Serializable", typeof(TImpl).GetPrettyName());
             Assert.IsNotNull(Impl);
 
             Impl.Container = container;

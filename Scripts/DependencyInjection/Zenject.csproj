@@ -60,7 +60,7 @@
     <Compile Include="Misc\IEntryPoint.cs" />
     <Compile Include="Misc\IKernel.cs" />
     <Compile Include="Misc\ITickable.cs" />
-    <Compile Include="Misc\KernelCustom.cs" />
+    <Compile Include="Misc\StandardKernel.cs" />
     <Compile Include="Misc\KernelInitializer.cs" />
     <Compile Include="Misc\ObjectGraphVisualizer.cs" />
     <Compile Include="Misc\ReflectionUtil.cs" />

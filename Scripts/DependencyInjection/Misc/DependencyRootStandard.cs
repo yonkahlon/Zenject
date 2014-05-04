@@ -9,14 +9,13 @@ namespace ModestTree.Zenject
         // just use [Inject] for the root classes
 
         [Inject]
-        IKernel _kernel = null;
+        UnityKernel _unityKernel = null;
 
         [Inject]
         EntryPointInitializer _initializer = null;
 
         public virtual void Start()
         {
-            Log.Info("Initializing dependency root");
             _initializer.Initialize();
         }
     }

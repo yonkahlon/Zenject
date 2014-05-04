@@ -26,10 +26,6 @@ namespace ModestTree.Zenject
 
         Vector3 _lastMousePosition;
 
-        [InjectNamed("TickPriority")]
-        [InjectOptional]
-        int? _tickPriority;
-
         int _lastWidth;
         int _lastHeight;
 
@@ -37,14 +33,6 @@ namespace ModestTree.Zenject
         {
             get;
             private set;
-        }
-
-        public int? TickPriority
-        {
-            get
-            {
-                return _tickPriority;
-            }
         }
 
         void Start()

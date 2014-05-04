@@ -5,26 +5,55 @@ namespace ModestTree.Zenject
 {
     public class SingletonProviderMap
     {
-        interface ISingletonLazyCreator
-        {
-            void IncRefCount();
-            void DecRefCount();
+        Dictionary<Type, SingletonLazyCreator> _creators = new Dictionary<Type, SingletonLazyCreator>();
+        DiContainer _container;
 
-            object GetInstance();
-            Type GetInstanceType();
+        public SingletonProviderMap(DiContainer container)
+        {
+            _container = container;
         }
 
-        class SingletonLazyCreator<T> : ISingletonLazyCreator
+        void RemoveCreator(Type instanceType)
+        {
+            _creators.RemoveWithConfirm(instanceType);
+        }
+
+        public ProviderBase CreateProvider<TConcrete>()
+        {
+            return CreateProvider(typeof(TConcrete));
+        }
+
+        public ProviderBase CreateProvider(Type concreteType)
+        {
+            SingletonLazyCreator creator;
+
+            if (!_creators.TryGetValue(concreteType, out creator))
+            {
+                creator = new SingletonLazyCreator(_container, this, concreteType);
+                _creators.Add(concreteType, creator);
+            }
+
+            creator.IncRefCount();
+
+            return new SingletonProvider(creator);
+        }
+
+        ////////////////////// Internal classes
+
+        class SingletonLazyCreator
         {
             int _referenceCount;
-            T _instance;
-            SingletonProviderMap _map;
+            object _instance;
+            Type _instanceType;
+            SingletonProviderMap _owner;
             DiContainer _container;
 
-            public SingletonLazyCreator(DiContainer container, SingletonProviderMap map)
+            public SingletonLazyCreator(
+                DiContainer container, SingletonProviderMap owner, Type instanceType)
             {
                 _container = container;
-                _map = map;
+                _owner = owner;
+                _instanceType = instanceType;
             }
 
             public void IncRefCount()
@@ -38,20 +67,20 @@ namespace ModestTree.Zenject
 
                 if (_referenceCount <= 0)
                 {
-                    _map.Remove<T>();
+                    _owner.RemoveCreator(_instanceType);
                 }
             }
 
             public Type GetInstanceType()
             {
-                return typeof(T);
+                return _instanceType;
             }
 
             public object GetInstance()
             {
                 if (_instance == null)
                 {
-                    _instance = Instantiator.Instantiate<T>(_container);
+                    _instance = Instantiator.Instantiate(_container, _instanceType);
                     Assert.That(_instance != null);
                 }
 
@@ -60,13 +89,13 @@ namespace ModestTree.Zenject
         }
 
         // NOTE: we need the provider seperate from the creator because
-        // if we return the same provider multiple times then the condition 
+        // if we return the same provider multiple times then the condition
         // will get over-written
-        private class SingletonProvider : ProviderBase
+        class SingletonProvider : ProviderBase
         {
-            ISingletonLazyCreator _creator;
+            SingletonLazyCreator _creator;
 
-            public SingletonProvider(ISingletonLazyCreator creator)
+            public SingletonProvider(SingletonLazyCreator creator)
             {
                 _creator = creator;
             }
@@ -85,36 +114,6 @@ namespace ModestTree.Zenject
             {
                 return _creator.GetInstance();
             }
-        }
-
-        private Dictionary<Type, ISingletonLazyCreator> _creators = new Dictionary<Type, ISingletonLazyCreator>();
-        private DiContainer _container;
-
-        public SingletonProviderMap(DiContainer container)
-        {
-            _container = container;
-        }
-
-        private void Remove<T>()
-        {
-            _creators.Remove(typeof(T));
-        }
-
-        public ProviderBase CreateProvider<TConcrete>()
-        {
-            var type = typeof (TConcrete);
-
-            ISingletonLazyCreator creator;
-
-            if (!_creators.TryGetValue(type, out creator))
-            {
-                creator = new SingletonLazyCreator<TConcrete>(_container, this);
-                _creators.Add(type, creator);
-            }
-
-            creator.IncRefCount();
-
-            return new SingletonProvider(creator);
         }
     }
 }
