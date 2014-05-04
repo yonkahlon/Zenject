@@ -43,7 +43,6 @@ namespace ModestTree
         const string SettingIdCategoryLabels = "ModestTree.Log.Category.";
 
         static bool _enabled = true;
-        static bool _hasInitializedStreams;
         static bool _isLoggingFromUnity;
 
         static Log()
@@ -55,6 +54,8 @@ namespace ModestTree
 #else
             InitFromConfig();
 #endif
+            InitStreams();
+
             _enabled = true;
         }
 
@@ -229,10 +230,6 @@ namespace ModestTree
 
         static void InitStreams()
         {
-            Assert.That(!_hasInitializedStreams);
-
-            _hasInitializedStreams = true;
-
             foreach (var streamTypeName in Config.GetAll<string>("Logging/LogStreams/" + Config.GetBuildConfiguration() + "/Stream"))
             {
                 var type = Type.GetType(streamTypeName);
@@ -262,7 +259,6 @@ namespace ModestTree
         public static void AddStream(ILogStream strm)
         {
             Assert.That(!_streams.Contains(strm));
-            Assert.That(_hasInitializedStreams);
 
             _streams.Add(strm);
         }
@@ -270,15 +266,12 @@ namespace ModestTree
         public static void RemoveStream(ILogStream strm)
         {
             Assert.That(_streams.Contains(strm));
-            Assert.That(_hasInitializedStreams);
 
             _streams.Remove(strm);
         }
 
         public static void OnUnityLog(string msg, string stackTraceStr, LogType type)
         {
-            Assert.That(_hasInitializedStreams);
-
             if (!Log.IsEnabled || _isLoggingFromUnity)
             {
                 return;
@@ -313,7 +306,18 @@ namespace ModestTree
                     {
                         StackTrace stackTrace = UnityStackTraceConverter.Convert(stackTraceStr);
 
-                        Assert.WithStackTrace(false, msg, stackTrace);
+                        try
+                        {
+                            // Now ignore all logs, even those that call Log.Info() directly
+                            // to avoid logging it twice from the assert
+                            Log.IsEnabled = false;
+                            Assert.WithStackTrace(false, msg, stackTrace);
+                        }
+                        finally
+                        {
+                            // Ensure this always gets reset using try-finally
+                            Log.IsEnabled = true;
+                        }
 
                         // The assert would normally trigger this anyway but won't in this case because of Log.IsEnabled set to false
                         InternalWrite(new LogMessageInfo(LogLevel.Error) { Category = "Unity", Message = msg, StackTrace = stackTrace });
@@ -417,7 +421,6 @@ namespace ModestTree
 
         static void InternalWrite(LogMessageInfo messageInfo)
         {
-            Assert.That(_hasInitializedStreams);
             Assert.That(messageInfo.Category != null);
             Assert.That(messageInfo.Message != null);
 
@@ -460,25 +463,24 @@ namespace ModestTree
             }
         }
 
+        public static void EnableHijackUnityLog()
+        {
+#if !TEST_BUILD
+            Application.RegisterLogCallback(OnUnityLog);
+#endif
+        }
+
         static void Write(LogMessageInfo messageInfo)
         {
-            if (!_hasInitializedStreams)
-            {
-                InitStreams();
-                Assert.That(_hasInitializedStreams);
-            }
-
             if (!Log.IsEnabled)
             {
                 // avoid infinite loops
                 return;
             }
 
-#if !TEST_BUILD
             // Ensure this is always the case
             // in case other code tries to steal it
-            Application.RegisterLogCallback(OnUnityLog);
-#endif
+            EnableHijackUnityLog();
 
             try
             {
