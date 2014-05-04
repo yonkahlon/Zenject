@@ -25,7 +25,7 @@ namespace ModestTree.Zenject
             foreach (var entry in graph)
             {
                 // ignore these to clean up the graph
-                if (entry.Key == typeof(EntryPointInitializer))
+                if (entry.Key == typeof(InitializableHandler))
                 {
                     continue;
                 }

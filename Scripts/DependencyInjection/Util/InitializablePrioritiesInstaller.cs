@@ -16,8 +16,10 @@ namespace ModestTree.Zenject
 
             foreach (var initializableType in Initializables)
             {
-                Assert.That(initializableType.DerivesFrom<IInitializable>());
-                _container.Bind<Tuple<Type, int>>().AsSingle(Tuple.New(initializableType, priorityCount));
+                Assert.That(initializableType.DerivesFrom<IInitializable>(),
+                    "Expected type '{0}' to derive from IInitializable", initializableType.GetPrettyName());
+
+                _container.Bind<Tuple<Type, int>>().AsSingle(Tuple.New(initializableType, priorityCount)).WhenInjectedInto<InitializableHandler>();
                 priorityCount++;
             }
         }

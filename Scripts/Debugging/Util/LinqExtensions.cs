@@ -155,5 +155,10 @@ namespace ModestTree
         {
             return list.Skip(1).FirstOrDefault();
         }
+
+        public static IEnumerable<T> FindDuplicates<T>(this IEnumerable<T> list)
+        {
+            return list.GroupBy(x => x).Where(x => x.Skip(1).Any()).Select(x => x.Key);
+        }
     }
 }

@@ -12,7 +12,7 @@ namespace ModestTree.Zenject
         UnityKernel _unityKernel = null;
 
         [Inject]
-        EntryPointInitializer _initializer = null;
+        InitializableHandler _initializer = null;
 
         public virtual void Start()
         {
