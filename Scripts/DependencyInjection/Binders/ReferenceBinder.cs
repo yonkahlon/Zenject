@@ -25,7 +25,7 @@ namespace ModestTree.Zenject
         public BindingConditionSetter ToSingle()
         {
             //Assert.That(!typeof(TContract).IsSubclassOf(typeof(MonoBehaviour)),
-            //    "Should not use AsSingle for Monobehaviours (when binding type " + typeof(TContract).GetPrettyName() + "), you probably want AsSingleFromPrefab or AsSingleGameObject");
+            //    "Should not use ToSingle for Monobehaviours (when binding type " + typeof(TContract).GetPrettyName() + "), you probably want AsSingleFromPrefab or AsSingleGameObject");
 
             return To(_singletonMap.CreateProvider<TContract>());
         }
@@ -33,7 +33,7 @@ namespace ModestTree.Zenject
         public BindingConditionSetter ToSingle<TConcrete>() where TConcrete : TContract
         {
             //Assert.That(!typeof(TConcrete).IsSubclassOf(typeof(MonoBehaviour)),
-            //    "Should not use AsSingle for Monobehaviours (when binding type " + typeof(TContract).GetPrettyName() + "), you probably want AsSingleFromPrefab or AsSingleGameObject");
+            //    "Should not use ToSingle for Monobehaviours (when binding type " + typeof(TContract).GetPrettyName() + "), you probably want AsSingleFromPrefab or AsSingleGameObject");
 
             return To(_singletonMap.CreateProvider<TConcrete>());
         }
@@ -51,7 +51,7 @@ namespace ModestTree.Zenject
         }
 
         // we can't have this method because of the necessary where() below, so in this case they have to specify TContract twice
-        //public BindingConditionSetter AsSingleFromPrefab(GameObject template)
+        //public BindingConditionSetter ToSingle(GameObject template)
 
         // Note: Here we assume that the contract is a component on the given prefab
         public BindingConditionSetter ToSingleFromPrefab<TConcrete>(GameObject template) where TConcrete : Component, TContract

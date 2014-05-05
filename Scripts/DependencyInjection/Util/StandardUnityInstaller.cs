@@ -11,7 +11,7 @@ namespace ModestTree.Zenject
 
             _container.Bind<StandardKernel>().ToSingle();
             // Uncomment this once you remove dependency in PlayerSandboxWrapper
-            //_container.Bind<StandardKernel>().AsTransient().WhenInjectedInto<UnityKernel>();
+            //_container.Bind<StandardKernel>().ToTransient().WhenInjectedInto<UnityKernel>();
 
             _container.Bind<InitializableHandler>().ToSingle();
             _container.Bind<ITickable>().ToLookup<UnityEventManager>();
