@@ -3,11 +3,18 @@ namespace ModestTree.Zenject
 {
     public abstract class ProviderBase : IDisposable
     {
-        private BindingCondition _condition = delegate { return true; };
+        BindingCondition _condition;
 
-        public BindingCondition GetCondition()
+        public bool AppliesTo(ResolveContext ctx)
         {
-            return _condition;
+            if (_condition == null)
+            {
+                // By default do not match if the target is named
+                // and we do not have a condition
+                return string.IsNullOrEmpty(ctx.Name);
+            }
+
+            return _condition(ctx);
         }
 
         public void SetCondition(BindingCondition condition)

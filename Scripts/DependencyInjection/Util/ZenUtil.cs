@@ -78,6 +78,38 @@ namespace ModestTree.Zenject
             return method.GetParameters();
         }
 
+        public static void InjectChildGameObjects(DiContainer container, Transform transform)
+        {
+            // Inject dependencies into child game objects
+            foreach (var childTransform in transform.GetComponentsInChildren<Transform>())
+            {
+                InjectGameObject(container, childTransform.gameObject);
+            }
+        }
+
+        public static void InjectGameObject(DiContainer container, GameObject gameObj)
+        {
+            var injecter = new PropertiesInjecter(container);
+
+            foreach (var component in gameObj.GetComponents<MonoBehaviour>())
+            {
+                // null if monobehaviour link is broken
+                if (component != null && component.enabled)
+                {
+                    using (container.PushLookup(component.GetType()))
+                    {
+                        injecter.Inject(component);
+                    }
+                }
+            }
+        }
+
+        public static void LoadLevel(string levelName, Action<DiContainer> extraBindings)
+        {
+            CompositionRoot.ExtraBindingsLookup = extraBindings;
+            Application.LoadLevel(levelName);
+        }
+
         public class InjectInfo
         {
             public bool Optional;

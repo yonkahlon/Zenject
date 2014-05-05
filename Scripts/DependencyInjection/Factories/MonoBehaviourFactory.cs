@@ -14,7 +14,7 @@ namespace ModestTree.Zenject
 
         public TContract Create<TContract>(GameObject gameObject) where TContract : Component
         {
-            using (new LookupInProgressAdder(_container, typeof(TContract)))
+            using (_container.PushLookup(typeof(TContract)))
             {
                 var injecter = new PropertiesInjecter(_container);
 

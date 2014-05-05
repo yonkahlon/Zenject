@@ -31,9 +31,7 @@ namespace ModestTree.Zenject
         public DiContainer()
         {
             _singletonMap = new SingletonProviderMap(this);
-
             Bind<DiContainer>().AsSingle(this);
-            Bind<GameObjectInstantiator>().AsSingle();
         }
 
         internal string GetCurrentObjectGraph()
@@ -69,6 +67,12 @@ namespace ModestTree.Zenject
         public CustomScope CreateScope()
         {
             return new CustomScope(this, _singletonMap);
+        }
+
+        // See comment in LookupInProgressAdder
+        internal LookupInProgressAdder PushLookup(Type type)
+        {
+            return new LookupInProgressAdder(this, type);
         }
 
         public void RegisterProvider<TContract>(ProviderBase provider)
@@ -129,7 +133,7 @@ namespace ModestTree.Zenject
             List<ProviderBase> providers;
             if (_providers.TryGetValue(contract, out providers))
             {
-                foreach (var provider in providers.Where(x => x.GetCondition()(context)))
+                foreach (var provider in providers.Where(x => x.AppliesTo(context)))
                 {
                     instances.Add(provider.GetInstance());
                 }
@@ -152,7 +156,7 @@ namespace ModestTree.Zenject
                 return false;
             }
 
-            return providers.Where(x => x.GetCondition()(context)).HasAtLeast(1);
+            return providers.Where(x => x.AppliesTo(context)).HasAtLeast(1);
         }
 
         public bool HasBinding<TContract>()
@@ -188,7 +192,7 @@ namespace ModestTree.Zenject
                 // TODO: fix this to work with providers that have conditions
                 var context = new ResolveContext();
 
-                return (from provider in _providers[contract] where provider.GetCondition()(context) select provider.GetInstanceType()).ToList();
+                return (from provider in _providers[contract] where provider.AppliesTo(context) select provider.GetInstanceType()).ToList();
             }
 
             return new List<Type> {};

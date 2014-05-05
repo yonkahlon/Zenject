@@ -16,7 +16,7 @@ namespace ModestTree.Zenject
         public static object Instantiate(
             DiContainer container, Type concreteType, params object[] constructorArgs)
         {
-            using (new LookupInProgressAdder(container, concreteType))
+            using (container.PushLookup(concreteType))
             {
                 return InstantiateInternal(container, concreteType, constructorArgs);
             }

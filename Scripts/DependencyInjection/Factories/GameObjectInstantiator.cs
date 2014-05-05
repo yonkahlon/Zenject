@@ -36,7 +36,7 @@ namespace ModestTree.Zenject
         // Note: gameobject here is not a prefab prototype, it is an instance
         public Component AddMonobehaviour(Type behaviourType, GameObject gameObject, params object[] args)
         {
-            using (new LookupInProgressAdder(_container, behaviourType))
+            using (_container.PushLookup(behaviourType))
             {
                 List<object> additional = new List<object>();
                 if (args != null)
@@ -106,7 +106,7 @@ namespace ModestTree.Zenject
         {
             Assert.That(template != null, "Null template found when instantiating game object");
 
-            using (new LookupInProgressAdder(_container, typeof(T)))
+            using (_container.PushLookup(typeof(T)))
             {
                 var obj = Instantiate(template);
 
@@ -131,7 +131,7 @@ namespace ModestTree.Zenject
 
             var component = gameObj.AddComponent(type);
 
-            using (new LookupInProgressAdder(_container, type))
+            using (_container.PushLookup(type))
             {
                 var injecter = new PropertiesInjecter(_container);
                 injecter.Inject(component);
