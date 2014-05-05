@@ -11,7 +11,7 @@ namespace ModestTree.Zenject
             {
                 // By default do not match if the target is named
                 // and we do not have a condition
-                return string.IsNullOrEmpty(ctx.Name);
+                return ctx.Identifier == null;
             }
 
             return _condition(ctx);

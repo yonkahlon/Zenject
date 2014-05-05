@@ -58,7 +58,7 @@ namespace ModestTree.Zenject
                     {
                         Target = concreteType,
                         FieldName = paramInfo.Name,
-                        Name = injectInfo == null ? null : injectInfo.Name,
+                        Identifier = injectInfo == null ? null : injectInfo.Identifier,
                         Parents = new List<Type>(container.LookupsInProgress)
                     };
 

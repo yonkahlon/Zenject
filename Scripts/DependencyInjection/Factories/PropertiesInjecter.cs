@@ -58,7 +58,7 @@ namespace ModestTree.Zenject
                 {
                     Target = injectable.GetType(),
                     FieldName = fieldInfo.Name,
-                    Name = injectInfo.Name,
+                    Identifier = injectInfo.Identifier,
                     Parents = parentDependencies,
                     TargetInstance = injectable,
                 };

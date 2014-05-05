@@ -35,10 +35,10 @@ namespace ModestTree.Zenject
                 {
                     info.Optional = true;
                 }
-                else if (attr.GetType() == typeof(InjectNamedAttribute))
+                else if (attr.GetType() == typeof(InjectAttribute))
                 {
-                    var namedAttr = (InjectNamedAttribute)attr;
-                    info.Name = namedAttr.Name;
+                    var injectAttr = (InjectAttribute)attr;
+                    info.Identifier = injectAttr.Identifier;
                 }
             }
 
@@ -119,7 +119,7 @@ namespace ModestTree.Zenject
         public class InjectInfo
         {
             public bool Optional;
-            public string Name;
+            public object Identifier;
         }
     }
 }

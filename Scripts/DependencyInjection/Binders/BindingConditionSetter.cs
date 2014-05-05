@@ -9,7 +9,7 @@ namespace ModestTree.Zenject
         public Type Target;
         public object TargetInstance;
         public string FieldName;
-        public string Name;
+        public object Identifier;
         public List<Type> Parents;
     }
 
@@ -41,17 +41,17 @@ namespace ModestTree.Zenject
 
         public void WhenInjectedInto<T>()
         {
-            _provider.SetCondition(r => r.Target == typeof (T));
+            _provider.SetCondition(r => r.Target == typeof(T));
         }
 
-        public void WhenInjectedInto<T>(string name)
+        public void WhenInjectedInto<T>(object identifier)
         {
-            _provider.SetCondition(r => r.Target == typeof(T) && r.Name == name);
+            _provider.SetCondition(r => r.Target == typeof(T) && r.Identifier.Equals(identifier));
         }
 
-        public void WhenInjectedInto(string name)
+        public void WhenInjectedInto(object identifier)
         {
-            _provider.SetCondition(r => r.Name == name);
+            _provider.SetCondition(r => r.Identifier.Equals(identifier));
         }
     }
 }
