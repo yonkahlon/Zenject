@@ -81,8 +81,8 @@ namespace ModestTree.Zenject
                     if (param == null && !isOptional)
                     {
                         throw new ZenjectResolveException(
-                            "Unable to find parameter with type '" + paramInfo.ParameterType.GetPrettyName() +
-                            "' while constructing '" + concreteType.GetPrettyName() + "'.\nObject graph:\n" + container.GetCurrentObjectGraph());
+                            "Unable to find parameter with type '{0}' while constructing '{1}'.\nObject graph:\n{2}",
+                            paramInfo.ParameterType.GetPrettyName(), concreteType.GetPrettyName(), container.GetCurrentObjectGraph());
                     }
 
                     parameters.Add(param);
@@ -98,7 +98,7 @@ namespace ModestTree.Zenject
             catch (Exception e)
             {
                 throw new ZenjectGeneralException(
-                    "Error occurred while instantiating object with type '" + concreteType.GetPrettyName() + "'", e);
+                    e, "Error occurred while instantiating object with type '" + concreteType.GetPrettyName() + "'");
             }
 
             FieldsInjecter.Inject(container, newObj, extrasList, true);

@@ -26,7 +26,7 @@ namespace ModestTree.Zenject
             if (component == null)
             {
                 throw new ZenjectResolveException(
-                    "Could not find component '" + typeof(TContract).GetPrettyName() + "' when creating game object from prefab");
+                    "Could not find component '{0}' when creating game object from prefab", typeof(TContract).GetPrettyName());
             }
 
             return component;

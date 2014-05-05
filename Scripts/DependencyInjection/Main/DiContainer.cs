@@ -230,7 +230,7 @@ namespace ModestTree.Zenject
                 if (!optional)
                 {
                     throw new ZenjectResolveException(
-                        "Unable to resolve type '" + contract + "'. \nObject graph:\n" + GetCurrentObjectGraph());
+                        "Unable to resolve type '{0}'. \nObject graph:\n{1}", contract.GetPrettyName(), GetCurrentObjectGraph());
                 }
 
                 return null;
@@ -241,7 +241,8 @@ namespace ModestTree.Zenject
                 if (!optional)
                 {
                     throw new ZenjectResolveException(
-                        "Found multiple matches when only one was expected for type '" + contract + "'. \nObject graph:\n" + GetCurrentObjectGraph());
+                        "Found multiple matches when only one was expected for type '{0}'. \nObject graph:\n {1}",
+                            contract.GetPrettyName(), GetCurrentObjectGraph());
                 }
 
                 return null;

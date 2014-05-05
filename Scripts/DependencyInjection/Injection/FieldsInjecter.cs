@@ -68,10 +68,10 @@ namespace ModestTree.Zenject
             if (shouldUseAll && !additionalCopy.IsEmpty())
             {
                 throw new ZenjectResolveException(
-                    String.Format("Passed unnecessary parameters when injecting into type '{0}'. \nExtra Parameters: {1}\nObject graph:\n{2}",
+                    "Passed unnecessary parameters when injecting into type '{0}'. \nExtra Parameters: {1}\nObject graph:\n{2}",
                         injectable.GetType().GetPrettyName(),
                         String.Join(",", additionalCopy.Select(x => x.GetType().GetPrettyName()).ToArray()),
-                        container.GetCurrentObjectGraph()));
+                        container.GetCurrentObjectGraph());
             }
         }
 
@@ -101,9 +101,8 @@ namespace ModestTree.Zenject
             if (!isOptional)
             {
                 throw new ZenjectResolveException(
-                    "Unable to find field with type '" + fieldInfo.FieldType +
-                    "' when injecting dependencies into '" + injectable +
-                    "'. \nObject graph:\n" + container.GetCurrentObjectGraph());
+                    "Unable to find field with type '{0}' when injecting dependencies into '{1}'. \nObject graph:\n {2}",
+                    fieldInfo.FieldType, injectable, container.GetCurrentObjectGraph());
             }
 
             return null;
