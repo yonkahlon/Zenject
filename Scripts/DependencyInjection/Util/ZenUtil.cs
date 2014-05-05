@@ -110,6 +110,12 @@ namespace ModestTree.Zenject
             Application.LoadLevel(levelName);
         }
 
+        public static void LoadLevelAdditive(string levelName, Action<DiContainer> extraBindings)
+        {
+            CompositionRoot.ExtraBindingsLookup = extraBindings;
+            Application.LoadLevelAdditive(levelName);
+        }
+
         public class InjectInfo
         {
             public bool Optional;
