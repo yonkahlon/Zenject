@@ -3,22 +3,23 @@ using UnityEngine;
 
 namespace ModestTree.Zenject
 {
+    // Instantiate via prefab
     public class GameObjectFactory<TContract> : IFactory<TContract> where TContract : Component
     {
         DiContainer _container;
-        GameObject _template;
+        GameObject _prefab;
         GameObjectInstantiator _instantiator;
 
-        public GameObjectFactory(DiContainer container, GameObject template)
+        public GameObjectFactory(DiContainer container, GameObject prefab)
         {
-            _template = template;
+            _prefab = prefab;
             _container = container;
             _instantiator = _container.Resolve<GameObjectInstantiator>();
         }
 
         public TContract Create(params object[] constructorArgs)
         {
-            var gameObj = _instantiator.Instantiate(_template, constructorArgs);
+            var gameObj = _instantiator.Instantiate(_prefab, constructorArgs);
 
             var component = gameObj.GetComponentInChildren<TContract>();
 

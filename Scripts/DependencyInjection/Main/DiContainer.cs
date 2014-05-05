@@ -259,12 +259,12 @@ namespace ModestTree.Zenject
         {
             var dependencies = new List<Type>();
 
-            foreach (var param in ZenUtil.GetConstructorDependencies(contract))
+            foreach (var param in InjectionInfoHelper.GetConstructorDependencies(contract))
             {
                 dependencies.Add(param.ParameterType);
             }
 
-            foreach (var fieldInfo in ZenUtil.GetFieldDependencies(contract))
+            foreach (var fieldInfo in InjectionInfoHelper.GetFieldDependencies(contract))
             {
                 dependencies.Add(fieldInfo.FieldType);
             }

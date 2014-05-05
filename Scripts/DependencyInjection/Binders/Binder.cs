@@ -30,7 +30,7 @@ namespace ModestTree.Zenject
             return new BindingConditionSetter(provider);
         }
 
-        public BindingConditionSetter ToMethod(MethodProvider<TContract>.Method method)
+        public BindingConditionSetter ToMethod(Func<DiContainer, TContract> method)
         {
             return To(new MethodProvider<TContract>(method, _container));
         }

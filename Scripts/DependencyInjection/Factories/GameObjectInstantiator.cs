@@ -4,12 +4,14 @@ using UnityEngine;
 
 namespace ModestTree.Zenject
 {
+    // Helper to instantiate game objects and also inject
+    // any dependencies they have
     public class GameObjectInstantiator
     {
         public event Action<GameObject> GameObjectInstantiated = delegate { };
-        readonly DiContainer _container;
 
-        CompositionRoot _compRoot;
+        readonly DiContainer _container;
+        readonly CompositionRoot _compRoot;
 
         public GameObjectInstantiator(DiContainer container)
         {
@@ -36,6 +38,8 @@ namespace ModestTree.Zenject
         // Note: gameobject here is not a prefab prototype, it is an instance
         public Component AddMonobehaviour(Type behaviourType, GameObject gameObject, params object[] args)
         {
+            var component = gameObject.AddComponent(behaviourType);
+
             using (_container.PushLookup(behaviourType))
             {
                 List<object> additional = new List<object>();
@@ -44,10 +48,7 @@ namespace ModestTree.Zenject
                     additional.AddRange(args);
                 }
 
-                var injecter = new PropertiesInjecter(_container, additional);
-
-                var component = gameObject.AddComponent(behaviourType);
-                injecter.Inject(component);
+                FieldsInjecter.Inject(_container, component, additional);
 
                 return component;
             }
@@ -73,17 +74,17 @@ namespace ModestTree.Zenject
                 additional.AddRange(args);
             }
 
-            var injecter = new PropertiesInjecter(_container, additional);
             var components = gameObj.GetComponentsInChildren<MonoBehaviour>();
-            foreach (var t in components)
+
+            foreach (var component in components)
             {
-                if (t == null)
+                if (component == null)
                 {
                     throw new ZenjectGeneralException(
                         "Undefined monobehaviour in template '" + template.name + "'");
                 }
 
-                injecter.Inject(t);
+                FieldsInjecter.Inject(_container, component, additional);
             }
 
             GameObjectInstantiated(gameObj);
@@ -133,8 +134,7 @@ namespace ModestTree.Zenject
 
             using (_container.PushLookup(type))
             {
-                var injecter = new PropertiesInjecter(_container);
-                injecter.Inject(component);
+                FieldsInjecter.Inject(_container, component);
             }
 
             GameObjectInstantiated(gameObj);

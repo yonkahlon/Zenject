@@ -26,7 +26,7 @@ namespace ModestTree.Zenject
             DiContainer container, Type concreteType, params object[] constructorArgs)
         {
             ConstructorInfo method;
-            var parameterInfos = ZenUtil.GetConstructorDependencies(concreteType, out method);
+            var parameterInfos = InjectionInfoHelper.GetConstructorDependencies(concreteType, out method);
 
             var parameters = new List<object>();
             var extrasList = new List<object>(constructorArgs);
@@ -52,7 +52,7 @@ namespace ModestTree.Zenject
 
                 if (!found)
                 {
-                    var injectInfo = ZenUtil.GetInjectInfo(paramInfo);
+                    var injectInfo = InjectionInfoHelper.GetInjectInfo(paramInfo);
 
                     var context = new ResolveContext()
                     {
@@ -101,14 +101,7 @@ namespace ModestTree.Zenject
                     "Error occurred while instantiating object with type '" + concreteType.GetPrettyName() + "'", e);
             }
 
-            var injecter = new PropertiesInjecter(container, extrasList);
-            injecter.Inject(newObj);
-
-            if (!extrasList.IsEmpty())
-            {
-                throw new ZenjectResolveException(
-                    "Passed unnecessary parameters when constructing '" + concreteType + "'. \nObject graph:\n" + container.GetCurrentObjectGraph());
-            }
+            FieldsInjecter.Inject(container, newObj, extrasList);
 
             return newObj;
         }

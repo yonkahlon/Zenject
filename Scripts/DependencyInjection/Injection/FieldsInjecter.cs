@@ -7,43 +7,35 @@ using System.Text;
 namespace ModestTree.Zenject
 {
     // Iterate over fields/properties on a given object and inject any with the [Inject] attribute
-    public class PropertiesInjecter
+    public class FieldsInjecter
     {
-        DiContainer _container;
-        List<object> _additional;
-
-        public PropertiesInjecter(DiContainer container)
+        public static void Inject(DiContainer container, object injectable)
         {
-            _container = container;
-            _additional = new List<object>();
+            Inject(container, injectable, new List<object>());
         }
 
-        public PropertiesInjecter(DiContainer container, List<object> additional)
-        {
-            _container = container;
-            _additional = additional;
-        }
-
-        public void Inject(object injectable)
+        public static void Inject(DiContainer container, object injectable, List<object> additional)
         {
             Assert.That(injectable != null);
 
-            var fields = ZenUtil.GetFieldDependencies(injectable.GetType());
+            var fields = InjectionInfoHelper.GetFieldDependencies(injectable.GetType());
 
-            var parentDependencies = new List<Type>(_container.LookupsInProgress);
+            var parentDependencies = new List<Type>(container.LookupsInProgress);
+
+            var additionalCopy = additional.ToList();
 
             foreach (var fieldInfo in fields)
             {
-                var injectInfo = ZenUtil.GetInjectInfo(fieldInfo);
+                var injectInfo = InjectionInfoHelper.GetInjectInfo(fieldInfo);
                 Assert.That(injectInfo != null);
 
                 bool foundAdditional = false;
-                foreach (object obj in _additional)
+                foreach (object obj in additionalCopy)
                 {
                     if (fieldInfo.FieldType.IsAssignableFrom(obj.GetType()))
                     {
                         fieldInfo.SetValue(injectable, obj);
-                        _additional.Remove(obj);
+                        additionalCopy.Remove(obj);
                         foundAdditional = true;
                         break;
                     }
@@ -63,21 +55,29 @@ namespace ModestTree.Zenject
                     TargetInstance = injectable,
                 };
 
-                var valueObj = ResolveField(fieldInfo, context, injectInfo, injectable);
+                var valueObj = ResolveField(container, fieldInfo, context, injectInfo, injectable);
 
                 fieldInfo.SetValue(injectable, valueObj);
             }
+
+            if (!additionalCopy.IsEmpty())
+            {
+                throw new ZenjectResolveException(
+                    "Passed unnecessary parameters when injecting into type '" + injectable.GetType().GetPrettyName()
+                    + "'. \nObject graph:\n" + container.GetCurrentObjectGraph());
+            }
         }
 
-        object ResolveField(
+        static object ResolveField(
+            DiContainer container,
             FieldInfo fieldInfo, ResolveContext context,
-            ZenUtil.InjectInfo injectInfo, object injectable)
+            InjectInfo injectInfo, object injectable)
         {
             var desiredType = fieldInfo.FieldType;
 
-            if (_container.HasBinding(desiredType, context))
+            if (container.HasBinding(desiredType, context))
             {
-                return _container.Resolve(desiredType, context);
+                return container.Resolve(desiredType, context);
             }
 
             // Dependencies that are lists are only optional if declared as such using the inject attribute
@@ -88,7 +88,7 @@ namespace ModestTree.Zenject
             {
                 var subType = desiredType.GetGenericArguments().Single();
 
-                return _container.ResolveMany(subType, context, isOptional);
+                return container.ResolveMany(subType, context, isOptional);
             }
 
             if (!isOptional)
@@ -96,7 +96,7 @@ namespace ModestTree.Zenject
                 throw new ZenjectResolveException(
                     "Unable to find field with type '" + fieldInfo.FieldType +
                     "' when injecting dependencies into '" + injectable +
-                    "'. \nObject graph:\n" + _container.GetCurrentObjectGraph());
+                    "'. \nObject graph:\n" + container.GetCurrentObjectGraph());
             }
 
             return null;

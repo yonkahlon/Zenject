@@ -5,6 +5,7 @@ using System.Security.Permissions;
 
 namespace ModestTree.Zenject
 {
+    // Instantiate given concrete class
     public class Factory<TContract, TConcrete> : IFactory<TContract> where TConcrete : TContract
     {
         readonly DiContainer _container;
@@ -33,6 +34,7 @@ namespace ModestTree.Zenject
         }
     }
 
+    // Instantiate given contract class
     public class Factory<TContract> : IFactory<TContract>
     {
         readonly DiContainer _container;
@@ -59,6 +61,7 @@ namespace ModestTree.Zenject
 
             if (typeof(IInitializable).IsAssignableFrom(_concreteType))
             {
+                // See comment above
                 ((IInitializable)obj).Initialize();
             }
 

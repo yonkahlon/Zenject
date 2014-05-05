@@ -45,7 +45,6 @@ namespace ModestTree.Zenject
             _container.Bind<CompositionRoot>().ToSingle(this);
 
             // Init default dependencies
-            _container.Bind<MonoBehaviourFactory>().ToSingle();
             _container.Bind<UnityEventManager>().ToSingleGameObject();
             _container.Bind<GameObjectInstantiator>().ToSingle();
 
@@ -69,7 +68,7 @@ namespace ModestTree.Zenject
 
         void Resolve()
         {
-            ZenUtil.InjectChildGameObjects(_container, transform);
+            InjectionHelper.InjectChildGameObjects(_container, transform);
 
             if (_container.HasBinding<IDependencyRoot>())
             {
