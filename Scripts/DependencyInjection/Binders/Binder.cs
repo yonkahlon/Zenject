@@ -14,25 +14,25 @@ namespace ModestTree.Zenject
             _singletonMap = singletonMap;
         }
 
-        public BindingConditionSetter AsLookup<TConcrete>() where TConcrete : TContract
+        public BindingConditionSetter ToLookup<TConcrete>() where TConcrete : TContract
         {
-            return AsMethod(c => c.Resolve<TConcrete>());
+            return ToMethod(c => c.Resolve<TConcrete>());
         }
 
-        public BindingConditionSetter AsFactory<TConcrete>() where TConcrete : IFactory<TContract>
+        public BindingConditionSetter ToFactory<TConcrete>() where TConcrete : IFactory<TContract>
         {
-            return AsMethod(c => c.Resolve<TConcrete>().Create());
+            return ToMethod(c => c.Resolve<TConcrete>().Create());
         }
 
-        public virtual BindingConditionSetter Bind(ProviderBase provider)
+        public virtual BindingConditionSetter To(ProviderBase provider)
         {
             _container.RegisterProvider<TContract>(provider);
             return new BindingConditionSetter(provider);
         }
 
-        public BindingConditionSetter AsMethod(MethodProvider<TContract>.Method method)
+        public BindingConditionSetter ToMethod(MethodProvider<TContract>.Method method)
         {
-            return Bind(new MethodProvider<TContract>(method, _container));
+            return To(new MethodProvider<TContract>(method, _container));
         }
     }
 }

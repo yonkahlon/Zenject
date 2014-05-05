@@ -42,12 +42,12 @@ namespace ModestTree.Zenject
             _container = new DiContainer();
 
             // Note: This has to go first
-            _container.Bind<CompositionRoot>().AsSingle(this);
+            _container.Bind<CompositionRoot>().ToSingle(this);
 
             // Init default dependencies
-            _container.Bind<MonoBehaviourFactory>().AsSingle();
-            _container.Bind<UnityEventManager>().AsSingleGameObject();
-            _container.Bind<GameObjectInstantiator>().AsSingle();
+            _container.Bind<MonoBehaviourFactory>().ToSingle();
+            _container.Bind<UnityEventManager>().ToSingleGameObject();
+            _container.Bind<GameObjectInstantiator>().ToSingle();
 
             if (_extraBindingLookup != null)
             {

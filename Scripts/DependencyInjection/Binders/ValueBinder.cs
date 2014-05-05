@@ -10,14 +10,14 @@ namespace ModestTree.Zenject
         {
         }
 
-        public BindingConditionSetter As(TContract value)
+        public BindingConditionSetter To(TContract value)
         {
-            return Bind(new SingletonInstanceProvider(value));
+            return To(new SingletonInstanceProvider(value));
         }
 
-        public override BindingConditionSetter Bind(ProviderBase provider)
+        public override BindingConditionSetter To(ProviderBase provider)
         {
-            var conditionSetter = base.Bind(provider);
+            var conditionSetter = base.To(provider);
 
             // Also bind to nullable primitives
             // this is useful so that we can have optional primitive dependencies

@@ -5,7 +5,7 @@ namespace ModestTree.Zenject
     {
         BindingCondition _condition;
 
-        public bool AppliesTo(ResolveContext ctx)
+        public bool Matches(ResolveContext ctx)
         {
             if (_condition == null)
             {

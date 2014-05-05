@@ -13,7 +13,7 @@ namespace ModestTree
         public static BindingConditionSetter AsMock<TContract>(this ReferenceBinder<TContract> binder) where TContract : class
         {
 #if UNITY_EDITOR && !UNITY_WEBPLAYER
-            return binder.Bind(new SingletonInstanceProvider(Mock.Of<TContract>()));
+            return binder.To(new SingletonInstanceProvider(Mock.Of<TContract>()));
 #else
             Assert.That(false, "The use of 'AsMock' in web builds is not supported");
             return null;

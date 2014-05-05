@@ -7,16 +7,14 @@ namespace ModestTree.Zenject
         // Install basic functionality for most unity apps
         public override void RegisterBindings()
         {
-            _container.Bind<UnityKernel>().AsSingleGameObject();
+            _container.Bind<UnityKernel>().ToSingleGameObject();
 
-            _container.Bind<StandardKernel>().AsSingle();
+            _container.Bind<StandardKernel>().ToSingle();
             // Uncomment this once you remove dependency in PlayerSandboxWrapper
             //_container.Bind<StandardKernel>().AsTransient().WhenInjectedInto<UnityKernel>();
 
-            _container.Bind<InitializableHandler>().AsSingle();
-            _container.Bind<ITickable>().AsLookup<UnityEventManager>();
+            _container.Bind<InitializableHandler>().ToSingle();
+            _container.Bind<ITickable>().ToLookup<UnityEventManager>();
         }
     }
 }
-
-

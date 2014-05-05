@@ -31,7 +31,7 @@ namespace ModestTree.Zenject
         public DiContainer()
         {
             _singletonMap = new SingletonProviderMap(this);
-            Bind<DiContainer>().AsSingle(this);
+            Bind<DiContainer>().ToSingle(this);
         }
 
         internal string GetCurrentObjectGraph()
@@ -46,12 +46,12 @@ namespace ModestTree.Zenject
         // This occurs so often that we might as well have a convenience method
         public BindingConditionSetter BindFactory<TContract>()
         {
-            return Bind<IFactory<TContract>>().AsSingle<Factory<TContract>>();
+            return Bind<IFactory<TContract>>().ToSingle<Factory<TContract>>();
         }
 
         public BindingConditionSetter BindFactory<TContract, TConcrete>() where TConcrete : TContract
         {
-            return Bind<IFactory<TContract>>().AsSingle<Factory<TContract, TConcrete>>();
+            return Bind<IFactory<TContract>>().ToSingle<Factory<TContract, TConcrete>>();
         }
 
         public ValueBinder<TContract> BindValue<TContract>() where TContract : struct
@@ -133,7 +133,7 @@ namespace ModestTree.Zenject
             List<ProviderBase> providers;
             if (_providers.TryGetValue(contract, out providers))
             {
-                foreach (var provider in providers.Where(x => x.AppliesTo(context)))
+                foreach (var provider in providers.Where(x => x.Matches(context)))
                 {
                     instances.Add(provider.GetInstance());
                 }
@@ -156,7 +156,7 @@ namespace ModestTree.Zenject
                 return false;
             }
 
-            return providers.Where(x => x.AppliesTo(context)).HasAtLeast(1);
+            return providers.Where(x => x.Matches(context)).HasAtLeast(1);
         }
 
         public bool HasBinding<TContract>()
@@ -192,7 +192,7 @@ namespace ModestTree.Zenject
                 // TODO: fix this to work with providers that have conditions
                 var context = new ResolveContext();
 
-                return (from provider in _providers[contract] where provider.AppliesTo(context) select provider.GetInstanceType()).ToList();
+                return (from provider in _providers[contract] where provider.Matches(context) select provider.GetInstanceType()).ToList();
             }
 
             return new List<Type> {};
