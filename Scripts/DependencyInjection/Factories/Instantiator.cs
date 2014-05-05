@@ -101,7 +101,7 @@ namespace ModestTree.Zenject
                     "Error occurred while instantiating object with type '" + concreteType.GetPrettyName() + "'", e);
             }
 
-            FieldsInjecter.Inject(container, newObj, extrasList);
+            FieldsInjecter.Inject(container, newObj, extrasList, true);
 
             return newObj;
         }

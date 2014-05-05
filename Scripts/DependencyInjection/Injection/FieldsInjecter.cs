@@ -16,6 +16,11 @@ namespace ModestTree.Zenject
 
         public static void Inject(DiContainer container, object injectable, List<object> additional)
         {
+            Inject(container, injectable, additional, false);
+        }
+
+        public static void Inject(DiContainer container, object injectable, List<object> additional, bool shouldUseAll)
+        {
             Assert.That(injectable != null);
 
             var fields = InjectionInfoHelper.GetFieldDependencies(injectable.GetType());
@@ -60,11 +65,13 @@ namespace ModestTree.Zenject
                 fieldInfo.SetValue(injectable, valueObj);
             }
 
-            if (!additionalCopy.IsEmpty())
+            if (shouldUseAll && !additionalCopy.IsEmpty())
             {
                 throw new ZenjectResolveException(
-                    "Passed unnecessary parameters when injecting into type '" + injectable.GetType().GetPrettyName()
-                    + "'. \nObject graph:\n" + container.GetCurrentObjectGraph());
+                    String.Format("Passed unnecessary parameters when injecting into type '{0}'. \nExtra Parameters: {1}\nObject graph:\n{2}",
+                        injectable.GetType().GetPrettyName(),
+                        String.Join(",", additionalCopy.Select(x => x.GetType().GetPrettyName()).ToArray()),
+                        container.GetCurrentObjectGraph()));
             }
         }
 
