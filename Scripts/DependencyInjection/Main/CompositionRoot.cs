@@ -68,7 +68,7 @@ namespace ModestTree.Zenject
 
         void Resolve()
         {
-            InjectionHelper.InjectChildGameObjects(_container, transform);
+            InjectionHelper.InjectChildGameObjects(_container, gameObject);
 
             if (_container.HasBinding<IDependencyRoot>())
             {

@@ -11,15 +11,15 @@ namespace ModestTree.Zenject
     {
         public static void Inject(DiContainer container, object injectable)
         {
-            Inject(container, injectable, new List<object>());
+            Inject(container, injectable, Enumerable.Empty<object>());
         }
 
-        public static void Inject(DiContainer container, object injectable, List<object> additional)
+        public static void Inject(DiContainer container, object injectable, IEnumerable<object> additional)
         {
             Inject(container, injectable, additional, false);
         }
 
-        public static void Inject(DiContainer container, object injectable, List<object> additional, bool shouldUseAll)
+        public static void Inject(DiContainer container, object injectable, IEnumerable<object> additional, bool shouldUseAll)
         {
             Assert.That(injectable != null);
 

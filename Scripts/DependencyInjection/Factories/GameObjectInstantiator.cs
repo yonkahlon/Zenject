@@ -29,29 +29,20 @@ namespace ModestTree.Zenject
 
         // Add a monobehaviour to an existing game object
         // Note: gameobject here is not a prefab prototype, it is an instance
-        public TContract AddMonobehaviour<TContract>(GameObject gameObject, params object[] args) where TContract : Component
+        public TContract AddMonobehaviour<TContract>(GameObject gameObject, params object[] args) where TContract : MonoBehaviour
         {
             return (TContract)AddMonobehaviour(typeof(TContract), gameObject, args);
         }
 
         // Add a monobehaviour to an existing game object, using Type rather than a generic
         // Note: gameobject here is not a prefab prototype, it is an instance
-        public Component AddMonobehaviour(Type behaviourType, GameObject gameObject, params object[] args)
+        public MonoBehaviour AddMonobehaviour(
+            Type behaviourType, GameObject gameObject, params object[] args)
         {
-            var component = gameObject.AddComponent(behaviourType);
-
-            using (_container.PushLookup(behaviourType))
-            {
-                List<object> additional = new List<object>();
-                if (args != null)
-                {
-                    additional.AddRange(args);
-                }
-
-                FieldsInjecter.Inject(_container, component, additional);
-
-                return component;
-            }
+            Assert.That(behaviourType.DerivesFrom<MonoBehaviour>());
+            var monoBehaviour = (MonoBehaviour)gameObject.AddComponent(behaviourType);
+            InjectionHelper.InjectMonoBehaviour(_container, monoBehaviour, args);
+            return monoBehaviour;
         }
 
         // Create a new game object from a given prefab
@@ -68,24 +59,7 @@ namespace ModestTree.Zenject
 
             gameObj.SetActive(true);
 
-            List<object> additional = new List<object>();
-            if (args != null)
-            {
-                additional.AddRange(args);
-            }
-
-            var components = gameObj.GetComponentsInChildren<MonoBehaviour>();
-
-            foreach (var component in components)
-            {
-                if (component == null)
-                {
-                    throw new ZenjectGeneralException(
-                        "Undefined monobehaviour in template '" + template.name + "'");
-                }
-
-                FieldsInjecter.Inject(_container, component, additional);
-            }
+            InjectionHelper.InjectChildGameObjects(_container, gameObj, args);
 
             GameObjectInstantiated(gameObj);
 
@@ -107,34 +81,29 @@ namespace ModestTree.Zenject
         {
             Assert.That(template != null, "Null template found when instantiating game object");
 
-            using (_container.PushLookup(typeof(T)))
+            var obj = Instantiate(template);
+
+            var component = obj.GetComponentInChildren<T>();
+
+            if (component == null)
             {
-                var obj = Instantiate(template);
-
-                var component = obj.GetComponentInChildren<T>();
-
-                if (component == null)
-                {
-                    throw new ZenjectResolveException(
-                        "Could not find component with type '{0}' when instantiating template", typeof(T));
-                }
-
-                return component;
+                throw new ZenjectResolveException(
+                    "Could not find component with type '{0}' when instantiating template", typeof(T));
             }
+
+            return component;
         }
 
         public object Instantiate(Type type, string name)
         {
-            Assert.That(typeof(Component).IsAssignableFrom(type));
-
             var gameObj = new GameObject(name);
             gameObj.transform.parent = _compRoot.transform;
 
             var component = gameObj.AddComponent(type);
 
-            using (_container.PushLookup(type))
+            if (type.DerivesFrom(typeof(MonoBehaviour)))
             {
-                FieldsInjecter.Inject(_container, component);
+                InjectionHelper.InjectMonoBehaviour(_container, (MonoBehaviour)component);
             }
 
             GameObjectInstantiated(gameObj);
