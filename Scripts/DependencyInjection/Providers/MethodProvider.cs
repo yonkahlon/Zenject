@@ -22,9 +22,9 @@ namespace ModestTree.Zenject
             var obj = _method(_container);
 
             Assert.That(obj != null, () =>
-                "Method provider returned null when looking up type '" +
-                typeof(T).GetPrettyName() + "'. \nObject graph:\n" +
-                _container.GetCurrentObjectGraph());
+                String.Format(
+                    "Method provider returned null when looking up type '{0}'. \nObject graph:\n{1}",
+                    typeof(T).GetPrettyName(), _container.GetCurrentObjectGraph()));
 
             return obj;
         }

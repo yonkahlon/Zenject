@@ -13,10 +13,15 @@ namespace ModestTree.Zenject
     public class DiContainer
     {
         readonly Dictionary<Type, List<ProviderBase>> _providers = new Dictionary<Type, List<ProviderBase>>();
-
         readonly SingletonProviderMap _singletonMap;
 
         Stack<Type> _lookupsInProgress = new Stack<Type>();
+
+        public DiContainer()
+        {
+            _singletonMap = new SingletonProviderMap(this);
+            Bind<DiContainer>().ToSingle(this);
+        }
 
         // This is the list of concrete types that are in the current object graph
         // Useful for error messages (and complex binding conditions)
@@ -28,18 +33,13 @@ namespace ModestTree.Zenject
             }
         }
 
-        public DiContainer()
-        {
-            _singletonMap = new SingletonProviderMap(this);
-            Bind<DiContainer>().ToSingle(this);
-        }
-
         internal string GetCurrentObjectGraph()
         {
             if (_lookupsInProgress.Count == 0)
             {
                 return "";
             }
+
             return _lookupsInProgress.Select(t => t.GetPrettyName()).Reverse().Aggregate((i, str) => i + "\n" + str);
         }
 
@@ -251,26 +251,22 @@ namespace ModestTree.Zenject
             return objects.First();
         }
 
-        public List<Type> GetDependencyContracts<TContract>()
+        public IEnumerable<Type> GetDependencyContracts<TContract>()
         {
             return GetDependencyContracts(typeof(TContract));
         }
 
-        public List<Type> GetDependencyContracts(Type contract)
+        public IEnumerable<Type> GetDependencyContracts(Type contract)
         {
-            var dependencies = new List<Type>();
-
             foreach (var param in InjectionInfoHelper.GetConstructorDependencies(contract))
             {
-                dependencies.Add(param.ParameterType);
+                yield return param.ParameterType;
             }
 
             foreach (var fieldInfo in InjectionInfoHelper.GetFieldDependencies(contract))
             {
-                dependencies.Add(fieldInfo.FieldType);
+                yield return fieldInfo.FieldType;
             }
-
-            return dependencies;
         }
 
         public Dictionary<Type, List<Type>> CalculateObjectGraph<TRoot>()

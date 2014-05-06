@@ -14,7 +14,7 @@ namespace ModestTree.Zenject
 
         static Action<DiContainer> _extraBindingLookup;
 
-        public static Action<DiContainer> ExtraBindingsLookup
+        internal static Action<DiContainer> ExtraBindingsLookup
         {
             set
             {
