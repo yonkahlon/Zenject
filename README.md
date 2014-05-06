@@ -1,4 +1,4 @@
-![Alt text](/Documentation/ZenjectLogo.png?raw=true "Zenject")
+<img src="/Documentation/ZenjectLogo.png?raw=true" alt="Zenject" width="600px" height="134px"/>
 
 Dependency Injection Framework for Unity3D
 =====================================
