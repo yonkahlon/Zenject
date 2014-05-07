@@ -17,7 +17,6 @@ This project is open source.  You can find the official repository [here](https:
 * Named injections (string, enum, etc.)
 * Auto-Mocking using the Moq library
 * Injection across different Unity scenes
-* Nested containers
 * Ability to print entire object graph as a UML image automatically
 
 # History
@@ -182,16 +181,118 @@ I prefer to avoid MonoBehaviours when possible in favour of just normal C# class
 
 For example, if you have code that needs to run per frame, then you can implement the ITickable interface:
 
+    public class Ship : ITickable
+    {
+        public void Tick()
+        {
+            // Perform per frame tasks
+        }
+    }
 
+Then it's just a matter of including the following in one of your installers (as long as you also include a few dependencies as outlined in the hello world example below)
+
+    _container.Bind<ITickable>().ToSingle<Ship>();
+
+The same goes for IInitializable, for cases where you have code that you want to run on startup.  (side note: using IInitializable is generally better than putting too much work in constructors).  IInitializable can also be used for objects that are created via factories (in which case Initialize() is called automatically, as long as you use one of the built in Zenject factory classes).
+
+# Zenject Hello World
+
+    public class TestInstallerWrapper : InstallerMonoBehaviourWrapper<TestInstaller>
+    {
+    }
+
+    [Serializable]
+    public class TestInstaller : Installer
+    {
+        public string Name;
+
+        public override void RegisterBindings()
+        {
+            Install<StandardUnityInstaller>();
+
+            _container.Bind<IDependencyRoot>().ToSingle<DependencyRootStandard>();
+
+            _container.Bind<ITickable>().ToSingle<TestRunner>();
+            _container.Bind<IInitializable>().ToSingle<TestRunner>();
+            _container.Bind<string>().ToSingle(Name).WhenInjectedInto<TestRunner>();
+        }
+    }
+
+    public class TestRunner : ITickable, IInitializable
+    {
+        string _name;
+
+        public TestRunner(string name)
+        {
+            _name = name;
+        }
+
+        public void Initialize()
+        {
+            Debug.Log("Hello " + _name + "!");
+        }
+
+        public void Tick()
+        {
+            if (Input.GetKeyDown(KeyCode.Space))
+            {
+                Debug.Log("Exiting!");
+                Application.Quit();
+            }
+        }
+    }
+
+You can run this example by copying and pasting the above code into a file named 'TestInstallerWrapper'.  Then create a new scene, add a GameObject. Attach CompositionRoot to the GameObject.  Attach TestInstallerWrapper.  Run.  Observe unity console.
+
+Some notes:
+
+* The `Install<StandardUnityInstaller>()` line is necessary to tell zenject to initialize some basic unity helper classes (including the Zenject class which updates all ITickables and the class which calls Initialize on all IInitializables).  It is done this way because in some cases you might not want to use the whole ITickable/IInitializable approach at all.  Or maybe you aren't even using Unity. Etc.
+* You will also need to define a dependency root otherwise Zenject will not create your object graph
+* Note that all Installers use the [Serializable] attribute.  This is so that Installers can expose settings to their MonoBehaviour wrapper.  In this case, we expose a "Name" variable.
+* Note the usage of WhenInjectedInto.  This is good because otherwise any class which had a string parameter in its constructor would get our Name parameter.
 
 # Update / Initialization Order
 
+In many cases, especially for small projects, the order that classes update or initialize in does not matter.  This is why Unity does not have an easy way to control this (besides in Edit -> Project Settings -> Script Execution Order but that is pretty awkward to use).  In Unity, after adding a bunch of MonoBehaviours to your scene, it can be difficult to predict in what order the Start(), Awake(), or Update() methods will be called in.
 
+By default, ITickables and IInitializables are updated in the order that they are added, however for cases where the update or initialization order matters, there is a much better way.  By specifying their priorities explicitly in the installer.  For example, in the sample project you can find this code:
+
+        public override void RegisterBindings()
+        {
+            ...
+            new TickablePrioritiesInstaller(_container, Tickables).RegisterBindings();
+            new InitializablePrioritiesInstaller(_container, Initializables).RegisterBindings();
+        }
+
+        static List<Type> Tickables = new List<Type>()
+        {
+            // Re-arrange this list to control update order
+            typeof(AsteroidManager),
+            typeof(GameController),
+        };
+
+        static List<Type> Initializables = new List<Type>()
+        {
+            // Re-arrange this list to control init order
+            typeof(GameController),
+        };
+
+This way, you won't hit a wall at the end of the project due to some unforseen order-dependency.
+
+Any ITickables or IInitializables that aren't given an explicit order are updated after everything else.
 
 # Rules / Guidelines / Recommendations
 
 * The container should *only* be referenced in the composition root layer.  Note that factories are part of this layer and the container can be referenced there (which is necessary to create objects at runtime).  For example, see ShipStateFactory in the sample project.
-* Prefer constructor injection to field or property injection
+* Prefer constructor injection to field or property injection.
+    * Constructor injection forces the dependency to only be resolved once, at class creation, which is usually what you want.  In many cases you don't want to expose a public property with your internal dependencies
+    * Constructor injection guarantees no circular dependencies between classes, which is generally a bad thing to do
+    * Constructor injection is more portable for cases where you decide to re-use the code without a DI framework such as Zenject.  You can do the same with public properties but it's more error prone.  It's possible to forget to initialize one field and leave the object in an invalid state
+    * Finally, Constructor injection makes it clear what all the dependencies of a class are when another programmer is reading the code.  They can simply look at the parameter list of the constructor.
+
+# "I still don't get it"
+
+Yasdfas
 
 # How is this different from Strange IoC?
 
