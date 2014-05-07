@@ -1,5 +1,6 @@
-Zenject: Dependency Injection Framework for Unity3D
-=====================================
+<img src="/Documentation/ZenjectLogo.png?raw=true" alt="Zenject" width="600px" height="134px"/>
+Dependency Injection Framework for Unity3D
+------------------------------
 
 This project started based on [this](https://github.com/sebas77/Lightweight-IoC-Container-for-Unity3D) implementation. The following articles may be helpful:
 
