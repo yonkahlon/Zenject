@@ -46,14 +46,12 @@ namespace ModestTree.Zenject
 
         public void WhenInjectedInto<T>(object identifier)
         {
-            Assert.IsNotNull(identifier);
-            _provider.SetCondition(r => r.Target == typeof(T) && identifier.Equals(r.Identifier));
+            _provider.SetCondition(r => r.Target == typeof(T) && r.Identifier.Equals(identifier));
         }
 
         public void WhenInjectedInto(object identifier)
         {
-            Assert.IsNotNull(identifier);
-            _provider.SetCondition(r => identifier.Equals(r.Identifier));
+            _provider.SetCondition(r => r.Identifier.Equals(identifier));
         }
     }
 }

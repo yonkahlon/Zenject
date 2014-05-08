@@ -55,48 +55,25 @@ namespace ModestTree.Zenject
             return type.GetFieldsWithAttribute<InjectAttributeBase>();
         }
 
-        public static IEnumerable<PropertyInfo> GetPropertyDependencies(Type type)
-        {
-            return type.GetPropertiesWithAttribute<InjectAttributeBase>();
-        }
-
         public static ParameterInfo[] GetConstructorDependencies(Type concreteType)
         {
-            return GetConstructorDependencies(concreteType, true);
-        }
-
-        public static ParameterInfo[] GetConstructorDependencies(Type concreteType, bool strict)
-        {
             ConstructorInfo method;
-            return GetConstructorDependencies(concreteType, out method, strict);
+            return GetConstructorDependencies(concreteType, out method);
         }
 
         public static ParameterInfo[] GetConstructorDependencies(Type concreteType, out ConstructorInfo method)
         {
-            return GetConstructorDependencies(concreteType, out method, true);
-        }
-
-        public static ParameterInfo[] GetConstructorDependencies(Type concreteType, out ConstructorInfo method, bool strict)
-        {
             var constructors = concreteType.GetConstructors(BindingFlags.Public | BindingFlags.Instance);
 
-            if (constructors.IsEmpty())
-            {
-                method = null;
-                return new ParameterInfo[0];
-            }
+            Assert.That(constructors.Length > 0,
+            "Could not find constructor for type '" + concreteType + "' when creating dependencies");
 
             if (constructors.Length > 1)
             {
                 method = (from c in constructors where c.GetCustomAttributes(typeof(InjectAttribute), true).Any() select c).SingleOrDefault();
 
-                if (!strict && method == null)
-                {
-                    return new ParameterInfo[0];
-                }
-
                 Assert.IsNotNull(method,
-                    "More than one constructor found for type '{0}' when creating dependencies.  Use [Inject] attribute to specify which to use.", concreteType);
+                "More than one constructor found for type '{0}' when creating dependencies.  Use [Inject] attribute to specify which to use.", concreteType);
             }
             else
             {

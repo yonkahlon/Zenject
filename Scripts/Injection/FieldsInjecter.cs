@@ -23,121 +23,89 @@ namespace ModestTree.Zenject
         {
             Assert.That(injectable != null);
 
+            var fields = InjectionInfoHelper.GetFieldDependencies(injectable.GetType());
+
+            var parentDependencies = new List<Type>(container.LookupsInProgress);
+
             var additionalCopy = additional.ToList();
 
-            var injectableMembers = GetInjectableMembers(injectable.GetType());
-
-            foreach (var memberInfo in injectableMembers)
+            foreach (var fieldInfo in fields)
             {
-                bool didInject = InjectFromExtras(memberInfo, injectable, additionalCopy);
+                var injectInfo = InjectionInfoHelper.GetInjectInfo(fieldInfo);
+                Assert.That(injectInfo != null);
 
-                if (!didInject)
+                bool foundAdditional = false;
+                foreach (object obj in additionalCopy)
                 {
-                    InjectFromResolve(memberInfo, container, injectable);
+                    if (fieldInfo.FieldType.IsAssignableFrom(obj.GetType()))
+                    {
+                        fieldInfo.SetValue(injectable, obj);
+                        additionalCopy.Remove(obj);
+                        foundAdditional = true;
+                        break;
+                    }
                 }
+
+                if (foundAdditional)
+                {
+                    continue;
+                }
+
+                var context = new ResolveContext()
+                {
+                    Target = injectable.GetType(),
+                    FieldName = fieldInfo.Name,
+                    Identifier = injectInfo.Identifier,
+                    Parents = parentDependencies,
+                    TargetInstance = injectable,
+                };
+
+                var valueObj = ResolveField(container, fieldInfo, context, injectInfo, injectable);
+
+                fieldInfo.SetValue(injectable, valueObj);
             }
 
             if (shouldUseAll && !additionalCopy.IsEmpty())
             {
                 throw new ZenjectResolveException(
                     "Passed unnecessary parameters when injecting into type '{0}'. \nExtra Parameters: {1}\nObject graph:\n{2}",
-                    injectable.GetType().GetPrettyName(),
-                    String.Join(",", additionalCopy.Select(x => x.GetType().GetPrettyName()).ToArray()),
-                    container.GetCurrentObjectGraph());
+                        injectable.GetType().GetPrettyName(),
+                        String.Join(",", additionalCopy.Select(x => x.GetType().GetPrettyName()).ToArray()),
+                        container.GetCurrentObjectGraph());
             }
         }
 
-        static bool InjectFromExtras(
-            InjectableMember memberInfo,
-            object injectable, List<object> additional)
+        static object ResolveField(
+            DiContainer container,
+            FieldInfo fieldInfo, ResolveContext context,
+            InjectInfo injectInfo, object injectable)
         {
-            foreach (object obj in additional)
+            var desiredType = fieldInfo.FieldType;
+
+            if (container.HasBinding(desiredType, context))
             {
-                if (memberInfo.MemberType.IsAssignableFrom(obj.GetType()))
-                {
-                    memberInfo.Setter(injectable, obj);
-                    additional.Remove(obj);
-                    return true;
-                }
+                return container.Resolve(desiredType, context);
             }
 
-            return false;
-        }
-
-        static void InjectFromResolve(
-            InjectableMember memberInfo, DiContainer container, object injectable)
-        {
-            var context = new ResolveContext()
-            {
-                Target = injectable.GetType(),
-                FieldName = memberInfo.MemberName,
-                Identifier = memberInfo.InjectInfo.Identifier,
-                Parents = container.LookupsInProgress.ToList(),
-                TargetInstance = injectable,
-            };
-
-            var valueObj = ResolveFromType(
-                container, context, injectable, memberInfo);
-
-            memberInfo.Setter(injectable, valueObj);
-        }
-
-        static IEnumerable<InjectableMember> GetInjectableMembers(Type injectableType)
-        {
-            foreach (var fieldInfo in InjectionInfoHelper.GetFieldDependencies(injectableType))
-            {
-                yield return new InjectableMember()
-                {
-                    MemberType = fieldInfo.FieldType,
-                    MemberName = fieldInfo.Name,
-                    Setter = ((object injectable, object value) => fieldInfo.SetValue(injectable, value)),
-                    InjectInfo = InjectionInfoHelper.GetInjectInfo(fieldInfo),
-                };
-            }
-
-            foreach (var propInfo in InjectionInfoHelper.GetPropertyDependencies(injectableType))
-            {
-                yield return new InjectableMember()
-                {
-                    MemberType = propInfo.PropertyType,
-                    MemberName = propInfo.Name,
-                    Setter = ((object injectable, object value) => propInfo.SetValue(injectable, value, null)),
-                    InjectInfo = InjectionInfoHelper.GetInjectInfo(propInfo),
-                };
-            }
-        }
-
-        static object ResolveFromType(
-            DiContainer container, ResolveContext context, object injectable, InjectableMember injectableMember)
-        {
-            if (container.HasBinding(injectableMember.MemberType, context))
-            {
-                return container.Resolve(injectableMember.MemberType, context);
-            }
+            // Dependencies that are lists are only optional if declared as such using the inject attribute
+            bool isOptional = (injectInfo == null ? false : injectInfo.Optional);
 
             // If it's a list it might map to a collection
-            if (ReflectionUtil.IsGenericList(injectableMember.MemberType))
+            if (ReflectionUtil.IsGenericList(desiredType))
             {
-                var subType = injectableMember.MemberType.GetGenericArguments().Single();
-                return container.ResolveMany(subType, context, injectableMember.InjectInfo.Optional);
+                var subType = desiredType.GetGenericArguments().Single();
+
+                return container.ResolveMany(subType, context, isOptional);
             }
 
-            if (!injectableMember.InjectInfo.Optional)
+            if (!isOptional)
             {
                 throw new ZenjectResolveException(
                     "Unable to find field with type '{0}' when injecting dependencies into '{1}'. \nObject graph:\n {2}",
-                    injectableMember.MemberType, injectable, container.GetCurrentObjectGraph());
+                    fieldInfo.FieldType, injectable, container.GetCurrentObjectGraph());
             }
 
             return null;
-        }
-
-        class InjectableMember
-        {
-            public Type MemberType;
-            public string MemberName;
-            public Action<object, object> Setter;
-            public InjectInfo InjectInfo;
         }
     }
 }

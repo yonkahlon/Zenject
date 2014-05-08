@@ -9,9 +9,6 @@ namespace ModestTree.Zenject
         {
             _container.Bind<UnityKernel>().ToSingleGameObject();
 
-            _container.Bind<UnityEventManager>().ToSingleGameObject();
-            _container.Bind<GameObjectInstantiator>().ToSingle();
-
             _container.Bind<StandardKernel>().ToSingle();
             // Uncomment this once you remove dependency in PlayerSandboxWrapper
             //_container.Bind<StandardKernel>().ToTransient().WhenInjectedInto<UnityKernel>();

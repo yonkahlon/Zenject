@@ -8,15 +8,6 @@ namespace ModestTree.Zenject
     {
         protected DiContainer _container;
 
-        public Installer(DiContainer container)
-        {
-            _container = container;
-        }
-
-        public Installer()
-        {
-        }
-
         public DiContainer Container
         {
             set

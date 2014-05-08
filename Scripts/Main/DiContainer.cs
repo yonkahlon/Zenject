@@ -23,14 +23,6 @@ namespace ModestTree.Zenject
             Bind<DiContainer>().ToSingle(this);
         }
 
-        public IEnumerable<Type> AllContracts
-        {
-            get
-            {
-                return _providers.Keys;
-            }
-        }
-
         // This is the list of concrete types that are in the current object graph
         // Useful for error messages (and complex binding conditions)
         internal Stack<Type> LookupsInProgress
@@ -206,7 +198,7 @@ namespace ModestTree.Zenject
             return new List<Type> {};
         }
 
-        // Return single instance of requested type or assert
+        // Return single insance of requested type or assert
         public TContract Resolve<TContract>()
         {
             return Resolve<TContract>(new ResolveContext());
@@ -266,7 +258,7 @@ namespace ModestTree.Zenject
 
         public IEnumerable<Type> GetDependencyContracts(Type contract)
         {
-            foreach (var param in InjectionInfoHelper.GetConstructorDependencies(contract, false))
+            foreach (var param in InjectionInfoHelper.GetConstructorDependencies(contract))
             {
                 yield return param.ParameterType;
             }
@@ -275,10 +267,58 @@ namespace ModestTree.Zenject
             {
                 yield return fieldInfo.FieldType;
             }
+        }
 
-            foreach (var propInfo in InjectionInfoHelper.GetPropertyDependencies(contract))
+        public Dictionary<Type, List<Type>> CalculateObjectGraph<TRoot>()
+        {
+            return CalculateObjectGraph(typeof(TRoot));
+        }
+
+        public Dictionary<Type, List<Type>> CalculateObjectGraph(Type rootContract)
+        {
+            var map = new Dictionary<Type, List<Type>>();
+            var types = ResolveTypeMany(rootContract);
+            Assert.IsEqual(types.Count, 1);
+            var rootType = types[0];
+
+            map.Add(rootType, new List<Type>());
+            AddToObjectGraph(rootType, map);
+
+            return map;
+        }
+
+        void AddToObjectGraph(Type type, Dictionary<Type, List<Type>> map)
+        {
+            var dependList = map[type];
+
+            foreach (var contractType in GetDependencyContracts(type))
             {
-                yield return propInfo.PropertyType;
+                List<Type> dependTypes;
+
+                if (contractType.FullName.StartsWith("System.Collections.Generic.List"))
+                {
+                    var subTypes = contractType.GetGenericArguments();
+                    Assert.IsEqual(subTypes.Length, 1);
+
+                    var subType = subTypes[0];
+                    dependTypes = ResolveTypeMany(subType);
+                }
+                else
+                {
+                    dependTypes = ResolveTypeMany(contractType);
+                    Assert.That(dependTypes.Count <= 1);
+                }
+
+                foreach (var dependType in dependTypes)
+                {
+                    dependList.Add(dependType);
+
+                    if (!map.ContainsKey(dependType))
+                    {
+                        map.Add(dependType, new List<Type>());
+                        AddToObjectGraph(dependType, map);
+                    }
+                }
             }
         }
     }
