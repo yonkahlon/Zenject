@@ -21,6 +21,7 @@
     * <a href="#update_order">Update Order And Initialization Order</a>
     * <a href="#across_scenes">Injecting Data Across Scenes</a>
     * <a href="#automocking">Auto-Mocking</a>
+    * <a href="#graphviz">Visualizing Your Object Graph</a>
 * FAQ
     * <a href="#strange">How is this different from Strange IoC?</a>
     * More to come!
@@ -412,6 +413,14 @@ After extracting the auto mocking package it is just a matter of using the follo
     _container.Bind<IFoo>().ToMock();
 
 However, this approach will not allow you to take advantage of the advanced features of Moq.  In order to do that, I recommend peeking in to the ToMock() method to see how that works.
+
+## <a id="graphviz"></a>Visualizing Object Graphs Automatically
+
+Zenject allows users to generate UML-style images of the object graphs for their applications.  You can do this simply by running your Zenject-driven app, then selectin from the menu `Assets -> Zenject -> Output Object Graph For Current Scene`.  You will be prompted for a location to save the generated image file.
+
+Note that you will need to have graphviz installed for this to work (which you can find [here](http://www.graphviz.org/)).  You will be prompted to choose the location.
+
+The result is two files (Foo.dot and Foo.png).  The dot file is included in case you want to add custom graphviz commands.
 
 ## <a id="strange"></a>How is this different from Strange IoC?
 
