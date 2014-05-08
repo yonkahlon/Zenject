@@ -1,13 +1,39 @@
 <img src="/Documentation/ZenjectLogo.png?raw=true" alt="Zenject" width="600px" height="134px"/>
-Dependency Injection Framework for Unity3D
 
-# Introduction
+# Dependency Injection Framework for Unity3D
+
+## Table Of Contents
+
+* <a href="#introduction">Introduction</a>
+* <a href="#features">Features</a>
+* <a href="#history">History</a>
+* Dependency Injection
+    * <a href="#theory">Theory</a>
+    * <a href="#misconceptions">Misconceptions</a>
+* Zenject API
+    * <a href="#getting_started">Getting Started</a>
+    * <a href="#zenject_overview">API Overview</a>
+    * <a href="#composition_root"/>Composition Root</a>
+    * <a href="#dependency_root">Dependency Root</a>
+    * <a href="#rules">Rules</a>
+    * <a href="#tickables">ITickable & IInitializable</a>
+    * <a href="#hello_world">Hello World</a>
+    * <a href="#update_order">Update Order And Initialization Order</a>
+    * <a href="#across_scenes">Injecting Data Across Scenes</a>
+    * <a href="#automocking">Auto-Mocking</a>
+* FAQ
+    * <a href="#strange">How is this different from Strange IoC?</a>
+    * More to come!
+
+## <a id="introduction"></a>Introduction
 
 Zenject is a lightweight dependency injection framework built specifically to target Unity 3D.  It can be used to turn your Unity 3D application into a collection of loosely-coupled parts with highly segmented responsibilities.  Zenject can then glue the parts together in many different configurations to allow you to easily write, re-use, refactor and test your code in a scalable and extremely flexible way.
 
 This project is open source.  You can find the official repository [here](https://github.com/modesttree/Zenject).  If you would like to contribute to the project pull requests are welcome!
 
-# Features
+For general support or bug requests, please feel free to create issues on the github page.  You can also email me directly at svermeulen@modesttree.com
+
+## <a id="features"></a>Features
 
 * Injection into normal C# classes or MonoBehaviours
 * Constructor injection (can tag constructor if there are multiple)
@@ -18,22 +44,22 @@ This project is open source.  You can find the official repository [here](https:
 * Injection across different Unity scenes
 * Ability to print entire object graph as a UML image automatically
 
-# History
+## <a id="history"></a>History
 
 Unity is a fantastic game engine, however the approach that new developers are encouraged to take does not lend itself well to writing large, flexible, or scalable code bases.  In particular, the default way that Unity manages dependencies between different game components can often be awkward and error prone.
 
 Having worked on non-unity projects that use dependency management frameworks (such as Ninject, which Zenject takes a lot of inspiration from), the problem irked me enough that I decided a custom framework was in order.  Upon googling for solutions, I found a series of great articles by Sebastiano Mandalà outlining the problem, which I strongly recommend that everyone read before firing up Zenject:
 
-* http://blog.sebaslab.com/ioc-container-for-unity3d-part-1/
-* http://blog.sebaslab.com/ioc-container-for-unity3d-part-2/
+* [http://blog.sebaslab.com/ioc-container-for-unity3d-part-1/](http://blog.sebaslab.com/ioc-container-for-unity3d-part-1/)
+* [http://blog.sebaslab.com/ioc-container-for-unity3d-part-2/](http://blog.sebaslab.com/ioc-container-for-unity3d-part-2/)
 
 Sebastiano even wrote a proof of concept and open sourced it, which became the basis for this library.
 
-I will not go into detail here about why dependency injection is a great pattern (other people have done a good enough job of that).   I will just say that if you don't have experience with DI frameworks, and are writing object oriented code, then trust me, you will thank me later!  Once you learn how to write properly loosely coupled code using DI, there is simply no going back.
+What follows in the next section is a general overview of Dependency Injection from my perspective.  I highly recommend seeking other resources for more information on the subject, as there are many (often more intelligent) people that have written on the subject.  In particular, I highly recommend anything written by Mark Seeman on the subject - in particular his book 'Dependency Injection in .NET'.
 
-I also highly recommend anything written by Mark Seeman on the subject, in particular his book 'Dependency Injection in .NET'.
+Finally, I will just say that if you don't have experience with DI frameworks, and are writing object oriented code, then trust me, you will thank me later!  Once you learn how to write properly loosely coupled code using DI, there is simply no going back.
 
-# Theory
+## <a id="theory"></a>Theory
 
 When writing an individual class to achieve some functionality, it will likely need to interact with other classes in the system to achieve its goals.  One way to do this is to have the class itself create its dependencies, by calling concrete constructors:
 
@@ -106,29 +132,31 @@ And class Bar probably also doesn't really care about what specific implementati
 
 So we find that it is useful to push the responsibility of deciding which specific implementations of which classes to use further and further up in the 'object graph' of the application.  Taking this to an extreme, we arrive at the entry point of the application, at which point all dependencies must be satisfied before things start.  The dependency injection lingo for this part of the application is called the 'composition root'.
 
-# Misconceptions
+## <a id="misconceptions"></a>Misconceptions
 
 There are many misconceptions about DI, due to the fact that it can be tricky to fully wrap your head around at first.  It will take time and experience before it fully 'clicks'.
 
-As shown in the above example, DI frameworks can be used to easily swap different implementations of a given interface (in the example this was ISomeService).  However, this is only one of many benefits that DI offers.  In most cases the various responsibilities of an application only have individual classes implementing them, so you will be injecting concrete references in those cases rather than interfaces (especially if you're like me and follow the Reused Abstraction Principle).
+As shown in the above example, DI can be used to easily swap different implementations of a given interface (in the example this was ISomeService).  However, this is only one of many benefits that DI offers.  In most cases the various responsibilities of an application have single, specific classes implementing them, so you will be injecting concrete references in those cases rather than interfaces (especially if you're like me and follow the [Reused Abstraction Principle](http://codemanship.co.uk/parlezuml/blog/?postid=934)).
 
-More important than that is the fact that using a dependency injection framework like Zenject allows you to more easily follow the 'Single Responsibility Principle'.  By letting Zenject worry about wiring up the classes, the classes themselves can just focus on fulfilling their specific responsibilities.
+More important than that is the fact that using a dependency injection framework like Zenject allows you to more easily follow the '[Single Responsibility Principle](http://en.wikipedia.org/wiki/Single_responsibility_principle)'.  By letting Zenject worry about wiring up the classes, the classes themselves can just focus on fulfilling their specific responsibilities.
 
-* Testability - Writing automated unit tests or user-driven tests becomes very easy, because it is just a matter of writing a different 'composition root' which wires up the dependencies in a different way.  Want to only test one subsystem?  Simply create a new composition root which creates 'mocks' for all other systems in the application.
+Other benefits include:
+
+* Testability - Writing automated unit tests or user-driven tests becomes very easy, because it is just a matter of writing a different 'composition root' which wires up the dependencies in a different way.  Want to only test one subsystem?  Simply create a new composition root which creates 'mocks' for all other systems in the application. (more detail on this below)
 * Refactorability - When code is loosely coupled, as is the case when using DI properly, the entire code base is much more resilient to changes.  You can completely change parts of the code base without having those changes wreak havoc on other parts.
 * Encourages modular code - When using a DI framework you will naturally follow better design practices, because it forces you to think about the interfaces between classes.
 
-# How should I get started?
+## <a id="getting_started"></a>How should I get started?
 
-Once you have an understanding of the theory behind Zenject (if not see the previous sections), then I recommend diving in to the included sample application to get started, by extracting the included unity package "ZenjectSampleGame.unitypackage" into your unity project.  The sample is well documented and conveys proper usage of Zenject better than I could explain here.
+Once you have an understanding of the theory behind Zenject (if not see the previous sections), then I recommend diving in to the included sample application to get started, by extracting the included unity package "ZenjectSampleGame.unitypackage" into your unity project.
 
-# Overview Of The Zenject API
+## <a id="zenject_overview"></a>Overview Of The Zenject API
 
 What follows is a general overview of how DI patterns are applied using Zenject.  However, the best documentation right now is probably the included sample project itself.  I would recommend using that for reference when reading over these concepts.
 
-## Composition Root / Installers
+## <a id="composition_root"/></a>Composition Root / Installers
 
-If you look at the sample application (a kind of asteroids clone) you will see that at the top of the scene heirarchy we have a game object with the name CompositionRoot.   This is where Zenject resolves all dependencies before kicking off your application.
+If you look at the sample application (a kind of asteroids clone) you will see that at the top of the scene heirarchy (in scene 'Main') we have a game object with the name CompositionRoot.   This is where Zenject resolves all dependencies before kicking off your application.
 
 To add dependency bindings to your application, you need to write what is referred to in Zenject as an 'Installer' which usually looks something like this:
 
@@ -159,7 +187,7 @@ Like many other DI frameworks, dependency mapping done by adding the binding to 
 
 However, any use of the container should be restricted to the composition root or factory classes (see rules/guidelines section below)
 
-# The dependency root
+## <a id="dependency_root"></a>The dependency root
 
 Every Zenject app has one root object.  The dependencies of this object generates the full object graph for the application/game.  For example, in the sample project this is the GameRoot class which is declared as below:
 
@@ -170,11 +198,20 @@ A Zenject driven application is executed by the following steps:
 * Composition Root is started (via Awake() method)
 * Composition Root calls RegisterBindings() on all installers that are attached below it in the scene heirarchy
 * Each Installer registers different sets of dependencies directly on to the DiContainer by calling Bind<> and BindValue<> methods.  Note that the order that this binding occurs should not matter.
-* The CR then traverses the scene heirarchy again and injects all MonoBehaviours with their dependencies.  Since MonoBehaviours are instantiated by Unity we cannot use constructor injection in this case and therefore field or property injection must be used (which is done by adding a [Inject] attribute to any member)
+* The Composition Root then traverses the scene heirarchy again and injects all MonoBehaviours with their dependencies.  Since MonoBehaviours are instantiated by Unity we cannot use constructor injection in this case and therefore field or property injection must be used (which is done by adding a [Inject] attribute to any member)
 * After filling in the scene dependencies the CR then calls `_container.Resolve` on the root object (that is, whatever is bound to IDependencyRoot).  In most cases code does not need to be in MonoBehaviours and will be resolved this way
 * If a dependency cannot be resolved, a ZenjectResolveException is thrown
 
-# Tickables / IInitializables
+## <a id="rules"></a>DI Rules / Guidelines / Recommendations
+
+* The container should *only* be referenced in the composition root layer.  Note that factories are part of this layer and the container can be referenced there (which is necessary to create objects at runtime).  For example, see ShipStateFactory in the sample project.
+* Prefer constructor injection to field or property injection.
+    * Constructor injection forces the dependency to only be resolved once, at class creation, which is usually what you want.  In many cases you don't want to expose a public property with your internal dependencies
+    * Constructor injection guarantees no circular dependencies between classes, which is generally a bad thing to do
+    * Constructor injection is more portable for cases where you decide to re-use the code without a DI framework such as Zenject.  You can do the same with public properties but it's more error prone.  It's possible to forget to initialize one field and leave the object in an invalid state
+    * Finally, Constructor injection makes it clear what all the dependencies of a class are when another programmer is reading the code.  They can simply look at the parameter list of the constructor.
+
+## <a id="tickables"></a>Tickables / IInitializables
 
 I prefer to avoid MonoBehaviours when possible in favour of just normal C# classes.  Zenject allows you to do this much more easily by providing interfaces that mirror functionality that you would normally need to use a MonoBehaviour for.
 
@@ -188,13 +225,15 @@ For example, if you have code that needs to run per frame, then you can implemen
         }
     }
 
-Then it's just a matter of including the following in one of your installers (as long as you also include a few dependencies as outlined in the hello world example below)
+Then it's just a matter of including the following in one of your installers (as long as you also include a few other dependencies as outlined in the hello world example below)
 
     _container.Bind<ITickable>().ToSingle<Ship>();
 
 The same goes for IInitializable, for cases where you have code that you want to run on startup.  (side note: using IInitializable is generally better than putting too much work in constructors).  IInitializable can also be used for objects that are created via factories (in which case Initialize() is called automatically, as long as you use one of the built in Zenject factory classes).
 
-# Zenject Hello World
+Note that you do not need to use this approach (that is, ITickables and IInitializables) to use Zenject. You can continue writing all your code in MonoBehaviours and still receive all the benefits of Zenject.
+
+## <a id="hello_world"></a>Zenject Hello World
 
     public class TestInstallerWrapper : InstallerMonoBehaviourWrapper<TestInstaller>
     {
@@ -250,7 +289,7 @@ Some notes:
 * Note that all Installers use the [Serializable] attribute.  This is so that Installers can expose settings to their MonoBehaviour wrapper.  In this case, we expose a "Name" variable.
 * Note the usage of WhenInjectedInto.  This is good because otherwise any class which had a string parameter in its constructor would get our Name parameter.
 
-# Update / Initialization Order
+## <a id="update_order"></a>Update / Initialization Order
 
 In many cases, especially for small projects, the order that classes update or initialize in does not matter.  This is why Unity does not have an easy way to control this (besides in Edit -> Project Settings -> Script Execution Order but that is pretty awkward to use).  In Unity, after adding a bunch of MonoBehaviours to your scene, it can be difficult to predict in what order the Start(), Awake(), or Update() methods will be called in.
 
@@ -280,7 +319,7 @@ This way, you won't hit a wall at the end of the project due to some unforseen o
 
 Any ITickables or IInitializables that aren't given an explicit order are updated after everything else.
 
-# Injecting data across scenes
+## <a id="across_scenes"></a>Injecting data across scenes
 
 In some cases it's useful to pass arguments from one scene to another.  The way Unity allows us to do this by default is fairly awkward.  Your options are to create a persistent GameObject and call DontDestroyOnLoad() to keep it alive when changing scenes, or use global static classes to temporarily store the data.
 
@@ -323,20 +362,58 @@ You can load the scene containing `LessonStandaloneStart` and specify a particul
 
 Note that you can still run the scene directly, in which case it will default to using "level01".  This is possible because we are using the InjectOptional flag.
 
-# Auto-Mocking using Moq
+## <a id="automocking"></a>Auto-Mocking using Moq
 
-TBD
+One of the really cool features of DI is the fact that it makes testing code much, much easier.  This is because you can easily substitute one dependency for another by using a different Composition Root.  For example, if you only want to test a particular class (let's call it Foo) and don't care about testing its dependencies, you might write 'mocks' for them so that you can isolate Foo specifically.
 
-# Rules / Guidelines / Recommendations
+    public class Foo
+    {
+        IWebServer _webServer;
 
-* The container should *only* be referenced in the composition root layer.  Note that factories are part of this layer and the container can be referenced there (which is necessary to create objects at runtime).  For example, see ShipStateFactory in the sample project.
-* Prefer constructor injection to field or property injection.
-    * Constructor injection forces the dependency to only be resolved once, at class creation, which is usually what you want.  In many cases you don't want to expose a public property with your internal dependencies
-    * Constructor injection guarantees no circular dependencies between classes, which is generally a bad thing to do
-    * Constructor injection is more portable for cases where you decide to re-use the code without a DI framework such as Zenject.  You can do the same with public properties but it's more error prone.  It's possible to forget to initialize one field and leave the object in an invalid state
-    * Finally, Constructor injection makes it clear what all the dependencies of a class are when another programmer is reading the code.  They can simply look at the parameter list of the constructor.
+        public Foo(IWebServer webServer)
+        {
+            _webServer = webServer;
+        }
 
-# How is this different from Strange IoC?
+        public void Initialize()
+        {
+            ...
+            var x = _webServer.GetSomething();
+            ...
+        }
+    }
+
+In this example, we have a class Foo that interacts with a web server to retrieve content.  This would normally be very difficult to test for the following reasons:
+
+* You would have to set up an environment where it can properly connect to a web server (configuring ports, urls, etc.)
+* Running the test could be slower and limit how much testing you can do
+* The web server itself could contain bugs so you couldn't with certainty isolate Foo as the problematic part of the test
+* You can't easily configure the values returned from the web server to test sending various inputs to the Foo class
+
+However, if we create a mock class for IWebServer then we can address all these problems:
+
+    public class MockWebServer : IWebServer
+    {
+        ...
+    }
+
+Then hook it up in our installer:
+
+    _container.Bind<IWebServer>().ToSingle<MockWebServer>();
+
+Then you can implement the fields of the IWebServer interface and configure them based on what you want to test on Foo. Hopefully You can see how this can make life when writing tests much easier.
+
+Zenject also allows you to even avoid having to write the MockWebServer class in favour of using a very useful library called "Moq" which does all the work for you.
+
+Note that by default, Auto-mocking is not enabled in Zenject.  If you wish to use the auto-mocking feature then go to your Zenject install directory and extract the contents of AddOns/ZenjectAutoMocking.unitypackage to your unity project.  Note also that AutoMocking is incompatible with webplayer builds, and you will also need to change your "Api Compatibility Level" from ".NET 2.0 Subset" to ".NET 2.0" (you can find this in PC build settings)
+
+After extracting the auto mocking package it is just a matter of using the following syntax to mock out various parts of your project:
+
+    _container.Bind<IFoo>().ToMock();
+
+However, this approach will not allow you to take advantage of the advanced features of Moq.  In order to do that, I recommend peeking in to the ToMock() method to see how that works.
+
+## <a id="strange"></a>How is this different from Strange IoC?
 
 Zenject is a pure dependency injection framework and does not offer the suite of features that Strange IoC does.  It is kept extremely lightweight to focus on its single purpose: Simple, reliable, and flexible dependency management.
 
