@@ -62,23 +62,41 @@ namespace ModestTree.Zenject
 
         public static ParameterInfo[] GetConstructorDependencies(Type concreteType)
         {
+            return GetConstructorDependencies(concreteType, true);
+        }
+
+        public static ParameterInfo[] GetConstructorDependencies(Type concreteType, bool strict)
+        {
             ConstructorInfo method;
-            return GetConstructorDependencies(concreteType, out method);
+            return GetConstructorDependencies(concreteType, out method, strict);
         }
 
         public static ParameterInfo[] GetConstructorDependencies(Type concreteType, out ConstructorInfo method)
         {
+            return GetConstructorDependencies(concreteType, out method, true);
+        }
+
+        public static ParameterInfo[] GetConstructorDependencies(Type concreteType, out ConstructorInfo method, bool strict)
+        {
             var constructors = concreteType.GetConstructors(BindingFlags.Public | BindingFlags.Instance);
 
-            Assert.That(constructors.Length > 0,
-            "Could not find constructor for type '" + concreteType + "' when creating dependencies");
+            if (constructors.IsEmpty())
+            {
+                method = null;
+                return new ParameterInfo[0];
+            }
 
             if (constructors.Length > 1)
             {
                 method = (from c in constructors where c.GetCustomAttributes(typeof(InjectAttribute), true).Any() select c).SingleOrDefault();
 
+                if (!strict && method == null)
+                {
+                    return new ParameterInfo[0];
+                }
+
                 Assert.IsNotNull(method,
-                "More than one constructor found for type '{0}' when creating dependencies.  Use [Inject] attribute to specify which to use.", concreteType);
+                    "More than one constructor found for type '{0}' when creating dependencies.  Use [Inject] attribute to specify which to use.", concreteType);
             }
             else
             {
