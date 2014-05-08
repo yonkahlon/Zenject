@@ -1,12 +1,11 @@
 <img src="/Documentation/ZenjectLogo.png?raw=true" alt="Zenject" width="600px" height="134px"/>
 Dependency Injection Framework for Unity3D
-------------------------------
 
 # Introduction
 
 Zenject is a lightweight dependency injection framework built specifically to target Unity 3D.  It can be used to turn your Unity 3D application into a collection of loosely-coupled parts with highly segmented responsibilities.  Zenject can then glue the parts together in many different configurations to allow you to easily write, re-use, refactor and test your code in a scalable and extremely flexible way.
 
-This project is open source.  You can find the official repository [here](https://github.com/modesttree/Zenject).
+This project is open source.  You can find the official repository [here](https://github.com/modesttree/Zenject).  If you would like to contribute to the project pull requests are welcome!
 
 # Features
 
@@ -281,6 +280,49 @@ This way, you won't hit a wall at the end of the project due to some unforseen o
 
 Any ITickables or IInitializables that aren't given an explicit order are updated after everything else.
 
+# Injecting data across scenes
+
+In some cases it's useful to pass arguments from one scene to another.  The way Unity allows us to do this by default is fairly awkward.  Your options are to create a persistent GameObject and call DontDestroyOnLoad() to keep it alive when changing scenes, or use global static classes to temporarily store the data.
+
+Let's pretend you want to specify a 'level' string to the next scene.  You have the following class that requires the input:
+
+    public class LevelHandler : IInitializable
+    {
+        readonly string _startLevel;
+
+        public LevelHandler(
+            [InjectOptional]
+            [Inject("StartLevelName")]
+            string startLevel)
+        {
+            if (startLevel == null)
+            {
+                _startLevel = "level01";
+            }
+            else
+            {
+                _startLevel = startLevel;
+            }
+        }
+
+        public void Initialize()
+        {
+            ...
+            [Load level]
+            ...
+        }
+    }
+
+You can load the scene containing `LessonStandaloneStart` and specify a particular level by using the following syntax:
+
+    ZenUtil.LoadLevel("NameOfSceneToLoad",
+        delegate (DiContainer container)
+        {
+            container.Bind<string>().ToSingle("level02").WhenInjectedInto<LevelHandler>("StartLevelName");
+        });
+
+Note that you can still run the scene directly, in which case it will default to using "level01".  This is possible because we are using the InjectOptional flag.
+
 # Rules / Guidelines / Recommendations
 
 * The container should *only* be referenced in the composition root layer.  Note that factories are part of this layer and the container can be referenced there (which is necessary to create objects at runtime).  For example, see ShipStateFactory in the sample project.
@@ -289,10 +331,6 @@ Any ITickables or IInitializables that aren't given an explicit order are update
     * Constructor injection guarantees no circular dependencies between classes, which is generally a bad thing to do
     * Constructor injection is more portable for cases where you decide to re-use the code without a DI framework such as Zenject.  You can do the same with public properties but it's more error prone.  It's possible to forget to initialize one field and leave the object in an invalid state
     * Finally, Constructor injection makes it clear what all the dependencies of a class are when another programmer is reading the code.  They can simply look at the parameter list of the constructor.
-
-# "I still don't get it"
-
-Yasdfas
 
 # How is this different from Strange IoC?
 
