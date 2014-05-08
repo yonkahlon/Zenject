@@ -323,6 +323,10 @@ You can load the scene containing `LessonStandaloneStart` and specify a particul
 
 Note that you can still run the scene directly, in which case it will default to using "level01".  This is possible because we are using the InjectOptional flag.
 
+# Auto-Mocking using Moq
+
+TBD
+
 # Rules / Guidelines / Recommendations
 
 * The container should *only* be referenced in the composition root layer.  Note that factories are part of this layer and the container can be referenced there (which is necessary to create objects at runtime).  For example, see ShipStateFactory in the sample project.
