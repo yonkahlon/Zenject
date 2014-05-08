@@ -112,17 +112,14 @@ namespace ModestTree
             return unmangledName + "<" + String.Join(",", genericArguments.Select<Type,string>(GetPrettyName).ToArray()) + ">";
         }
 
+        public static IEnumerable<PropertyInfo> GetPropertiesWithAttribute<T>(this Type type)
+        {
+            return (from p in GetAllProperties(type) where p.GetCustomAttributes(typeof(T), true).Any() select p);
+        }
+
         public static IEnumerable<FieldInfo> GetFieldsWithAttribute<T>(this Type type)
         {
-            foreach (var fieldInfo in GetAllFields(type))
-            {
-                var attrs = fieldInfo.GetCustomAttributes(typeof(T), true);
-
-                if (attrs.Length > 0)
-                {
-                    yield return fieldInfo;
-                }
-            }
+            return (from f in GetAllFields(type) where f.GetCustomAttributes(typeof(T), true).Any() select f);
         }
 
         public static IEnumerable<FieldInfo> GetAllFields(this Type type)
@@ -132,6 +129,15 @@ namespace ModestTree
 
             var flags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly;
             return type.GetFields(flags).Concat(baseClassFields);
+        }
+
+        public static IEnumerable<PropertyInfo> GetAllProperties(this Type type)
+        {
+            // Recursion is necessary since otherwise we won't get private members in base classes
+            var baseClassProperties = (type.BaseType == null ? Enumerable.Empty<PropertyInfo>() : type.BaseType.GetAllProperties());
+
+            var flags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly;
+            return type.GetProperties(flags).Concat(baseClassProperties);
         }
     }
 }

@@ -16,6 +16,7 @@ namespace ModestTree.Zenject
         List<TickableInfo> _queuedTasks = new List<TickableInfo>();
 
         public StandardKernel(
+            [InjectOptional]
             List<ITickable> tickables,
             [InjectOptional]
             List<Tuple<Type, int>> priorities)

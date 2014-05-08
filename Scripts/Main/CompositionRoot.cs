@@ -44,10 +44,6 @@ namespace ModestTree.Zenject
             // Note: This has to go first
             _container.Bind<CompositionRoot>().ToSingle(this);
 
-            // Init default dependencies
-            _container.Bind<UnityEventManager>().ToSingleGameObject();
-            _container.Bind<GameObjectInstantiator>().ToSingle();
-
             if (_extraBindingLookup != null)
             {
                 _extraBindingLookup(_container);
