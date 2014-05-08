@@ -55,6 +55,11 @@ namespace ModestTree.Zenject
             return type.GetFieldsWithAttribute<InjectAttributeBase>();
         }
 
+        public static IEnumerable<PropertyInfo> GetPropertyDependencies(Type type)
+        {
+            return type.GetPropertiesWithAttribute<InjectAttributeBase>();
+        }
+
         public static ParameterInfo[] GetConstructorDependencies(Type concreteType)
         {
             ConstructorInfo method;
