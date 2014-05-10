@@ -51,7 +51,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Scripts\Binders\Binder.cs" />
     <Compile Include="Scripts\Binders\BindingConditionSetter.cs" />
-    <Compile Include="Scripts\Binders\CustomScope.cs" />
+    <Compile Include="Scripts\Binders\BindScope.cs" />
     <Compile Include="Scripts\Binders\ReferenceBinder.cs" />
     <Compile Include="Scripts\Binders\ValueBinder.cs" />
     <Compile Include="Scripts\Exceptions\ZenjectException.cs" />
@@ -71,7 +71,7 @@
     <Compile Include="Scripts\Misc\IDependencyRoot.cs" />
     <Compile Include="Scripts\Misc\IInitializable.cs" />
     <Compile Include="Scripts\Misc\IKernel.cs" />
-    <Compile Include="Scripts\Misc\InitializableInitializer.cs" />
+    <Compile Include="Scripts\Misc\InitializableHandler.cs" />
     <Compile Include="Scripts\Misc\InitializablePrioritiesInstaller.cs" />
     <Compile Include="Scripts\Misc\InjectAttribute.cs" />
     <Compile Include="Scripts\Misc\InstallerMonoBehaviourWrapper.cs" />
