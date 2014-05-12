@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Fasterflect;
 
 namespace ModestTree
 {
@@ -129,11 +130,7 @@ namespace ModestTree
 
         public static IEnumerable<MethodInfo> GetAllMethods(this Type type)
         {
-            // Recursion is necessary since otherwise we won't get private members in base classes
-            var baseClassMethods = type.BaseType == null ? Enumerable.Empty<MethodInfo>() : type.BaseType.GetAllMethods();
-
-            var flags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly;
-            return type.GetMethods(flags).Concat(baseClassMethods);
+            return type.Methods(Fasterflect.Flags.InstanceAnyVisibility | Fasterflect.Flags.ExcludeBackingMembers);
         }
 
         public static IEnumerable<FieldInfo> GetAllFields(this Type type)
