@@ -6,6 +6,7 @@ using Debug = UnityEngine.Debug;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using Fasterflect;
 
 namespace ModestTree
 {
@@ -20,9 +21,7 @@ namespace ModestTree
         {
             if (IsGenericList(type))
             {
-                var genericArgs = type.GetGenericArguments();
-                Assert.IsEqual(genericArgs.Length, 1);
-                contentsType = genericArgs[0];
+                contentsType = type.GetGenericArguments().Single();
                 return true;
             }
 
@@ -32,10 +31,9 @@ namespace ModestTree
 
         public static IList CreateGenericList(Type elementType, object[] contentsAsObj)
         {
-            var listType = typeof(List<>);
-            var constructedListType = listType.MakeGenericType(elementType);
+            var genericType = typeof(List<>).MakeGenericType(elementType);
 
-            var list = (IList)Activator.CreateInstance(constructedListType);
+            var list = (IList)Activator.CreateInstance(genericType);
 
             foreach (var obj in contentsAsObj)
             {
@@ -53,10 +51,9 @@ namespace ModestTree
         {
             Assert.That(keysAsObj.Length == valuesAsObj.Length);
 
-            var dictionaryType = typeof(Dictionary<,>);
-            var boundDictionaryType = dictionaryType.MakeGenericType(keyType, valueType);
+            var genericType = typeof(Dictionary<,>).MakeGenericType(keyType, valueType);
 
-            var dictionary = (IDictionary)Activator.CreateInstance(boundDictionaryType);
+            var dictionary = (IDictionary)Activator.CreateInstance(genericType);
 
             for (int i = 0; i < keysAsObj.Length; i++)
             {
@@ -76,18 +73,6 @@ namespace ModestTree
             }
 
             return toList;
-        }
-
-        public static List<string> GetFieldNamesWithAttribute<T>(Type type)
-        {
-            var names = new List<string>();
-
-            foreach (var field in type.GetFieldsWithAttribute<T>())
-            {
-                names.Add(field.Name);
-            }
-
-            return names;
         }
 
         // Returns more intuitive defaults
