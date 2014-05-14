@@ -25,7 +25,7 @@ namespace ModestTree.Zenject
                 Assert.That(tickableType.DerivesFrom<ITickable>(),
                     "Expected type '{0}' to derive from ITickable", tickableType.GetPrettyName());
 
-                _container.Bind<Tuple<Type, int>>().ToSingle(Tuple.New(tickableType, priorityCount)).WhenInjectedInto<StandardKernel>();
+                _container.Bind<Tuple<Type, int>>().To(Tuple.New(tickableType, priorityCount)).WhenInjectedInto<StandardKernel>();
                 priorityCount++;
             }
         }

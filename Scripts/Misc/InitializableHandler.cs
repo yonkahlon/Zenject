@@ -74,7 +74,7 @@ namespace ModestTree.Zenject
                 }
                 catch (Exception e)
                 {
-                    throw new ZenjectGeneralException(
+                    throw new ZenjectException(
                         e, "Error occurred while initializing IInitializable with type '" + initializable.GetType().GetPrettyName() + "'");
                 }
             }

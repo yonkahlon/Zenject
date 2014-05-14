@@ -14,12 +14,12 @@ namespace ModestTree.Zenject
 
         public BindingConditionSetter ToTransient()
         {
-            return To(new TransientProvider<TContract>(_container));
+            return ToProvider(new TransientProvider<TContract>(_container));
         }
 
         public BindingConditionSetter ToTransient<TConcrete>() where TConcrete : TContract
         {
-            return To(new TransientProvider<TConcrete>(_container));
+            return ToProvider(new TransientProvider<TConcrete>(_container));
         }
 
         public BindingConditionSetter ToSingle()
@@ -27,7 +27,7 @@ namespace ModestTree.Zenject
             //Assert.That(!typeof(TContract).IsSubclassOf(typeof(MonoBehaviour)),
             //    "Should not use ToSingle for Monobehaviours (when binding type " + typeof(TContract).GetPrettyName() + "), you probably want AsSingleFromPrefab or AsSingleGameObject");
 
-            return To(_singletonMap.CreateProvider<TContract>());
+            return ToProvider(_singletonMap.CreateProvider<TContract>());
         }
 
         public BindingConditionSetter ToSingle<TConcrete>() where TConcrete : TContract
@@ -35,19 +35,27 @@ namespace ModestTree.Zenject
             //Assert.That(!typeof(TConcrete).IsSubclassOf(typeof(MonoBehaviour)),
             //    "Should not use ToSingle for Monobehaviours (when binding type " + typeof(TContract).GetPrettyName() + "), you probably want AsSingleFromPrefab or AsSingleGameObject");
 
-            return To(_singletonMap.CreateProvider<TConcrete>());
+            return ToProvider(_singletonMap.CreateProvider<TConcrete>());
         }
 
         public BindingConditionSetter ToSingle(Type concreteType)
         {
             Assert.That(concreteType.DerivesFrom(typeof(TContract)));
-            return To(_singletonMap.CreateProvider(concreteType));
+            return ToProvider(_singletonMap.CreateProvider(concreteType));
+        }
+
+        public BindingConditionSetter To<TConcrete>(TConcrete instance) where TConcrete : TContract
+        {
+            Assert.That(instance != null || _container.AllowNullBindings, "provided instance is null");
+            return ToProvider(new InstanceProvider(instance));
         }
 
         public BindingConditionSetter ToSingle<TConcrete>(TConcrete instance) where TConcrete : TContract
         {
-            Assert.That(instance != null || _container.AllowNullBindings, "provided singleton instance is null");
-            return To(new SingletonInstanceProvider(instance));
+            Assert.That(instance != null || _container.AllowNullBindings,
+                "provided singleton instance is null");
+
+            return ToProvider(_singletonMap.CreateProvider(instance));
         }
 
         // we can't have this method because of the necessary where() below, so in this case they have to specify TContract twice
@@ -59,7 +67,7 @@ namespace ModestTree.Zenject
             // We have to cast to object otherwise we get SecurityExceptions when this function is run outside of unity
             Assert.That((object)(template) != null || _container.AllowNullBindings, "Received null template while binding type '" + typeof(TConcrete).GetPrettyName() + "'");
 
-            return To(new GameObjectSingletonProviderFromPrefab<TConcrete>(_container, template));
+            return ToProvider(new GameObjectSingletonProviderFromPrefab<TConcrete>(_container, template));
         }
 
         // Note: Here we assume that the contract is a component on the given prefab
@@ -67,7 +75,7 @@ namespace ModestTree.Zenject
         {
             // We have to cast to object otherwise we get SecurityExceptions when this function is run outside of unity
             Assert.That((object)(template) != null || _container.AllowNullBindings, "provided template instance is null");
-            return To(new GameObjectTransientProviderFromPrefab<TConcrete>(_container, template));
+            return ToProvider(new GameObjectTransientProviderFromPrefab<TConcrete>(_container, template));
         }
 
         public BindingConditionSetter ToSingleGameObject()
@@ -79,14 +87,14 @@ namespace ModestTree.Zenject
         public BindingConditionSetter ToSingleGameObject(string name)
         {
             Assert.That(typeof(TContract).IsSubclassOf(typeof(MonoBehaviour)), "Expected MonoBehaviour derived type when binding type '" + typeof(TContract).GetPrettyName() + "'");
-            return To(new GameObjectSingletonProvider<TContract>(_container, name));
+            return ToProvider(new GameObjectSingletonProvider<TContract>(_container, name));
         }
 
         // Creates a new game object and adds the given type as a new component on it
         public BindingConditionSetter ToSingleGameObject<TConcrete>(string name) where TConcrete : MonoBehaviour, TContract
         {
             Assert.That(typeof(TConcrete).IsSubclassOf(typeof(MonoBehaviour)), "Expected MonoBehaviour derived type when binding type '" + typeof(TConcrete).GetPrettyName() + "'");
-            return To(new GameObjectSingletonProvider<TConcrete>(_container, name));
+            return ToProvider(new GameObjectSingletonProvider<TConcrete>(_container, name));
         }
     }
 }

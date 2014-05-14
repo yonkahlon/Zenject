@@ -25,14 +25,36 @@ namespace ModestTree.Zenject
             return CreateProvider(typeof(TConcrete));
         }
 
+        public ProviderBase CreateProvider<TConcrete>(TConcrete instance)
+        {
+            return CreateProvider(typeof(TConcrete), instance);
+        }
+
         public ProviderBase CreateProvider(Type concreteType)
         {
+            return CreateProvider(concreteType, null);
+        }
+
+        public ProviderBase CreateProvider(Type concreteType, object instance)
+        {
+            Assert.That(instance == null || instance.GetType() == concreteType);
+
             SingletonLazyCreator creator;
 
             if (!_creators.TryGetValue(concreteType, out creator))
             {
                 creator = new SingletonLazyCreator(_container, this, concreteType);
                 _creators.Add(concreteType, creator);
+            }
+
+            if (instance != null)
+            {
+                if (creator.HasCreatedInstance())
+                {
+                    throw new ZenjectBindException("Found multiple singleton instances bound to the type '{0}'", concreteType.GetPrettyName());
+                }
+
+                creator.SetInstance(instance);
             }
 
             creator.IncRefCount();
@@ -71,6 +93,17 @@ namespace ModestTree.Zenject
                 {
                     _owner.RemoveCreator(_instanceType);
                 }
+            }
+
+            public void SetInstance(object instance)
+            {
+                Assert.IsNull(_instance);
+                _instance = instance;
+            }
+
+            public bool HasCreatedInstance()
+            {
+                return _instance != null;
             }
 
             public Type GetInstanceType()

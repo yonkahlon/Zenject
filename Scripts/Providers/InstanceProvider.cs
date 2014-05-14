@@ -4,11 +4,11 @@ using System.Linq;
 
 namespace ModestTree.Zenject
 {
-    public class SingletonInstanceProvider : ProviderBase
+    public class InstanceProvider : ProviderBase
     {
         readonly object _instance;
 
-        public SingletonInstanceProvider(object instance)
+        public InstanceProvider(object instance)
         {
             _instance = instance;
         }

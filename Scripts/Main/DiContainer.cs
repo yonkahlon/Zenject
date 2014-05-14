@@ -22,7 +22,7 @@ namespace ModestTree.Zenject
         public DiContainer()
         {
             _singletonMap = new SingletonProviderMap(this);
-            Bind<DiContainer>().ToSingle(this);
+            Bind<DiContainer>().To(this);
         }
 
         public bool AllowNullBindings

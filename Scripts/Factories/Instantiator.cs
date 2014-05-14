@@ -63,7 +63,7 @@ namespace ModestTree.Zenject
             }
             catch (Exception e)
             {
-                throw new ZenjectGeneralException(
+                throw new ZenjectResolveException(
                     e, "Error occurred while instantiating object with type '" + concreteType.GetPrettyName() + "'");
             }
 
