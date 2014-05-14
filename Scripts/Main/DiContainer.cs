@@ -272,13 +272,13 @@ namespace ModestTree.Zenject
             return new List<Type> {};
         }
 
-        internal object Resolve(InjectInfo injectInfo)
+        internal object Resolve(InjectableInfo injectInfo)
         {
             return Resolve(injectInfo, null);
         }
 
         internal object Resolve(
-            InjectInfo injectInfo, object targetInstance)
+            InjectableInfo injectInfo, object targetInstance)
         {
             var context = new ResolveContext(
                 injectInfo, LookupsInProgress.ToList(), targetInstance);
@@ -367,7 +367,7 @@ namespace ModestTree.Zenject
         {
             Assert.That(!_hasDisposed);
 
-            foreach (var injectMember in InjectionInfoHelper.GetAllDependencies(contract, false))
+            foreach (var injectMember in InjectablesFinder.GetAllInjectables(contract, false))
             {
                 yield return injectMember.ContractType;
             }

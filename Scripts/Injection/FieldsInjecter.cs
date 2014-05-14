@@ -25,7 +25,7 @@ namespace ModestTree.Zenject
 
             var additionalCopy = additional.ToList();
 
-            var injectInfos = InjectionInfoHelper.GetFieldAndPropertyDependencies(injectable.GetType());
+            var injectInfos = InjectablesFinder.GetFieldAndPropertyInjectables(injectable.GetType());
 
             foreach (var injectInfo in injectInfos)
             {
@@ -46,14 +46,14 @@ namespace ModestTree.Zenject
                     container.GetCurrentObjectGraph());
             }
 
-            foreach (var methodInfo in InjectionInfoHelper.GetPostInjectMethods(injectable.GetType()))
+            foreach (var methodInfo in InjectablesFinder.GetPostInjectMethods(injectable.GetType()))
             {
                 methodInfo.Invoke(injectable, new object[0]);
             }
         }
 
         static bool InjectFromExtras(
-            InjectInfo injectInfo,
+            InjectableInfo injectInfo,
             object injectable, List<object> additional)
         {
             foreach (object obj in additional)
@@ -72,7 +72,7 @@ namespace ModestTree.Zenject
         }
 
         static void InjectFromResolve(
-            InjectInfo injectInfo, DiContainer container, object targetInstance)
+            InjectableInfo injectInfo, DiContainer container, object targetInstance)
         {
             var valueObj = container.Resolve(injectInfo, targetInstance);
 

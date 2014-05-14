@@ -26,7 +26,7 @@ namespace ModestTree.Zenject
             DiContainer container, Type concreteType, params object[] constructorArgs)
         {
             ConstructorInfo method;
-            var injectInfos = InjectionInfoHelper.GetConstructorDependencies(concreteType, out method);
+            var injectInfos = InjectablesFinder.GetConstructorInjectables(concreteType, out method);
 
             var paramValues = new List<object>();
             var extrasList = new List<object>(constructorArgs);
@@ -73,7 +73,7 @@ namespace ModestTree.Zenject
         }
 
         static object ResolveFromType(
-            DiContainer container, ResolveContext context, object injectable, InjectInfo injectInfo)
+            DiContainer container, ResolveContext context, object injectable, InjectableInfo injectInfo)
         {
             if (container.HasBinding(injectInfo.ContractType, context))
             {

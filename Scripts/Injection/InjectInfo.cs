@@ -7,19 +7,8 @@ using System.Linq;
 
 namespace ModestTree.Zenject
 {
-    internal class InjectInfo
-    {
-        public bool Optional;
-        public object Identifier;
-        public string Name;
-        public Type ContractType;
-        public Type ContainedType;
-        // Null for constructor declared dependencies
-        public Action<object, object> Setter;
-    }
-
     // Helper to find data that needs to be injected
-    internal static class InjectionInfoHelper
+    internal static class InjectablesFinder
     {
         public static IEnumerable<MethodInfo> GetPostInjectMethods(Type type)
         {
@@ -28,23 +17,23 @@ namespace ModestTree.Zenject
                 typeof(PostInjectAttribute));
         }
 
-        public static IEnumerable<InjectInfo> GetAllDependencies(Type type)
+        public static IEnumerable<InjectableInfo> GetAllInjectables(Type type)
         {
-            return GetAllDependencies(type, true);
+            return GetAllInjectables(type, true);
         }
 
-        public static IEnumerable<InjectInfo> GetAllDependencies(Type type, bool strict)
+        public static IEnumerable<InjectableInfo> GetAllInjectables(Type type, bool strict)
         {
-            return GetConstructorDependencies(type, strict)
-                .Append(GetFieldAndPropertyDependencies(type));
+            return GetConstructorInjectables(type, strict)
+                .Append(GetFieldAndPropertyInjectables(type));
         }
 
-        public static IEnumerable<InjectInfo> GetFieldAndPropertyDependencies(Type type)
+        public static IEnumerable<InjectableInfo> GetFieldAndPropertyInjectables(Type type)
         {
-            return GetFieldDependencies(type).Append(GetPropertyDependencies(type));
+            return GetFieldInjectables(type).Append(GetPropertyInjectables(type));
         }
 
-        public static IEnumerable<InjectInfo> GetPropertyDependencies(Type type)
+        public static IEnumerable<InjectableInfo> GetPropertyInjectables(Type type)
         {
             var propInfos = type.PropertiesWith(
                 Fasterflect.Flags.InstanceAnyVisibility | Fasterflect.Flags.ExcludeBackingMembers,
@@ -52,47 +41,47 @@ namespace ModestTree.Zenject
 
             foreach (var propInfo in propInfos)
             {
-                yield return CreateInjectInfoForMember(propInfo, type);
+                yield return CreateForMember(propInfo, type);
             }
         }
 
-        public static IEnumerable<InjectInfo> GetFieldDependencies(Type type)
+        public static IEnumerable<InjectableInfo> GetFieldInjectables(Type type)
         {
             var fieldInfos = type.FieldsWith(
                 Fasterflect.Flags.InstanceAnyVisibility, typeof(InjectAttribute), typeof(InjectOptionalAttribute));
 
             foreach (var fieldInfo in fieldInfos)
             {
-                yield return CreateInjectInfoForMember(fieldInfo, type);
+                yield return CreateForMember(fieldInfo, type);
             }
         }
 
-        public static IEnumerable<InjectInfo> GetConstructorDependencies(Type containedType)
+        public static IEnumerable<InjectableInfo> GetConstructorInjectables(Type enclosingType)
         {
-            return GetConstructorDependencies(containedType, true);
+            return GetConstructorInjectables(enclosingType, true);
         }
 
-        public static IEnumerable<InjectInfo> GetConstructorDependencies(
-            Type containedType, bool strict)
+        public static IEnumerable<InjectableInfo> GetConstructorInjectables(
+            Type enclosingType, bool strict)
         {
             ConstructorInfo method;
-            return GetConstructorDependencies(containedType, out method, strict);
+            return GetConstructorInjectables(enclosingType, out method, strict);
         }
 
-        public static IEnumerable<InjectInfo> GetConstructorDependencies(Type containedType, out ConstructorInfo method)
+        public static IEnumerable<InjectableInfo> GetConstructorInjectables(Type enclosingType, out ConstructorInfo method)
         {
-            return GetConstructorDependencies(containedType, out method, true);
+            return GetConstructorInjectables(enclosingType, out method, true);
         }
 
-        public static IList<InjectInfo> GetConstructorDependencies(
-            Type containedType, out ConstructorInfo method, bool strict)
+        public static IList<InjectableInfo> GetConstructorInjectables(
+            Type enclosingType, out ConstructorInfo method, bool strict)
         {
-            var constructors = containedType.Constructors(Flags.Public | Flags.InstanceAnyVisibility);
+            var constructors = enclosingType.Constructors(Flags.Public | Flags.InstanceAnyVisibility);
 
             if (constructors.IsEmpty())
             {
                 method = null;
-                return new List<InjectInfo>();
+                return new List<InjectableInfo>();
             }
 
             if (constructors.HasMoreThan(1))
@@ -101,44 +90,45 @@ namespace ModestTree.Zenject
 
                 if (!strict && method == null)
                 {
-                    return new List<InjectInfo>();
+                    return new List<InjectableInfo>();
                 }
 
                 Assert.IsNotNull(method,
-                    "More than one constructor found for type '{0}' when creating dependencies.  Use [Inject] attribute to specify which to use.", containedType);
+                    "More than one constructor found for type '{0}' when creating dependencies.  Use [Inject] attribute to specify which to use.", enclosingType);
             }
             else
             {
                 method = constructors[0];
             }
 
-            return method.Parameters().Select(paramInfo => CreateInjectInfoForConstructorParam(paramInfo, containedType)).ToList();
+            return method.Parameters().Select(paramInfo => CreateForConstructorParam(paramInfo, enclosingType)).ToList();
         }
 
-        static InjectInfo CreateInjectInfoForConstructorParam(ParameterInfo paramInfo, Type containedType)
+        static InjectableInfo CreateForConstructorParam(
+            ParameterInfo paramInfo, Type enclosingType)
         {
             var injectAttr = paramInfo.Attribute<InjectAttribute>();
 
-            return new InjectInfo()
+            return new InjectableInfo()
             {
                 Optional = paramInfo.HasAttribute(typeof(InjectOptionalAttribute)),
                 Identifier = (injectAttr == null ? null : injectAttr.Identifier),
-                Name = paramInfo.Name,
+                SourceName = paramInfo.Name,
                 ContractType = paramInfo.ParameterType,
-                ContainedType = containedType,
+                EnclosingType = enclosingType,
             };
         }
 
-        static InjectInfo CreateInjectInfoForMember(MemberInfo memInfo, Type containedType)
+        static InjectableInfo CreateForMember(MemberInfo memInfo, Type enclosingType)
         {
             var injectAttr = memInfo.Attribute<InjectAttribute>();
 
-            var info = new InjectInfo()
+            var info = new InjectableInfo()
             {
                 Optional = memInfo.HasAttribute(typeof(InjectOptionalAttribute)),
                 Identifier = (injectAttr == null ? null : injectAttr.Identifier),
-                Name = memInfo.Name,
-                ContainedType = containedType,
+                SourceName = memInfo.Name,
+                EnclosingType = enclosingType,
             };
 
             if (memInfo is FieldInfo)

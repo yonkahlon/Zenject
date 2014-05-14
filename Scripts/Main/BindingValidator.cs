@@ -67,11 +67,11 @@ namespace ModestTree.Zenject
         {
             using (container.PushLookup(concreteType))
             {
-                var dependencies = InjectionInfoHelper.GetAllDependencies(concreteType);
+                var dependencies = InjectablesFinder.GetAllInjectables(concreteType);
 
                 foreach (var dependInfo in dependencies)
                 {
-                    Assert.IsEqual(dependInfo.ContainedType, concreteType);
+                    Assert.IsEqual(dependInfo.EnclosingType, concreteType);
 
                     var context = new ResolveContext(
                         dependInfo, container.LookupsInProgress.ToList(), null);
