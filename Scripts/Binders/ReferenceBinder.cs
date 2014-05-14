@@ -46,7 +46,7 @@ namespace ModestTree.Zenject
 
         public BindingConditionSetter ToSingle<TConcrete>(TConcrete instance) where TConcrete : TContract
         {
-            Assert.That(instance != null, "provided singleton instance is null");
+            Assert.That(instance != null || _container.AllowNullBindings, "provided singleton instance is null");
             return To(new SingletonInstanceProvider(instance));
         }
 
@@ -56,14 +56,17 @@ namespace ModestTree.Zenject
         // Note: Here we assume that the contract is a component on the given prefab
         public BindingConditionSetter ToSingleFromPrefab<TConcrete>(GameObject template) where TConcrete : Component, TContract
         {
-            Assert.IsNotNull(template, "Received null template while binding type '" + typeof(TConcrete).GetPrettyName() + "'");
+            // We have to cast to object otherwise we get SecurityExceptions when this function is run outside of unity
+            Assert.That((object)(template) != null || _container.AllowNullBindings, "Received null template while binding type '" + typeof(TConcrete).GetPrettyName() + "'");
+
             return To(new GameObjectSingletonProviderFromPrefab<TConcrete>(_container, template));
         }
 
         // Note: Here we assume that the contract is a component on the given prefab
         public BindingConditionSetter ToTransientFromPrefab<TConcrete>(GameObject template) where TConcrete : Component, TContract
         {
-            Assert.IsNotNull(template, "provided template instance is null");
+            // We have to cast to object otherwise we get SecurityExceptions when this function is run outside of unity
+            Assert.That((object)(template) != null || _container.AllowNullBindings, "provided template instance is null");
             return To(new GameObjectTransientProviderFromPrefab<TConcrete>(_container, template));
         }
 

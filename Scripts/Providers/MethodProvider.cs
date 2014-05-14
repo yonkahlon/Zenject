@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 namespace ModestTree.Zenject
 {
     public class MethodProvider<T> : ProviderBase
@@ -27,6 +29,11 @@ namespace ModestTree.Zenject
                     typeof(T).GetPrettyName(), _container.GetCurrentObjectGraph()));
 
             return obj;
+        }
+
+        public override void ValidateBinding()
+        {
+            // Can't validate method bindings so just assume its valid
         }
     }
 }

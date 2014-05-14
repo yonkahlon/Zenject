@@ -14,11 +14,15 @@ namespace ModestTree.Zenject
         {
             _prefab = prefab;
             _container = container;
-            _instantiator = _container.Resolve<GameObjectInstantiator>();
         }
 
         public TContract Create(params object[] constructorArgs)
         {
+            if (_instantiator == null)
+            {
+                _instantiator = _container.Resolve<GameObjectInstantiator>();
+            }
+
             var gameObj = _instantiator.Instantiate(_prefab, constructorArgs);
 
             var component = gameObj.GetComponentInChildren<TContract>();

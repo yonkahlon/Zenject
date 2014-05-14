@@ -26,25 +26,24 @@ namespace ModestTree.Zenject
             DiContainer container, Type concreteType, params object[] constructorArgs)
         {
             ConstructorInfo method;
-            var parameterInfos = InjectionInfoHelper.GetConstructorDependencies(concreteType, out method);
+            var injectInfos = InjectionInfoHelper.GetConstructorDependencies(concreteType, out method);
 
-            var parameters = new List<object>();
+            var paramValues = new List<object>();
             var extrasList = new List<object>(constructorArgs);
 
             Assert.That(!extrasList.Contains(null),
                 "Null value given to factory constructor arguments. This is currently not allowed");
 
-            foreach (var paramInfo in parameterInfos)
+            foreach (var injectInfo in injectInfos)
             {
                 var found = false;
-                var desiredType = paramInfo.ParameterType;
 
                 foreach (var extra in extrasList)
                 {
-                    if (extra == null && !desiredType.IsValueType || desiredType.IsAssignableFrom(extra.GetType()))
+                    if (extra.GetType().DerivesFrom(injectInfo.ContractType))
                     {
                         found = true;
-                        parameters.Add(extra);
+                        paramValues.Add(extra);
                         extrasList.Remove(extra);
                         break;
                     }
@@ -52,40 +51,7 @@ namespace ModestTree.Zenject
 
                 if (!found)
                 {
-                    var injectInfo = InjectionInfoHelper.GetInjectInfo(paramInfo);
-
-                    var context = new ResolveContext()
-                    {
-                        Target = concreteType,
-                        FieldName = paramInfo.Name,
-                        Identifier = injectInfo.Identifier,
-                        Parents = new List<Type>(container.LookupsInProgress)
-                    };
-
-                    // Dependencies that are lists are only optional if declared as such using the inject attribute
-                    bool isOptional = injectInfo.Optional;
-
-                    object param = null;
-
-                    if (container.HasBinding(paramInfo.ParameterType, context))
-                    {
-                        param = container.Resolve(paramInfo.ParameterType, context);
-                    }
-                    else if (ReflectionUtil.IsGenericList(desiredType))
-                    // If it's a list it might map to a collection
-                    {
-                        var subType = desiredType.GetGenericArguments().Single();
-                        param = container.ResolveMany(subType, context, isOptional);
-                    }
-
-                    if (param == null && !isOptional)
-                    {
-                        throw new ZenjectResolveException(
-                            "Unable to find parameter with type '{0}' while constructing '{1}'.\nObject graph:\n{2}",
-                            paramInfo.ParameterType.GetPrettyName(), concreteType.GetPrettyName(), container.GetCurrentObjectGraph());
-                    }
-
-                    parameters.Add(param);
+                    paramValues.Add(container.Resolve(injectInfo));
                 }
             }
 
@@ -93,7 +59,7 @@ namespace ModestTree.Zenject
 
             try
             {
-                newObj = method.Invoke(parameters.ToArray());
+                newObj = method.Invoke(paramValues.ToArray());
             }
             catch (Exception e)
             {
@@ -104,6 +70,31 @@ namespace ModestTree.Zenject
             FieldsInjecter.Inject(container, newObj, extrasList, true);
 
             return newObj;
+        }
+
+        static object ResolveFromType(
+            DiContainer container, ResolveContext context, object injectable, InjectInfo injectInfo)
+        {
+            if (container.HasBinding(injectInfo.ContractType, context))
+            {
+                return container.Resolve(injectInfo.ContractType, context);
+            }
+
+            // If it's a list it might map to a collection
+            if (ReflectionUtil.IsGenericList(injectInfo.ContractType))
+            {
+                var subType = injectInfo.ContractType.GetGenericArguments().Single();
+                return container.ResolveMany(subType, context, injectInfo.Optional);
+            }
+
+            if (!injectInfo.Optional)
+            {
+                throw new ZenjectResolveException(
+                    "Unable to find field with type '{0}' when injecting dependencies into '{1}'. \nObject graph:\n {2}",
+                    injectInfo.ContractType, injectable, container.GetCurrentObjectGraph());
+            }
+
+            return null;
         }
     }
 }

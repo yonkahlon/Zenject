@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace ModestTree.Zenject
 {
@@ -36,7 +37,7 @@ namespace ModestTree.Zenject
 
             creator.IncRefCount();
 
-            return new SingletonProvider(creator);
+            return new SingletonProvider(_container, creator);
         }
 
         ////////////////////// Internal classes
@@ -95,10 +96,13 @@ namespace ModestTree.Zenject
         class SingletonProvider : ProviderBase
         {
             SingletonLazyCreator _creator;
+            DiContainer _container;
 
-            public SingletonProvider(SingletonLazyCreator creator)
+            public SingletonProvider(
+                DiContainer container, SingletonLazyCreator creator)
             {
                 _creator = creator;
+                _container = container;
             }
 
             public override void Dispose()
@@ -114,6 +118,11 @@ namespace ModestTree.Zenject
             public override object GetInstance()
             {
                 return _creator.GetInstance();
+            }
+
+            public override void ValidateBinding()
+            {
+                BindingValidator.ValidateCanCreateConcrete(_container, GetInstanceType());
             }
         }
     }

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace ModestTree.Zenject
 {
@@ -20,6 +21,10 @@ namespace ModestTree.Zenject
         public override object GetInstance()
         {
             return _instance;
+        }
+
+        public override void ValidateBinding()
+        {
         }
     }
 }

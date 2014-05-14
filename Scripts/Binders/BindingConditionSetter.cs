@@ -7,10 +7,27 @@ namespace ModestTree.Zenject
     public class ResolveContext
     {
         public Type Target;
+        // note this is null for constructor params
         public object TargetInstance;
         public string FieldName;
         public object Identifier;
         public List<Type> Parents;
+
+        internal ResolveContext(
+            InjectInfo injectInfo, List<Type> parents, object targetInstance)
+        {
+            Identifier = injectInfo.Identifier;
+            FieldName = injectInfo.Name;
+            Target = injectInfo.ContainedType;
+            TargetInstance = targetInstance;
+            Parents = parents;
+        }
+
+        internal ResolveContext(Type targetType)
+        {
+            Parents = new List<Type>();
+            Target = targetType;
+        }
     }
 
     public delegate bool BindingCondition(ResolveContext c);
