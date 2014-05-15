@@ -12,7 +12,7 @@ namespace ModestTree.Zenject
 
         public BindingConditionSetter To(TContract value)
         {
-            return ToProvider(new InstanceProvider(value));
+            return ToProvider(new InstanceProvider(typeof(TContract), value));
         }
 
         public override BindingConditionSetter ToProvider(ProviderBase provider)

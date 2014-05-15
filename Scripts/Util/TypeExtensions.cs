@@ -16,7 +16,17 @@ namespace ModestTree
         // This seems easier to think about than IsAssignableFrom
         public static bool DerivesFrom(this Type a, Type b)
         {
-            return b.IsAssignableFrom(a);
+            return b != a && b.IsAssignableFrom(a);
+        }
+
+        public static bool DerivesFromOrEqual<T>(this Type a)
+        {
+            return DerivesFromOrEqual(a, typeof(T));
+        }
+
+        public static bool DerivesFromOrEqual(this Type a, Type b)
+        {
+            return b == a || b.IsAssignableFrom(a);
         }
 
         public static object GetDefaultValue(this Type type)

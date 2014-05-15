@@ -40,14 +40,14 @@ namespace ModestTree.Zenject
 
         public BindingConditionSetter ToSingle(Type concreteType)
         {
-            Assert.That(concreteType.DerivesFrom(typeof(TContract)) || (concreteType == null && _container.AllowNullBindings));
+            Assert.That(concreteType.DerivesFromOrEqual(typeof(TContract)) || (concreteType == null && _container.AllowNullBindings));
             return ToProvider(_singletonMap.CreateProvider(concreteType));
         }
 
         public BindingConditionSetter To<TConcrete>(TConcrete instance) where TConcrete : TContract
         {
             Assert.That(instance != null || _container.AllowNullBindings, "provided instance is null");
-            return ToProvider(new InstanceProvider(instance));
+            return ToProvider(new InstanceProvider(typeof(TConcrete), instance));
         }
 
         public BindingConditionSetter ToSingle<TConcrete>(TConcrete instance) where TConcrete : TContract

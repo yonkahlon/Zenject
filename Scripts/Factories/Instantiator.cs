@@ -47,7 +47,7 @@ namespace ModestTree.Zenject
 
                 foreach (var extra in extrasList)
                 {
-                    if (extra.GetType().DerivesFrom(injectInfo.ContractType))
+                    if (extra.GetType().DerivesFromOrEqual(injectInfo.ContractType))
                     {
                         found = true;
                         paramValues.Add(extra);

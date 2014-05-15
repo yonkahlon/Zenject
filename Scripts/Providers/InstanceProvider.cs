@@ -7,15 +7,19 @@ namespace ModestTree.Zenject
     public class InstanceProvider : ProviderBase
     {
         readonly object _instance;
+        readonly Type _instanceType;
 
-        public InstanceProvider(object instance)
+        public InstanceProvider(Type instanceType, object instance)
         {
+            Assert.That(instance == null || instance.GetType().DerivesFromOrEqual(instanceType));
+
             _instance = instance;
+            _instanceType = instanceType;
         }
 
         public override Type GetInstanceType()
         {
-            return _instance.GetType();
+            return _instanceType;
         }
 
         public override object GetInstance()
