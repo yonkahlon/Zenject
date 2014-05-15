@@ -50,11 +50,13 @@ namespace ModestTree.Zenject
             }
         }
 
+        // Note that this list is not exhaustive by any means
+        // It is also not necessary accurate
         public IEnumerable<Type> AllConcreteTypes
         {
             get
             {
-                return (from x in _providers from p in x.Value select p.GetInstanceType()).Distinct();
+                return (from x in _providers from p in x.Value select p.GetInstanceType()).Where(x => !x.IsInterface && !x.IsAbstract).Distinct();
             }
         }
 
