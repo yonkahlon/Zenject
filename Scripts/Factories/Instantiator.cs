@@ -5,25 +5,32 @@ using System.Linq;
 
 namespace ModestTree.Zenject
 {
-    public static class Instantiator
+    public class Instantiator
     {
-        public static T Instantiate<T>(
-            DiContainer container, params object[] constructorArgs)
+        readonly DiContainer _container;
+
+        public Instantiator(DiContainer container)
         {
-            return (T)Instantiate(container, typeof(T), constructorArgs);
+            _container = container;
         }
 
-        public static object Instantiate(
-            DiContainer container, Type concreteType, params object[] constructorArgs)
+        public T Instantiate<T>(
+            params object[] constructorArgs)
         {
-            using (container.PushLookup(concreteType))
+            return (T)Instantiate(typeof(T), constructorArgs);
+        }
+
+        public object Instantiate(
+            Type concreteType, params object[] constructorArgs)
+        {
+            using (_container.PushLookup(concreteType))
             {
-                return InstantiateInternal(container, concreteType, constructorArgs);
+                return InstantiateInternal(concreteType, constructorArgs);
             }
         }
 
-        static object InstantiateInternal(
-            DiContainer container, Type concreteType, params object[] constructorArgs)
+        object InstantiateInternal(
+            Type concreteType, params object[] constructorArgs)
         {
             ConstructorInfo method;
             var injectInfos = InjectablesFinder.GetConstructorInjectables(concreteType, out method);
@@ -51,7 +58,7 @@ namespace ModestTree.Zenject
 
                 if (!found)
                 {
-                    paramValues.Add(container.Resolve(injectInfo));
+                    paramValues.Add(_container.Resolve(injectInfo));
                 }
             }
 
@@ -67,31 +74,31 @@ namespace ModestTree.Zenject
                     e, "Error occurred while instantiating object with type '" + concreteType.GetPrettyName() + "'");
             }
 
-            FieldsInjecter.Inject(container, newObj, extrasList, true);
+            FieldsInjecter.Inject(_container, newObj, extrasList, true);
 
             return newObj;
         }
 
-        static object ResolveFromType(
-            DiContainer container, ResolveContext context, object injectable, InjectableInfo injectInfo)
+        object ResolveFromType(
+            ResolveContext context, object injectable, InjectableInfo injectInfo)
         {
-            if (container.HasBinding(injectInfo.ContractType, context))
+            if (_container.HasBinding(injectInfo.ContractType, context))
             {
-                return container.Resolve(injectInfo.ContractType, context);
+                return _container.Resolve(injectInfo.ContractType, context);
             }
 
             // If it's a list it might map to a collection
             if (ReflectionUtil.IsGenericList(injectInfo.ContractType))
             {
                 var subType = injectInfo.ContractType.GetGenericArguments().Single();
-                return container.ResolveMany(subType, context, injectInfo.Optional);
+                return _container.ResolveMany(subType, context, injectInfo.Optional);
             }
 
             if (!injectInfo.Optional)
             {
                 throw new ZenjectResolveException(
                     "Unable to find field with type '{0}' when injecting dependencies into '{1}'. \nObject graph:\n {2}",
-                    injectInfo.ContractType, injectable, container.GetCurrentObjectGraph());
+                    injectInfo.ContractType, injectable, _container.GetCurrentObjectGraph());
             }
 
             return null;

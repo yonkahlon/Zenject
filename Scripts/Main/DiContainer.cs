@@ -22,7 +22,12 @@ namespace ModestTree.Zenject
         public DiContainer()
         {
             _singletonMap = new SingletonProviderMap(this);
+
             Bind<DiContainer>().To(this);
+
+            // Pass an instance of Instantiator otherwise it will
+            // try to call itself to create itself
+            Bind<Instantiator>().ToSingle(new Instantiator(this));
         }
 
         public bool AllowNullBindings
@@ -42,6 +47,14 @@ namespace ModestTree.Zenject
             get
             {
                 return _providers.Keys;
+            }
+        }
+
+        public IEnumerable<Type> AllConcreteTypes
+        {
+            get
+            {
+                return (from x in _providers from p in x.Value select p.GetInstanceType()).Distinct();
             }
         }
 

@@ -71,6 +71,7 @@ namespace ModestTree.Zenject
             Type _instanceType;
             SingletonProviderMap _owner;
             DiContainer _container;
+            Instantiator _instantiator;
 
             public SingletonLazyCreator(
                 DiContainer container, SingletonProviderMap owner, Type instanceType)
@@ -115,7 +116,12 @@ namespace ModestTree.Zenject
             {
                 if (_instance == null)
                 {
-                    _instance = Instantiator.Instantiate(_container, _instanceType);
+                    if (_instantiator == null)
+                    {
+                        _instantiator = _container.Resolve<Instantiator>();
+                    }
+
+                    _instance = _instantiator.Instantiate(_instanceType);
                     Assert.That(_instance != null);
                 }
 
