@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Fasterflect;
 
 namespace ModestTree.Zenject
 {
@@ -59,7 +60,7 @@ namespace ModestTree.Zenject
             {
                 throw new ZenjectResolveException(
                     "Could not find required dependency with type '{0}' \nObject graph:\n{1}",
-                    contractType.GetPrettyName(), container.GetCurrentObjectGraph());
+                    contractType.Name(), container.GetCurrentObjectGraph());
             }
         }
 

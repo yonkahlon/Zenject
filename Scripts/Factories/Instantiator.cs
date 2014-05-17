@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Linq;
+using Fasterflect;
 
 namespace ModestTree.Zenject
 {
@@ -71,7 +72,7 @@ namespace ModestTree.Zenject
             catch (Exception e)
             {
                 throw new ZenjectResolveException(
-                    e, "Error occurred while instantiating object with type '" + concreteType.GetPrettyName() + "'");
+                    e, "Error occurred while instantiating object with type '" + concreteType.Name() + "'");
             }
 
             FieldsInjecter.Inject(_container, newObj, extrasList, true);

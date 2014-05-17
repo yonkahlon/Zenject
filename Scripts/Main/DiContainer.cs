@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using Fasterflect;
 
 namespace ModestTree.Zenject
 {
@@ -78,7 +79,7 @@ namespace ModestTree.Zenject
                 return "";
             }
 
-            return _lookupsInProgress.Select(t => t.GetPrettyName()).Reverse().Aggregate((i, str) => i + "\n" + str);
+            return _lookupsInProgress.Select(t => t.Name()).Reverse().Aggregate((i, str) => i + "\n" + str);
         }
 
         public void Dispose()
@@ -183,6 +184,17 @@ namespace ModestTree.Zenject
             BindingValidator.ValidateContract(this, contractType);
         }
 
+        public void ValidateCanCreateConcrete<TConcrete>()
+        {
+            ValidateCanCreateConcrete(typeof(TConcrete));
+        }
+
+        public void ValidateCanCreateConcrete(Type contractType)
+        {
+            Assert.That(!contractType.IsAbstract);
+            BindingValidator.ValidateCanCreateConcrete(this, contractType);
+        }
+
         public List<TContract> ResolveMany<TContract>()
         {
             Assert.That(!_hasDisposed);
@@ -266,7 +278,7 @@ namespace ModestTree.Zenject
             if (!optional)
             {
                 throw new ZenjectResolveException(
-                    "Could not find required dependency with type '" + contract.GetPrettyName() + "' \nObject graph:\n" + GetCurrentObjectGraph());
+                    "Could not find required dependency with type '" + contract.Name() + "' \nObject graph:\n" + GetCurrentObjectGraph());
             }
 
             // All many-dependencies are optional, return an empty list
@@ -351,7 +363,7 @@ namespace ModestTree.Zenject
                 if (!optional)
                 {
                     throw new ZenjectResolveException(
-                        "Unable to resolve type '{0}'. \nObject graph:\n{1}", contractType.GetPrettyName(), GetCurrentObjectGraph());
+                        "Unable to resolve type '{0}'. \nObject graph:\n{1}", contractType.Name(), GetCurrentObjectGraph());
                 }
 
                 return null;
@@ -363,7 +375,7 @@ namespace ModestTree.Zenject
                 {
                     throw new ZenjectResolveException(
                         "Found multiple matches when only one was expected for type '{0}'. \nObject graph:\n {1}",
-                            contractType.GetPrettyName(), GetCurrentObjectGraph());
+                            contractType.Name(), GetCurrentObjectGraph());
                 }
 
                 return null;

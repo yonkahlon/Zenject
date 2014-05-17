@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Fasterflect;
 
 namespace ModestTree.Zenject
 {
@@ -51,7 +52,7 @@ namespace ModestTree.Zenject
             {
                 if (creator.HasCreatedInstance())
                 {
-                    throw new ZenjectBindException("Found multiple singleton instances bound to the type '{0}'", concreteType.GetPrettyName());
+                    throw new ZenjectBindException("Found multiple singleton instances bound to the type '{0}'", concreteType.Name());
                 }
 
                 creator.SetInstance(instance);

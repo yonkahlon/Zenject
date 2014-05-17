@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using Fasterflect;
 
 namespace ModestTree.Zenject
 {
@@ -41,8 +42,8 @@ namespace ModestTree.Zenject
             {
                 throw new ZenjectResolveException(
                     "Passed unnecessary parameters when injecting into type '{0}'. \nExtra Parameters: {1}\nObject graph:\n{2}",
-                    injectable.GetType().GetPrettyName(),
-                    String.Join(",", additionalCopy.Select(x => x.GetType().GetPrettyName()).ToArray()),
+                    injectable.GetType().Name(),
+                    String.Join(",", additionalCopy.Select(x => x.GetType().Name()).ToArray()),
                     container.GetCurrentObjectGraph());
             }
 

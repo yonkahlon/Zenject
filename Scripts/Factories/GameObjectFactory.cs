@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using Fasterflect;
 
 namespace ModestTree.Zenject
 {
@@ -30,7 +31,7 @@ namespace ModestTree.Zenject
             if (component == null)
             {
                 throw new ZenjectResolveException(
-                    "Could not find component '{0}' when creating game object from prefab", typeof(TContract).GetPrettyName());
+                    "Could not find component '{0}' when creating game object from prefab", typeof(TContract).Name());
             }
 
             return component;

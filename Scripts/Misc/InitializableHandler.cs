@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using Fasterflect;
 
 namespace ModestTree.Zenject
 {
@@ -49,7 +50,7 @@ namespace ModestTree.Zenject
 
             foreach (var objType in unboundTypes)
             {
-                Log.WarnFormat("Found unbound IInitializable with type '{0}'", objType.GetPrettyName());
+                Log.WarnFormat("Found unbound IInitializable with type '{0}'", objType.Name());
             }
         }
 
@@ -92,7 +93,7 @@ namespace ModestTree.Zenject
                 catch (Exception e)
                 {
                     throw new ZenjectException(
-                        e, "Error occurred while initializing IInitializable with type '" + initializable.GetType().GetPrettyName() + "'");
+                        e, "Error occurred while initializing IInitializable with type '" + initializable.GetType().Name() + "'");
                 }
             }
         }

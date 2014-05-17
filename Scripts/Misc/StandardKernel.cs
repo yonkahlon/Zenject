@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
+using Fasterflect;
 
 namespace ModestTree.Zenject
 {
@@ -54,7 +55,7 @@ namespace ModestTree.Zenject
 
             foreach (var objType in unboundTypes)
             {
-                Log.WarnFormat("Found unbound ITickable with type '{0}'", objType.GetPrettyName());
+                Log.WarnFormat("Found unbound ITickable with type '{0}'", objType.Name());
             }
         }
 

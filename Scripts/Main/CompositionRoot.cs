@@ -53,6 +53,8 @@ namespace ModestTree.Zenject
 
         void Awake()
         {
+            Log.Debug("CompositionRoot Started");
+
             InitContainer();
             Register();
             Resolve();
