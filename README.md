@@ -887,9 +887,9 @@ If you have external resources that you want to clean up when the app closes, th
 
 Then in your installer you can include:
 
-    _container.Bind<Logger>().Bind();
-    _container.Bind<IInitializable>().Bind<Logger>();
-    _container.Bind<IDisposable>().Bind<Logger>();
+    _container.Bind<Logger>().ToSingle();
+    _container.Bind<IInitializable>().ToSingle<Logger>();
+    _container.Bind<IDisposable>().ToSingle<Logger>();
 
 This works because when the scene changes or your unity application is closed, the unity event OnDestroy() is called on all MonoBehaviours, including the CompositionRoot class.  The CompositionRoot class, which owns your DiContainer, calls Dispose() on the DiContainer, which then calls Dispose() on all objects that are bound to IDisposable.
 
