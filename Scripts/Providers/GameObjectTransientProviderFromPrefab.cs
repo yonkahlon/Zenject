@@ -26,9 +26,9 @@ namespace ModestTree.Zenject
             return _factory.Create();
         }
 
-        public override void ValidateBinding()
+        public override IEnumerable<ZenjectResolveException> ValidateBinding()
         {
-            BindingValidator.ValidateObjectGraph(_container, typeof(T));
+            return BindingValidator.ValidateObjectGraph(_container, typeof(T));
         }
     }
 }

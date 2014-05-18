@@ -47,10 +47,25 @@ namespace ModestTree.Zenject
 
             var installer = sceneInstallers.Single();
 
+            var resolveErrors = GetResolveErrors(compRoot, installer);
+
+            // Only show a few to avoid spamming the log too much
+            foreach (var error in resolveErrors.Take(10))
+            {
+                Debug.LogException(error);
+            }
+        }
+
+        static IEnumerable<ZenjectResolveException> GetResolveErrors(
+            CompositionRoot compRoot, ISceneInstaller installer)
+        {
             var modulesContainer = new DiContainer();
             installer.InstallModules(modulesContainer);
 
-            modulesContainer.ValidateResolve<List<Module>>();
+            foreach (var error in modulesContainer.ValidateResolve<List<Module>>())
+            {
+                yield return error;
+            }
 
             var container = new DiContainer();
 
@@ -62,7 +77,10 @@ namespace ModestTree.Zenject
                 module.AddBindings();
             }
 
-            container.ValidateResolve<IDependencyRoot>();
+            foreach (var error in container.ValidateResolve<IDependencyRoot>())
+            {
+                yield return error;
+            }
 
             // Also make sure we can fill in all the dependencies in the built-in scene
             foreach (var monoBehaviour in compRoot.GetComponentsInChildren<MonoBehaviour>())

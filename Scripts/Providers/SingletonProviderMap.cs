@@ -160,9 +160,9 @@ namespace ModestTree.Zenject
                 return _creator.GetInstance();
             }
 
-            public override void ValidateBinding()
+            public override IEnumerable<ZenjectResolveException> ValidateBinding()
             {
-                BindingValidator.ValidateObjectGraph(_container, GetInstanceType());
+                return BindingValidator.ValidateObjectGraph(_container, GetInstanceType());
             }
         }
     }

@@ -172,27 +172,27 @@ namespace ModestTree.Zenject
 
         // Walk the object graph for the given type
         // Throws ZenjectResolveException if there is a problem
-        public void ValidateResolve<TContract>()
+        public IEnumerable<ZenjectResolveException> ValidateResolve<TContract>()
         {
-            BindingValidator.ValidateContract(this, typeof(TContract));
+            return BindingValidator.ValidateContract(this, typeof(TContract));
         }
 
         // Walk the object graph for the given type
         // Throws ZenjectResolveException if there is a problem
-        public void ValidateResolve(Type contractType)
+        public IEnumerable<ZenjectResolveException> ValidateResolve(Type contractType)
         {
-            BindingValidator.ValidateContract(this, contractType);
+            return BindingValidator.ValidateContract(this, contractType);
         }
 
-        public void ValidateObjectGraph<TConcrete>(params Type[] extras)
+        public IEnumerable<ZenjectResolveException> ValidateObjectGraph<TConcrete>(params Type[] extras)
         {
-            ValidateObjectGraph(typeof(TConcrete), extras);
+            return ValidateObjectGraph(typeof(TConcrete), extras);
         }
 
-        public void ValidateObjectGraph(Type contractType, params Type[] extras)
+        public IEnumerable<ZenjectResolveException> ValidateObjectGraph(Type contractType, params Type[] extras)
         {
             Assert.That(!contractType.IsAbstract);
-            BindingValidator.ValidateObjectGraph(this, contractType, extras);
+            return BindingValidator.ValidateObjectGraph(this, contractType, extras);
         }
 
         public List<TContract> ResolveMany<TContract>()

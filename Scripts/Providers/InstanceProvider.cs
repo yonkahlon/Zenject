@@ -27,8 +27,9 @@ namespace ModestTree.Zenject
             return _instance;
         }
 
-        public override void ValidateBinding()
+        public override IEnumerable<ZenjectResolveException> ValidateBinding()
         {
+            return Enumerable.Empty<ZenjectResolveException>();
         }
     }
 }

@@ -26,7 +26,7 @@ namespace ModestTree.Zenject
         public abstract object GetInstance();
         public abstract Type GetInstanceType();
 
-        public abstract void ValidateBinding();
+        public abstract IEnumerable<ZenjectResolveException> ValidateBinding();
 
         public virtual void Dispose()
         {
