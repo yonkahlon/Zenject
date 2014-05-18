@@ -18,9 +18,10 @@ namespace ModestTree.Zenject
 
         public abstract void AddBindings();
 
-        public virtual void ValidateSubGraphs()
+        public virtual IEnumerable<ZenjectResolveException> ValidateSubGraphs()
         {
             // optional
+            return Enumerable.Empty<ZenjectResolveException>();
         }
     }
 }

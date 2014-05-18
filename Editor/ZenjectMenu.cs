@@ -47,12 +47,21 @@ namespace ModestTree.Zenject
 
             var installer = sceneInstallers.Single();
 
-            var resolveErrors = GetResolveErrors(compRoot, installer);
+            var resolveErrors = GetResolveErrors(compRoot, installer).Take(10);
 
             // Only show a few to avoid spamming the log too much
-            foreach (var error in resolveErrors.Take(10))
+            foreach (var error in resolveErrors)
             {
                 Debug.LogException(error);
+            }
+
+            if (resolveErrors.Any())
+            {
+                Debug.LogError("Validation Completed With Errors");
+            }
+            else
+            {
+                Debug.Log("Validation Completed Successfully");
             }
         }
 
@@ -85,15 +94,19 @@ namespace ModestTree.Zenject
             // Also make sure we can fill in all the dependencies in the built-in scene
             foreach (var monoBehaviour in compRoot.GetComponentsInChildren<MonoBehaviour>())
             {
-                container.ValidateObjectGraph(monoBehaviour.GetType());
+                foreach (var error in container.ValidateObjectGraph(monoBehaviour.GetType()))
+                {
+                    yield return error;
+                }
             }
 
             foreach (var module in allModules)
             {
-                module.ValidateSubGraphs();
+                foreach (var error in module.ValidateSubGraphs())
+                {
+                    yield return error;
+                }
             }
-
-            UnityEngine.Debug.Log("Validation succeeded for object graph given by '" + installer.GetType().Name() + "'");
         }
 
         [MenuItem("Assets/Zenject/Output Object Graph For Current Scene")]
