@@ -184,15 +184,15 @@ namespace ModestTree.Zenject
             BindingValidator.ValidateContract(this, contractType);
         }
 
-        public void ValidateCanCreateConcrete<TConcrete>()
+        public void ValidateObjectGraph<TConcrete>(params Type[] extras)
         {
-            ValidateCanCreateConcrete(typeof(TConcrete));
+            ValidateObjectGraph(typeof(TConcrete), extras);
         }
 
-        public void ValidateCanCreateConcrete(Type contractType)
+        public void ValidateObjectGraph(Type contractType, params Type[] extras)
         {
             Assert.That(!contractType.IsAbstract);
-            BindingValidator.ValidateCanCreateConcrete(this, contractType);
+            BindingValidator.ValidateObjectGraph(this, contractType, extras);
         }
 
         public List<TContract> ResolveMany<TContract>()

@@ -24,8 +24,6 @@ namespace ModestTree.Zenject
         {
             var matches = container.GetProviderMatches(contractType, context);
 
-            bool isValid = true;
-
             if (matches.IsLength(1))
             {
                 matches.Single().ValidateBinding();
@@ -40,7 +38,12 @@ namespace ModestTree.Zenject
 
                     if (matches.IsEmpty())
                     {
-                        isValid = isOptional;
+                        if (!isOptional)
+                        {
+                            throw new ZenjectResolveException(
+                                "Could not find dependency with type 'List<{0}>' when injecting into '{1}.  If the empty list is also valid, you can allow this by using the [InjectOptional] attribute.' \nObject graph:\n{2}",
+                                subType.Name(), context.EnclosingType.Name(), container.GetCurrentObjectGraph());
+                        }
                     }
                     else
                     {
@@ -52,27 +55,39 @@ namespace ModestTree.Zenject
                 }
                 else
                 {
-                    isValid = isOptional;
-                }
-            }
+                    if (!isOptional)
+                    {
+                        if (matches.IsEmpty())
+                        {
+                            throw new ZenjectResolveException(
+                                "Could not find required dependency with type '{0}' when injecting into '{1}' \nObject graph:\n{2}",
+                                contractType.Name(), context.EnclosingType.Name(), container.GetCurrentObjectGraph());
+                        }
 
-            if (!isValid)
-            {
-                throw new ZenjectResolveException(
-                    "Could not find required dependency with type '{0}' \nObject graph:\n{1}",
-                    contractType.Name(), container.GetCurrentObjectGraph());
+                        throw new ZenjectResolveException(
+                            "Found multiple matches when only one was expected for dependency with type '{0}' when injecting into '{1}' \nObject graph:\n{2}",
+                            contractType.Name(), context.EnclosingType.Name(), container.GetCurrentObjectGraph());
+                    }
+                }
             }
         }
 
-        public static void ValidateCanCreateConcrete(DiContainer container, Type concreteType)
+        public static void ValidateObjectGraph(
+            DiContainer container, Type concreteType, params Type[] extras)
         {
             using (container.PushLookup(concreteType))
             {
                 var dependencies = InjectablesFinder.GetAllInjectables(concreteType);
+                var extrasList = extras.ToList();
 
                 foreach (var dependInfo in dependencies)
                 {
                     Assert.IsEqual(dependInfo.EnclosingType, concreteType);
+
+                    if (TryTakingFromExtras(dependInfo.ContractType, extrasList))
+                    {
+                        continue;
+                    }
 
                     var context = new ResolveContext(
                         dependInfo, container.LookupsInProgress.ToList(), null);
@@ -81,6 +96,20 @@ namespace ModestTree.Zenject
                         container, dependInfo.ContractType, context, dependInfo.Optional);
                 }
             }
+        }
+
+        static bool TryTakingFromExtras(Type contractType, List<Type> extrasList)
+        {
+            foreach (var extraType in extrasList)
+            {
+                if (extraType.DerivesFromOrEqual(contractType))
+                {
+                    extrasList.RemoveWithConfirm(extraType);
+                    return true;
+                }
+            }
+
+            return false;
         }
     }
 }

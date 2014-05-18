@@ -35,7 +35,7 @@ namespace ModestTree.Zenject
 
         public override void ValidateBinding()
         {
-            BindingValidator.ValidateCanCreateConcrete(_container, typeof(T));
+            BindingValidator.ValidateObjectGraph(_container, typeof(T));
         }
     }
 }
