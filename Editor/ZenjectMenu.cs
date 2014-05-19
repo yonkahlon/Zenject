@@ -47,7 +47,7 @@ namespace ModestTree.Zenject
 
             var installer = sceneInstallers.Single();
 
-            var resolveErrors = GetResolveErrors(compRoot, installer).Take(10);
+            var resolveErrors = ZenUtil.ValidateInstaller(installer, false, compRoot).Take(10);
 
             // Only show a few to avoid spamming the log too much
             foreach (var error in resolveErrors)
@@ -62,50 +62,6 @@ namespace ModestTree.Zenject
             else
             {
                 Debug.Log("Validation Completed Successfully");
-            }
-        }
-
-        static IEnumerable<ZenjectResolveException> GetResolveErrors(
-            CompositionRoot compRoot, ISceneInstaller installer)
-        {
-            var modulesContainer = new DiContainer();
-            installer.InstallModules(modulesContainer);
-
-            foreach (var error in modulesContainer.ValidateResolve<List<Module>>())
-            {
-                yield return error;
-            }
-
-            var container = new DiContainer();
-
-            var allModules = modulesContainer.ResolveMany<Module>();
-
-            foreach (var module in allModules)
-            {
-                module.Container = container;
-                module.AddBindings();
-            }
-
-            foreach (var error in container.ValidateResolve<IDependencyRoot>())
-            {
-                yield return error;
-            }
-
-            // Also make sure we can fill in all the dependencies in the built-in scene
-            foreach (var monoBehaviour in compRoot.GetComponentsInChildren<MonoBehaviour>())
-            {
-                foreach (var error in container.ValidateObjectGraph(monoBehaviour.GetType()))
-                {
-                    yield return error;
-                }
-            }
-
-            foreach (var module in allModules)
-            {
-                foreach (var error in module.ValidateSubGraphs())
-                {
-                    yield return error;
-                }
             }
         }
 

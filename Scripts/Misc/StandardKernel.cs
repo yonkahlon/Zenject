@@ -63,7 +63,7 @@ namespace ModestTree.Zenject
         {
             get
             {
-                return ActiveTasks.Append(_queuedTasks);
+                return ActiveTasks.Concat(_queuedTasks);
             }
         }
 
@@ -71,7 +71,7 @@ namespace ModestTree.Zenject
         {
             get
             {
-                return _sortedTasks.Append(_unsortedTasks);
+                return _sortedTasks.Concat(_unsortedTasks);
             }
         }
 
@@ -99,7 +99,7 @@ namespace ModestTree.Zenject
 
         public void RemoveTask(ITickable task)
         {
-            var info = _sortedTasks.Append(_unsortedTasks).Where(x => x.Tickable == task).Single();
+            var info = _sortedTasks.Concat(_unsortedTasks).Where(x => x.Tickable == task).Single();
 
             Assert.That(!info.IsRemoved, "Tried to remove task twice, task = " + task.GetType().Name);
             info.IsRemoved = true;

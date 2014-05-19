@@ -27,5 +27,57 @@ namespace ModestTree.Zenject
             CompositionRoot.ExtraBindingsLookup = extraBindings;
             Application.LoadLevelAdditive(levelName);
         }
+
+        public static IEnumerable<ZenjectResolveException> ValidateInstaller(ISceneInstaller installer, bool allowNullBindings)
+        {
+            return ValidateInstaller(installer, allowNullBindings, null);
+        }
+
+        public static IEnumerable<ZenjectResolveException> ValidateInstaller(ISceneInstaller installer, bool allowNullBindings, CompositionRoot compRoot)
+        {
+            var modulesContainer = new DiContainer();
+            installer.InstallModules(modulesContainer);
+
+            foreach (var error in modulesContainer.ValidateResolve<List<Module>>())
+            {
+                yield return error;
+            }
+
+            var allModules = modulesContainer.ResolveMany<Module>();
+
+            var execContainer = new DiContainer();
+            execContainer.AllowNullBindings = allowNullBindings;
+
+            foreach (var module in allModules)
+            {
+                module.Container = execContainer;
+                module.AddBindings();
+            }
+
+            foreach (var error in execContainer.ValidateResolve<IDependencyRoot>())
+            {
+                yield return error;
+            }
+
+            foreach (var module in allModules)
+            {
+                foreach (var error in module.ValidateSubGraphs())
+                {
+                    yield return error;
+                }
+            }
+
+            if (!UnityUtil.IsNull(compRoot))
+            {
+                // Also make sure we can fill in all the dependencies in the built-in scene
+                foreach (var monoBehaviour in compRoot.GetComponentsInChildren<MonoBehaviour>())
+                {
+                    foreach (var error in execContainer.ValidateObjectGraph(monoBehaviour.GetType()))
+                    {
+                        yield return error;
+                    }
+                }
+            }
+        }
     }
 }
