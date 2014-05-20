@@ -48,6 +48,8 @@ namespace ModestTree.Zenject
             var execContainer = new DiContainer();
             execContainer.AllowNullBindings = allowNullBindings;
 
+            execContainer.Bind<CompositionRoot>().To(compRoot);
+
             foreach (var module in allModules)
             {
                 module.Container = execContainer;
