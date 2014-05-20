@@ -86,10 +86,12 @@ namespace ModestTree.Zenject
         {
             Assert.That(!_hasDisposed);
 
-            foreach (var disposable in ResolveMany<IDisposable>())
-            {
-                disposable.Dispose();
-            }
+            // TODO: Fix this
+            // It should not call resolve here because this will actually create new objects
+            //foreach (var disposable in ResolveMany<IDisposable>())
+            //{
+                //disposable.Dispose();
+            //}
 
             _hasDisposed = true;
         }
