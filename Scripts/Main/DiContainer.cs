@@ -28,7 +28,7 @@ namespace ModestTree.Zenject
 
             // Pass an instance of Instantiator otherwise it will
             // try to call itself to create itself
-            Bind<Instantiator>().ToSingle(new Instantiator(this));
+            Bind<Instantiator>().To(new Instantiator(this));
         }
 
         public bool AllowNullBindings
