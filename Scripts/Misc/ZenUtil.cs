@@ -24,7 +24,7 @@ namespace ModestTree.Zenject
 
         public static void LoadSceneAdditive(string levelName, Action<DiContainer> extraBindings)
         {
-            LoadSceneAdditive(levelName, extraBindings);
+            LoadSceneAdditive(levelName, extraBindings, null);
         }
 
         public static void LoadSceneAdditive(string levelName, Action<DiContainer> extraBindings, Action<DiContainer> installerBindings)
