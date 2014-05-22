@@ -191,6 +191,17 @@ namespace ModestTree.Zenject
             return ValidateObjectGraph(typeof(TConcrete), extras);
         }
 
+        public IEnumerable<ZenjectResolveException> ValidateObjectGraphsForTypes(params Type[] types)
+        {
+            foreach (var type in types)
+            {
+                foreach (var error in ValidateObjectGraph(type))
+                {
+                    yield return error;
+                }
+            }
+        }
+
         public IEnumerable<ZenjectResolveException> ValidateObjectGraph(Type contractType, params Type[] extras)
         {
             Assert.That(!contractType.IsAbstract);

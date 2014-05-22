@@ -162,6 +162,12 @@ namespace ModestTree.Zenject
 
             public override IEnumerable<ZenjectResolveException> ValidateBinding()
             {
+                if (_creator.HasCreatedInstance())
+                {
+                    // This would be the case if given an instance at binding time with ToSingle(instance)
+                    return Enumerable.Empty<ZenjectResolveException>();
+                }
+
                 return BindingValidator.ValidateObjectGraph(_container, GetInstanceType());
             }
         }
