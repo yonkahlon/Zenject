@@ -24,5 +24,11 @@ namespace ModestTree.Zenject
             // optional
             return Enumerable.Empty<ZenjectResolveException>();
         }
+
+        // Helper method for ValidateSubGraphs
+        protected IEnumerable<ZenjectResolveException> Validate<T>(params Type[] extraTypes)
+        {
+            return _container.ValidateObjectGraph<T>(extraTypes);
+        }
     }
 }
