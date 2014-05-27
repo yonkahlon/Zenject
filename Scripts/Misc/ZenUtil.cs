@@ -11,6 +11,11 @@ namespace ModestTree.Zenject
 {
     public class ZenUtil
     {
+        public static void LoadScene(string levelName)
+        {
+            ZenUtil.LoadScene(levelName, null);
+        }
+
         public static void LoadScene(string levelName, Action<DiContainer> extraBindings)
         {
             CompositionRoot.ExtraBindingsLookup = extraBindings;

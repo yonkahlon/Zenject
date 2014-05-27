@@ -34,7 +34,7 @@ namespace ModestTree.Zenject
         public BindingConditionSetter ToSingle()
         {
             //Assert.That(!ContractType.IsSubclassOf(typeof(MonoBehaviour)),
-            //    "Should not use ToSingle for Monobehaviours (when binding type " + ContractType.Name() + "), you probably want AsSingleFromPrefab or AsSingleGameObject");
+            //    "Should not use ToSingle for Monobehaviours (when binding type " + ContractType.Name() + "), you probably want ToSingleFromPrefab or ToSingleGameObject");
 
             return ToProvider(_singletonMap.CreateProvider<TContract>());
         }
@@ -42,7 +42,7 @@ namespace ModestTree.Zenject
         public BindingConditionSetter ToSingle<TConcrete>() where TConcrete : TContract
         {
             //Assert.That(!typeof(TConcrete).IsSubclassOf(typeof(MonoBehaviour)),
-            //    "Should not use ToSingle for Monobehaviours (when binding type " + ContractType.Name() + "), you probably want AsSingleFromPrefab or AsSingleGameObject");
+            //    "Should not use ToSingle for Monobehaviours (when binding type " + ContractType.Name() + "), you probably want ToSingleFromPrefab or ToSingleGameObject");
 
             return ToProvider(_singletonMap.CreateProvider<TConcrete>());
         }
