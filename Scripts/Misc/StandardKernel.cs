@@ -122,7 +122,8 @@ namespace ModestTree.Zenject
                 !x.IsRemoved && x.Priority >= minPriority && x.Priority < maxPriority))
             {
                 Assert.That(taskInfo.Priority.HasValue);
-                taskInfo.Tickable.Tick();
+
+                LogUtil.CallAndCatchExceptions(() => taskInfo.Tickable.Tick());
             }
 
             ClearRemovedTasks(_sortedTasks);
