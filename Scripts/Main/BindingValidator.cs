@@ -107,6 +107,15 @@ namespace ModestTree.Zenject
                         yield return error;
                     }
                 }
+
+                if (!extrasList.IsEmpty())
+                {
+                    yield return new ZenjectResolveException(
+                        "Found unnecessary extra parameters passed when injecting into '{0}' with types '{1}'.  \nObject graph:\n{2}",
+                        concreteType.Name(),
+                        String.Join(",", extrasList.Select(x => x.Name()).ToArray()),
+                        container.GetCurrentObjectGraph());
+                }
             }
         }
 
