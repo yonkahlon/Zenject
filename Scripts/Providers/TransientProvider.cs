@@ -19,6 +19,11 @@ namespace ModestTree.Zenject
             return typeof(T);
         }
 
+        public override bool HasInstance()
+        {
+            return false;
+        }
+
         public override object GetInstance()
         {
             var obj = _factory.Create();

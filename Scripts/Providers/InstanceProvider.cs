@@ -22,6 +22,11 @@ namespace ModestTree.Zenject
             return _instanceType;
         }
 
+        public override bool HasInstance()
+        {
+            return true;
+        }
+
         public override object GetInstance()
         {
             return _instance;

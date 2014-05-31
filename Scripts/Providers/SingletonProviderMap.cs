@@ -150,6 +150,11 @@ namespace ModestTree.Zenject
                 _creator.DecRefCount();
             }
 
+            public override bool HasInstance()
+            {
+                return _creator.HasCreatedInstance();
+            }
+
             public override Type GetInstanceType()
             {
                 return _creator.GetInstanceType();
