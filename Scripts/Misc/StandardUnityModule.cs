@@ -1,11 +1,12 @@
 using System;
+using System.Linq;
 
 namespace ModestTree.Zenject
 {
-    public class StandardUnityInstaller : Installer
+    public class StandardUnityModule : Module
     {
         // Install basic functionality for most unity apps
-        public override void RegisterBindings()
+        public override void AddBindings()
         {
             _container.Bind<UnityKernel>().ToSingleGameObject();
 
@@ -13,8 +14,8 @@ namespace ModestTree.Zenject
             _container.Bind<GameObjectInstantiator>().ToSingle();
 
             _container.Bind<StandardKernel>().ToSingle();
-            // Uncomment this once you remove dependency in PlayerSandboxWrapper
-            //_container.Bind<StandardKernel>().ToTransient().WhenInjectedInto<UnityKernel>();
+            // TODO: Do this instead:
+            //_container.Bind<IKernel>().ToTransient<StandardKernel>();
 
             _container.Bind<InitializableHandler>().ToSingle();
             _container.Bind<ITickable>().ToLookup<UnityEventManager>();

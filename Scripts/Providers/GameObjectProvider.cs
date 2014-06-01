@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace ModestTree.Zenject
@@ -21,6 +23,11 @@ namespace ModestTree.Zenject
             return typeof(T);
         }
 
+        public override bool HasInstance()
+        {
+            return _instance != null;
+        }
+
         public override object GetInstance()
         {
             if (_instance == null)
@@ -36,6 +43,11 @@ namespace ModestTree.Zenject
             }
 
             return _instance;
+        }
+
+        public override IEnumerable<ZenjectResolveException> ValidateBinding()
+        {
+            return BindingValidator.ValidateObjectGraph(_container, typeof(T));
         }
     }
 }

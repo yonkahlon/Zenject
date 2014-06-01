@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using Fasterflect;
 
 namespace ModestTree.Zenject
 {
@@ -24,8 +26,20 @@ namespace ModestTree.Zenject
             return CreateProvider(typeof(TConcrete));
         }
 
+        public ProviderBase CreateProvider<TConcrete>(TConcrete instance)
+        {
+            return CreateProvider(typeof(TConcrete), instance);
+        }
+
         public ProviderBase CreateProvider(Type concreteType)
         {
+            return CreateProvider(concreteType, null);
+        }
+
+        public ProviderBase CreateProvider(Type concreteType, object instance)
+        {
+            Assert.That(instance == null || instance.GetType() == concreteType);
+
             SingletonLazyCreator creator;
 
             if (!_creators.TryGetValue(concreteType, out creator))
@@ -34,9 +48,19 @@ namespace ModestTree.Zenject
                 _creators.Add(concreteType, creator);
             }
 
+            if (instance != null)
+            {
+                if (creator.HasCreatedInstance())
+                {
+                    throw new ZenjectBindException("Found multiple singleton instances bound to the type '{0}'", concreteType.Name());
+                }
+
+                creator.SetInstance(instance);
+            }
+
             creator.IncRefCount();
 
-            return new SingletonProvider(creator);
+            return new SingletonProvider(_container, creator);
         }
 
         ////////////////////// Internal classes
@@ -48,6 +72,7 @@ namespace ModestTree.Zenject
             Type _instanceType;
             SingletonProviderMap _owner;
             DiContainer _container;
+            Instantiator _instantiator;
 
             public SingletonLazyCreator(
                 DiContainer container, SingletonProviderMap owner, Type instanceType)
@@ -72,6 +97,17 @@ namespace ModestTree.Zenject
                 }
             }
 
+            public void SetInstance(object instance)
+            {
+                Assert.IsNull(_instance);
+                _instance = instance;
+            }
+
+            public bool HasCreatedInstance()
+            {
+                return _instance != null;
+            }
+
             public Type GetInstanceType()
             {
                 return _instanceType;
@@ -81,7 +117,12 @@ namespace ModestTree.Zenject
             {
                 if (_instance == null)
                 {
-                    _instance = Instantiator.Instantiate(_container, _instanceType);
+                    if (_instantiator == null)
+                    {
+                        _instantiator = _container.Resolve<Instantiator>();
+                    }
+
+                    _instance = _instantiator.Instantiate(_instanceType);
                     Assert.That(_instance != null);
                 }
 
@@ -95,15 +136,23 @@ namespace ModestTree.Zenject
         class SingletonProvider : ProviderBase
         {
             SingletonLazyCreator _creator;
+            DiContainer _container;
 
-            public SingletonProvider(SingletonLazyCreator creator)
+            public SingletonProvider(
+                DiContainer container, SingletonLazyCreator creator)
             {
                 _creator = creator;
+                _container = container;
             }
 
             public override void Dispose()
             {
                 _creator.DecRefCount();
+            }
+
+            public override bool HasInstance()
+            {
+                return _creator.HasCreatedInstance();
             }
 
             public override Type GetInstanceType()
@@ -114,6 +163,17 @@ namespace ModestTree.Zenject
             public override object GetInstance()
             {
                 return _creator.GetInstance();
+            }
+
+            public override IEnumerable<ZenjectResolveException> ValidateBinding()
+            {
+                if (_creator.HasCreatedInstance())
+                {
+                    // This would be the case if given an instance at binding time with ToSingle(instance)
+                    return Enumerable.Empty<ZenjectResolveException>();
+                }
+
+                return BindingValidator.ValidateObjectGraph(_container, GetInstanceType());
             }
         }
     }

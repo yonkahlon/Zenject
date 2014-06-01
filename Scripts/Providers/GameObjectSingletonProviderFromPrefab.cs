@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace ModestTree.Zenject
@@ -7,15 +9,22 @@ namespace ModestTree.Zenject
     {
         IFactory<T> _factory;
         object _instance;
+        DiContainer _container;
 
         public GameObjectSingletonProviderFromPrefab(DiContainer container, GameObject template)
         {
             _factory = new GameObjectFactory<T>(container, template);
+            _container = container;
         }
 
         public override Type GetInstanceType()
         {
             return typeof(T);
+        }
+
+        public override bool HasInstance()
+        {
+            return _instance != null;
         }
 
         public override object GetInstance()
@@ -27,6 +36,11 @@ namespace ModestTree.Zenject
             }
 
             return _instance;
+        }
+
+        public override IEnumerable<ZenjectResolveException> ValidateBinding()
+        {
+            return BindingValidator.ValidateObjectGraph(_container, typeof(T));
         }
     }
 }

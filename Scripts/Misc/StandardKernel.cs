@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
+using Fasterflect;
 
 namespace ModestTree.Zenject
 {
@@ -19,9 +20,15 @@ namespace ModestTree.Zenject
             [InjectOptional]
             List<ITickable> tickables,
             [InjectOptional]
-            List<Tuple<Type, int>> priorities)
+            List<Tuple<Type, int>> priorities,
+            DiContainer container)
         {
             var priorityMap = priorities.ToDictionary(x => x.First, x => x.Second);
+
+            if (Assert.IsEnabled)
+            {
+                WarnForMissingBindings(tickables, container);
+            }
 
             foreach (var tickable in tickables)
             {
@@ -40,11 +47,23 @@ namespace ModestTree.Zenject
             }
         }
 
+        void WarnForMissingBindings(List<ITickable> tickables, DiContainer container)
+        {
+            var boundTypes = tickables.Select(x => x.GetType()).Distinct();
+
+            var unboundTypes = container.AllConcreteTypes.Where(x => x.DerivesFrom<ITickable>() && !boundTypes.Contains(x));
+
+            foreach (var objType in unboundTypes)
+            {
+                Debug.LogWarning("Found unbound ITickable with type '" + objType.Name() + "'");
+            }
+        }
+
         IEnumerable<TickableInfo> AllTasks
         {
             get
             {
-                return ActiveTasks.Append(_queuedTasks);
+                return ActiveTasks.Concat(_queuedTasks);
             }
         }
 
@@ -52,7 +71,7 @@ namespace ModestTree.Zenject
         {
             get
             {
-                return _sortedTasks.Append(_unsortedTasks);
+                return _sortedTasks.Concat(_unsortedTasks);
             }
         }
 
@@ -80,7 +99,7 @@ namespace ModestTree.Zenject
 
         public void RemoveTask(ITickable task)
         {
-            var info = _sortedTasks.Append(_unsortedTasks).Where(x => x.Tickable == task).Single();
+            var info = _sortedTasks.Concat(_unsortedTasks).Where(x => x.Tickable == task).Single();
 
             Assert.That(!info.IsRemoved, "Tried to remove task twice, task = " + task.GetType().Name);
             info.IsRemoved = true;
@@ -103,7 +122,15 @@ namespace ModestTree.Zenject
                 !x.IsRemoved && x.Priority >= minPriority && x.Priority < maxPriority))
             {
                 Assert.That(taskInfo.Priority.HasValue);
-                taskInfo.Tickable.Tick();
+
+                try
+                {
+                    taskInfo.Tickable.Tick();
+                }
+                catch (Exception e)
+                {
+                    Debug.LogException(e);
+                }
             }
 
             ClearRemovedTasks(_sortedTasks);

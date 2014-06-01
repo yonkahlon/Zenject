@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Text;
 using System.Diagnostics;
 using UnityEngine;
+using Fasterflect;
 
 namespace ModestTree.Zenject
 {
@@ -36,7 +37,7 @@ namespace ModestTree.Zenject
 
             var resultStr = "digraph { \n";
 
-            resultStr += "use rankdir=LR;\n";
+            resultStr += "rankdir=LR;\n";
 
             foreach (var entry in graph)
             {
@@ -123,11 +124,12 @@ namespace ModestTree.Zenject
 
         static string GetFormattedTypeName(Type type)
         {
-            var str = type.GetPrettyName();
+            var str = type.Name();
 
-            // GraphViz does not read names with < and > characters so replace them
+            // GraphViz does not read names with <, >, or . characters so replace them
             str = str.Replace(">", "_");
             str = str.Replace("<", "_");
+            str = str.Replace(".", "_");
 
             return str;
         }
