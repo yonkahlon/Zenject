@@ -2,6 +2,8 @@
 
 # Dependency Injection Framework for Unity3D
 
+NOTE: The following documentation is written to be packaged with Zenject as it appears in the Asset store, so some of it may not apply to this repository alone.  The unit tests that it refers to can be found [here](https://github.com/modesttree/ZenjectUnitTests) and the sample game that it refers to (which is probably the best resource to get Zenject from) can be found [here](https://github.com/modesttree/ZenjectSample)
+
 ## Table Of Contents
 
 * <a href="#introduction">Introduction</a>
