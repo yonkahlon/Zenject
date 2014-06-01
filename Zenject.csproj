@@ -30,6 +30,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Fasterflect">
+      <HintPath>Lib\Fasterflect\Fasterflect.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -53,6 +56,7 @@
     <Compile Include="Scripts\Binders\BindingConditionSetter.cs" />
     <Compile Include="Scripts\Binders\BindScope.cs" />
     <Compile Include="Scripts\Binders\ReferenceBinder.cs" />
+    <Compile Include="Scripts\Binders\ResolveContext.cs" />
     <Compile Include="Scripts\Binders\ValueBinder.cs" />
     <Compile Include="Scripts\Exceptions\ZenjectException.cs" />
     <Compile Include="Scripts\Factories\Factory.cs" />
@@ -62,44 +66,43 @@
     <Compile Include="Scripts\Factories\Instantiator.cs" />
     <Compile Include="Scripts\Factories\ListFactory.cs" />
     <Compile Include="Scripts\Injection\FieldsInjecter.cs" />
+    <Compile Include="Scripts\Injection\InjectableInfo.cs" />
     <Compile Include="Scripts\Injection\InjectInfo.cs" />
     <Compile Include="Scripts\Injection\InjectionHelper.cs" />
+    <Compile Include="Scripts\Main\BindingValidator.cs" />
     <Compile Include="Scripts\Main\CompositionRoot.cs" />
     <Compile Include="Scripts\Main\DiContainer.cs" />
-    <Compile Include="Scripts\Main\Installer.cs" />
+    <Compile Include="Scripts\Main\ISceneInstaller.cs" />
+    <Compile Include="Scripts\Main\Module.cs" />
     <Compile Include="Scripts\Misc\DependencyRootStandard.cs" />
     <Compile Include="Scripts\Misc\IDependencyRoot.cs" />
     <Compile Include="Scripts\Misc\IInitializable.cs" />
     <Compile Include="Scripts\Misc\IKernel.cs" />
     <Compile Include="Scripts\Misc\InitializableHandler.cs" />
-    <Compile Include="Scripts\Misc\InitializablePrioritiesInstaller.cs" />
+    <Compile Include="Scripts\Misc\InitializablePrioritiesModule.cs" />
     <Compile Include="Scripts\Misc\InjectAttribute.cs" />
-    <Compile Include="Scripts\Misc\InstallerMonoBehaviourWrapper.cs" />
     <Compile Include="Scripts\Misc\ITickable.cs" />
     <Compile Include="Scripts\Misc\KernelUtil.cs" />
     <Compile Include="Scripts\Misc\LookupInProgressAdder.cs" />
     <Compile Include="Scripts\Misc\StandardKernel.cs" />
-    <Compile Include="Scripts\Misc\StandardUnityInstaller.cs" />
-    <Compile Include="Scripts\Misc\TickablePrioritiesInstaller.cs" />
+    <Compile Include="Scripts\Misc\StandardUnityModule.cs" />
+    <Compile Include="Scripts\Misc\TickablePrioritiesModule.cs" />
     <Compile Include="Scripts\Misc\UnityEventManager.cs" />
     <Compile Include="Scripts\Misc\UnityKernel.cs" />
     <Compile Include="Scripts\Misc\ZenUtil.cs" />
     <Compile Include="Scripts\Providers\GameObjectProvider.cs" />
     <Compile Include="Scripts\Providers\GameObjectSingletonProviderFromPrefab.cs" />
     <Compile Include="Scripts\Providers\GameObjectTransientProviderFromPrefab.cs" />
+    <Compile Include="Scripts\Providers\InstanceProvider.cs" />
     <Compile Include="Scripts\Providers\MethodProvider.cs" />
     <Compile Include="Scripts\Providers\ProviderBase.cs" />
-    <Compile Include="Scripts\Providers\SingletonInstanceProvider.cs" />
     <Compile Include="Scripts\Providers\SingletonProviderMap.cs" />
     <Compile Include="Scripts\Providers\TransientProvider.cs" />
     <Compile Include="Scripts\Util\LinqExtensions.cs" />
     <Compile Include="Scripts\Util\ReflectionUtil.cs" />
     <Compile Include="Scripts\Util\Tuple.cs" />
     <Compile Include="Scripts\Util\TypeExtensions.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Scripts\DependencyInjection\Providers\SingletonProvider\" />
-    <Folder Include="Scripts\Providers\SingletonProvider\" />
+    <Compile Include="Scripts\Util\UnityUtil.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
