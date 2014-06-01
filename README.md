@@ -11,7 +11,7 @@
     * <a href="#theory">Theory</a>
     * <a href="#misconceptions">Misconceptions</a>
 * Zenject API
-    * <a href="#zenjectoverview">Overview of the Zenject API</a>
+    * <a href="#overview-of-the-zenject-api">Overview of the Zenject API</a>
         * <a href="#hello_world">Hellow World Example</a>
         * <a href="#bindings">Binding</a>
         * <a href="#optional_bindings">Optional Binding</a>
