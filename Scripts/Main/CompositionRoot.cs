@@ -102,6 +102,10 @@ namespace ModestTree.Zenject
 
         void Awake()
         {
+            // Include this log statement early since our logging system initializes lazily
+            // This will ensure we log any errors that occur early
+            Log.Info("Zenject Started");
+
             InitContainer();
             Register();
             Resolve();
