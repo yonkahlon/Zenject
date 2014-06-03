@@ -61,6 +61,7 @@ For general support or bug requests, please feel free to create issues on the gi
 * Auto-Mocking using the Moq library
 * Injection across different Unity scenes
 * Ability to print entire object graph as a UML image automatically
+* Ability to validate object graphs at editor time
 
 ## <a id="history"></a>History
 
