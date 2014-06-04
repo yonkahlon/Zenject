@@ -65,7 +65,7 @@ namespace ModestTree.Zenject
             var proc = new System.Diagnostics.Process();
 
             proc.StartInfo.FileName = dotExePath;
-            proc.StartInfo.Arguments = String.Format("-Tpng {0}.dot -o{0}.png", fileBaseName);
+            proc.StartInfo.Arguments = "-Tpng {0}.dot -o{0}.png".With(fileBaseName);
             proc.StartInfo.RedirectStandardError = true;
             proc.StartInfo.RedirectStandardOutput = true;
             proc.StartInfo.UseShellExecute = false;
@@ -80,12 +80,12 @@ namespace ModestTree.Zenject
             if (errorMessage.IsEmpty())
             {
                 EditorUtility.DisplayDialog(
-                    "Success!", String.Format("Successfully created files {0}.dot and {0}.png", fileBaseName), "Ok");
+                    "Success!", "Successfully created files {0}.dot and {0}.png".With(fileBaseName), "Ok");
             }
             else
             {
                 EditorUtility.DisplayDialog(
-                    "Error", String.Format("Error occurred while generating {0}.png", fileBaseName), "Ok");
+                    "Error", "Error occurred while generating {0}.png".With(fileBaseName), "Ok");
 
                 Debug.LogError("Zenject error: Failure during object graph creation: " + errorMessage);
 

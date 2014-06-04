@@ -129,7 +129,7 @@ namespace ModestTree.Zenject
             if (!contractType.IsOpenGenericType())
             {
                 throw new ZenjectException(
-                    "Expected open generic contract type in call to BindGeneric but found '{0}' instead", contractType);
+                    "Expected open generic contract type in call to BindGeneric but found '{0}' instead".With(contractType));
             }
 
             return new GenericBinder(this, contractType, _singletonMap);
@@ -157,7 +157,7 @@ namespace ModestTree.Zenject
                 if (_providers[contractType].Find(item => ReferenceEquals(item, provider)) != null)
                 {
                     throw new ZenjectException(
-                        "Found duplicate singleton binding for contract '{0}'", contractType);
+                        "Found duplicate singleton binding for contract '{0}'".With(contractType));
                 }
 
                 _providers[contractType].Add(provider);
@@ -427,7 +427,8 @@ namespace ModestTree.Zenject
                 if (!optional)
                 {
                     throw new ZenjectResolveException(
-                        "Unable to resolve type '{0}' while building object with type '{1}'. \nObject graph:\n{2}", contractType.Name(), context.EnclosingType, GetCurrentObjectGraph());
+                        "Unable to resolve type '{0}' while building object with type '{1}'. \nObject graph:\n{2}"
+                        .With(contractType.Name(), context.EnclosingType, GetCurrentObjectGraph()));
                 }
 
                 return null;
@@ -438,8 +439,8 @@ namespace ModestTree.Zenject
                 if (!optional)
                 {
                     throw new ZenjectResolveException(
-                        "Found multiple matches when only one was expected for type '{0}' while building object with type '{1}'. \nObject graph:\n {2}",
-                            context.EnclosingType, contractType.Name(), GetCurrentObjectGraph());
+                        "Found multiple matches when only one was expected for type '{0}' while building object with type '{1}'. \nObject graph:\n {2}"
+                        .With(context.EnclosingType, contractType.Name(), GetCurrentObjectGraph()));
                 }
 
                 return null;

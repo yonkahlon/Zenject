@@ -106,6 +106,11 @@ namespace ModestTree.Zenject
             // This will ensure we log any errors that occur early
             Log.Info("Zenject Started");
 
+            LogUtil.CallAndCatchExceptions(Init);
+        }
+
+        void Init()
+        {
             InitContainer();
             Register();
             Resolve();

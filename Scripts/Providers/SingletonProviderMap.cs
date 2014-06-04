@@ -52,7 +52,7 @@ namespace ModestTree.Zenject
             {
                 if (creator.HasCreatedInstance())
                 {
-                    throw new ZenjectBindException("Found multiple singleton instances bound to the type '{0}'", concreteType.Name());
+                    throw new ZenjectBindException("Found multiple singleton instances bound to the type '{0}'".With(concreteType.Name()));
                 }
 
                 creator.SetInstance(instance);
