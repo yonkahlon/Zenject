@@ -113,13 +113,26 @@ namespace ModestTree.Zenject
         public ValueBinder<TContract> BindValue<TContract>() where TContract : struct
         {
             Assert.That(!_hasDisposed);
-            return new ValueBinder<TContract>(this, _singletonMap);
+            return new ValueBinder<TContract>(this);
         }
 
         public ReferenceBinder<TContract> Bind<TContract>() where TContract : class
         {
             Assert.That(!_hasDisposed);
             return new ReferenceBinder<TContract>(this, _singletonMap);
+        }
+
+        public GenericBinder BindGeneric(Type contractType)
+        {
+            Assert.That(!_hasDisposed);
+
+            if (!contractType.IsOpenGenericType())
+            {
+                throw new ZenjectException(
+                    "Expected open generic contract type in call to BindGeneric but found '{0}' instead", contractType);
+            }
+
+            return new GenericBinder(this, contractType, _singletonMap);
         }
 
         public BindScope CreateScope()
@@ -135,20 +148,23 @@ namespace ModestTree.Zenject
             return new LookupInProgressAdder(this, type);
         }
 
-        public void RegisterProvider<TContract>(ProviderBase provider)
+        public void RegisterProvider(ProviderBase provider, Type contractType)
         {
             Assert.That(!_hasDisposed);
-            if (_providers.ContainsKey(typeof (TContract)))
+            if (_providers.ContainsKey(contractType))
             {
                 // Prevent duplicate singleton bindings:
-                Assert.That(_providers[typeof(TContract)].Find(item => ReferenceEquals(item, provider)) == null,
-                    "Found duplicate singleton binding for contract '" + typeof (TContract) + "'");
+                if (_providers[contractType].Find(item => ReferenceEquals(item, provider)) != null)
+                {
+                    throw new ZenjectException(
+                        "Found duplicate singleton binding for contract '{0}'", contractType);
+                }
 
-                _providers[typeof (TContract)].Add(provider);
+                _providers[contractType].Add(provider);
             }
             else
             {
-                _providers.Add(typeof (TContract), new List<ProviderBase> {provider});
+                _providers.Add(contractType, new List<ProviderBase> {provider});
             }
         }
 
@@ -218,7 +234,7 @@ namespace ModestTree.Zenject
         public List<TContract> ResolveMany<TContract>(ResolveContext context)
         {
             Assert.That(!_hasDisposed);
-            return (List<TContract>) ResolveMany(typeof (TContract), context);
+            return (List<TContract>) ResolveMany(typeof(TContract), context);
         }
 
         public object ResolveMany(Type contract)
@@ -233,29 +249,41 @@ namespace ModestTree.Zenject
         }
 
         // Soft == only resolve if the instance is already created
-        List<object> ResolveInternalList(Type contract, ResolveContext context, bool soft)
+        List<object> ResolveInternalList(Type contractType, ResolveContext context, bool soft)
         {
             Assert.That(!_hasDisposed);
 
-            var providers = GetProviderMatches(contract, context);
+            var providers = GetProviderMatches(contractType, context);
 
             if (soft)
             {
-                providers = providers.Where(x => x.HasInstance());
+                providers = providers.Where(x => x.HasInstance(contractType));
             }
 
-            return providers.Select(x => x.GetInstance()).ToList();
+            return providers.Select(x => x.GetInstance(contractType)).ToList();
         }
 
-        internal IEnumerable<ProviderBase> GetProviderMatches(Type contract, ResolveContext context)
+        internal IEnumerable<ProviderBase> GetProviderMatches(Type contractType, ResolveContext context)
+        {
+            return GetProvidersForContract(contractType).Where(x => x.Matches(context));
+        }
+
+        internal IEnumerable<ProviderBase> GetProvidersForContract(Type contractType)
         {
             Assert.That(!_hasDisposed);
 
             List<ProviderBase> providers;
 
-            if (_providers.TryGetValue(contract, out providers))
+            if (_providers.TryGetValue(contractType, out providers))
             {
-                return providers.Where(x => x.Matches(context));
+                return providers;
+            }
+
+            // If we are asking for a List<int>, we should also match for any providers that are bound to the open generic type List<>
+            // Currently it only matches one and not the other - not totally sure if this is better than returning both
+            if (contractType.IsGenericType && _providers.TryGetValue(contractType.GetGenericTypeDefinition(), out providers))
+            {
+                return providers;
             }
 
             return Enumerable.Empty<ProviderBase>();
@@ -305,10 +333,12 @@ namespace ModestTree.Zenject
             Assert.That(!_hasDisposed);
             // Note that different types can map to the same provider (eg. a base type to a concrete class and a concrete class to itself)
 
-            if (_providers.ContainsKey(contract))
+            var matches = ResolveInternalList(contract, context, soft);
+
+            if (matches.Any())
             {
                 return ReflectionUtil.CreateGenericList(
-                    contract, ResolveInternalList(contract, context, soft).ToArray());
+                    contract, matches.ToArray());
             }
 
             if (!optional)
@@ -327,7 +357,6 @@ namespace ModestTree.Zenject
             {
                 // TODO: fix this to work with providers that have conditions
                 var context = new ResolveContext(contract);
-
                 return (from provider in _providers[contract] where provider.Matches(context) select provider.GetInstanceType()).ToList();
             }
 
@@ -358,7 +387,7 @@ namespace ModestTree.Zenject
         public TContract Resolve<TContract>(ResolveContext context)
         {
             Assert.That(!_hasDisposed);
-            return (TContract) Resolve(typeof (TContract), context);
+            return (TContract) Resolve(typeof(TContract), context);
         }
 
         public object Resolve(Type contract)

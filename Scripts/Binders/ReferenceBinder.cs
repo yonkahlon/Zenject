@@ -4,37 +4,30 @@ using Fasterflect;
 
 namespace ModestTree.Zenject
 {
-    // The class constraint is necessary to work property with Moq
-    // Lazily create singleton providers and ensure that only one exists for every concrete type
-    public class ReferenceBinder<TContract> : Binder<TContract> where TContract : class
+    public class ReferenceBinder<TContract> : BinderGeneric<TContract> where TContract : class
     {
-        public ReferenceBinder(DiContainer container, SingletonProviderMap singletonMap)
-            : base(container, singletonMap)
-        {
-        }
+        readonly protected SingletonProviderMap _singletonMap;
 
-        Type ContractType
+        public ReferenceBinder(DiContainer container, SingletonProviderMap singletonMap)
+            : base(container)
         {
-            get
-            {
-                return typeof(TContract);
-            }
+            _singletonMap = singletonMap;
         }
 
         public BindingConditionSetter ToTransient()
         {
-            return ToProvider(new TransientProvider<TContract>(_container));
+            return ToProvider(new TransientProvider(_container, typeof(TContract)));
         }
 
         public BindingConditionSetter ToTransient<TConcrete>() where TConcrete : TContract
         {
-            return ToProvider(new TransientProvider<TConcrete>(_container));
+            return ToProvider(new TransientProvider(_container, typeof(TConcrete)));
         }
 
         public BindingConditionSetter ToSingle()
         {
-            //Assert.That(!ContractType.IsSubclassOf(typeof(MonoBehaviour)),
-            //    "Should not use ToSingle for Monobehaviours (when binding type " + ContractType.Name() + "), you probably want ToSingleFromPrefab or ToSingleGameObject");
+            //Assert.That(!_contractType.IsSubclassOf(typeof(MonoBehaviour)),
+            //    "Should not use ToSingle for Monobehaviours (when binding type " + _contractType.Name() + "), you probably want ToSingleFromPrefab or ToSingleGameObject");
 
             return ToProvider(_singletonMap.CreateProvider<TContract>());
         }
@@ -42,18 +35,18 @@ namespace ModestTree.Zenject
         public BindingConditionSetter ToSingle<TConcrete>() where TConcrete : TContract
         {
             //Assert.That(!typeof(TConcrete).IsSubclassOf(typeof(MonoBehaviour)),
-            //    "Should not use ToSingle for Monobehaviours (when binding type " + ContractType.Name() + "), you probably want ToSingleFromPrefab or ToSingleGameObject");
+            //    "Should not use ToSingle for Monobehaviours (when binding type " + _contractType.Name() + "), you probably want ToSingleFromPrefab or ToSingleGameObject");
 
             return ToProvider(_singletonMap.CreateProvider<TConcrete>());
         }
 
         public BindingConditionSetter ToSingle(Type concreteType)
         {
-            if (!concreteType.DerivesFromOrEqual(ContractType))
+            if (!concreteType.DerivesFromOrEqual(_contractType))
             {
                 throw new ZenjectBindException(
                     "Invalid type given during bind command.  Expected type '{0}' to derive from type '{1}'",
-                    concreteType.Name(), ContractType.Name());
+                    concreteType.Name(), _contractType.Name());
             }
 
             return ToProvider(_singletonMap.CreateProvider(concreteType));
@@ -65,14 +58,14 @@ namespace ModestTree.Zenject
             {
                 string message;
 
-                if (ContractType == typeof(TConcrete))
+                if (_contractType == typeof(TConcrete))
                 {
-                    message = string.Format("Received null instance during Bind command with type '{0}'", ContractType.Name());
+                    message = string.Format("Received null instance during Bind command with type '{0}'", _contractType.Name());
                 }
                 else
                 {
                     message = string.Format(
-                        "Received null instance during Bind command when binding type '{0}' to '{1}'", ContractType.Name(), typeof(TConcrete).Name());
+                        "Received null instance during Bind command when binding type '{0}' to '{1}'", _contractType.Name(), typeof(TConcrete).Name());
                 }
 
                 throw new ZenjectBindException(message);
@@ -87,14 +80,14 @@ namespace ModestTree.Zenject
             {
                 string message;
 
-                if (ContractType == typeof(TConcrete))
+                if (_contractType == typeof(TConcrete))
                 {
-                    message = string.Format("Received null singleton instance during Bind command with type '{0}'", ContractType.Name());
+                    message = string.Format("Received null singleton instance during Bind command with type '{0}'", _contractType.Name());
                 }
                 else
                 {
                     message = string.Format(
-                        "Received null singleton instance during Bind command when binding type '{0}' to '{1}'", ContractType.Name(), typeof(TConcrete).Name());
+                        "Received null singleton instance during Bind command when binding type '{0}' to '{1}'", _contractType.Name(), typeof(TConcrete).Name());
                 }
 
                 throw new ZenjectBindException(message);
@@ -132,15 +125,15 @@ namespace ModestTree.Zenject
 
         public BindingConditionSetter ToSingleGameObject()
         {
-            return ToSingleGameObject(ContractType.Name());
+            return ToSingleGameObject(_contractType.Name());
         }
 
         // Creates a new game object and adds the given type as a new component on it
         public BindingConditionSetter ToSingleGameObject(string name)
         {
-            if (!ContractType.IsSubclassOf(typeof(MonoBehaviour)))
+            if (!_contractType.IsSubclassOf(typeof(MonoBehaviour)))
             {
-                throw new ZenjectBindException("Expected MonoBehaviour derived type when binding type '{0}'", ContractType.Name());
+                throw new ZenjectBindException("Expected MonoBehaviour derived type when binding type '{0}'", _contractType.Name());
             }
 
             return ToProvider(new GameObjectSingletonProvider<TContract>(_container, name));
@@ -149,9 +142,9 @@ namespace ModestTree.Zenject
         // Creates a new game object and adds the given type as a new component on it
         public BindingConditionSetter ToSingleGameObject<TConcrete>(string name) where TConcrete : MonoBehaviour, TContract
         {
-            if (!ContractType.IsSubclassOf(typeof(MonoBehaviour)))
+            if (!_contractType.IsSubclassOf(typeof(MonoBehaviour)))
             {
-                throw new ZenjectBindException("Expected MonoBehaviour derived type when binding type '{0}'", ContractType.Name());
+                throw new ZenjectBindException("Expected MonoBehaviour derived type when binding type '{0}'", _contractType.Name());
             }
 
             return ToProvider(new GameObjectSingletonProvider<TConcrete>(_container, name));
