@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace ModestTree
 {
@@ -9,6 +10,11 @@ namespace ModestTree
         public static string With(this string s, params object[] args)
         {
             return String.Format(s, args);
+        }
+
+        public static IEnumerable<T> Yield<T>(this T item)
+        {
+            yield return item;
         }
     }
 }
