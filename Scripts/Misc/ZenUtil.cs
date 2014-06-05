@@ -16,19 +16,10 @@ namespace ModestTree.Zenject
             ZenUtil.LoadScene(levelName, null);
         }
 
-        public static void LoadScene(string levelName, Action<DiContainer> extraBindings)
-        {
-            CompositionRoot.ExtraBindingsLookup = extraBindings;
-            Application.LoadLevel(levelName);
-        }
-
         public static void LoadScene(
-            string levelName,
-            Action<DiContainer> extraBindings,
-            Action<DiContainer> installerBindings)
+            string levelName, Action<DiContainer> extraBindings)
         {
             CompositionRoot.ExtraBindingsLookup = extraBindings;
-            CompositionRoot.ExtraInstallerBindingsLookup = installerBindings;
             Application.LoadLevel(levelName);
         }
 
@@ -37,16 +28,10 @@ namespace ModestTree.Zenject
             LoadSceneAdditive(levelName, null);
         }
 
-        public static void LoadSceneAdditive(string levelName, Action<DiContainer> extraBindings)
-        {
-            LoadSceneAdditive(levelName, extraBindings, null);
-        }
-
-        public static void LoadSceneAdditive(string levelName, Action<DiContainer> extraBindings, Action<DiContainer> installerBindings)
+        public static void LoadSceneAdditive(
+            string levelName, Action<DiContainer> extraBindings)
         {
             CompositionRoot.ExtraBindingsLookup = extraBindings;
-            CompositionRoot.ExtraInstallerBindingsLookup = installerBindings;
-
             Application.LoadLevelAdditive(levelName);
         }
 

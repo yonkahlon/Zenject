@@ -13,7 +13,6 @@ namespace ModestTree.Zenject
         IDependencyRoot _dependencyRoot;
 
         static Action<DiContainer> _extraBindingLookup;
-        static Action<DiContainer> _extraInstallerBindingLookup;
 
         internal static Action<DiContainer> ExtraBindingsLookup
         {
@@ -21,15 +20,6 @@ namespace ModestTree.Zenject
             {
                 Assert.IsNull(_extraBindingLookup);
                 _extraBindingLookup = value;
-            }
-        }
-
-        internal static Action<DiContainer> ExtraInstallerBindingsLookup
-        {
-            set
-            {
-                Assert.IsNull(_extraInstallerBindingLookup);
-                _extraInstallerBindingLookup = value;
             }
         }
 
@@ -59,17 +49,9 @@ namespace ModestTree.Zenject
 
             var installer = sceneInstallers.Single();
 
-            var moduleContainer = new DiContainer();
+            installer.InstallModules(_container);
 
-            installer.InstallModules(moduleContainer);
-
-            if (_extraInstallerBindingLookup != null)
-            {
-                _extraInstallerBindingLookup(moduleContainer);
-                _extraInstallerBindingLookup = null;
-            }
-
-            var modules = moduleContainer.ResolveMany<Module>();
+            var modules = _container.ResolveMany<Module>();
 
             if (modules.IsEmpty())
             {
