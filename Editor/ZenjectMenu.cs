@@ -62,6 +62,13 @@ namespace ModestTree.Zenject
 
             foreach (var installer in compRoot.Installers)
             {
+                if (installer == null)
+                {
+                    yield return new ZenjectResolveException(
+                        "Found null installer in properties of Composition Root");
+                    yield break;
+                }
+
                 installer.Container = container;
                 container.Bind<IInstaller>().To(installer);
             }

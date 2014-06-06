@@ -602,12 +602,12 @@ One implication of writing most of your code as normal C# classes instead of Mon
 
     public class AsteroidsSceneInstaller : MonoBehaviour, ISceneInstaller
     {
-        public AsteroidsMainModule.Settings AsteroidSettings;
+        public AsteroidsMainInstaller.Settings AsteroidSettings;
 
         public override void InstallBindings()
         {
             ...
-            container.Bind<AsteroidsMainModule.Settings>().To(AsteroidSettings);
+            container.Bind<AsteroidsMainInstaller.Settings>().To(AsteroidSettings);
             ...
         }
     }

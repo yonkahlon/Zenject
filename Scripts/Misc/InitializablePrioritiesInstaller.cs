@@ -5,11 +5,11 @@ using Fasterflect;
 
 namespace ModestTree.Zenject
 {
-    public class InitializablePrioritiesModule : Installer
+    public class InitializablePrioritiesInstaller : Installer
     {
         List<Type> _initializables;
 
-        public InitializablePrioritiesModule(List<Type> initializables)
+        public InitializablePrioritiesInstaller(List<Type> initializables)
         {
             _initializables = initializables;
         }
@@ -29,5 +29,4 @@ namespace ModestTree.Zenject
         }
     }
 }
-
 

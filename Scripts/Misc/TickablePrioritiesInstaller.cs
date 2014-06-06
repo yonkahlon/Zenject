@@ -5,11 +5,11 @@ using Fasterflect;
 
 namespace ModestTree.Zenject
 {
-    public class TickablePrioritiesModule : Installer
+    public class TickablePrioritiesInstaller : Installer
     {
         List<Type> _tickables;
 
-        public TickablePrioritiesModule(List<Type> tickables)
+        public TickablePrioritiesInstaller(List<Type> tickables)
         {
             _tickables = tickables;
         }
@@ -29,4 +29,3 @@ namespace ModestTree.Zenject
         }
     }
 }
-

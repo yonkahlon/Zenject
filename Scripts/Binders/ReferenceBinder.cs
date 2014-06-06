@@ -16,26 +16,48 @@ namespace ModestTree.Zenject
 
         public BindingConditionSetter ToTransient()
         {
+            if (_contractType.DerivesFrom(typeof(MonoBehaviour)))
+            {
+                throw new ZenjectBindException(
+                    "Should not use ToTransient for Monobehaviours (when binding type '{0}'), you probably want either ToLookup or ToTransientFromPrefab"
+                    .With(_contractType.Name()));
+            }
+
             return ToProvider(new TransientProvider(_container, typeof(TContract)));
         }
 
         public BindingConditionSetter ToTransient<TConcrete>() where TConcrete : TContract
         {
+            if (typeof(TConcrete).DerivesFrom(typeof(MonoBehaviour)))
+            {
+                throw new ZenjectBindException(
+                    "Should not use ToTransient for Monobehaviours (when binding type '{0}' to '{1}'), you probably want either ToLookup or ToTransientFromPrefab"
+                    .With(_contractType.Name(), typeof(TConcrete).Name()));
+            }
+
             return ToProvider(new TransientProvider(_container, typeof(TConcrete)));
         }
 
         public BindingConditionSetter ToSingle()
         {
-            //Assert.That(!_contractType.IsSubclassOf(typeof(MonoBehaviour)),
-            //    "Should not use ToSingle for Monobehaviours (when binding type " + _contractType.Name() + "), you probably want ToSingleFromPrefab or ToSingleGameObject");
+            if (_contractType.DerivesFrom(typeof(MonoBehaviour)))
+            {
+                throw new ZenjectBindException(
+                    "Should not use ToSingle for Monobehaviours (when binding type '{0}'), you probably want either ToLookup or ToSingleFromPrefab or ToSingleGameObject"
+                    .With(_contractType.Name()));
+            }
 
             return ToProvider(_singletonMap.CreateProvider<TContract>());
         }
 
         public BindingConditionSetter ToSingle<TConcrete>() where TConcrete : TContract
         {
-            //Assert.That(!typeof(TConcrete).IsSubclassOf(typeof(MonoBehaviour)),
-            //    "Should not use ToSingle for Monobehaviours (when binding type " + _contractType.Name() + "), you probably want ToSingleFromPrefab or ToSingleGameObject");
+            if (typeof(TConcrete).DerivesFrom(typeof(MonoBehaviour)))
+            {
+                throw new ZenjectBindException(
+                    "Should not use ToSingle for Monobehaviours (when binding type '{0}' to '{1}'), you probably want either ToLookup or ToSingleFromPrefab or ToSingleGameObject"
+                    .With(_contractType.Name(), typeof(TConcrete).Name()));
+            }
 
             return ToProvider(_singletonMap.CreateProvider<TConcrete>());
         }

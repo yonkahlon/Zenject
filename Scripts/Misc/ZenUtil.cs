@@ -35,24 +35,31 @@ namespace ModestTree.Zenject
             Application.LoadLevelAdditive(levelName);
         }
 
-        public static IEnumerable<ZenjectResolveException> ValidateInstallers(DiContainer container)
+        public static List<IInstaller> InstallInstallers(DiContainer container)
         {
             var uninstalled = container.ResolveMany<IInstaller>();
+
             var allInstallers = new List<IInstaller>();
 
             while (!uninstalled.IsEmpty())
             {
-                allInstallers.AddRange(uninstalled);
-
                 container.ReleaseBindings<IInstaller>();
 
                 foreach (var installer in uninstalled)
                 {
                     installer.InstallBindings();
+                    allInstallers.Add(installer);
                 }
 
                 uninstalled = container.ResolveMany<IInstaller>();
             }
+
+            return allInstallers;
+        }
+
+        public static IEnumerable<ZenjectResolveException> ValidateInstallers(DiContainer container)
+        {
+            var allInstallers = InstallInstallers(container);
 
             foreach (var error in container.ValidateResolve<IDependencyRoot>())
             {

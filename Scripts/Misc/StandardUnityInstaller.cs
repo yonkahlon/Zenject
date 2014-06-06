@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace ModestTree.Zenject
 {
-    public class StandardUnityModule : Installer
+    public class StandardUnityInstaller : Installer
     {
         // Install basic functionality for most unity apps
         public override void InstallBindings()

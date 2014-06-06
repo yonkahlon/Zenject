@@ -41,28 +41,19 @@ namespace ModestTree.Zenject
                 return;
             }
 
-            var uninstalled = Installers.Cast<IInstaller>().ToList();
-
-            // The installers that are part of the scene are monobehaviours
-            // and therefore were not created via Zenject and therefore do
-            // not have their members injected
-            // At the very least they will need the container injected
-            foreach (var installer in uninstalled)
+            foreach (var installer in Installers)
             {
+                // The installers that are part of the scene are monobehaviours
+                // and therefore were not created via Zenject and therefore do
+                // not have their members injected
+                // At the very least they will need the container injected but
+                // they might also have some configuration passed from another
+                // scene
                 FieldsInjecter.Inject(_container, installer);
+                _container.Bind<IInstaller>().To(installer);
             }
 
-            while (!uninstalled.IsEmpty())
-            {
-                _container.ReleaseBindings<IInstaller>();
-
-                foreach (var installer in uninstalled)
-                {
-                    installer.InstallBindings();
-                }
-
-                uninstalled = _container.ResolveMany<IInstaller>();
-            }
+            ZenUtil.InstallInstallers(_container);
         }
 
         void InitContainer()
