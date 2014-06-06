@@ -31,23 +31,13 @@ namespace ModestTree.Zenject
 
             var compRoot = compRoots.Single();
 
-            var sceneInstallers = compRoot.GetComponents<MonoBehaviour>().Where(x => x.GetType().DerivesFrom<ISceneInstaller>()).Cast<ISceneInstaller>();
-
-            if (sceneInstallers.HasMoreThan(1))
-            {
-                Debug.LogError("Found multiple scene installers when only one was expected while validating current scene");
-                return;
-            }
-
-            if (sceneInstallers.IsEmpty())
+            if (compRoot.Installers.IsEmpty())
             {
                 Debug.LogError("Could not find scene installer while validating current scene");
                 return;
             }
 
-            var installer = sceneInstallers.Single();
-
-            var resolveErrors = ZenUtil.ValidateInstaller(installer, false, compRoot).Take(10);
+            var resolveErrors = ValidateInstallers(compRoot).Take(10);
 
             // Only show a few to avoid spamming the log too much
             foreach (var error in resolveErrors)
@@ -62,6 +52,32 @@ namespace ModestTree.Zenject
             else
             {
                 Debug.Log("Validation Completed Successfully");
+            }
+        }
+
+        static IEnumerable<ZenjectResolveException> ValidateInstallers(CompositionRoot compRoot)
+        {
+            var container = new DiContainer();
+            container.Bind<CompositionRoot>().ToSingle(compRoot);
+
+            foreach (var installer in compRoot.Installers)
+            {
+                installer.Container = container;
+                container.Bind<IInstaller>().To(installer);
+            }
+
+            foreach (var error in ZenUtil.ValidateInstallers(container))
+            {
+                yield return error;
+            }
+
+            // Also make sure we can fill in all the dependencies in the built-in scene
+            foreach (var monoBehaviour in compRoot.GetComponentsInChildren<MonoBehaviour>())
+            {
+                foreach (var error in container.ValidateObjectGraph(monoBehaviour.GetType()))
+                {
+                    yield return error;
+                }
             }
         }
 

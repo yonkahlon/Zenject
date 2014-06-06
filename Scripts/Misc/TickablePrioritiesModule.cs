@@ -5,7 +5,7 @@ using Fasterflect;
 
 namespace ModestTree.Zenject
 {
-    public class TickablePrioritiesModule : Module
+    public class TickablePrioritiesModule : Installer
     {
         List<Type> _tickables;
 
@@ -14,7 +14,7 @@ namespace ModestTree.Zenject
             _tickables = tickables;
         }
 
-        public override void AddBindings()
+        public override void InstallBindings()
         {
             int priorityCount = 1;
 

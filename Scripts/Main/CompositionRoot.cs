@@ -12,6 +12,8 @@ namespace ModestTree.Zenject
         DiContainer _container;
         IDependencyRoot _dependencyRoot;
 
+        public MonoInstaller[] Installers;
+
         static Action<DiContainer> _extraBindingLookup;
 
         internal static Action<DiContainer> ExtraBindingsLookup
@@ -33,38 +35,33 @@ namespace ModestTree.Zenject
 
         void Register()
         {
-            var sceneInstallers = (from c in gameObject.GetComponents<MonoBehaviour>() where c.GetType().DerivesFrom<ISceneInstaller>() select ((ISceneInstaller)(object)c));
-
-            if (sceneInstallers.HasMoreThan(1))
+            if (Installers.IsEmpty())
             {
-                Debug.LogError("Found multiple scene installers when only one was expected while initializing CompositionRoot");
+                Debug.LogError("No installers found while initializing CompositionRoot");
                 return;
             }
 
-            if (sceneInstallers.IsEmpty())
+            var uninstalled = Installers.Cast<IInstaller>().ToList();
+
+            // The installers that are part of the scene are monobehaviours
+            // and therefore were not created via Zenject and therefore do
+            // not have their members injected
+            // At the very least they will need the container injected
+            foreach (var installer in uninstalled)
             {
-                Debug.LogError("Could not find scene installer while initializing CompositionRoot");
-                return;
+                FieldsInjecter.Inject(_container, installer);
             }
 
-            var installer = sceneInstallers.Single();
-
-            installer.InstallModules(_container);
-
-            var modules = _container.ResolveMany<Module>();
-
-            if (modules.IsEmpty())
+            while (!uninstalled.IsEmpty())
             {
-                Debug.Log("No modules found while initializing CompositionRoot");
-                return;
-            }
+                _container.ReleaseBindings<IInstaller>();
 
-            Debug.Log("Initializing Composition Root with " + modules.Count() + " modules");
+                foreach (var installer in uninstalled)
+                {
+                    installer.InstallBindings();
+                }
 
-            foreach (var module in modules)
-            {
-                module.Container = _container;
-                module.AddBindings();
+                uninstalled = _container.ResolveMany<IInstaller>();
             }
         }
 

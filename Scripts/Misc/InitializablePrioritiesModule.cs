@@ -5,7 +5,7 @@ using Fasterflect;
 
 namespace ModestTree.Zenject
 {
-    public class InitializablePrioritiesModule : Module
+    public class InitializablePrioritiesModule : Installer
     {
         List<Type> _initializables;
 
@@ -14,7 +14,7 @@ namespace ModestTree.Zenject
             _initializables = initializables;
         }
 
-        public override void AddBindings()
+        public override void InstallBindings()
         {
             int priorityCount = 1;
 

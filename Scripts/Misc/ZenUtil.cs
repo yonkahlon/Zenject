@@ -35,56 +35,35 @@ namespace ModestTree.Zenject
             Application.LoadLevelAdditive(levelName);
         }
 
-        public static IEnumerable<ZenjectResolveException> ValidateInstaller(ISceneInstaller installer, bool allowNullBindings)
+        public static IEnumerable<ZenjectResolveException> ValidateInstallers(DiContainer container)
         {
-            return ValidateInstaller(installer, allowNullBindings, null);
-        }
+            var uninstalled = container.ResolveMany<IInstaller>();
+            var allInstallers = new List<IInstaller>();
 
-        public static IEnumerable<ZenjectResolveException> ValidateInstaller(ISceneInstaller installer, bool allowNullBindings, CompositionRoot compRoot)
-        {
-            var modulesContainer = new DiContainer();
-            installer.InstallModules(modulesContainer);
+            while (!uninstalled.IsEmpty())
+            {
+                allInstallers.AddRange(uninstalled);
 
-            foreach (var error in modulesContainer.ValidateResolve<List<Module>>())
+                container.ReleaseBindings<IInstaller>();
+
+                foreach (var installer in uninstalled)
+                {
+                    installer.InstallBindings();
+                }
+
+                uninstalled = container.ResolveMany<IInstaller>();
+            }
+
+            foreach (var error in container.ValidateResolve<IDependencyRoot>())
             {
                 yield return error;
             }
 
-            var allModules = modulesContainer.ResolveMany<Module>();
-
-            var execContainer = new DiContainer();
-            execContainer.AllowNullBindings = allowNullBindings;
-
-            execContainer.Bind<CompositionRoot>().To(compRoot);
-
-            foreach (var module in allModules)
+            foreach (var installer in allInstallers)
             {
-                module.Container = execContainer;
-                module.AddBindings();
-            }
-
-            foreach (var error in execContainer.ValidateResolve<IDependencyRoot>())
-            {
-                yield return error;
-            }
-
-            foreach (var module in allModules)
-            {
-                foreach (var error in module.ValidateSubGraphs())
+                foreach (var error in installer.ValidateSubGraphs())
                 {
                     yield return error;
-                }
-            }
-
-            if (!UnityUtil.IsNull(compRoot))
-            {
-                // Also make sure we can fill in all the dependencies in the built-in scene
-                foreach (var monoBehaviour in compRoot.GetComponentsInChildren<MonoBehaviour>())
-                {
-                    foreach (var error in execContainer.ValidateObjectGraph(monoBehaviour.GetType()))
-                    {
-                        yield return error;
-                    }
                 }
             }
         }

@@ -449,6 +449,29 @@ namespace ModestTree.Zenject
             return objects.First();
         }
 
+        public bool ReleaseBindings<TContract>()
+        {
+            List<ProviderBase> providersToRemove;
+
+            if (_providers.TryGetValue(typeof(TContract), out providersToRemove))
+            {
+                _providers.Remove(typeof(TContract));
+
+                // Only dispose if the provider is not bound to another type
+                foreach (var provider in providersToRemove)
+                {
+                    if (_providers.Where(x => x.Value.Contains(provider)).IsEmpty())
+                    {
+                        provider.Dispose();
+                    }
+                }
+
+                return true;
+            }
+
+            return false;
+        }
+
         public IEnumerable<Type> GetDependencyContracts<TContract>()
         {
             Assert.That(!_hasDisposed);
