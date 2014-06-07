@@ -163,9 +163,10 @@ namespace ModestTree.Zenject
         // Creates a new game object and adds the given type as a new component on it
         public BindingConditionSetter ToSingleGameObject<TConcrete>(string name) where TConcrete : MonoBehaviour, TContract
         {
-            if (!_contractType.IsSubclassOf(typeof(MonoBehaviour)))
+            if (!typeof(TConcrete).DerivesFrom(typeof(MonoBehaviour)))
             {
-                throw new ZenjectBindException("Expected MonoBehaviour derived type when binding type '{0}'".With(_contractType.Name()));
+                throw new ZenjectBindException(
+                    "Expected MonoBehaviour derived type when binding type '{0}'".With(typeof(TConcrete).Name()));
             }
 
             return ToProvider(new GameObjectSingletonProvider<TConcrete>(_container, name));
