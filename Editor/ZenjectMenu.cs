@@ -81,6 +81,13 @@ namespace ModestTree.Zenject
             // Also make sure we can fill in all the dependencies in the built-in scene
             foreach (var monoBehaviour in compRoot.GetComponentsInChildren<MonoBehaviour>())
             {
+                if (monoBehaviour == null)
+                {
+                    // Be nice to give more information here
+                    Log.Warn("Found null MonoBehaviour in scene");
+                    continue;
+                }
+
                 foreach (var error in container.ValidateObjectGraph(monoBehaviour.GetType()))
                 {
                     yield return error;
