@@ -1,4 +1,4 @@
 *.suo
 *.pidb
-/obj
 /bin
+/obj

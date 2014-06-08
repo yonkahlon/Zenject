@@ -41,20 +41,22 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
     <Reference Include="UnityEditor">
-      <HintPath>..\MTMEDITOR\Libraries\Unity\UnityEditor.dll</HintPath>
+      <HintPath>Lib\UnityEditor.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine">
-      <HintPath>..\MTMEDITOR\Libraries\Unity\UnityEngine.dll</HintPath>
+      <HintPath>Lib\UnityEngine.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assert.cs" />
     <Compile Include="Editor\ObjectGraphVisualizer.cs" />
+    <Compile Include="Editor\ZenEditorUtil.cs" />
     <Compile Include="Editor\ZenjectMenu.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Scripts\Binders\Binder.cs" />
     <Compile Include="Scripts\Binders\BindingConditionSetter.cs" />
     <Compile Include="Scripts\Binders\BindScope.cs" />
+    <Compile Include="Scripts\Binders\GenericBinder.cs" />
     <Compile Include="Scripts\Binders\ReferenceBinder.cs" />
     <Compile Include="Scripts\Binders\ResolveContext.cs" />
     <Compile Include="Scripts\Binders\ValueBinder.cs" />
@@ -72,21 +74,20 @@
     <Compile Include="Scripts\Main\BindingValidator.cs" />
     <Compile Include="Scripts\Main\CompositionRoot.cs" />
     <Compile Include="Scripts\Main\DiContainer.cs" />
-    <Compile Include="Scripts\Main\ISceneInstaller.cs" />
-    <Compile Include="Scripts\Main\Module.cs" />
+    <Compile Include="Scripts\Main\IInstaller.cs" />
     <Compile Include="Scripts\Misc\DependencyRootStandard.cs" />
     <Compile Include="Scripts\Misc\IDependencyRoot.cs" />
     <Compile Include="Scripts\Misc\IInitializable.cs" />
     <Compile Include="Scripts\Misc\IKernel.cs" />
     <Compile Include="Scripts\Misc\InitializableHandler.cs" />
-    <Compile Include="Scripts\Misc\InitializablePrioritiesModule.cs" />
+    <Compile Include="Scripts\Misc\InitializablePrioritiesInstaller.cs" />
     <Compile Include="Scripts\Misc\InjectAttribute.cs" />
     <Compile Include="Scripts\Misc\ITickable.cs" />
     <Compile Include="Scripts\Misc\KernelUtil.cs" />
     <Compile Include="Scripts\Misc\LookupInProgressAdder.cs" />
     <Compile Include="Scripts\Misc\StandardKernel.cs" />
-    <Compile Include="Scripts\Misc\StandardUnityModule.cs" />
-    <Compile Include="Scripts\Misc\TickablePrioritiesModule.cs" />
+    <Compile Include="Scripts\Misc\StandardUnityInstaller.cs" />
+    <Compile Include="Scripts\Misc\TickablePrioritiesInstaller.cs" />
     <Compile Include="Scripts\Misc\UnityEventManager.cs" />
     <Compile Include="Scripts\Misc\UnityKernel.cs" />
     <Compile Include="Scripts\Misc\ZenUtil.cs" />
@@ -99,6 +100,7 @@
     <Compile Include="Scripts\Providers\SingletonProviderMap.cs" />
     <Compile Include="Scripts\Providers\TransientProvider.cs" />
     <Compile Include="Scripts\Util\LinqExtensions.cs" />
+    <Compile Include="Scripts\Util\MiscExtensions.cs" />
     <Compile Include="Scripts\Util\ReflectionUtil.cs" />
     <Compile Include="Scripts\Util\Tuple.cs" />
     <Compile Include="Scripts\Util\TypeExtensions.cs" />
