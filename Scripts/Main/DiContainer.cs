@@ -168,7 +168,7 @@ namespace ModestTree.Zenject
             }
         }
 
-        public void UnregisterProvider(ProviderBase provider)
+        public int UnregisterProvider(ProviderBase provider)
         {
             Assert.That(!_hasDisposed);
             int numRemoved = 0;
@@ -187,6 +187,8 @@ namespace ModestTree.Zenject
             }
 
             provider.Dispose();
+
+            return numRemoved;
         }
 
         // Walk the object graph for the given type
