@@ -270,6 +270,11 @@ Inject by custom method. You can customize creation logic yourself by defining a
         return new Foo();
     }
 
+Inject by getter.  This method can be useful if you want to bind to a property of another object.
+
+    _container.Bind<IFoo>().ToSingle<Foo>()
+    _container.Bind<Bar>().ToGetter<IFoo>(x => x.GetBar())
+
 Inject many.  You can also bind multiple types to the same interface, with the result being a list of dependencies.  In this case Bar would get a list containing a new instance of Foo1, Foo2, and Foo3:
 
     _container.Bind<IFoo>().ToSingle<Foo1>();
@@ -286,6 +291,11 @@ Inject many.  You can also bind multiple types to the same interface, with the r
     }
 
 Note that when defining List dependencies, the empty list will result in an error.  If the empty list is valid, then you can suppress the error by marking the List as optional as described <a href="#optional-binding">here</a>.
+
+Inject by lookup.  This can be used to do a recursive look up to bind an interface to a concrete class or another interface.  It is usually only useful in rare circumstances.
+
+    _container.Bind<Foo>().ToSingleFromPrefab<Foo>(PrefabGameObject);
+    _container.Bind<IFoo>().ToLookup<Foo>();
 
 ## <a id="optional-binding"></a>Optional Binding
 
