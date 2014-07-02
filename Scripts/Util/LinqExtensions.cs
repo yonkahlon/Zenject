@@ -27,6 +27,16 @@ namespace ModestTree
             return sum / count;
         }
 
+        public static IEnumerable<T> Append<T>(this IEnumerable<T> first, T item)
+        {
+            foreach (T t in first)
+            {
+                yield return t;
+            }
+
+            yield return item;
+        }
+
         public static IEnumerable<T> Prepend<T>(this IEnumerable<T> first, T item)
         {
             yield return item;
@@ -136,6 +146,29 @@ namespace ModestTree
         public static IEnumerable<T> FindDuplicates<T>(this IEnumerable<T> list)
         {
             return list.GroupBy(x => x).Where(x => x.Skip(1).Any()).Select(x => x.Key);
+        }
+
+        public static int RemoveAll<T>(this LinkedList<T> list, Func<T, bool> predicate)
+        {
+            int numRemoved = 0;
+
+            var currentNode = list.First;
+            while (currentNode != null)
+            {
+                if (predicate(currentNode.Value))
+                {
+                    var toRemove = currentNode;
+                    currentNode = currentNode.Next;
+                    list.Remove(toRemove);
+                    numRemoved++;
+                }
+                else
+                {
+                    currentNode = currentNode.Next;
+                }
+            }
+
+            return numRemoved;
         }
     }
 }

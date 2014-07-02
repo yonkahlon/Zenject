@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -35,43 +36,27 @@ namespace ModestTree.Zenject
             Application.LoadLevelAdditive(levelName);
         }
 
-        public static List<IInstaller> InstallInstallers(DiContainer container)
+        // This method can be used to load the given scene and perform injection on its contents
+        // Note that the scene we're loading can have [Inject] flags however it should not have
+        // its own composition root
+        public static IEnumerator LoadSceneAdditiveWithContainer(
+            string levelName, DiContainer parentContainer)
         {
-            var uninstalled = container.ResolveMany<IInstaller>();
+            var rootObjectsBeforeLoad = GameObject.FindObjectsOfType<Transform>().Where(x => x.parent == null).ToList();
 
-            var allInstallers = new List<IInstaller>();
+            Application.LoadLevelAdditive(levelName);
 
-            while (!uninstalled.IsEmpty())
+            // Wait one frame for objects to be added to the scene heirarchy
+            yield return null;
+
+            var rootObjectsAfterLoad = GameObject.FindObjectsOfType<Transform>().Where(x => x.parent == null).ToList();
+
+            foreach (var newObject in rootObjectsAfterLoad.Except(rootObjectsBeforeLoad).Select(x => x.gameObject))
             {
-                container.ReleaseBindings<IInstaller>();
+                Assert.That(newObject.GetComponent<CompositionRoot>() == null,
+                    "LoadSceneAdditiveWithContainer does not expect a container to exist in the loaded scene");
 
-                foreach (var installer in uninstalled)
-                {
-                    installer.InstallBindings();
-                    allInstallers.Add(installer);
-                }
-
-                uninstalled = container.ResolveMany<IInstaller>();
-            }
-
-            return allInstallers;
-        }
-
-        public static IEnumerable<ZenjectResolveException> ValidateInstallers(DiContainer container)
-        {
-            var allInstallers = InstallInstallers(container);
-
-            foreach (var error in container.ValidateResolve<IDependencyRoot>())
-            {
-                yield return error;
-            }
-
-            foreach (var installer in allInstallers)
-            {
-                foreach (var error in installer.ValidateSubGraphs())
-                {
-                    yield return error;
-                }
+                InjectionHelper.InjectChildGameObjects(parentContainer, newObject);
             }
         }
     }

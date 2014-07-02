@@ -27,13 +27,13 @@ namespace ModestTree.Zenject
             return false;
         }
 
-        public override object GetInstance(Type contractType)
+        public override object GetInstance(Type contractType, InjectContext context)
         {
             Assert.That(typeof(T).DerivesFromOrEqual(contractType));
             return _factory.Create();
         }
 
-        public override IEnumerable<ZenjectResolveException> ValidateBinding()
+        public override IEnumerable<ZenjectResolveException> ValidateBinding(Type contractType, InjectContext context)
         {
             return BindingValidator.ValidateObjectGraph(_container, typeof(T));
         }

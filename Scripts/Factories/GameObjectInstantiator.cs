@@ -68,7 +68,7 @@ namespace ModestTree.Zenject
 
         // Create from prefab and customize name
         // Return specific monobehaviour
-        public T Instantiate<T>(GameObject template, string name) where T : MonoBehaviour
+        public T Instantiate<T>(GameObject template, string name) where T : Component
         {
             var component = Instantiate<T>(template);
             component.gameObject.name = name;
@@ -77,7 +77,7 @@ namespace ModestTree.Zenject
 
         // Create from prefab
         // Return specific monobehaviour
-        public T Instantiate<T>(GameObject template) where T : MonoBehaviour
+        public T Instantiate<T>(GameObject template) where T : Component
         {
             Assert.That(template != null, "Null template found when instantiating game object");
 

@@ -35,25 +35,37 @@ namespace ModestTree.Zenject
 
         void Register()
         {
-            if (Installers.IsEmpty())
+            if (Installers.Where(x => x != null).IsEmpty())
             {
-                Debug.LogError("No installers found while initializing CompositionRoot");
+                Debug.LogWarning("No installers found while initializing CompositionRoot");
                 return;
             }
 
             foreach (var installer in Installers)
             {
-                // The installers that are part of the scene are monobehaviours
-                // and therefore were not created via Zenject and therefore do
-                // not have their members injected
-                // At the very least they will need the container injected but
-                // they might also have some configuration passed from another
-                // scene
-                FieldsInjecter.Inject(_container, installer);
-                _container.Bind<IInstaller>().To(installer);
-            }
+                if (installer == null)
+                {
+                    Debug.LogWarning("Found null installer hooked up to CompositionRoot");
+                    continue;
+                }
 
-            ZenUtil.InstallInstallers(_container);
+                if (installer.enabled)
+                {
+                    // The installers that are part of the scene are monobehaviours
+                    // and therefore were not created via Zenject and therefore do
+                    // not have their members injected
+                    // At the very least they will need the container injected but
+                    // they might also have some configuration passed from another
+                    // scene as well
+                    FieldsInjecter.Inject(_container, installer);
+                    _container.Bind<IInstaller>().To(installer);
+
+                    // Install this installer and also any other installers that it installs
+                    _container.InstallInstallers();
+
+                    Assert.That(!_container.HasBinding<IInstaller>());
+                }
+            }
         }
 
         void InitContainer()

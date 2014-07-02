@@ -92,7 +92,7 @@ namespace ModestTree.Zenject
                 catch (Exception e)
                 {
                     throw new ZenjectException(
-                        "Error occurred while initializing IInitializable with type '{0}'".With(initializable.GetType().Name()), e);
+                        "Error occurred while initializing IInitializable with type '{0}'".With(initializable.Initializable.GetType().Name()), e);
                 }
             }
         }

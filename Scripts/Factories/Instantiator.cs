@@ -33,8 +33,13 @@ namespace ModestTree.Zenject
         object InstantiateInternal(
             Type concreteType, params object[] constructorArgs)
         {
-            ConstructorInfo method;
-            var injectInfos = InjectablesFinder.GetConstructorInjectables(concreteType, out method);
+            var typeInfo = TypeAnalyzer.GetInfo(concreteType);
+
+            if (typeInfo.InjectConstructor == null)
+            {
+                throw new ZenjectResolveException(
+                    "More than one or zero constructors found for type '{0}' when creating dependencies.  Use one [Inject] attribute to specify which to use.".With(concreteType));
+            }
 
             var paramValues = new List<object>();
             var extrasList = new List<object>(constructorArgs);
@@ -42,7 +47,7 @@ namespace ModestTree.Zenject
             Assert.That(!extrasList.Contains(null),
                 "Null value given to factory constructor arguments. This is currently not allowed");
 
-            foreach (var injectInfo in injectInfos)
+            foreach (var injectInfo in typeInfo.ConstructorInjectables)
             {
                 var found = false;
 
@@ -67,7 +72,7 @@ namespace ModestTree.Zenject
 
             try
             {
-                newObj = method.Invoke(paramValues.ToArray());
+                newObj = typeInfo.InjectConstructor.Invoke(paramValues.ToArray());
             }
             catch (Exception e)
             {
@@ -75,34 +80,9 @@ namespace ModestTree.Zenject
                     "Error occurred while instantiating object with type '{0}'".With(concreteType.Name()), e);
             }
 
-            FieldsInjecter.Inject(_container, newObj, extrasList, true);
+            FieldsInjecter.Inject(_container, newObj, extrasList, true, typeInfo);
 
             return newObj;
-        }
-
-        object ResolveFromType(
-            ResolveContext context, object injectable, InjectableInfo injectInfo)
-        {
-            if (_container.HasBinding(injectInfo.ContractType, context))
-            {
-                return _container.Resolve(injectInfo.ContractType, context);
-            }
-
-            // If it's a list it might map to a collection
-            if (ReflectionUtil.IsGenericList(injectInfo.ContractType))
-            {
-                var subType = injectInfo.ContractType.GetGenericArguments().Single();
-                return _container.ResolveMany(subType, context, injectInfo.Optional);
-            }
-
-            if (!injectInfo.Optional)
-            {
-                throw new ZenjectResolveException(
-                    "Unable to find field with type '{0}' when injecting dependencies into '{1}'. \nObject graph:\n {2}"
-                        .With(injectInfo.ContractType, injectable, _container.GetCurrentObjectGraph()));
-            }
-
-            return null;
         }
     }
 }

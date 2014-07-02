@@ -173,12 +173,12 @@ namespace ModestTree.Zenject
                 return _creator.GetInstanceType();
             }
 
-            public override object GetInstance(Type contractType)
+            public override object GetInstance(Type contractType, InjectContext context)
             {
                 return _creator.GetInstance(contractType);
             }
 
-            public override IEnumerable<ZenjectResolveException> ValidateBinding()
+            public override IEnumerable<ZenjectResolveException> ValidateBinding(Type contractType, InjectContext context)
             {
                 if (_creator.HasCreatedInstance())
                 {

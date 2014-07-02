@@ -1,46 +1,54 @@
+#if !UNITY_WEBPLAYER && (NOT_UNITY || UNITY_EDITOR)
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Moq;
 using Fasterflect;
 
 namespace ModestTree.Zenject
 {
-    public class MethodProvider<T> : ProviderBase
+    public class TransientMockProvider : ProviderBase
     {
         readonly DiContainer _container;
-        readonly Func<DiContainer, T> _method;
 
-        public MethodProvider(Func<DiContainer, T> method, DiContainer container)
+        Dictionary<Type, object> _instances = new Dictionary<Type, object>();
+
+        public TransientMockProvider(DiContainer container)
         {
-            _method = method;
             _container = container;
         }
 
         public override Type GetInstanceType()
         {
-            return typeof(T);
+            return null;
         }
 
         public override bool HasInstance(Type contractType)
         {
-            Assert.That(typeof(T).DerivesFromOrEqual(contractType));
             return false;
         }
 
         public override object GetInstance(Type contractType, InjectContext context)
         {
-            Assert.That(typeof(T).DerivesFromOrEqual(contractType));
-            var obj = _method(_container);
+            object instance;
 
-            Assert.That(obj != null, () =>
-                    "Method provider returned null when looking up type '{0}'. \nObject graph:\n{1}".With(typeof(T).Name(), DiContainer.GetCurrentObjectGraph()));
+            if (!_instances.TryGetValue(contractType, out instance))
+            {
+                instance = typeof(Mock).Method(new Type[] { contractType }, "Of", Flags.StaticAnyVisibility).Invoke(null, null);
+                _instances.Add(contractType, instance);
+            }
 
-            return obj;
+            return instance;
         }
 
         public override IEnumerable<ZenjectResolveException> ValidateBinding(Type contractType, InjectContext context)
         {
+            // Always succeeds
             return Enumerable.Empty<ZenjectResolveException>();
         }
     }
 }
+
+
+#endif

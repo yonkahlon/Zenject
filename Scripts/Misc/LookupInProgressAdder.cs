@@ -24,12 +24,12 @@ namespace ModestTree.Zenject
 
         public LookupInProgressAdder(DiContainer container, Type concreteType)
         {
-            if (container.LookupsInProgress.Contains(concreteType))
+            if (DiContainer.LookupsInProgress.Contains(concreteType))
             {
-                Assert.That(false, () => "Circular dependency detected! \nObject graph:\n" + container.GetCurrentObjectGraph());
+                Assert.That(false, () => "Circular dependency detected! \nObject graph:\n" + DiContainer.GetCurrentObjectGraph());
             }
 
-            container.LookupsInProgress.Push(concreteType);
+            DiContainer.LookupsInProgress.Push(concreteType);
 
             _container = container;
             _concreteType = concreteType;
@@ -37,8 +37,8 @@ namespace ModestTree.Zenject
 
         public void Dispose()
         {
-            Assert.That(_container.LookupsInProgress.Peek() == _concreteType);
-            _container.LookupsInProgress.Pop();
+            Assert.That(DiContainer.LookupsInProgress.Peek() == _concreteType);
+            DiContainer.LookupsInProgress.Pop();
         }
     }
 }

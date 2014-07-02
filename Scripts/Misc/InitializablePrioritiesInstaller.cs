@@ -9,7 +9,8 @@ namespace ModestTree.Zenject
     {
         List<Type> _initializables;
 
-        public InitializablePrioritiesInstaller(List<Type> initializables)
+        public InitializablePrioritiesInstaller(
+            List<Type> initializables)
         {
             _initializables = initializables;
         }
@@ -20,12 +21,19 @@ namespace ModestTree.Zenject
 
             foreach (var initializableType in _initializables)
             {
-                Assert.That(initializableType.DerivesFrom<IInitializable>(), "Expected type '{0}' to derive from IInitializable", initializableType.Name());
-
-                _container.Bind<Tuple<Type, int>>().To(
-                    Tuple.New(initializableType, priorityCount)).WhenInjectedInto<InitializableHandler>();
+                BindPriority(_container, initializableType, priorityCount);
                 priorityCount++;
             }
+        }
+
+        public static void BindPriority(
+            DiContainer container, Type initializableType, int priorityCount)
+        {
+            Assert.That(initializableType.DerivesFrom<IInitializable>(),
+                "Expected type '{0}' to derive from IInitializable", initializableType.Name());
+
+            container.Bind<Tuple<Type, int>>().To(
+                Tuple.New(initializableType, priorityCount)).WhenInjectedInto<InitializableHandler>();
         }
     }
 }

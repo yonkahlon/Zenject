@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace ModestTree.Zenject
 {
-    public delegate bool BindingCondition(ResolveContext c);
+    public delegate bool BindingCondition(InjectContext c);
 
     public class BindingConditionSetter
     {
@@ -15,36 +15,33 @@ namespace ModestTree.Zenject
             _provider = provider;
         }
 
-        public void When(BindingCondition condition)
+        public void As(object identifier)
         {
-            _provider.SetCondition(condition);
+            _provider.Identifier = identifier;
         }
 
-        public void WhenInjectedIntoInstance(object instance)
+        public IdentifierSetter When(BindingCondition condition)
         {
-            _provider.SetCondition(r => ReferenceEquals(r.EnclosingInstance, instance));
+            _provider.Condition = condition;
+            return new IdentifierSetter(_provider);
         }
 
-        public void WhenInjectedInto(params Type[] targets)
+        public IdentifierSetter WhenInjectedIntoInstance(object instance)
         {
-            _provider.SetCondition(r => targets.Contains(r.EnclosingType));
+            _provider.Condition = r => ReferenceEquals(r.EnclosingInstance, instance);
+            return new IdentifierSetter(_provider);
         }
 
-        public void WhenInjectedInto<T>()
+        public IdentifierSetter WhenInjectedInto(params Type[] targets)
         {
-            _provider.SetCondition(r => r.EnclosingType == typeof(T));
+            _provider.Condition = r => targets.Where(x => r.EnclosingType != null && r.EnclosingType.DerivesFromOrEqual(x)).Any();
+            return new IdentifierSetter(_provider);
         }
 
-        public void WhenInjectedInto<T>(object identifier)
+        public IdentifierSetter WhenInjectedInto<T>()
         {
-            Assert.IsNotNull(identifier);
-            _provider.SetCondition(r => r.EnclosingType == typeof(T) && identifier.Equals(r.Identifier));
-        }
-
-        public void WhenInjectedInto(object identifier)
-        {
-            Assert.IsNotNull(identifier);
-            _provider.SetCondition(r => identifier.Equals(r.Identifier));
+            _provider.Condition = r => r.EnclosingType != null && r.EnclosingType.DerivesFromOrEqual(typeof(T));
+            return new IdentifierSetter(_provider);
         }
     }
 }

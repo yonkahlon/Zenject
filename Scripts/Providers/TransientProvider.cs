@@ -26,7 +26,7 @@ namespace ModestTree.Zenject
             return false;
         }
 
-        public override object GetInstance(Type contractType)
+        public override object GetInstance(Type contractType, InjectContext context)
         {
             if (_instantiator == null)
             {
@@ -51,7 +51,7 @@ namespace ModestTree.Zenject
             return _concreteType;
         }
 
-        public override IEnumerable<ZenjectResolveException> ValidateBinding()
+        public override IEnumerable<ZenjectResolveException> ValidateBinding(Type contractType, InjectContext context)
         {
             return BindingValidator.ValidateObjectGraph(_container, _concreteType);
         }
