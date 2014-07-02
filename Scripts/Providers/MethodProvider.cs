@@ -27,18 +27,18 @@ namespace ModestTree.Zenject
             return false;
         }
 
-        public override object GetInstance(Type contractType)
+        public override object GetInstance(Type contractType, InjectContext context)
         {
             Assert.That(typeof(T).DerivesFromOrEqual(contractType));
             var obj = _method(_container);
 
             Assert.That(obj != null, () =>
-                "Method provider returned null when looking up type '{0}'. \nObject graph:\n{1}".With(typeof(T).Name(), _container.GetCurrentObjectGraph()));
+                    "Method provider returned null when looking up type '{0}'. \nObject graph:\n{1}".With(typeof(T).Name(), DiContainer.GetCurrentObjectGraph()));
 
             return obj;
         }
 
-        public override IEnumerable<ZenjectResolveException> ValidateBinding()
+        public override IEnumerable<ZenjectResolveException> ValidateBinding(Type contractType, InjectContext context)
         {
             return Enumerable.Empty<ZenjectResolveException>();
         }

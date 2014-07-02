@@ -28,13 +28,14 @@ namespace ModestTree.Zenject
             return true;
         }
 
-        public override object GetInstance(Type contractType)
+        public override object GetInstance(Type contractType, InjectContext context)
         {
-            Assert.That(_instance.GetType().DerivesFromOrEqual(contractType));
+            // _instance == null during validation sometimes
+            Assert.That(_instance == null || _instance.GetType().DerivesFromOrEqual(contractType));
             return _instance;
         }
 
-        public override IEnumerable<ZenjectResolveException> ValidateBinding()
+        public override IEnumerable<ZenjectResolveException> ValidateBinding(Type contractType, InjectContext context)
         {
             return Enumerable.Empty<ZenjectResolveException>();
         }

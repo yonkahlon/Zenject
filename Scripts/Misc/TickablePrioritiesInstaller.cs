@@ -9,7 +9,8 @@ namespace ModestTree.Zenject
     {
         List<Type> _tickables;
 
-        public TickablePrioritiesInstaller(List<Type> tickables)
+        public TickablePrioritiesInstaller(
+            List<Type> tickables)
         {
             _tickables = tickables;
         }
@@ -20,12 +21,19 @@ namespace ModestTree.Zenject
 
             foreach (var tickableType in _tickables)
             {
-                Assert.That(tickableType.DerivesFrom<ITickable>(),
-                    "Expected type '{0}' to derive from ITickable", tickableType.Name());
-
-                _container.Bind<Tuple<Type, int>>().To(Tuple.New(tickableType, priorityCount)).WhenInjectedInto<StandardKernel>();
+                BindPriority(_container, tickableType, priorityCount);
                 priorityCount++;
             }
+        }
+
+        public static void BindPriority(
+            DiContainer container, Type tickableType, int priorityCount)
+        {
+            Assert.That(tickableType.DerivesFrom<ITickable>(),
+                "Expected type '{0}' to derive from ITickable", tickableType.Name());
+
+            container.Bind<Tuple<Type, int>>().To(
+                Tuple.New(tickableType, priorityCount)).WhenInjectedInto<StandardKernel>();
         }
     }
 }

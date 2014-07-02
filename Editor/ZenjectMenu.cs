@@ -12,32 +12,42 @@ namespace ModestTree.Zenject
 {
     public static class ZenjectMenu
     {
+        public static void ValidateCurrentSceneThenPlay()
+        {
+            if (ValidateCurrentScene())
+            {
+                EditorApplication.isPlaying = true;
+            }
+        }
+
         [MenuItem("Edit/Zenject/Validate Current Scene #%v")]
-        public static void ValidateCurrentScene()
+        public static bool ValidateCurrentScene()
         {
             var compRoots = GameObject.FindObjectsOfType<CompositionRoot>();
 
             if (compRoots.HasMoreThan(1))
             {
                 Debug.LogError("Found multiple composition roots when only one was expected while validating current scene");
-                return;
+                return false;
             }
 
             if (compRoots.IsEmpty())
             {
+                // Return true to allow playing in this case
                 Debug.LogError("Could not find composition root while validating current scene");
-                return;
+                return true;
             }
 
             var compRoot = compRoots.Single();
 
             if (compRoot.Installers.IsEmpty())
             {
-                Debug.LogError("Could not find scene installer while validating current scene");
-                return;
+                Debug.LogWarning("Could not find installers while validating current scene");
+                // Return true to allow playing in this case
+                return true;
             }
 
-            var resolveErrors = ValidateInstallers(compRoot).Take(10);
+            var resolveErrors = ValidateInstallers(compRoot).Take(10).ToList();
 
             // Only show a few to avoid spamming the log too much
             foreach (var error in resolveErrors)
@@ -48,17 +58,19 @@ namespace ModestTree.Zenject
             if (resolveErrors.Any())
             {
                 Debug.LogError("Validation Completed With Errors");
+                return false;
             }
-            else
-            {
-                Debug.Log("Validation Completed Successfully");
-            }
+
+            Debug.Log("Validation Completed Successfully");
+            return true;
         }
 
         static IEnumerable<ZenjectResolveException> ValidateInstallers(CompositionRoot compRoot)
         {
             var container = new DiContainer();
             container.Bind<CompositionRoot>().ToSingle(compRoot);
+
+            var allInstallers = new List<IInstaller>();
 
             foreach (var installer in compRoot.Installers)
             {
@@ -69,11 +81,18 @@ namespace ModestTree.Zenject
                     yield break;
                 }
 
-                installer.Container = container;
-                container.Bind<IInstaller>().To(installer);
+                if (installer.enabled)
+                {
+                    installer.Container = container;
+                    container.Bind<IInstaller>().To(installer);
+                }
+
+                allInstallers.AddRange(container.InstallInstallers());
+
+                Assert.That(!container.HasBinding<IInstaller>());
             }
 
-            foreach (var error in ZenUtil.ValidateInstallers(container))
+            foreach (var error in container.ValidateResolve<IDependencyRoot>())
             {
                 yield return error;
             }
@@ -89,6 +108,15 @@ namespace ModestTree.Zenject
                 }
 
                 foreach (var error in container.ValidateObjectGraph(monoBehaviour.GetType()))
+                {
+                    yield return error;
+                }
+            }
+
+            // Validate dynamically created object graphs
+            foreach (var installer in allInstallers)
+            {
+                foreach (var error in installer.ValidateSubGraphs())
                 {
                     yield return error;
                 }
@@ -111,7 +139,7 @@ namespace ModestTree.Zenject
             }
             catch (ZenjectException e)
             {
-                Debug.LogError("Unable to find container in current scene. " + e.Message);
+                Debug.LogError("Unable to find container in current scene. " + e.ToString());
                 return;
             }
 

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace ModestTree
 {
@@ -15,6 +16,11 @@ namespace ModestTree
         public static IEnumerable<T> Yield<T>(this T item)
         {
             yield return item;
+        }
+
+        public static string Join(this IEnumerable<string> values, string separator)
+        {
+            return string.Join(separator, values.ToArray());
         }
 
         // Most of the time when you call remove you always intend on removing something

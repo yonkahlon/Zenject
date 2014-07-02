@@ -35,6 +35,15 @@ namespace ModestTree.Zenject
             return ToMethod(c => c.Resolve<TConcrete>());
         }
 
+        public BindingConditionSetter ToLookup<TConcrete>(object identifier) where TConcrete : TContract
+        {
+            return ToMethod(c => c.Resolve<TConcrete>(
+                new InjectContext(typeof(TConcrete))
+                {
+                    Identifier = identifier,
+                }));
+        }
+
         public BindingConditionSetter ToMethod(Func<DiContainer, TContract> method)
         {
             return ToProvider(new MethodProvider<TContract>(method, _container));

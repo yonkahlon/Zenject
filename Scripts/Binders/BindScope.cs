@@ -5,7 +5,7 @@ using System.Text;
 
 namespace ModestTree.Zenject
 {
-    // This class should ONLY be used the following way:
+    // This class is meant to be used the following way:
     //
     //  using (var scope = _container.CreateScope())
     //  {

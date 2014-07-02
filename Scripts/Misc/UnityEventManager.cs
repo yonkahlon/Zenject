@@ -17,6 +17,9 @@ namespace ModestTree.Zenject
         public event Action LeftMouseButtonDown = delegate { };
         public event Action LeftMouseButtonUp = delegate { };
 
+        public event Action MiddleMouseButtonDown = delegate { };
+        public event Action MiddleMouseButtonUp = delegate { };
+
         public event Action RightMouseButtonDown = delegate { };
         public event Action RightMouseButtonUp = delegate { };
 
@@ -45,6 +48,7 @@ namespace ModestTree.Zenject
         {
             int buttonLeft = 0;
             int buttonRight = 1;
+            int buttonMiddle = 2;
 
             if (Input.GetMouseButtonDown(buttonLeft))
             {
@@ -62,6 +66,15 @@ namespace ModestTree.Zenject
             else if (Input.GetMouseButtonUp(buttonRight))
             {
                 RightMouseButtonUp();
+            }
+
+            if (Input.GetMouseButtonDown(buttonMiddle))
+            {
+                MiddleMouseButtonDown();
+            }
+            else if (Input.GetMouseButtonUp(buttonMiddle))
+            {
+                MiddleMouseButtonUp();
             }
 
             if (_lastMousePosition != Input.mousePosition)

@@ -4,39 +4,57 @@ namespace ModestTree.Zenject
 {
     public abstract class ProviderBase : IDisposable
     {
-        BindingCondition _condition;
+        object _identifier;
+        BindingCondition _condition = delegate { return true; };
 
-        public bool Matches(ResolveContext ctx)
+        public BindingCondition Condition
         {
-            if (_condition == null)
+            set
             {
-                // By default do not match if the target is named
-                // and we do not have a condition
-                return ctx.Identifier == null;
+                _condition = value;
+            }
+        }
+
+        public object Identifier
+        {
+            get
+            {
+                return _identifier;
+            }
+            set
+            {
+                _identifier = value;
+            }
+        }
+
+        public bool Matches(InjectContext context)
+        {
+            // Identifier will be null most of the time
+            return IdentifiersMatch(context.Identifier) && _condition(context);
+        }
+
+        bool IdentifiersMatch(object identifier)
+        {
+            if (_identifier == null)
+            {
+                return identifier == null;
             }
 
-            return _condition(ctx);
+            return _identifier.Equals(identifier);
         }
 
-        public void SetCondition(BindingCondition condition)
-        {
-            _condition = condition;
-        }
-
+        // Return null if not applicable (for eg. if instance type is dependent on contractType)
         public abstract Type GetInstanceType();
-
-        // Note: We pass in contractType for these methods for the case where
-        // the contract type is used to determine what instance to return
-        // (this is only needed for mapping contracts with generic parameters)
 
         // Returns true if this provider already has an instance to return
         // and false in the case where the provider would create it next time
         // GetInstance is called
+        // Is not applicable in some cases
         public abstract bool HasInstance(Type contractType);
 
-        public abstract object GetInstance(Type contractType);
+        public abstract object GetInstance(Type contractType, InjectContext context);
 
-        public abstract IEnumerable<ZenjectResolveException> ValidateBinding();
+        public abstract IEnumerable<ZenjectResolveException> ValidateBinding(Type contractType, InjectContext context);
 
         public virtual void Dispose()
         {

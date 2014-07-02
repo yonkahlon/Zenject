@@ -22,13 +22,17 @@ namespace ModestTree.Zenject
 
         public static void Inject(DiContainer container, object injectable, IEnumerable<object> additional, bool shouldUseAll)
         {
+            Inject(container, injectable, additional, shouldUseAll, TypeAnalyzer.GetInfo(injectable.GetType()));
+        }
+
+        internal static void Inject(DiContainer container, object injectable, IEnumerable<object> additional, bool shouldUseAll, ZenjectTypeInfo typeInfo)
+        {
+            Assert.IsEqual(typeInfo.TypeAnalyzed, injectable.GetType());
             Assert.That(injectable != null);
 
             var additionalCopy = additional.ToList();
 
-            var injectInfos = InjectablesFinder.GetFieldAndPropertyInjectables(injectable.GetType());
-
-            foreach (var injectInfo in injectInfos)
+            foreach (var injectInfo in typeInfo.FieldInjectables.Concat(typeInfo.PropertyInjectables))
             {
                 bool didInject = InjectFromExtras(injectInfo, injectable, additionalCopy);
 
@@ -42,10 +46,10 @@ namespace ModestTree.Zenject
             {
                 throw new ZenjectResolveException(
                     "Passed unnecessary parameters when injecting into type '{0}'. \nExtra Parameters: {1}\nObject graph:\n{2}"
-                        .With(injectable.GetType().Name(), String.Join(",", additionalCopy.Select(x => x.GetType().Name()).ToArray()), container.GetCurrentObjectGraph()));
+                        .With(injectable.GetType().Name(), String.Join(",", additionalCopy.Select(x => x.GetType().Name()).ToArray()), DiContainer.GetCurrentObjectGraph()));
             }
 
-            foreach (var methodInfo in InjectablesFinder.GetPostInjectMethods(injectable.GetType()))
+            foreach (var methodInfo in typeInfo.PostInjectMethods)
             {
                 methodInfo.Invoke(injectable, new object[0]);
             }
@@ -75,7 +79,7 @@ namespace ModestTree.Zenject
         {
             var valueObj = container.Resolve(injectInfo, targetInstance);
 
-            if (valueObj == null)
+            if (valueObj == null && !container.AllowNullBindings)
             {
                 // Do not change if optional
                 // Since it may have some hard coded value
