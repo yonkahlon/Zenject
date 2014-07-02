@@ -31,6 +31,8 @@
         * <a href="#implementing-idisposable">Implementing IDisposable</a>
         * <a href="#auto-mocking-using-moq">Auto-Mocking Using Moq</a>
         * <a href="#visualizing-object-graphs-automatically">Visualizing Object Graph Automatically</a>
+    * <a href="#questions">Frequently Asked Questions</a>
+        * <a href="#faq-performance">How is Performance?</a>
     * <a href="#further-help">Further Help</a>
     * <a href="#license">License</a>
     * <a href="#version">Version</a>
@@ -41,9 +43,9 @@ Zenject is a lightweight dependency injection framework built specifically to ta
 
 Tested in Unity 3D on the following platforms: PC/Mac/Linux, iOS, Android, and Webplayer
 
-This project is open source.  You can find the official repository [here](https://github.com/modesttree/Zenject).  If you would like to contribute to the project pull requests are welcome!
+This project is open source.  You can find the official repository [here](https://github.com/modesttree/Zenject).
 
-For general support or bug requests, please feel free to create issues on the github page.  You can also email me directly at svermeulen@modesttree.com
+For general troubleshooting / support, please use the google group which you can find [here](https://groups.google.com/forum/#!forum/zenject/).  If you have found a bug, you are also welcome to create an issue on the [github page](https://github.com/modesttree/Zenject), or a pull request if you have a fix / extension.  Finally, you can also email me directly at svermeulen@modesttree.com
 
 ## <a id="features"></a>Features
 
@@ -339,7 +341,7 @@ Use different implementations of IFoo in different cases:
 
 Inject by name:
 
-    _container.Bind<IFoo>().ToSingle<Foo>().WhenInjectedInto("foo");
+    _container.Bind<IFoo>().ToSingle<Foo>().As("foo");
 
     public class Bar
     {
@@ -349,11 +351,11 @@ Inject by name:
 
 You can also inject by name and also restrict to only Bar class:
 
-    _container.Bind<IFoo>().ToSingle<Foo>().WhenInjectedInto<Bar>("foo");
+    _container.Bind<IFoo>().ToSingle<Foo>().WhenInjectedInto<Bar2>().As("foo");
 
-Note that both of these are simple shorthands.  The long version would be:
+Note that are simple shorthands.  The long version would be:
 
-    _container.Bind<IFoo>().ToSingle<Foo>().When(context => context.Target == typeof(Bar) && identifier.Equals("foo"));
+    _container.Bind<IFoo>().ToSingle<Foo>().When(context => context.Target == typeof(Bar)).As("foo");
 
 Note also that you can name dependencies with any type (and not just string) and that it applies to constructor arguments as well, for example:
 
@@ -371,6 +373,15 @@ Note also that you can name dependencies with any type (and not just string) and
         {
         }
     }
+
+You can use the generic When() method for more complex conditionals.  The InjectContext class contains the following information that you can use in your conditional:
+
+* `Type EnclosingType` - The type of the newly instantiated object, which we are injecting dependencies into.
+* `object EnclosingInstance` - The newly instantiated instance that is having its dependencies filled.  Note that this is only available when injecting fields and null for constructor parameters
+* `string SourceName` - The name of the field or parameter that we are injecting into.  This can be used, for example, in the case where you have multiple constructor parameters that are strings.  However, using the parameter or field name can be error prone since other programmers may refactor it to use a different name.  In many cases it's better to use an explicit identifier
+* `object Identifier` - This will be null in most cases and set to whatever is given as a parameter to the [Inject] attribute.  For example, `[Inject("foo")] _foo` will result in `Identifier` being equal to the string "foo".
+* `List<Type> ParentTypes` - This contains the entire object graph that precedes the current class being created.  For example, dependency A might be created, which requires an instance of B, which requires an instance of C.  In this case, the InjectContext given for any fields when creating C will contains the list `{typeof(A), typeof(B)}`.
+* `bool Optional` - True if the [InjectOptional] parameter is declared on the field being injected
 
 ## <a id="the-dependency-root"></a>The dependency root
 
@@ -428,6 +439,8 @@ Note that if you do plan to use IInitializable and ITickable as described here t
 
 This also means that you do not need to use this approach at all.  You can use a custom dependency root and handle your own updating and initialization yourself, or simply write all your code in MonoBehaviours, and still receive all the benefits of Zenject.
 
+In the case where there are multiple [PostInject] methods on a given object, they are called in the order of Base class to Derived class.
+
 ## <a id="zenject-order-of-operations"></a>Zenject Order Of Operations
 
 A Zenject driven application is executed by the following steps:
@@ -435,7 +448,7 @@ A Zenject driven application is executed by the following steps:
 * Composition Root is started (via Unity Awake() method)
 * Composition Root creates a new DiContainer object to be used to contain all instances used in the scene
 * Composition Root iterates through all the Installers that have been added to it via the Unity Inspector, and updates them to point to the new DiContainer.  It then calls InstallBindings() on each installer.
-* Each Installer then registers different sets of dependencies directly on to the given DiContainer by calling one of the Bind<> methods.  Note that the order that this binding occurs should not matter. Each installer may also include other installers by binding to the IInstaller interface.
+* Each Installer then registers different sets of dependencies directly on to the given DiContainer by calling one of the Bind<> methods.  Note that the order that this binding occurs does not generally matter. Each installer may also include other installers by binding to the IInstaller interface.  Each installer can also add bindings to configure other installers, however note that in this case you will have to make sure that the installers are executed in the correct order (which you can control by re-ordering the Installers property of the CompositionRoot)
 * The Composition Root then traverses the entire scene heirarchy and injects all MonoBehaviours with their dependencies. Since MonoBehaviours are instantiated by Unity we cannot use constructor injection in this case and therefore field or property injection must be used (which is done by adding a [Inject] attribute to any member).  Any methods on these MonoBehaviour's marked with [PostInject] are called at this point as well.
 * After filling in the scene dependencies the Composition Root then retrieves the instance of the root object (that is, whatever is bound to IDependencyRoot).  In most cases code does not need to be in MonoBehaviours and will be resolved as a result of this
 * If any required dependencies cannot be resolved, a ZenjectResolveException is thrown
@@ -780,7 +793,7 @@ You can load the scene containing `LessonStandaloneStart` and specify a particul
     ZenUtil.LoadScene("NameOfSceneToLoad",
         delegate (DiContainer container)
         {
-            container.Bind<string>().To("custom_level").WhenInjectedInto<LevelHandler>("StartLevelName");
+            container.Bind<string>().To("custom_level").WhenInjectedInto<LevelHandler>().As("StartLevelName");
         });
 
 Note that you can still run the scene directly, in which case it will default to using "level01".  This is possible because we are using the InjectOptional flag.
@@ -827,10 +840,12 @@ Then, instead of injecting directly into the LevelHandler we can inject into the
     ZenUtil.LoadScene("NameOfSceneToLoad",
         delegate (DiContainer container)
         {
-            container.Bind<string>().To("level02").WhenInjectedInto<GameInstaller>("LevelName");
+            container.Bind<string>().To("level02").WhenInjectedInto<GameInstaller>().As("LevelName");
         });
 
 Note that in this case I didn't need to use the "LevelName" identifier since there is only one string injected into the GameInstaller class, however I find it's sometimes nice to be explicit.
+
+Some people have also found it useful to separate out content into different scenes and then load each scene additively using the Unity method `Application.LoadLevelAdditive`.  In some cases it's useful to have the dependencies in the new scene resolved using the container of the original scene.  To achieve this, you can call `ZenUtil.LoadSceneAdditiveWithContainer` and pass in your scene's container.  Note however that it is assumed in this case that the new scene does not have its own container + Composition Root.
 
 ## <a id="using-the-unity-inspector-to-configure-settings"></a>Using the Unity Inspector To Configure Settings
 
@@ -874,7 +889,7 @@ This works ok for small projects, but as the complexity of your project grows it
 
 You can do this in Zenject out-of-the-box by executing the menu item `Edit -> Zenject -> Validate Current Scene` or simply hitting CTRL+SHIFT+V with the scene open that you want to validate.  This will execute all installers for the current scene and construct a fully bound container.   It will then iterate through the object graphs and verify that all bindings can be found (without actually instantiating any of them).
 
-Also, if you happen to be a fan of automated testing (as I am) then you can include object graph validation as part of that by calling `ZenUtil.ValidateInstallers()`
+Also, if you happen to be a fan of automated testing (as I am) then you can also include calls to this menu item as part of your testing suite.
 
 ## <a id="dynamic-object-graph-validation"></a>Dynamic Object Graph Validation
 
@@ -992,15 +1007,21 @@ The result is two files (Foo.dot and Foo.png).  The dot file is included in case
 
 <img src="ExampleObjectGraph.png?raw=true" alt="Example Object Graph" width="600px" height="127px"/>
 
+## <a id="questions"></a>Frequently Asked Questions
+
+* ### <a id="faq-performance"></a>How is performance?
+
+DI can affect start-up time when it builds the initial object graph. However it can also affect performance any time you instantiate new objects at run time.
+
+Zenject uses C# reflection which is typically slow, but in Zenject this work is cached so any performance hits only occur once for each class type.  In other words, Zenject avoids costly reflection operations by making a trade-off between performance and memory to ensure good performance.
+
 ## <a id="further-help"></a>Further Help
 
-There currently does not exist a support forum yet.  In the meantime, I would recommend creating an issue on the Zenject github repository, which you can find [here](https://github.com/modesttree/Zenject).
-
-Alternatively, you can contact me directly at svermeulen@modesttree.com
+For general troubleshooting / support, please use the google group which you can find [here](https://groups.google.com/forum/#!forum/zenject/).  If you have found a bug, you are also welcome to create an issue on the [github page](https://github.com/modesttree/Zenject), or a pull request if you have a fix / extension.  Finally, you can also email me directly at svermeulen@modesttree.com
 
 ## <a id="introduction"></a>Version
 
-Version 1.07
+Version 1.09
 
 ## <a id="license"></a>License
 
