@@ -1031,7 +1031,7 @@ For general troubleshooting / support, please use the google group which you can
 
 ## <a id="introduction"></a>Version
 
-Version 1.09
+Version 1.08
 
 ## <a id="license"></a>License
 
