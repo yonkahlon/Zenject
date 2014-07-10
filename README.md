@@ -1,4 +1,4 @@
-<img src="ZenjectLogo.png?raw=true" alt="Zenject" width="600px" height="134px"/>
+<img src="UnityProject/Assets/Zenject/Main/ZenjectLogo.png?raw=true" alt="Zenject" width="600px" height="134px"/>
 
 # Dependency Injection Framework for Unity3D
 
@@ -1019,7 +1019,7 @@ Note that you will need to have graphviz installed for this to work (which you c
 
 The result is two files (Foo.dot and Foo.png).  The dot file is included in case you want to add custom graphviz commands.  As an example, this is the graph that is generated when run on the sample project:
 
-<img src="ExampleObjectGraph.png?raw=true" alt="Example Object Graph" width="600px" height="127px"/>
+<img src="UnityProject/Assets/Zenject/Main/ExampleObjectGraph.png?raw=true" alt="Example Object Graph" width="600px" height="127px"/>
 
 ## <a id="questions"></a>Frequently Asked Questions
 
