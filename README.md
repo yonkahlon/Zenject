@@ -34,8 +34,9 @@
     * <a href="#questions">Frequently Asked Questions</a>
         * <a href="#faq-performance">How is Performance?</a>
     * <a href="#further-help">Further Help</a>
-    * <a href="#license">License</a>
     * <a href="#version">Version</a>
+    * <a href="#version">Release Notes</a>
+    * <a href="#license">License</a>
 
 ## NOTE
 
@@ -1036,6 +1037,24 @@ For general troubleshooting / support, please use the google group which you can
 ## <a id="introduction"></a>Version
 
 Version 1.08
+
+## <a id="release-notes"></a>Release Notes
+
+1.08
+
+* Order of magnitude speed improvement by using more caching
+* Minor change to API to use the As() method to specify identifiers
+* Bug fixes
+
+1.07
+
+* Simplified API by removing the concept of modules in favour of just having installers instead (and add support for installers installing other installers)
+* Bug fixes
+
+1.06
+
+* Introduced concept of scnee installer, renamed installers 'modules'
+* Bug fixes
 
 ## <a id="license"></a>License
 
