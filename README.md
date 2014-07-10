@@ -39,7 +39,7 @@
 
 ## NOTE
 
-The following documentation is written to be packaged with Zenject as it appears in the Asset store (which you can find [here](http://u3d.as/content/modest-tree-media/zenject-dependency-injection/7ER)), so some of it may not apply to this repository alone.  The unit tests that it refers to can be found [here](https://github.com/modesttree/ZenjectUnitTests) and the sample game that it refers to can be found [here](https://github.com/modesttree/ZenjectSample)
+The following documentation is written to be packaged with Zenject as it appears in the Asset store (which you can find [here](http://u3d.as/content/modest-tree-media/zenject-dependency-injection/7ER))
 
 ## <a id="introduction"></a>Introduction
 
