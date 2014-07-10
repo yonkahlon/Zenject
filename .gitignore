@@ -1,4 +1,4 @@
 *.suo
 *.pidb
-/bin
-/obj
+/UnityProject/Assets/Zenject/AddOns.meta
+/UnityProject/Assets/Zenject/AddOns
