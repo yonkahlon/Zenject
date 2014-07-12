@@ -400,9 +400,9 @@ You can use the generic When() method for more complex conditionals.  The Inject
 
 ## <a id="the-dependency-root"></a>The dependency root
 
-Every Zenject app has one root object.  The dependencies of this object generates the full object graph for the application/game (not including the object graphs that are built into the scene as well as the object graphs that are created dynamically).  For example, in the sample project this is the GameRoot class which is declared as below:
+Every Zenject app has one root object.  The dependencies of this object generates the full object graph for the application/game (not including the object graphs that are built into the scene as well as the object graphs that are created dynamically).  In many cases, you can just use DependencyRootStandard for this which just contain the supporting classes for ITickable and IInitializable (this is also what's done in the sample game).  Your binding would then look like this:
 
-    _container.Bind<IDependencyRoot>().ToSingle<GameRoot>();
+    _container.Bind<IDependencyRoot>().ToSingle<DependencyRootStandard>();
 
 ## <a id="itickable"></a>ITickable
 
