@@ -50,7 +50,7 @@ Tested in Unity 3D on the following platforms: PC/Mac/Linux, iOS, Android, and W
 
 This project is open source.  You can find the official repository [here](https://github.com/modesttree/Zenject).
 
-For general troubleshooting / support, please use the google group which you can find [here](https://groups.google.com/forum/#!forum/zenject/).  If you have found a bug, you are also welcome to create an issue on the [github page](https://github.com/modesttree/Zenject), or a pull request if you have a fix / extension.  Finally, you can also email me directly at svermeulen@modesttree.com
+For general troubleshooting / support, please use the google group which you can find [here](https://groups.google.com/forum/#!forum/zenject/).  If you have found a bug, you are also welcome to create an issue on the [github page](https://github.com/modesttree/Zenject), or a pull request if you have a fix / extension.  You can also follow @Zenject on twitter for updates.  Finally, you can also email me directly at svermeulen@modesttree.com
 
 ## <a id="features"></a>Features
 
