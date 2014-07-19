@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using Fasterflect;
+using UnityEngine;
 
 namespace ModestTree.Zenject
 {
@@ -18,19 +19,18 @@ namespace ModestTree.Zenject
 
         static Stack<Type> _lookupsInProgress = new Stack<Type>();
 
-        bool _hasDisposed;
         bool _allowNullBindings;
+
         ProviderBase _fallbackProvider;
+        Instantiator _instantiator;
 
         public DiContainer()
         {
             _singletonMap = new SingletonProviderMap(this);
+            _instantiator = new Instantiator(this);
 
             Bind<DiContainer>().To(this);
-
-            // Pass an instance of Instantiator otherwise it will
-            // try to call itself to create itself
-            Bind<Instantiator>().To(new Instantiator(this));
+            Bind<Instantiator>().To(_instantiator);
         }
 
         // This can be used to handle the case where the given contract is not
@@ -40,7 +40,7 @@ namespace ModestTree.Zenject
         // _container.FallbackProvider = new TransientMockProvider(_container);
         // It can also be used to create nested containers:
         // var nestedContainer = new DiContainer();
-        // nestedContainer.FallbackProvider = new DiContainer(mainContainer);
+        // nestedContainer.FallbackProvider = new DiContainerProvider(mainContainer);
         public ProviderBase FallbackProvider
         {
             get
@@ -83,6 +83,14 @@ namespace ModestTree.Zenject
             }
         }
 
+        IEnumerable<object> AllConcreteInstances
+        {
+            get
+            {
+                return (from x in _providers from p in x.Value where p.HasInstance(p.GetInstanceType()) select p.GetInstance(p.GetInstanceType(), new InjectContext()));
+            }
+        }
+
         // This is the list of concrete types that are in the current object graph
         // Useful for error messages (and complex binding conditions)
         internal static Stack<Type> LookupsInProgress
@@ -103,54 +111,55 @@ namespace ModestTree.Zenject
             return _lookupsInProgress.Select(t => t.Name()).Reverse().Aggregate((i, str) => i + "\n" + str);
         }
 
-        public void Dispose()
-        {
-            Assert.That(!_hasDisposed);
-
-            // Disable fallback provider before looking up IDisposables
-            _fallbackProvider = null;
-
-            var context = new InjectContext();
-            context.Optional = true;
-            var disposables = (List<IDisposable>)ResolveMany(typeof(IDisposable), context, true);
-
-            foreach (var disposable in disposables)
-            {
-                disposable.Dispose();
-            }
-
-            _hasDisposed = true;
-        }
-
         // This occurs so often that we might as well have a convenience method
         public BindingConditionSetter BindFactory<TContract>()
         {
-            Assert.That(!_hasDisposed);
+            if (typeof(TContract).DerivesFrom(typeof(MonoBehaviour)))
+            {
+                throw new ZenjectBindException(
+                    "Error while binding factory for type '{0}'. Must use version of BindFactory which includes a reference to a prefab you wish to instantiate"
+                    .With(typeof(TContract).Name()));
+            }
+
             return Bind<IFactory<TContract>>().ToSingle<Factory<TContract>>();
         }
 
         public BindingConditionSetter BindFactory<TContract, TConcrete>() where TConcrete : TContract
         {
-            Assert.That(!_hasDisposed);
+            if (typeof(TContract).DerivesFrom(typeof(MonoBehaviour)))
+            {
+                throw new ZenjectBindException(
+                    "Error while binding factory for type '{0}'. Must use version of BindFactory which includes a reference to a prefab you wish to instantiate"
+                    .With(typeof(TConcrete).Name()));
+            }
+
             return Bind<IFactory<TContract>>().ToSingle<Factory<TContract, TConcrete>>();
+        }
+
+        public BindingConditionSetter BindFactory<TContract>(GameObject prefab) where TContract : Component
+        {
+            return Bind<IFactory<TContract>>()
+                .To(new GameObjectFactory<TContract>(this, prefab));
+        }
+
+        public BindingConditionSetter BindFactory<TContract, TConcrete>(GameObject prefab) where TConcrete : Component, TContract
+        {
+            return Bind<IFactory<TContract>>()
+                .To(new GameObjectFactory<TContract, TConcrete>(this, prefab));
         }
 
         public ValueBinder<TContract> BindValue<TContract>() where TContract : struct
         {
-            Assert.That(!_hasDisposed);
             return new ValueBinder<TContract>(this);
         }
 
         public ReferenceBinder<TContract> Bind<TContract>() where TContract : class
         {
-            Assert.That(!_hasDisposed);
             return new ReferenceBinder<TContract>(this, _singletonMap);
         }
 
         public GenericBinder BindGeneric(Type contractType)
         {
-            Assert.That(!_hasDisposed);
-
             if (!contractType.IsOpenGenericType())
             {
                 throw new ZenjectException(
@@ -162,20 +171,17 @@ namespace ModestTree.Zenject
 
         public BindScope CreateScope()
         {
-            Assert.That(!_hasDisposed);
             return new BindScope(this, _singletonMap);
         }
 
         // See comment in LookupInProgressAdder
         internal LookupInProgressAdder PushLookup(Type type)
         {
-            Assert.That(!_hasDisposed);
             return new LookupInProgressAdder(this, type);
         }
 
         public void RegisterProvider(ProviderBase provider, Type contractType)
         {
-            Assert.That(!_hasDisposed);
             if (_providers.ContainsKey(contractType))
             {
                 // Prevent duplicate singleton bindings:
@@ -195,7 +201,6 @@ namespace ModestTree.Zenject
 
         public int UnregisterProvider(ProviderBase provider)
         {
-            Assert.That(!_hasDisposed);
             int numRemoved = 0;
 
             foreach (var keyValue in _providers)
@@ -232,6 +237,11 @@ namespace ModestTree.Zenject
             return ValidateResolve(contractType, new InjectContext());
         }
 
+        public IEnumerable<ZenjectResolveException> ValidateResolve<TContract>(InjectContext context)
+        {
+            return ValidateResolve(typeof(TContract), context);
+        }
+
         // Walk the object graph for the given type
         // Throws ZenjectResolveException if there is a problem
         public IEnumerable<ZenjectResolveException> ValidateResolve(Type contractType, InjectContext context)
@@ -263,13 +273,11 @@ namespace ModestTree.Zenject
 
         public List<TContract> ResolveMany<TContract>()
         {
-            Assert.That(!_hasDisposed);
             return ResolveMany<TContract>(false);
         }
 
         public List<TContract> ResolveMany<TContract>(bool optional)
         {
-            Assert.That(!_hasDisposed);
             var context = new InjectContext();
             context.Optional = optional;
             return ResolveMany<TContract>(context);
@@ -277,13 +285,11 @@ namespace ModestTree.Zenject
 
         public List<TContract> ResolveMany<TContract>(InjectContext context)
         {
-            Assert.That(!_hasDisposed);
             return (List<TContract>) ResolveMany(typeof(TContract), context);
         }
 
         public object ResolveMany(Type contract)
         {
-            Assert.That(!_hasDisposed);
             return ResolveMany(contract, new InjectContext());
         }
 
@@ -328,8 +334,6 @@ namespace ModestTree.Zenject
 
         internal IEnumerable<ProviderBase> GetProvidersForContract(Type contractType)
         {
-            Assert.That(!_hasDisposed);
-
             List<ProviderBase> providers;
 
             if (_providers.TryGetValue(contractType, out providers))
@@ -349,13 +353,11 @@ namespace ModestTree.Zenject
 
         public bool HasBinding(Type contract)
         {
-            Assert.That(!_hasDisposed);
             return HasBinding(contract, new InjectContext());
         }
 
         public bool HasBinding(Type contract, InjectContext context)
         {
-            Assert.That(!_hasDisposed);
             List<ProviderBase> providers;
 
             if (!_providers.TryGetValue(contract, out providers))
@@ -368,20 +370,17 @@ namespace ModestTree.Zenject
 
         public bool HasBinding<TContract>()
         {
-            Assert.That(!_hasDisposed);
             return HasBinding(typeof(TContract));
         }
 
         public object ResolveMany(Type contract, InjectContext context)
         {
-            Assert.That(!_hasDisposed);
             // Soft == false, always create new instances when possible
             return ResolveMany(contract, context, false);
         }
 
         public object ResolveMany(Type contractType, InjectContext context, bool soft)
         {
-            Assert.That(!_hasDisposed);
             // Note that different types can map to the same provider (eg. a base type to a concrete class and a concrete class to itself)
 
             var matches = GetProviderMatchesInternal(contractType, context, soft).ToList();
@@ -413,7 +412,6 @@ namespace ModestTree.Zenject
 
         public List<Type> ResolveTypeMany(Type contract)
         {
-            Assert.That(!_hasDisposed);
             if (_providers.ContainsKey(contract))
             {
                 return _providers[contract].Select(x => x.GetInstanceType()).Where(x => x != null).ToList();
@@ -478,25 +476,21 @@ namespace ModestTree.Zenject
         // Return single instance of requested type or assert
         public TContract Resolve<TContract>()
         {
-            Assert.That(!_hasDisposed);
             return Resolve<TContract>(new InjectContext());
         }
 
         public TContract Resolve<TContract>(InjectContext context)
         {
-            Assert.That(!_hasDisposed);
             return (TContract) Resolve(typeof(TContract), context);
         }
 
         public object Resolve(Type contract)
         {
-            Assert.That(!_hasDisposed);
             return Resolve(contract, new InjectContext());
         }
 
         public object Resolve(Type contractType, InjectContext context)
         {
-            Assert.That(!_hasDisposed);
             // Note that different types can map to the same provider (eg. a base type to a concrete class and a concrete class to itself)
 
             var providers = GetProviderMatchesInternal(contractType, context, false).ToList();
@@ -520,7 +514,7 @@ namespace ModestTree.Zenject
                     throw new ZenjectResolveException(
                         "Unable to resolve type '{0}'{1}. \nObject graph:\n{2}"
                         .With(
-                            contractType.Name(),
+                            contractType.Name() + (context.Identifier == null ? "" : " with ID '" + context.Identifier.ToString() + "'"),
                             (context.EnclosingType == null ? "" : " while building object with type '{0}'".With(context.EnclosingType.Name())),
                             GetCurrentObjectGraph()));
                 }
@@ -567,18 +561,26 @@ namespace ModestTree.Zenject
 
         public IEnumerable<Type> GetDependencyContracts<TContract>()
         {
-            Assert.That(!_hasDisposed);
             return GetDependencyContracts(typeof(TContract));
         }
 
         public IEnumerable<Type> GetDependencyContracts(Type contract)
         {
-            Assert.That(!_hasDisposed);
-
             foreach (var injectMember in TypeAnalyzer.GetInfo(contract).AllInjectables)
             {
                 yield return injectMember.ContractType;
             }
+        }
+
+        public T Instantiate<T>(params object[] constructorArgs)
+        {
+            return _instantiator.Instantiate<T>(constructorArgs);
+        }
+
+        public object Instantiate(
+            Type concreteType, params object[] constructorArgs)
+        {
+            return _instantiator.Instantiate(concreteType, constructorArgs);
         }
     }
 }

@@ -16,12 +16,12 @@ namespace ModestTree.Zenject
         public List<Type> ParentTypes;
         public bool Optional;
 
-        internal InjectContext()
+        public InjectContext()
         {
             ParentTypes = new List<Type>();
         }
 
-        internal InjectContext(Type targetType)
+        public InjectContext(Type targetType)
         {
             ParentTypes = new List<Type>();
             EnclosingType = targetType;

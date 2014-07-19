@@ -31,7 +31,7 @@ namespace ModestTree.Zenject
 
         public override IEnumerable<ZenjectResolveException> ValidateBinding(Type contractType, InjectContext context)
         {
-            return _container.ValidateResolve(contractType);
+            return _container.ValidateResolve(contractType, context);
         }
     }
 }

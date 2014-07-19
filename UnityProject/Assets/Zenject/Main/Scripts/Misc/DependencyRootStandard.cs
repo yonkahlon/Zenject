@@ -10,9 +10,17 @@ namespace ModestTree.Zenject
         [Inject]
         public InitializableHandler Initializer;
 
+        [Inject]
+        public DisposablesHandler DisposablesHandler;
+
         public virtual void Start()
         {
             Initializer.Initialize();
+        }
+
+        public virtual void Dispose()
+        {
+            DisposablesHandler.Dispose();
         }
     }
 

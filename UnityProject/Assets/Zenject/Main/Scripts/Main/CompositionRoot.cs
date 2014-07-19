@@ -37,7 +37,7 @@ namespace ModestTree.Zenject
         {
             if (Installers.Where(x => x != null).IsEmpty())
             {
-                Debug.LogWarning("No installers found while initializing CompositionRoot");
+                Log.Warn("No installers found while initializing CompositionRoot");
                 return;
             }
 
@@ -45,7 +45,7 @@ namespace ModestTree.Zenject
             {
                 if (installer == null)
                 {
-                    Debug.LogWarning("Found null installer hooked up to CompositionRoot");
+                    Log.Warn("Found null installer hooked up to CompositionRoot");
                     continue;
                 }
 
@@ -84,6 +84,8 @@ namespace ModestTree.Zenject
 
         void Awake()
         {
+            Log.Debug("Zenject Started");
+
             InitContainer();
             Register();
             Resolve();
@@ -91,7 +93,10 @@ namespace ModestTree.Zenject
 
         void OnDestroy()
         {
-            _container.Dispose();
+            if (_dependencyRoot != null)
+            {
+                _dependencyRoot.Dispose();
+            }
         }
 
         void Resolve()
@@ -105,7 +110,7 @@ namespace ModestTree.Zenject
             }
             else
             {
-                Debug.LogWarning("No dependency root found");
+                Log.Warn("No dependency root found");
             }
         }
     }

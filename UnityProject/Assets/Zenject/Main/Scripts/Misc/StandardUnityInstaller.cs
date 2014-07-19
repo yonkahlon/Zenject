@@ -18,6 +18,7 @@ namespace ModestTree.Zenject
             //_container.Bind<IKernel>().ToTransient<StandardKernel>();
 
             _container.Bind<InitializableHandler>().ToSingle();
+            _container.Bind<DisposablesHandler>().ToSingle();
             _container.Bind<ITickable>().ToLookup<UnityEventManager>();
         }
     }

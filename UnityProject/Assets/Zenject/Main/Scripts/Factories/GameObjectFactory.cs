@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 using Fasterflect;
 
@@ -42,6 +43,11 @@ namespace ModestTree.Zenject
 
             return component;
         }
+
+        public IEnumerable<ZenjectResolveException> Validate(params Type[] extras)
+        {
+            return _container.ValidateObjectGraph<TConcrete>(extras);
+        }
     }
 
     // Instantiate via prefab
@@ -53,7 +59,7 @@ namespace ModestTree.Zenject
 
         public GameObjectFactory(DiContainer container, GameObject prefab)
         {
-            if (!container.AllowNullBindings && prefab == null)
+            if (!container.AllowNullBindings && UnityUtil.IsNull(prefab))
             {
                 throw new ZenjectBindException(
                     "Null prefab given for binding with type '{0}'".With(typeof(TContract)));
@@ -81,6 +87,11 @@ namespace ModestTree.Zenject
             }
 
             return component;
+        }
+
+        public IEnumerable<ZenjectResolveException> Validate(params Type[] extras)
+        {
+            return _container.ValidateObjectGraph<TContract>(extras);
         }
     }
 }

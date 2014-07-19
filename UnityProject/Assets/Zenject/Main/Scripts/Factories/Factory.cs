@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Security.Permissions;
+using Fasterflect;
 
 namespace ModestTree.Zenject
 {
@@ -25,6 +26,11 @@ namespace ModestTree.Zenject
 
             return _instantiator.Instantiate<TConcrete>(constructorArgs);
         }
+
+        public IEnumerable<ZenjectResolveException> Validate(params Type[] extras)
+        {
+            return _container.ValidateObjectGraph<TConcrete>(extras);
+        }
     }
 
     // Instantiate given contract class
@@ -43,7 +49,11 @@ namespace ModestTree.Zenject
 
         public Factory(DiContainer container, Type concreteType)
         {
-            Assert.That(typeof(TContract).IsAssignableFrom(concreteType));
+            if (!concreteType.DerivesFromOrEqual(typeof(TContract)))
+            {
+                throw new ZenjectResolveException(
+                    "Expected type '{0}' to derive from '{1}'".With(concreteType.Name(), typeof(TContract).Name()));
+            }
 
             _container = container;
             _concreteType = concreteType;
@@ -57,6 +67,11 @@ namespace ModestTree.Zenject
             }
 
             return (TContract)_instantiator.Instantiate(_concreteType, constructorArgs);
+        }
+
+        public IEnumerable<ZenjectResolveException> Validate(params Type[] extras)
+        {
+            return _container.ValidateObjectGraph(_concreteType, extras);
         }
     }
 }
