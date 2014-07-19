@@ -2,15 +2,14 @@ using System;
 
 namespace ModestTree.Zenject
 {
-    public class GenericBinder : Binder
+    public class BinderUntyped : Binder
     {
         readonly protected SingletonProviderMap _singletonMap;
 
-        public GenericBinder(
+        public BinderUntyped(
             DiContainer container, Type contractType, SingletonProviderMap singletonMap)
             : base(container, contractType)
         {
-            Assert.That(contractType.IsOpenGenericType(), "Expected open generic type in GenericBinder");
             _singletonMap = singletonMap;
         }
 
