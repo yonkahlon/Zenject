@@ -24,15 +24,21 @@ namespace ModestTree.Zenject
         public object Instantiate(
             Type concreteType, params object[] constructorArgs)
         {
-            using (_container.PushLookup(concreteType))
+            using (ProfileBlock.Start("Zenject.Instantiate({0})".With(concreteType)))
             {
-                return InstantiateInternal(concreteType, constructorArgs);
+                using (_container.PushLookup(concreteType))
+                {
+                    return InstantiateInternal(concreteType, constructorArgs);
+                }
             }
         }
 
         object InstantiateInternal(
             Type concreteType, params object[] constructorArgs)
         {
+            Assert.That(!concreteType.DerivesFrom<UnityEngine.Component>(),
+                "Error occurred while instantiating object of type '{0}'. Instantiator should not be used to create new mono behaviours.  Must use GameObjectInstantiator, GameObjectFactory, or GameObject.Instantiate.", concreteType.Name());
+
             var typeInfo = TypeAnalyzer.GetInfo(concreteType);
 
             if (typeInfo.InjectConstructor == null)
@@ -72,7 +78,10 @@ namespace ModestTree.Zenject
 
             try
             {
-                newObj = typeInfo.InjectConstructor.Invoke(paramValues.ToArray());
+                using (ProfileBlock.Start("{0}.{0}()".With(concreteType)))
+                {
+                    newObj = typeInfo.InjectConstructor.Invoke(paramValues.ToArray());
+                }
             }
             catch (Exception e)
             {
