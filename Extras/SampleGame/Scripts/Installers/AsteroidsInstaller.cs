@@ -55,12 +55,13 @@ namespace ModestTree.Asteroids
             _container.Bind<AsteroidManager>().ToSingle();
 
             // Here, we're defining a generic factory to create asteroid objects using the given prefab
-            // (GameObjectFactory assumes that the given type is a monobehaviour on the given prefab)
             // There's several different ways of instantiating new game objects in zenject, this is
             // only one of them
-            // Other options include injecting as transient or using GameObjectInstantiator directly
-            _container.Bind<IFactory<IAsteroid>>().To(
-                new GameObjectFactory<IAsteroid, Asteroid>(_container, SceneSettings.Asteroid.Prefab));
+            // Other options include injecting as transient, using GameObjectInstantiator directly
+            // This line is exactly the same as the following:
+            //_container.Bind<IFactory<IAsteroid>>().To(
+                //new GameObjectFactory<IAsteroid, Asteroid>(_container, SceneSettings.Asteroid.Prefab));
+            _container.BindFactory<IAsteroid, Asteroid>(SceneSettings.Asteroid.Prefab);
 
             _container.Bind<IInitializable>().ToSingle<GameController>();
             _container.Bind<ITickable>().ToSingle<GameController>();
