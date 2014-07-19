@@ -158,15 +158,10 @@ namespace ModestTree.Zenject
             return new ReferenceBinder<TContract>(this, _singletonMap);
         }
 
-        public GenericBinder BindGeneric(Type contractType)
+        // Note that this can include open generic types as well such as List<>
+        public BinderUntyped Bind(Type contractType)
         {
-            if (!contractType.IsOpenGenericType())
-            {
-                throw new ZenjectException(
-                    "Expected open generic contract type in call to BindGeneric but found '{0}' instead".With(contractType));
-            }
-
-            return new GenericBinder(this, contractType, _singletonMap);
+            return new BinderUntyped(this, contractType, _singletonMap);
         }
 
         public BindScope CreateScope()
