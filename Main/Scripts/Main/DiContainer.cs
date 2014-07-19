@@ -238,7 +238,7 @@ namespace ModestTree.Zenject
         }
 
         // Walk the object graph for the given type
-        // Throws ZenjectResolveException if there is a problem
+        // Returns all ZenjectResolveExceptions found
         public IEnumerable<ZenjectResolveException> ValidateResolve(Type contractType, InjectContext context)
         {
             return BindingValidator.ValidateContract(this, contractType, context);
