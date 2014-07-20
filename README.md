@@ -235,43 +235,35 @@ In Zenject, dependency mapping is done by adding bindings to something called a 
 
 The format for the bind command can be any of the following:
 
-* Inject by interface.  Note in this case it is injected as a singleton so there will only be one instance of Foo injected into any classes that use it.
-
+Inject by interface.  Note in this case it is injected as a singleton so there will only be one instance of Foo injected into any classes that use it.
 
     _container.Bind<IFoo>().ToSingle<Foo>();
 
-* Inject by concrete class.  Note again that it is ToSingle and therefore there will only be one instance of Foo
-
+Inject by concrete class.  Note again that it is ToSingle and therefore there will only be one instance of Foo
 
     _container.Bind<Foo>().ToSingle();
 
-* Inject interface as transient.  In this case a new instance of Foo will be generated each time it is injected.
-
+Inject interface as transient.  In this case a new instance of Foo will be generated each time it is injected.
 
     _container.Bind<IFoo>().ToTransient<Foo>();
 
-* Inject concrete class as transient.
-
+Inject concrete class as transient.
 
     _container.Bind<Foo>().ToTransient();
 
-* Inject from unity prefab.  This will instantiate a new instance of the given prefab and inject the same one every time the given monobehaviour class is injected.  Note in this case specifying `FooMonoBehaviour` twice is redundant but necessary
-
+Inject from unity prefab.  This will instantiate a new instance of the given prefab and inject the same one every time the given monobehaviour class is injected.  Note in this case specifying `FooMonoBehaviour` twice is redundant but necessary
 
     _container.Bind<FooMonoBehaviour>().ToSingleFromPrefab<FooMonoBehaviour>(PrefabGameObject);
 
-* A variation on inject from unity prefab injects a new instance of the given prefab every time the given MonoBehaviour class is injected.
-
+A variation on inject from unity prefab injects a new instance of the given prefab every time the given MonoBehaviour class is injected.
 
     _container.Bind<FooMonoBehaviour>().ToTransientFromPrefab<FooMonoBehaviour>(PrefabGameObject);
 
-* Inject MonoBehaviour. Creates a new game object and attaches FooMonoBehaviour to it:
-
+Inject MonoBehaviour. Creates a new game object and attaches FooMonoBehaviour to it:
 
     _container.Bind<FooMonoBehaviour>().ToSingleGameObject();
 
-* Inject by custom method. You can customize creation logic yourself by defining a method:
-
+Inject by custom method. You can customize creation logic yourself by defining a method:
 
     _container.Bind<IFoo>().ToMethod(SomeMethod);
 
@@ -283,14 +275,12 @@ The format for the bind command can be any of the following:
         return new Foo();
     }
 
-* Inject by getter.  This method can be useful if you want to bind to a property of another object.
-
+Inject by getter.  This method can be useful if you want to bind to a property of another object.
 
     _container.Bind<IFoo>().ToSingle<Foo>()
     _container.Bind<Bar>().ToGetter<IFoo>(x => x.GetBar())
 
-* Inject many.  You can also bind multiple types to the same interface, with the result being a list of dependencies.  In this case Bar would get a list containing a new instance of Foo1, Foo2, and Foo3:
-
+Inject many.  You can also bind multiple types to the same interface, with the result being a list of dependencies.  In this case Bar would get a list containing a new instance of Foo1, Foo2, and Foo3:
 
     _container.Bind<IFoo>().ToSingle<Foo1>();
     _container.Bind<IFoo>().ToSingle<Foo2>();
@@ -307,14 +297,12 @@ The format for the bind command can be any of the following:
 
 Note that when defining List dependencies, the empty list will result in an error.  If the empty list is valid, then you can suppress the error by marking the List as optional as described <a href="#optional-binding">here</a>.
 
-* Inject by lookup.  This can be used to do a recursive look up to bind an interface to a concrete class or another interface.  Can be useful in more rare circumstances
-
+Inject by lookup.  This can be used to do a recursive look up to bind an interface to a concrete class or another interface.  Can be useful in more rare circumstances
 
     _container.Bind<Foo>().ToSingleFromPrefab<Foo>(PrefabGameObject);
     _container.Bind<IFoo>().ToLookup<Foo>();
 
-* For primitive types you have to use BindValue instead.  Note that when binding to primitives you will almost certaintly want to specify the type that the binding is for using `WhenInjectedInto` (described <a href="#conditional-bindings">below</a>).  I'll also add that while it can be useful to inject primitives for configuration settings it is often better to inject a "settings" object instead.  There are other advantages to this approach as well as described <a href="#using-the-unity-inspector-to-configure-settings">here</a>.
-
+For primitive types you have to use BindValue instead.  Note that when binding to primitives you will almost certaintly want to specify the type that the binding is for using `WhenInjectedInto` (described <a href="#conditional-bindings">below</a>).  I'll also add that while it can be useful to inject primitives for configuration settings it is often better to inject a "settings" object instead.  There are other advantages to this approach as well as described <a href="#using-the-unity-inspector-to-configure-settings">here</a>.
 
     _container.BindValue<float>().To(1.5f);
     _container.BindValue<int>().To(42);
