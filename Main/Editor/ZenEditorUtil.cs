@@ -87,11 +87,11 @@ namespace ModestTree.Zenject
                 EditorUtility.DisplayDialog(
                     "Error", "Error occurred while generating {0}.png".With(fileBaseName), "Ok");
 
-                Debug.LogError("Zenject error: Failure during object graph creation: " + errorMessage);
+                Log.Error("Zenject error: Failure during object graph creation: " + errorMessage);
 
                 // Do we care about STDOUT?
                 //var outputMessage = proc.StandardOutput.ReadToEnd();
-                //Debug.Log("outputMessage = " + outputMessage);
+                //Log.Error("outputMessage = " + outputMessage);
             }
 
         }
