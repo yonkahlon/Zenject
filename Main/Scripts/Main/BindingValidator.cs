@@ -19,7 +19,7 @@ namespace ModestTree.Zenject
         {
             var matches = container.GetProviderMatches(contractType, context);
 
-            if (matches.IsLength(1))
+            if (matches.Count == 1)
             {
                 foreach (var error in matches.Single().ValidateBinding(contractType, context))
                 {

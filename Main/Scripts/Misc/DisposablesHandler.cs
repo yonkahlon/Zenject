@@ -50,7 +50,7 @@ namespace ModestTree.Zenject
             {
                 WarnForMissingBindings();
 
-                foreach (var disposable in _disposables.Select(x => x.Disposable).FindDuplicates())
+                foreach (var disposable in _disposables.Select(x => x.Disposable).GetDuplicates())
                 {
                     Assert.That(false, "Found duplicate IDisposable with type '{0}'".With(disposable.GetType()));
                 }
@@ -74,8 +74,11 @@ namespace ModestTree.Zenject
 
         void WarnForMissingBindings()
         {
-            var boundTypes = _disposables.Select(x => x.GetType()).Distinct();
-            var unboundTypes = _container.AllConcreteTypes.Where(x => x.DerivesFrom<IDisposable>() && !boundTypes.Contains(x));
+            var ignoredTypes = new Type[] { typeof(DependencyRootStandard), typeof(DisposablesHandler) };
+
+            var boundTypes = _disposables.Select(x => x.Disposable.GetType()).Distinct();
+
+            var unboundTypes = _container.AllConcreteTypes.Where(x => x.DerivesFrom<IDisposable>() && !boundTypes.Contains(x) && !ignoredTypes.Contains(x));
 
             foreach (var objType in unboundTypes)
             {
@@ -85,15 +88,15 @@ namespace ModestTree.Zenject
 
         int SortCompare(DisposableInfo e1, DisposableInfo e2)
         {
-            // Initialize disposables with null priorities last
+            // Dispose disposables with null priorities first
             if (!e1.Priority.HasValue)
             {
-                return 1;
+                return -1;
             }
 
             if (!e2.Priority.HasValue)
             {
-                return -1;
+                return 1;
             }
 
             return e1.Priority.Value.CompareTo(e2.Priority.Value);

@@ -75,7 +75,7 @@ namespace ModestTree.Zenject
 
             if (Assert.IsEnabled)
             {
-                foreach (var initializable in _initializables.Select(x => x.Initializable).FindDuplicates())
+                foreach (var initializable in _initializables.Select(x => x.Initializable).GetDuplicates())
                 {
                     Assert.That(false, "Found duplicate IInitializable with type '{0}'".With(initializable.GetType()));
                 }
