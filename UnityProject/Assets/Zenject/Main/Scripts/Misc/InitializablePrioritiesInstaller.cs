@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using ModestTree.Zenject;
-using Fasterflect;
 
 namespace ModestTree.Zenject
 {

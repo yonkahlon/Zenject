@@ -70,6 +70,31 @@ namespace ModestTree.Zenject.Test
             TestAssert.That(test3.HasInitialized2);
         }
 
+        public class SimpleBase
+        {
+            public bool WasCalled = false;
+
+            [PostInject]
+            void Init()
+            {
+                WasCalled = true;
+            }
+        }
+
+        public class SimpleDerived : SimpleBase
+        {
+        }
+
+        [Test]
+        public void TestPrivateBaseClassPostInject()
+        {
+            _container.Bind<SimpleBase>().ToSingle<SimpleDerived>();
+
+            var simple = _container.Resolve<SimpleBase>();
+
+            TestAssert.That(simple.WasCalled);
+        }
+
         [Test]
         public void TestInheritance()
         {
@@ -81,9 +106,7 @@ namespace ModestTree.Zenject.Test
             TestAssert.That(((FooDerived)foo).WasDerivedCalled);
             TestAssert.That(((FooBase)foo).WasBaseCalled);
             TestAssert.That(((FooDerived)foo).WasDerivedCalled2);
-
-            // Should choose the most-derived version
-            TestAssert.That(!((FooBase)foo).WasBaseCalled2);
+            TestAssert.That(((FooBase)foo).WasBaseCalled2);
         }
 
         [Test]
@@ -97,7 +120,7 @@ namespace ModestTree.Zenject.Test
             FooDerived.DerivedCallOrder = 0;
             FooDerived2.Derived2CallOrder = 0;
 
-            var foo = _container.Resolve<IFoo>();
+            _container.Resolve<IFoo>();
 
             //Log.Info("FooBase.BaseCallOrder = {0}".With(FooBase.BaseCallOrder));
             //Log.Info("FooDerived.DerivedCallOrder = {0}".With(FooDerived.DerivedCallOrder));
@@ -130,6 +153,7 @@ namespace ModestTree.Zenject.Test
             [PostInject]
             public virtual void TestVirtual1()
             {
+                TestAssert.That(!WasBaseCalled2);
                 WasBaseCalled2 = true;
             }
         }
@@ -148,9 +172,9 @@ namespace ModestTree.Zenject.Test
                 DerivedCallOrder = _initOrder++;
             }
 
-            [PostInject]
             public override void TestVirtual1()
             {
+                base.TestVirtual1();
                 TestAssert.That(!WasDerivedCalled2);
                 WasDerivedCalled2 = true;
             }

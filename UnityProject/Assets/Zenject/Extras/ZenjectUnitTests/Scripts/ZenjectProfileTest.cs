@@ -4,7 +4,6 @@ using System.Diagnostics;
 using ModestTree.Zenject;
 using NUnit.Framework;
 using TestAssert=NUnit.Framework.Assert;
-using Fasterflect;
 
 namespace ModestTree.Zenject.Test
 {
@@ -28,7 +27,7 @@ namespace ModestTree.Zenject.Test
 
         class Test1
         {
-            
+
 
             [Inject]
             public Test0 TestB
@@ -55,7 +54,7 @@ namespace ModestTree.Zenject.Test
 
         class Test2
         {
-            
+
             [Inject]
             public Test1 TestB
             {
