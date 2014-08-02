@@ -6,7 +6,6 @@ using System.Reflection;
 using System.Text;
 using System.Diagnostics;
 using UnityEngine;
-using Fasterflect;
 
 namespace ModestTree.Zenject
 {

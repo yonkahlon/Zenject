@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using ModestTree.Zenject;
 using NUnit.Framework;
+using ModestTree.Tests;
 using TestAssert=NUnit.Framework.Assert;
 using System.Linq;
 
@@ -37,7 +38,7 @@ namespace ModestTree.Zenject.Test
             var expectedList = GetStandardTypeInclusions().Concat(expectedValues).ToList();
 
             TestAssert.That(
-                TestUtil.ListsContainSameElements(
+                TestUtil.ContainSameElements(
                     concreteList, expectedList),
                     "Unexpected list: " + TestUtil.PrintList(concreteList) + "\nExpected: " + TestUtil.PrintList(expectedList));
         }
@@ -48,7 +49,7 @@ namespace ModestTree.Zenject.Test
             var expectedList = GetStandardTypeInclusions().Concat(expectedValues).ToList();
 
             TestAssert.That(
-                TestUtil.ListsContainSameElements(
+                TestUtil.ContainSameElements(
                     contractList, expectedList),
                     "Unexpected list: " + TestUtil.PrintList(contractList) + "\nExpected: " + TestUtil.PrintList(expectedList));
         }
@@ -91,6 +92,5 @@ namespace ModestTree.Zenject.Test
         }
     }
 }
-
 
 

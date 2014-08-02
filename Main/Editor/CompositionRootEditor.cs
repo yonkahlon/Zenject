@@ -13,13 +13,11 @@ namespace ModestTree
     {
         static readonly GUIContent INSTALLERS_HEADER = new GUIContent("Installers", "Sorted array of custom installers for your scene");
 
-        CompositionRoot _instance;
         ReorderableList _installersList;
         SerializedProperty _installersProperty;
 
         void OnEnable()
         {
-            _instance = target as CompositionRoot;
             _installersProperty = serializedObject.FindProperty("Installers");
 
             _installersList = new ReorderableList(serializedObject, _installersProperty, true, true, true, true);

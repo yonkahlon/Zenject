@@ -19,7 +19,6 @@ namespace ModestTree.Zenject
     // using C# using() pattern
     internal class LookupInProgressAdder : IDisposable
     {
-        DiContainer _container;
         Type _concreteType;
 
         public LookupInProgressAdder(DiContainer container, Type concreteType)
@@ -31,7 +30,6 @@ namespace ModestTree.Zenject
 
             DiContainer.LookupsInProgress.Push(concreteType);
 
-            _container = container;
             _concreteType = concreteType;
         }
 

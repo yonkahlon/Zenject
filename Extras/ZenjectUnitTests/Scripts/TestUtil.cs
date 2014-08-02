@@ -2,11 +2,17 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace ModestTree.Zenject.Test
+namespace ModestTree.Tests
 {
     public static class TestUtil
     {
-        public static bool ListsContainSameElements<T>(
+        public static bool ContainSameElements<T>(
+            IEnumerable<T> listA, IEnumerable<T> listB)
+        {
+            return ContainSameElementsInternal(listA.ToList(), listB.ToList());
+        }
+
+        static bool ContainSameElementsInternal<T>(
             List<T> listA, List<T> listB)
         {
             // We don't care how they are sorted as long as they are sorted the same way so just use hashcode

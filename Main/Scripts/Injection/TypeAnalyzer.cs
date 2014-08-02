@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
-using Fasterflect;
 using UnityEngine;
 using System.Linq;
 
@@ -44,14 +43,14 @@ namespace ModestTree.Zenject
                 return Enumerable.Empty<InjectableInfo>();
             }
 
-            return constructorInfo.Parameters().Select(
+            return constructorInfo.GetParameters().Select(
                 paramInfo => CreateForConstructorParam(enclosingType, paramInfo));
         }
 
         static InjectableInfo CreateForConstructorParam(
             Type enclosingType, ParameterInfo paramInfo)
         {
-            var injectAttr = paramInfo.Attribute<InjectAttribute>();
+            var injectAttr = paramInfo.AllAttributes<InjectAttribute>().FirstOrDefault();
 
             return new InjectableInfo()
             {
@@ -65,9 +64,13 @@ namespace ModestTree.Zenject
 
         static IEnumerable<MethodInfo> GetPostInjectMethods(Type type)
         {
-            var methods = type.MethodsWith(
-                Fasterflect.Flags.InstanceAnyVisibility | Fasterflect.Flags.ExcludeBackingMembers,
-                typeof(PostInjectAttribute));
+            // Note that unlike with fields and properties we use GetCustomAttributes
+            // This is so that we can ignore inherited attributes, which is necessary
+            // otherwise a base class method marked with [Inject] would cause all overridden
+            // derived methods to be added as well
+            var methods = type.GetAllMethods(
+                BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
+                .Where(x => x.GetCustomAttributes(typeof(PostInjectAttribute), false).Any()).ToList();
 
             var heirarchyList = type.Yield().Concat(type.GetParentTypes()).Reverse().ToList();
 
@@ -78,9 +81,9 @@ namespace ModestTree.Zenject
 
         static IEnumerable<InjectableInfo> GetPropertyInjectables(Type type)
         {
-            var propInfos = type.PropertiesWith(
-                Fasterflect.Flags.InstanceAnyVisibility | Fasterflect.Flags.ExcludeBackingMembers,
-                typeof(InjectAttribute), typeof(InjectOptionalAttribute));
+            var propInfos = type.GetAllProperties(
+                BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
+                .Where(x => x.HasAttribute(typeof(InjectAttribute), typeof(InjectOptionalAttribute)));
 
             foreach (var propInfo in propInfos)
             {
@@ -90,8 +93,9 @@ namespace ModestTree.Zenject
 
         static IEnumerable<InjectableInfo> GetFieldInjectables(Type type)
         {
-            var fieldInfos = type.FieldsWith(
-                Fasterflect.Flags.InstanceAnyVisibility, typeof(InjectAttribute), typeof(InjectOptionalAttribute));
+            var fieldInfos = type.GetAllFields(
+                BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
+                .Where(x => x.HasAttribute(typeof(InjectAttribute), typeof(InjectOptionalAttribute)));
 
             foreach (var fieldInfo in fieldInfos)
             {
@@ -101,7 +105,7 @@ namespace ModestTree.Zenject
 
         static InjectableInfo CreateForMember(MemberInfo memInfo, Type enclosingType)
         {
-            var injectAttr = memInfo.Attribute<InjectAttribute>();
+            var injectAttr = memInfo.AllAttributes<InjectAttribute>().FirstOrDefault();
 
             var info = new InjectableInfo()
             {
@@ -130,8 +134,8 @@ namespace ModestTree.Zenject
 
         static ConstructorInfo GetInjectConstructor(Type enclosingType)
         {
-            var constructors = enclosingType.Constructors(
-                Flags.Public | Flags.InstanceAnyVisibility);
+            var constructors = enclosingType.GetConstructors(
+                BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
 
             if (constructors.IsEmpty())
             {
@@ -141,7 +145,7 @@ namespace ModestTree.Zenject
             if (constructors.HasMoreThan(1))
             {
                 // This will return null if there is more than one constructor and none are marked with the [Inject] attribute
-                return (from c in constructors where c.HasAnyAttribute(typeof(InjectAttribute)) select c).SingleOrDefault();
+                return (from c in constructors where c.HasAttribute<InjectAttribute>() select c).SingleOrDefault();
             }
 
             return constructors[0];
