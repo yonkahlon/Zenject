@@ -15,6 +15,18 @@ namespace ModestTree.Zenject
             _singletonMap = singletonMap;
         }
 
+        public BindingConditionSetter ToTransient(Type concreteType)
+        {
+            if (_contractType.DerivesFrom(typeof(MonoBehaviour)))
+            {
+                throw new ZenjectBindException(
+                    "Should not use ToTransient for Monobehaviours (when binding type '{0}'), you probably want either ToLookup or ToTransientFromPrefab"
+                    .With(_contractType.Name()));
+            }
+
+            return ToProvider(new TransientProvider(_container, concreteType));
+        }
+
         public BindingConditionSetter ToTransient()
         {
             if (_contractType.DerivesFrom(typeof(MonoBehaviour)))
@@ -50,9 +62,9 @@ namespace ModestTree.Zenject
             return ToProvider(_singletonMap.CreateProvider(concreteType));
         }
 
-        public BindingConditionSetter To<TConcrete>(TConcrete instance)
+        public BindingConditionSetter To(object instance)
         {
-            var concreteType = typeof(TConcrete);
+            var concreteType = instance.GetType();
 
             if (!concreteType.DerivesFromOrEqual(_contractType))
             {

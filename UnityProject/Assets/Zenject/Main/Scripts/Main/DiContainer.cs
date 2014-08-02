@@ -53,6 +53,9 @@ namespace ModestTree.Zenject
             }
         }
 
+        // This flag is used during validation
+        // in which case we use nulls to indicate whether we have an instance or not
+        // Should be set to false otherwise
         public bool AllowNullBindings
         {
             get
