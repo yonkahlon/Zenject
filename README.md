@@ -34,7 +34,6 @@
     * <a href="#questions">Frequently Asked Questions</a>
         * <a href="#faq-performance">How is Performance?</a>
     * <a href="#further-help">Further Help</a>
-    * <a href="#version">Version</a>
     * <a href="#version">Release Notes</a>
     * <a href="#license">License</a>
 
@@ -1093,11 +1092,14 @@ Zenject uses C# reflection which is typically slow, but in Zenject this work is 
 
 For general troubleshooting / support, please use the google group which you can find [here](https://groups.google.com/forum/#!forum/zenject/).  If you have found a bug, you are also welcome to create an issue on the [github page](https://github.com/modesttree/Zenject), or a pull request if you have a fix / extension.  Finally, you can also email me directly at svermeulen@modesttree.com
 
-## <a id="introduction"></a>Version
-
-Version 1.09
-
 ## <a id="release-notes"></a>Release Notes
+
+1.11
+* Removed Fasterflect library to keep Zenject nice and lightweight (it was also causing issues on WP8)
+* Fixed bug related to singletons + object graph validation. Changed the way IDisposables are handled to be closer to the way IInitializable and ITickable are handled. Added method to BinderUntyped.
+
+1.10
+* Added custom editor for the Installers property of CompositionRoot to make re-ordering easier
 
 1.09
 
