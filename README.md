@@ -322,7 +322,7 @@ You can declare some dependencies as optional as follows:
 
 In this case, if IFoo is not bound in any installers, then it will be passed as null.
 
-Note that when declaring dependencies with primitive types as optional, they will be given their default value (eg. 0 for ints).  However, if you need to distiguish between being given a default value and the primitive dependency not being specified, you can do this as well by declaring it as nullable:
+Note that when declaring dependencies with primitive types as optional, they will be given their default value (eg. 0 for ints).  However, if you need to distinguish between being given a default value and the primitive dependency not being specified, you can do this as well by declaring it as nullable:
 
     public class Bar
     {
@@ -454,7 +454,7 @@ In these cases you can mark any methods that you want to be called after injecti
         }
     }
 
-This still has the drawback that it is called in the middle of object graph construction, but can be useful in many cases.  In particular, if you are using property injection (which isn't generally recommended but necessary in some cases) then you will not have your dependencies in the constructor, and therefore you will need to define a [PostInject] method in this case.  You will also need to use [PostInject] for MonoBehaviours that you are creating dynamically, since MonoBehaviours cannot have contructors.
+This still has the drawback that it is called in the middle of object graph construction, but can be useful in many cases.  In particular, if you are using property injection (which isn't generally recommended but necessary in some cases) then you will not have your dependencies in the constructor, and therefore you will need to define a [PostInject] method in this case.  You will also need to use [PostInject] for MonoBehaviours that you are creating dynamically, since MonoBehaviours cannot have constructors.
 
 Note again that if you do plan to use IInitializable and ITickable as described here that you will need to either bind DependencyRootStandard to IDependencyRoot or a subclass of DependencyRootStandard.  This is because DependencyRootStandard includes the classes responsible for triggering the IInitializable's, ITickable's, and IDisposable's
 
@@ -470,7 +470,7 @@ A Zenject driven application is executed by the following steps:
 * Composition Root creates a new DiContainer object to be used to contain all instances used in the scene
 * Composition Root iterates through all the Installers that have been added to it via the Unity Inspector, and updates them to point to the new DiContainer.  It then calls InstallBindings() on each installer.
 * Each Installer then registers different sets of dependencies directly on to the given DiContainer by calling one of the Bind<> methods.  Note that the order that this binding occurs does not generally matter. Each installer may also include other installers by binding to the IInstaller interface.  Each installer can also add bindings to configure other installers, however note that in this case order might actually matter, since you will have to make sure that code configuring other installers is executed before the installers that you are configuring! You can control the order by simply re-ordering the Installers property of the CompositionRoot
-* The Composition Root then traverses the entire scene heirarchy and injects all MonoBehaviours with their dependencies. Since MonoBehaviours are instantiated by Unity we cannot use constructor injection in this case and therefore field or property injection must be used (which is done by adding a [Inject] attribute to any member).  Any methods on these MonoBehaviour's marked with [PostInject] are called at this point as well.
+* The Composition Root then traverses the entire scene hierarchy and injects all MonoBehaviours with their dependencies. Since MonoBehaviours are instantiated by Unity we cannot use constructor injection in this case and therefore field or property injection must be used (which is done by adding a [Inject] attribute to any member).  Any methods on these MonoBehaviour's marked with [PostInject] are called at this point as well.
 * After filling in the scene dependencies the Composition Root then retrieves the instance of the root object (that is, whatever is bound to IDependencyRoot).  In most cases code does not need to be in MonoBehaviours and will be resolved as a result of this
 * If any required dependencies cannot be resolved, a ZenjectResolveException is thrown
 * Initialize() is called on all IInitializable objects in the order specified in the installers
@@ -523,7 +523,7 @@ In Zenject, by default, ITickables and IInitializables are updated in the order 
         };
     }
 
-This way, you won't hit a wall at the end of the project due to some unforseen order-dependency.
+This way, you won't hit a wall at the end of the project due to some unforeseen order-dependency.
 
 Note also that any ITickables or IInitializables that aren't given an explicit order are updated last.
 
@@ -751,7 +751,7 @@ For example, suppose one day we decide to add further runtime constructor argume
         }
     }
 
-And let's say we want the damage of the EnemyWeapon class to be specified by the EnemySpawner class.  How do we pass that argument down to EnemyWeapon?  In this case it might be easiest to create the EnemyWeeapon class first and then pass it to the factory.  However, for the sake of this example let's pretend we want to create the EnemyClass in one call to Instantiate
+And let's say we want the damage of the EnemyWeapon class to be specified by the EnemySpawner class.  How do we pass that argument down to EnemyWeapon?  In this case it might be easiest to create the EnemyWeapon class first and then pass it to the factory.  However, for the sake of this example let's pretend we want to create the EnemyClass in one call to Instantiate
 
     public class EnemyFactory
     {
@@ -914,7 +914,7 @@ Also, if you happen to be a fan of automated testing (as I am) then you can incl
 
 The above approach great for dependencies that are attached to the dependency root, as well as any dependencies that are attached to any MonoBehaviour's that are saved into the scene, but what about classes that are instantiated at runtime via factories?  How do you validate those object graphs?
 
-If you want to be thorough (and I recommend it) then you can include these object graphs as well, by overridding an extra method in your installers to declare these object graphs.  For example, in the sample project, we define the following:
+If you want to be thorough (and I recommend it) then you can include these object graphs as well, by overriding an extra method in your installers to declare these object graphs.  For example, in the sample project, we define the following:
 
     public class AsteroidsInstaller : MonoInstaller
     {
@@ -1121,7 +1121,7 @@ For general troubleshooting / support, please use the google group which you can
 
 1.06
 
-* Introduced concept of scnee installer, renamed installers 'modules'
+* Introduced concept of scene installer, renamed installers 'modules'
 * Bug fixes
 
 ## <a id="license"></a>License
