@@ -18,7 +18,7 @@ namespace ModestTree.Zenject
         public static void InjectChildGameObjects(
             DiContainer container, GameObject gameObject, IEnumerable<object> extraArgs)
         {
-            foreach (var monoBehaviour in gameObject.GetComponentsInChildren<MonoBehaviour>())
+            foreach (var monoBehaviour in gameObject.GetComponentsInChildren<MonoBehaviour>(true))
             {
                 InjectMonoBehaviour(container, monoBehaviour, extraArgs);
             }
