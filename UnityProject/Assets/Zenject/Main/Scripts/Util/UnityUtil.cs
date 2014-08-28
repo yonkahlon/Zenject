@@ -15,9 +15,19 @@ namespace ModestTree.Zenject
             return obj == null || obj.Equals(null);
         }
 
-        public static bool ControlKeyIsDown()
+        public static bool IsAltKeyIsDown()
+        {
+            return Input.GetKey(KeyCode.LeftAlt) || Input.GetKey(KeyCode.RightAlt);
+        }
+
+        public static bool IsControlKeyIsDown()
         {
             return Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl);
+        }
+
+        public static bool IsShiftKeyIsDown()
+        {
+            return Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift);
         }
     }
 }
