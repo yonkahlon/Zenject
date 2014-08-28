@@ -67,6 +67,8 @@ namespace ModestTree.Zenject
         static IEnumerable<ZenjectResolveException> ValidateInstallers(CompositionRoot compRoot)
         {
             var container = new DiContainer();
+
+            container.AllowNullBindings = true;
             container.Bind<CompositionRoot>().ToSingle(compRoot);
 
             var allInstallers = new List<IInstaller>();
@@ -97,18 +99,20 @@ namespace ModestTree.Zenject
             }
 
             // Also make sure we can fill in all the dependencies in the built-in scene
-            foreach (var monoBehaviour in compRoot.GetComponentsInChildren<MonoBehaviour>())
+            foreach (var curTransform in compRoot.GetComponentsInChildren<Transform>())
             {
-                if (monoBehaviour == null)
+                foreach (var monoBehaviour in curTransform.GetComponents<MonoBehaviour>())
                 {
-                    // Be nice to give more information here
-                    Log.Warn("Found null MonoBehaviour in scene");
-                    continue;
-                }
+                    if (monoBehaviour == null)
+                    {
+                        Log.Warn("Found null MonoBehaviour on " + curTransform.name);
+                        continue;
+                    }
 
-                foreach (var error in container.ValidateObjectGraph(monoBehaviour.GetType()))
-                {
-                    yield return error;
+                    foreach (var error in container.ValidateObjectGraph(monoBehaviour.GetType()))
+                    {
+                        yield return error;
+                    }
                 }
             }
 
@@ -119,6 +123,11 @@ namespace ModestTree.Zenject
                 {
                     yield return error;
                 }
+            }
+
+            foreach (var error in container.ValidateFactories())
+            {
+                yield return error;
             }
         }
 
@@ -138,7 +147,7 @@ namespace ModestTree.Zenject
             }
             catch (ZenjectException e)
             {
-                Log.Error("Unable to find container in current scene. " + e.ToString());
+                Log.Error("Unable to find container in current scene. " + e.Message);
                 return;
             }
 
