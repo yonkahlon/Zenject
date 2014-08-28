@@ -75,6 +75,8 @@ namespace ModestTree.Zenject
             // Note: This has to go first
             _container.Bind<CompositionRoot>().To(this);
 
+            // Install the extra bindings immediately in case they configure the
+            // installers used in this scene
             if (_extraBindingLookup != null)
             {
                 _extraBindingLookup(_container);

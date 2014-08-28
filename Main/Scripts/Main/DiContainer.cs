@@ -89,7 +89,7 @@ namespace ModestTree.Zenject
         {
             get
             {
-                return (from x in _providers from p in x.Value where p.HasInstance(p.GetInstanceType()) select p.GetInstance(p.GetInstanceType(), new InjectContext()));
+                return (from x in _providers from p in x.Value where p.HasInstance(p.GetInstanceType()) select p.GetInstance(p.GetInstanceType(), new InjectContext(this)));
             }
         }
 
@@ -111,6 +111,11 @@ namespace ModestTree.Zenject
             }
 
             return _lookupsInProgress.Select(t => t.Name()).Reverse().Aggregate((i, str) => i + "\n" + str);
+        }
+
+        public BindingConditionSetter BindFactoryMethod<TContract>(Func<DiContainer, object[], TContract> method)
+        {
+            return Bind<IFactory<TContract>>().To(new FactoryMethod<TContract>(this, method));
         }
 
         // This occurs so often that we might as well have a convenience method
@@ -218,6 +223,24 @@ namespace ModestTree.Zenject
             return numRemoved;
         }
 
+        public IEnumerable<ZenjectResolveException> ValidateFactories(params Type[] ignoreTypes)
+        {
+            var injectCtx = new InjectContext(this);
+
+            foreach (var pair in _providers.Where(x => x.Key.DerivesFrom<IValidatable>() && ignoreTypes.Where(i => x.Key.DerivesFromOrEqual(i)).IsEmpty()))
+            {
+                foreach (var provider in pair.Value)
+                {
+                    var factory = (IValidatable)provider.GetInstance(pair.Key, injectCtx);
+
+                    foreach (var error in factory.Validate())
+                    {
+                        yield return error;
+                    }
+                }
+            }
+        }
+
         // Walk the object graph for the given type
         // Throws ZenjectResolveException if there is a problem
         // Note: If you just want to know whether a binding exists for the given TContract,
@@ -231,7 +254,7 @@ namespace ModestTree.Zenject
         // Throws ZenjectResolveException if there is a problem
         public IEnumerable<ZenjectResolveException> ValidateResolve(Type contractType)
         {
-            return ValidateResolve(contractType, new InjectContext());
+            return ValidateResolve(contractType, new InjectContext(this));
         }
 
         public IEnumerable<ZenjectResolveException> ValidateResolve<TContract>(InjectContext context)
@@ -275,7 +298,7 @@ namespace ModestTree.Zenject
 
         public List<TContract> ResolveMany<TContract>(bool optional)
         {
-            var context = new InjectContext();
+            var context = new InjectContext(this);
             context.Optional = optional;
             return ResolveMany<TContract>(context);
         }
@@ -287,13 +310,13 @@ namespace ModestTree.Zenject
 
         public object ResolveMany(Type contract)
         {
-            return ResolveMany(contract, new InjectContext());
+            return ResolveMany(contract, new InjectContext(this));
         }
 
         // Wrap IEnumerable<> to avoid LINQ mistakes
         internal List<ProviderBase> GetProviderMatches(Type contractType)
         {
-            return GetProviderMatches(contractType, new InjectContext());
+            return GetProviderMatches(contractType, new InjectContext(this));
         }
 
         // Wrap IEnumerable<> to avoid LINQ mistakes
@@ -312,7 +335,7 @@ namespace ModestTree.Zenject
         IEnumerable<ProviderBase> GetProviderMatchesInternal(Type contractType)
         {
             return GetProviderMatchesInternal(
-                contractType, new InjectContext(), false);
+                contractType, new InjectContext(this), false);
         }
 
         // Be careful with this method since it is a coroutine
@@ -350,7 +373,7 @@ namespace ModestTree.Zenject
 
         public bool HasBinding(Type contract)
         {
-            return HasBinding(contract, new InjectContext());
+            return HasBinding(contract, new InjectContext(this));
         }
 
         public bool HasBinding(Type contract, InjectContext context)
@@ -436,7 +459,7 @@ namespace ModestTree.Zenject
                     break;
                 }
 
-                var installer = (IInstaller)provider.GetInstance(typeof(IInstaller), new InjectContext());
+                var installer = (IInstaller)provider.GetInstance(typeof(IInstaller), new InjectContext(this));
 
                 Assert.IsNotNull(installer);
 
@@ -465,7 +488,7 @@ namespace ModestTree.Zenject
             InjectableInfo injectInfo, object targetInstance)
         {
             var context = new InjectContext(
-                injectInfo, LookupsInProgress.ToList(), targetInstance);
+                this, injectInfo, LookupsInProgress.ToList(), targetInstance);
 
             return Resolve(injectInfo.ContractType, context);
         }
@@ -473,7 +496,7 @@ namespace ModestTree.Zenject
         // Return single instance of requested type or assert
         public TContract Resolve<TContract>()
         {
-            return Resolve<TContract>(new InjectContext());
+            return Resolve<TContract>(new InjectContext(this));
         }
 
         public TContract Resolve<TContract>(InjectContext context)
@@ -483,7 +506,7 @@ namespace ModestTree.Zenject
 
         public object Resolve(Type contract)
         {
-            return Resolve(contract, new InjectContext());
+            return Resolve(contract, new InjectContext(this));
         }
 
         public object Resolve(Type contractType, InjectContext context)
