@@ -465,14 +465,13 @@ namespace ModestTree.Zenject
 
                 UnregisterProvider(provider);
 
-                installer.InstallBindings();
-
                 if (allInstallers.Where(x => x.GetType() == installer.GetType()).Any())
                 {
-                    throw new ZenjectException(
-                        "Found multiple installers with type '{0}'.  Expected only one".With(installer.GetType().Name()));
+                    // Do not install the same installer twice
+                    continue;
                 }
 
+                installer.InstallBindings();
                 allInstallers.Add(installer);
             }
 
@@ -604,3 +603,4 @@ namespace ModestTree.Zenject
         }
     }
 }
+
