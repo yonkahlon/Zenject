@@ -71,8 +71,6 @@ namespace ModestTree.Zenject
             container.AllowNullBindings = true;
             container.Bind<CompositionRoot>().ToSingle(compRoot);
 
-            var allInstallers = new List<IInstaller>();
-
             foreach (var installer in compRoot.Installers)
             {
                 if (installer == null)
@@ -88,7 +86,7 @@ namespace ModestTree.Zenject
                     container.Bind<IInstaller>().To(installer);
                 }
 
-                allInstallers.AddRange(container.InstallInstallers());
+                container.InstallInstallers();
 
                 Assert.That(!container.HasBinding<IInstaller>());
             }
@@ -117,7 +115,7 @@ namespace ModestTree.Zenject
             }
 
             // Validate dynamically created object graphs
-            foreach (var installer in allInstallers)
+            foreach (var installer in container.InstalledInstallers)
             {
                 foreach (var error in installer.ValidateSubGraphs())
                 {

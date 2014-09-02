@@ -23,6 +23,8 @@ namespace ModestTree.Zenject
         ProviderBase _fallbackProvider;
         Instantiator _instantiator;
 
+        readonly List<IInstaller> _installedInstallers = new List<IInstaller>();
+
         public DiContainer()
         {
             _singletonMap = new SingletonProviderMap(this);
@@ -30,6 +32,14 @@ namespace ModestTree.Zenject
 
             Bind<DiContainer>().To(this);
             Bind<Instantiator>().To(_instantiator);
+        }
+
+        public IEnumerable<IInstaller> InstalledInstallers
+        {
+            get
+            {
+                return _installedInstallers;
+            }
         }
 
         // This can be used to handle the case where the given contract is not
@@ -446,10 +456,8 @@ namespace ModestTree.Zenject
         // And we also want earlier installers to be able to configure later installers
         // So we need to Resolve() one at a time, removing each installer binding
         // as we go
-        public List<IInstaller> InstallInstallers()
+        public void InstallInstallers()
         {
-            var allInstallers = new List<IInstaller>();
-
             while (true)
             {
                 var provider = GetProviderMatchesInternal(typeof(IInstaller)).FirstOrDefault();
@@ -465,17 +473,15 @@ namespace ModestTree.Zenject
 
                 UnregisterProvider(provider);
 
-                if (allInstallers.Where(x => x.GetType() == installer.GetType()).Any())
+                if (_installedInstallers.Where(x => x.GetType() == installer.GetType()).Any())
                 {
                     // Do not install the same installer twice
                     continue;
                 }
 
                 installer.InstallBindings();
-                allInstallers.Add(installer);
+                _installedInstallers.Add(installer);
             }
-
-            return allInstallers;
         }
 
         internal object Resolve(InjectableInfo injectInfo)
