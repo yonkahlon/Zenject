@@ -38,6 +38,16 @@ namespace ModestTree.Tests
             }
         }
 
+        public override void Setup()
+        {
+            base.Setup();
+
+            // Reset counters since static state is not being reset by 'Unity Test Tools'.
+            Test0.Count = 0;
+            Test1.Count = 0;
+            Test2.Count = 0;
+        }
+
         [Test]
         public void Test()
         {
