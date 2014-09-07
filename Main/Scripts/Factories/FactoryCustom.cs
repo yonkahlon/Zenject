@@ -6,7 +6,7 @@ namespace ModestTree.Zenject
     public abstract class FactoryCustom<TValue> : IValidatable
     {
         [Inject]
-        readonly DiContainer _container;
+        readonly DiContainer _container = null;
 
         protected TValue Instantiate(params object[] constructorArgs)
         {

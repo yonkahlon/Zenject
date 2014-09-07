@@ -17,7 +17,7 @@ namespace ModestTree.Zenject
     public class FactoryTyped<TValue> : IFactoryTyped<TValue>
     {
         [Inject]
-        readonly DiContainer _container;
+        readonly DiContainer _container = null;
 
         public TValue Create()
         {
@@ -40,7 +40,7 @@ namespace ModestTree.Zenject
         : IFactoryTyped<TParam1, TValue>
     {
         [Inject]
-        readonly DiContainer _container;
+        readonly DiContainer _container = null;
 
         public TValue Create(TParam1 param)
         {
@@ -62,7 +62,7 @@ namespace ModestTree.Zenject
     public class FactoryTyped<TParam1, TParam2, TValue> : IFactoryTyped<TParam1, TParam2, TValue>
     {
         [Inject]
-        readonly DiContainer _container;
+        readonly DiContainer _container = null;
 
         public TValue Create(TParam1 param1, TParam2 param2)
         {
@@ -86,7 +86,7 @@ namespace ModestTree.Zenject
         : IFactoryTyped<TParam1, TParam2, TParam3, TValue>
     {
         [Inject]
-        readonly DiContainer _container;
+        readonly DiContainer _container = null;
 
         public TValue Create(TParam1 param1, TParam2 param2, TParam3 param3)
         {
@@ -110,7 +110,7 @@ namespace ModestTree.Zenject
         : IFactoryTyped<TParam1, TParam2, TParam3, TParam4, TValue>
     {
         [Inject]
-        readonly DiContainer _container;
+        readonly DiContainer _container = null;
 
         public TValue Create(TParam1 param1, TParam2 param2, TParam3 param3, TParam4 param4)
         {
