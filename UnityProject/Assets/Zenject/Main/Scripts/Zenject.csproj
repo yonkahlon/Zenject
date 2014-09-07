@@ -47,6 +47,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\..\Assert.cs" />
+    <Compile Include="..\..\Log.cs" />
+    <Compile Include="..\..\ProfileBlock.cs" />
     <Compile Include="Binders\Binder.cs" />
     <Compile Include="Binders\BinderGeneric.cs" />
     <Compile Include="Binders\BinderUntyped.cs" />
@@ -58,6 +60,9 @@
     <Compile Include="Binders\ValueBinder.cs" />
     <Compile Include="Exceptions\ZenjectException.cs" />
     <Compile Include="Factories\Factory.cs" />
+    <Compile Include="Factories\FactoryCustom.cs" />
+    <Compile Include="Factories\FactoryMethod.cs" />
+    <Compile Include="Factories\FactoryTyped.cs" />
     <Compile Include="Factories\GameObjectFactory.cs" />
     <Compile Include="Factories\GameObjectInstantiator.cs" />
     <Compile Include="Factories\IFactory.cs" />
@@ -68,7 +73,6 @@
     <Compile Include="Injection\InjectableInfo.cs" />
     <Compile Include="Injection\InjectionHelper.cs" />
     <Compile Include="Injection\TypeAnalyzer.cs" />
-    <Compile Include="..\..\Log.cs" />
     <Compile Include="Main\BindingValidator.cs" />
     <Compile Include="Main\CompositionRoot.cs" />
     <Compile Include="Main\DiContainer.cs" />
@@ -93,7 +97,6 @@
     <Compile Include="Misc\UnityEventManager.cs" />
     <Compile Include="Misc\UnityKernel.cs" />
     <Compile Include="Misc\ZenUtil.cs" />
-    <Compile Include="..\..\ProfileBlock.cs" />
     <Compile Include="Providers\DiContainerProvider.cs" />
     <Compile Include="Providers\GameObjectProvider.cs" />
     <Compile Include="Providers\GameObjectSingletonProviderFromPrefab.cs" />
