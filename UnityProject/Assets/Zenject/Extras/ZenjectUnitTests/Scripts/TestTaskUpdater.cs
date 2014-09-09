@@ -10,7 +10,7 @@ using ModestTree.Zenject.Test;
 namespace ModestTree.Zenject
 {
     [TestFixture]
-    public class TestKernel
+    public class TestTaskUpdater
     {
         DiContainer _container;
 
@@ -19,8 +19,7 @@ namespace ModestTree.Zenject
         {
             _container = new DiContainer();
 
-            _container.Bind<IKernel>().ToSingle<StandardKernel>();
-            _container.Bind<StandardKernel>().ToSingle();
+            _container.Bind<TaskUpdater<ITickable>>().ToSingle();
         }
 
         public void BindTickable<TTickable>(int priority) where TTickable : ITickable
@@ -32,8 +31,8 @@ namespace ModestTree.Zenject
         [Test]
         public void TestTickablesAreOptional()
         {
-            TestAssert.That(_container.ValidateResolve<StandardKernel>().IsEmpty());
-            TestAssert.IsNotNull(_container.Resolve<StandardKernel>());
+            TestAssert.That(_container.ValidateResolve<TaskUpdater<ITickable>>().IsEmpty());
+            TestAssert.IsNotNull(_container.Resolve<TaskUpdater<ITickable>>());
         }
 
         [Test]
@@ -48,8 +47,8 @@ namespace ModestTree.Zenject
             BindTickable<Tickable1>(0);
             BindTickable<Tickable2>(1);
 
-            TestAssert.That(_container.ValidateResolve<StandardKernel>().IsEmpty());
-            var kernel = _container.Resolve<StandardKernel>();
+            TestAssert.That(_container.ValidateResolve<TaskUpdater<ITickable>>().IsEmpty());
+            var kernel = _container.Resolve<TaskUpdater<ITickable>>();
 
             TestAssert.That(_container.ValidateResolve<Tickable1>().IsEmpty());
             var tick1 = _container.Resolve<Tickable1>();

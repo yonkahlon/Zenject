@@ -51,6 +51,8 @@ namespace ModestTree.Asteroids
             _container.Bind<LevelHelper>().ToSingle();
 
             _container.Bind<ITickable>().ToSingle<AsteroidManager>();
+            _container.Bind<IFixedTickable>().ToSingle<AsteroidManager>();
+
             _container.Bind<AsteroidManager>().ToSingle();
 
             // Here, we're defining a generic factory to create asteroid objects using the given prefab
@@ -60,7 +62,7 @@ namespace ModestTree.Asteroids
             // This line is exactly the same as the following:
             //_container.Bind<IFactory<IAsteroid>>().To(
                 //new GameObjectFactory<IAsteroid, Asteroid>(_container, SceneSettings.Asteroid.Prefab));
-            _container.BindFactory<IAsteroid, Asteroid>(SceneSettings.Asteroid.Prefab);
+            _container.BindFactory<Asteroid>(SceneSettings.Asteroid.Prefab);
 
             _container.Bind<IInitializable>().ToSingle<GameController>();
             _container.Bind<ITickable>().ToSingle<GameController>();
