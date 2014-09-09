@@ -22,14 +22,56 @@ namespace ModestTree.Zenject
         [InjectOptional]
         readonly List<Tuple<Type, int>> _priorities;
 
+        [Inject("Fixed")]
+        [InjectOptional]
+        readonly List<Tuple<Type, int>> _fixedPriorities;
+
         TaskUpdater<ITickable> _updater;
         TaskUpdater<IFixedTickable> _fixedUpdater;
 
         [PostInject]
         public void Initialize()
         {
-            _updater = new TaskUpdater<ITickable>(UpdateTickable);
+            InitTickables();
+            InitFixedTickables();
+        }
+
+        void InitFixedTickables()
+        {
             _fixedUpdater = new TaskUpdater<IFixedTickable>(UpdateFixedTickable);
+
+            foreach (var type in _fixedPriorities.Select(x => x.First))
+            {
+                Assert.That(type.DerivesFrom<IFixedTickable>(),
+                    "Expected type '{0}' to drive from IFixedTickable while checking priorities in UnityKernel", type.Name());
+            }
+
+            var priorityMap = _fixedPriorities.ToDictionary(x => x.First, x => x.Second);
+
+            foreach (var tickable in _fixedTickables)
+            {
+                int priority;
+
+                if (priorityMap.TryGetValue(tickable.GetType(), out priority))
+                {
+                    _fixedUpdater.AddTask(tickable, priority);
+                }
+                else
+                {
+                    _fixedUpdater.AddTask(tickable);
+                }
+            }
+        }
+
+        void InitTickables()
+        {
+            _updater = new TaskUpdater<ITickable>(UpdateTickable);
+
+            foreach (var type in _priorities.Select(x => x.First))
+            {
+                Assert.That(type.DerivesFrom<ITickable>(),
+                    "Expected type '{0}' to drive from ITickable while checking priorities in UnityKernel", type.Name());
+            }
 
             var priorityMap = _priorities.ToDictionary(x => x.First, x => x.Second);
 
@@ -44,20 +86,6 @@ namespace ModestTree.Zenject
                 else
                 {
                     _updater.AddTask(tickable);
-                }
-            }
-
-            foreach (var tickable in _fixedTickables)
-            {
-                int priority;
-
-                if (priorityMap.TryGetValue(tickable.GetType(), out priority))
-                {
-                    _fixedUpdater.AddTask(tickable, priority);
-                }
-                else
-                {
-                    _fixedUpdater.AddTask(tickable);
                 }
             }
         }
