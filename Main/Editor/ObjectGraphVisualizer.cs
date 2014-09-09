@@ -27,7 +27,7 @@ namespace ModestTree.Zenject
             {
                 typeof(DiContainer),
                 typeof(InitializableHandler),
-                typeof(StandardKernel),
+                typeof(UnityKernel),
             };
 
             ignoreTypes.AddRange(externalIgnoreTypes);

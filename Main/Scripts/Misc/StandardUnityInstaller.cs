@@ -13,10 +13,6 @@ namespace ModestTree.Zenject
             _container.Bind<UnityEventManager>().ToSingleGameObject();
             _container.Bind<GameObjectInstantiator>().ToSingle();
 
-            _container.Bind<StandardKernel>().ToSingle();
-            // TODO: Do this instead:
-            //_container.Bind<IKernel>().ToTransient<StandardKernel>();
-
             _container.Bind<InitializableHandler>().ToSingle();
             _container.Bind<DisposablesHandler>().ToSingle();
             _container.Bind<ITickable>().ToLookup<UnityEventManager>();

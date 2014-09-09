@@ -8,4 +8,9 @@ namespace ModestTree.Zenject
     {
         void Tick();
     }
+
+    public interface IFixedTickable
+    {
+        void FixedTick();
+    }
 }
