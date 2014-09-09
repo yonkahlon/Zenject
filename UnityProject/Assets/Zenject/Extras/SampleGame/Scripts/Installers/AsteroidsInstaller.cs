@@ -99,8 +99,10 @@ namespace ModestTree.Asteroids
                 .WhenInjectedInto<InitializablePrioritiesInstaller>();
 
             _container.Bind<IInstaller>().ToSingle<TickablePrioritiesInstaller>();
-            _container.Bind<List<Type>>().To(Tickables)
-                .WhenInjectedInto<TickablePrioritiesInstaller>();
+            _container.Bind<List<Type>>().To(Tickables).WhenInjectedInto<TickablePrioritiesInstaller>();
+
+            _container.Bind<IInstaller>().ToSingle<FixedTickablePrioritiesInstaller>();
+            _container.Bind<List<Type>>().To(FixedTickables).WhenInjectedInto<FixedTickablePrioritiesInstaller>();
         }
 
         // Here we override ValidateSubGraphs to indicate to Zenject the object graphs
@@ -156,6 +158,12 @@ namespace ModestTree.Asteroids
             // Re-arrange this list to control update order
             typeof(AsteroidManager),
             typeof(GameController),
+        };
+
+        static List<Type> FixedTickables = new List<Type>()
+        {
+            // Re-arrange this list to control update order
+            typeof(AsteroidManager),
         };
     }
 }
