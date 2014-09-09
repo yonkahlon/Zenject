@@ -19,6 +19,7 @@ namespace ModestTree.Zenject
         readonly List<IFixedTickable> _fixedTickables;
 
         [Inject]
+        [InjectOptional]
         readonly List<Tuple<Type, int>> _priorities;
 
         TaskUpdater<ITickable> _updater;
