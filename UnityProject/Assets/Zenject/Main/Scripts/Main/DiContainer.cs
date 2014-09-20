@@ -170,6 +170,12 @@ namespace ModestTree.Zenject
             return new ValueBinder<TContract>(this);
         }
 
+        public ReferenceBinder<TContract> Rebind<TContract>() where TContract : class
+        {
+            Unbind<TContract>();
+            return Bind<TContract>();
+        }
+
         public ReferenceBinder<TContract> Bind<TContract>() where TContract : class
         {
             return new ReferenceBinder<TContract>(this, _singletonMap);
@@ -561,7 +567,7 @@ namespace ModestTree.Zenject
             }
         }
 
-        public bool ReleaseBindings<TContract>()
+        public bool Unbind<TContract>()
         {
             List<ProviderBase> providersToRemove;
 
