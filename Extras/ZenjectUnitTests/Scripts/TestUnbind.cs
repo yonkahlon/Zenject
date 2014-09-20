@@ -5,7 +5,7 @@ using NUnit.Framework;
 namespace ModestTree.Zenject.Test
 {
     [TestFixture]
-    public class TestReleaseBindings : TestWithContainer
+    public class TestUnbind : TestWithContainer
     {
         interface IFoo
         {
@@ -22,7 +22,7 @@ namespace ModestTree.Zenject.Test
 
             TestAssert.That(_container.ValidateResolve<IFoo>().IsEmpty());
 
-            _container.ReleaseBindings<IFoo>();
+            _container.Unbind<IFoo>();
 
             TestAssert.That(!_container.ValidateResolve<IFoo>().IsEmpty());
         }
