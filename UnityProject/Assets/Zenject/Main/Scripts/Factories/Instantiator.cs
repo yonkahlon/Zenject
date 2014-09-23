@@ -23,7 +23,7 @@ namespace ModestTree.Zenject
         public object Instantiate(
             Type concreteType, params object[] constructorArgs)
         {
-            using (ProfileBlock.Start("Zenject.Instantiate({0})".With(concreteType)))
+            using (ProfileBlock.Start("Zenject.Instantiate({0})", concreteType))
             {
                 using (_container.PushLookup(concreteType))
                 {
@@ -77,7 +77,7 @@ namespace ModestTree.Zenject
 
             try
             {
-                using (ProfileBlock.Start("{0}.{0}()".With(concreteType)))
+                using (ProfileBlock.Start("{0}.{0}()", concreteType))
                 {
                     newObj = typeInfo.InjectConstructor.Invoke(paramValues.ToArray());
                 }

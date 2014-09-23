@@ -80,11 +80,13 @@ namespace ModestTree.Zenject
         public void UpdateRange(int minPriority, int maxPriority)
         {
             // Make sure that tasks with priority of int.MaxValue are updated when maxPriority is int.MaxValue
-            foreach (var taskInfo in _sortedTasks.Where(x =>
-                !x.IsRemoved && x.Priority >= minPriority && (maxPriority == int.MaxValue || x.Priority < maxPriority)))
+            foreach (var taskInfo in _sortedTasks)
             {
-                Assert.That(taskInfo.Priority.HasValue);
-                _updateFunc(taskInfo.Task);
+                if (!taskInfo.IsRemoved && taskInfo.Priority >= minPriority && (maxPriority == int.MaxValue || taskInfo.Priority < maxPriority))
+                {
+                    Assert.That(taskInfo.Priority.HasValue);
+                    _updateFunc(taskInfo.Task);
+                }
             }
 
             ClearRemovedTasks(_sortedTasks);
@@ -92,10 +94,13 @@ namespace ModestTree.Zenject
 
         public void UpdateUnsorted()
         {
-            foreach (var taskInfo in _unsortedTasks.Where(x => !x.IsRemoved))
+            foreach (var taskInfo in _unsortedTasks)
             {
-                Assert.That(!taskInfo.Priority.HasValue);
-                _updateFunc(taskInfo.Task);
+                if (!taskInfo.IsRemoved)
+                {
+                    Assert.That(!taskInfo.Priority.HasValue);
+                    _updateFunc(taskInfo.Task);
+                }
             }
 
             ClearRemovedTasks(_unsortedTasks);
@@ -122,9 +127,12 @@ namespace ModestTree.Zenject
 
         void AddQueuedTasks()
         {
-            foreach (var task in _queuedTasks.Where(x => !x.IsRemoved))
+            foreach (var task in _queuedTasks)
             {
-                InsertTaskSorted(task);
+                if (!task.IsRemoved)
+                {
+                    InsertTaskSorted(task);
+                }
             }
             _queuedTasks.Clear();
         }

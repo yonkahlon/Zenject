@@ -12,19 +12,19 @@ namespace ModestTree.Zenject
 
         [Inject]
         [InjectOptional]
-        readonly List<ITickable> _tickables;
+        readonly List<ITickable> _tickables = null;
 
         [Inject]
         [InjectOptional]
-        readonly List<IFixedTickable> _fixedTickables;
+        readonly List<IFixedTickable> _fixedTickables = null;
 
         [Inject]
         [InjectOptional]
-        readonly List<Tuple<Type, int>> _priorities;
+        readonly List<Tuple<Type, int>> _priorities = null;
 
         [Inject("Fixed")]
         [InjectOptional]
-        readonly List<Tuple<Type, int>> _fixedPriorities;
+        readonly List<Tuple<Type, int>> _fixedPriorities = null;
 
         TaskUpdater<ITickable> _updater;
         TaskUpdater<IFixedTickable> _fixedUpdater;
@@ -92,7 +92,7 @@ namespace ModestTree.Zenject
 
         void UpdateFixedTickable(IFixedTickable tickable)
         {
-            using (ProfileBlock.Start("{0}.FixedTick()".With(tickable.GetType().Name())))
+            using (ProfileBlock.Start("{0}.FixedTick()", tickable.GetType().Name()))
             {
                 tickable.FixedTick();
             }
@@ -100,7 +100,7 @@ namespace ModestTree.Zenject
 
         void UpdateTickable(ITickable tickable)
         {
-            using (ProfileBlock.Start("{0}.Tick()".With(tickable.GetType().Name())))
+            using (ProfileBlock.Start("{0}.Tick()", tickable.GetType().Name()))
             {
                 tickable.Tick();
             }

@@ -6,6 +6,7 @@ using UnityEngine;
 using TestAssert = NUnit.Framework.Assert;
 using ModestTree.Zenject;
 using ModestTree.Zenject.Test;
+using System.Linq;
 
 namespace ModestTree.Zenject
 {
@@ -19,7 +20,7 @@ namespace ModestTree.Zenject
         {
             _container = new DiContainer();
 
-            _container.Bind<TaskUpdater<ITickable>>().ToSingle();
+            _container.Bind<TaskUpdater<ITickable>>().ToSingle(new TaskUpdater<ITickable>(t => t.Tick()));
         }
 
         public void BindTickable<TTickable>(int priority) where TTickable : ITickable

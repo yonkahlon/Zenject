@@ -86,7 +86,7 @@ namespace ModestTree.Zenject
 
                 try
                 {
-                    using (ProfileBlock.Start("{0}.Initialize()".With(initializable.Initializable.GetType().Name())))
+                    using (ProfileBlock.Start("{0}.Initialize()", initializable.Initializable.GetType().Name()))
                     {
                         initializable.Initializable.Initialize();
                     }
