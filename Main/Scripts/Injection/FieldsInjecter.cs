@@ -50,7 +50,7 @@ namespace ModestTree.Zenject
 
             foreach (var methodInfo in typeInfo.PostInjectMethods)
             {
-                using (ProfileBlock.Start("{0}.{1}()".With(injectable.GetType(), methodInfo.Name)))
+                using (ProfileBlock.Start("{0}.{1}()", injectable.GetType(), methodInfo.Name))
                 {
                     methodInfo.Invoke(injectable, new object[0]);
                 }
