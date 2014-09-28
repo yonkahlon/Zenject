@@ -25,13 +25,13 @@ namespace ModestTree.Zenject.Test
         [Test]
         public void TestExtraParametersSameType()
         {
-            var factory1 = new Factory<Test1>(_container);
+            var factory1 = new Factory<Test1>(Container);
             var test1 = factory1.Create(5, 10);
 
             TestAssert.That(test1 != null);
             TestAssert.That(test1.f1 == 5 && test1.f2 == 10);
 
-            var factory2 = new Factory<Test1>(_container);
+            var factory2 = new Factory<Test1>(Container);
             var test2 = factory2.Create(10, 5);
 
             TestAssert.That(test2 != null);
@@ -41,12 +41,12 @@ namespace ModestTree.Zenject.Test
         [Test]
         public void TestMissingParameterThrows()
         {
-            _container.Bind<Test1>().ToTransient();
+            Container.Bind<Test1>().ToTransient();
 
             TestAssert.Throws<ZenjectResolveException>(
-                delegate { _container.Resolve<Test1>(); });
+                delegate { Container.Resolve<Test1>(); });
 
-            TestAssert.That(_container.ValidateResolve<Test1>().Any());
+            TestAssert.That(Container.ValidateResolve<Test1>().Any());
         }
     }
 }

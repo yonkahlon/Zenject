@@ -68,9 +68,9 @@ namespace ModestTree.Zenject
                 return true;
             }
 
+            // Only show a few to avoid spamming the log too much
             var resolveErrors = ValidateInstallers(compRoot).Take(10).ToList();
 
-            // Only show a few to avoid spamming the log too much
             foreach (var error in resolveErrors)
             {
                 Log.ErrorException(error);
@@ -88,30 +88,8 @@ namespace ModestTree.Zenject
 
         static IEnumerable<ZenjectResolveException> ValidateInstallers(CompositionRoot compRoot)
         {
-            var container = new DiContainer();
-
-            container.AllowNullBindings = true;
-            container.Bind<CompositionRoot>().ToSingle(compRoot);
-
-            foreach (var installer in compRoot.Installers)
-            {
-                if (installer == null)
-                {
-                    yield return new ZenjectResolveException(
-                        "Found null installer in properties of Composition Root");
-                    yield break;
-                }
-
-                if (installer.enabled)
-                {
-                    installer.Container = container;
-                    container.Bind<IInstaller>().To(installer);
-                }
-
-                container.InstallInstallers();
-
-                Assert.That(!container.HasBinding<IInstaller>());
-            }
+            var globalContainer = GlobalCompositionRoot.CreateContainer(true, null);
+            var container = compRoot.CreateContainer(true, globalContainer);
 
             foreach (var error in container.ValidateResolve<IDependencyRoot>())
             {
@@ -136,16 +114,18 @@ namespace ModestTree.Zenject
                 }
             }
 
-            // Validate dynamically created object graphs
-            foreach (var installer in container.InstalledInstallers)
+            foreach (var installer in globalContainer.InstalledInstallers.Concat(container.InstalledInstallers))
             {
-                foreach (var error in installer.ValidateSubGraphs())
+                if (installer is IValidatable)
                 {
-                    yield return error;
+                    foreach (var error in ((IValidatable)installer).Validate())
+                    {
+                        yield return error;
+                    }
                 }
             }
 
-            foreach (var error in container.ValidateFactories())
+            foreach (var error in container.ValidateValidatables())
             {
                 yield return error;
             }

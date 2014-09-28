@@ -21,13 +21,13 @@ namespace ModestTree.Zenject.Test
         [Test]
         public void TestToSingle()
         {
-            _container.Bind(typeof(Test1<>)).ToSingle();
+            Container.Bind(typeof(Test1<>)).ToSingle();
 
-            var test1 = _container.Resolve<Test1<int>>();
+            var test1 = Container.Resolve<Test1<int>>();
             TestAssert.That(test1.Data == 0);
             test1.Data = 5;
 
-            var test2 = _container.Resolve<Test1<int>>();
+            var test2 = Container.Resolve<Test1<int>>();
 
             TestAssert.That(test2 == test1);
             TestAssert.That(test1.Data == 5);
@@ -36,18 +36,18 @@ namespace ModestTree.Zenject.Test
         [Test]
         public void TestToTransient()
         {
-            _container.Bind(typeof(Test1<>)).ToTransient();
+            Container.Bind(typeof(Test1<>)).ToTransient();
 
-            var test1 = _container.Resolve<Test1<int>>();
+            var test1 = Container.Resolve<Test1<int>>();
             TestAssert.That(test1.Data == 0);
 
-            var test2 = _container.Resolve<Test1<int>>();
+            var test2 = Container.Resolve<Test1<int>>();
             TestAssert.That(test2.Data == 0);
             TestAssert.That(test2 != test1);
 
-            _container.Resolve<Test1<string>>();
-            _container.Resolve<Test1<List<int>>>();
-            _container.Resolve<Test1<Test2>>();
+            Container.Resolve<Test1<string>>();
+            Container.Resolve<Test1<List<int>>>();
+            Container.Resolve<Test1<Test2>>();
         }
     }
 }

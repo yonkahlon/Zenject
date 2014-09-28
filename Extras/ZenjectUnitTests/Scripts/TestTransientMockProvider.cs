@@ -20,9 +20,9 @@ namespace ModestTree.Zenject.Test
         {
             // Commented out because this requires that zenject be installed with mocking support which isn't always the case
 
-            //_container.FallbackProvider = new TransientMockProvider(_container);
+            //Container.FallbackProvider = new TransientMockProvider(Container);
 
-            //var foo = _container.Resolve<IFoo>();
+            //var foo = Container.Resolve<IFoo>();
 
             //TestAssert.AreEqual(foo.GetBar(), 0);
         }

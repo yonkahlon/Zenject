@@ -9,7 +9,15 @@ namespace ModestTree.Zenject.Test
 {
     public class TestWithContainer
     {
-        protected DiContainer _container;
+        DiContainer _container;
+
+        protected DiContainer Container
+        {
+            get
+            {
+                return _container;
+            }
+        }
 
         [SetUp]
         public virtual void Setup()

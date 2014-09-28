@@ -24,10 +24,10 @@ namespace ModestTree.Zenject.Test
         [Test]
         public void TestCase1()
         {
-            _container.Bind<Test0>().ToSingle<Test1>();
-            _container.Bind<Test0>().ToSingle<Test2>();
+            Container.Bind<Test0>().ToSingle<Test1>();
+            Container.Bind<Test0>().ToSingle<Test2>();
 
-            List<Test0> many = _container.ResolveMany<Test0>();
+            List<Test0> many = Container.ResolveMany<Test0>();
 
             TestAssert.That(many.Count == 2);
         }
@@ -35,7 +35,7 @@ namespace ModestTree.Zenject.Test
         [Test]
         public void TestOptional()
         {
-            List<Test0> many = _container.ResolveMany<Test0>(true);
+            List<Test0> many = Container.ResolveMany<Test0>(true);
             TestAssert.That(many.Count == 0);
         }
     }

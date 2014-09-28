@@ -46,12 +46,12 @@ namespace ModestTree.Zenject.Test
         public void TestMultiBind2()
         {
             // Multi-binds should not map to single-binds
-            _container.Bind<Test0>().ToSingle<Test3>();
-            _container.Bind<Test0>().ToSingle<Test4>();
-            _container.Bind<Test2>().ToSingle();
+            Container.Bind<Test0>().ToSingle<Test3>();
+            Container.Bind<Test0>().ToSingle<Test4>();
+            Container.Bind<Test2>().ToSingle();
 
-            TestAssert.That(_container.ValidateResolve<Test2>().IsEmpty());
-            _container.Resolve<Test2>();
+            TestAssert.That(Container.ValidateResolve<Test2>().IsEmpty());
+            Container.Resolve<Test2>();
         }
     }
 }

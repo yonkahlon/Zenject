@@ -32,27 +32,27 @@ namespace ModestTree.Zenject.Test
         public override void Setup()
         {
             base.Setup();
-            _container.Bind<Test0>().ToSingle().When(r => r.SourceName == "name1");
+            Container.Bind<Test0>().ToSingle().When(r => r.SourceName == "name1");
         }
 
         [Test]
         public void TestNameConditionError()
         {
-            _container.Bind<Test2>().ToSingle();
+            Container.Bind<Test2>().ToSingle();
 
             TestAssert.Throws<ZenjectResolveException>(
-                delegate { _container.Resolve<Test2>(); });
+                delegate { Container.Resolve<Test2>(); });
 
-            TestAssert.That(_container.ValidateResolve<Test2>().Any());
+            TestAssert.That(Container.ValidateResolve<Test2>().Any());
         }
 
         [Test]
         public void TestNameConditionSuccess()
         {
-            _container.Bind<Test1>().ToSingle();
+            Container.Bind<Test1>().ToSingle();
 
-            TestAssert.That(_container.ValidateResolve<Test1>().IsEmpty());
-            var test1 = _container.Resolve<Test1>();
+            TestAssert.That(Container.ValidateResolve<Test1>().IsEmpty());
+            var test1 = Container.Resolve<Test1>();
 
             TestAssert.That(test1 != null);
         }

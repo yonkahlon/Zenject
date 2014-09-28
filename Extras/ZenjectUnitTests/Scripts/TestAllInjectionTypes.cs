@@ -13,11 +13,11 @@ namespace ModestTree.Zenject.Test
         // Test all variations of injection
         public void TestCase1()
         {
-            _container.Bind<Test0>().To(new Test0());
-            _container.Bind<IFoo>().ToSingle<FooDerived>();
+            Container.Bind<Test0>().To(new Test0());
+            Container.Bind<IFoo>().ToSingle<FooDerived>();
 
-            TestAssert.That(_container.ValidateResolve<IFoo>().IsEmpty());
-            var foo = _container.Resolve<IFoo>();
+            TestAssert.That(Container.ValidateResolve<IFoo>().IsEmpty());
+            var foo = Container.Resolve<IFoo>();
 
             TestAssert.That(foo.DidPostInjectBase);
             TestAssert.That(foo.DidPostInjectDerived);

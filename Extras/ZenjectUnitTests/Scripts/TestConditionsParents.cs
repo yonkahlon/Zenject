@@ -61,23 +61,23 @@ namespace ModestTree.Zenject.Test
         [Test]
         public void TestCase1()
         {
-            _container.Bind<Test1>().ToSingle();
-            _container.Bind<Test0>().ToSingle().When(c => c.ParentTypes.Contains(typeof(Test2)));
+            Container.Bind<Test1>().ToSingle();
+            Container.Bind<Test0>().ToSingle().When(c => c.ParentTypes.Contains(typeof(Test2)));
 
             TestAssert.Throws<ZenjectResolveException>(
-                delegate { _container.Resolve<Test1>(); });
+                delegate { Container.Resolve<Test1>(); });
 
-            TestAssert.That(_container.ValidateResolve<Test0>().Any());
+            TestAssert.That(Container.ValidateResolve<Test0>().Any());
         }
 
         [Test]
         public void TestCase2()
         {
-            _container.Bind<Test1>().ToSingle();
-            _container.Bind<Test0>().ToSingle().When(c => c.ParentTypes.Contains(typeof(Test1)));
+            Container.Bind<Test1>().ToSingle();
+            Container.Bind<Test0>().ToSingle().When(c => c.ParentTypes.Contains(typeof(Test1)));
 
-            TestAssert.That(_container.ValidateResolve<Test1>().IsEmpty());
-            var test1 = _container.Resolve<Test1>();
+            TestAssert.That(Container.ValidateResolve<Test1>().IsEmpty());
+            var test1 = Container.Resolve<Test1>();
             TestAssert.That(test1 != null);
         }
 
@@ -88,18 +88,18 @@ namespace ModestTree.Zenject.Test
             var t0a = new Test0();
             var t0b = new Test0();
 
-            _container.Bind<Test3>().ToSingle();
-            _container.Bind<Test4>().ToSingle();
-            _container.Bind<Test1>().ToTransient();
+            Container.Bind<Test3>().ToSingle();
+            Container.Bind<Test4>().ToSingle();
+            Container.Bind<Test1>().ToTransient();
 
-            _container.Bind<Test0>().To(t0a).When(c => c.ParentTypes.Contains(typeof(Test3)));
-            _container.Bind<Test0>().To(t0b).When(c => c.ParentTypes.Contains(typeof(Test4)));
+            Container.Bind<Test0>().To(t0a).When(c => c.ParentTypes.Contains(typeof(Test3)));
+            Container.Bind<Test0>().To(t0b).When(c => c.ParentTypes.Contains(typeof(Test4)));
 
-            TestAssert.That(_container.ValidateResolve<Test3>().IsEmpty());
-            var test3 = _container.Resolve<Test3>();
+            TestAssert.That(Container.ValidateResolve<Test3>().IsEmpty());
+            var test3 = Container.Resolve<Test3>();
 
-            TestAssert.That(_container.ValidateResolve<Test4>().IsEmpty());
-            var test4 = _container.Resolve<Test4>();
+            TestAssert.That(Container.ValidateResolve<Test4>().IsEmpty());
+            var test4 = Container.Resolve<Test4>();
 
             TestAssert.That(ReferenceEquals(test3.test1.test0, t0a));
             TestAssert.That(ReferenceEquals(test4.test1.test0, t0b));
@@ -108,34 +108,34 @@ namespace ModestTree.Zenject.Test
         [Test]
         public void TestCase4()
         {
-            _container.Bind<ITest1>().ToSingle<Test2>();
-            _container.Bind<Test0>().ToSingle().When(c => c.ParentTypes.Contains(typeof(ITest1)));
+            Container.Bind<ITest1>().ToSingle<Test2>();
+            Container.Bind<Test0>().ToSingle().When(c => c.ParentTypes.Contains(typeof(ITest1)));
 
             TestAssert.Throws<ZenjectResolveException>(
-                delegate { _container.Resolve<ITest1>(); });
+                delegate { Container.Resolve<ITest1>(); });
 
-            TestAssert.That(_container.ValidateResolve<Test1>().Any());
+            TestAssert.That(Container.ValidateResolve<Test1>().Any());
         }
 
         [Test]
         public void TestCase5()
         {
-            _container.Bind<ITest1>().ToSingle<Test2>();
-            _container.Bind<Test0>().ToSingle().When(c => c.ParentTypes.Contains(typeof(Test2)));
+            Container.Bind<ITest1>().ToSingle<Test2>();
+            Container.Bind<Test0>().ToSingle().When(c => c.ParentTypes.Contains(typeof(Test2)));
 
-            TestAssert.That(_container.ValidateResolve<ITest1>().IsEmpty());
-            var test1 = _container.Resolve<ITest1>();
+            TestAssert.That(Container.ValidateResolve<ITest1>().IsEmpty());
+            var test1 = Container.Resolve<ITest1>();
             TestAssert.That(test1 != null);
         }
 
         [Test]
         public void TestCase6()
         {
-            _container.Bind<ITest1>().ToSingle<Test2>();
-            _container.Bind<Test0>().ToSingle().When(c => c.ParentTypes.Where(x => typeof(ITest1).IsAssignableFrom(x)).Any());
+            Container.Bind<ITest1>().ToSingle<Test2>();
+            Container.Bind<Test0>().ToSingle().When(c => c.ParentTypes.Where(x => typeof(ITest1).IsAssignableFrom(x)).Any());
 
-            TestAssert.That(_container.ValidateResolve<ITest1>().IsEmpty());
-            var test1 = _container.Resolve<ITest1>();
+            TestAssert.That(Container.ValidateResolve<ITest1>().IsEmpty());
+            var test1 = Container.Resolve<ITest1>();
             TestAssert.That(test1 != null);
         }
     }

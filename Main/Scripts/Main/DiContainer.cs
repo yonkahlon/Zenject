@@ -251,7 +251,7 @@ namespace ModestTree.Zenject
             return numRemoved;
         }
 
-        public IEnumerable<ZenjectResolveException> ValidateFactories(params Type[] ignoreTypes)
+        public IEnumerable<ZenjectResolveException> ValidateValidatables(params Type[] ignoreTypes)
         {
             var injectCtx = new InjectContext(this);
 

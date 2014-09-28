@@ -35,47 +35,47 @@ namespace ModestTree.Zenject.Test
         [Test]
         public void TestFieldRequired()
         {
-            _container.Bind<Test2>().ToSingle();
+            Container.Bind<Test2>().ToSingle();
 
-            TestAssert.That(_container.ValidateResolve<Test2>().Any());
+            TestAssert.That(Container.ValidateResolve<Test2>().Any());
 
             TestAssert.Throws<ZenjectResolveException>(
-                delegate { _container.Resolve<Test2>(); });
+                delegate { Container.Resolve<Test2>(); });
         }
 
         [Test]
         public void TestFieldOptional()
         {
-            _container.Bind<Test3>().ToSingle();
+            Container.Bind<Test3>().ToSingle();
 
-            TestAssert.That(_container.ValidateResolve<Test3>().IsEmpty());
-            var test = _container.Resolve<Test3>();
+            TestAssert.That(Container.ValidateResolve<Test3>().IsEmpty());
+            var test = Container.Resolve<Test3>();
             TestAssert.That(test.val1 == null);
         }
 
         [Test]
         public void TestFieldOptional2()
         {
-            _container.Bind<Test3>().ToSingle();
+            Container.Bind<Test3>().ToSingle();
 
             var test1 = new Test1();
-            _container.Bind<Test1>().To(test1);
+            Container.Bind<Test1>().To(test1);
 
-            TestAssert.That(_container.ValidateResolve<Test3>().IsEmpty());
-            TestAssert.AreEqual(_container.Resolve<Test3>().val1, test1);
+            TestAssert.That(Container.ValidateResolve<Test3>().IsEmpty());
+            TestAssert.AreEqual(Container.Resolve<Test3>().val1, test1);
         }
 
         [Test]
         public void TestFieldOptional3()
         {
-            _container.Bind<Test0>().ToTransient();
+            Container.Bind<Test0>().ToTransient();
 
             // Should not redefine the hard coded value in this case
-            TestAssert.AreEqual(_container.Resolve<Test0>().Val1, 5);
+            TestAssert.AreEqual(Container.Resolve<Test0>().Val1, 5);
 
-            _container.BindValue<int>().To(3);
+            Container.BindValue<int>().To(3);
 
-            TestAssert.AreEqual(_container.Resolve<Test0>().Val1, 3);
+            TestAssert.AreEqual(Container.Resolve<Test0>().Val1, 3);
         }
 
         class Test4
@@ -100,21 +100,21 @@ namespace ModestTree.Zenject.Test
         [Test]
         public void TestParameterRequired()
         {
-            _container.Bind<Test4>().ToSingle();
+            Container.Bind<Test4>().ToSingle();
 
             TestAssert.Throws<ZenjectResolveException>(
-                delegate { _container.Resolve<Test4>(); });
+                delegate { Container.Resolve<Test4>(); });
 
-            TestAssert.That(_container.ValidateResolve<Test2>().Any());
+            TestAssert.That(Container.ValidateResolve<Test2>().Any());
         }
 
         [Test]
         public void TestParameterOptional()
         {
-            _container.Bind<Test5>().ToSingle();
+            Container.Bind<Test5>().ToSingle();
 
-            TestAssert.That(_container.ValidateResolve<Test5>().IsEmpty());
-            var test = _container.Resolve<Test5>();
+            TestAssert.That(Container.ValidateResolve<Test5>().IsEmpty());
+            var test = Container.Resolve<Test5>();
             TestAssert.That(test.Val1 == null);
         }
 
@@ -128,13 +128,13 @@ namespace ModestTree.Zenject.Test
         [Test]
         public void TestChildDependencyOptional()
         {
-            _container.Bind<Test6>().ToSingle();
-            _container.Bind<Test2>().ToSingle();
+            Container.Bind<Test6>().ToSingle();
+            Container.Bind<Test2>().ToSingle();
 
-            TestAssert.That(_container.ValidateResolve<Test6>().Any());
+            TestAssert.That(Container.ValidateResolve<Test6>().Any());
 
             TestAssert.Throws<ZenjectResolveException>(
-                delegate { _container.Resolve<Test6>(); });
+                delegate { Container.Resolve<Test6>(); });
         }
     }
 }

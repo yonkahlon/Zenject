@@ -24,13 +24,13 @@ namespace ModestTree.Zenject.Test
         [Test]
         public void TestCase1()
         {
-            _container.Bind<ITest1>().ToSingle<Test1>();
-            _container.Bind<ITest2>().ToSingle<Test1>();
+            Container.Bind<ITest1>().ToSingle<Test1>();
+            Container.Bind<ITest2>().ToSingle<Test1>();
 
-            TestAssert.That(_container.ValidateResolve<ITest1>().IsEmpty());
-            var test1 = _container.Resolve<ITest1>();
-            TestAssert.That(_container.ValidateResolve<ITest2>().IsEmpty());
-            var test2 = _container.Resolve<ITest2>();
+            TestAssert.That(Container.ValidateResolve<ITest1>().IsEmpty());
+            var test1 = Container.Resolve<ITest1>();
+            TestAssert.That(Container.ValidateResolve<ITest2>().IsEmpty());
+            var test2 = Container.Resolve<ITest2>();
 
             TestAssert.That(ReferenceEquals(test1, test2));
         }

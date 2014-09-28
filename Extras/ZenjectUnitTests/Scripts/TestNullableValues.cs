@@ -22,11 +22,11 @@ namespace ModestTree.Zenject.Test
         [Test]
         public void RunTest1()
         {
-            _container.Bind<Test2>().ToSingle();
-            _container.BindValue<int>().To(1);
+            Container.Bind<Test2>().ToSingle();
+            Container.BindValue<int>().To(1);
 
-            TestAssert.That(_container.ValidateResolve<Test2>().IsEmpty());
-            var test1 = _container.Resolve<Test2>();
+            TestAssert.That(Container.ValidateResolve<Test2>().IsEmpty());
+            var test1 = Container.Resolve<Test2>();
             TestAssert.AreEqual(test1.val, 1);
         }
     }

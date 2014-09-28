@@ -59,13 +59,13 @@ namespace ModestTree.Zenject.Test
         [Test]
         public void Test()
         {
-            _container.Bind<Test0>().ToSingle();
-            _container.Bind<Test1>().ToSingle();
-            _container.Bind<Test2>().ToSingle();
-            _container.Bind<Test3>().ToSingle();
+            Container.Bind<Test0>().ToSingle();
+            Container.Bind<Test1>().ToSingle();
+            Container.Bind<Test2>().ToSingle();
+            Container.Bind<Test3>().ToSingle();
 
-            TestAssert.That(_container.ValidateResolve<Test3>().IsEmpty());
-            var test3 = _container.Resolve<Test3>();
+            TestAssert.That(Container.ValidateResolve<Test3>().IsEmpty());
+            var test3 = Container.Resolve<Test3>();
             TestAssert.That(test3.HasInitialized);
             TestAssert.That(test3.HasInitialized2);
         }
@@ -88,9 +88,9 @@ namespace ModestTree.Zenject.Test
         [Test]
         public void TestPrivateBaseClassPostInject()
         {
-            _container.Bind<SimpleBase>().ToSingle<SimpleDerived>();
+            Container.Bind<SimpleBase>().ToSingle<SimpleDerived>();
 
-            var simple = _container.Resolve<SimpleBase>();
+            var simple = Container.Resolve<SimpleBase>();
 
             TestAssert.That(simple.WasCalled);
         }
@@ -98,10 +98,10 @@ namespace ModestTree.Zenject.Test
         [Test]
         public void TestInheritance()
         {
-            _container.Bind<IFoo>().ToSingle<FooDerived>();
+            Container.Bind<IFoo>().ToSingle<FooDerived>();
 
-            TestAssert.That(_container.ValidateResolve<IFoo>().IsEmpty());
-            var foo = _container.Resolve<IFoo>();
+            TestAssert.That(Container.ValidateResolve<IFoo>().IsEmpty());
+            var foo = Container.Resolve<IFoo>();
 
             TestAssert.That(((FooDerived)foo).WasDerivedCalled);
             TestAssert.That(((FooBase)foo).WasBaseCalled);
@@ -112,7 +112,7 @@ namespace ModestTree.Zenject.Test
         [Test]
         public void TestInheritanceOrder()
         {
-            _container.Bind<IFoo>().ToSingle<FooDerived2>();
+            Container.Bind<IFoo>().ToSingle<FooDerived2>();
 
             // base post inject methods should be called first
             _initOrder = 0;
@@ -120,7 +120,7 @@ namespace ModestTree.Zenject.Test
             FooDerived.DerivedCallOrder = 0;
             FooDerived2.Derived2CallOrder = 0;
 
-            _container.Resolve<IFoo>();
+            Container.Resolve<IFoo>();
 
             //Log.Info("FooBase.BaseCallOrder = {0}".With(FooBase.BaseCallOrder));
             //Log.Info("FooDerived.DerivedCallOrder = {0}".With(FooDerived.DerivedCallOrder));

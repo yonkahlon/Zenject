@@ -20,7 +20,7 @@ namespace ModestTree.Zenject
 
             foreach (var tickableType in _tickables)
             {
-                BindPriority(_container, tickableType, priorityCount);
+                BindPriority(Container, tickableType, priorityCount);
                 priorityCount++;
             }
         }

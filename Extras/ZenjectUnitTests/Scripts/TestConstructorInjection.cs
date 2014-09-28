@@ -26,11 +26,11 @@ namespace ModestTree.Zenject.Test
         [Test]
         public void TestCase1()
         {
-            _container.Bind<Test2>().ToSingle();
-            _container.Bind<Test1>().ToSingle();
+            Container.Bind<Test2>().ToSingle();
+            Container.Bind<Test1>().ToSingle();
 
-            TestAssert.That(_container.ValidateResolve<Test2>().IsEmpty());
-            var test1 = _container.Resolve<Test2>();
+            TestAssert.That(Container.ValidateResolve<Test2>().IsEmpty());
+            var test1 = Container.Resolve<Test2>();
 
             TestAssert.That(test1.val != null);
         }
@@ -38,10 +38,10 @@ namespace ModestTree.Zenject.Test
         [Test]
         public void TestConstructByFactory()
         {
-            _container.Bind<Test2>().ToSingle();
+            Container.Bind<Test2>().ToSingle();
 
             var val = new Test1();
-            var factory = new Factory<Test2>(_container);
+            var factory = new Factory<Test2>(Container);
             var test1 = factory.Create(val);
 
             TestAssert.That(test1.val == val);

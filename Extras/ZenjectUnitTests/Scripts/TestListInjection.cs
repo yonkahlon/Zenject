@@ -40,18 +40,18 @@ namespace ModestTree.Zenject.Test
         [ExpectedException]
         public void TestCase1()
         {
-            _container.Bind<Test1>().ToSingle();
+            Container.Bind<Test1>().ToSingle();
 
-            _container.ResolveMany<Test1>();
+            Container.ResolveMany<Test1>();
         }
 
         [Test]
         public void TestCase2()
         {
-            _container.Bind<Test2>().ToSingle();
+            Container.Bind<Test2>().ToSingle();
 
-            TestAssert.That(_container.ValidateResolve<Test2>().IsEmpty());
-            var result = _container.ResolveMany<Test2>();
+            TestAssert.That(Container.ValidateResolve<Test2>().IsEmpty());
+            var result = Container.ResolveMany<Test2>();
 
             TestAssert.That(result != null);
         }
@@ -60,17 +60,17 @@ namespace ModestTree.Zenject.Test
         [ExpectedException(typeof(ZenjectResolveException))]
         public void TestCase3()
         {
-            _container.Bind<Test3>().ToSingle();
+            Container.Bind<Test3>().ToSingle();
 
-            _container.ResolveMany<Test3>();
+            Container.ResolveMany<Test3>();
         }
 
         [Test]
         public void TestCase4()
         {
-            _container.Bind<Test4>().ToSingle();
+            Container.Bind<Test4>().ToSingle();
 
-            var result = _container.ResolveMany<Test4>();
+            var result = Container.ResolveMany<Test4>();
 
             TestAssert.That(result != null);
         }

@@ -19,7 +19,7 @@ namespace ModestTree.Zenject
 
             foreach (var disposableType in _disposables)
             {
-                BindPriority(_container, disposableType, priorityCount);
+                BindPriority(Container, disposableType, priorityCount);
                 priorityCount++;
             }
         }

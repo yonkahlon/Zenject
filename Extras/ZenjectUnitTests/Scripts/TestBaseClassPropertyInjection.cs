@@ -34,11 +34,11 @@ namespace ModestTree.Zenject.Test
         [Test]
         public void TestCaseBaseClassPropertyInjection()
         {
-            _container.Bind<Test0>().ToSingle();
-            _container.Bind<Test2>().ToSingle();
+            Container.Bind<Test0>().ToSingle();
+            Container.Bind<Test2>().ToSingle();
 
-            TestAssert.That(_container.ValidateResolve<Test2>().IsEmpty());
-            var test1 = _container.Resolve<Test2>();
+            TestAssert.That(Container.ValidateResolve<Test2>().IsEmpty());
+            var test1 = Container.Resolve<Test2>();
 
             TestAssert.That(test1.GetVal() != null);
         }

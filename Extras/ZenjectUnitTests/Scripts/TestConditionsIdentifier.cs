@@ -33,64 +33,64 @@ namespace ModestTree.Zenject.Test
         {
             base.Setup();
 
-            _container.Bind<Test1>().ToTransient();
-            _container.Bind<Test2>().ToTransient();
-            _container.Bind<Test3>().ToTransient();
-            _container.Bind<Test4>().ToTransient();
+            Container.Bind<Test1>().ToTransient();
+            Container.Bind<Test2>().ToTransient();
+            Container.Bind<Test3>().ToTransient();
+            Container.Bind<Test4>().ToTransient();
         }
 
         [Test]
         public void TestUnspecifiedNameConstructorInjection()
         {
-            _container.Bind<Test0>().ToTransient();
+            Container.Bind<Test0>().ToTransient();
 
             TestAssert.Throws<ZenjectResolveException>(
-                delegate { _container.Resolve<Test1>(); });
+                delegate { Container.Resolve<Test1>(); });
 
-            TestAssert.That(_container.ValidateResolve<Test1>().Any());
+            TestAssert.That(Container.ValidateResolve<Test1>().Any());
         }
 
         [Test]
         public void TestUnspecifiedNameFieldInjection()
         {
-            _container.Bind<Test0>().ToTransient();
+            Container.Bind<Test0>().ToTransient();
 
             TestAssert.Throws<ZenjectResolveException>(
-                delegate { _container.Resolve<Test2>(); });
+                delegate { Container.Resolve<Test2>(); });
 
-            TestAssert.That(_container.ValidateResolve<Test2>().Any());
+            TestAssert.That(Container.ValidateResolve<Test2>().Any());
         }
 
         [Test]
         public void TestTooManySpecified()
         {
-            _container.Bind<Test0>().ToTransient();
-            _container.Bind<Test0>().ToTransient();
+            Container.Bind<Test0>().ToTransient();
+            Container.Bind<Test0>().ToTransient();
 
             TestAssert.Throws<ZenjectResolveException>(
-                delegate { _container.Resolve<Test1>(); });
+                delegate { Container.Resolve<Test1>(); });
 
-            TestAssert.That(_container.ValidateResolve<Test2>().Any());
+            TestAssert.That(Container.ValidateResolve<Test2>().Any());
         }
 
         [Test]
         public void TestSuccessConstructorInjectionString()
         {
-            _container.Bind<Test0>().To(new Test0());
-            _container.Bind<Test0>().To(new Test0()).As("foo");
+            Container.Bind<Test0>().To(new Test0());
+            Container.Bind<Test0>().To(new Test0()).As("foo");
 
-            TestAssert.That(_container.ValidateResolve<Test1>().IsEmpty());
-            TestAssert.IsNotNull(_container.Resolve<Test1>());
+            TestAssert.That(Container.ValidateResolve<Test1>().IsEmpty());
+            TestAssert.IsNotNull(Container.Resolve<Test1>());
         }
 
         [Test]
         public void TestSuccessFieldInjectionString()
         {
-            _container.Bind<Test0>().To(new Test0());
-            _container.Bind<Test0>().To(new Test0()).As("foo");
+            Container.Bind<Test0>().To(new Test0());
+            Container.Bind<Test0>().To(new Test0()).As("foo");
 
-            TestAssert.That(_container.ValidateResolve<Test2>().IsEmpty());
-            TestAssert.IsNotNull(_container.Resolve<Test2>());
+            TestAssert.That(Container.ValidateResolve<Test2>().IsEmpty());
+            TestAssert.IsNotNull(Container.Resolve<Test2>());
         }
 
         enum TestEnum
@@ -117,45 +117,45 @@ namespace ModestTree.Zenject.Test
         [Test]
         public void TestFailConstructorInjectionEnum()
         {
-            _container.Bind<Test0>().To(new Test0());
-            _container.Bind<Test0>().To(new Test0()).As(TestEnum.TestValue1);
+            Container.Bind<Test0>().To(new Test0());
+            Container.Bind<Test0>().To(new Test0()).As(TestEnum.TestValue1);
 
             TestAssert.Throws<ZenjectResolveException>(
-                delegate { _container.Resolve<Test3>(); });
+                delegate { Container.Resolve<Test3>(); });
 
-            TestAssert.That(_container.ValidateResolve<Test1>().Any());
+            TestAssert.That(Container.ValidateResolve<Test1>().Any());
         }
 
         [Test]
         public void TestSuccessConstructorInjectionEnum()
         {
-            _container.Bind<Test0>().To(new Test0());
-            _container.Bind<Test0>().To(new Test0()).As(TestEnum.TestValue2);
+            Container.Bind<Test0>().To(new Test0());
+            Container.Bind<Test0>().To(new Test0()).As(TestEnum.TestValue2);
 
-            TestAssert.That(_container.ValidateResolve<Test3>().IsEmpty());
-            TestAssert.IsNotNull(_container.Resolve<Test3>());
+            TestAssert.That(Container.ValidateResolve<Test3>().IsEmpty());
+            TestAssert.IsNotNull(Container.Resolve<Test3>());
         }
 
         [Test]
         public void TestFailFieldInjectionEnum()
         {
-            _container.Bind<Test0>().To(new Test0());
-            _container.Bind<Test0>().To(new Test0()).As(TestEnum.TestValue1);
+            Container.Bind<Test0>().To(new Test0());
+            Container.Bind<Test0>().To(new Test0()).As(TestEnum.TestValue1);
 
             TestAssert.Throws<ZenjectResolveException>(
-                delegate { _container.Resolve<Test3>(); });
+                delegate { Container.Resolve<Test3>(); });
 
-            TestAssert.That(_container.ValidateResolve<Test3>().Any());
+            TestAssert.That(Container.ValidateResolve<Test3>().Any());
         }
 
         [Test]
         public void TestSuccessFieldInjectionEnum()
         {
-            _container.Bind<Test0>().To(new Test0());
-            _container.Bind<Test0>().To(new Test0()).As(TestEnum.TestValue3);
+            Container.Bind<Test0>().To(new Test0());
+            Container.Bind<Test0>().To(new Test0()).As(TestEnum.TestValue3);
 
-            TestAssert.That(_container.ValidateResolve<Test4>().IsEmpty());
-            TestAssert.IsNotNull(_container.Resolve<Test4>());
+            TestAssert.That(Container.ValidateResolve<Test4>().IsEmpty());
+            TestAssert.IsNotNull(Container.Resolve<Test4>());
         }
     }
 }

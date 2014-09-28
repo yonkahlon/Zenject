@@ -26,21 +26,21 @@ namespace ModestTree.Zenject.Test
         [Test]
         public void TestClassRegistration()
         {
-            _container.Bind<Foo>().ToSingle();
+            Container.Bind<Foo>().ToSingle();
 
-            TestAssert.That(_container.ValidateResolve<Foo>().IsEmpty());
-            TestAssert.That(_container.Resolve<Foo>().ReturnValue() == 5);
+            TestAssert.That(Container.ValidateResolve<Foo>().IsEmpty());
+            TestAssert.That(Container.Resolve<Foo>().ReturnValue() == 5);
         }
 
         [Test]
         public void TestSingletonOneInstance()
         {
-            _container.Bind<Foo>().ToSingle();
+            Container.Bind<Foo>().ToSingle();
 
-            TestAssert.That(_container.ValidateResolve<Foo>().IsEmpty());
-            var test1 = _container.Resolve<Foo>();
-            TestAssert.That(_container.ValidateResolve<Foo>().IsEmpty());
-            var test2 = _container.Resolve<Foo>();
+            TestAssert.That(Container.ValidateResolve<Foo>().IsEmpty());
+            var test1 = Container.Resolve<Foo>();
+            TestAssert.That(Container.ValidateResolve<Foo>().IsEmpty());
+            var test2 = Container.Resolve<Foo>();
 
             TestAssert.That(test1 != null && test2 != null);
             TestAssert.That(ReferenceEquals(test1, test2));
@@ -49,12 +49,12 @@ namespace ModestTree.Zenject.Test
         [Test]
         public void TestSingletonOneInstanceUntyped()
         {
-            _container.Bind(typeof(Foo)).ToSingle();
+            Container.Bind(typeof(Foo)).ToSingle();
 
-            TestAssert.That(_container.ValidateResolve<Foo>().IsEmpty());
-            var test1 = _container.Resolve<Foo>();
-            TestAssert.That(_container.ValidateResolve<Foo>().IsEmpty());
-            var test2 = _container.Resolve<Foo>();
+            TestAssert.That(Container.ValidateResolve<Foo>().IsEmpty());
+            var test1 = Container.Resolve<Foo>();
+            TestAssert.That(Container.ValidateResolve<Foo>().IsEmpty());
+            var test2 = Container.Resolve<Foo>();
 
             TestAssert.That(test1 != null && test2 != null);
             TestAssert.That(ReferenceEquals(test1, test2));
@@ -63,19 +63,19 @@ namespace ModestTree.Zenject.Test
         [Test]
         public void TestInterfaceBoundToImplementationRegistration()
         {
-            _container.Bind<IFoo>().ToSingle<Foo>();
+            Container.Bind<IFoo>().ToSingle<Foo>();
 
-            TestAssert.That(_container.ValidateResolve<IFoo>().IsEmpty());
-            TestAssert.That(_container.Resolve<IFoo>().ReturnValue() == 5);
+            TestAssert.That(Container.ValidateResolve<IFoo>().IsEmpty());
+            TestAssert.That(Container.Resolve<IFoo>().ReturnValue() == 5);
         }
 
         [Test]
         public void TestInterfaceBoundToImplementationRegistrationUntyped()
         {
-            _container.Bind(typeof(IFoo)).ToSingle(typeof(Foo));
+            Container.Bind(typeof(IFoo)).ToSingle(typeof(Foo));
 
-            TestAssert.That(_container.ValidateResolve<IFoo>().IsEmpty());
-            TestAssert.That(_container.Resolve<IFoo>().ReturnValue() == 5);
+            TestAssert.That(Container.ValidateResolve<IFoo>().IsEmpty());
+            TestAssert.That(Container.Resolve<IFoo>().ReturnValue() == 5);
         }
 
         [Test]
@@ -83,10 +83,10 @@ namespace ModestTree.Zenject.Test
         {
             IFoo instance = new Foo();
 
-            _container.Bind<IFoo>().To(instance);
+            Container.Bind<IFoo>().To(instance);
 
-            TestAssert.That(_container.ValidateResolve<IFoo>().IsEmpty());
-            var builtInstance = _container.Resolve<IFoo>();
+            TestAssert.That(Container.ValidateResolve<IFoo>().IsEmpty());
+            var builtInstance = Container.Resolve<IFoo>();
 
             TestAssert.That(ReferenceEquals(builtInstance, instance));
             TestAssert.That(builtInstance.ReturnValue() == 5);
@@ -97,10 +97,10 @@ namespace ModestTree.Zenject.Test
         {
             IFoo instance = new Foo();
 
-            _container.Bind(typeof(IFoo)).To(instance);
+            Container.Bind(typeof(IFoo)).To(instance);
 
-            TestAssert.That(_container.ValidateResolve<IFoo>().IsEmpty());
-            var builtInstance = _container.Resolve<IFoo>();
+            TestAssert.That(Container.ValidateResolve<IFoo>().IsEmpty());
+            var builtInstance = Container.Resolve<IFoo>();
 
             TestAssert.That(ReferenceEquals(builtInstance, instance));
             TestAssert.That(builtInstance.ReturnValue() == 5);
@@ -110,32 +110,32 @@ namespace ModestTree.Zenject.Test
         public void TestDuplicateBindings()
         {
             // Note: does not error out until a request for Foo is made
-            _container.Bind<Foo>().ToSingle();
-            _container.Bind<Foo>().ToSingle();
+            Container.Bind<Foo>().ToSingle();
+            Container.Bind<Foo>().ToSingle();
         }
 
         [Test]
         public void TestDuplicateBindingsFail()
         {
-            _container.Bind<Foo>().ToSingle();
-            _container.Bind<Foo>().ToSingle();
+            Container.Bind<Foo>().ToSingle();
+            Container.Bind<Foo>().ToSingle();
 
             TestAssert.Throws<ZenjectResolveException>(
-                delegate { _container.Resolve<Foo>(); });
+                delegate { Container.Resolve<Foo>(); });
 
-            TestAssert.That(_container.ValidateResolve<Foo>().Any());
+            TestAssert.That(Container.ValidateResolve<Foo>().Any());
         }
 
         [Test]
         public void TestDuplicateBindingsFailUntyped()
         {
-            _container.Bind(typeof(Foo)).ToSingle();
-            _container.Bind(typeof(Foo)).ToSingle();
+            Container.Bind(typeof(Foo)).ToSingle();
+            Container.Bind(typeof(Foo)).ToSingle();
 
             TestAssert.Throws<ZenjectResolveException>(
-                delegate { _container.Resolve<Foo>(); });
+                delegate { Container.Resolve<Foo>(); });
 
-            TestAssert.That(_container.ValidateResolve<Foo>().Any());
+            TestAssert.That(Container.ValidateResolve<Foo>().Any());
         }
 
         [Test]
@@ -143,13 +143,13 @@ namespace ModestTree.Zenject.Test
         {
             var instance = new Foo();
 
-            _container.Bind<Foo>().To(instance);
-            _container.Bind<Foo>().To(instance);
+            Container.Bind<Foo>().To(instance);
+            Container.Bind<Foo>().To(instance);
 
-            TestAssert.That(_container.ValidateResolve<Foo>().Any());
+            TestAssert.That(Container.ValidateResolve<Foo>().Any());
 
             TestAssert.Throws<ZenjectResolveException>(
-                delegate { _container.Resolve<Foo>(); });
+                delegate { Container.Resolve<Foo>(); });
         }
 
         [Test]
@@ -157,29 +157,29 @@ namespace ModestTree.Zenject.Test
         {
             var instance = new Foo();
 
-            _container.Bind(typeof(Foo)).To(instance);
-            _container.Bind(typeof(Foo)).To(instance);
+            Container.Bind(typeof(Foo)).To(instance);
+            Container.Bind(typeof(Foo)).To(instance);
 
-            TestAssert.That(_container.ValidateResolve<Foo>().Any());
+            TestAssert.That(Container.ValidateResolve<Foo>().Any());
 
             TestAssert.Throws<ZenjectResolveException>(
-                delegate { _container.Resolve<Foo>(); });
+                delegate { Container.Resolve<Foo>(); });
         }
 
         [Test]
         [ExpectedException(typeof(ZenjectBindException))]
         public void TestToSingleWithInstance()
         {
-            _container.Bind<Foo>().ToSingle(new Foo());
-            _container.Bind<Foo>().ToSingle(new Foo());
+            Container.Bind<Foo>().ToSingle(new Foo());
+            Container.Bind<Foo>().ToSingle(new Foo());
         }
 
         [Test]
         [ExpectedException(typeof(ZenjectBindException))]
         public void TestToSingleWithInstanceUntyped()
         {
-            _container.Bind(typeof(Foo)).ToSingle(new Foo());
-            _container.Bind(typeof(Foo)).ToSingle(new Foo());
+            Container.Bind(typeof(Foo)).ToSingle(new Foo());
+            Container.Bind(typeof(Foo)).ToSingle(new Foo());
         }
 
         [Test]
@@ -187,11 +187,11 @@ namespace ModestTree.Zenject.Test
         {
             var foo = new Foo();
 
-            _container.Bind<Foo>().ToSingle(foo);
-            _container.Bind<IFoo>().ToSingle<Foo>();
+            Container.Bind<Foo>().ToSingle(foo);
+            Container.Bind<IFoo>().ToSingle<Foo>();
 
             TestAssert.That(
-                ReferenceEquals(_container.Resolve<IFoo>(), _container.Resolve<Foo>()));
+                ReferenceEquals(Container.Resolve<IFoo>(), Container.Resolve<Foo>()));
         }
 
         [Test]
@@ -199,11 +199,11 @@ namespace ModestTree.Zenject.Test
         {
             var foo = new Foo();
 
-            _container.Bind(typeof(Foo)).ToSingle(foo);
-            _container.Bind(typeof(IFoo)).ToSingle<Foo>();
+            Container.Bind(typeof(Foo)).ToSingle(foo);
+            Container.Bind(typeof(IFoo)).ToSingle<Foo>();
 
             TestAssert.That(
-                ReferenceEquals(_container.Resolve<IFoo>(), _container.Resolve<Foo>()));
+                ReferenceEquals(Container.Resolve<IFoo>(), Container.Resolve<Foo>()));
         }
 
         [Test]
@@ -211,11 +211,11 @@ namespace ModestTree.Zenject.Test
         {
             var foo = new Foo();
 
-            _container.Bind<Foo>().To(foo);
-            _container.Bind<IFoo>().ToSingle<Foo>();
+            Container.Bind<Foo>().To(foo);
+            Container.Bind<IFoo>().ToSingle<Foo>();
 
             TestAssert.That(
-                !ReferenceEquals(_container.Resolve<IFoo>(), _container.Resolve<Foo>()));
+                !ReferenceEquals(Container.Resolve<IFoo>(), Container.Resolve<Foo>()));
         }
 
         [Test]
@@ -223,11 +223,11 @@ namespace ModestTree.Zenject.Test
         {
             var foo = new Foo();
 
-            _container.Bind(typeof(Foo)).To(foo);
-            _container.Bind(typeof(IFoo)).ToSingle<Foo>();
+            Container.Bind(typeof(Foo)).To(foo);
+            Container.Bind(typeof(IFoo)).ToSingle<Foo>();
 
             TestAssert.That(
-                !ReferenceEquals(_container.Resolve<IFoo>(), _container.Resolve<Foo>()));
+                !ReferenceEquals(Container.Resolve<IFoo>(), Container.Resolve<Foo>()));
         }
     }
 }
