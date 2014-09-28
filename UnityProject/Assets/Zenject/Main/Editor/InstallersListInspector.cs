@@ -8,8 +8,7 @@ using Object = UnityEngine.Object;
 
 namespace ModestTree
 {
-    [CustomEditor(typeof(CompositionRoot))]
-    internal sealed class CompositionRootEditor : UnityEditor.Editor
+    internal class InstallersListInspector : UnityEditor.Editor
     {
         static readonly GUIContent INSTALLERS_HEADER = new GUIContent("Installers", "Sorted array of custom installers for your scene");
 
@@ -48,5 +47,16 @@ namespace ModestTree
             GUI.enabled = true;
             serializedObject.ApplyModifiedProperties();
         }
+    }
+
+    // Unfortunately unity only allows one CustomEditor attribute per class so we use this workaround:
+    [CustomEditor(typeof(GlobalInstallerConfig))]
+    internal sealed class GlobalInstallerConfigEditor : InstallersListInspector
+    {
+    }
+
+    [CustomEditor(typeof(CompositionRoot))]
+    internal sealed class CompositionRootEditor : InstallersListInspector
+    {
     }
 }

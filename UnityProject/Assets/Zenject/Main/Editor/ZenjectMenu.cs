@@ -19,6 +19,12 @@ namespace ModestTree.Zenject
             }
         }
 
+        [MenuItem("Assets/Create/Zenject Global Installer Config")]
+        public static void CreateProjectConfig()
+        {
+            CustomAssetUtility.CreateAsset<GlobalInstallerConfig>();
+        }
+
         [MenuItem("Edit/Zenject/Validate Current Scene #%v")]
         public static bool ValidateCurrentScene()
         {
@@ -51,7 +57,7 @@ namespace ModestTree.Zenject
             // Only show a few to avoid spamming the log too much
             foreach (var error in resolveErrors)
             {
-                Log.Error(error);
+                Log.ErrorException(error);
             }
 
             if (resolveErrors.Any())
@@ -156,3 +162,4 @@ namespace ModestTree.Zenject
         }
     }
 }
+
