@@ -26,7 +26,7 @@ namespace ModestTree.Zenject
             var ignoreTypes = new List<Type>()
             {
                 typeof(DiContainer),
-                typeof(InitializableHandler),
+                typeof(InitializableManager),
             };
 
             ignoreTypes.AddRange(externalIgnoreTypes);
