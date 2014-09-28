@@ -18,13 +18,13 @@ namespace ModestTree.Zenject.Test
         [Test]
         public void TestCase1()
         {
-            _container.Bind<IFoo>().ToSingle<Foo>();
+            Container.Bind<IFoo>().ToSingle<Foo>();
 
-            TestAssert.That(_container.ValidateResolve<IFoo>().IsEmpty());
+            TestAssert.That(Container.ValidateResolve<IFoo>().IsEmpty());
 
-            _container.Unbind<IFoo>();
+            Container.Unbind<IFoo>();
 
-            TestAssert.That(!_container.ValidateResolve<IFoo>().IsEmpty());
+            TestAssert.That(!Container.ValidateResolve<IFoo>().IsEmpty());
         }
     }
 }

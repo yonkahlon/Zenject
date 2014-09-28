@@ -20,14 +20,14 @@ namespace ModestTree.Zenject.Test
         [Test]
         public void TestCaseBothInterfaceAndConcreteBoundToSameSingleton()
         {
-            _container.Bind<Test0>().ToSingle<Test1>();
-            _container.Bind<Test1>().ToSingle();
+            Container.Bind<Test0>().ToSingle<Test1>();
+            Container.Bind<Test1>().ToSingle();
 
-            TestAssert.That(_container.ValidateResolve<Test0>().IsEmpty());
-            var test1 = _container.Resolve<Test0>();
+            TestAssert.That(Container.ValidateResolve<Test0>().IsEmpty());
+            var test1 = Container.Resolve<Test0>();
 
-            TestAssert.That(_container.ValidateResolve<Test1>().IsEmpty());
-            var test2 = _container.Resolve<Test1>();
+            TestAssert.That(Container.ValidateResolve<Test1>().IsEmpty());
+            var test2 = Container.Resolve<Test1>();
 
             TestAssert.That(ReferenceEquals(test1, test2));
         }

@@ -26,13 +26,13 @@ namespace ModestTree.Zenject.Test
         [ExpectedException]
         public void Test()
         {
-            _container.Bind<Test1>().ToSingle();
-            _container.Bind<Test2>().ToSingle();
+            Container.Bind<Test1>().ToSingle();
+            Container.Bind<Test2>().ToSingle();
 
             TestAssert.Throws<ZenjectResolveException>(
-                delegate { _container.Resolve<Test2>(); });
+                delegate { Container.Resolve<Test2>(); });
 
-            TestAssert.That(_container.ValidateResolve<Test2>().Any());
+            TestAssert.That(Container.ValidateResolve<Test2>().Any());
         }
     }
 }

@@ -25,15 +25,15 @@ namespace ModestTree.Zenject.Test
         [Test]
         public void Run()
         {
-            _container.Bind<Test1>().ToSingle<Test2>();
+            Container.Bind<Test1>().ToSingle<Test2>();
 
-            TestAssert.That(_container.ValidateResolve<Test1>().IsEmpty());
-            TestAssert.That(_container.Resolve<Test1>() is Test2);
+            TestAssert.That(Container.ValidateResolve<Test1>().IsEmpty());
+            TestAssert.That(Container.Resolve<Test1>() is Test2);
 
-            _container.Rebind<Test1>().ToSingle<Test3>();
+            Container.Rebind<Test1>().ToSingle<Test3>();
 
-            TestAssert.That(_container.ValidateResolve<Test1>().IsEmpty());
-            TestAssert.That(_container.Resolve<Test1>() is Test3);
+            TestAssert.That(Container.ValidateResolve<Test1>().IsEmpty());
+            TestAssert.That(Container.Resolve<Test1>() is Test3);
         }
     }
 }

@@ -17,20 +17,20 @@ namespace ModestTree.Zenject.Test
         [Test]
         public void TestIsRemoved()
         {
-            using (var scope = _container.CreateScope())
+            using (var scope = Container.CreateScope())
             {
                 var test1 = new Test0();
 
                 scope.Bind<Test0>().To(test1);
 
-                TestAssert.That(_container.ValidateResolve<Test0>().IsEmpty());
-                TestAssert.That(ReferenceEquals(test1, _container.Resolve<Test0>()));
+                TestAssert.That(Container.ValidateResolve<Test0>().IsEmpty());
+                TestAssert.That(ReferenceEquals(test1, Container.Resolve<Test0>()));
             }
 
-            TestAssert.That(_container.ValidateResolve<Test0>().Any());
+            TestAssert.That(Container.ValidateResolve<Test0>().Any());
 
             TestAssert.Throws<ZenjectResolveException>(
-                delegate { _container.Resolve<Test0>(); });
+                delegate { Container.Resolve<Test0>(); });
         }
 
         class Test1
@@ -45,39 +45,39 @@ namespace ModestTree.Zenject.Test
             Test0 test0;
             Test1 test1;
 
-            using (var scope = _container.CreateScope())
+            using (var scope = Container.CreateScope())
             {
                 var test0Local = new Test0();
 
                 scope.Bind<Test0>().To(test0Local);
                 scope.Bind<Test1>().ToSingle();
 
-                TestAssert.That(_container.ValidateResolve<Test0>().IsEmpty());
-                test0 = _container.Resolve<Test0>();
+                TestAssert.That(Container.ValidateResolve<Test0>().IsEmpty());
+                test0 = Container.Resolve<Test0>();
                 TestAssert.AreEqual(test0Local, test0);
 
-                TestAssert.That(_container.ValidateResolve<Test1>().IsEmpty());
-                test1 = _container.Resolve<Test1>();
+                TestAssert.That(Container.ValidateResolve<Test1>().IsEmpty());
+                test1 = Container.Resolve<Test1>();
             }
 
-            TestAssert.That(_container.ValidateResolve<Test0>().Any());
+            TestAssert.That(Container.ValidateResolve<Test0>().Any());
 
             TestAssert.Throws<ZenjectResolveException>(
-                delegate { _container.Resolve<Test0>(); });
+                delegate { Container.Resolve<Test0>(); });
 
-            TestAssert.That(_container.ValidateResolve<Test1>().Any());
+            TestAssert.That(Container.ValidateResolve<Test1>().Any());
 
             TestAssert.Throws<ZenjectResolveException>(
-                delegate { _container.Resolve<Test1>(); });
+                delegate { Container.Resolve<Test1>(); });
 
-            _container.Bind<Test0>().ToSingle();
-            _container.Bind<Test1>().ToSingle();
+            Container.Bind<Test0>().ToSingle();
+            Container.Bind<Test1>().ToSingle();
 
-            TestAssert.That(_container.ValidateResolve<Test0>().IsEmpty());
-            TestAssert.That(_container.Resolve<Test0>() != test0);
+            TestAssert.That(Container.ValidateResolve<Test0>().IsEmpty());
+            TestAssert.That(Container.Resolve<Test0>() != test0);
 
-            TestAssert.That(_container.ValidateResolve<Test1>().IsEmpty());
-            TestAssert.That(_container.Resolve<Test1>() != test1);
+            TestAssert.That(Container.ValidateResolve<Test1>().IsEmpty());
+            TestAssert.That(Container.Resolve<Test1>() != test1);
         }
 
         interface IFoo
@@ -97,18 +97,18 @@ namespace ModestTree.Zenject.Test
         {
             IFoo foo1;
 
-            using (var scope = _container.CreateScope())
+            using (var scope = Container.CreateScope())
             {
                 scope.Bind<IFoo>().ToSingle<Foo>();
-                foo1 = _container.Resolve<IFoo>();
+                foo1 = Container.Resolve<IFoo>();
             }
 
-            TestAssert.That(!_container.ValidateResolve<IFoo>().IsEmpty());
+            TestAssert.That(!Container.ValidateResolve<IFoo>().IsEmpty());
 
-            using (var scope = _container.CreateScope())
+            using (var scope = Container.CreateScope())
             {
                 scope.Bind<IFoo>().ToSingle<Foo>();
-                var foo2 = _container.Resolve<IFoo>();
+                var foo2 = Container.Resolve<IFoo>();
 
                 TestAssert.That(foo2 != foo1);
             }

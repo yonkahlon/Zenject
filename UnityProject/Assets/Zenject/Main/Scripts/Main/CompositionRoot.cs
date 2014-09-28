@@ -25,7 +25,43 @@ namespace ModestTree.Zenject
             }
         }
 
-        void InstallInstallers()
+        public void Awake()
+        {
+            Log.Debug("Zenject Started");
+
+            _container = CreateContainer(false, GlobalCompositionRoot.Instance.Container);
+
+            InjectionHelper.InjectChildGameObjects(_container, gameObject);
+            _dependencyRoot = _container.Resolve<IDependencyRoot>();
+        }
+
+        public DiContainer CreateContainer(bool allowNullBindings, DiContainer parentContainer)
+        {
+            var container = new DiContainer();
+            container.AllowNullBindings = allowNullBindings;
+            container.FallbackProvider = new DiContainerProvider(parentContainer);
+
+            // Install the extra bindings immediately in case they configure the
+            // installers used in this scene
+            if (ExtraBindingsLookup != null)
+            {
+                ExtraBindingsLookup(container);
+
+                // Reset extra bindings for next time we change scenes
+                ExtraBindingsLookup = null;
+            }
+
+            container.Bind<IInstaller>().ToSingle<StandardUnityInstaller>();
+            container.Bind<GameObject>().To(this.gameObject).WhenInjectedInto<StandardUnityInstaller>();
+            container.InstallInstallers();
+            Assert.That(!container.HasBinding<IInstaller>());
+
+            InstallSceneInstallers(container);
+
+            return container;
+        }
+
+        void InstallSceneInstallers(DiContainer container)
         {
             if (Installers.Where(x => x != null).IsEmpty())
             {
@@ -49,51 +85,15 @@ namespace ModestTree.Zenject
                     // At the very least they will need the container injected but
                     // they might also have some configuration passed from another
                     // scene as well
-                    FieldsInjecter.Inject(_container, installer);
-                    _container.Bind<IInstaller>().To(installer);
+                    FieldsInjecter.Inject(container, installer);
+                    container.Bind<IInstaller>().To(installer);
 
                     // Install this installer and also any other installers that it installs
-                    _container.InstallInstallers();
+                    container.InstallInstallers();
 
-                    Assert.That(!_container.HasBinding<IInstaller>());
+                    Assert.That(!container.HasBinding<IInstaller>());
                 }
             }
-        }
-
-        void InitContainer()
-        {
-            _container = new DiContainer();
-
-            _container.FallbackProvider = new DiContainerProvider(
-                GlobalCompositionRoot.Instance.Container);
-
-            _container.Bind<CompositionRoot>().To(this);
-
-            // Install the extra bindings immediately in case they configure the
-            // installers used in this scene
-            if (ExtraBindingsLookup != null)
-            {
-                ExtraBindingsLookup(_container);
-
-                // Reset extra bindings for next time we change scenes
-                ExtraBindingsLookup = null;
-            }
-
-            _container.Bind<IInstaller>().ToSingle<StandardUnityInstaller>();
-            _container.Bind<GameObject>().To(this.gameObject).WhenInjectedInto<StandardUnityInstaller>();
-            _container.InstallInstallers();
-            Assert.That(!_container.HasBinding<IInstaller>());
-        }
-
-        public void Awake()
-        {
-            Log.Debug("Zenject Started");
-
-            InitContainer();
-            InstallInstallers();
-
-            InjectionHelper.InjectChildGameObjects(_container, gameObject);
-            _dependencyRoot = _container.Resolve<IDependencyRoot>();
         }
     }
 }

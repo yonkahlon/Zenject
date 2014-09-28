@@ -24,15 +24,15 @@ namespace ModestTree.Zenject.Test
         [Test]
         public void TestCaseDuplicateInjection()
         {
-            _container.Bind<Test0>().ToSingle();
-            _container.Bind<Test0>().ToSingle();
+            Container.Bind<Test0>().ToSingle();
+            Container.Bind<Test0>().ToSingle();
 
-            _container.Bind<Test1>().ToSingle();
+            Container.Bind<Test1>().ToSingle();
 
             TestAssert.Throws<ZenjectResolveException>(
-                delegate { _container.Resolve<Test1>(); });
+                delegate { Container.Resolve<Test1>(); });
 
-            TestAssert.That(_container.ValidateResolve<Test1>().Any());
+            TestAssert.That(Container.ValidateResolve<Test1>().Any());
         }
     }
 }

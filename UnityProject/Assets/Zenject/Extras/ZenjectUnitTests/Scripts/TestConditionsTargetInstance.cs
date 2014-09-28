@@ -26,14 +26,14 @@ namespace ModestTree.Zenject.Test
             base.Setup();
 
             _test1 = new Test1();
-            _container.Bind<Test0>().ToSingle().When(r => r.EnclosingInstance == _test1);
-            _container.Bind<Test1>().To(_test1);
+            Container.Bind<Test0>().ToSingle().When(r => r.EnclosingInstance == _test1);
+            Container.Bind<Test1>().To(_test1);
         }
 
         [Test]
         public void TestTargetConditionError()
         {
-            FieldsInjecter.Inject(_container, _test1);
+            FieldsInjecter.Inject(Container, _test1);
 
             TestAssert.That(_test1.test0 != null);
         }

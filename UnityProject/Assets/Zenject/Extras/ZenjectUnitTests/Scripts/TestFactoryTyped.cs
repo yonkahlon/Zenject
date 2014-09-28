@@ -38,10 +38,10 @@ namespace ModestTree.Zenject.Test
         [Test]
         public void Test()
         {
-            _container.Bind<Test0>().ToSingle();
-            _container.Bind<Test2.Factory>().ToSingle();
+            Container.Bind<Test0>().ToSingle();
+            Container.Bind<Test2.Factory>().ToSingle();
 
-            var factory = _container.Resolve<Test2.Factory>();
+            var factory = Container.Resolve<Test2.Factory>();
             var test = factory.Create(5, new Test1());
 
             TestAssert.That(test.value == 5);

@@ -37,22 +37,22 @@ namespace ModestTree.Zenject.Test
             var nestedContainer = new DiContainer();
 
             TestAssert.Throws<ZenjectResolveException>(() => nestedContainer.Resolve<IFoo>());
-            TestAssert.Throws<ZenjectResolveException>(() => _container.Resolve<IFoo>());
+            TestAssert.Throws<ZenjectResolveException>(() => Container.Resolve<IFoo>());
 
-            _container.Bind<IFoo>().ToSingle<Foo>();
+            Container.Bind<IFoo>().ToSingle<Foo>();
 
             TestAssert.Throws<ZenjectResolveException>(() => nestedContainer.Resolve<IFoo>());
-            TestAssert.AreEqual(_container.Resolve<IFoo>().GetBar(), 0);
+            TestAssert.AreEqual(Container.Resolve<IFoo>().GetBar(), 0);
 
-            nestedContainer.FallbackProvider = new DiContainerProvider(_container);
+            nestedContainer.FallbackProvider = new DiContainerProvider(Container);
 
             TestAssert.AreEqual(nestedContainer.Resolve<IFoo>().GetBar(), 0);
-            TestAssert.AreEqual(_container.Resolve<IFoo>().GetBar(), 0);
+            TestAssert.AreEqual(Container.Resolve<IFoo>().GetBar(), 0);
 
             nestedContainer.Bind<IFoo>().ToSingle<Foo2>();
 
             TestAssert.AreEqual(nestedContainer.Resolve<IFoo>().GetBar(), 1);
-            TestAssert.AreEqual(_container.Resolve<IFoo>().GetBar(), 0);
+            TestAssert.AreEqual(Container.Resolve<IFoo>().GetBar(), 0);
         }
     }
 }
