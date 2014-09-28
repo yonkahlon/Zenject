@@ -8,7 +8,7 @@ using System.Linq;
 namespace ModestTree.Zenject.Test
 {
     [TestFixture]
-    public class TestFactoryTyped : TestWithContainer
+    public class TestTypedFactory : TestWithContainer
     {
         class Test0
         {
@@ -30,7 +30,7 @@ namespace ModestTree.Zenject.Test
             public int value;
 
             // Test1 should be provided from container
-            public class Factory : FactoryTyped<int, Test1, Test2>
+            public class Factory : TypedFactory<int, Test1, Test2>
             {
             }
         }
@@ -48,4 +48,5 @@ namespace ModestTree.Zenject.Test
         }
     }
 }
+
 

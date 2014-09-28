@@ -148,14 +148,6 @@ namespace ModestTree.Zenject.Test
         {
             [Inject]
             public IFoo _foo = null;
-
-            public void Start()
-            {
-            }
-
-            public void Dispose()
-            {
-            }
         }
     }
 }

@@ -35,15 +35,11 @@ namespace ModestTree.Asteroids
         // better off making it a prefab and then just including it in your scene to re-use it
         void InstallIncludes()
         {
-            // This installer is needed for all unity projects (Yes, Zenject can support non-unity projects)
-            _container.Bind<IInstaller>().ToSingle<StandardUnityInstaller>();
+            //_container.Bind<IInstaller>().ToSingle<MyCustomInstaller>();
         }
 
         void InstallAsteroids()
         {
-            // Root of our object graph
-            _container.Bind<IDependencyRoot>().ToSingle<DependencyRootStandard>();
-
             // In this game there is only one camera so an enum isn't necessary
             // but used here to show how it would work if there were multiple
             _container.Bind<Camera>().ToSingle(SceneSettings.MainCamera).As(Cameras.Main);
