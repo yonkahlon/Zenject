@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace ModestTree.Zenject
@@ -31,6 +33,18 @@ namespace ModestTree.Zenject
                 .AddComponent<GlobalCompositionRoot>();
         }
 
+        IEnumerable<IInstaller> GetGlobalInstallers()
+        {
+            var installerConfig = (GlobalInstallerConfig)Resources.Load("ZenjectGlobalInstallers", typeof(GlobalInstallerConfig));
+
+            if (installerConfig == null)
+            {
+                return Enumerable.Empty<IInstaller>();
+            }
+
+            return installerConfig.Installers;
+        }
+
         void Awake()
         {
             DontDestroyOnLoad(gameObject);
@@ -45,7 +59,7 @@ namespace ModestTree.Zenject
             _container.InstallInstallers();
             Assert.That(!_container.HasBinding<IInstaller>());
 
-            foreach (var installer in GlobalInstallerConfig.Instance.Installers)
+            foreach (var installer in GetGlobalInstallers())
             {
                 FieldsInjecter.Inject(_container, installer);
                 _container.Bind<IInstaller>().To(installer);

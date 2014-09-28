@@ -22,7 +22,23 @@ namespace ModestTree.Zenject
         [MenuItem("Assets/Create/Zenject Global Installer Config")]
         public static void CreateProjectConfig()
         {
-            CustomAssetUtility.CreateAsset<GlobalInstallerConfig>();
+            var asset = ScriptableObject.CreateInstance<GlobalInstallerConfig>();
+
+            var path = AssetDatabase.GetAssetPath(Selection.activeObject);
+
+            if (path == "")
+            {
+                path = "Assets";
+            }
+            else if (Path.GetExtension(path) != "")
+            {
+                path = path.Replace(Path.GetFileName(AssetDatabase.GetAssetPath(Selection.activeObject)), "");
+            }
+
+            var assetPathAndName = AssetDatabase.GenerateUniqueAssetPath(path + "/ZenjectGlobalInstallers.asset");
+
+            AssetDatabase.CreateAsset(asset, assetPathAndName);
+            AssetDatabase.SaveAssets();
         }
 
         [MenuItem("Edit/Zenject/Validate Current Scene #%v")]
