@@ -29,11 +29,12 @@ namespace ModestTree.Zenject
             DiContainer container, Type tickableType, int priorityCount)
         {
             Assert.That(tickableType.DerivesFrom<IFixedTickable>(),
-            "Expected type '{0}' to derive from IFixedTickable", tickableType.Name());
+                "Expected type '{0}' to derive from IFixedTickable", tickableType.Name());
 
             container.Bind<Tuple<Type, int>>().To(
-                Tuple.New(tickableType, priorityCount)).WhenInjectedInto<UnityKernel>()
+                Tuple.New(tickableType, priorityCount)).WhenInjectedInto<TickableHandler>()
                 .As("Fixed");
         }
     }
 }
+

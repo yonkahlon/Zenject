@@ -5,26 +5,26 @@ using System.Linq;
 
 namespace ModestTree.Zenject
 {
-    public class UnityKernel : MonoBehaviour
+    public class TickableHandler
     {
         public const int LateUpdateTickPriority = 10000;
         public const int OnGuiTickPriority = 20000;
 
         [Inject]
         [InjectOptional]
-        readonly List<ITickable> _tickables = null;
+        readonly List<ITickable> _tickables;
 
         [Inject]
         [InjectOptional]
-        readonly List<IFixedTickable> _fixedTickables = null;
+        readonly List<IFixedTickable> _fixedTickables;
 
         [Inject]
         [InjectOptional]
-        readonly List<Tuple<Type, int>> _priorities = null;
+        readonly List<Tuple<Type, int>> _priorities;
 
         [Inject("Fixed")]
         [InjectOptional]
-        readonly List<Tuple<Type, int>> _fixedPriorities = null;
+        readonly List<Tuple<Type, int>> _fixedPriorities;
 
         TaskUpdater<ITickable> _updater;
         TaskUpdater<IFixedTickable> _fixedUpdater;
@@ -43,7 +43,7 @@ namespace ModestTree.Zenject
             foreach (var type in _fixedPriorities.Select(x => x.First))
             {
                 Assert.That(type.DerivesFrom<IFixedTickable>(),
-                    "Expected type '{0}' to drive from IFixedTickable while checking priorities in UnityKernel", type.Name());
+                    "Expected type '{0}' to drive from IFixedTickable while checking priorities in TickableHandler", type.Name());
             }
 
             var priorityMap = _fixedPriorities.ToDictionary(x => x.First, x => x.Second);
@@ -70,7 +70,7 @@ namespace ModestTree.Zenject
             foreach (var type in _priorities.Select(x => x.First))
             {
                 Assert.That(type.DerivesFrom<ITickable>(),
-                    "Expected type '{0}' to drive from ITickable while checking priorities in UnityKernel", type.Name());
+                    "Expected type '{0}' to drive from ITickable while checking priorities in TickableHandler", type.Name());
             }
 
             var priorityMap = _priorities.ToDictionary(x => x.First, x => x.Second);
@@ -92,7 +92,7 @@ namespace ModestTree.Zenject
 
         void UpdateFixedTickable(IFixedTickable tickable)
         {
-            using (ProfileBlock.Start("{0}.FixedTick()", tickable.GetType().Name()))
+            using (ProfileBlock.Start("{0}.FixedTick()".With(tickable.GetType().Name())))
             {
                 tickable.FixedTick();
             }
@@ -100,7 +100,7 @@ namespace ModestTree.Zenject
 
         void UpdateTickable(ITickable tickable)
         {
-            using (ProfileBlock.Start("{0}.Tick()", tickable.GetType().Name()))
+            using (ProfileBlock.Start("{0}.Tick()".With(tickable.GetType().Name())))
             {
                 tickable.Tick();
             }
@@ -162,3 +162,4 @@ namespace ModestTree.Zenject
         }
     }
 }
+

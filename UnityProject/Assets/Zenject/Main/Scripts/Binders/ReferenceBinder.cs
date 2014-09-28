@@ -72,7 +72,8 @@ namespace ModestTree.Zenject
             return ToProvider(_singletonMap.CreateProvider(concreteType));
         }
 
-        public BindingConditionSetter To<TConcrete>(TConcrete instance) where TConcrete : TContract
+        public BindingConditionSetter To<TConcrete>(TConcrete instance)
+            where TConcrete : TContract
         {
             if (UnityUtil.IsNull(instance) && !_container.AllowNullBindings)
             {
@@ -94,7 +95,8 @@ namespace ModestTree.Zenject
             return ToProvider(new InstanceProvider(typeof(TConcrete), instance));
         }
 
-        public BindingConditionSetter ToSingle<TConcrete>(TConcrete instance) where TConcrete : TContract
+        public BindingConditionSetter ToSingle<TConcrete>(TConcrete instance)
+            where TConcrete : TContract
         {
             if (UnityUtil.IsNull(instance) && !_container.AllowNullBindings)
             {
@@ -163,6 +165,12 @@ namespace ModestTree.Zenject
         public BindingConditionSetter ToSingleGameObject<TConcrete>(string name) where TConcrete : MonoBehaviour, TContract
         {
             return ToProvider(new GameObjectSingletonProvider(typeof(TConcrete), _container, name));
+        }
+
+        public BindingConditionSetter ToSingleMonoBehaviour<TConcrete>(GameObject gameObject)
+            where TConcrete : TContract
+        {
+            return ToProvider(new MonoBehaviourSingletonProvider(typeof(TConcrete), _container, gameObject));
         }
     }
 }

@@ -25,6 +25,13 @@ namespace ModestTree.Zenject
             }
         }
 
+        public static void BindPriority<T>(
+            DiContainer container, int priorityCount)
+            where T : IInitializable
+        {
+            BindPriority(container, typeof(T), priorityCount);
+        }
+
         public static void BindPriority(
             DiContainer container, Type initializableType, int priorityCount)
         {
