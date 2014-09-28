@@ -31,7 +31,7 @@ namespace ModestTree.Zenject
                 "Expected type '{0}' to derive from IDisposable", disposableType.Name());
 
             container.Bind<Tuple<Type, int>>().To(
-                Tuple.New(disposableType, priorityCount)).WhenInjectedInto<DisposablesHandler>();
+                Tuple.New(disposableType, priorityCount)).WhenInjectedInto<DisposableManager>();
         }
     }
 }

@@ -4,13 +4,13 @@ using System.Linq;
 
 namespace ModestTree.Zenject
 {
-    public class DisposablesHandler : IDisposable
+    public class DisposableManager : IDisposable
     {
         List<DisposableInfo> _disposables = new List<DisposableInfo>();
         DiContainer _container;
         bool _disposed;
 
-        public DisposablesHandler(
+        public DisposableManager(
             [InjectOptional]
             List<IDisposable> disposables,
             [InjectOptional]
@@ -73,7 +73,7 @@ namespace ModestTree.Zenject
 
         void WarnForMissingBindings()
         {
-            var ignoredTypes = new Type[] { typeof(DisposablesHandler) };
+            var ignoredTypes = new Type[] { typeof(DisposableManager) };
 
             var boundTypes = _disposables.Select(x => x.Disposable.GetType()).Distinct();
 

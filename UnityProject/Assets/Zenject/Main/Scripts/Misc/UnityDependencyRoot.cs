@@ -6,33 +6,33 @@ namespace ModestTree.Zenject
     public sealed class UnityDependencyRoot : MonoBehaviour, IDependencyRoot
     {
         [Inject]
-        public TickableHandler _tickableHandler;
+        public TickableManager _tickableMgr;
 
         [Inject]
-        public InitializableHandler _initializableHandler;
+        public InitializableManager _initializableMgr;
 
         [Inject]
-        public DisposablesHandler _disposablesHandler;
+        public DisposableManager _disposablesMgr;
 
         [PostInject]
         public void Initialize()
         {
-            _initializableHandler.Initialize();
+            _initializableMgr.Initialize();
         }
 
         public void OnDestroy()
         {
-            _disposablesHandler.Dispose();
+            _disposablesMgr.Dispose();
         }
 
         public void Update()
         {
-            _tickableHandler.Update();
+            _tickableMgr.Update();
         }
 
         public void FixedUpdate()
         {
-            _tickableHandler.FixedUpdate();
+            _tickableMgr.FixedUpdate();
         }
     }
 }

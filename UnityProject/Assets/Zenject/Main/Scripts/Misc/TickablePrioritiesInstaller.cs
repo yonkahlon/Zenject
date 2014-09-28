@@ -32,7 +32,7 @@ namespace ModestTree.Zenject
                 "Expected type '{0}' to derive from ITickable", tickableType.Name());
 
             container.Bind<Tuple<Type, int>>().To(
-                Tuple.New(tickableType, priorityCount)).WhenInjectedInto<TickableHandler>();
+                Tuple.New(tickableType, priorityCount)).WhenInjectedInto<TickableManager>();
         }
     }
 }
