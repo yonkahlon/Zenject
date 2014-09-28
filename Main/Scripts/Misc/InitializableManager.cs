@@ -7,11 +7,11 @@ namespace ModestTree.Zenject
 {
     // Responsibilities:
     // - Run Initialize() on all Iinitializable's, in the order specified by InitPriority
-    public class InitializableHandler
+    public class InitializableManager
     {
         List<InitializableInfo> _initializables = new List<InitializableInfo>();
 
-        public InitializableHandler(
+        public InitializableManager(
             [InjectOptional]
             List<IInitializable> initializables,
             [InjectOptional]

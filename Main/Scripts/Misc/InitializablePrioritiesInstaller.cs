@@ -39,7 +39,7 @@ namespace ModestTree.Zenject
                 "Expected type '{0}' to derive from IInitializable", initializableType.Name());
 
             container.Bind<Tuple<Type, int>>().To(
-                Tuple.New(initializableType, priorityCount)).WhenInjectedInto<InitializableHandler>();
+                Tuple.New(initializableType, priorityCount)).WhenInjectedInto<InitializableManager>();
         }
     }
 }

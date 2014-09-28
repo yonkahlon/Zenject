@@ -5,11 +5,8 @@ using System.Linq;
 
 namespace ModestTree.Zenject
 {
-    public class TickableHandler
+    public class TickableManager
     {
-        public const int LateUpdateTickPriority = 10000;
-        public const int OnGuiTickPriority = 20000;
-
         [Inject]
         [InjectOptional]
         readonly List<ITickable> _tickables;
@@ -139,20 +136,7 @@ namespace ModestTree.Zenject
         public void Update()
         {
             _updater.OnFrameStart();
-            _updater.UpdateRange(int.MinValue, LateUpdateTickPriority);
-
-            // Put Tickables with unspecified priority after Update() and before LateUpdate()
-            _updater.UpdateUnsorted();
-        }
-
-        public void LateUpdate()
-        {
-            _updater.UpdateRange(LateUpdateTickPriority, OnGuiTickPriority);
-        }
-
-        public void OnGUI()
-        {
-            _updater.UpdateRange(OnGuiTickPriority, int.MaxValue);
+            _updater.UpdateAll();
         }
 
         public void FixedUpdate()
@@ -162,4 +146,3 @@ namespace ModestTree.Zenject
         }
     }
 }
-
