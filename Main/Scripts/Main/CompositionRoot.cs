@@ -7,23 +7,15 @@ namespace ModestTree.Zenject
 {
     // Define this class as a component of a top-level game object of your scene heirarchy
     // Then any children will get injected during resolve stage
-    public class CompositionRoot : MonoBehaviour
+    public sealed class CompositionRoot : MonoBehaviour
     {
+        public static Action<DiContainer> ExtraBindingsLookup;
+
         DiContainer _container;
         IDependencyRoot _dependencyRoot;
 
+        [SerializeField]
         public MonoInstaller[] Installers;
-
-        static Action<DiContainer> _extraBindingLookup;
-
-        internal static Action<DiContainer> ExtraBindingsLookup
-        {
-            set
-            {
-                Assert.IsNull(_extraBindingLookup);
-                _extraBindingLookup = value;
-            }
-        }
 
         public DiContainer Container
         {
@@ -33,7 +25,7 @@ namespace ModestTree.Zenject
             }
         }
 
-        void Register()
+        void InstallInstallers()
         {
             if (Installers.Where(x => x != null).IsEmpty())
             {
@@ -72,48 +64,36 @@ namespace ModestTree.Zenject
         {
             _container = new DiContainer();
 
-            // Note: This has to go first
+            _container.FallbackProvider = new DiContainerProvider(
+                GlobalCompositionRoot.Instance.Container);
+
             _container.Bind<CompositionRoot>().To(this);
 
             // Install the extra bindings immediately in case they configure the
             // installers used in this scene
-            if (_extraBindingLookup != null)
+            if (ExtraBindingsLookup != null)
             {
-                _extraBindingLookup(_container);
-                _extraBindingLookup = null;
+                ExtraBindingsLookup(_container);
+
+                // Reset extra bindings for next time we change scenes
+                ExtraBindingsLookup = null;
             }
+
+            _container.Bind<IInstaller>().ToSingle<StandardUnityInstaller>();
+            _container.Bind<GameObject>().To(this.gameObject).WhenInjectedInto<StandardUnityInstaller>();
+            _container.InstallInstallers();
+            Assert.That(!_container.HasBinding<IInstaller>());
         }
 
-        void Awake()
+        public void Awake()
         {
             Log.Debug("Zenject Started");
 
             InitContainer();
-            Register();
-            Resolve();
-        }
+            InstallInstallers();
 
-        void OnDestroy()
-        {
-            if (_dependencyRoot != null)
-            {
-                _dependencyRoot.Dispose();
-            }
-        }
-
-        void Resolve()
-        {
             InjectionHelper.InjectChildGameObjects(_container, gameObject);
-
-            if (_container.HasBinding<IDependencyRoot>())
-            {
-                _dependencyRoot = _container.Resolve<IDependencyRoot>();
-                _dependencyRoot.Start();
-            }
-            else
-            {
-                Log.Warn("No dependency root found");
-            }
+            _dependencyRoot = _container.Resolve<IDependencyRoot>();
         }
     }
 }

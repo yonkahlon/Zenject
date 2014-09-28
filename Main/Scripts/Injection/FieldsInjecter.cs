@@ -29,11 +29,14 @@ namespace ModestTree.Zenject
             Assert.IsEqual(typeInfo.TypeAnalyzed, injectable.GetType());
             Assert.That(injectable != null);
 
+            Assert.That(container.AllowNullBindings || !additional.Contains(null),
+                "Null value given to factory constructor arguments. This is currently not allowed");
+
             var additionalCopy = additional.ToList();
 
             foreach (var injectInfo in typeInfo.FieldInjectables.Concat(typeInfo.PropertyInjectables))
             {
-                bool didInject = InjectFromExtras(injectInfo, injectable, additionalCopy);
+                bool didInject = InjectFromExtras(container, injectInfo, injectable, additionalCopy);
 
                 if (!didInject)
                 {
@@ -58,12 +61,16 @@ namespace ModestTree.Zenject
         }
 
         static bool InjectFromExtras(
+            DiContainer container,
             InjectableInfo injectInfo,
             object injectable, List<object> additional)
         {
+            Assert.That(container.AllowNullBindings || !additional.Contains(null),
+                "Null value given to factory constructor arguments. This is currently not allowed");
+
             foreach (object obj in additional)
             {
-                if (injectInfo.ContractType.IsAssignableFrom(obj.GetType()))
+                if (obj == null || injectInfo.ContractType.IsAssignableFrom(obj.GetType()))
                 {
                     Assert.IsNotNull(injectInfo.Setter);
 

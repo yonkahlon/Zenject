@@ -123,6 +123,18 @@ namespace ModestTree.Zenject
             return _lookupsInProgress.Select(t => t.Name()).Reverse().Aggregate((i, str) => i + "\n" + str);
         }
 
+        public BindingConditionSetter BindGameObjectFactory<T>(GameObject prefab)
+            // This would be useful but fails with webplayer builds for some reason
+            //where T : TypedGameObjectFactory
+            where T : class
+        {
+            // We could bind the game object separately and bind the factory ToSingle
+            // but doing it this way is better since it allows us to have multiple game
+            // object factories injected into different places
+            return Bind<T>().ToMethod(
+                c => c.Instantiate<T>(this, prefab, c.Resolve<GameObjectInstantiator>()));
+        }
+
         public BindingConditionSetter BindFactoryMethod<TContract>(Func<DiContainer, object[], TContract> method)
         {
             return Bind<IFactory<TContract>>().To(new FactoryMethod<TContract>(this, method));
@@ -615,4 +627,5 @@ namespace ModestTree.Zenject
         }
     }
 }
+
 

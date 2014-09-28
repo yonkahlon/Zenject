@@ -49,7 +49,7 @@ namespace ModestTree.Zenject
             var paramValues = new List<object>();
             var extrasList = new List<object>(constructorArgs);
 
-            Assert.That(!extrasList.Contains(null),
+            Assert.That(_container.AllowNullBindings || !extrasList.Contains(null),
                 "Null value given to factory constructor arguments. This is currently not allowed");
 
             foreach (var injectInfo in typeInfo.ConstructorInjectables)
@@ -58,7 +58,7 @@ namespace ModestTree.Zenject
 
                 foreach (var extra in extrasList)
                 {
-                    if (extra.GetType().DerivesFromOrEqual(injectInfo.ContractType))
+                    if (extra == null || extra.GetType().DerivesFromOrEqual(injectInfo.ContractType))
                     {
                         found = true;
                         paramValues.Add(extra);
