@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Text;
 using System.Diagnostics;
 using UnityEngine;
+using Fasterflect;
 
 namespace ModestTree.Zenject
 {
@@ -27,7 +28,6 @@ namespace ModestTree.Zenject
             {
                 typeof(DiContainer),
                 typeof(InitializableHandler),
-                typeof(UnityKernel),
             };
 
             ignoreTypes.AddRange(externalIgnoreTypes);
