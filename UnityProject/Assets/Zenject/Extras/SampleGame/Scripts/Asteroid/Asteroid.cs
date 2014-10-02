@@ -125,5 +125,9 @@ namespace ModestTree.Asteroids
             public float massScaleFactor;
             public float maxSpeed;
         }
+
+        public class Factory : GameObjectFactory<Asteroid>
+        {
+        }
     }
 }

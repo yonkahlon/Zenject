@@ -25,13 +25,13 @@ namespace ModestTree.Zenject.Test
         [Test]
         public void TestExtraParametersSameType()
         {
-            var factory1 = new Factory<Test1>(Container);
+            var factory1 = new FactoryUntyped<Test1>(Container);
             var test1 = factory1.Create(5, 10);
 
             TestAssert.That(test1 != null);
             TestAssert.That(test1.f1 == 5 && test1.f2 == 10);
 
-            var factory2 = new Factory<Test1>(Container);
+            var factory2 = new FactoryUntyped<Test1>(Container);
             var test2 = factory2.Create(10, 5);
 
             TestAssert.That(test2 != null);

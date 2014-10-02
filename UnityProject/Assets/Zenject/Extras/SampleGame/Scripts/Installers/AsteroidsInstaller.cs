@@ -12,7 +12,7 @@ namespace ModestTree.Asteroids
         Main,
     }
 
-    public class AsteroidsInstaller : MonoInstaller, IValidatable
+    public class AsteroidsInstaller : MonoInstaller
     {
         public Settings SceneSettings;
 
@@ -58,7 +58,7 @@ namespace ModestTree.Asteroids
             // This line is exactly the same as the following:
             //Container.Bind<IFactory<IAsteroid>>().To(
                 //new GameObjectFactory<IAsteroid, Asteroid>(Container, SceneSettings.Asteroid.Prefab));
-            Container.BindFactory<Asteroid>(SceneSettings.Asteroid.Prefab);
+            Container.BindGameObjectFactory<Asteroid.Factory>(SceneSettings.Asteroid.Prefab);
 
             Container.Bind<IInitializable>().ToSingle<GameController>();
             Container.Bind<ITickable>().ToSingle<GameController>();
@@ -99,23 +99,6 @@ namespace ModestTree.Asteroids
 
             Container.Bind<IInstaller>().ToSingle<FixedTickablePrioritiesInstaller>();
             Container.Bind<List<Type>>().To(FixedTickables).WhenInjectedInto<FixedTickablePrioritiesInstaller>();
-        }
-
-        // Here we override ValidateSubGraphs to indicate to Zenject the object graphs
-        // that we are creating at run time
-        // This isn't necessary but is good to do so that you can catch zenject errors
-        // before running your unity scene
-        // So in this case, if one of the dependencies of ShipStateDead was missing and
-        // we didn't include it here, then we wouldn't run into this issue until we
-        // played the game and then died
-        // This way, we can simply either run Assets -> Zenject -> Validate or hit
-        // CTRL+SHIFT+V and confirm that Zenject can generate our object graphs correctly
-        public IEnumerable<ZenjectResolveException> Validate()
-        {
-            return Container.ValidateObjectGraph<Asteroid>().Concat(
-                Container.ValidateObjectGraph<ShipStateDead>(typeof(Ship))).Concat(
-                Container.ValidateObjectGraph<ShipStateMoving>(typeof(Ship))).Concat(
-                Container.ValidateObjectGraph<ShipStateWaitingToStart>(typeof(Ship)));
         }
 
         [Serializable]

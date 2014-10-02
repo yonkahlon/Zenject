@@ -61,11 +61,6 @@ namespace ModestTree.Zenject
 
         static bool ShouldIgnoreType(Type type, List<Type> ignoreTypes)
         {
-            if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Factory<>))
-            {
-                return true;
-            }
-
             return ignoreTypes.Contains(type);
         }
 

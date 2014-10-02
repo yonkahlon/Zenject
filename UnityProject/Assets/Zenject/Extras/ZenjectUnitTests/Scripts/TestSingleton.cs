@@ -229,6 +229,37 @@ namespace ModestTree.Zenject.Test
             TestAssert.That(
                 !ReferenceEquals(Container.Resolve<IFoo>(), Container.Resolve<Foo>()));
         }
+
+        [Test]
+        public void TestToSingleMethod()
+        {
+            var foo = new Foo();
+
+            Container.Bind(typeof(Foo)).ToSingleMethod((container) => foo);
+            Container.Bind(typeof(IFoo)).ToSingle<Foo>();
+
+            TestAssert.That(ReferenceEquals(Container.Resolve<Foo>(), foo));
+            TestAssert.That(ReferenceEquals(Container.Resolve<Foo>(), Container.Resolve<IFoo>()));
+        }
+
+        [Test]
+        [ExpectedException(typeof(ZenjectBindException))]
+        public void TestToSingleMethod2()
+        {
+            var foo = new Foo();
+            var foo2 = new Foo();
+
+            Container.Bind(typeof(Foo)).ToSingleMethod((container) => foo);
+            Container.Bind(typeof(IFoo)).ToSingleMethod((container) => foo2);
+        }
+
+        [Test]
+        [ExpectedException(typeof(ZenjectBindException))]
+        public void TestToSingleMethod3()
+        {
+            Container.Bind<Foo>().ToSingle();
+            Container.Bind(typeof(IFoo)).ToSingleMethod((container) => new Foo());
+        }
     }
 }
 
