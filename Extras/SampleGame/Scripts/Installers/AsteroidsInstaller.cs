@@ -28,11 +28,12 @@ namespace ModestTree.Asteroids
 
         // In this example there is only one 'installer' but in larger projects you
         // will likely end up with many different re-usable installers
-        // that you'll want to use in several different installers
+        // that you'll want to use in several different scenes
         // To re-use an existing installer you can simply bind it to IInstaller like below
         // Note that this will only work if your installer is just a normal C# class
         // If it's a monobehaviour (that is, derived from MonoInstaller) then you would be
-        // better off making it a prefab and then just including it in your scene to re-use it
+        // better off making it a prefab and then just including it in your scene (and adding
+        // it to the list of installers in the inspector of CompositionRoot) to re-use it
         void InstallIncludes()
         {
             //Container.Bind<IInstaller>().ToSingle<MyCustomInstaller>();
@@ -40,24 +41,20 @@ namespace ModestTree.Asteroids
 
         void InstallAsteroids()
         {
-            // In this game there is only one camera so an enum isn't necessary
-            // but used here to show how it would work if there were multiple
-            Container.Bind<Camera>().ToSingle(SceneSettings.MainCamera).As(Cameras.Main);
-
             Container.Bind<LevelHelper>().ToSingle();
 
+            // Any time you use ToSingle<>, what that means is that the DiContainer will only ever instantiate
+            // one instance of the type given inside the ToSingle<>. So in this case, any classes that take ITickable,
+            // IFixedTickable, or AsteroidManager as inputs will receive the same instance of AsteroidManager
             Container.Bind<ITickable>().ToSingle<AsteroidManager>();
             Container.Bind<IFixedTickable>().ToSingle<AsteroidManager>();
-
             Container.Bind<AsteroidManager>().ToSingle();
 
             // Here, we're defining a generic factory to create asteroid objects using the given prefab
             // There's several different ways of instantiating new game objects in zenject, this is
             // only one of them
-            // Other options include injecting as transient, using GameObjectInstantiator directly
-            // This line is exactly the same as the following:
-            //Container.Bind<IFactory<IAsteroid>>().To(
-                //new GameObjectFactory<IAsteroid, Asteroid>(Container, SceneSettings.Asteroid.Prefab));
+            // So any classes that want to create new asteroid objects can simply include a injected field
+            // or constructor parameter of type Asteroid.Factory, then call create on that
             Container.BindGameObjectFactory<Asteroid.Factory>(SceneSettings.Asteroid.Prefab);
 
             Container.Bind<IInitializable>().ToSingle<GameController>();
@@ -70,6 +67,10 @@ namespace ModestTree.Asteroids
             // We prefer to use ITickable / IInitializable in favour of the Monobehaviour methods
             // so we just use a monobehaviour wrapper class here to pass in asset data
             Container.Bind<ShipHooks>().ToTransientFromPrefab<ShipHooks>(SceneSettings.Ship.Prefab).WhenInjectedInto<Ship>();
+
+            // In this game there is only one camera so an enum isn't necessary
+            // but used here to show how it would work if there were multiple
+            Container.Bind<Camera>().ToSingle(SceneSettings.MainCamera).As(Cameras.Main);
 
             Container.Bind<Ship>().ToSingle();
             Container.Bind<ITickable>().ToSingle<Ship>();
@@ -91,14 +92,14 @@ namespace ModestTree.Asteroids
         void InitPriorities()
         {
             Container.Bind<IInstaller>().ToSingle<InitializablePrioritiesInstaller>();
-            Container.Bind<List<Type>>().To(Initializables)
+            Container.Bind<List<Type>>().To(InitializablesOrder)
                 .WhenInjectedInto<InitializablePrioritiesInstaller>();
 
             Container.Bind<IInstaller>().ToSingle<TickablePrioritiesInstaller>();
-            Container.Bind<List<Type>>().To(Tickables).WhenInjectedInto<TickablePrioritiesInstaller>();
+            Container.Bind<List<Type>>().To(TickablesOrder).WhenInjectedInto<TickablePrioritiesInstaller>();
 
             Container.Bind<IInstaller>().ToSingle<FixedTickablePrioritiesInstaller>();
-            Container.Bind<List<Type>>().To(FixedTickables).WhenInjectedInto<FixedTickablePrioritiesInstaller>();
+            Container.Bind<List<Type>>().To(FixedTickablesOrder).WhenInjectedInto<FixedTickablePrioritiesInstaller>();
         }
 
         [Serializable]
@@ -126,20 +127,20 @@ namespace ModestTree.Asteroids
             }
         }
 
-        static List<Type> Initializables = new List<Type>()
+        static List<Type> InitializablesOrder = new List<Type>()
         {
             // Re-arrange this list to control init order
             typeof(GameController),
         };
 
-        static List<Type> Tickables = new List<Type>()
+        static List<Type> TickablesOrder = new List<Type>()
         {
             // Re-arrange this list to control update order
             typeof(AsteroidManager),
             typeof(GameController),
         };
 
-        static List<Type> FixedTickables = new List<Type>()
+        static List<Type> FixedTickablesOrder = new List<Type>()
         {
             // Re-arrange this list to control update order
             typeof(AsteroidManager),
