@@ -1,76 +1,76 @@
 using System;
 using System.Collections.Generic;
-using System.Reflection;
-using System.Security.Permissions;
 
 namespace ModestTree.Zenject
 {
-    // Instantiate given concrete class
-    public class Factory<TContract, TConcrete> : IFactory<TContract> where TConcrete : TContract
+    // Zero parameters
+    public class Factory<T> : ValidatableFactory<T>
     {
-        readonly DiContainer _container;
-        Instantiator _instantiator;
-
-        public Factory(DiContainer container)
+        public override T Create()
         {
-            _container = container;
-        }
-
-        public virtual TContract Create(params object[] constructorArgs)
-        {
-            if (_instantiator == null)
-            {
-                _instantiator = _container.Resolve<Instantiator>();
-            }
-
-            return _instantiator.Instantiate<TConcrete>(constructorArgs);
-        }
-
-        public IEnumerable<ZenjectResolveException> Validate(params Type[] extras)
-        {
-            return _container.ValidateObjectGraph<TConcrete>(extras);
+            return _container.Instantiate<T>();
         }
     }
 
-    // Instantiate given contract class
-    public class Factory<TContract> : IFactory<TContract>
+    // One parameter
+    public class Factory<TParam1, TValue> : ValidatableFactory<TParam1, TValue>
     {
-        readonly DiContainer _container;
-        readonly Type _concreteType;
-        Instantiator _instantiator;
-
-        [Inject]
-        public Factory(DiContainer container)
+        public override TValue Create(TParam1 param)
         {
-            _container = container;
-            _concreteType = typeof(TContract);
+            return _container.InstantiateExplicit<TValue>(
+                new List<TypeValuePair>()
+                {
+                    InstantiateUtil.CreateTypePair(param),
+                });
         }
+    }
 
-        public Factory(DiContainer container, Type concreteType)
+    // Two parameters
+    public class Factory<TParam1, TParam2, TValue>
+        : ValidatableFactory<TParam1, TParam2, TValue>
+    {
+        public override TValue Create(TParam1 param1, TParam2 param2)
         {
-            if (!concreteType.DerivesFromOrEqual(typeof(TContract)))
-            {
-                throw new ZenjectResolveException(
-                    "Expected type '{0}' to derive from '{1}'".With(concreteType.Name(), typeof(TContract).Name()));
-            }
-
-            _container = container;
-            _concreteType = concreteType;
+            return _container.InstantiateExplicit<TValue>(
+                new List<TypeValuePair>()
+                {
+                    InstantiateUtil.CreateTypePair(param1),
+                    InstantiateUtil.CreateTypePair(param2),
+                });
         }
+    }
 
-        public virtual TContract Create(params object[] constructorArgs)
+    // Three parameters
+    public class Factory<TParam1, TParam2, TParam3, TValue>
+        : ValidatableFactory<TParam1, TParam2, TParam3, TValue>
+    {
+        public override TValue Create(TParam1 param1, TParam2 param2, TParam3 param3)
         {
-            if (_instantiator == null)
-            {
-                _instantiator = _container.Resolve<Instantiator>();
-            }
-
-            return (TContract)_instantiator.Instantiate(_concreteType, constructorArgs);
+            return _container.InstantiateExplicit<TValue>(
+                new List<TypeValuePair>()
+                {
+                    InstantiateUtil.CreateTypePair(param1),
+                    InstantiateUtil.CreateTypePair(param2),
+                    InstantiateUtil.CreateTypePair(param3),
+                });
         }
+    }
 
-        public IEnumerable<ZenjectResolveException> Validate(params Type[] extras)
+    // Four parameters
+    public class Factory<TParam1, TParam2, TParam3, TParam4, TValue>
+        : ValidatableFactory<TParam1, TParam2, TParam3, TParam4, TValue>
+    {
+        public override TValue Create(
+            TParam1 param1, TParam2 param2, TParam3 param3, TParam4 param4)
         {
-            return _container.ValidateObjectGraph(_concreteType, extras);
+            return _container.InstantiateExplicit<TValue>(
+                new List<TypeValuePair>()
+                {
+                    InstantiateUtil.CreateTypePair(param1),
+                    InstantiateUtil.CreateTypePair(param2),
+                    InstantiateUtil.CreateTypePair(param3),
+                    InstantiateUtil.CreateTypePair(param4),
+                });
         }
     }
 }

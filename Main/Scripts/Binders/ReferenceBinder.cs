@@ -172,5 +172,11 @@ namespace ModestTree.Zenject
         {
             return ToProvider(new MonoBehaviourSingletonProvider(typeof(TConcrete), _container, gameObject));
         }
+
+        public BindingConditionSetter ToSingleMethod<TConcrete>(Func<DiContainer, TConcrete> method)
+            where TConcrete : TContract
+        {
+            return ToProvider(_singletonMap.CreateProvider(method));
+        }
     }
 }

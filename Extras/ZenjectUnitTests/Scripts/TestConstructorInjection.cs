@@ -41,7 +41,7 @@ namespace ModestTree.Zenject.Test
             Container.Bind<Test2>().ToSingle();
 
             var val = new Test1();
-            var factory = new Factory<Test2>(Container);
+            var factory = new FactoryUntyped<Test2>(Container);
             var test1 = factory.Create(val);
 
             TestAssert.That(test1.val == val);

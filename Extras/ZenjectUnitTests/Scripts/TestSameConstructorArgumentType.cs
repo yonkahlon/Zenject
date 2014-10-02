@@ -33,10 +33,10 @@ namespace ModestTree.Zenject.Test
             var t1 = new Test2();
             var t2 = new Test2();
 
-            Container.Bind<Factory<Test1>>().ToSingle();
+            Container.Bind<FactoryUntyped<Test1>>().ToSingle();
 
-            TestAssert.That(Container.ValidateResolve<Factory<Test1>>().IsEmpty());
-            var factory = Container.Resolve<Factory<Test1>>();
+            TestAssert.That(Container.ValidateResolve<FactoryUntyped<Test1>>().IsEmpty());
+            var factory = Container.Resolve<FactoryUntyped<Test1>>();
 
             var test = factory.Create(t1, 5.0f, t2);
 

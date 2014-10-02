@@ -3,26 +3,55 @@ using System.Collections.Generic;
 
 namespace ModestTree.Zenject
 {
-    // Instantiate using a delegate
-    public class FactoryMethod<TContract> : IFactory<TContract>
+    // Zero parameters
+    public sealed class FactoryMethod<TValue>
+        : ValidatableFactory<TValue>
     {
-        readonly DiContainer _container;
-        readonly Func<DiContainer, object[], TContract> _method;
+        [Inject]
+        readonly Func<DiContainer, TValue> _method;
 
-        public FactoryMethod(DiContainer container, Func<DiContainer, object[], TContract> method)
+        public override TValue Create()
         {
-            _container = container;
-            _method = method;
+            return _method(_container);
         }
+    }
 
-        public TContract Create(params object[] constructorArgs)
+    // One parameters
+    public sealed class FactoryMethod<TParam1, TValue>
+        : ValidatableFactory<TParam1, TValue>
+    {
+        [Inject]
+        readonly Func<DiContainer, TParam1, TValue> _method;
+
+        public override TValue Create(TParam1 param)
         {
-            return _method(_container, constructorArgs);
+            return _method(_container, param);
         }
+    }
 
-        public IEnumerable<ZenjectResolveException> Validate(params Type[] extras)
+    // Two parameters
+    public sealed class FactoryMethod<TParam1, TParam2, TValue>
+        : ValidatableFactory<TParam1, TParam2, TValue>
+    {
+        [Inject]
+        readonly Func<DiContainer, TParam1, TParam2, TValue> _method;
+
+        public override TValue Create(TParam1 param1, TParam2 param2)
         {
-            yield break;
+            return _method(_container, param1, param2);
+        }
+    }
+
+    // Three parameters
+    public sealed class FactoryMethod<TParam1, TParam2, TParam3, TValue>
+        : ValidatableFactory<TParam1, TParam2, TParam3, TValue>
+    {
+        [Inject]
+        readonly Func<DiContainer, TParam1, TParam2, TParam3, TValue> _method;
+
+        public override TValue Create(TParam1 param1, TParam2 param2, TParam3 param3)
+        {
+            return _method(_container, param1, param2, param3);
         }
     }
 }

@@ -14,14 +14,14 @@ namespace ModestTree.Asteroids
         Settings _settings;
         float _timeToNextSpawn;
         float _timeIntervalBetweenSpawns;
-        IFactory<Asteroid> _asteroidFactory;
+        Asteroid.Factory _asteroidFactory;
         LevelHelper _level;
         bool _started;
         List<Asteroid> _asteroids = new List<Asteroid>();
         Queue<AsteroidAttributes> _cachedAttributes = new Queue<AsteroidAttributes>();
 
         public AsteroidManager(
-            Settings settings, IFactory<Asteroid> asteroidFactory, LevelHelper level)
+            Settings settings, Asteroid.Factory asteroidFactory, LevelHelper level)
         {
             _settings = settings;
             _timeIntervalBetweenSpawns = _settings.maxSpawnTime / (_settings.maxSpawns - _settings.startingSpawns);
