@@ -128,7 +128,7 @@ namespace ModestTree.Zenject
             //where T : GameObjectFactory
             where T : class
         {
-            if (prefab == null && !AllowNullBindings)
+            if (prefab == null)
             {
                 throw new ZenjectBindException(
                     "Null prefab provided to BindGameObjectFactory for type '{0}'".With(typeof(T).Name()));
@@ -229,7 +229,7 @@ namespace ModestTree.Zenject
 
         public BindingConditionSetter BindFactoryForPrefab<TContract>(GameObject prefab) where TContract : Component
         {
-            if (prefab == null && !AllowNullBindings)
+            if (prefab == null)
             {
                 throw new ZenjectBindException(
                     "Null prefab provided to BindFactoryForPrefab for type '{0}'".With(typeof(TContract).Name()));
@@ -319,15 +319,38 @@ namespace ModestTree.Zenject
         {
             var injectCtx = new InjectContext(this);
 
-            foreach (var pair in _providers.Where(x => x.Key.DerivesFrom<IValidatable>() && ignoreTypes.Where(i => x.Key.DerivesFromOrEqual(i)).IsEmpty()))
+            foreach (var pair in _providers)
             {
-                foreach (var provider in pair.Value)
+                if (ignoreTypes.Where(i => pair.Key.DerivesFromOrEqual(i)).Any())
                 {
-                    var factory = (IValidatable)provider.GetInstance(pair.Key, injectCtx);
+                    continue;
+                }
 
-                    foreach (var error in factory.Validate())
+                if (pair.Key.DerivesFrom<IValidatableFactory>())
+                {
+                    foreach (var provider in pair.Value)
                     {
-                        yield return error;
+                        var factory = (IValidatableFactory)provider.GetInstance(pair.Key, injectCtx);
+
+                        var type = factory.ConstructedType;
+                        var providedArgs = factory.ProvidedTypes;
+
+                        foreach (var error in ValidateObjectGraph(type, providedArgs))
+                        {
+                            yield return error;
+                        }
+                    }
+                }
+                else if (pair.Key.DerivesFrom<IValidatable>())
+                {
+                    foreach (var provider in pair.Value)
+                    {
+                        var factory = (IValidatable)provider.GetInstance(pair.Key, injectCtx);
+
+                        foreach (var error in factory.Validate())
+                        {
+                            yield return error;
+                        }
                     }
                 }
             }
