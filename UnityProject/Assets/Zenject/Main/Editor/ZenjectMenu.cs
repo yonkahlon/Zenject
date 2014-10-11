@@ -19,26 +19,19 @@ namespace ModestTree.Zenject
             }
         }
 
-        [MenuItem("Assets/Create/Zenject Global Installer Config")]
+        [MenuItem("Edit/Zenject/Create Global Composition Root")]
         public static void CreateProjectConfig()
         {
             var asset = ScriptableObject.CreateInstance<GlobalInstallerConfig>();
 
-            var path = AssetDatabase.GetAssetPath(Selection.activeObject);
-
-            if (path == "")
+            if (!Directory.Exists(Path.Combine(Directory.GetCurrentDirectory(), "Assets/Resources")))
             {
-                path = "Assets";
-            }
-            else if (Path.GetExtension(path) != "")
-            {
-                path = path.Replace(Path.GetFileName(AssetDatabase.GetAssetPath(Selection.activeObject)), "");
+                AssetDatabase.CreateFolder("Assets", "Resources");
             }
 
-            var assetPathAndName = AssetDatabase.GenerateUniqueAssetPath(path + "/ZenjectGlobalInstallers.asset");
-
-            AssetDatabase.CreateAsset(asset, assetPathAndName);
-            AssetDatabase.SaveAssets();
+            string assetPath = AssetDatabase.GenerateUniqueAssetPath("Assets/Resources/ZenjectGlobalCompositionRoot.asset");
+            AssetDatabase.CreateAsset(asset, assetPath);
+            AssetDatabase.Refresh();
         }
 
         [MenuItem("Edit/Zenject/Validate Current Scene #%v")]

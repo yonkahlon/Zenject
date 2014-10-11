@@ -20,6 +20,7 @@
         * <a href="#itickable">ITickable</a>
         * <a href="#iinitializable-and-postinject">IInitializable and PostInject</a>
         * <a href="#implementing-idisposable">Implementing IDisposable</a>
+        * <a href="#installers">Installers</a>
     * <a href="#zenject-order-of-operations">Zenject Order Of Operations</a>
     * <a href="#di-rules--guidelines--recommendations">Rules / Guidelines / Recommendations</a>
     * Advanced Features
@@ -222,7 +223,7 @@ You can run this example by doing the following:
 * Run
 * Observe unity console for output
 
-The CompositionRoot MonoBehaviour is the entry point of the application, where Zenject sets up all the various dependencies before kicking off your scene.  To add content to your Zenject scene, you need to write what is referred to in Zenject as an 'Installer', which declares all the dependencies used in your scene and their relationships with each other.
+The CompositionRoot MonoBehaviour is the entry point of the application, where Zenject sets up all the various dependencies before kicking off your scene.  To add content to your Zenject scene, you need to write what is referred to in Zenject as an 'Installer', which declares all the dependencies used in your scene and their relationships with each other.  If the above doesn't make sense to you yet, keep reading!
 
 ## <a id="binding"></a>Binding
 
@@ -516,6 +517,49 @@ Then in your installer you can include:
 This works because when the scene changes or your unity application is closed, the unity event OnDestroy() is called on all MonoBehaviours, including the CompositionRoot class, which then triggers all objects that are bound to IDisposable
 
 Note that this example may or may not be a good idea (for example, the file will be left open if your app crashes), but illustrates the point  :)
+
+## <a id="installers"></a>Installers
+
+Often, there is some collection of related bindings for each sub-system and so it makes sense to group those bindings into a re-usable object.  In Zenject this re-usable object is called an Installer.  You can define a new installer as follows:
+
+    public class FooInstaller : MonoInstaller
+    {
+        public override void InstallBindings()
+        {
+            Container.Bind<ITickable>().ToSingle<Foo>();
+            Container.Bind<IInitializable>().ToSingle<Foo>();
+        }
+    }
+
+You add bindings by overriding the InstallBindings method, which is called by the CompositionRoot when your scene starts up.  MonoInstaller is a MonoBehaviour so you can add FooInstaller by attaching it to a GameObject.  Since it is a GameObject you can also add public members to it to configure your installer from the Unity inspector.  However, note that in order for your installer to be used it must be attached to the Installers property of the CompositionRoot object.
+
+In many cases you want to have your installer derive from MonoInstaller.  There is also another base class called Installer which you can use in cases where you do not need it to be a MonoBehaviour.
+
+It can also be nice to use Installer since this allows you to "include" it from another installer. For example:
+
+    public class BarInstaller : Installer
+    {
+        public override void InstallBindings()
+        {
+            ...
+        }
+    }
+
+    public class FooInstaller : MonoInstaller
+    {
+        public override void InstallBindings()
+        {
+            Container.Bind<IInstaller>().ToSingle<BarInstaller>();
+        }
+    }
+
+This way you don't need to have an instance of BarInstaller in your scene in order to use it.  After the CompositionRoot calls InstallBindings it will then instantiate and call any extra installers that have bound to IInstaller.
+
+One of the main reasons we use installers as opposed to just having all our bindings declared all at once for each scene, is to make them re-usable.  So how then do we use the same installer in multiple scenes?
+
+The recommended way of doing this is to use unity prefabs.  After attaching your MonoInstaller to a gameobject in your scene, you can then create a prefab out of it.  This is nice because it allows you to share any configuration that you've done in the inspector on the MonoInstaller across scenes (and also have per-scene overrides if you want)
+
+Installers that simply implement Installer instead of MonoInstaller can be simply bound as described above, to re-use in different scenes.
 
 ## <a id="zenject-order-of-operations"></a>Zenject Order Of Operations
 
@@ -1060,51 +1104,25 @@ However, this approach will not allow you to take advantage of the advanced feat
 
 This all works great for each individual scene, but what if have dependencies that you wish to persist permanently across all scenes?  In Zenject you can do this by adding installers to the global container.
 
+This works by first add a global composition root and then adding installers to it.
 
+defining a list of global installers using an asset in one of the Resources folders in your project.  You can create an empty global composition root by selecting Edit -> Zenject -> Create Global Composition Root.  After selecting this menu item you should see a new asset in the root level Resources folder called 'ZenjectGlobalCompositionRoot'.
+
+If you click on this it will display a property for the list of Installers in the same way that it does for the composition root object that is placed in each scene.  The only difference in this case is that the installers you add here must exist in the project as prefabs and cannot exist in any specific scene.  You can then directly reference those prefabs by dragging them into the Installers property of the global composition root.
+
+Then, when you start any scene, the CompositionRoot for the scene will call the global composition root to install the global bindings, before installing any scene specific bindings.  If you load another scene from the first scene, the global composition root will not be called again and the bindings that it added previously will persist into the new scene.  You can declare ITickable / IInitializable / IDisposable objects in your global installers in the same way you do for your scene installers with the result being IInitializable.Initialize is called only once across each play session and IDisposable.Dispose is only called once the application is fully stopped.
 
 ## <a id="nested-containers"></a>Nested Containers / FallbackProvider
 
-As mentioned above, it is possible to pass dependencies between scenes using `ZenUtil.LoadScene`, so this could allow you to pass the persistent dependencies from one scene to another.  However, a better way might be to use nested containers instead.
+Every DiContainer exposes a FallbackProvider property, which by default is null.  In cases where the container is unable to resolve a dependency, the container will first try using the FallbackProvider before throwing a ZenjectResolveException.
 
-How that might work is to set up a static container singleton with its own container:
+This allows for the ability to define nested sub-containers by executing the following:
 
-    public class StaticContainerWrapper
-    {
-        static DiContainer Container;
+    Container.FallbackProvider = new DiContainerProvider(_nestedContainer);
 
-        static StaticContainerWrapper()
-        {
-            Container = new DiContainer();
+Nested sub-containers can be useful in some rare cases.  For example, if you are creating a word processor it may be useful to have a sub-container for each tab that represents a separate document.  Nested sub-containers is also the way that the Global Composition Root works under the hood.
 
-            Container.Bind<Foo>().ToSingle();
-            ... etc
-        }
-
-        public static DiContainer Container
-        {
-            get
-            {
-                return Container;
-            }
-        }
-    }
-
-Then in your installer for each scene you would just have to configure your scene-specific container to 'fall back' on using the static container:
-
-    public override void InstallBindings()
-    {
-        ...
-
-        Container.FallbackProvider = new DiContainerProvider(StaticContainerWrapper.Container);
-
-        ...
-    }
-
-Now, you can register global dependencies that you want to share across scenes using the static container, and use them as if they are defined in the container specific to each scene.
-
-This works because every DiContainer exposes a FallbackProvider property, which by default is null.  In cases where the container is unable to resolve a dependency, the container will first try using the FallbackProvider before throwing a ZenjectResolveException.
-
-In this example, the fallback provider uses another container to retrieve the requested dependency, however there are other uses for it as well.
+There are other uses for FallbackProvider as well.
 
 For example, if you are writing test code and want to automatically auto-mock missing dependencies, you can do the following:
 
@@ -1137,6 +1155,16 @@ Zenject uses C# reflection which is typically slow, but in Zenject this work is 
 For general troubleshooting / support, please use the google group which you can find [here](https://groups.google.com/forum/#!forum/zenject/).  If you have found a bug, you are also welcome to create an issue on the [github page](https://github.com/modesttree/Zenject), or a pull request if you have a fix / extension.  Finally, you can also email me directly at svermeulen@modesttree.com
 
 ## <a id="release-notes"></a>Release Notes
+
+1.12
+* Added Rebind<> method
+* Changed Factories to use strongly typed parameters by default.  Also added ability to pass in null values as arguments as well as multiple instances of the same type
+* Renamed _container to Container in the installers
+* Added support for Global Composition Root to allow project-wide installers/bindings
+* Added DiContainer.ToSingleMonoBehaviour method
+* Changed to always include the StandardUnityInstaller in the CompositionRoot class.
+* Changed UnityKernel to not be a monobehaviour and receive its update from the UnityDependencyRoot instead
+* Added IFixedTickable class to support unity FixedUpdate method
 
 1.11
 * Removed Fasterflect library to keep Zenject nice and lightweight (it was also causing issues on WP8)
