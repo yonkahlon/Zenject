@@ -15,21 +15,23 @@
         * <a href="#hello-world-example">Hello World Example</a>
         * <a href="#binding">Binding</a>
         * <a href="#optional-binding">Optional Binding</a>
+        * <a href="#list-bindings">List Bindings</a>
         * <a href="#conditional-bindings">Conditional Bindings</a>
-        * <a href="#the-dependency-root">The Dependency Root</a>
         * <a href="#itickable">ITickable</a>
         * <a href="#iinitializable-and-postinject">IInitializable and PostInject</a>
+        * <a href="#implementing-idisposable">Implementing IDisposable</a>
     * <a href="#zenject-order-of-operations">Zenject Order Of Operations</a>
     * <a href="#di-rules--guidelines--recommendations">Rules / Guidelines / Recommendations</a>
     * Advanced Features
         * <a href="#update--initialization-order">Update Order And Initialization Order</a>
-        * <a href="#dynamic-object-graph-validation">Creating Objects Dynamically</a>
+        * <a href="#creating-objects-dynamically">Creating Objects Dynamically</a>
+        * <a href="#custom-factories">Custom Factories</a>
         * <a href="#using-bindscope">Using BindScope</a>
         * <a href="#injecting-data-across-scenes">Injecting Data Across Scenes</a>
         * <a href="#using-the-unity-inspector-to-configure-settings">Using the Unity Inspector To Configure Settings</a>
         * <a href="#object-graph-validation">Object Graph Validation</a>
-        * <a href="#implementing-idisposable">Implementing IDisposable</a>
         * <a href="#auto-mocking-using-moq">Auto-Mocking Using Moq</a>
+        * <a href="#global-bindings">Global Bindings</a>
         * <a href="#visualizing-object-graphs-automatically">Visualizing Object Graph Automatically</a>
     * <a href="#questions">Frequently Asked Questions</a>
         * <a href="#faq-performance">How is Performance?</a>
@@ -59,11 +61,11 @@ For general troubleshooting / support, please use the google group which you can
 * Property injection
 * Conditional Binding Including Named injections (string, enum, etc.)
 * Optional Dependencies
-* Support For Building Dynamic Object Graphs At Runtime
+* Support For Building Dynamic Object Graphs At Runtime Using Factories
 * Auto-Mocking using the Moq library
 * Injection across different Unity scenes
 * Ability to print entire object graph as a UML image automatically
-* Ability to validate object graphs at editor time
+* Ability to validate object graphs at editor time including dynamic object graphs
 * Nested Containers
 
 ## <a id="history"></a>History
@@ -186,12 +188,8 @@ The unit tests may also be helpful to show usage for each specific feature (whic
     {
         public override void InstallBindings()
         {
-            _container.Bind<IDependencyRoot>().ToSingle<DependencyRootStandard>();
-
-            _container.Bind<IInstaller>().ToSingle<StandardUnityInstaller>();
-
-            _container.Bind<ITickable>().ToSingle<TestRunner>();
-            _container.Bind<IInitializable>().ToSingle<TestRunner>();
+            Container.Bind<ITickable>().ToSingle<TestRunner>();
+            Container.Bind<IInitializable>().ToSingle<TestRunner>();
         }
     }
 
@@ -219,12 +217,12 @@ You can run this example by doing the following:
 * Add a new GameObject and name it "CompositionRoot" (though the name does not really matter)
 * Attach the CompositionRoot MonoBehaviour out of Zenject to your new GameObject
 * Add your TestInstaller script to the scene as well (as its own GameObject or on the same GameObject as the CompositionRoot, it doesn't matter)
-* Add a reference to your TestInstaller to the properties of the CompositionRoot by dragging the TestInstaller GameObject to the "Installers" property in the inspector
-* Validate your scene by either selecting Edit -> Zenject -> Validate Current Scene.  (note that this step isn't necessary but good practice to get into)
+* Add a reference to your TestInstaller to the properties of the CompositionRoot by adding a new row in the inspector of the "Installers" property and then dragging the TestInstaller GameObject to it
+* Validate your scene by either selecting Edit -> Zenject -> Validate Current Scene or hitting CTRL+SHIFT+V.  (note that this step isn't necessary but good practice to get into)
 * Run
 * Observe unity console for output
 
-The CompositionRoot MonoBehaviour is the entry point of the application, where Zenject sets up all the various dependencies before kicking off your scene.  To add content to your Zenject scene, you need to write what is referred to in Zenject as an 'Installer'.  Don't worry if this or the above code isn't making sense yet.  We will return to this in a later section.
+The CompositionRoot MonoBehaviour is the entry point of the application, where Zenject sets up all the various dependencies before kicking off your scene.  To add content to your Zenject scene, you need to write what is referred to in Zenject as an 'Installer', which declares all the dependencies used in your scene and their relationships with each other.
 
 ## <a id="binding"></a>Binding
 
@@ -232,58 +230,101 @@ Every dependency injection framework is ultimately just a framework to bind type
 
 In Zenject, dependency mapping is done by adding bindings to something called a container.  The container should then 'know' how to create all the object instances in our application, by recursively resolving all dependencies for a given object.
 
-The format for the bind command can be any of the following:
+When the container is asked to construct an instance of a given type, it uses C# reflection to find the list of constructor arguments, and all fields/properties that are marked with an [Inject] attribute.  It then attempts to resolve each of these required dependencies, which it uses to call the constructor and create the new instance.
 
-Inject by interface.  Note in this case it is injected as a singleton so there will only be one instance of Foo injected into any classes that use it.
+Each Zenject application therefore must tell the container how to resolve each of these dependencies, which is done via Bind commands.  The format for the bind command can be any of the following:
 
-    _container.Bind<IFoo>().ToSingle<Foo>();
+1. **ToSingle** - Inject as singleton
 
-Inject by concrete class.  Note again that it is ToSingle and therefore there will only be one instance of Foo
+        Container.Bind<Foo>().ToSingle();
 
-    _container.Bind<Foo>().ToSingle();
+    When a type is bound using ToSingle this will construct one and only one instance of Foo and use that everywhere that has Foo as a dependency
 
-Inject interface as transient.  In this case a new instance of Foo will be generated each time it is injected.
+    You may also bind the singleton instance to one or more interfaces:
 
-    _container.Bind<IFoo>().ToTransient<Foo>();
+        Container.Bind<IFoo>().ToSingle<Foo>();
+        Container.Bind<IBar>().ToSingle<Foo>();
 
-Inject concrete class as transient.
+    This will cause any dependencies of type IFoo or IBar to use the same instance of Foo.  Of course, Foo must implement both IFoo and IBar for this to compile.  However, with only the above two lines the Foo singleton will not be accessible directly.  You can achieve this by using another line to uses ToSingle directly:
 
-    _container.Bind<Foo>().ToTransient();
+        Container.Bind<Foo>().ToSingle();
+        Container.Bind<IFoo>().ToSingle<Foo>();
+        Container.Bind<IBar>().ToSingle<Foo>();
 
-Inject from unity prefab.  This will instantiate a new instance of the given prefab and inject the same one every time the given monobehaviour class is injected.  Note in this case specifying `FooMonoBehaviour` twice is redundant but necessary
+    Note again that the same instance will be used for all dependencies that take Foo, IFoo, or IBar.
 
-    _container.Bind<FooMonoBehaviour>().ToSingleFromPrefab<FooMonoBehaviour>(PrefabGameObject);
+1. **ToTransient** - Inject as newly created object
 
-A variation on inject from unity prefab injects a new instance of the given prefab every time the given MonoBehaviour class is injected.
+        Container.Bind<Foo>().ToTransient();
 
-    _container.Bind<FooMonoBehaviour>().ToTransientFromPrefab<FooMonoBehaviour>(PrefabGameObject);
+    In this case a new instance of Foo will be generated each time it is injected. Similar to ToSingle, you can bind via an interface as well:
 
-Inject MonoBehaviour. Creates a new game object and attaches FooMonoBehaviour to it:
+        Container.Bind<IFoo>().ToTransient<Foo>();
 
-    _container.Bind<FooMonoBehaviour>().ToSingleGameObject();
+1. **ToSingleFromPrefab** - Inject from unity prefab as singleton
 
-Inject by custom method. You can customize creation logic yourself by defining a method:
+        Container.Bind<FooMonoBehaviour>().ToSingleFromPrefab<FooMonoBehaviour>(PrefabGameObject);
 
-    _container.Bind<IFoo>().ToMethod(SomeMethod);
+    This will instantiate a new instance of the given prefab, and then search the newly created game object for the given component (in this case FooMonoBehaviour).  Note in this case specifying `FooMonoBehaviour` twice is redundant but necessary.
 
-    ...
+    Also, because it is ToSingle it will only instantiate the prefab once, and otherwise use the same instance of FooMonoBehaviour
 
-    public IFoo SomeMethod(DiContainer container)
-    {
+1. **ToTransientFromPrefab** - Inject from unity prefab as newly created object
+
+        Container.Bind<FooMonoBehaviour>().ToTransientFromPrefab<FooMonoBehaviour>(PrefabGameObject);
+
+    This works similar to ToSingleFromPrefab except it will instantiate a new instance of the given prefab every time the dependency is injected.
+
+1.  **ToSingleGameObject** - Inject MonoBehaviour.
+
+        Container.Bind<FooMonoBehaviour>().ToSingleGameObject();
+
+    This binding will create a new game object and attach the given FooMonoBehaviour.  Also note that since it is ToSingle that it will use the same instance everywhere that has FooMonoBehaviour as a dependency
+
+1.  **ToMethod** - Inject using a custom method
+
+    This binding allows you to customize creation logic yourself by defining a method:
+
+        Container.Bind<IFoo>().ToMethod(SomeMethod);
+
         ...
-        return new Foo();
-    }
 
-Inject by getter.  This method can be useful if you want to bind to a property of another object.
+        public IFoo SomeMethod(DiContainer container)
+        {
+            ...
+            return new Foo();
+        }
 
-    _container.Bind<IFoo>().ToSingle<Foo>()
-    _container.Bind<Bar>().ToGetter<IFoo>(x => x.GetBar())
+1.  **ToGetter** - Inject by getter.
 
-Inject many.  You can also bind multiple types to the same interface, with the result being a list of dependencies.  In this case Bar would get a list containing a new instance of Foo1, Foo2, and Foo3:
+    This method can be useful if you want to bind to a property of another object.
 
-    _container.Bind<IFoo>().ToSingle<Foo1>();
-    _container.Bind<IFoo>().ToSingle<Foo2>();
-    _container.Bind<IFoo>().ToSingle<Foo3>();
+        Container.Bind<IFoo>().ToSingle<Foo>()
+        Container.Bind<Bar>().ToGetter<IFoo>(x => x.GetBar())
+
+1.  **ToLookup** - Inject by recursive resolve.
+
+        Container.Bind<IFoo>().ToLookup<IBar>()
+        Container.Bind<IBar>().ToLookup<Foo>()
+
+    In some cases it is useful to be able to bind an interface to another interface.  However, you cannot use ToSingle or ToTransient because they both require concrete types.
+
+    In the example code above we assume that Foo inherits from IBar, which inherits from IFoo.  The result here will be that all dependencies for IFoo will be bound to whatever IBar is bound to (in this case, Foo).
+
+1. **BindValue** - Inject primitive values
+
+        Container.BindValue<float>().To(1.5f);
+        Container.BindValue<int>().To(42);
+
+    Primitive types such as int, float, struct, etc. are treated specially in Zenject.  Note that when binding to primitives you will almost certaintly want to specify the type that the binding is for using `WhenInjectedInto` (described <a href="#conditional-bindings">below</a>).  I'll also add that while it can be useful to inject primitives for configuration settings it is often better to inject a "settings" object instead.  There are other advantages to this approach as well as described <a href="#using-the-unity-inspector-to-configure-settings">here</a>.
+
+## <a id="list-bindings"></a>List Bindings
+
+You can also bind multiple types to the same interface, with the result being a list of dependencies.  In the example code below, Bar would get a list containing a new instance of Foo1, Foo2, and Foo3:
+
+    Container.Bind<IFoo>().ToSingle<Foo1>();
+    Container.Bind<IFoo>().ToSingle<Foo2>();
+    Container.Bind<IFoo>().ToSingle<Foo3>();
 
     ...
 
@@ -295,16 +336,6 @@ Inject many.  You can also bind multiple types to the same interface, with the r
     }
 
 Note that when defining List dependencies, the empty list will result in an error.  If the empty list is valid, then you can suppress the error by marking the List as optional as described <a href="#optional-binding">here</a>.
-
-Inject by lookup.  This can be used to do a recursive look up to bind an interface to a concrete class or another interface.  Can be useful in more rare circumstances
-
-    _container.Bind<Foo>().ToSingleFromPrefab<Foo>(PrefabGameObject);
-    _container.Bind<IFoo>().ToLookup<Foo>();
-
-For primitive types you have to use BindValue instead.  Note that when binding to primitives you will almost certaintly want to specify the type that the binding is for using `WhenInjectedInto` (described <a href="#conditional-bindings">below</a>).  I'll also add that while it can be useful to inject primitives for configuration settings it is often better to inject a "settings" object instead.  There are other advantages to this approach as well as described <a href="#using-the-unity-inspector-to-configure-settings">here</a>.
-
-    _container.BindValue<float>().To(1.5f);
-    _container.BindValue<int>().To(42);
 
 ## <a id="optional-binding"></a>Optional Binding
 
@@ -347,7 +378,7 @@ Note that when declaring dependencies with primitive types as optional, they wil
     ...
 
     // Can leave this commented or not and it will still work
-    // _container.BindValue<int>().To(1);
+    // Container.BindValue<int>().To(1);
 
 ## <a id="conditional-bindings"></a>Conditional Bindings
 
@@ -355,12 +386,12 @@ In many cases you will want to restrict where a given dependency is injected.  Y
 
 Use different implementations of IFoo in different cases:
 
-    _container.Bind<IFoo>().ToSingle<Foo1>().WhenInjectedInto<Bar1>();
-    _container.Bind<IFoo>().ToSingle<Foo2>().WhenInjectedInto<Bar2>();
+    Container.Bind<IFoo>().ToSingle<Foo1>().WhenInjectedInto<Bar1>();
+    Container.Bind<IFoo>().ToSingle<Foo2>().WhenInjectedInto<Bar2>();
 
 Inject by name:
 
-    _container.Bind<IFoo>().ToSingle<Foo>().As("foo");
+    Container.Bind<IFoo>().ToSingle<Foo>().As("foo");
 
     ...
 
@@ -372,7 +403,7 @@ Inject by name:
 
 You can also inject by name and also restrict to only Bar class:
 
-    _container.Bind<IFoo>().ToSingle<Foo>().WhenInjectedInto<Bar2>().As("foo");
+    Container.Bind<IFoo>().ToSingle<Foo>().WhenInjectedInto<Bar2>().As("foo");
 
 Note also that you can name dependencies with any type (and not just string) and that it applies to constructor arguments as well, for example:
 
@@ -393,7 +424,7 @@ Note also that you can name dependencies with any type (and not just string) and
 
 Note that `WhenInjectedInto` is simple shorthand for the following.  You can use the more general `When()` method for more complex conditionals.
 
-    _container.Bind<IFoo>().ToSingle<Foo>().When(context => context.Target == typeof(Bar)).As("foo");
+    Container.Bind<IFoo>().ToSingle<Foo>().When(context => context.Target == typeof(Bar)).As("foo");
 
 The InjectContext class (which is passed as the `context` parameter above) contains the following information that you can use in your conditional:
 
@@ -403,12 +434,6 @@ The InjectContext class (which is passed as the `context` parameter above) conta
 * `object Identifier` - This will be null in most cases and set to whatever is given as a parameter to the [Inject] attribute.  For example, `[Inject("foo")] _foo` will result in `Identifier` being equal to the string "foo".
 * `List<Type> ParentTypes` - This contains the entire object graph that precedes the current class being created.  For example, dependency A might be created, which requires an instance of B, which requires an instance of C.  In this case, the InjectContext given for any fields when creating C will contains the list `{typeof(A), typeof(B)}`.
 * `bool Optional` - True if the [InjectOptional] parameter is declared on the field being injected
-
-## <a id="the-dependency-root"></a>The dependency root
-
-Every Zenject app has one root object.  The dependencies of this object generate the full object graph for the application/game (not including the object graphs that are built into the scene as well as the object graphs that are created dynamically).  In many cases, you can just use DependencyRootStandard for this which just contain the supporting classes that handle ITickable, IInitializable, and IDisposable (described in the next section).  Your binding would then look like this:
-
-    _container.Bind<IDependencyRoot>().ToSingle<DependencyRootStandard>();
 
 ## <a id="itickable"></a>ITickable
 
@@ -426,7 +451,7 @@ For example, if you have code that needs to run per frame, then you can implemen
 
 Then it's just a matter of including the following in one of your installers (as long as you are using DependencyRootStandard or a subclass)
 
-    _container.Bind<ITickable>().ToSingle<Ship>();
+    Container.Bind<ITickable>().ToSingle<Ship>();
 
 Note that the order that Tick() is called on all ITickables is also configurable, as outlined <a href="#update--initialization-order">here</a>.
 
@@ -456,11 +481,41 @@ In these cases you can mark any methods that you want to be called after injecti
 
 This still has the drawback that it is called in the middle of object graph construction, but can be useful in many cases.  In particular, if you are using property injection (which isn't generally recommended but necessary in some cases) then you will not have your dependencies in the constructor, and therefore you will need to define a [PostInject] method in this case.  You will also need to use [PostInject] for MonoBehaviours that you are creating dynamically, since MonoBehaviours cannot have constructors.
 
-Note again that if you do plan to use IInitializable and ITickable as described here that you will need to either bind DependencyRootStandard to IDependencyRoot or a subclass of DependencyRootStandard.  This is because DependencyRootStandard includes the classes responsible for triggering the IInitializable's, ITickable's, and IDisposable's
-
-This also means that you do not need to use this approach at all.  You can use a custom dependency root and handle your own updating and initialization yourself, or simply write all your code in MonoBehaviours, and still receive many of the benefits of Zenject.
-
 In the case where there are multiple [PostInject] methods on a given object, they are called in the order of Base class to Derived class.
+
+## <a id="implementing-idisposable"></a>Implementing IDisposable
+
+If you have external resources that you want to clean up when the app closes, the scene changes, or for whatever reason the composition root object is destroyed, you can do the following:
+
+    public class Logger : IInitializable, IDisposable
+    {
+        FileStream _outStream;
+
+        public void Initialize()
+        {
+            _outStream = File.Open("log.txt", FileMode.Open);
+        }
+
+        public void Log(string msg)
+        {
+            _outStream.WriteLine(msg);
+        }
+
+        public void Dispose()
+        {
+            _outStream.Close();
+        }
+    }
+
+Then in your installer you can include:
+
+    Container.Bind<Logger>().ToSingle();
+    Container.Bind<IInitializable>().ToSingle<Logger>();
+    Container.Bind<IDisposable>().ToSingle<Logger>();
+
+This works because when the scene changes or your unity application is closed, the unity event OnDestroy() is called on all MonoBehaviours, including the CompositionRoot class, which then triggers all objects that are bound to IDisposable
+
+Note that this example may or may not be a good idea (for example, the file will be left open if your app crashes), but illustrates the point  :)
 
 ## <a id="zenject-order-of-operations"></a>Zenject Order Of Operations
 
@@ -469,9 +524,9 @@ A Zenject driven application is executed by the following steps:
 * Composition Root is started (via Unity Awake() method)
 * Composition Root creates a new DiContainer object to be used to contain all instances used in the scene
 * Composition Root iterates through all the Installers that have been added to it via the Unity Inspector, and updates them to point to the new DiContainer.  It then calls InstallBindings() on each installer.
-* Each Installer then registers different sets of dependencies directly on to the given DiContainer by calling one of the Bind<> methods.  Note that the order that this binding occurs does not generally matter. Each installer may also include other installers by binding to the IInstaller interface.  Each installer can also add bindings to configure other installers, however note that in this case order might actually matter, since you will have to make sure that code configuring other installers is executed before the installers that you are configuring! You can control the order by simply re-ordering the Installers property of the CompositionRoot
+* Each Installer then registers different sets of dependencies directly on to the given DiContainer by calling one of the Bind<> methods.  Note that the order that this binding occurs should not generally matter. Each installer may also include other installers by binding to the IInstaller interface.  Each installer can also add bindings to configure other installers, however note that in this case order might actually matter, since you will have to make sure that code configuring other installers is executed before the installers that you are configuring! You can control the order by simply re-ordering the Installers property of the CompositionRoot
 * The Composition Root then traverses the entire scene hierarchy and injects all MonoBehaviours with their dependencies. Since MonoBehaviours are instantiated by Unity we cannot use constructor injection in this case and therefore field or property injection must be used (which is done by adding a [Inject] attribute to any member).  Any methods on these MonoBehaviour's marked with [PostInject] are called at this point as well.
-* After filling in the scene dependencies the Composition Root then retrieves the instance of the root object (that is, whatever is bound to IDependencyRoot).  In most cases code does not need to be in MonoBehaviours and will be resolved as a result of this
+* After filling in the scene dependencies the Composition Root then retrieves the instance of IDependencyRoot, which contains the objects that handle the ITickable/IInitializable/IDisposable interfaces.
 * If any required dependencies cannot be resolved, a ZenjectResolveException is thrown
 * Initialize() is called on all IInitializable objects in the order specified in the installers
 * Unity Start() is called on all built-in MonoBehaviours
@@ -500,22 +555,22 @@ In Zenject, by default, ITickables and IInitializables are updated in the order 
 
         void InitPriorities()
         {
-            _container.Bind<IInstaller>().ToSingle<InitializablePrioritiesInstaller>();
-            _container.Bind<List<Type>>().To(Initializables)
+            Container.Bind<IInstaller>().ToSingle<InitializablePrioritiesInstaller>();
+            Container.Bind<List<Type>>().To(InitializablesOrder)
                 .WhenInjectedInto<InitializablePrioritiesInstaller>();
 
-            _container.Bind<IInstaller>().ToSingle<TickablePrioritiesInstaller>();
-            _container.Bind<List<Type>>().To(Tickables)
+            Container.Bind<IInstaller>().ToSingle<TickablePrioritiesInstaller>();
+            Container.Bind<List<Type>>().To(Tickables)
                 .WhenInjectedInto<TickablePrioritiesInstaller>();
         }
 
-        static List<Type> Initializables = new List<Type>()
+        static List<Type> InitializablesOrder = new List<Type>()
         {
             // Re-arrange this list to control init order
             typeof(GameController),
         };
 
-        static List<Type> Tickables = new List<Type>()
+        static List<Type> TickablesOrder = new List<Type>()
         {
             // Re-arrange this list to control update order
             typeof(AsteroidManager),
@@ -527,25 +582,25 @@ This way, you won't hit a wall at the end of the project due to some unforeseen 
 
 Note also that any ITickables or IInitializables that aren't given an explicit order are updated last.
 
-## <a id="dynamic-object-graph-validation"></a>Creating Objects Dynamically
+## <a id="creating-objects-dynamically"></a>Creating Objects Dynamically
 
-One of the things that often confuses people new to dependency injection is the question of how to create new objects dynamically, after the app/game has fully started up and after the composition root has resolved the dependency root.  For example, if you are writing a game in which you are spawning new enemies throughout the game, then you will want to construct a new object graph for the 'enemy' class.  How to do this?  The answer: Factories.
+One of the things that often confuses people new to dependency injection is the question of how to create new objects dynamically, after the app/game has fully started up and all the IInitializable objects have had their Initialize() method called.  For example, if you are writing a game in which you are spawning new enemies throughout the game, then you will want to construct a new object graph for the 'enemy' class.  How to do this?  The answer: Factories.
 
 Remember that an important part of dependency injection is to reserve use of the container to strictly the "Composition Root Layer".  The container class (DiContainer) is included as a dependency in itself automatically so there is nothing stopping you from ignoring this rule and injecting the container into any classes that you want.  For example, the following code will work:
 
     public class Enemy
     {
-        DiContainer _container;
+        DiContainer Container;
 
         public Enemy(DiContainer container)
         {
-            _container = container;
+            Container = container;
         }
 
         public void Update()
         {
             ...
-            var player = _container.Resolve<Player>();
+            var player = Container.Resolve<Player>();
             WalkTowards(player.Position);
             ...
             etc.
@@ -593,14 +648,30 @@ For example, if you have a class responsible for spawning new enemies, before DI
 
 This will not work however, since in our case the Enemy class requires a reference to the Player class in its constructor.  We could add a dependency to the Player class to the EnemySpawner class, but then we have the problem described <a href="#theory">above</a>.  The EnemySpawner class doesn't care about filling in the dependencies for the Enemy class.  All the EnemySpawner class cares about is getting a new Enemy instance.
 
-There are several ways to handle this case in Zenject.  The first way:
+The recommended way to do this in Zenject is the following:
+
+    public class Enemy
+    {
+        Player _player;
+
+        public Enemy(Player player)
+        {
+            _player = player;
+        }
+
+        ...
+
+        public class Factory : Factory<Enemy>
+        {
+        }
+    }
 
     public class EnemySpawner
     {
-        IFactory<Enemy> _enemyFactory;
+        Enemy.Factory _enemyFactory;
         List<Enemy> _enemies = new List<Enemy>();
 
-        public EnemySpawner(IFactory<Enemy> enemyFactory)
+        public EnemySpawner(Enemy.Factory enemyFactory)
         {
             _enemyFactory = enemyFactory;
         }
@@ -617,13 +688,13 @@ There are several ways to handle this case in Zenject.  The first way:
 
 Then in your installer, you would include:
 
-    _container.BindFactory<Enemy>();
+    Container.Bind<Enemy.Factory>().ToSingle();
 
-Which is simply shorthand for the following:
+By using Enemy.Factory above, all the dependencies for the Enemy class (such as the Player) will be automatically filled in.
 
-    _container.Bind<IFactory<Enemy>>().ToSingle<Factory<Enemy>>();
+There is no requirement that the Enemy.Factory class be a subclass of Enemy, however we have found this to be a very useful convention.  Enemy.Factory is empty and simply derives from the built-in Zenject Factory<> class, which handles the work of using the DiContainer to construct a new instance of Enemy.
 
-Doing it this way, all the dependencies for the Enemy class (such as the Player) will automatically be filled in.
+Also note that by using the built-in Zenject Factory<> class, the Enemy class will be automatically validated as well.  So if the constructor of the Enemy class includes a type that is missing a binding, this error can be caught before running your app, by simply running validation.  Validation can be especially useful for dynamically created objects, because otherwise you may not catch the error until the factory is invoked at some point during runtime.  See <a href="#dynamic-object-graph-validation">this section</a> for more details on Validation.
 
 However, in more complex examples, the EnemySpawner class may wish to pass in custom constructor arguments as well. For example, let's say we want to randomize the speed of each Enemy to add some interesting variation to our game.  Our enemy class becomes:
 
@@ -638,82 +709,17 @@ However, in more complex examples, the EnemySpawner class may wish to pass in cu
             _runSpeed = runSpeed;
         }
 
-        public void Update()
+        public class Factory : Factory<float, Enemy>
         {
-            ...
-            WalkTowards(_player.Position);
-            ...
         }
     }
-
-The first and easiest way would to handle this would be to change the EnemySpawner class to the following:
 
     public class EnemySpawner
     {
-        ...
-        public void Update()
-        {
-            ...
-            var newSpeed = Random.Range(MIN_ENEMY_SPEED, MAX_ENEMY_SPEED);
-            var enemy = _enemyFactory.Create(newSpeed);
-            ...
-        }
-    }
-
-This works because the IFactory<> interface accepts a variable number of arguments.  It will try and intelligently match the given set of arguments to the constructor of the object that its creating.
-
-While this will work, it can be a bit error prone because the arguments that you supply to the `IFactory<Enemy>` class are not validated until run time.  So in some cases you may wish to write a custom factory to wrap the call to IFactory instead:
-
-    public class EnemyFactory
-    {
-        private IFactory<Enemy> _factory;
-
-        public EnemyFactory(DiContainer container)
-        {
-            _factory = new Factory<Enemy>(container);
-        }
-
-        public Enemy Create(float speed)
-        {
-            return _factory.Create(speed);
-        }
-    }
-
-Or alternatively (which would be equivalent):
-
-    public class EnemyFactory
-    {
-        private Instantiator _instantiator;
-
-        public EnemyFactory(Instantiator instantiator)
-        {
-            _instantiator = instantiator;
-        }
-
-        public Enemy Create(float speed)
-        {
-            return _instantiator.Instantiate<Enemy>(speed);
-        }
-    }
-
-
-And then change our installer to include:
-
-    _container.Bind<EnemyFactory>().ToSingle();
-
-Note the following:
-
-* We no longer need the line `_container.BindFactory<Enemy>();` since we are directly creating the Factory<> class in the EnemyFactory constructor (in the first method)
-* We are injecting the DiContainer/Instantiator directly into the EnemyFactory class, which is generally a bad thing to do but ok in this case because it is a factory (and therefore part of the "composition root layer")
-
-Our EnemySpawner class becomes:
-
-    public class EnemySpawner
-    {
-        EnemyFactory _enemyFactory;
+        Enemy.Factory _enemyFactory;
         List<Enemy> _enemies = new List<Enemy>();
 
-        public EnemySpawner(EnemyFactory enemyFactory)
+        public EnemySpawner(Enemy.Factory enemyFactory)
         {
             _enemyFactory = enemyFactory;
         }
@@ -729,9 +735,99 @@ Our EnemySpawner class becomes:
         }
     }
 
+The dynamic parameters that are provided to the Enemy constructor are declared by using generic arguments to the Factory<> base class of Enemy.Factory.  This will add a method to Enemy.Factory that takes the parameters with the given types.
+
+## <a id="custom-factories"></a>Custom Factories
+
+You may also use your own custom factory.  This is often necessary when you want to construct an instance of an interface at runtime.  In this case you do not want to refer to a concrete factory class (eg. Enemy.Factory) as described above.
+
+    public enum Difficulties
+    {
+        Easy,
+        Hard,
+    }
+
+    public interface IEnemy
+    {
+        ...
+    }
+
+    public class Demon : IEnemy
+    {
+        ...
+    }
+
+    public class Dog : IEnemy
+    {
+        ...
+    }
+
+    public class EnemyFactory
+    {
+        DiContainer _container;
+        Difficulties _difficulty;
+
+        public EnemyFactory(DiContainer container, Difficulties difficulty)
+        {
+            _container = container;
+            _difficulty = difficulty;
+        }
+
+        public IEnemy Create(float speed)
+        {
+            if (_difficulty == Difficulties.Hard)
+            {
+                return _container.Instantiate<Demon>(speed);
+            }
+
+            return _container.Instantiate<Dog>(speed);
+        }
+    }
+
+And then in our installer we would include:
+
+    Container.Bind<EnemyFactory>().ToSingle();
+    Container.BindValue<Difficulties>().To(Difficulties.Easy);
+
+This way we can change the type of enemy we spawn by simply changing the difficulty bound in the installer.
+
+One issue with the above implementation is that it will not be validated properly.  Any constructor parameters added to the Dog or Demon classes that cannot be resolved will not be detected until runtime.  If you wish to address this you can implement it the following way:
+
+    public class EnemyFactory : IValidatable
+    {
+        DiContainer _container;
+        Difficulties _difficulty;
+
+        public EnemyFactory(DiContainer container, Difficulties difficulty)
+        {
+            _container = container;
+            _difficulty = difficulty;
+        }
+
+        public IEnemy Create(float speed)
+        {
+            if (_difficulty == Difficulties.Hard)
+            {
+                return _container.Instantiate<Demon>(speed);
+            }
+
+            return _container.Instantiate<Dog>(speed);
+        }
+
+        public IEnumerable<ZenjectResolveException> Validate()
+        {
+            return _container.ValidateObjectGraph<Dog>(typeof(float))
+                .Concat(_container.ValidateObjectGraph<Demon>(typeof(float)));
+        }
+    }
+
+This is optional but can be nice if you are fan of validation.  The parameters provided to the ValidateObjectGraph method indicate the dependencies that can be skipped for validation.  This should include any runtime parameters.
+
+Note that we are injecting the DiContainer directly into the EnemyFactory class, which is generally a bad thing to do but ok in this case because it is a factory (and therefore part of the "composition root layer")
+
 ## <a id="using-bindscope"></a>Using BindScope
 
-Right now, the difference between using our custom factory vs simply IFactory directly isn't very much.  However, there may be more complicated construction scenarios in the real world where the value of this approach would be more clear.
+In the real world there can sometimes be complex construction that needs to occur in your custom factory classes.  In some of these cases it can be useful to use a feature called BindScope.
 
 For example, suppose one day we decide to add further runtime constructor arguments to the Enemy class:
 
@@ -755,24 +851,24 @@ And let's say we want the damage of the EnemyWeapon class to be specified by the
 
     public class EnemyFactory
     {
-        private Instantiator _instantiator;
+        DiContainer _container;
 
-        public EnemyFactory(Instantiator instantiator)
+        public EnemyFactory(DiContainer container)
         {
-            _instantiator = instantiator;
+            _container = container;
         }
 
         public Enemy Create(float weaponDamage)
         {
-            using (BindScope scope = _container.CreateScope())
+            using (BindScope scope = Container.CreateScope())
             {
                 scope.Bind<float>().ToSingle(weaponDamage).WhenInjectedInto<EnemyWeapon>();
-                return _factory.Create();
+                return _container.Instantiate<Enemy>();
             }
         }
     }
 
-BindScope can be used in factories to temporarily configure the container in a similar way that's done in installers.  This can be useful when creating complex object graphs at runtime.  After the function returns, whatever bindings you added in the using{} block are automatically removed.  BindScope can also be used to specify injection identifiers as well (which can be less error prone than passing extra parameters as variable arguments to IFactory).  Using object identifiers may be necessary for example, if the Enemy class took multiple float arguments, in which case BindScope would be necessary as well
+BindScope can be used in factories to temporarily configure the container in a similar way that's done in installers.  This can be useful when creating complex object graphs at runtime.  After the function returns, whatever bindings you added in the using{} block are automatically removed.  BindScope can also be used to specify injection identifiers as well.
 
 ## <a id="injecting-data-across-scenes"></a>Injecting data across scenes
 
@@ -817,7 +913,7 @@ You can load the scene containing `LessonStandaloneStart` and specify a particul
 
 Note that you can still run the scene directly, in which case it will default to using "level01".  This is possible because we are using the InjectOptional flag.
 
-An alternative way to do this would be to customize the installer itself rather than the LevelHandler class.  In this case we can write our LevelHandler class like this (without the [InjectOptional] flag)
+An alternative and arguably cleaner way to do this would be to customize the installer itself rather than the LevelHandler class.  In this case we can write our LevelHandler class like this (without the [InjectOptional] flag)
 
     public class LevelHandler : IInitializable
     {
@@ -840,7 +936,6 @@ Then, in the installer for our scene we can include the following:
 
     public class GameInstaller : Installer
     {
-        [Inject("LevelName")]
         [InjectOptional]
         public string LevelName = "default_level";
 
@@ -849,7 +944,7 @@ Then, in the installer for our scene we can include the following:
         public override void InstallBindings()
         {
             ...
-            _container.Bind<string>().To(LevelName).WhenInjectedInto<LevelHandler>();
+            Container.Bind<string>().To(LevelName).WhenInjectedInto<LevelHandler>();
             ...
         }
     }
@@ -859,10 +954,10 @@ Then, instead of injecting directly into the LevelHandler we can inject into the
     ZenUtil.LoadScene("NameOfSceneToLoad",
         delegate (DiContainer container)
         {
-            container.Bind<string>().To("level02").WhenInjectedInto<GameInstaller>().As("LevelName");
+            container.Bind<string>().To("level02").WhenInjectedInto<GameInstaller>();
         });
 
-Note that in this case I didn't need to use the "LevelName" identifier since there is only one string injected into the GameInstaller class, however I find it's sometimes nice to be explicit.
+Note that in this case I didn't need to use the "LevelName" identifier since there is only one string injected into the GameInstaller class.
 
 Some people have also found it useful to separate out content into different scenes and then load each scene additively using the Unity method `Application.LoadLevelAdditive`.  In some cases it's useful to have the dependencies in the new scene resolved using the container of the original scene.  To achieve this, you can call `ZenUtil.LoadSceneAdditiveWithContainer` and pass in your scene's container.  Note however that it is assumed in this case that the new scene does not have its own container + Composition Root.
 
@@ -877,7 +972,7 @@ One implication of writing most of your code as normal C# classes instead of Mon
         public override void InstallBindings()
         {
             ...
-            _container.Bind<ShipStateMoving.Settings>().ToSingle(SceneSettings.StateMoving);
+            Container.Bind<ShipStateMoving.Settings>().ToSingle(SceneSettings.StateMoving);
             ...
         }
 
@@ -904,66 +999,11 @@ The usual workflow when setting up bindings using a DI framework is something li
 * Modify your bindings to address problem
 * Repeat
 
-This works ok for small projects, but as the complexity of your project grows it is often a tedious process.  The problem gets worse if the startup time of your application is particularly bad.  What would be great is some tool to analyze your object graph and tell you exactly where all the missing bindings are, without requiring the cost of firing up your whole app.
+This works ok for small projects, but as the complexity of your project grows it is often a tedious process.  The problem gets worse if the startup time of your application is particularly bad, or when the resolve errors only occur from factories at various points at runtime.  What would be great is some tool to analyze your object graph and tell you exactly where all the missing bindings are, without requiring the cost of firing up your whole app.
 
 You can do this in Zenject out-of-the-box by executing the menu item `Edit -> Zenject -> Validate Current Scene` or simply hitting CTRL+SHIFT+V with the scene open that you want to validate.  This will execute all installers for the current scene and construct a fully bound container.   It will then iterate through the object graphs and verify that all bindings can be found (without actually instantiating any of them).
 
 Also, if you happen to be a fan of automated testing (as I am) then you can include calls to this menu item as part of your testing suite.
-
-## <a id="dynamic-object-graph-validation"></a>Dynamic Object Graph Validation
-
-The above approach great for dependencies that are attached to the dependency root, as well as any dependencies that are attached to any MonoBehaviour's that are saved into the scene, but what about classes that are instantiated at runtime via factories?  How do you validate those object graphs?
-
-If you want to be thorough (and I recommend it) then you can include these object graphs as well, by overriding an extra method in your installers to declare these object graphs.  For example, in the sample project, we define the following:
-
-    public class AsteroidsInstaller : MonoInstaller
-    {
-        ...
-        public override IEnumerable<ZenjectResolveException> ValidateSubGraphs()
-        {
-            return Validate<Asteroid>().Concat(
-                   Validate<ShipStateDead>(typeof(Ship))).Concat(
-                   Validate<ShipStateMoving>(typeof(Ship))).Concat(
-                   Validate<ShipStateWaitingToStart>(typeof(Ship)));
-        }
-        ...
-    }
-
-This information is used when validating to cover the dynamic object graphs.  Note that in many cases the dynamically created object will get all of its required dependencies out of the container, but in some cases the dependencies will be provided manually, as extra parameters to `[Factory].Create()` (for eg. the ship state classes above).  In these cases you need to tell Zenject to ignore these dependencies for validation by passing in a list of types.
-
-## <a id="implementing-idisposable"></a>Implementing IDisposable
-
-If you have external resources that you want to clean up when the app closes, the scene changes, or for whatever reason the composition root object is destroyed, you can do the following:
-
-    public class Logger : IInitializable, IDisposable
-    {
-        FileStream _outStream;
-
-        public void Initialize()
-        {
-            _outStream = File.Open("log.txt", FileMode.Open);
-        }
-
-        public void Log(string msg)
-        {
-            _outStream.WriteLine(msg);
-        }
-
-        public void Dispose()
-        {
-            _outStream.Close();
-        }
-    }
-
-Then in your installer you can include:
-
-    _container.Bind<Logger>().ToSingle();
-    _container.Bind<IInitializable>().ToSingle<Logger>();
-    _container.Bind<IDisposable>().ToSingle<Logger>();
-
-This works because when the scene changes or your unity application is closed, the unity event OnDestroy() is called on all MonoBehaviours, including the CompositionRoot class, which then triggers all objects that are bound to IDisposable
-
-Note that this example may or may not be a good idea (for example, the file will be left open if your app crashes), but illustrates the point  :)
 
 ## <a id="auto-mocking-using-moq"></a>Auto-Mocking using Moq
 
@@ -1002,7 +1042,7 @@ However, if we create a mock class for IWebServer then we can address all these 
 
 Then hook it up in our installer:
 
-    _container.Bind<IWebServer>().ToSingle<MockWebServer>();
+    Container.Bind<IWebServer>().ToSingle<MockWebServer>();
 
 Then you can implement the fields of the IWebServer interface and configure them based on what you want to test on Foo. Hopefully You can see how this can make life when writing tests much easier.
 
@@ -1012,13 +1052,17 @@ Note that by default, Auto-mocking is not enabled in Zenject.  If you wish to us
 
 After extracting the auto mocking package it is just a matter of using the following syntax to mock out various parts of your project:
 
-    _container.Bind<IFoo>().ToMock();
+    Container.Bind<IFoo>().ToMock();
 
 However, this approach will not allow you to take advantage of the advanced features of Moq.  For more advanced usages, see the documentation for Moq
 
-## <a id="nested-containers"></a>Nested Containers / FallbackProvider
+## <a id="global-bindings"></a>Global Bindings
 
-This all works great for each individual scene, but what if have dependencies that you wish to persist across scenes?  Is there a way to do that?
+This all works great for each individual scene, but what if have dependencies that you wish to persist permanently across all scenes?  In Zenject you can do this by adding installers to the global container.
+
+
+
+## <a id="nested-containers"></a>Nested Containers / FallbackProvider
 
 As mentioned above, it is possible to pass dependencies between scenes using `ZenUtil.LoadScene`, so this could allow you to pass the persistent dependencies from one scene to another.  However, a better way might be to use nested containers instead.
 
@@ -1026,13 +1070,13 @@ How that might work is to set up a static container singleton with its own conta
 
     public class StaticContainerWrapper
     {
-        static DiContainer _container;
+        static DiContainer Container;
 
         static StaticContainerWrapper()
         {
-            _container = new DiContainer();
+            Container = new DiContainer();
 
-            _container.Bind<Foo>().ToSingle();
+            Container.Bind<Foo>().ToSingle();
             ... etc
         }
 
@@ -1040,7 +1084,7 @@ How that might work is to set up a static container singleton with its own conta
         {
             get
             {
-                return _container;
+                return Container;
             }
         }
     }
@@ -1051,7 +1095,7 @@ Then in your installer for each scene you would just have to configure your scen
     {
         ...
 
-        _container.FallbackProvider = new DiContainerProvider(StaticContainerWrapper.Container);
+        Container.FallbackProvider = new DiContainerProvider(StaticContainerWrapper.Container);
 
         ...
     }
@@ -1064,7 +1108,7 @@ In this example, the fallback provider uses another container to retrieve the re
 
 For example, if you are writing test code and want to automatically auto-mock missing dependencies, you can do the following:
 
-    _container.FallbackProvider = new TransientMockProvider(_container);
+    Container.FallbackProvider = new TransientMockProvider(Container);
 
 Or, perhaps you wish to write custom logic to handle cases of missing dependencies.  You can do that as well, by writing a custom "Provider" class and setting it to be used as the FallbackProvider
 
