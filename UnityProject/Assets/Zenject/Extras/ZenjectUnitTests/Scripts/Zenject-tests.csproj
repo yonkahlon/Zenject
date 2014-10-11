@@ -48,6 +48,15 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\Main\Scripts\Zenject.csproj">
+      <Project>{46f25a62-2e29-48cb-95f3-bdbcb0976ddc}</Project>
+      <Name>Zenject</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Properties\" />
+  </ItemGroup>
+  <ItemGroup>
     <Compile Include="TestAllInjectionTypes.cs" />
     <Compile Include="TestBaseClassPropertyInjection.cs" />
     <Compile Include="TestBindScope.cs" />
@@ -61,7 +70,8 @@
     <Compile Include="TestConstructorInjection.cs" />
     <Compile Include="TestDiContainer.cs" />
     <Compile Include="TestDuplicateInjection.cs" />
-    <Compile Include="TestFactoryTyped.cs" />
+    <Compile Include="TestFactory.cs" />
+    <Compile Include="TestFactoryNullArgs.cs" />
     <Compile Include="TestGenericContract.cs" />
     <Compile Include="TestListInjection.cs" />
     <Compile Include="TestMoq.cs" />
@@ -89,15 +99,6 @@
     <Compile Include="TestValidateInstaller.cs" />
     <Compile Include="TestWithContainer.cs" />
     <Compile Include="ZenjectProfileTest.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\..\Main\Scripts\Zenject.csproj">
-      <Project>{46f25a62-2e29-48cb-95f3-bdbcb0976ddc}</Project>
-      <Name>Zenject</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Properties\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
