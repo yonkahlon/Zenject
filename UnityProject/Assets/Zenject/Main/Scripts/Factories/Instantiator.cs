@@ -24,7 +24,7 @@ namespace ModestTree.Zenject
             Type concreteType, params object[] extraArgs)
         {
             Assert.That(!extraArgs.Contains(null),
-                "Null value given to factory constructor arguments. In order to use null use InstantiateExplicit");
+                "Null value given to factory constructor arguments when instantiating object with type '{0}'. In order to use null use InstantiateExplicit", concreteType);
 
             return InstantiateExplicit(
                 concreteType, InstantiateUtil.CreateTypeValueList(extraArgs));

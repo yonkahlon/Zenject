@@ -124,8 +124,7 @@ namespace ModestTree.Zenject
         // Note: Here we assume that the contract is a component on the given prefab
         public BindingConditionSetter ToSingleFromPrefab<TConcrete>(GameObject prefab) where TConcrete : Component, TContract
         {
-            // We have to cast to object otherwise we get SecurityExceptions when this function is run outside of unity
-            if (UnityUtil.IsNull(prefab) && !_container.AllowNullBindings)
+            if (UnityUtil.IsNull(prefab))
             {
                 throw new ZenjectBindException("Received null prefab while binding type '{0}'".With(typeof(TConcrete).Name()));
             }
@@ -137,7 +136,7 @@ namespace ModestTree.Zenject
         public BindingConditionSetter ToTransientFromPrefab<TConcrete>(GameObject prefab) where TConcrete : Component, TContract
         {
             // We have to cast to object otherwise we get SecurityExceptions when this function is run outside of unity
-            if (UnityUtil.IsNull(prefab) && !_container.AllowNullBindings)
+            if (UnityUtil.IsNull(prefab))
             {
                 throw new ZenjectBindException("Received null prefab while binding type '{0}'".With(typeof(TConcrete).Name()));
             }
