@@ -326,31 +326,51 @@ namespace ModestTree.Zenject
                     continue;
                 }
 
+                List<ProviderBase> validatableFactoryProviders;
+
                 if (pair.Key.DerivesFrom<IValidatableFactory>())
                 {
-                    foreach (var provider in pair.Value)
+                    validatableFactoryProviders = pair.Value;
+                }
+                else
+                {
+                    validatableFactoryProviders = pair.Value.Where(x => x.GetInstanceType().DerivesFrom<IValidatableFactory>()).ToList();
+                }
+
+                foreach (var provider in validatableFactoryProviders)
+                {
+                    var factory = (IValidatableFactory)provider.GetInstance(pair.Key, injectCtx);
+
+                    var type = factory.ConstructedType;
+                    var providedArgs = factory.ProvidedTypes;
+
+                    foreach (var error in ValidateObjectGraph(type, providedArgs))
                     {
-                        var factory = (IValidatableFactory)provider.GetInstance(pair.Key, injectCtx);
-
-                        var type = factory.ConstructedType;
-                        var providedArgs = factory.ProvidedTypes;
-
-                        foreach (var error in ValidateObjectGraph(type, providedArgs))
-                        {
-                            yield return error;
-                        }
+                        yield return error;
                     }
                 }
-                else if (pair.Key.DerivesFrom<IValidatable>())
-                {
-                    foreach (var provider in pair.Value)
-                    {
-                        var factory = (IValidatable)provider.GetInstance(pair.Key, injectCtx);
 
-                        foreach (var error in factory.Validate())
-                        {
-                            yield return error;
-                        }
+                List<ProviderBase> validatableProviders;
+
+                if (pair.Key.DerivesFrom<IValidatable>())
+                {
+                    validatableProviders = pair.Value;
+                }
+                else
+                {
+                    validatableProviders = pair.Value.Where(x => x.GetInstanceType().DerivesFrom<IValidatable>()).ToList();
+                }
+
+                Assert.That(validatableFactoryProviders.Intersect(validatableProviders).IsEmpty(),
+                    "Found provider implementing both IValidatable and IValidatableFactory.  This is not allowed.");
+
+                foreach (var provider in validatableProviders)
+                {
+                    var factory = (IValidatable)provider.GetInstance(pair.Key, injectCtx);
+
+                    foreach (var error in factory.Validate())
+                    {
+                        yield return error;
                     }
                 }
             }
