@@ -1,3 +1,6 @@
+// Ignore the fact that we don't use _dependencyRoot
+#pragma warning disable 414
+
 using System;
 using System.Collections.Generic;
 using UnityEngine;
