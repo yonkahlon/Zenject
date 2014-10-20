@@ -76,7 +76,7 @@ namespace ModestTree.Zenject
 
         static IEnumerable<IInstaller> GetGlobalInstallers()
         {
-            var installerConfig = (GlobalInstallerConfig)Resources.Load("ZenjectGlobalInstallers", typeof(GlobalInstallerConfig));
+            var installerConfig = (GlobalInstallerConfig)Resources.Load("ZenjectGlobalCompositionRoot", typeof(GlobalInstallerConfig));
 
             if (installerConfig == null)
             {
