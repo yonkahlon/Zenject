@@ -4,7 +4,7 @@ using ModestTree.Zenject;
 using NUnit.Framework;
 using TestAssert=NUnit.Framework.Assert;
 
-namespace ModestTree.Zenject.Test
+namespace ModestTree.Tests.Zenject
 {
     [TestFixture]
     public class TestBothInterfaceAndConcreteBoundToSameSingleton : TestWithContainer

@@ -5,7 +5,7 @@ using NUnit.Framework;
 using TestAssert=NUnit.Framework.Assert;
 using System.Linq;
 
-namespace ModestTree.Zenject.Test
+namespace ModestTree.Tests.Zenject
 {
     [TestFixture]
     public class TestConditionsIdentifier : TestWithContainer
@@ -26,7 +26,7 @@ namespace ModestTree.Zenject.Test
         class Test2
         {
             [Inject("foo")]
-            Test0 name2;
+            public Test0 name2 = null;
         }
 
         public override void Setup()

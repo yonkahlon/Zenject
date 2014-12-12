@@ -5,7 +5,7 @@ using NUnit.Framework;
 using TestAssert=NUnit.Framework.Assert;
 using System.Linq;
 
-namespace ModestTree.Zenject.Test
+namespace ModestTree.Tests.Zenject
 {
     [TestFixture]
     public class TestCircularDependencies : TestWithContainer
@@ -23,7 +23,6 @@ namespace ModestTree.Zenject.Test
         }
 
         [Test]
-        [ExpectedException]
         public void Test()
         {
             Container.Bind<Test1>().ToSingle();
@@ -31,8 +30,6 @@ namespace ModestTree.Zenject.Test
 
             TestAssert.Throws<ZenjectResolveException>(
                 delegate { Container.Resolve<Test2>(); });
-
-            TestAssert.That(Container.ValidateResolve<Test2>().Any());
         }
     }
 }

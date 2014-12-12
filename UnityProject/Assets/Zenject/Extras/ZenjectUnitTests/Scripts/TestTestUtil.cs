@@ -6,7 +6,7 @@ using ModestTree.Tests;
 using TestAssert=NUnit.Framework.Assert;
 using System.Linq;
 
-namespace ModestTree.Zenject.Test
+namespace ModestTree.Tests.Zenject
 {
     [TestFixture]
     public class TestTestUtil
@@ -14,19 +14,19 @@ namespace ModestTree.Zenject.Test
         [Test]
         public void TestTrue()
         {
-            TestAssert.IsTrue(TestUtil.ContainSameElements(
+            TestAssert.IsTrue(TestListComparer.ContainSameElements(
                 new List<int> {1},
                 new List<int> {1}));
 
-            TestAssert.IsTrue(TestUtil.ContainSameElements(
+            TestAssert.IsTrue(TestListComparer.ContainSameElements(
                 new List<int> {1, 2},
                 new List<int> {2, 1}));
 
-            TestAssert.IsTrue(TestUtil.ContainSameElements(
+            TestAssert.IsTrue(TestListComparer.ContainSameElements(
                 new List<int> {1, 2, 3},
                 new List<int> {3, 2, 1}));
 
-            TestAssert.IsTrue(TestUtil.ContainSameElements(
+            TestAssert.IsTrue(TestListComparer.ContainSameElements(
                 new List<int> {},
                 new List<int> {}));
         }
@@ -34,11 +34,11 @@ namespace ModestTree.Zenject.Test
         [Test]
         public void TestFalse()
         {
-            TestAssert.IsFalse(TestUtil.ContainSameElements(
+            TestAssert.IsFalse(TestListComparer.ContainSameElements(
                 new List<int> {1, 2, 3},
                 new List<int> {3, 2, 3}));
 
-            TestAssert.IsFalse(TestUtil.ContainSameElements(
+            TestAssert.IsFalse(TestListComparer.ContainSameElements(
                 new List<int> {1, 2},
                 new List<int> {1, 2, 3}));
         }

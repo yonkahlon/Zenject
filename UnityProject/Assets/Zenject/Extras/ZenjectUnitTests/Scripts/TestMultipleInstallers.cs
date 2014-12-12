@@ -1,7 +1,7 @@
 using System;
 using ModestTree.Zenject;
 using NUnit.Framework;
-using ModestTree.Zenject.Test;
+using ModestTree.Tests.Zenject;
 using TestAssert=NUnit.Framework.Assert;
 
 namespace ModestTree.Tests

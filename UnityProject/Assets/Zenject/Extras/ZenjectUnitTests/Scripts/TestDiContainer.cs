@@ -6,7 +6,7 @@ using ModestTree.Tests;
 using TestAssert=NUnit.Framework.Assert;
 using System.Linq;
 
-namespace ModestTree.Zenject.Test
+namespace ModestTree.Tests.Zenject
 {
     [TestFixture]
     public class TestDiContainer
@@ -38,9 +38,9 @@ namespace ModestTree.Zenject.Test
             var expectedList = GetStandardTypeInclusions().Concat(expectedValues).ToList();
 
             TestAssert.That(
-                TestUtil.ContainSameElements(
+                TestListComparer.ContainSameElements(
                     concreteList, expectedList),
-                    "Unexpected list: " + TestUtil.PrintList(concreteList) + "\nExpected: " + TestUtil.PrintList(expectedList));
+                    "Unexpected list: " + TestListComparer.PrintList(concreteList) + "\nExpected: " + TestListComparer.PrintList(expectedList));
         }
 
         void AssertHasContracts(IEnumerable<Type> expectedValues)
@@ -49,9 +49,9 @@ namespace ModestTree.Zenject.Test
             var expectedList = GetStandardTypeInclusions().Concat(expectedValues).ToList();
 
             TestAssert.That(
-                TestUtil.ContainSameElements(
+                TestListComparer.ContainSameElements(
                     contractList, expectedList),
-                    "Unexpected list: " + TestUtil.PrintList(contractList) + "\nExpected: " + TestUtil.PrintList(expectedList));
+                    "Unexpected list: " + TestListComparer.PrintList(contractList) + "\nExpected: " + TestListComparer.PrintList(expectedList));
         }
 
         List<Type> GetStandardTypeInclusions()

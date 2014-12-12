@@ -3,7 +3,7 @@ using NUnit.Framework;
 using TestAssert=NUnit.Framework.Assert;
 //using Moq;
 
-namespace ModestTree.Zenject.Test
+namespace ModestTree.Tests.Zenject
 {
     [TestFixture]
     public class TestMoq
