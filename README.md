@@ -1259,12 +1259,15 @@ For general troubleshooting / support, please use the google group which you can
 
 ## <a id="release-notes"></a>Release Notes
 
-1.13
+1.14
 * Added flag to CompositionRoot for whether to inject into inactive game objects or ignore them completely
 * Added BindAllInterfacesToSingle method to DiContainer
 * Changed to call PostInject[] on children first when instantiating from prefab
 * Added ILateTickable interface, which works just like ITickable or IFixedTickable for unity's LateUpdate event
 * Added support for 'decorators', which can be used to add dependencies to another scene
+
+1.13
+Minor bug fix to global composition root.  Also fixed a few compiler warnings.
 
 1.12
 * Added Rebind<> method
