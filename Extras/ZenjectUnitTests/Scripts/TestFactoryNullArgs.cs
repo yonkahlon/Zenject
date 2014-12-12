@@ -52,10 +52,10 @@ namespace ModestTree.Zenject.Test
         class Test2 : ITest
         {
             [Inject]
-            public Foo Foo;
+            public Foo Foo = null;
 
             [Inject]
-            public Bar Bar;
+            public Bar Bar = null;
 
             public class Factory : Factory<Bar, Test2>
             {
@@ -90,13 +90,13 @@ namespace ModestTree.Zenject.Test
         class Test3 : ITest
         {
             [Inject]
-            public Foo Foo1;
+            public Foo Foo1 = null;
 
             [Inject]
-            public Foo Foo2;
+            public Foo Foo2 = null;
 
             [Inject]
-            public Foo Foo3;
+            public Foo Foo3 = null;
 
             public class Factory : Factory<Foo, Foo, Foo, Test3>
             {

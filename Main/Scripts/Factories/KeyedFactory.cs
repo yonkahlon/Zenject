@@ -8,17 +8,17 @@ namespace ModestTree.Zenject
     public abstract class KeyedFactoryBase<TBase, TKey> : IValidatable
     {
         [Inject]
-        readonly DiContainer _container;
+        readonly DiContainer _container = null;
 
         [Inject]
         [InjectOptional]
-        readonly List<Tuple<TKey, Type>> _typePairs;
+        readonly List<Tuple<TKey, Type>> _typePairs = null;
 
         Dictionary<TKey, Type> _typeMap;
 
         [Inject]
         [InjectOptional]
-        readonly Type _fallbackType;
+        readonly Type _fallbackType = null;
 
         protected DiContainer Container
         {
@@ -41,6 +41,11 @@ namespace ModestTree.Zenject
 
             _typeMap = _typePairs.ToDictionary(x => x.First, x => x.Second);
             _typePairs.Clear();
+        }
+
+        public bool HasKey(TKey key)
+        {
+            return _typeMap.ContainsKey(key);
         }
 
         public Type GetMapping(TKey key)

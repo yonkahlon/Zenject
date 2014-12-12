@@ -37,8 +37,11 @@ namespace ModestTree
 
             foreach (var obj in contentsAsObj)
             {
-                Assert.That(elementType.IsAssignableFrom(obj.GetType()),
-                    "Wrong type when creating generic list, expected something assignable from '"+ elementType +"', but found '" + obj.GetType() + "'");
+                if (obj != null)
+                {
+                    Assert.That(elementType.IsAssignableFrom(obj.GetType()),
+                        "Wrong type when creating generic list, expected something assignable from '"+ elementType +"', but found '" + obj.GetType() + "'");
+                }
 
                 list.Add(obj);
             }

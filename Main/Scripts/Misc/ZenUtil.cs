@@ -13,26 +13,57 @@ namespace ModestTree.Zenject
     {
         public static void LoadScene(string levelName)
         {
-            ZenUtil.LoadScene(levelName, null);
+            LoadSceneInternal(levelName, false, null, null);
+        }
+
+        public static void LoadScene(string levelName, Action<DiContainer> preBindings)
+        {
+            LoadSceneInternal(levelName, false, preBindings, null);
         }
 
         public static void LoadScene(
-            string levelName, Action<DiContainer> extraBindings)
+            string levelName, Action<DiContainer> preBindings, Action<DiContainer> postBindings)
         {
-            CompositionRoot.ExtraBindingsLookup += extraBindings;
-            Application.LoadLevel(levelName);
+            LoadSceneInternal(levelName, false, preBindings, postBindings);
         }
 
         public static void LoadSceneAdditive(string levelName)
         {
-            LoadSceneAdditive(levelName, null);
+            LoadSceneInternal(levelName, true, null, null);
+        }
+
+        public static void LoadSceneAdditive(string levelName, Action<DiContainer> preBindings)
+        {
+            LoadSceneInternal(levelName, true, preBindings, null);
         }
 
         public static void LoadSceneAdditive(
-            string levelName, Action<DiContainer> extraBindings)
+            string levelName, Action<DiContainer> preBindings, Action<DiContainer> postBindings)
         {
-            CompositionRoot.ExtraBindingsLookup += extraBindings;
-            Application.LoadLevelAdditive(levelName);
+            LoadSceneInternal(levelName, true, preBindings, postBindings);
+        }
+
+        static void LoadSceneInternal(
+            string levelName, bool isAdditive, Action<DiContainer> preBindings, Action<DiContainer> postBindings)
+        {
+            if (preBindings != null)
+            {
+                CompositionRoot.BeforeInstallHooks += preBindings;
+            }
+
+            if (postBindings != null)
+            {
+                CompositionRoot.AfterInstallHooks += postBindings;
+            }
+
+            if (isAdditive)
+            {
+                Application.LoadLevelAdditive(levelName);
+            }
+            else
+            {
+                Application.LoadLevel(levelName);
+            }
         }
 
         // This method can be used to load the given scene and perform injection on its contents

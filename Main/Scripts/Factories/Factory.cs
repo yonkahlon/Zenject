@@ -27,7 +27,7 @@ namespace ModestTree.Zenject
             }
         }
 
-        public T Create()
+        public virtual T Create()
         {
             return _container.Instantiate<T>();
         }
@@ -57,7 +57,7 @@ namespace ModestTree.Zenject
             }
         }
 
-        public TValue Create(TParam1 param)
+        public virtual TValue Create(TParam1 param)
         {
             return _container.InstantiateExplicit<TValue>(
                 new List<TypeValuePair>()
@@ -91,7 +91,7 @@ namespace ModestTree.Zenject
             }
         }
 
-        public TValue Create(TParam1 param1, TParam2 param2)
+        public virtual TValue Create(TParam1 param1, TParam2 param2)
         {
             return _container.InstantiateExplicit<TValue>(
                 new List<TypeValuePair>()
@@ -126,7 +126,7 @@ namespace ModestTree.Zenject
             }
         }
 
-        public TValue Create(TParam1 param1, TParam2 param2, TParam3 param3)
+        public virtual TValue Create(TParam1 param1, TParam2 param2, TParam3 param3)
         {
             return _container.InstantiateExplicit<TValue>(
                 new List<TypeValuePair>()
@@ -139,7 +139,8 @@ namespace ModestTree.Zenject
     }
 
     // Four parameters
-    public class Factory<TParam1, TParam2, TParam3, TParam4, TValue> : IValidatableFactory, IFactory<TParam1, TParam2, TParam3, TParam4, TValue>
+    public class Factory<TParam1, TParam2, TParam3, TParam4, TValue> :
+        IValidatableFactory, IFactory<TParam1, TParam2, TParam3, TParam4, TValue>
     {
         [Inject]
         DiContainer _container = null;
@@ -162,7 +163,7 @@ namespace ModestTree.Zenject
             }
         }
 
-        public TValue Create(
+        public virtual TValue Create(
             TParam1 param1, TParam2 param2, TParam3 param3, TParam4 param4)
         {
             return _container.InstantiateExplicit<TValue>(
@@ -172,6 +173,172 @@ namespace ModestTree.Zenject
                     InstantiateUtil.CreateTypePair(param2),
                     InstantiateUtil.CreateTypePair(param3),
                     InstantiateUtil.CreateTypePair(param4),
+                });
+        }
+    }
+
+    // Five parameters
+    public class Factory<TParam1, TParam2, TParam3, TParam4, TParam5, TValue> :
+        IValidatableFactory, IFactory<TParam1, TParam2, TParam3, TParam4, TParam5, TValue>
+    {
+        [Inject]
+        DiContainer _container = null;
+
+        public Type ConstructedType
+        {
+            get { return typeof(TValue); }
+        }
+
+        public Type[] ProvidedTypes
+        {
+            get { return new Type[] { typeof(TParam1), typeof(TParam2), typeof(TParam3), typeof(TParam4), typeof(TParam5) }; }
+        }
+
+        protected DiContainer Container
+        {
+            get
+            {
+                return _container;
+            }
+        }
+
+        public virtual TValue Create(
+            TParam1 param1, TParam2 param2, TParam3 param3, TParam4 param4, TParam5 param5)
+        {
+            return _container.InstantiateExplicit<TValue>(
+                new List<TypeValuePair>()
+                {
+                    InstantiateUtil.CreateTypePair(param1),
+                    InstantiateUtil.CreateTypePair(param2),
+                    InstantiateUtil.CreateTypePair(param3),
+                    InstantiateUtil.CreateTypePair(param4),
+                    InstantiateUtil.CreateTypePair(param5),
+                });
+        }
+    }
+
+    // Six parameters
+    public class Factory<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6, TValue> :
+        IValidatableFactory, IFactory<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6, TValue>
+    {
+        [Inject]
+        DiContainer _container = null;
+
+        public Type ConstructedType
+        {
+            get { return typeof(TValue); }
+        }
+
+        public Type[] ProvidedTypes
+        {
+            get { return new Type[] { typeof(TParam1), typeof(TParam2), typeof(TParam3), typeof(TParam4), typeof(TParam5), typeof(TParam6) }; }
+        }
+
+        protected DiContainer Container
+        {
+            get
+            {
+                return _container;
+            }
+        }
+
+        public virtual TValue Create(
+            TParam1 param1, TParam2 param2, TParam3 param3, TParam4 param4, TParam5 param5, TParam6 param6)
+        {
+            return _container.InstantiateExplicit<TValue>(
+                new List<TypeValuePair>()
+                {
+                    InstantiateUtil.CreateTypePair(param1),
+                    InstantiateUtil.CreateTypePair(param2),
+                    InstantiateUtil.CreateTypePair(param3),
+                    InstantiateUtil.CreateTypePair(param4),
+                    InstantiateUtil.CreateTypePair(param5),
+                    InstantiateUtil.CreateTypePair(param6),
+                });
+        }
+    }
+
+    // Seven parameters
+    public class Factory<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6, TParam7, TValue> :
+        IValidatableFactory, IFactory<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6, TParam7, TValue>
+    {
+        [Inject]
+        DiContainer _container = null;
+
+        public Type ConstructedType
+        {
+            get { return typeof(TValue); }
+        }
+
+        public Type[] ProvidedTypes
+        {
+            get { return new Type[] { typeof(TParam1), typeof(TParam2), typeof(TParam3), typeof(TParam4), typeof(TParam5), typeof(TParam6), typeof(TParam7) }; }
+        }
+
+        protected DiContainer Container
+        {
+            get
+            {
+                return _container;
+            }
+        }
+
+        public virtual TValue Create(
+            TParam1 param1, TParam2 param2, TParam3 param3, TParam4 param4, TParam5 param5, TParam6 param6, TParam7 param7)
+        {
+            return _container.InstantiateExplicit<TValue>(
+                new List<TypeValuePair>()
+                {
+                    InstantiateUtil.CreateTypePair(param1),
+                    InstantiateUtil.CreateTypePair(param2),
+                    InstantiateUtil.CreateTypePair(param3),
+                    InstantiateUtil.CreateTypePair(param4),
+                    InstantiateUtil.CreateTypePair(param5),
+                    InstantiateUtil.CreateTypePair(param6),
+                    InstantiateUtil.CreateTypePair(param7),
+                });
+        }
+    }
+
+    // Seven parameters
+    public class Factory<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6, TParam7, TParam8, TValue> :
+        IValidatableFactory, IFactory<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6, TParam7, TParam8, TValue>
+    {
+        [Inject]
+        DiContainer _container = null;
+
+        public Type ConstructedType
+        {
+            get { return typeof(TValue); }
+        }
+
+        public Type[] ProvidedTypes
+        {
+            get { return new Type[] { typeof(TParam1), typeof(TParam2), typeof(TParam3), typeof(TParam4), typeof(TParam5), typeof(TParam6), typeof(TParam7), typeof(TParam8) }; }
+        }
+
+        protected DiContainer Container
+        {
+            get
+            {
+                return _container;
+            }
+        }
+
+        public virtual TValue Create(
+            TParam1 param1, TParam2 param2, TParam3 param3, TParam4 param4, TParam5 param5, TParam6 param6, TParam7 param7, TParam8 param8)
+        {
+            return _container.InstantiateExplicit<TValue>(
+                new List<TypeValuePair>()
+                {
+                    InstantiateUtil.CreateTypePair(param1),
+                    InstantiateUtil.CreateTypePair(param2),
+                    InstantiateUtil.CreateTypePair(param3),
+                    InstantiateUtil.CreateTypePair(param4),
+                    InstantiateUtil.CreateTypePair(param5),
+                    InstantiateUtil.CreateTypePair(param6),
+                    InstantiateUtil.CreateTypePair(param7),
+                    InstantiateUtil.CreateTypePair(param8),
                 });
         }
     }

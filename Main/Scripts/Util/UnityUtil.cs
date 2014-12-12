@@ -89,5 +89,15 @@ namespace ModestTree.Zenject
         {
             return Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift);
         }
+
+        public static bool WasShiftKeyJustPressed()
+        {
+            return Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.RightShift);
+        }
+
+        public static bool WasAltKeyJustPressed()
+        {
+            return Input.GetKeyDown(KeyCode.LeftAlt) || Input.GetKeyDown(KeyCode.RightAlt);
+        }
     }
 }

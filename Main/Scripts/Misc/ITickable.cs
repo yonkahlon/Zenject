@@ -13,5 +13,10 @@ namespace ModestTree.Zenject
     {
         void FixedTick();
     }
+
+    public interface ILateTickable
+    {
+        void LateTick();
+    }
 }
 

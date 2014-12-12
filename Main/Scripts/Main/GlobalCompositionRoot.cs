@@ -1,4 +1,3 @@
-// Ignore the fact that we don't use _dependencyRoot
 #pragma warning disable 414
 
 using System;
@@ -60,19 +59,8 @@ namespace ModestTree.Zenject
             var container = new DiContainer();
             container.AllowNullBindings = allowNullBindings;
 
-            container.Bind<IInstaller>().ToSingle<StandardUnityInstaller>();
-            container.Bind<GameObject>().To(gameObj)
-                .WhenInjectedInto<StandardUnityInstaller>();
-            container.InstallInstallers();
-            Assert.That(!container.HasBinding<IInstaller>());
-
-            foreach (var installer in GetGlobalInstallers())
-            {
-                FieldsInjecter.Inject(container, installer);
-                container.Bind<IInstaller>().To(installer);
-                container.InstallInstallers();
-                Assert.That(!container.HasBinding<IInstaller>());
-            }
+            CompositionRootHelper.InstallStandardInstaller(container, gameObj);
+            CompositionRootHelper.InstallSceneInstallers(container, GetGlobalInstallers());
 
             return container;
         }

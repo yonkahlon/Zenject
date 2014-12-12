@@ -27,7 +27,7 @@ namespace ModestTree.Zenject.Test
             public Test0 test0 = null;
 
             [Inject]
-            public int value;
+            public int value = 0;
 
             // Test1 should be provided from container
             public class Factory : Factory<int, Test1, Test2>

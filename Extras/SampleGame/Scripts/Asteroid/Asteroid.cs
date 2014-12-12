@@ -9,10 +9,10 @@ namespace ModestTree.Asteroids
     public class Asteroid : MonoBehaviour
     {
         [Inject]
-        LevelHelper _level;
+        LevelHelper _level = null;
 
         [Inject]
-        Settings _settings;
+        Settings _settings = null;
 
         bool _hasDisposed;
 

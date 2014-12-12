@@ -47,7 +47,7 @@ namespace ModestTree.Zenject
 
             foreach (var sceneInfo in activeScenes)
             {
-                Log.Info("Validating scene '{0}'...", sceneInfo.Name);
+                Log.Trace("Validating scene '{0}'...", sceneInfo.Name);
 
                 EditorApplication.OpenScene(sceneInfo.Path);
 
@@ -68,7 +68,7 @@ namespace ModestTree.Zenject
 
             if (failedScenes.IsEmpty())
             {
-                Log.Info("Successfully validated all {0} scenes", activeScenes.Count);
+                Log.Trace("Successfully validated all {0} scenes", activeScenes.Count);
                 return true;
             }
             else
@@ -82,14 +82,69 @@ namespace ModestTree.Zenject
         [MenuItem("Edit/Zenject/Validate Current Scene #%v")]
         public static bool ValidateCurrentScene()
         {
+            var startTime = DateTime.Now;
             var compRoot = GameObject.FindObjectsOfType<CompositionRoot>().OnlyOrDefault();
 
-            if (compRoot == null)
+            if (compRoot != null)
+            {
+                return ValidateCompRoot(compRoot, startTime);
+            }
+
+            var decoratorCompRoot = GameObject.FindObjectsOfType<SceneDecoratorCompositionRoot>().OnlyOrDefault();
+
+            if (decoratorCompRoot == null)
             {
                 Log.Error("Unable to find unique composition root in current scene");
                 return false;
             }
 
+            var sceneName = decoratorCompRoot.SceneName;
+            var scenePath = UnityEditor.EditorBuildSettings.scenes.Select(x => x.path).Where(x => Path.GetFileNameWithoutExtension(x) == sceneName).SingleOrDefault();
+
+            if (scenePath == null)
+            {
+                Log.Error("Could not find scene path for decorated scene '{0}'", sceneName);
+                return false;
+            }
+
+            if (decoratorCompRoot.Installers == null || decoratorCompRoot.Installers.IsEmpty())
+            {
+                Log.Warn("No installers found in decorator composition root");
+            }
+
+            var rootObjectsBefore = GameObject.FindObjectsOfType<Transform>().Where(x => x.parent == null).ToList();
+
+            // Use finally to ensure we clean up the data added from EditorApplication.OpenSceneAdditive
+            try
+            {
+                EditorApplication.OpenSceneAdditive(scenePath);
+
+                compRoot = GameObject.FindObjectsOfType<CompositionRoot>().OnlyOrDefault();
+
+                if (compRoot == null)
+                {
+                    Log.Error("Could not find composition root in decorated scene '{0}'", sceneName);
+                    return false;
+                }
+
+                CompositionRoot.BeforeInstallHooks += decoratorCompRoot.AddPreBindings;
+                CompositionRoot.AfterInstallHooks += decoratorCompRoot.AddPostBindings;
+
+                return ValidateCompRoot(compRoot, startTime);
+            }
+            finally
+            {
+                var rootObjectsAfter = GameObject.FindObjectsOfType<Transform>().Where(x => x.parent == null).ToList();
+
+                foreach (var newObject in rootObjectsAfter.Except(rootObjectsBefore).Select(x => x.gameObject))
+                {
+                    GameObject.DestroyImmediate(newObject);
+                }
+            }
+        }
+
+        static bool ValidateCompRoot(CompositionRoot compRoot, DateTime startTime)
+        {
             if (compRoot.Installers.IsEmpty())
             {
                 Log.Warn("Could not find installers while validating current scene");
@@ -105,13 +160,15 @@ namespace ModestTree.Zenject
                 Log.ErrorException(error);
             }
 
+            var secondsElapsed = (DateTime.Now - startTime).Milliseconds / 1000.0f;
+
             if (resolveErrors.Any())
             {
-                Log.Error("Validation Completed With Errors");
+                Log.Error("Validation Completed With Errors, Took {0:0.00} Seconds.", secondsElapsed);
                 return false;
             }
 
-            Log.Info("Validation Completed Successfully");
+            Log.Info("Validation Completed Successfully, Took {0:0.00} Seconds.", secondsElapsed);
             return true;
         }
 

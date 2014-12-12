@@ -241,6 +241,21 @@ namespace ModestTree.Zenject
                 .ToMethod((container) => container.Instantiate<GameObjectFactory<TContract>>(prefab));
         }
 
+        public void BindAllInterfacesToSingle<TConcrete>()
+            where TConcrete : class
+        {
+            BindAllInterfacesToSingle(typeof(TConcrete));
+        }
+
+        public void BindAllInterfacesToSingle(Type concreteType)
+        {
+            foreach (var interfaceType in concreteType.GetInterfaces())
+            {
+                Assert.That(concreteType.DerivesFrom(interfaceType));
+                Bind(interfaceType).ToSingle(concreteType);
+            }
+        }
+
         public ValueBinder<TContract> BindValue<TContract>() where TContract : struct
         {
             return new ValueBinder<TContract>(this);

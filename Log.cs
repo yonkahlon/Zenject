@@ -33,6 +33,13 @@ namespace ModestTree.Zenject
 
         /////////////
 
+        public static void Trace(string message, params object[] args)
+        {
+            UnityEngine.Debug.Log(string.Format(message, args));
+        }
+
+        /////////////
+
         public static void ErrorException(Exception e)
         {
             UnityEngine.Debug.LogException(e);

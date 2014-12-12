@@ -8,13 +8,21 @@ namespace ModestTree.Zenject
     public abstract class Installer : IInstaller
     {
         [Inject]
-        DiContainer _container;
+        DiContainer _container = null;
 
         protected DiContainer Container
         {
             get
             {
                 return _container;
+            }
+        }
+
+        public virtual bool IsEnabled
+        {
+            get
+            {
+                return true;
             }
         }
 
