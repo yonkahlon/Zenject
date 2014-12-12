@@ -20,6 +20,9 @@ namespace ModestTree.Asteroids
         List<Asteroid> _asteroids = new List<Asteroid>();
         Queue<AsteroidAttributes> _cachedAttributes = new Queue<AsteroidAttributes>();
 
+        [InjectOptional]
+        bool _autoSpawn = true;
+
         public AsteroidManager(
             Settings settings, Asteroid.Factory asteroidFactory, LevelHelper level)
         {
@@ -121,7 +124,7 @@ namespace ModestTree.Asteroids
                 asteroid.Tick();
             }
 
-            if (_started)
+            if (_started && _autoSpawn)
             {
                 _timeToNextSpawn -= Time.deltaTime;
 
@@ -133,7 +136,7 @@ namespace ModestTree.Asteroids
             }
         }
 
-        void SpawnNext()
+        public void SpawnNext()
         {
             var asteroid = _asteroidFactory.Create();
 
