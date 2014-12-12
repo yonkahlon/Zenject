@@ -1132,6 +1132,7 @@ For example, let's say we want to add some special keyboard shortcuts to our mai
 * Type in the scene you want to 'decorate' in the 'Scene Name' field of SceneDecoratorCompositionRoot
 * Create a new C# script with the following contents, then add your the MonoBehaviour to your scene and drag it to the Installers property of SceneDecoratorCompositionRoot
 
+
     public class ExampleDecoratorInstaller : DecoratorInstaller
     {
         public override void PostInstallBindings()
