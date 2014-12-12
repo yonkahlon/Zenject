@@ -37,7 +37,7 @@
 <li><a href="#using-the-unity-inspector-to-configure-settings">Using the Unity Inspector To Configure Settings</a></li>
 <li><a href="#object-graph-validation">Object Graph Validation</a></li>
 <li><a href="#global-bindings">Global Bindings</a></li>
-<li><a href="#scene-decorator-pattern">Scene Decorator Pattern</a></li>
+<li><a href="#scenes-decorator">Scenes Decorators</a></li>
 <li><a href="#auto-mocking-using-moq">Auto-Mocking Using Moq</a></li>
 <li><a href="#nested-containers">Nested Containers / FallbackProvider</a></li>
 <li><a href="#visualizing-object-graphs-automatically">Visualizing Object Graph Automatically</a></li>
@@ -937,35 +937,46 @@ Container.BindValue<span class="tag">&lt;<span class="title">Difficulties</span>
 <p>This works by first add a global composition root and then adding installers to it.  You can create an empty global composition root by selecting Edit -&gt; Zenject -&gt; Create Global Composition Root.  After selecting this menu item you should see a new asset in the root level Resources folder called 'ZenjectGlobalCompositionRoot'.</p>
 <p>If you click on this it will display a property for the list of Installers in the same way that it does for the composition root object that is placed in each scene.  The only difference in this case is that the installers you add here must exist in the project as prefabs and cannot exist in any specific scene.  You can then directly reference those prefabs by dragging them into the Installers property of the global composition root.</p>
 <p>Then, when you start any scene, the CompositionRoot for the scene will call the global composition root to install the global bindings, before installing any scene specific bindings.  If you load another scene from the first scene, the global composition root will not be called again and the bindings that it added previously will persist into the new scene.  You can declare ITickable / IInitializable / IDisposable objects in your global installers in the same way you do for your scene installers with the result being IInitializable.Initialize is called only once across each play session and IDisposable.Dispose is only called once the application is fully stopped.</p>
-<h2 id="-a-id-scene-decorator-pattern-a-scene-decorator-pattern"><a id="scene-decorator-pattern"></a>Scene Decorator Pattern</h2>
-<p>The Scene Decorator Pattern can be used to add behaviour to another scene without actually changing the installers in that scene.  The usual way to achieve this is to use flags on MonoInstallers to conditionally add different bindings within the scene itself.  However the scene decorator approach can be cleaner sometimes because it doesn't involve changing the scene itself.</p>
-<p>For example, let's say we want to add some special keyboard shortcuts to our main production scene for testing purposes.  One way to do this would be to create a new scene then add a single game object to it with the following monobehaviour attached:</p>
-<pre><code class="python">public <span class="class"><span class="keyword">class</span> <span class="title">FooSceneDecorator</span> :</span> MonoBehaviour
+<h2 id="-a-id-scenes-decorator-a-scene-decorators"><a id="scenes-decorator"></a>Scene Decorators</h2>
+<p>Scene Decorators can be used to add behaviour to another scene without actually changing the installers in that scene.  The usual way to achieve this is to use flags on MonoInstallers to conditionally add different bindings within the scene itself.  However the scene decorator approach can be cleaner sometimes because it doesn't involve changing the main scene.</p>
+<p>For example, let's say we want to add some special keyboard shortcuts to our main production scene for testing purposes.  In order to do this using decorators, you can do the following:</p>
+<ul>
+<li>Create a new scene</li>
+<li>Add an empty GameObject and name it 'CompositionRoot'</li>
+<li>Add a 'SceneDecoratorCompositionRoot' MonoBehaviour to it</li>
+<li>Type in the scene you want to 'decorate' in the 'Scene Name' field of SceneDecoratorCompositionRoot</li>
+<li><p>Create a new C# script with the following contents, then add your the MonoBehaviour to your scene and drag it to the Installers property of SceneDecoratorCompositionRoot</p>
+<pre><code class="xml">public class ExampleDecoratorInstaller : DecoratorInstaller
 {
-    public Settings SceneSettings;
+  public override void PostInstallBindings()
+  {
+      // Add bindings here that you want added AFTER installing the main scene
 
-    public void Start()
-    {
-        ZenUtil.LoadScene(<span class="string">"Foo"</span>, InstallDecoratorBindings);
-    }
+      Container.Bind<span class="tag">&lt;<span class="title">ITickable</span>&gt;</span>().ToSingle<span class="tag">&lt;<span class="title">TestHotKeysAdder</span>&gt;</span>();
+  }
 
-    void InstallDecoratorBindings(DiContainer container)
-    {
-        container.Bind&lt;ITickable&gt;().ToSingle&lt;TestHotKeysAdder&gt;();
-    }
+  public override void PreInstallBindings()
+  {
+      // Add bindings here that you want added BEFORE installing the main scene
+  }
 }
 
-public <span class="class"><span class="keyword">class</span> <span class="title">TestHotKeysAdder</span> :</span> ITickable
+public class TestHotKeysAdder : ITickable
 {
-    public void Tick()
-    {
-        <span class="keyword">if</span> (Input.GetKeyDown(KeyCode.F1))
-        {
-            // Do custom behaviour
-        }
-    }
+  <span class="keyword">public</span> <span class="keyword">void</span> Tick()
+  {
+      <span class="keyword">if</span> (Input.GetKeyDown(KeyCode.Space))
+      {
+          Debug.Log(<span class="string">"Hotkey triggered!"</span>);
+      }
+  }
 }
-</code></pre><p>Note that in this case we do not want to have a CompositionRoot object in our scene.  Note that the TestHotKeysAdder class can include dependencies to anything defined in the "Foo" scene.</p>
+</code></pre>
+</li>
+</ul>
+<p>If you run your scene it should now behave exactly like the scene you entered in 'Scene Name' except with the added functionality in your decorator installer.</p>
+<p>The PostInstallBindings method is useful when you want to override a binding in the main scene using 'Rebind'.  And PreInstallBindings is necessary if you want to inject data into the installers in the main scene. For a better example see the asteroids project that comes with Zenject (open 'AsteroidsDecoratorExample' scene).</p>
+<p>Note also that Zenject validate (using CTRL+SHIFT+V or the menu item via Edit-&gt;Zenject-&gt;Validate Current Scene) also works with decorator scenes.</p>
 <h2 id="-a-id-auto-mocking-using-moq-a-auto-mocking-using-moq"><a id="auto-mocking-using-moq"></a>Auto-Mocking using Moq</h2>
 <p>One of the really cool features of DI is the fact that it makes testing code much, much easier.  This is because you can easily substitute one dependency for another by using a different Composition Root.  For example, if you only want to test a particular class (let's call it Foo) and don't care about testing its dependencies, you might write 'mocks' for them so that you can isolate Foo specifically.</p>
 <pre><code class="cpp"><span class="keyword">public</span> <span class="keyword">class</span> Foo
@@ -1018,7 +1029,7 @@ public <span class="class"><span class="keyword">class</span> <span class="title
 <p>Note that you will need to have graphviz installed for this to work (which you can find <a href="http://www.graphviz.org/">here</a>).  You will be prompted to choose the location the first time.</p>
 <p>The result is two files (Foo.dot and Foo.png).  The dot file is included in case you want to add custom graphviz commands.  As an example, this is the graph that is generated when run on the sample project:</p>
 <p>However, admittedly, I personally haven't gotten a lot of mileage out of this feature.  When I have found it useful it's when I first encounter a lot of unfamiliar code.  Reading a visual diagram can be easier than reading the code in some cases.</p>
-<p><img src="Main/ExampleObjectGraph.png?raw=true" alt="Example Object Graph" width="600px" height="127px"></p>
+<p><img src="UnityProject/Assets/Zenject/Main/ExampleObjectGraph.png?raw=true" alt="Example Object Graph" width="600px" height="127px"></p>
 <h2 id="-a-id-questions-a-frequently-asked-questions"><a id="questions"></a>Frequently Asked Questions</h2>
 <ul>
 <li><p><strong><a id="faq-performance"></a>How is performance?</strong></p>
@@ -1029,6 +1040,14 @@ public <span class="class"><span class="keyword">class</span> <span class="title
 <h2 id="-a-id-further-help-a-further-help"><a id="further-help"></a>Further Help</h2>
 <p>For general troubleshooting / support, please use the google group which you can find <a href="https://groups.google.com/forum/#!forum/zenject/">here</a>.  If you have found a bug, you are also welcome to create an issue on the <a href="https://github.com/modesttree/Zenject">github page</a>, or a pull request if you have a fix / extension.  Finally, you can also email me directly at svermeulen@modesttree.com</p>
 <h2 id="-a-id-release-notes-a-release-notes"><a id="release-notes"></a>Release Notes</h2>
+<p>1.13</p>
+<ul>
+<li>Added flag to CompositionRoot for whether to inject into inactive game objects or ignore them completely</li>
+<li>Added BindAllInterfacesToSingle method to DiContainer</li>
+<li>Changed to call PostInject[] on children first when instantiating from prefab</li>
+<li>Added ILateTickable interface, which works just like ITickable or IFixedTickable for unity's LateUpdate event</li>
+<li>Added support for 'decorators', which can be used to add dependencies to another scene</li>
+</ul>
 <p>1.12</p>
 <ul>
 <li>Added Rebind&lt;&gt; method</li>
@@ -1083,3 +1102,4 @@ public <span class="class"><span class="keyword">class</span> <span class="title
    See the License for the specific language governing permissions and
    limitations under the License.</p>
 </body></html>
+

@@ -34,7 +34,7 @@
         * <a href="#using-the-unity-inspector-to-configure-settings">Using the Unity Inspector To Configure Settings</a>
         * <a href="#object-graph-validation">Object Graph Validation</a>
         * <a href="#global-bindings">Global Bindings</a>
-        * <a href="#scene-decorator-pattern">Scene Decorator Pattern</a>
+        * <a href="#scenes-decorator">Scenes Decorators</a>
         * <a href="#auto-mocking-using-moq">Auto-Mocking Using Moq</a>
         * <a href="#nested-containers">Nested Containers / FallbackProvider</a>
         * <a href="#visualizing-object-graphs-automatically">Visualizing Object Graph Automatically</a>
@@ -1120,24 +1120,30 @@ If you click on this it will display a property for the list of Installers in th
 
 Then, when you start any scene, the CompositionRoot for the scene will call the global composition root to install the global bindings, before installing any scene specific bindings.  If you load another scene from the first scene, the global composition root will not be called again and the bindings that it added previously will persist into the new scene.  You can declare ITickable / IInitializable / IDisposable objects in your global installers in the same way you do for your scene installers with the result being IInitializable.Initialize is called only once across each play session and IDisposable.Dispose is only called once the application is fully stopped.
 
-## <a id="scene-decorator-pattern"></a>Scene Decorator Pattern
+## <a id="scenes-decorator"></a>Scene Decorators
 
-The Scene Decorator Pattern can be used to add behaviour to another scene without actually changing the installers in that scene.  The usual way to achieve this is to use flags on MonoInstallers to conditionally add different bindings within the scene itself.  However the scene decorator approach can be cleaner sometimes because it doesn't involve changing the scene itself.
+Scene Decorators can be used to add behaviour to another scene without actually changing the installers in that scene.  The usual way to achieve this is to use flags on MonoInstallers to conditionally add different bindings within the scene itself.  However the scene decorator approach can be cleaner sometimes because it doesn't involve changing the main scene.
 
-For example, let's say we want to add some special keyboard shortcuts to our main production scene for testing purposes.  One way to do this would be to create a new scene then add a single game object to it with the following monobehaviour attached:
+For example, let's say we want to add some special keyboard shortcuts to our main production scene for testing purposes.  In order to do this using decorators, you can do the following:
 
-    public class FooSceneDecorator : MonoBehaviour
+* Create a new scene
+* Add an empty GameObject and name it 'CompositionRoot'
+* Add a 'SceneDecoratorCompositionRoot' MonoBehaviour to it
+* Type in the scene you want to 'decorate' in the 'Scene Name' field of SceneDecoratorCompositionRoot
+* Create a new C# script with the following contents, then add your the MonoBehaviour to your scene and drag it to the Installers property of SceneDecoratorCompositionRoot
+
+    public class ExampleDecoratorInstaller : DecoratorInstaller
     {
-        public Settings SceneSettings;
-
-        public void Start()
+        public override void PostInstallBindings()
         {
-            ZenUtil.LoadScene("Foo", InstallDecoratorBindings);
+            // Add bindings here that you want added AFTER installing the main scene
+
+            Container.Bind<ITickable>().ToSingle<TestHotKeysAdder>();
         }
 
-        void InstallDecoratorBindings(DiContainer container)
+        public override void PreInstallBindings()
         {
-            container.Bind<ITickable>().ToSingle<TestHotKeysAdder>();
+            // Add bindings here that you want added BEFORE installing the main scene
         }
     }
 
@@ -1145,14 +1151,18 @@ For example, let's say we want to add some special keyboard shortcuts to our mai
     {
         public void Tick()
         {
-            if (Input.GetKeyDown(KeyCode.F1))
+            if (Input.GetKeyDown(KeyCode.Space))
             {
-                // Do custom behaviour
+                Debug.Log("Hotkey triggered!");
             }
         }
     }
 
-Note that in this case we do not want to have a CompositionRoot object in our scene.  Note that the TestHotKeysAdder class can include dependencies to anything defined in the "Foo" scene.
+If you run your scene it should now behave exactly like the scene you entered in 'Scene Name' except with the added functionality in your decorator installer.
+
+The PostInstallBindings method is useful when you want to override a binding in the main scene using 'Rebind'.  And PreInstallBindings is necessary if you want to inject data into the installers in the main scene. For a better example see the asteroids project that comes with Zenject (open 'AsteroidsDecoratorExample' scene).
+
+Note also that Zenject validate (using CTRL+SHIFT+V or the menu item via Edit->Zenject->Validate Current Scene) also works with decorator scenes.
 
 ## <a id="auto-mocking-using-moq"></a>Auto-Mocking using Moq
 
@@ -1248,6 +1258,13 @@ However, admittedly, I personally haven't gotten a lot of mileage out of this fe
 For general troubleshooting / support, please use the google group which you can find [here](https://groups.google.com/forum/#!forum/zenject/).  If you have found a bug, you are also welcome to create an issue on the [github page](https://github.com/modesttree/Zenject), or a pull request if you have a fix / extension.  Finally, you can also email me directly at svermeulen@modesttree.com
 
 ## <a id="release-notes"></a>Release Notes
+
+1.13
+* Added flag to CompositionRoot for whether to inject into inactive game objects or ignore them completely
+* Added BindAllInterfacesToSingle method to DiContainer
+* Changed to call PostInject[] on children first when instantiating from prefab
+* Added ILateTickable interface, which works just like ITickable or IFixedTickable for unity's LateUpdate event
+* Added support for 'decorators', which can be used to add dependencies to another scene
 
 1.12
 * Added Rebind<> method
