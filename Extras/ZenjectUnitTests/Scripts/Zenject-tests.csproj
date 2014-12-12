@@ -73,6 +73,7 @@
     <Compile Include="TestFactory.cs" />
     <Compile Include="TestFactoryNullArgs.cs" />
     <Compile Include="TestGenericContract.cs" />
+    <Compile Include="TestListComparer.cs" />
     <Compile Include="TestListInjection.cs" />
     <Compile Include="TestMoq.cs" />
     <Compile Include="TestMultiBind.cs" />
@@ -95,7 +96,6 @@
     <Compile Include="TestTransientInjection.cs" />
     <Compile Include="TestTransientMockProvider.cs" />
     <Compile Include="TestUnbind.cs" />
-    <Compile Include="TestUtil.cs" />
     <Compile Include="TestValidateInstaller.cs" />
     <Compile Include="TestWithContainer.cs" />
     <Compile Include="ZenjectProfileTest.cs" />
