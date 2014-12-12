@@ -1132,32 +1132,31 @@ For example, let's say we want to add some special keyboard shortcuts to our mai
 * Type in the scene you want to 'decorate' in the 'Scene Name' field of SceneDecoratorCompositionRoot
 * Create a new C# script with the following contents, then add your the MonoBehaviour to your scene and drag it to the Installers property of SceneDecoratorCompositionRoot
 
-
-    public class ExampleDecoratorInstaller : DecoratorInstaller
-    {
-        public override void PostInstallBindings()
+        public class ExampleDecoratorInstaller : DecoratorInstaller
         {
-            // Add bindings here that you want added AFTER installing the main scene
-
-            Container.Bind<ITickable>().ToSingle<TestHotKeysAdder>();
-        }
-
-        public override void PreInstallBindings()
-        {
-            // Add bindings here that you want added BEFORE installing the main scene
-        }
-    }
-
-    public class TestHotKeysAdder : ITickable
-    {
-        public void Tick()
-        {
-            if (Input.GetKeyDown(KeyCode.Space))
+            public override void PostInstallBindings()
             {
-                Debug.Log("Hotkey triggered!");
+                // Add bindings here that you want added AFTER installing the main scene
+
+                Container.Bind<ITickable>().ToSingle<TestHotKeysAdder>();
+            }
+
+            public override void PreInstallBindings()
+            {
+                // Add bindings here that you want added BEFORE installing the main scene
             }
         }
-    }
+
+        public class TestHotKeysAdder : ITickable
+        {
+            public void Tick()
+            {
+                if (Input.GetKeyDown(KeyCode.Space))
+                {
+                    Debug.Log("Hotkey triggered!");
+                }
+            }
+        }
 
 If you run your scene it should now behave exactly like the scene you entered in 'Scene Name' except with the added functionality in your decorator installer.
 
