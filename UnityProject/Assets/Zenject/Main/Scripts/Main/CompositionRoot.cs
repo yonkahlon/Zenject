@@ -1,4 +1,3 @@
-// Ignore the fact that we don't use _dependencyRoot
 #pragma warning disable 414
 
 using System;
@@ -12,10 +11,13 @@ namespace ModestTree.Zenject
     // Then any children will get injected during resolve stage
     public sealed class CompositionRoot : MonoBehaviour
     {
-        public static Action<DiContainer> ExtraBindingsLookup;
+        public static Action<DiContainer> BeforeInstallHooks;
+        public static Action<DiContainer> AfterInstallHooks;
+
+        public bool OnlyInjectWhenActive = true;
 
         DiContainer _container;
-        IDependencyRoot _dependencyRoot;
+        IDependencyRoot _dependencyRoot = null;
 
         [SerializeField]
         public MonoInstaller[] Installers;
@@ -34,7 +36,7 @@ namespace ModestTree.Zenject
 
             _container = CreateContainer(false, GlobalCompositionRoot.Instance.Container);
 
-            InjectionHelper.InjectChildGameObjects(_container, gameObject);
+            InjectionHelper.InjectChildGameObjects(_container, gameObject, !OnlyInjectWhenActive);
             _dependencyRoot = _container.Resolve<IDependencyRoot>();
         }
 
@@ -44,59 +46,32 @@ namespace ModestTree.Zenject
             container.AllowNullBindings = allowNullBindings;
             container.FallbackProvider = new DiContainerProvider(parentContainer);
 
-            // Install the extra bindings immediately in case they configure the
-            // installers used in this scene
-            if (ExtraBindingsLookup != null)
+            if (BeforeInstallHooks != null)
             {
-                ExtraBindingsLookup(container);
-
+                BeforeInstallHooks(container);
                 // Reset extra bindings for next time we change scenes
-                ExtraBindingsLookup = null;
+                BeforeInstallHooks = null;
             }
 
-            container.Bind<IInstaller>().ToSingle<StandardUnityInstaller>();
-            container.Bind<GameObject>().To(this.gameObject).WhenInjectedInto<StandardUnityInstaller>();
-            container.InstallInstallers();
-            Assert.That(!container.HasBinding<IInstaller>());
+            CompositionRootHelper.InstallStandardInstaller(container, this.gameObject);
 
-            InstallSceneInstallers(container);
-
-            return container;
-        }
-
-        void InstallSceneInstallers(DiContainer container)
-        {
             if (Installers.Where(x => x != null).IsEmpty())
             {
                 Log.Warn("No installers found while initializing CompositionRoot");
-                return;
             }
-
-            foreach (var installer in Installers)
+            else
             {
-                if (installer == null)
-                {
-                    Log.Warn("Found null installer hooked up to CompositionRoot");
-                    continue;
-                }
-
-                if (installer.enabled)
-                {
-                    // The installers that are part of the scene are monobehaviours
-                    // and therefore were not created via Zenject and therefore do
-                    // not have their members injected
-                    // At the very least they will need the container injected but
-                    // they might also have some configuration passed from another
-                    // scene as well
-                    FieldsInjecter.Inject(container, installer);
-                    container.Bind<IInstaller>().To(installer);
-
-                    // Install this installer and also any other installers that it installs
-                    container.InstallInstallers();
-
-                    Assert.That(!container.HasBinding<IInstaller>());
-                }
+                CompositionRootHelper.InstallSceneInstallers(container, Installers);
             }
+
+            if (AfterInstallHooks != null)
+            {
+                AfterInstallHooks(container);
+                // Reset extra bindings for next time we change scenes
+                AfterInstallHooks = null;
+            }
+
+            return container;
         }
     }
 }

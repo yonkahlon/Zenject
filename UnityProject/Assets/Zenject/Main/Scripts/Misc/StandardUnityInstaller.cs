@@ -7,7 +7,7 @@ namespace ModestTree.Zenject
     public class StandardUnityInstaller : Installer
     {
         [Inject]
-        GameObject _root;
+        GameObject _root = null;
 
         // Install basic functionality for most unity apps
         public override void InstallBindings()

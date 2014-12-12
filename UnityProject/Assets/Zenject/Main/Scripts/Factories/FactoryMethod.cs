@@ -7,7 +7,7 @@ namespace ModestTree.Zenject
     public sealed class FactoryMethod<TValue> : IValidatableFactory, IFactory<TValue>
     {
         [Inject]
-        DiContainer _container;
+        DiContainer _container = null;
 
         [Inject]
         readonly Func<DiContainer, TValue> _method = null;
@@ -32,7 +32,7 @@ namespace ModestTree.Zenject
     public sealed class FactoryMethod<TParam1, TValue> : IValidatableFactory, IFactory<TParam1, TValue>
     {
         [Inject]
-        DiContainer _container;
+        DiContainer _container = null;
 
         [Inject]
         readonly Func<DiContainer, TParam1, TValue> _method = null;
@@ -57,7 +57,7 @@ namespace ModestTree.Zenject
     public sealed class FactoryMethod<TParam1, TParam2, TValue> : IValidatableFactory, IFactory<TParam1, TParam2, TValue>
     {
         [Inject]
-        DiContainer _container;
+        DiContainer _container = null;
 
         [Inject]
         readonly Func<DiContainer, TParam1, TParam2, TValue> _method = null;
@@ -82,7 +82,7 @@ namespace ModestTree.Zenject
     public sealed class FactoryMethod<TParam1, TParam2, TParam3, TValue> : IValidatableFactory, IFactory<TParam1, TParam2, TParam3, TValue>
     {
         [Inject]
-        DiContainer _container;
+        DiContainer _container = null;
 
         [Inject]
         readonly Func<DiContainer, TParam1, TParam2, TParam3, TValue> _method = null;

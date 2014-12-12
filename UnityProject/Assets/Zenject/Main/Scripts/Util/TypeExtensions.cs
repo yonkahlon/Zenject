@@ -177,31 +177,31 @@ namespace ModestTree
 
         public static string Name(this Type type)
         {
-            if( type.IsArray )
+            if (type.IsArray)
             {
-                return string.Format( "{0}[]", type.GetElementType().Name() );
+                return string.Format("{0}[]", type.GetElementType().Name());
             }
 
-            if( type.ContainsGenericParameters || type.IsGenericType )
+            if (type.ContainsGenericParameters || type.IsGenericType)
             {
-                if( type.BaseType == typeof(Nullable<>) || (type.BaseType == typeof(ValueType) && type.UnderlyingSystemType.Name.StartsWith( "Nullable" )) )
+                if (type.BaseType == typeof(Nullable<>) || (type.BaseType == typeof(ValueType) && type.UnderlyingSystemType.Name.StartsWith("Nullable")))
                 {
-                    return GetCSharpTypeName( type.GetGenericArguments().Single().Name ) + "?";
+                    return GetCSharpTypeName(type.GetGenericArguments().Single().Name) + "?";
                 }
 
-                int index = type.Name.IndexOf( "`" );
-                string genericTypeName = index > 0 ? type.Name.Substring( 0, index ) : type.Name;
-                string genericArgs = string.Join( ",", type.GetGenericArguments().Select( t => t.Name() ).ToArray() );
+                int index = type.Name.IndexOf("`");
+                string genericTypeName = index > 0 ? type.Name.Substring(0, index) : type.Name;
+                string genericArgs = string.Join(",", type.GetGenericArguments().Select(t => t.Name()).ToArray());
                 return genericArgs.Length == 0 ? genericTypeName : genericTypeName + "<" + genericArgs + ">";
             }
 
             // If a nested class, include the parent classes as well
-            return (type.DeclaringType == null ? "" : type.DeclaringType.Name() + ".") + GetCSharpTypeName( type.Name );
+            return (type.DeclaringType == null ? "" : type.DeclaringType.Name() + ".") + GetCSharpTypeName(type.Name);
         }
 
         static string GetCSharpTypeName(string typeName)
         {
-            switch( typeName )
+            switch (typeName)
             {
                 case "String":
                 case "Object":

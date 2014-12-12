@@ -10,15 +10,15 @@ namespace ModestTree.Zenject
     {
         // Inject dependencies into child game objects
         public static void InjectChildGameObjects(
-            DiContainer container, GameObject gameObject)
+            DiContainer container, GameObject gameObject, bool includeInactive = false)
         {
-            InjectChildGameObjects(container, gameObject, Enumerable.Empty<object>());
+            InjectChildGameObjects(container, gameObject, includeInactive, Enumerable.Empty<object>());
         }
 
         public static void InjectChildGameObjects(
-            DiContainer container, GameObject gameObject, IEnumerable<object> extraArgs)
+            DiContainer container, GameObject gameObject, bool includeInactive, IEnumerable<object> extraArgs)
         {
-            foreach (var monoBehaviour in gameObject.GetComponentsInChildren<MonoBehaviour>())
+            foreach (var monoBehaviour in gameObject.GetComponentsInChildren<MonoBehaviour>(includeInactive))
             {
                 InjectMonoBehaviour(container, monoBehaviour, extraArgs);
             }

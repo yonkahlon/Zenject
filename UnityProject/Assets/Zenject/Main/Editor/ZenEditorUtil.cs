@@ -22,20 +22,26 @@ namespace ModestTree.Zenject
             return compRoot.Container;
         }
 
-        public static IEnumerable<ZenjectResolveException> ValidateAllActiveScenes()
+        public static List<ZenjectResolveException> ValidateAllActiveScenes(int maxErrors)
         {
+            var errors = new List<ZenjectResolveException>();
             var activeScenes = UnityEditor.EditorBuildSettings.scenes
                 .Select(x => new { Name = Path.GetFileNameWithoutExtension(x.path), Path = x.path }).ToList();
 
             foreach (var sceneInfo in activeScenes)
             {
+                Log.Trace("Validating Scene '{0}'", sceneInfo.Path);
                 EditorApplication.OpenScene(sceneInfo.Path);
 
-                foreach (var error in ValidateCurrentScene())
+                errors.AddRange(ValidateCurrentScene().Take(maxErrors - errors.Count));
+
+                if (errors.Count >= maxErrors)
                 {
-                    yield return error;
+                    break;
                 }
             }
+
+            return errors;
         }
 
         public static IEnumerable<ZenjectResolveException> ValidateCurrentScene()

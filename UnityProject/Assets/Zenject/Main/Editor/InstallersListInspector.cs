@@ -8,44 +8,30 @@ using Object = UnityEngine.Object;
 
 namespace ModestTree
 {
-    internal class InstallersListInspector : UnityEditor.Editor
+    internal class InstallersListInspector : UnityInspectorListEditor
     {
-        static readonly GUIContent INSTALLERS_HEADER = new GUIContent("Installers", "Sorted array of custom installers for your scene");
-
-        ReorderableList _installersList;
-        SerializedProperty _installersProperty;
-
-        void OnEnable()
+        protected override string[] PropertyNames
         {
-            _installersProperty = serializedObject.FindProperty("Installers");
-
-            _installersList = new ReorderableList(serializedObject, _installersProperty, true, true, true, true);
-
-            _installersList.drawHeaderCallback += rect =>
+            get
             {
-                GUI.Label(rect, INSTALLERS_HEADER);
-            };
-            _installersList.drawElementCallback += (rect, index, active, focused) =>
-            {
-                rect.width -= 40;
-                rect.x += 20;
-                EditorGUI.PropertyField(rect, _installersProperty.GetArrayElementAtIndex(index), GUIContent.none, true);
-            };
+                return new[] { "Installers" };
+            }
         }
 
-        public override void OnInspectorGUI()
+        protected override string[] PropertyDescriptions
         {
-            serializedObject.Update();
-
-            if (Application.isPlaying)
+            get
             {
-                GUI.enabled = false;
+                return new[] { "Sorted array of custom installers for your scene" };
             }
+        }
 
-            _installersList.DoLayoutList();
-
-            GUI.enabled = true;
-            serializedObject.ApplyModifiedProperties();
+        protected override bool DisplayAllProperties
+        {
+            get
+            {
+                return false;
+            }
         }
     }
 
@@ -58,5 +44,23 @@ namespace ModestTree
     [CustomEditor(typeof(CompositionRoot))]
     internal sealed class CompositionRootEditor : InstallersListInspector
     {
+        public override void OnInspectorGUI()
+        {
+            var compRoot = this.target as CompositionRoot;
+            compRoot.OnlyInjectWhenActive = EditorGUILayout.Toggle("Only Inject When Active", compRoot.OnlyInjectWhenActive);
+            base.OnInspectorGUI();
+        }
+    }
+
+    [CustomEditor(typeof(SceneDecoratorCompositionRoot))]
+    internal sealed class SceneDecoratorCompositionRootEditor : InstallersListInspector
+    {
+        protected override bool DisplayAllProperties
+        {
+            get
+            {
+                return true;
+            }
+        }
     }
 }

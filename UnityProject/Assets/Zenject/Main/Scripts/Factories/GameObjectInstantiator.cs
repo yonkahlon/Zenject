@@ -51,9 +51,19 @@ namespace ModestTree.Zenject
 
             gameObj.SetActive(true);
 
-            InjectionHelper.InjectChildGameObjects(_container, gameObj, args);
+            InjectionHelper.InjectChildGameObjects(_container, gameObj, false, args);
 
             return gameObj;
+        }
+
+        int GetDepthLevel(Transform transform)
+        {
+            if (transform == null)
+            {
+                return 0;
+            }
+
+            return 1 + GetDepthLevel(transform.parent);
         }
 
         // Create from prefab
@@ -75,19 +85,27 @@ namespace ModestTree.Zenject
 
             T requestedScript = null;
 
-            foreach (var component in gameObj.GetComponentsInChildren<Component>())
+            // Inject on the children first since the parent objects are more likely to use them in their post inject methods
+            foreach (var component in gameObj.GetComponentsInChildren<Component>().OrderByDescending(x => GetDepthLevel(x.transform)))
             {
-                var extraArgs = Enumerable.Empty<object>();
-
-                if (component.GetType() == typeof(T))
+                if (component != null)
                 {
-                    Assert.IsNull(requestedScript,
-                        "Found multiple matches with type '{0}' when instantiating new game object", typeof(T));
-                    requestedScript = (T)component;
-                    extraArgs = args;
-                }
+                    var extraArgs = Enumerable.Empty<object>();
 
-                InjectionHelper.InjectMonoBehaviour(_container, component, extraArgs);
+                    if (component.GetType() == typeof(T))
+                    {
+                        Assert.IsNull(requestedScript,
+                            "Found multiple matches with type '{0}' when instantiating new game object from template '{1}'", typeof(T), template.name);
+                        requestedScript = (T)component;
+                        extraArgs = args;
+                    }
+
+                    InjectionHelper.InjectMonoBehaviour(_container, component, extraArgs);
+                }
+                else
+                {
+                    Log.Warn("Found null component while instantiating prefab '{0}'.  Possible missing script.", template.name);
+                }
             }
 
             if (requestedScript == null)
