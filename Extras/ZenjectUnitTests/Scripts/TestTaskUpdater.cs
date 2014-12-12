@@ -5,7 +5,7 @@ using NUnit.Framework;
 using UnityEngine;
 using TestAssert = NUnit.Framework.Assert;
 using ModestTree.Zenject;
-using ModestTree.Zenject.Test;
+using ModestTree.Tests.Zenject;
 using System.Linq;
 
 namespace ModestTree.Zenject
