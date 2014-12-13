@@ -1,4 +1,5 @@
 using System;
+using UnityEngine;
 
 namespace ModestTree.Zenject
 {
@@ -6,20 +7,21 @@ namespace ModestTree.Zenject
     {
         int _referenceCount;
         object _instance;
-        Type _instanceType;
         SingletonProviderMap _owner;
         DiContainer _container;
         Instantiator _instantiator;
+        GameObjectInstantiator _gameObjInstantiator;
         bool _hasInstance;
         Func<DiContainer, object> _createMethod;
+        SingletonId _id;
 
         public SingletonLazyCreator(
             DiContainer container, SingletonProviderMap owner,
-            Type instanceType, Func<DiContainer, object> createMethod = null)
+            SingletonId id, Func<DiContainer, object> createMethod = null)
         {
             _container = container;
             _owner = owner;
-            _instanceType = instanceType;
+            _id = id;
             _createMethod = createMethod;
         }
 
@@ -42,7 +44,7 @@ namespace ModestTree.Zenject
 
             if (_referenceCount <= 0)
             {
-                _owner.RemoveCreator(_instanceType);
+                _owner.RemoveCreator(_id);
             }
         }
 
@@ -68,26 +70,14 @@ namespace ModestTree.Zenject
 
         public Type GetInstanceType()
         {
-            return _instanceType;
+            return _id.Type;
         }
 
         public object GetInstance(Type contractType)
         {
             if (!_hasInstance)
             {
-                if (_createMethod != null)
-                {
-                    _instance = _createMethod(_container);
-                }
-                else
-                {
-                    if (_instantiator == null)
-                    {
-                        _instantiator = _container.Resolve<Instantiator>();
-                    }
-
-                    _instance = _instantiator.Instantiate(GetTypeToInstantiate(contractType));
-                }
+                _instance = Instantiate(contractType);
 
                 if (_instance == null)
                 {
@@ -101,17 +91,46 @@ namespace ModestTree.Zenject
             return _instance;
         }
 
+        object Instantiate(Type contractType)
+        {
+            if (_createMethod != null)
+            {
+                return _createMethod(_container);
+            }
+
+            var concreteType = GetTypeToInstantiate(contractType);
+
+            if (_id.Prefab != null)
+            {
+                Assert.That(concreteType.DerivesFrom<Component>(), "Expected '{0}' to derive from 'Component'", concreteType.Name);
+
+                if (_gameObjInstantiator == null)
+                {
+                    _gameObjInstantiator = _container.Resolve<GameObjectInstantiator>();
+                }
+
+                return _gameObjInstantiator.Instantiate(_id.Type, _id.Prefab);
+            }
+
+            if (_instantiator == null)
+            {
+                _instantiator = _container.Resolve<Instantiator>();
+            }
+
+            return _instantiator.Instantiate(concreteType);
+        }
+
         Type GetTypeToInstantiate(Type contractType)
         {
-            if (_instanceType.IsOpenGenericType())
+            if (_id.Type.IsOpenGenericType())
             {
                 Assert.That(!contractType.IsAbstract);
-                Assert.That(contractType.GetGenericTypeDefinition() == _instanceType);
+                Assert.That(contractType.GetGenericTypeDefinition() == _id.Type);
                 return contractType;
             }
 
-            Assert.That(_instanceType.DerivesFromOrEqual(contractType));
-            return _instanceType;
+            Assert.That(_id.Type.DerivesFromOrEqual(contractType));
+            return _id.Type;
         }
     }
 }

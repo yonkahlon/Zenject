@@ -122,14 +122,15 @@ namespace ModestTree.Zenject
         //public BindingConditionSetter ToSingle(GameObject prefab)
 
         // Note: Here we assume that the contract is a component on the given prefab
-        public BindingConditionSetter ToSingleFromPrefab<TConcrete>(GameObject prefab) where TConcrete : Component, TContract
+        public BindingConditionSetter ToSingleFromPrefab<TConcrete>(GameObject prefab)
+            where TConcrete : Component, TContract
         {
             if (UnityUtil.IsNull(prefab))
             {
                 throw new ZenjectBindException("Received null prefab while binding type '{0}'".With(typeof(TConcrete).Name()));
             }
 
-            return ToProvider(new GameObjectSingletonProviderFromPrefab<TConcrete>(_container, prefab));
+            return ToProvider(_singletonMap.CreateProviderFromPrefab<TConcrete>(prefab));
         }
 
         // Note: Here we assume that the contract is a component on the given prefab
