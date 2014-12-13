@@ -107,12 +107,12 @@
     <Compile Include="Misc\ZenUtil.cs" />
     <Compile Include="Providers\DiContainerProvider.cs" />
     <Compile Include="Providers\GameObjectProvider.cs" />
-    <Compile Include="Providers\GameObjectSingletonProviderFromPrefab.cs" />
     <Compile Include="Providers\GameObjectTransientProviderFromPrefab.cs" />
     <Compile Include="Providers\InstanceProvider.cs" />
     <Compile Include="Providers\MethodProvider.cs" />
     <Compile Include="Providers\MonoBehaviourSingletonProvider.cs" />
     <Compile Include="Providers\ProviderBase.cs" />
+    <Compile Include="Providers\SingletonId.cs" />
     <Compile Include="Providers\SingletonLazyCreator.cs" />
     <Compile Include="Providers\SingletonProvider.cs" />
     <Compile Include="Providers\SingletonProviderMap.cs" />
