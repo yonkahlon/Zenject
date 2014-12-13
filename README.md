@@ -185,7 +185,7 @@ The unit tests may also be helpful to show usage for each specific feature (whic
 
 ## <a id="hello-world-example"></a>Hello World Example
 
-    using ModestTree.Zenject;
+    using Zenject;
     using UnityEngine;
     using System.Collections;
 
