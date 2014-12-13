@@ -66,12 +66,19 @@ namespace ModestTree.Zenject
             return 1 + GetDepthLevel(transform.parent);
         }
 
-        // Create from prefab
-        // Return specific monobehaviour
         public T Instantiate<T>(
             GameObject template, params object[] args) where T : Component
         {
+            return (T)Instantiate(typeof(T), template);
+        }
+
+        // Create from prefab
+        // Return specific monobehaviour
+        public object Instantiate(
+            Type componentType, GameObject template, params object[] args)
+        {
             Assert.That(template != null, "Null template found when instantiating game object");
+            Assert.That(componentType.DerivesFrom<Component>());
 
             var gameObj = (GameObject)GameObject.Instantiate(template);
 
@@ -83,7 +90,7 @@ namespace ModestTree.Zenject
 
             gameObj.SetActive(true);
 
-            T requestedScript = null;
+            Component requestedScript = null;
 
             // Inject on the children first since the parent objects are more likely to use them in their post inject methods
             foreach (var component in gameObj.GetComponentsInChildren<Component>().OrderByDescending(x => GetDepthLevel(x.transform)))
@@ -92,11 +99,11 @@ namespace ModestTree.Zenject
                 {
                     var extraArgs = Enumerable.Empty<object>();
 
-                    if (component.GetType() == typeof(T))
+                    if (component.GetType() == componentType)
                     {
                         Assert.IsNull(requestedScript,
-                            "Found multiple matches with type '{0}' when instantiating new game object from template '{1}'", typeof(T), template.name);
-                        requestedScript = (T)component;
+                            "Found multiple matches with type '{0}' when instantiating new game object from template '{1}'", componentType, template.name);
+                        requestedScript = component;
                         extraArgs = args;
                     }
 
@@ -111,7 +118,7 @@ namespace ModestTree.Zenject
             if (requestedScript == null)
             {
                 throw new ZenjectResolveException(
-                    "Could not find component with type '{0}' when instantiating new game object".With(typeof(T)));
+                    "Could not find component with type '{0}' when instantiating new game object".With(componentType));
             }
 
             return requestedScript;

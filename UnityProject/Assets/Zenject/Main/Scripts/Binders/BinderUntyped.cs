@@ -158,7 +158,7 @@ namespace ModestTree.Zenject
                 throw new ZenjectBindException("Received null prefab while binding type '{0}'".With(concreteType.Name()));
             }
 
-            return ToProvider(new GameObjectSingletonProviderFromPrefab<TConcrete>(_container, prefab));
+            return ToProvider(_singletonMap.CreateProviderFromPrefab(typeof(TConcrete), prefab));
         }
 
         // Note: Here we assume that the contract is a component on the given prefab
