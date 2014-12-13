@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
-using ModestTree.Zenject;
+using Zenject;
 using System.Linq;
 
-namespace ModestTree.Zenject
+namespace Zenject
 {
     public class ListFactory<T>
     {

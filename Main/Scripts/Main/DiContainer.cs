@@ -6,7 +6,7 @@ using System.Reflection;
 using System.Text;
 using UnityEngine;
 
-namespace ModestTree.Zenject
+namespace Zenject
 {
     // Responsibilities:
     // - Expose methods to configure object graph via Bind() methods

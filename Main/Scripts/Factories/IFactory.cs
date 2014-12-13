@@ -1,6 +1,6 @@
 using System;
 
-namespace ModestTree.Zenject
+namespace Zenject
 {
     public interface IFactory<T>
     {

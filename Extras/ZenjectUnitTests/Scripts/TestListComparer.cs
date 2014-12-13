@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace ModestTree.Tests.Zenject
+namespace Zenject.Tests
 {
     public static class TestListComparer
     {

@@ -1,10 +1,10 @@
 using System;
-using ModestTree.Zenject;
+using Zenject;
 using NUnit.Framework;
-using ModestTree.Tests.Zenject;
+using Zenject.Tests;
 using TestAssert=NUnit.Framework.Assert;
 
-namespace ModestTree.Tests
+namespace Zenject.Tests
 {
     [TestFixture]
     public class TestMultipleInstallers : TestWithContainer

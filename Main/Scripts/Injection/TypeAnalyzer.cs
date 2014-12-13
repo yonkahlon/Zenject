@@ -4,7 +4,7 @@ using System.Reflection;
 using UnityEngine;
 using System.Linq;
 
-namespace ModestTree.Zenject
+namespace Zenject
 {
     internal static class TypeAnalyzer
     {

@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using ModestTree.Zenject;
+using Zenject;
 using NUnit.Framework;
 
-namespace ModestTree.Tests.Zenject
+namespace Zenject.Tests
 {
     public class TestWithContainer
     {

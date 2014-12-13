@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 
-namespace ModestTree.Zenject
+namespace Zenject
 {
     // Define this class as a component of a top-level game object of your scene heirarchy
     // Then any children will get injected during resolve stage

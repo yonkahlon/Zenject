@@ -1,12 +1,12 @@
 using System.Collections.Generic;
 using System.Linq;
-using ModestTree.Zenject;
+using Zenject;
 using UnityEditor;
 using UnityEditorInternal;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-namespace ModestTree.Zenject
+namespace Zenject
 {
     public abstract class UnityInspectorListEditor : UnityEditor.Editor
     {

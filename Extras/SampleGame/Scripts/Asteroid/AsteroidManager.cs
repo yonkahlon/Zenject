@@ -1,13 +1,12 @@
 using System;
 using System.Collections.Generic;
-using ModestTree;
 using UnityEngine;
 using System.Collections;
-using ModestTree.Zenject;
+using Zenject;
 using Random=UnityEngine.Random;
 using System.Linq;
 
-namespace ModestTree.Asteroids
+namespace Asteroids
 {
     public class AsteroidManager : ITickable, IFixedTickable
     {

@@ -4,11 +4,11 @@ using System.Diagnostics;
 using NUnit.Framework;
 using UnityEngine;
 using TestAssert = NUnit.Framework.Assert;
-using ModestTree.Zenject;
-using ModestTree.Tests.Zenject;
+using Zenject;
+using Zenject.Tests;
 using System.Linq;
 
-namespace ModestTree.Zenject
+namespace Zenject
 {
     [TestFixture]
     public class TestTaskUpdater

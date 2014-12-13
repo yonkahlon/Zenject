@@ -7,7 +7,7 @@ using UnityEngine;
 using System.Linq;
 using Debug=UnityEngine.Debug;
 
-namespace ModestTree.Zenject
+namespace Zenject
 {
     public static class ZenjectMenu
     {

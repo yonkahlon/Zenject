@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 
-namespace ModestTree.Zenject
+namespace Zenject
 {
     // Update tasks once per frame based on a priority
     public class TaskUpdater<TTask>

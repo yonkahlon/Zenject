@@ -7,7 +7,7 @@ using System.Text;
 using System.Diagnostics;
 using UnityEngine;
 
-namespace ModestTree.Zenject
+namespace Zenject
 {
     public class ZenUtil
     {

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 
-namespace ModestTree.Zenject
+namespace Zenject
 {
     public abstract class Installer : IInstaller
     {

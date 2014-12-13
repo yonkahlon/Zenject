@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace ModestTree.Zenject
+namespace Zenject
 {
     // These classes can be derived from to add post-creation logic to your factory
     // Just call CreateInternal from your custom factory then do whatever you want before

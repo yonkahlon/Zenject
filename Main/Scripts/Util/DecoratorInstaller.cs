@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-namespace ModestTree.Zenject
+namespace Zenject
 {
     public abstract class DecoratorInstaller : MonoBehaviour
     {

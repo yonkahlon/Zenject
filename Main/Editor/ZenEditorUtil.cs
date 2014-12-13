@@ -5,7 +5,7 @@ using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
-namespace ModestTree.Zenject
+namespace Zenject
 {
     public static class ZenEditorUtil
     {

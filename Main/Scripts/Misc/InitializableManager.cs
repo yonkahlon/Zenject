@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace ModestTree.Zenject
+namespace Zenject
 {
     // Responsibilities:
     // - Run Initialize() on all Iinitializable's, in the order specified by InitPriority

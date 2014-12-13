@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
-using ModestTree.Zenject;
+using Zenject;
 
-namespace ModestTree.Zenject
+namespace Zenject
 {
     public class DisposablePrioritiesInstaller : Installer
     {

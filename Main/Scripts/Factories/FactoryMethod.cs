@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace ModestTree.Zenject
+namespace Zenject
 {
     // Zero parameters
     public sealed class FactoryMethod<TValue> : IValidatableFactory, IFactory<TValue>
