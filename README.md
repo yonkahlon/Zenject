@@ -1259,6 +1259,9 @@ For general troubleshooting / support, please use the google group which you can
 
 ## <a id="release-notes"></a>Release Notes
 
+1.16
+* Removed the word 'ModestTree' from namespaces since Zenject is open source and not proprietary to the company ModestTree.
+
 1.15
 * Fixed bug with ToSingleFromPrefab which was causing it to create multiple instances when used in different bindings.
 
