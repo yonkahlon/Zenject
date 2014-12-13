@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace ModestTree.Zenject
+namespace Zenject
 {
     // Instantiate using a delegate
     public class FactoryMethodUntyped<TContract> : IFactoryUntyped<TContract>

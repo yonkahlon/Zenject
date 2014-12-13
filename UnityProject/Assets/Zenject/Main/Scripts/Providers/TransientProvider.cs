@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-namespace ModestTree.Zenject
+namespace Zenject
 {
     public class TransientProvider : ProviderBase
     {

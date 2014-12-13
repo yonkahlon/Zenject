@@ -2,7 +2,7 @@ using System;
 using UnityEngine;
 using System.Linq;
 
-namespace ModestTree.Zenject
+namespace Zenject
 {
     public sealed class SceneDecoratorCompositionRoot : MonoBehaviour
     {

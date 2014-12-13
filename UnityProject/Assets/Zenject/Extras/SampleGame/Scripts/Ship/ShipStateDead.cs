@@ -1,10 +1,10 @@
 using System;
 using UnityEngine;
 using System.Collections;
-using ModestTree.Zenject;
+using Zenject;
 using Random=UnityEngine.Random;
 
-namespace ModestTree.Asteroids
+namespace Asteroids
 {
     public class ShipStateDead : ShipState
     {

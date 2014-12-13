@@ -1,12 +1,12 @@
 using System;
 using System.Collections.Generic;
-using ModestTree.Zenject;
+using Zenject;
 using NUnit.Framework;
-using ModestTree.Tests;
+using Zenject.Tests;
 using TestAssert=NUnit.Framework.Assert;
 using System.Linq;
 
-namespace ModestTree.Tests.Zenject
+namespace Zenject.Tests
 {
     [TestFixture]
     public class TestDiContainer

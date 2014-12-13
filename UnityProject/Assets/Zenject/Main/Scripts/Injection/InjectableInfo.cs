@@ -1,6 +1,6 @@
 using System;
 
-namespace ModestTree.Zenject
+namespace Zenject
 {
     // An injectable is a field or property with [Inject] attribute
     // Or a constructor parameter

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace ModestTree.Zenject
+namespace Zenject
 {
     // Helper to instantiate game objects and also inject
     // any dependencies they have

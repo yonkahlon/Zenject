@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace ModestTree
+namespace Asteroids
 {
     public static class UnityExtensionMethods
     {

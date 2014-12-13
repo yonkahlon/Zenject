@@ -1,9 +1,9 @@
 using System;
 using UnityEngine;
 using System.Collections;
-using ModestTree.Zenject;
+using Zenject;
 
-namespace ModestTree.Asteroids
+namespace Asteroids
 {
     public class ShipStateWaitingToStart : ShipState
     {

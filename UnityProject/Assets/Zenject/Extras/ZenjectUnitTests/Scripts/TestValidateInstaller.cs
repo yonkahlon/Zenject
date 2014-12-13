@@ -4,10 +4,10 @@ using System.Diagnostics;
 using NUnit.Framework;
 using UnityEngine;
 using TestAssert = NUnit.Framework.Assert;
-using ModestTree.Zenject;
+using Zenject;
 using System.Linq;
 
-namespace ModestTree.Tests.Zenject
+namespace Zenject.Tests
 {
     [TestFixture]
     public class TestValidateInstaller

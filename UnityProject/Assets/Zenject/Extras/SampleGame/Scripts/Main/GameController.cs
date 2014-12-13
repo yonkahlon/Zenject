@@ -1,8 +1,8 @@
 using UnityEngine;
 using System.Collections;
-using ModestTree.Zenject;
+using Zenject;
 
-namespace ModestTree.Asteroids
+namespace Asteroids
 {
     public enum GameStates
     {

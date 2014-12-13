@@ -4,7 +4,7 @@ using UnityEngine;
 using System.Linq;
 using System.Collections;
 
-namespace ModestTree
+namespace Zenject
 {
     public static class LinqExtensions
     {

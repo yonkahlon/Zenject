@@ -2,7 +2,7 @@ using System;
 using System.Linq;
 using UnityEngine;
 
-namespace ModestTree.Zenject
+namespace Zenject
 {
     public class StandardUnityInstaller : Installer
     {

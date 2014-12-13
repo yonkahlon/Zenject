@@ -6,7 +6,7 @@ using System.Text;
 using System.Diagnostics;
 using UnityEngine;
 
-namespace ModestTree.Zenject
+namespace Zenject
 {
     // Responsibilities:
     // - Output a file specifying the full object graph for a given root dependency

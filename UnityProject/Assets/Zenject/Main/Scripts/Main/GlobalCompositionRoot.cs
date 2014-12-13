@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace ModestTree.Zenject
+namespace Zenject
 {
     public sealed class GlobalCompositionRoot : MonoBehaviour
     {

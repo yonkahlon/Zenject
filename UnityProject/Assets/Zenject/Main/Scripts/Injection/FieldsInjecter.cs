@@ -4,7 +4,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 
-namespace ModestTree.Zenject
+namespace Zenject
 {
     // Iterate over fields/properties on a given object and inject any with the [Inject] attribute
     public class FieldsInjecter

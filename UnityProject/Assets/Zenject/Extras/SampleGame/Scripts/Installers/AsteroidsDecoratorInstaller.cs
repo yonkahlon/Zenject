@@ -1,8 +1,8 @@
 ﻿using UnityEngine;
 using System.Collections;
-using ModestTree.Zenject;
+using Zenject;
 
-namespace ModestTree.Asteroids
+namespace Asteroids
 {
     // This scene is an example of how decorators work
     // We override move settings to make the ship much slower and add a hotkey to manually spawn asteroids

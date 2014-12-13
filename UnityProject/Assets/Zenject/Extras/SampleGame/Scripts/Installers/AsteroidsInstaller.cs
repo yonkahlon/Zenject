@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System.Collections;
-using ModestTree.Zenject;
+using Zenject;
 using System.Linq;
 
-namespace ModestTree.Asteroids
+namespace Asteroids
 {
     public enum Cameras
     {

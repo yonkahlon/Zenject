@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace ModestTree.Zenject
+namespace Zenject
 {
     // NOTE: we need the provider seperate from the creator because
     // if we return the same provider multiple times then the condition

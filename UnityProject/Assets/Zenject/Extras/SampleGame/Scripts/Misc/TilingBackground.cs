@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-namespace ModestTree.Asteroids
+namespace Asteroids
 {
     public class TilingBackground : MonoBehaviour 
     {

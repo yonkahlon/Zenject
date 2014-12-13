@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Security.Permissions;
 
-namespace ModestTree.Zenject
+namespace Zenject
 {
     public interface IInitializable
     {

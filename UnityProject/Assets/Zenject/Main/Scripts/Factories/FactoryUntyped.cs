@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Security.Permissions;
 
-namespace ModestTree.Zenject
+namespace Zenject
 {
     // Instantiate given concrete class
     public class FactoryUntyped<TContract, TConcrete> : IFactoryUntyped<TContract> where TConcrete : TContract

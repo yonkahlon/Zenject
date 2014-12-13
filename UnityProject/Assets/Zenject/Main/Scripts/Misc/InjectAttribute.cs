@@ -1,6 +1,6 @@
 using System;
 
-namespace ModestTree.Zenject
+namespace Zenject
 {
     [AttributeUsage(AttributeTargets.Constructor | AttributeTargets.Parameter | AttributeTargets.Property | AttributeTargets.Field, AllowMultiple = false)]
     public class InjectAttribute : Attribute

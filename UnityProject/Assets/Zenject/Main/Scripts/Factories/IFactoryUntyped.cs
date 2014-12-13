@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 
-namespace ModestTree.Zenject
+namespace Zenject
 {
     // The difference between a factory and a provider:
     // Factories create new instances, providers might return an existing instance

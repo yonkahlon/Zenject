@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace ModestTree
+namespace Zenject
 {
     public class Tuple<T1, T2>
     {

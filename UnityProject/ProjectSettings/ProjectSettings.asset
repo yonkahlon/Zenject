@@ -73,7 +73,7 @@ PlayerSettings:
     16:10: 1
     16:9: 1
     Others: 1
-  iPhoneBundleIdentifier: com.ModestTree.Asteroids
+  iPhoneBundleIdentifier: com.Asteroids
   metroEnableIndependentInputSource: 0
   metroEnableLowLatencyPresentationAPI: 0
   productGUID: 5ed61df0b8965e44b81c9baf7e91dc14
