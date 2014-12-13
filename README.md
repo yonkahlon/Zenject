@@ -1259,6 +1259,9 @@ For general troubleshooting / support, please use the google group which you can
 
 ## <a id="release-notes"></a>Release Notes
 
+1.15
+* Fixed bug with ToSingleFromPrefab which was causing it to create multiple instances when used in different bindings.
+
 1.14
 * Added flag to CompositionRoot for whether to inject into inactive game objects or ignore them completely
 * Added BindAllInterfacesToSingle method to DiContainer
