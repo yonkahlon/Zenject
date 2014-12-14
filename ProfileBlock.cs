@@ -6,7 +6,7 @@ using System.Diagnostics;
 using System.Text.RegularExpressions;
 using UnityEngine;
 
-namespace Zenject
+namespace ModestTree
 {
     public class ProfileBlock : IDisposable
     {

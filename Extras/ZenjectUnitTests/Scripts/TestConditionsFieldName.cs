@@ -4,6 +4,7 @@ using Zenject;
 using NUnit.Framework;
 using TestAssert=NUnit.Framework.Assert;
 using System.Linq;
+using ModestTree;
 
 namespace Zenject.Tests
 {

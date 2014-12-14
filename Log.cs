@@ -7,7 +7,7 @@ using System.Reflection;
 using System.Text.RegularExpressions;
 using UnityEngine;
 
-namespace Zenject
+namespace ModestTree
 {
     // Simple wrapper around unity's logging system
     public static class Log
