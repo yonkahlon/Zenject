@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Zenject;
 using NUnit.Framework;
 using TestAssert=NUnit.Framework.Assert;
+using ModestTree;
 
 namespace Zenject.Tests
 {

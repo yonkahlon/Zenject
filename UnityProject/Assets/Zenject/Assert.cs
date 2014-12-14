@@ -4,7 +4,7 @@ using System.Diagnostics;
 using Debug = UnityEngine.Debug;
 using System.Linq;
 
-namespace Zenject
+namespace ModestTree
 {
     public class AssertException : Exception
     {

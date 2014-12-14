@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-namespace Zenject
+namespace ModestTree
 {
     public static class UnityUtil
     {

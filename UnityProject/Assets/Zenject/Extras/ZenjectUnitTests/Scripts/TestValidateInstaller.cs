@@ -6,6 +6,7 @@ using UnityEngine;
 using TestAssert = NUnit.Framework.Assert;
 using Zenject;
 using System.Linq;
+using ModestTree;
 
 namespace Zenject.Tests
 {

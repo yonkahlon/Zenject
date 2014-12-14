@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
-namespace Zenject
+namespace ModestTree
 {
     public static class TypeExtensions
     {

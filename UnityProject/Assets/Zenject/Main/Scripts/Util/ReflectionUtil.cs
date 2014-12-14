@@ -8,7 +8,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 
-namespace Zenject
+namespace ModestTree
 {
     public static class ReflectionUtil
     {
