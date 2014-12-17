@@ -70,7 +70,7 @@ namespace Zenject
         public T Instantiate<T>(
             GameObject template, params object[] args) where T : Component
         {
-            return (T)Instantiate(typeof(T), template);
+            return (T)Instantiate(typeof(T), template, args);
         }
 
         // Create from prefab
