@@ -1259,6 +1259,9 @@ For general troubleshooting / support, please use the google group which you can
 
 ## <a id="release-notes"></a>Release Notes
 
+1.17
+* Bug fix.  Was not forwarding parameters correctly when instantiating objects from prefabs
+
 1.16
 * Removed the word 'ModestTree' from namespaces since Zenject is open source and not proprietary to the company ModestTree.
 
