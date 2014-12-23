@@ -337,8 +337,11 @@ Each Zenject application therefore must tell the container how to resolve each o
 
 ## <a id="list-bindings"></a>List Bindings
 
-You can also bind multiple types to the same interface, with the result being a list of dependencies.  In the example code below, Bar would get a list containing a new instance of Foo1, Foo2, and Foo3:
+When Zenject finds multiple bindings for the same type, it interprets that to be a list.  So, in the example code below, Bar would get a list containing a new instance of Foo1, Foo2, and Foo3:
 
+    ...
+
+    // In an installer somewhere
     Container.Bind<IFoo>().ToSingle<Foo1>();
     Container.Bind<IFoo>().ToSingle<Foo2>();
     Container.Bind<IFoo>().ToSingle<Foo3>();
@@ -352,7 +355,14 @@ You can also bind multiple types to the same interface, with the result being a 
         }
     }
 
-Note that when defining List dependencies, the empty list will result in an error.  If the empty list is valid, then you can suppress the error by marking the List as optional as described <a href="#optional-binding">here</a>.
+Also worth noting is that if you try and declare a single dependency of IFoo (like Bar below) and there are multiple bindings for it, then Zenject will throw an exception, since Zenject doesn't know which instance of IFoo to use.  Also, if the empty list is valid, then you should mark your List constructor parameter (or [Inject] field) as optional (see <a href="#optional-binding">here</a> for details).
+
+    public class Bar
+    {
+        public Bar(IFoo foo)
+        {
+        }
+    }
 
 ## <a id="optional-binding"></a>Optional Binding
 
