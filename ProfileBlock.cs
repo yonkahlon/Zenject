@@ -1,4 +1,4 @@
-#define PROFILING_ENABLED
+//#define PROFILING_ENABLED
 
 using System;
 using System.Collections.Generic;

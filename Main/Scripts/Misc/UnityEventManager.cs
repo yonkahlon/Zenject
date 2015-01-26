@@ -11,7 +11,6 @@ namespace Zenject
 
         public event Action ApplicationQuit = delegate { };
         public event Action ChangingScenes = delegate { };
-        public event Action Gui = delegate { };
         public event Action DrawGizmos = delegate { };
 
         public event Action LeftMouseButtonDown = delegate { };
@@ -89,11 +88,6 @@ namespace Zenject
                 _lastHeight = Screen.height;
                 ScreenSizeChanged();
             }
-        }
-
-        void OnGUI()
-        {
-            Gui();
         }
 
         void OnDestroy()
