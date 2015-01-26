@@ -80,14 +80,22 @@ namespace Zenject
 
         public void UpdateRange(int minPriority, int maxPriority)
         {
-            // Make sure that tasks with priority of int.MaxValue are updated when maxPriority is int.MaxValue
-            foreach (var taskInfo in _sortedTasks)
+            var node = _sortedTasks.First;
+
+            while (node != null)
             {
-                if (!taskInfo.IsRemoved && taskInfo.Priority >= minPriority && (maxPriority == int.MaxValue || taskInfo.Priority < maxPriority))
+                var next = node.Next;
+                var taskInfo = node.Value;
+
+                // Make sure that tasks with priority of int.MaxValue are updated when maxPriority is int.MaxValue
+                if (!taskInfo.IsRemoved && taskInfo.Priority >= minPriority
+                    && (maxPriority == int.MaxValue || taskInfo.Priority < maxPriority))
                 {
                     Assert.That(taskInfo.Priority.HasValue);
                     _updateFunc(taskInfo.Task);
                 }
+
+                node = next;
             }
 
             ClearRemovedTasks(_sortedTasks);
@@ -95,13 +103,20 @@ namespace Zenject
 
         public void UpdateUnsorted()
         {
-            foreach (var taskInfo in _unsortedTasks)
+            var node = _unsortedTasks.First;
+
+            while (node != null)
             {
+                var next = node.Next;
+                var taskInfo = node.Value;
+
                 if (!taskInfo.IsRemoved)
                 {
                     Assert.That(!taskInfo.Priority.HasValue);
                     _updateFunc(taskInfo.Task);
                 }
+
+                node = next;
             }
 
             ClearRemovedTasks(_unsortedTasks);

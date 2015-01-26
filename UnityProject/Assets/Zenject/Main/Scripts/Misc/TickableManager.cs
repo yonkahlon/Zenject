@@ -152,7 +152,7 @@ namespace Zenject
 
         void UpdateLateTickable(ILateTickable tickable)
         {
-            using (ProfileBlock.Start("{0}.LateTick()".With(tickable.GetType().Name())))
+            //using (ProfileBlock.Start("{0}.LateTick()".With(tickable.GetType().Name())))
             {
                 tickable.LateTick();
             }
@@ -160,7 +160,7 @@ namespace Zenject
 
         void UpdateFixedTickable(IFixedTickable tickable)
         {
-            using (ProfileBlock.Start("{0}.FixedTick()".With(tickable.GetType().Name())))
+            //using (ProfileBlock.Start("{0}.FixedTick()".With(tickable.GetType().Name())))
             {
                 tickable.FixedTick();
             }
@@ -168,7 +168,7 @@ namespace Zenject
 
         void UpdateTickable(ITickable tickable)
         {
-            using (ProfileBlock.Start("{0}.Tick()".With(tickable.GetType().Name())))
+            //using (ProfileBlock.Start("{0}.Tick()".With(tickable.GetType().Name())))
             {
                 tickable.Tick();
             }
