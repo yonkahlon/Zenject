@@ -1,10 +1,10 @@
 #pragma warning disable 414
-using ModestTree;
 
 using System;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
+using ModestTree;
 
 namespace Zenject
 {
@@ -46,6 +46,7 @@ namespace Zenject
             var container = new DiContainer();
             container.AllowNullBindings = allowNullBindings;
             container.FallbackProvider = new DiContainerProvider(parentContainer);
+            container.Bind<CompositionRoot>().To(this);
 
             if (BeforeInstallHooks != null)
             {
