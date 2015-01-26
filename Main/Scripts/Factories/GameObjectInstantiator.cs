@@ -100,7 +100,7 @@ namespace Zenject
                 {
                     var extraArgs = Enumerable.Empty<object>();
 
-                    if (component.GetType() == componentType)
+                    if (component.GetType().DerivesFromOrEqual(componentType))
                     {
                         Assert.IsNull(requestedScript,
                             "Found multiple matches with type '{0}' when instantiating new game object from template '{1}'", componentType, template.name);

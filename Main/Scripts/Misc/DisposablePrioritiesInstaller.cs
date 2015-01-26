@@ -25,6 +25,13 @@ namespace Zenject
             }
         }
 
+        public static void BindPriority<T>(
+            DiContainer container, int priorityCount)
+            where T : IDisposable
+        {
+            BindPriority(container, typeof(T), priorityCount);
+        }
+
         public static void BindPriority(
             DiContainer container, Type disposableType, int priorityCount)
         {

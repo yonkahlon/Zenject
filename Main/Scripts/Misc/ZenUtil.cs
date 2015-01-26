@@ -63,7 +63,9 @@ namespace Zenject
             }
             else
             {
+                Log.Debug("Starting to load scene '{0}'", levelName);
                 Application.LoadLevel(levelName);
+                Log.Debug("Finished loading scene '{0}'", levelName);
             }
         }
 

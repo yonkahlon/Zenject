@@ -300,7 +300,7 @@ namespace Zenject
         }
     }
 
-    // Seven parameters
+    // Eigth parameters
     public class Factory<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6, TParam7, TParam8, TValue> :
         IValidatableFactory, IFactory<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6, TParam7, TParam8, TValue>
     {
@@ -339,6 +339,95 @@ namespace Zenject
                     InstantiateUtil.CreateTypePair(param6),
                     InstantiateUtil.CreateTypePair(param7),
                     InstantiateUtil.CreateTypePair(param8),
+                });
+        }
+    }
+
+    // Nine parameters
+    public class Factory<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6, TParam7, TParam8, TParam9, TValue> :
+        IValidatableFactory, IFactory<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6, TParam7, TParam8, TParam9, TValue>
+    {
+        [Inject]
+        DiContainer _container = null;
+
+        public Type ConstructedType
+        {
+            get { return typeof(TValue); }
+        }
+
+        public Type[] ProvidedTypes
+        {
+            get { return new Type[] { typeof(TParam1), typeof(TParam2), typeof(TParam3), typeof(TParam4), typeof(TParam5), typeof(TParam6), typeof(TParam7), typeof(TParam8), typeof(TParam9) }; }
+        }
+
+        protected DiContainer Container
+        {
+            get
+            {
+                return _container;
+            }
+        }
+
+        public virtual TValue Create(
+            TParam1 param1, TParam2 param2, TParam3 param3, TParam4 param4, TParam5 param5, TParam6 param6, TParam7 param7, TParam8 param8, TParam9 param9)
+        {
+            return _container.InstantiateExplicit<TValue>(
+                new List<TypeValuePair>()
+                {
+                    InstantiateUtil.CreateTypePair(param1),
+                    InstantiateUtil.CreateTypePair(param2),
+                    InstantiateUtil.CreateTypePair(param3),
+                    InstantiateUtil.CreateTypePair(param4),
+                    InstantiateUtil.CreateTypePair(param5),
+                    InstantiateUtil.CreateTypePair(param6),
+                    InstantiateUtil.CreateTypePair(param7),
+                    InstantiateUtil.CreateTypePair(param8),
+                    InstantiateUtil.CreateTypePair(param9),
+                });
+        }
+    }
+
+    // Ten parameters
+    public class Factory<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6, TParam7, TParam8, TParam9, TParam10, TValue> :
+        IValidatableFactory, IFactory<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6, TParam7, TParam8, TParam9, TParam10, TValue>
+    {
+        [Inject]
+        DiContainer _container = null;
+
+        public Type ConstructedType
+        {
+            get { return typeof(TValue); }
+        }
+
+        public Type[] ProvidedTypes
+        {
+            get { return new Type[] { typeof(TParam1), typeof(TParam2), typeof(TParam3), typeof(TParam4), typeof(TParam5), typeof(TParam6), typeof(TParam7), typeof(TParam8), typeof(TParam9), typeof(TParam10) }; }
+        }
+
+        protected DiContainer Container
+        {
+            get
+            {
+                return _container;
+            }
+        }
+
+        public virtual TValue Create(
+            TParam1 param1, TParam2 param2, TParam3 param3, TParam4 param4, TParam5 param5, TParam6 param6, TParam7 param7, TParam8 param8, TParam9 param9, TParam10 param10)
+        {
+            return _container.InstantiateExplicit<TValue>(
+                new List<TypeValuePair>()
+                {
+                    InstantiateUtil.CreateTypePair(param1),
+                    InstantiateUtil.CreateTypePair(param2),
+                    InstantiateUtil.CreateTypePair(param3),
+                    InstantiateUtil.CreateTypePair(param4),
+                    InstantiateUtil.CreateTypePair(param5),
+                    InstantiateUtil.CreateTypePair(param6),
+                    InstantiateUtil.CreateTypePair(param7),
+                    InstantiateUtil.CreateTypePair(param8),
+                    InstantiateUtil.CreateTypePair(param9),
+                    InstantiateUtil.CreateTypePair(param10),
                 });
         }
     }

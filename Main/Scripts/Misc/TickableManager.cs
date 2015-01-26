@@ -36,12 +36,37 @@ namespace Zenject
         TaskUpdater<IFixedTickable> _fixedUpdater;
         TaskUpdater<ILateTickable> _lateUpdater;
 
+        [Inject]
+        DiContainer _container = null;
+
+        [InjectOptional]
+        bool _warnForMissing = false;
+
         [PostInject]
         public void Initialize()
         {
             InitTickables();
             InitFixedTickables();
             InitLateTickables();
+
+            if (_warnForMissing)
+            {
+                WarnForMissingBindings();
+            }
+        }
+
+        void WarnForMissingBindings()
+        {
+            var ignoredTypes = new Type[] { };
+
+            var boundTypes = _tickables.Select(x => x.GetType()).Distinct();
+
+            var unboundTypes = _container.AllConcreteTypes.Where(x => x.DerivesFrom<ITickable>() && !boundTypes.Contains(x) && !ignoredTypes.Contains(x));
+
+            foreach (var objType in unboundTypes)
+            {
+                Log.Warn("Found unbound ITickable with type '" + objType.Name() + "'");
+            }
         }
 
         void InitFixedTickables()

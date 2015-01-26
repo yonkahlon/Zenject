@@ -22,6 +22,10 @@ namespace Zenject
 
         public void AddPreBindings(DiContainer container)
         {
+            // Make our scene graph a child of the new CompositionRoot so any monobehaviour's that are
+            // built into the scene get injected
+            transform.parent = container.Resolve<CompositionRoot>().transform;
+
             ProcessInstallers(container, true);
         }
 
