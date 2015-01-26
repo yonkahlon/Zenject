@@ -9,7 +9,6 @@ namespace Zenject
     public class MonoBehaviourSingletonProvider : ProviderBase
     {
         Component _instance;
-        GameObjectInstantiator _instantiator;
         DiContainer _container;
         Type _componentType;
         GameObject _gameObject;

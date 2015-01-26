@@ -6,18 +6,18 @@ namespace Zenject
     public sealed class UnityDependencyRoot : MonoBehaviour, IDependencyRoot
     {
         [Inject]
-        TickableManager _tickableManager;
+        TickableManager _tickableManager = null;
 
         [Inject]
-        InitializableManager _initializableManager;
+        InitializableManager _initializableManager = null;
 
         [Inject]
-        DisposableManager _disposablesManager;
+        DisposableManager _disposablesManager = null;
 
         // For cases where you have game objects that aren't referenced anywhere but still want them to be
         // created on startup
         [InjectOptional]
-        List<MonoBehaviour> _initialObjects;
+        public List<MonoBehaviour> _initialObjects = null;
 
         [PostInject]
         public void Initialize()
