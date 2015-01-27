@@ -60,7 +60,7 @@ namespace Zenject
         public static IEnumerable<ZenjectResolveException> ValidateInstallers(CompositionRoot compRoot)
         {
             var globalContainer = GlobalCompositionRoot.CreateContainer(true, null);
-            var container = compRoot.CreateContainer(true, globalContainer);
+            var container = compRoot.CreateContainer(true, globalContainer, new List<IInstaller>());
 
             foreach (var error in container.ValidateResolve<IDependencyRoot>())
             {

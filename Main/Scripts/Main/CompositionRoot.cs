@@ -17,11 +17,13 @@ namespace Zenject
 
         public bool OnlyInjectWhenActive = true;
 
+        [SerializeField]
+        public MonoInstaller[] Installers = new MonoInstaller[0];
+
         DiContainer _container;
         IDependencyRoot _dependencyRoot = null;
 
-        [SerializeField]
-        public MonoInstaller[] Installers;
+        static List<IInstaller> _staticInstallers = new List<IInstaller>();
 
         public DiContainer Container
         {
@@ -31,17 +33,37 @@ namespace Zenject
             }
         }
 
+        // This method is used for cases where you need to create the CompositionRoot entirely in code
+        // Necessary because the Awake() method is called immediately after AddComponent<CompositionRoot>
+        // so there's no other way to add installers to it
+        public static CompositionRoot AddComponent(
+            GameObject gameObject, IInstaller rootInstaller)
+        {
+            return AddComponent(gameObject, new List<IInstaller>() { rootInstaller });
+        }
+
+        public static CompositionRoot AddComponent(
+            GameObject gameObject, List<IInstaller> installers)
+        {
+            Assert.That(_staticInstallers.IsEmpty());
+            _staticInstallers.AddRange(installers);
+            return gameObject.AddComponent<CompositionRoot>();
+        }
+
         public void Awake()
         {
             Log.Debug("Zenject Started");
 
-            _container = CreateContainer(false, GlobalCompositionRoot.Instance.Container);
+            _container = CreateContainer(
+                false, GlobalCompositionRoot.Instance.Container, _staticInstallers);
+            _staticInstallers.Clear();
 
             InjectionHelper.InjectChildGameObjects(_container, gameObject, !OnlyInjectWhenActive);
             _dependencyRoot = _container.Resolve<IDependencyRoot>();
         }
 
-        public DiContainer CreateContainer(bool allowNullBindings, DiContainer parentContainer)
+        public DiContainer CreateContainer(
+            bool allowNullBindings, DiContainer parentContainer, List<IInstaller> extraInstallers)
         {
             var container = new DiContainer();
             container.AllowNullBindings = allowNullBindings;
@@ -57,13 +79,15 @@ namespace Zenject
 
             CompositionRootHelper.InstallStandardInstaller(container, this.gameObject);
 
-            if (Installers.Where(x => x != null).IsEmpty())
+            var allInstallers = extraInstallers.Concat(Installers).ToList();
+
+            if (allInstallers.Where(x => x != null).IsEmpty())
             {
                 Log.Warn("No installers found while initializing CompositionRoot");
             }
             else
             {
-                CompositionRootHelper.InstallSceneInstallers(container, Installers);
+                CompositionRootHelper.InstallSceneInstallers(container, allInstallers);
             }
 
             if (AfterInstallHooks != null)
