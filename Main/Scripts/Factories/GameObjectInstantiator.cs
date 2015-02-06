@@ -87,7 +87,7 @@ namespace Zenject
             // This is good so that the entire object graph is
             // contained underneath it, which is useful for cases
             // where you need to delete the entire object graph
-            gameObj.transform.parent = _rootTransform;
+            gameObj.transform.SetParent(_rootTransform, false);
 
             gameObj.SetActive(true);
 
