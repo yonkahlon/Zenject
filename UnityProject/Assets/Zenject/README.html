@@ -1040,6 +1040,13 @@ public class TestHotKeysAdder : ITickable
 <h2 id="-a-id-further-help-a-further-help"><a id="further-help"></a>Further Help</h2>
 <p>For general troubleshooting / support, please use the google group which you can find <a href="https://groups.google.com/forum/#!forum/zenject/">here</a>.  If you have found a bug, you are also welcome to create an issue on the <a href="https://github.com/modesttree/Zenject">github page</a>, or a pull request if you have a fix / extension.  Finally, you can also email me directly at svermeulen@modesttree.com</p>
 <h2 id="-a-id-release-notes-a-release-notes"><a id="release-notes"></a>Release Notes</h2>
+<p>1.19</p>
+<ul>
+<li>Upgraded to Unity 5</li>
+<li>Added an optional identifier to InjectOptional attribute</li>
+<li>Changed the way priorities are interpreted for tickables, disposables, etc. Zero is now used as default for any unspecified priorities.  This is helpful because it allows you to choose priorities that occur either before or after the unspecified priorities.</li>
+<li>Added some helper methods to ZenEditorUtil for use by CI servers to validate all scenes</li>
+</ul>
 <p>1.18</p>
 <ul>
 <li>Added minor optimizations to reduce per-frame allocation to zero</li>

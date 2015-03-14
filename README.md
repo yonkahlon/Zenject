@@ -1268,6 +1268,13 @@ However, admittedly, I personally haven't gotten a lot of mileage out of this fe
 For general troubleshooting / support, please use the google group which you can find [here](https://groups.google.com/forum/#!forum/zenject/).  If you have found a bug, you are also welcome to create an issue on the [github page](https://github.com/modesttree/Zenject), or a pull request if you have a fix / extension.  Finally, you can also email me directly at svermeulen@modesttree.com
 
 ## <a id="release-notes"></a>Release Notes
+
+1.19
+* Upgraded to Unity 5
+* Added an optional identifier to InjectOptional attribute
+* Changed the way priorities are interpreted for tickables, disposables, etc. Zero is now used as default for any unspecified priorities.  This is helpful because it allows you to choose priorities that occur either before or after the unspecified priorities.
+* Added some helper methods to ZenEditorUtil for use by CI servers to validate all scenes
+
 1.18
 * Added minor optimizations to reduce per-frame allocation to zero
 * Fixed unit tests to be compatible with unity test tools
