@@ -52,7 +52,7 @@ namespace Zenject
             if (!concreteType.DerivesFromOrEqual(typeof(TContract)))
             {
                 throw new ZenjectResolveException(
-                    "Expected type '{0}' to derive from '{1}'".With(concreteType.Name(), typeof(TContract).Name()));
+                    "Expected type '{0}' to derive from '{1}'".Fmt(concreteType.Name(), typeof(TContract).Name()));
             }
 
             _container = container;

@@ -16,6 +16,14 @@ namespace Zenject
             _container = container;
         }
 
+        internal IEnumerable<SingletonLazyCreator> Creators
+        {
+            get
+            {
+                return _creators.Values;
+            }
+        }
+
         internal void RemoveCreator(SingletonId id)
         {
             bool success = _creators.Remove(id);
@@ -31,7 +39,7 @@ namespace Zenject
             if (_creators.ContainsKey(id))
             {
                 throw new ZenjectBindException(
-                    "Found multiple singleton instances bound to type '{0}'".With(typeof(TConcrete)));
+                    "Found multiple singleton instances bound to type '{0}'".Fmt(typeof(TConcrete)));
             }
 
             creator = new SingletonLazyCreator(
@@ -106,7 +114,7 @@ namespace Zenject
 
             if (creator.HasInstance())
             {
-                throw new ZenjectBindException("Found multiple singleton instances bound to the type '{0}'".With(concreteType.Name()));
+                throw new ZenjectBindException("Found multiple singleton instances bound to the type '{0}'".Fmt(concreteType.Name()));
             }
 
             creator.SetInstance(instance);

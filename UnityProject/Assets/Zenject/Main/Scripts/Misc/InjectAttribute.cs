@@ -24,6 +24,20 @@ namespace Zenject
     [AttributeUsage(AttributeTargets.Parameter | AttributeTargets.Property | AttributeTargets.Field, AllowMultiple = false)]
     public class InjectOptionalAttribute : Attribute
     {
+        public InjectOptionalAttribute(object identifier)
+        {
+            Identifier = identifier;
+        }
+
+        public InjectOptionalAttribute()
+        {
+        }
+
+        public object Identifier
+        {
+            get;
+            private set;
+        }
     }
 
     [AttributeUsage(AttributeTargets.Method, AllowMultiple = false)]

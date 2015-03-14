@@ -60,7 +60,7 @@ namespace Zenject
             if (typeInfo.InjectConstructor == null)
             {
                 throw new ZenjectResolveException(
-                    "More than one or zero constructors found for type '{0}' when creating dependencies.  Use one [Inject] attribute to specify which to use.".With(concreteType));
+                    "More than one or zero constructors found for type '{0}' when creating dependencies.  Use one [Inject] attribute to specify which to use.".Fmt(concreteType));
             }
 
             // Make a copy since we remove from it below
@@ -91,7 +91,7 @@ namespace Zenject
             catch (Exception e)
             {
                 throw new ZenjectResolveException(
-                    "Error occurred while instantiating object with type '{0}'".With(concreteType.Name()), e);
+                    "Error occurred while instantiating object with type '{0}'".Fmt(concreteType.Name()), e);
             }
 
             FieldsInjecter.Inject(_container, newObj, extraArgMap, true, typeInfo);

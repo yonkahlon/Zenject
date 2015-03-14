@@ -7,8 +7,9 @@ namespace Zenject
 {
     public class DisposableManager : IDisposable
     {
+        readonly SingletonProviderMap _singletonProviderMap;
+
         List<DisposableInfo> _disposables = new List<DisposableInfo>();
-        DiContainer _container;
         bool _disposed;
 
         public DisposableManager(
@@ -16,24 +17,18 @@ namespace Zenject
             List<IDisposable> disposables,
             [InjectOptional]
             List<Tuple<Type, int>> priorities,
-            DiContainer container)
+            SingletonProviderMap singletonProviderMap)
         {
-            _container = container;
-            var priorityMap = priorities.ToDictionary(x => x.First, x => x.Second);
+            _singletonProviderMap = singletonProviderMap;
 
             foreach (var disposable in disposables)
             {
-                int priority;
-                bool success = priorityMap.TryGetValue(disposable.GetType(), out priority);
+                // Note that we use zero for unspecified priority
+                // This is nice because you can use negative or positive for before/after unspecified
+                var matches = priorities.Where(x => disposable.GetType().DerivesFromOrEqual(x.First)).Select(x => x.Second).ToList();
+                int priority = matches.IsEmpty() ? 0 : matches.Single();
 
-                if (!success)
-                {
-                    //Log.Warn(
-                        //String.Format("IDisposable with type '{0}' does not have a priority assigned", //disposable.GetType()));
-                }
-
-                _disposables.Add(
-                    new DisposableInfo(disposable, success ? (int?)priority : null));
+                _disposables.Add(new DisposableInfo(disposable, priority));
             }
 
             Log.Debug("Loaded {0} IDisposables to DisposablesHandler", _disposables.Count());
@@ -44,7 +39,7 @@ namespace Zenject
             Assert.That(!_disposed);
             _disposed = true;
 
-            _disposables.Sort(SortCompare);
+            _disposables = _disposables.OrderBy(x => x.Priority).ToList();
 
             if (Assert.IsEnabled)
             {
@@ -52,7 +47,7 @@ namespace Zenject
 
                 foreach (var disposable in _disposables.Select(x => x.Disposable).GetDuplicates())
                 {
-                    Assert.That(false, "Found duplicate IDisposable with type '{0}'".With(disposable.GetType()));
+                    Assert.That(false, "Found duplicate IDisposable with type '{0}'".Fmt(disposable.GetType()));
                 }
             }
 
@@ -65,7 +60,7 @@ namespace Zenject
                 catch (Exception e)
                 {
                     throw new ZenjectException(
-                        "Error occurred while disposing IDisposable with type '{0}'".With(disposable.Disposable.GetType().Name()), e);
+                        "Error occurred while disposing IDisposable with type '{0}'".Fmt(disposable.Disposable.GetType().Name()), e);
                 }
             }
 
@@ -78,7 +73,11 @@ namespace Zenject
 
             var boundTypes = _disposables.Select(x => x.Disposable.GetType()).Distinct();
 
-            var unboundTypes = _container.AllConcreteTypes.Where(x => x.DerivesFrom<IDisposable>() && !boundTypes.Contains(x) && !ignoredTypes.Contains(x));
+            var unboundTypes = _singletonProviderMap.Creators
+                .Select(x => x.GetInstanceType())
+                .Where(x => x.DerivesFrom<IDisposable>())
+                .Distinct()
+                .Where(x => !boundTypes.Contains(x) && !ignoredTypes.Contains(x));
 
             foreach (var objType in unboundTypes)
             {
@@ -86,28 +85,12 @@ namespace Zenject
             }
         }
 
-        int SortCompare(DisposableInfo e1, DisposableInfo e2)
-        {
-            // Dispose disposables with null priorities first
-            if (!e1.Priority.HasValue)
-            {
-                return -1;
-            }
-
-            if (!e2.Priority.HasValue)
-            {
-                return 1;
-            }
-
-            return e1.Priority.Value.CompareTo(e2.Priority.Value);
-        }
-
         class DisposableInfo
         {
             public IDisposable Disposable;
-            public int? Priority;
+            public int Priority;
 
-            public DisposableInfo(IDisposable disposable, int? priority)
+            public DisposableInfo(IDisposable disposable, int priority)
             {
                 Disposable = disposable;
                 Priority = priority;

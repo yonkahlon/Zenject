@@ -9,8 +9,7 @@ namespace Zenject
     // Update tasks once per frame based on a priority
     public class TaskUpdater<TTask>
     {
-        LinkedList<TaskInfo> _sortedTasks = new LinkedList<TaskInfo>();
-        LinkedList<TaskInfo> _unsortedTasks = new LinkedList<TaskInfo>();
+        LinkedList<TaskInfo> _tasks = new LinkedList<TaskInfo>();
 
         List<TaskInfo> _queuedTasks = new List<TaskInfo>();
         Action<TTask> _updateFunc;
@@ -27,7 +26,7 @@ namespace Zenject
         {
             get
             {
-                return _sortedTasks.Concat(_unsortedTasks);
+                return _tasks;
             }
         }
 
@@ -36,17 +35,12 @@ namespace Zenject
             _updateFunc = updateFunc;
         }
 
-        public void AddTask(TTask task)
-        {
-            AddTaskInternal(task, null);
-        }
-
         public void AddTask(TTask task, int priority)
         {
             AddTaskInternal(task, priority);
         }
 
-        void AddTaskInternal(TTask task, int? priority)
+        void AddTaskInternal(TTask task, int priority)
         {
             Assert.That(!AllTasks.Select(x => x.Task).Contains(task),
                 "Duplicate task added to kernel with name '" + task.GetType().FullName + "'");
@@ -54,8 +48,7 @@ namespace Zenject
             // Wait until next frame to add the task, otherwise whether it gets updated
             // on the current frame depends on where in the update order it was added
             // from, so you might get off by one frame issues
-            _queuedTasks.Add(
-                new TaskInfo(task, priority));
+            _queuedTasks.Add(new TaskInfo(task, priority));
         }
 
         public void RemoveTask(TTask task)
@@ -75,12 +68,11 @@ namespace Zenject
         public void UpdateAll()
         {
             UpdateRange(int.MinValue, int.MaxValue);
-            UpdateUnsorted();
         }
 
         public void UpdateRange(int minPriority, int maxPriority)
         {
-            var node = _sortedTasks.First;
+            var node = _tasks.First;
 
             while (node != null)
             {
@@ -91,35 +83,13 @@ namespace Zenject
                 if (!taskInfo.IsRemoved && taskInfo.Priority >= minPriority
                     && (maxPriority == int.MaxValue || taskInfo.Priority < maxPriority))
                 {
-                    Assert.That(taskInfo.Priority.HasValue);
                     _updateFunc(taskInfo.Task);
                 }
 
                 node = next;
             }
 
-            ClearRemovedTasks(_sortedTasks);
-        }
-
-        public void UpdateUnsorted()
-        {
-            var node = _unsortedTasks.First;
-
-            while (node != null)
-            {
-                var next = node.Next;
-                var taskInfo = node.Value;
-
-                if (!taskInfo.IsRemoved)
-                {
-                    Assert.That(!taskInfo.Priority.HasValue);
-                    _updateFunc(taskInfo.Task);
-                }
-
-                node = next;
-            }
-
-            ClearRemovedTasks(_unsortedTasks);
+            ClearRemovedTasks(_tasks);
         }
 
         void ClearRemovedTasks(LinkedList<TaskInfo> tasks)
@@ -155,41 +125,28 @@ namespace Zenject
 
         void InsertTaskSorted(TaskInfo task)
         {
-            if (!task.Priority.HasValue)
+            for (var current = _tasks.First; current != null; current = current.Next)
             {
-                _unsortedTasks.AddLast(task);
-                return;
-            }
-
-            for (var current = _sortedTasks.First; current != null; current = current.Next)
-            {
-                Assert.That(current.Value.Priority.HasValue);
-
                 if (current.Value.Priority > task.Priority)
                 {
-                    _sortedTasks.AddBefore(current, task);
+                    _tasks.AddBefore(current, task);
                     return;
                 }
             }
 
-            _sortedTasks.AddLast(task);
+            _tasks.AddLast(task);
         }
 
         class TaskInfo
         {
             public TTask Task;
-            public int? Priority;
+            public int Priority;
             public bool IsRemoved;
 
-            public TaskInfo(TTask task, int? priority)
+            public TaskInfo(TTask task, int priority)
             {
                 Task = task;
                 Priority = priority;
-            }
-
-            public TaskInfo(TTask task)
-                : this(task, null)
-            {
             }
         }
     }

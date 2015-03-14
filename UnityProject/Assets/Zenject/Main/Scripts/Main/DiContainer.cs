@@ -33,6 +33,7 @@ namespace Zenject
 
             Bind<DiContainer>().To(this);
             Bind<Instantiator>().To(_instantiator);
+            Bind<SingletonProviderMap>().To(_singletonMap);
         }
 
         public IEnumerable<IInstaller> InstalledInstallers
@@ -86,21 +87,12 @@ namespace Zenject
             }
         }
 
-        // Note that this list is not exhaustive by any means
-        // It is also not necessary accurate
+        // Note that this list is not exhaustive or even accurate so use with caution
         public IEnumerable<Type> AllConcreteTypes
         {
             get
             {
                 return (from x in _providers from p in x.Value select p.GetInstanceType()).Where(x => x != null && !x.IsInterface && !x.IsAbstract).Distinct();
-            }
-        }
-
-        IEnumerable<object> AllConcreteInstances
-        {
-            get
-            {
-                return (from x in _providers from p in x.Value where p.HasInstance(p.GetInstanceType()) select p.GetInstance(p.GetInstanceType(), new InjectContext(this)));
             }
         }
 
@@ -132,12 +124,13 @@ namespace Zenject
             if (prefab == null)
             {
                 throw new ZenjectBindException(
-                    "Null prefab provided to BindGameObjectFactory for type '{0}'".With(typeof(T).Name()));
+                    "Null prefab provided to BindGameObjectFactory for type '{0}'".Fmt(typeof(T).Name()));
             }
+
             // We could bind the factory ToSingle but doing it this way is better
             // since it allows us to have multiple game object factories that
             // use different prefabs and have them injected into different places
-            return Bind<T>().ToMethod((c, ctx) => c.Instantiate<T>(prefab));
+            return Bind<T>().ToMethod(c => c.Instantiate<T>(prefab));
         }
 
         public BindingConditionSetter BindFactoryToMethodUntyped<TContract>(Func<DiContainer, object[], TContract> method)
@@ -147,22 +140,22 @@ namespace Zenject
 
         public BindingConditionSetter BindFactoryToMethod<TContract>(Func<DiContainer, TContract> method)
         {
-            return Bind<IFactory<TContract>>().ToMethod((c, ctx) => c.Instantiate<FactoryMethod<TContract>>(method));
+            return Bind<IFactory<TContract>>().ToMethod((c) => c.Instantiate<FactoryMethod<TContract>>(method));
         }
 
         public BindingConditionSetter BindFactoryToMethod<TParam1, TContract>(Func<DiContainer, TParam1, TContract> method)
         {
-            return Bind<IFactory<TParam1, TContract>>().ToMethod((c, ctx) => c.Instantiate<FactoryMethod<TParam1, TContract>>(method));
+            return Bind<IFactory<TParam1, TContract>>().ToMethod((c) => c.Instantiate<FactoryMethod<TParam1, TContract>>(method));
         }
 
         public BindingConditionSetter BindFactoryToMethod<TParam1, TParam2, TContract>(Func<DiContainer, TParam1, TParam2, TContract> method)
         {
-            return Bind<IFactory<TParam1, TParam2, TContract>>().ToMethod((c, ctx) => c.Instantiate<FactoryMethod<TParam1, TParam2, TContract>>(method));
+            return Bind<IFactory<TParam1, TParam2, TContract>>().ToMethod((c) => c.Instantiate<FactoryMethod<TParam1, TParam2, TContract>>(method));
         }
 
         public BindingConditionSetter BindFactoryToMethod<TParam1, TParam2, TParam3, TContract>(Func<DiContainer, TParam1, TParam2, TParam3, TContract> method)
         {
-            return Bind<IFactory<TParam1, TParam2, TParam3, TContract>>().ToMethod((c, ctx) => c.Instantiate<FactoryMethod<TParam1, TParam2, TParam3, TContract>>(method));
+            return Bind<IFactory<TParam1, TParam2, TParam3, TContract>>().ToMethod((c) => c.Instantiate<FactoryMethod<TParam1, TParam2, TParam3, TContract>>(method));
         }
 
         public BindingConditionSetter BindFactory<TContract>()
@@ -173,6 +166,16 @@ namespace Zenject
         public BindingConditionSetter BindFactory<TParam1, TContract>()
         {
             return Bind<IFactory<TParam1, TContract>>().ToSingle<Factory<TParam1, TContract>>();
+        }
+
+        public BindingConditionSetter BindFactory<TParam1, TParam2, TContract>()
+        {
+            return Bind<IFactory<TParam1, TParam2, TContract>>().ToSingle<Factory<TParam1, TParam2, TContract>>();
+        }
+
+        public BindingConditionSetter BindFactory<TParam1, TParam2, TParam3, TContract>()
+        {
+            return Bind<IFactory<TParam1, TParam2, TParam3, TContract>>().ToSingle<Factory<TParam1, TParam2, TParam3, TContract>>();
         }
 
         // Bind IFactory<TContract> such that it creates instances of type TConcrete
@@ -186,6 +189,18 @@ namespace Zenject
             where TConcrete : TContract
         {
             return BindFactoryToMethod<TParam1, TContract>((c, param1) => c.Resolve<IFactory<TParam1, TConcrete>>().Create(param1));
+        }
+
+        public BindingConditionSetter BindFactoryToFactory<TParam1, TParam2, TContract, TConcrete>()
+            where TConcrete : TContract
+        {
+            return BindFactoryToMethod<TParam1, TParam2, TContract>((c, param1, param2) => c.Resolve<IFactory<TParam1, TParam2, TConcrete>>().Create(param1, param2));
+        }
+
+        public BindingConditionSetter BindFactoryToFactory<TParam1, TParam2, TParam3, TContract, TConcrete>()
+            where TConcrete : TContract
+        {
+            return BindFactoryToMethod<TParam1, TParam2, TParam3, TContract>((c, param1, param2, param3) => c.Resolve<IFactory<TParam1, TParam2, TParam3, TConcrete>>().Create(param1, param2, param3));
         }
 
         public BindingConditionSetter BindFactoryToCustomFactory<TContract, TConcrete, TFactory>()
@@ -210,7 +225,7 @@ namespace Zenject
             {
                 throw new ZenjectBindException(
                     "Error while binding factory for type '{0}'. Must use version of BindFactory which includes a reference to a prefab you wish to instantiate"
-                    .With(typeof(TContract).Name()));
+                    .Fmt(typeof(TContract).Name()));
             }
 
             return Bind<IFactoryUntyped<TContract>>().ToSingle<FactoryUntyped<TContract>>();
@@ -222,7 +237,7 @@ namespace Zenject
             {
                 throw new ZenjectBindException(
                     "Error while binding factory for type '{0}'. Must use version of BindFactory which includes a reference to a prefab you wish to instantiate"
-                    .With(typeof(TConcrete).Name()));
+                    .Fmt(typeof(TConcrete).Name()));
             }
 
             return Bind<IFactoryUntyped<TContract>>().ToSingle<FactoryUntyped<TContract, TConcrete>>();
@@ -233,13 +248,13 @@ namespace Zenject
             if (prefab == null)
             {
                 throw new ZenjectBindException(
-                    "Null prefab provided to BindFactoryForPrefab for type '{0}'".With(typeof(TContract).Name()));
+                    "Null prefab provided to BindFactoryForPrefab for type '{0}'".Fmt(typeof(TContract).Name()));
             }
 
             // We could use ToSingleMethod here but then we'd have issues when using .When() conditionals to inject
             // multiple factories in different places
             return Bind<IFactory<TContract>>()
-                .ToMethod((container, ctx) => container.Instantiate<GameObjectFactory<TContract>>(prefab));
+                .ToMethod((container) => container.Instantiate<GameObjectFactory<TContract>>(prefab));
         }
 
         public void BindAllInterfacesToSingle<TConcrete>()
@@ -298,7 +313,7 @@ namespace Zenject
                 if (_providers[contractType].Find(item => ReferenceEquals(item, provider)) != null)
                 {
                     throw new ZenjectException(
-                        "Found duplicate singleton binding for contract '{0}'".With(contractType));
+                        "Found duplicate singleton binding for contract '{0}'".Fmt(contractType));
                 }
 
                 _providers[contractType].Add(provider);
@@ -438,7 +453,12 @@ namespace Zenject
 
         public IEnumerable<ZenjectResolveException> ValidateObjectGraph(Type contractType, params Type[] extras)
         {
-            Assert.That(!contractType.IsAbstract);
+            if (contractType.IsAbstract)
+            {
+                throw new ZenjectResolveException(
+                    "Expected contract type '{0}' to be non-abstract".Fmt(contractType.Name()));
+            }
+
             return BindingValidator.ValidateObjectGraph(this, contractType, extras);
         }
 
@@ -656,9 +676,9 @@ namespace Zenject
 
                     throw new ZenjectResolveException(
                         "Unable to resolve type '{0}'{1}. \nObject graph:\n{2}"
-                        .With(
+                        .Fmt(
                             contractType.Name() + (context.Identifier == null ? "" : " with ID '" + context.Identifier.ToString() + "'"),
-                            (context.EnclosingType == null ? "" : " while building object with type '{0}'".With(context.EnclosingType.Name())),
+                            (context.EnclosingType == null ? "" : " while building object with type '{0}'".Fmt(context.EnclosingType.Name())),
                             GetCurrentObjectGraph()));
                 }
 
@@ -668,9 +688,9 @@ namespace Zenject
             {
                 throw new ZenjectResolveException(
                     "Found multiple matches when only one was expected for type '{0}'{1}. \nObject graph:\n {2}"
-                    .With(
+                    .Fmt(
                         contractType.Name(),
-                        (context.EnclosingType == null ? "" : " while building object with type '{0}'".With(context.EnclosingType.Name())),
+                        (context.EnclosingType == null ? "" : " while building object with type '{0}'".Fmt(context.EnclosingType.Name())),
                         GetCurrentObjectGraph()));
             }
             else
