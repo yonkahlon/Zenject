@@ -12,26 +12,26 @@ namespace Zenject
 
         public BindingConditionSetter ToLookup<TConcrete>() where TConcrete : TContract
         {
-            return ToMethod(c => c.Resolve<TConcrete>());
+            return ToMethod((c, ctx) => c.Resolve<TConcrete>());
         }
 
         public BindingConditionSetter ToLookup<TConcrete>(object identifier) where TConcrete : TContract
         {
-            return ToMethod(c => c.Resolve<TConcrete>(
+            return ToMethod((c, ctx) => c.Resolve<TConcrete>(
                 new InjectContext(_container, typeof(TConcrete))
                 {
                     Identifier = identifier,
                 }));
         }
 
-        public BindingConditionSetter ToMethod(Func<DiContainer, TContract> method)
+        public BindingConditionSetter ToMethod(Func<DiContainer, InjectContext, TContract> method)
         {
             return ToProvider(new MethodProvider<TContract>(method, _container));
         }
 
         public BindingConditionSetter ToGetter<TObj>(Func<TObj, TContract> method)
         {
-            return ToMethod(c => method(c.Resolve<TObj>()));
+            return ToMethod((c, ctx) => method(c.Resolve<TObj>()));
         }
     }
 }
