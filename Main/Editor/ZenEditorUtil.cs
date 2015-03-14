@@ -25,9 +25,45 @@ namespace Zenject
 
         public static List<ZenjectResolveException> ValidateAllActiveScenes(int maxErrors)
         {
+            var activeScenes = UnityEditor.EditorBuildSettings.scenes.Where(x => x.enabled).Select(x => x.ToString()).ToList();
+            return ValidateScenes(activeScenes, maxErrors);
+        }
+
+        // This can be called by build scripts using batch mode unity for continuous integration testing
+        public static void ValidateAllScenesFromScript()
+        {
+            var activeScenes = UnityEditor.EditorBuildSettings.scenes.Where(x => x.enabled).Select(x => x.ToString()).ToList();
+            ValidateScenesThenExit(activeScenes, 25);
+        }
+
+        public static void ValidateScenesThenExit(List<string> sceneNames, int maxErrors)
+        {
+            var errors = ValidateScenes(sceneNames, maxErrors);
+
+            if (errors.IsEmpty())
+            {
+                // 0 = no errors
+                EditorApplication.Exit(0);
+            }
+            else
+            {
+                Log.Error("Found {0} validation errors!", errors.Count == maxErrors ? ("over " + maxErrors.ToString()) : errors.Count.ToString());
+
+                foreach (var err in errors)
+                {
+                    Log.ErrorException(err);
+                }
+
+                // 1 = errors occurred
+                EditorApplication.Exit(1);
+            }
+        }
+
+        public static List<ZenjectResolveException> ValidateScenes(List<string> sceneNames, int maxErrors)
+        {
             var errors = new List<ZenjectResolveException>();
-            var activeScenes = UnityEditor.EditorBuildSettings.scenes
-                .Select(x => new { Name = Path.GetFileNameWithoutExtension(x.path), Path = x.path }).ToList();
+            var activeScenes = sceneNames
+                .Select(x => new { Name = x, Path = GetScenePath(x) }).ToList();
 
             foreach (var sceneInfo in activeScenes)
             {
@@ -42,7 +78,35 @@ namespace Zenject
                 }
             }
 
+            if (errors.IsEmpty())
+            {
+                Log.Trace("Successfully validated all {0} scenes", activeScenes.Count);
+            }
+            else
+            {
+                Log.Error("Zenject Validation failed!  Found {0} errors.", errors.Count);
+
+                foreach (var err in errors)
+                {
+                    Log.ErrorException(err);
+                }
+            }
+
             return errors;
+        }
+
+        static string GetScenePath(string sceneName)
+        {
+            var namesToPaths = UnityEditor.EditorBuildSettings.scenes.ToDictionary(
+                x => Path.GetFileNameWithoutExtension(x.path), x => x.path);
+
+            if (!namesToPaths.ContainsKey(sceneName))
+            {
+                throw new Exception(
+                    "Could not find scene with name '" + sceneName + "'");
+            }
+
+            return namesToPaths[sceneName];
         }
 
         public static IEnumerable<ZenjectResolveException> ValidateCurrentScene()
@@ -139,7 +203,7 @@ namespace Zenject
             var proc = new System.Diagnostics.Process();
 
             proc.StartInfo.FileName = dotExePath;
-            proc.StartInfo.Arguments = "-Tpng {0}.dot -o{0}.png".With(fileBaseName);
+            proc.StartInfo.Arguments = "-Tpng {0}.dot -o{0}.png".Fmt(fileBaseName);
             proc.StartInfo.RedirectStandardError = true;
             proc.StartInfo.RedirectStandardOutput = true;
             proc.StartInfo.UseShellExecute = false;
@@ -154,12 +218,12 @@ namespace Zenject
             if (errorMessage.IsEmpty())
             {
                 EditorUtility.DisplayDialog(
-                    "Success!", "Successfully created files {0}.dot and {0}.png".With(fileBaseName), "Ok");
+                    "Success!", "Successfully created files {0}.dot and {0}.png".Fmt(fileBaseName), "Ok");
             }
             else
             {
                 EditorUtility.DisplayDialog(
-                    "Error", "Error occurred while generating {0}.png".With(fileBaseName), "Ok");
+                    "Error", "Error occurred while generating {0}.png".Fmt(fileBaseName), "Ok");
 
                 Log.Error("Zenject error: Failure during object graph creation: " + errorMessage);
 

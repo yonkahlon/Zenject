@@ -51,12 +51,13 @@ namespace Zenject
         static InjectableInfo CreateForConstructorParam(
             Type enclosingType, ParameterInfo paramInfo)
         {
-            var injectAttr = paramInfo.AllAttributes<InjectAttribute>().FirstOrDefault();
+            var identifier = paramInfo.AllAttributes<InjectAttribute>().Select(x => x.Identifier)
+                .Concat(paramInfo.AllAttributes<InjectOptionalAttribute>().Select(x => x.Identifier)).FirstOrDefault();
 
             return new InjectableInfo()
             {
                 Optional = paramInfo.HasAttribute(typeof(InjectOptionalAttribute)),
-                Identifier = (injectAttr == null ? null : injectAttr.Identifier),
+                Identifier = identifier,
                 SourceName = paramInfo.Name,
                 ContractType = paramInfo.ParameterType,
                 EnclosingType = enclosingType,
@@ -106,12 +107,13 @@ namespace Zenject
 
         static InjectableInfo CreateForMember(MemberInfo memInfo, Type enclosingType)
         {
-            var injectAttr = memInfo.AllAttributes<InjectAttribute>().FirstOrDefault();
+            var identifier = memInfo.AllAttributes<InjectAttribute>().Select(x => x.Identifier)
+                .Concat(memInfo.AllAttributes<InjectOptionalAttribute>().Select(x => x.Identifier)).FirstOrDefault();
 
             var info = new InjectableInfo()
             {
                 Optional = memInfo.HasAttribute(typeof(InjectOptionalAttribute)),
-                Identifier = (injectAttr == null ? null : injectAttr.Identifier),
+                Identifier = identifier,
                 SourceName = memInfo.Name,
                 EnclosingType = enclosingType,
             };

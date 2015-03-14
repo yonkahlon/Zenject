@@ -21,7 +21,7 @@ namespace Zenject
             {
                 throw new ZenjectBindException(
                     "Should not use ToTransient for Monobehaviours (when binding type '{0}'), you probably want either ToLookup or ToTransientFromPrefab"
-                    .With(_contractType.Name()));
+                    .Fmt(_contractType.Name()));
             }
 
             return ToProvider(new TransientProvider(_container, concreteType));
@@ -33,7 +33,7 @@ namespace Zenject
             {
                 throw new ZenjectBindException(
                     "Should not use ToTransient for Monobehaviours (when binding type '{0}'), you probably want either ToLookup or ToTransientFromPrefab"
-                    .With(_contractType.Name()));
+                    .Fmt(_contractType.Name()));
             }
 
             return ToProvider(new TransientProvider(_container, _contractType));
@@ -45,7 +45,7 @@ namespace Zenject
             {
                 throw new ZenjectBindException(
                     "Should not use ToSingle for Monobehaviours (when binding type '{0}'), you probably want either ToLookup or ToSingleFromPrefab or ToSingleGameObject"
-                    .With(_contractType.Name()));
+                    .Fmt(_contractType.Name()));
             }
 
             return ToProvider(_singletonMap.CreateProvider(_contractType));
@@ -56,7 +56,7 @@ namespace Zenject
             if (!concreteType.DerivesFromOrEqual(_contractType))
             {
                 throw new ZenjectBindException(
-                    "Invalid type given during bind command.  Expected type '{0}' to derive from type '{1}'".With(concreteType.Name(), _contractType.Name()));
+                    "Invalid type given during bind command.  Expected type '{0}' to derive from type '{1}'".Fmt(concreteType.Name(), _contractType.Name()));
             }
 
             return ToProvider(_singletonMap.CreateProvider(concreteType));
@@ -69,7 +69,7 @@ namespace Zenject
             if (!concreteType.DerivesFromOrEqual(_contractType))
             {
                 throw new ZenjectBindException(
-                    "Invalid type given during bind command.  Expected type '{0}' to derive from type '{1}'".With(concreteType.Name(), _contractType.Name()));
+                    "Invalid type given during bind command.  Expected type '{0}' to derive from type '{1}'".Fmt(concreteType.Name(), _contractType.Name()));
             }
 
             if (UnityUtil.IsNull(instance) && !_container.AllowNullBindings)
@@ -78,12 +78,12 @@ namespace Zenject
 
                 if (_contractType == concreteType)
                 {
-                    message = "Received null instance during Bind command with type '{0}'".With(_contractType.Name());
+                    message = "Received null instance during Bind command with type '{0}'".Fmt(_contractType.Name());
                 }
                 else
                 {
                     message =
-                        "Received null instance during Bind command when binding type '{0}' to '{1}'".With(_contractType.Name(), concreteType.Name());
+                        "Received null instance during Bind command when binding type '{0}' to '{1}'".Fmt(_contractType.Name(), concreteType.Name());
                 }
 
                 throw new ZenjectBindException(message);
@@ -99,7 +99,7 @@ namespace Zenject
             if (!concreteType.DerivesFromOrEqual(_contractType))
             {
                 throw new ZenjectBindException(
-                    "Invalid type given during bind command.  Expected type '{0}' to derive from type '{1}'".With(concreteType.Name(), _contractType.Name()));
+                    "Invalid type given during bind command.  Expected type '{0}' to derive from type '{1}'".Fmt(concreteType.Name(), _contractType.Name()));
             }
 
             if (UnityUtil.IsNull(instance) && !_container.AllowNullBindings)
@@ -108,12 +108,12 @@ namespace Zenject
 
                 if (_contractType == concreteType)
                 {
-                    message = "Received null singleton instance during Bind command with type '{0}'".With(_contractType.Name());
+                    message = "Received null singleton instance during Bind command with type '{0}'".Fmt(_contractType.Name());
                 }
                 else
                 {
                     message =
-                        "Received null singleton instance during Bind command when binding type '{0}' to '{1}'".With(_contractType.Name(), concreteType.Name());
+                        "Received null singleton instance during Bind command when binding type '{0}' to '{1}'".Fmt(_contractType.Name(), concreteType.Name());
                 }
 
                 throw new ZenjectBindException(message);
@@ -129,14 +129,14 @@ namespace Zenject
             if (!concreteType.DerivesFromOrEqual(_contractType))
             {
                 throw new ZenjectBindException(
-                    "Invalid type given during bind command.  Expected type '{0}' to derive from type '{1}'".With(concreteType.Name(), _contractType.Name()));
+                    "Invalid type given during bind command.  Expected type '{0}' to derive from type '{1}'".Fmt(concreteType.Name(), _contractType.Name()));
             }
 
             if (concreteType.DerivesFrom(typeof(MonoBehaviour)))
             {
                 throw new ZenjectBindException(
                     "Should not use ToSingle for Monobehaviours (when binding type '{0}' to '{1}'), you probably want either ToLookup or ToSingleFromPrefab or ToSingleGameObject"
-                    .With(_contractType.Name(), concreteType.Name()));
+                    .Fmt(_contractType.Name(), concreteType.Name()));
             }
 
             return ToProvider(_singletonMap.CreateProvider<TConcrete>());
@@ -150,13 +150,13 @@ namespace Zenject
             if (!concreteType.DerivesFromOrEqual(_contractType))
             {
                 throw new ZenjectBindException(
-                    "Invalid type given during bind command.  Expected type '{0}' to derive from type '{1}'".With(concreteType.Name(), _contractType.Name()));
+                    "Invalid type given during bind command.  Expected type '{0}' to derive from type '{1}'".Fmt(concreteType.Name(), _contractType.Name()));
             }
 
             // We have to cast to object otherwise we get SecurityExceptions when this function is run outside of unity
             if (UnityUtil.IsNull(prefab) && !_container.AllowNullBindings)
             {
-                throw new ZenjectBindException("Received null prefab while binding type '{0}'".With(concreteType.Name()));
+                throw new ZenjectBindException("Received null prefab while binding type '{0}'".Fmt(concreteType.Name()));
             }
 
             return ToProvider(_singletonMap.CreateProviderFromPrefab(typeof(TConcrete), prefab));
@@ -170,13 +170,13 @@ namespace Zenject
             if (!concreteType.DerivesFromOrEqual(_contractType))
             {
                 throw new ZenjectBindException(
-                    "Invalid type given during bind command.  Expected type '{0}' to derive from type '{1}'".With(concreteType.Name(), _contractType.Name()));
+                    "Invalid type given during bind command.  Expected type '{0}' to derive from type '{1}'".Fmt(concreteType.Name(), _contractType.Name()));
             }
 
             // We have to cast to object otherwise we get SecurityExceptions when this function is run outside of unity
             if (UnityUtil.IsNull(prefab) && !_container.AllowNullBindings)
             {
-                throw new ZenjectBindException("Received null prefab while binding type '{0}'".With(concreteType.Name()));
+                throw new ZenjectBindException("Received null prefab while binding type '{0}'".Fmt(concreteType.Name()));
             }
 
             return ToProvider(new GameObjectTransientProviderFromPrefab<TConcrete>(_container, prefab));
@@ -192,7 +192,7 @@ namespace Zenject
         {
             if (!_contractType.IsSubclassOf(typeof(MonoBehaviour)))
             {
-                throw new ZenjectBindException("Expected MonoBehaviour derived type when binding type '{0}'".With(_contractType.Name()));
+                throw new ZenjectBindException("Expected MonoBehaviour derived type when binding type '{0}'".Fmt(_contractType.Name()));
             }
 
             return ToProvider(new GameObjectSingletonProvider(_contractType, _container, name));
@@ -206,7 +206,7 @@ namespace Zenject
             if (!concreteType.DerivesFromOrEqual(_contractType))
             {
                 throw new ZenjectBindException(
-                    "Invalid type given during bind command.  Expected type '{0}' to derive from type '{1}'".With(concreteType.Name(), _contractType.Name()));
+                    "Invalid type given during bind command.  Expected type '{0}' to derive from type '{1}'".Fmt(concreteType.Name(), _contractType.Name()));
             }
 
             return ToProvider(new GameObjectSingletonProvider(typeof(TConcrete), _container, name));

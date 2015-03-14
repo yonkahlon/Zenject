@@ -41,7 +41,7 @@ namespace Zenject
         {
             var startScene = EditorApplication.currentScene;
 
-            var activeScenes = UnityEditor.EditorBuildSettings.scenes
+            var activeScenes = UnityEditor.EditorBuildSettings.scenes.Where(x => x.enabled)
                 .Select(x => new { Name = Path.GetFileNameWithoutExtension(x.path), Path = x.path }).ToList();
 
             var failedScenes = new List<string>();
@@ -108,11 +108,6 @@ namespace Zenject
                 return false;
             }
 
-            if (decoratorCompRoot.Installers == null || decoratorCompRoot.Installers.IsEmpty())
-            {
-                Log.Warn("No installers found in decorator composition root");
-            }
-
             var rootObjectsBefore = GameObject.FindObjectsOfType<Transform>().Where(x => x.parent == null).ToList();
 
             // Use finally to ensure we clean up the data added from EditorApplication.OpenSceneAdditive
@@ -135,6 +130,8 @@ namespace Zenject
             }
             finally
             {
+                decoratorCompRoot.transform.parent = null;
+
                 var rootObjectsAfter = GameObject.FindObjectsOfType<Transform>().Where(x => x.parent == null).ToList();
 
                 foreach (var newObject in rootObjectsAfter.Except(rootObjectsBefore).Select(x => x.gameObject))

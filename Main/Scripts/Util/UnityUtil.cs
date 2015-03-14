@@ -3,6 +3,13 @@ using UnityEngine;
 
 namespace ModestTree
 {
+    public enum MouseWheelScrollDirections
+    {
+        None,
+        Up,
+        Down,
+    }
+
     public static class UnityUtil
     {
         // Due to the way that Unity overrides the Equals operator,
@@ -15,89 +22,61 @@ namespace ModestTree
             return obj == null || obj.Equals(null);
         }
 
-        public static bool IsMobile
+        public static bool IsAltKeyDown
         {
             get
             {
-#if UNITY_IPHONE || UNITY_ANDROID || UNITY_BLACKBERRY || UNITY_WP8
-                return true;
-#else
-                return false;
-#endif
+                return Input.GetKey(KeyCode.LeftAlt) || Input.GetKey(KeyCode.RightAlt);
             }
         }
 
-        public static bool IsStandalone
+        public static bool IsControlKeyDown
         {
             get
             {
-#if UNITY_STANDALONE
-                return true;
-#else
-                return false;
-#endif
+                return Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl);
             }
         }
 
-        public static bool IsAndroid
+        public static bool IsShiftKeyDown
         {
             get
             {
-#if UNITY_ANDROID
-                return true;
-#else
-                return false;
-#endif
+                return Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift);
             }
         }
 
-        public static bool IsEditor
+        public static bool WasShiftKeyJustPressed
         {
             get
             {
-#if UNITY_EDITOR
-                return true;
-#else
-                return false;
-#endif
+                return Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.RightShift);
             }
         }
 
-        public static bool IsWebPlayer
+        public static bool WasAltKeyJustPressed
         {
             get
             {
-#if UNITY_WEBPLAYER
-                return true;
-#else
-                return false;
-#endif
+                return Input.GetKeyDown(KeyCode.LeftAlt) || Input.GetKeyDown(KeyCode.RightAlt);
             }
         }
 
-        public static bool IsAltKeyIsDown()
+        public static MouseWheelScrollDirections CheckMouseScrollWheel()
         {
-            return Input.GetKey(KeyCode.LeftAlt) || Input.GetKey(KeyCode.RightAlt);
-        }
+            var value = Input.GetAxis("Mouse ScrollWheel");
 
-        public static bool IsControlKeyIsDown()
-        {
-            return Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl);
-        }
+            if (Mathf.Approximately(value, 0.0f))
+            {
+                return MouseWheelScrollDirections.None;
+            }
 
-        public static bool IsShiftKeyIsDown()
-        {
-            return Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift);
-        }
+            if (value < 0)
+            {
+                return MouseWheelScrollDirections.Down;
+            }
 
-        public static bool WasShiftKeyJustPressed()
-        {
-            return Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.RightShift);
-        }
-
-        public static bool WasAltKeyJustPressed()
-        {
-            return Input.GetKeyDown(KeyCode.LeftAlt) || Input.GetKeyDown(KeyCode.RightAlt);
+            return MouseWheelScrollDirections.Up;
         }
     }
 }

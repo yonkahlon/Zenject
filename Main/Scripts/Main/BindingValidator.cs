@@ -49,9 +49,9 @@ namespace Zenject
                             {
                                 yield return new ZenjectResolveException(
                                     "Could not find dependency with type 'List<{0}>'{1}.  If the empty list is also valid, you can allow this by using the [InjectOptional] attribute.' \nObject graph:\n{2}"
-                                    .With(
+                                    .Fmt(
                                         subType.Name(),
-                                        (context.EnclosingType == null ? "" : " when injecting into '{0}'".With(context.EnclosingType.Name())),
+                                        (context.EnclosingType == null ? "" : " when injecting into '{0}'".Fmt(context.EnclosingType.Name())),
                                         DiContainer.GetCurrentObjectGraph()));
                             }
                         }
@@ -84,9 +84,9 @@ namespace Zenject
                             {
                                 yield return new ZenjectResolveException(
                                     "Could not find required dependency with type '{0}'{1} \nObject graph:\n{2}"
-                                    .With(
+                                    .Fmt(
                                         contractType.Name(),
-                                        (context.EnclosingType == null ? "" : " when injecting into '{0}'".With(context.EnclosingType.Name())),
+                                        (context.EnclosingType == null ? "" : " when injecting into '{0}'".Fmt(context.EnclosingType.Name())),
                                         DiContainer.GetCurrentObjectGraph()));
                             }
                         }
@@ -94,9 +94,9 @@ namespace Zenject
                         {
                             yield return new ZenjectResolveException(
                                 "Found multiple matches when only one was expected for dependency with type '{0}'{1} \nObject graph:\n{2}"
-                                .With(
+                                .Fmt(
                                     contractType.Name(),
-                                    (context.EnclosingType == null ? "" : " when injecting into '{0}'".With(context.EnclosingType.Name())),
+                                    (context.EnclosingType == null ? "" : " when injecting into '{0}'".Fmt(context.EnclosingType.Name())),
                                     DiContainer.GetCurrentObjectGraph()));
                         }
                     }
@@ -135,7 +135,7 @@ namespace Zenject
                 {
                     yield return new ZenjectResolveException(
                         "Found unnecessary extra parameters passed when injecting into '{0}' with types '{1}'.  \nObject graph:\n{2}"
-                        .With(concreteType.Name(), String.Join(",", extrasList.Select(x => x.Name()).ToArray()), DiContainer.GetCurrentObjectGraph()));
+                        .Fmt(concreteType.Name(), String.Join(",", extrasList.Select(x => x.Name()).ToArray()), DiContainer.GetCurrentObjectGraph()));
                 }
             }
         }

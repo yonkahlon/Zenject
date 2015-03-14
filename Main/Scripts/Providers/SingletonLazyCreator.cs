@@ -83,7 +83,7 @@ namespace Zenject
                 if (_instance == null)
                 {
                     throw new ZenjectException(
-                        "Unable to instantiate type '{0}' in SingletonLazyCreator".With(contractType));
+                        "Unable to instantiate type '{0}' in SingletonLazyCreator".Fmt(contractType));
                 }
 
                 _hasInstance = true;
@@ -101,7 +101,7 @@ namespace Zenject
 
             var concreteType = GetTypeToInstantiate(contractType);
 
-            if (_id.Prefab != null)
+            if (!UnityUtil.IsNull(_id.Prefab))
             {
                 Assert.That(concreteType.DerivesFrom<Component>(), "Expected '{0}' to derive from 'Component'", concreteType.Name);
 

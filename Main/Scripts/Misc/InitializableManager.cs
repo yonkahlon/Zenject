@@ -10,6 +10,7 @@ namespace Zenject
     // - Run Initialize() on all Iinitializable's, in the order specified by InitPriority
     public class InitializableManager
     {
+        readonly SingletonProviderMap _singletonProviderMap;
         List<InitializableInfo> _initializables = new List<InitializableInfo>();
 
         public InitializableManager(
@@ -17,9 +18,10 @@ namespace Zenject
             List<IInitializable> initializables,
             [InjectOptional]
             List<Tuple<Type, int>> priorities,
-            DiContainer container)
+            DiContainer container,
+            SingletonProviderMap singletonProviderMap)
         {
-            var priorityMap = priorities.ToDictionary(x => x.First, x => x.Second);
+            _singletonProviderMap = singletonProviderMap;
 
             if (Assert.IsEnabled)
             {
@@ -28,24 +30,25 @@ namespace Zenject
 
             foreach (var initializable in initializables)
             {
-                int priority;
-                bool success = priorityMap.TryGetValue(initializable.GetType(), out priority);
+                // Note that we use zero for unspecified priority
+                // This is nice because you can use negative or positive for before/after unspecified
+                var matches = priorities.Where(x => initializable.GetType().DerivesFromOrEqual(x.First)).Select(x => x.Second).ToList();
+                int priority = matches.IsEmpty() ? 0 : matches.Single();
 
-                if (!success)
-                {
-                    //Log.Warn(
-                        //String.Format("IInitializable with type '{0}' does not have a priority assigned", //initializable.GetType()));
-                }
-
-                _initializables.Add(
-                    new InitializableInfo(initializable, success ? (int?)priority : null));
+                _initializables.Add(new InitializableInfo(initializable, priority));
             }
         }
 
         void WarnForMissingBindings(List<IInitializable> initializables, DiContainer container)
         {
+            var ignoredTypes = new Type[] {};
             var boundTypes = initializables.Select(x => x.GetType()).Distinct();
-            var unboundTypes = container.AllConcreteTypes.Where(x => x.DerivesFrom<IInitializable>() && !boundTypes.Contains(x));
+
+            var unboundTypes = _singletonProviderMap.Creators
+                .Select(x => x.GetInstanceType())
+                .Where(x => x.DerivesFrom<IInitializable>())
+                .Distinct()
+                .Where(x => !boundTypes.Contains(x) && !ignoredTypes.Contains(x));
 
             foreach (var objType in unboundTypes)
             {
@@ -53,31 +56,15 @@ namespace Zenject
             }
         }
 
-        int SortCompare(InitializableInfo e1, InitializableInfo e2)
-        {
-            // Initialize initializables with null priorities last
-            if (!e1.Priority.HasValue)
-            {
-                return 1;
-            }
-
-            if (!e2.Priority.HasValue)
-            {
-                return -1;
-            }
-
-            return e1.Priority.Value.CompareTo(e2.Priority.Value);
-        }
-
         public void Initialize()
         {
-            _initializables.Sort(SortCompare);
+            _initializables = _initializables.OrderBy(x => x.Priority).ToList();
 
             if (Assert.IsEnabled)
             {
                 foreach (var initializable in _initializables.Select(x => x.Initializable).GetDuplicates())
                 {
-                    Assert.That(false, "Found duplicate IInitializable with type '{0}'".With(initializable.GetType()));
+                    Assert.That(false, "Found duplicate IInitializable with type '{0}'".Fmt(initializable.GetType()));
                 }
             }
 
@@ -95,7 +82,7 @@ namespace Zenject
                 catch (Exception e)
                 {
                     throw new ZenjectException(
-                        "Error occurred while initializing IInitializable with type '{0}'".With(initializable.Initializable.GetType().Name()), e);
+                        "Error occurred while initializing IInitializable with type '{0}'".Fmt(initializable.Initializable.GetType().Name()), e);
                 }
             }
         }
@@ -103,9 +90,9 @@ namespace Zenject
         class InitializableInfo
         {
             public IInitializable Initializable;
-            public int? Priority;
+            public int Priority;
 
-            public InitializableInfo(IInitializable initializable, int? priority)
+            public InitializableInfo(IInitializable initializable, int priority)
             {
                 Initializable = initializable;
                 Priority = priority;

@@ -32,12 +32,12 @@ namespace Zenject
         [InjectOptional]
         readonly List<Tuple<Type, int>> _latePriorities = null;
 
+        [Inject]
+        readonly SingletonProviderMap _singletonProviderMap = null;
+
         TaskUpdater<ITickable> _updater;
         TaskUpdater<IFixedTickable> _fixedUpdater;
         TaskUpdater<ILateTickable> _lateUpdater;
-
-        [Inject]
-        DiContainer _container = null;
 
         [InjectOptional]
         bool _warnForMissing = false;
@@ -57,11 +57,15 @@ namespace Zenject
 
         void WarnForMissingBindings()
         {
-            var ignoredTypes = new Type[] { };
+            var ignoredTypes = new Type[] {};
 
             var boundTypes = _tickables.Select(x => x.GetType()).Distinct();
 
-            var unboundTypes = _container.AllConcreteTypes.Where(x => x.DerivesFrom<ITickable>() && !boundTypes.Contains(x) && !ignoredTypes.Contains(x));
+            var unboundTypes = _singletonProviderMap.Creators
+                .Select(x => x.GetInstanceType())
+                .Where(x => x.DerivesFrom<ITickable>())
+                .Distinct()
+                .Where(x => !boundTypes.Contains(x) && !ignoredTypes.Contains(x));
 
             foreach (var objType in unboundTypes)
             {
@@ -79,20 +83,14 @@ namespace Zenject
                     "Expected type '{0}' to drive from IFixedTickable while checking priorities in TickableHandler", type.Name());
             }
 
-            var priorityMap = _fixedPriorities.ToDictionary(x => x.First, x => x.Second);
-
             foreach (var tickable in _fixedTickables)
             {
-                int priority;
+                // Note that we use zero for unspecified priority
+                // This is nice because you can use negative or positive for before/after unspecified
+                var matches = _fixedPriorities.Where(x => tickable.GetType().DerivesFromOrEqual(x.First)).Select(x => x.Second).ToList();
+                int priority = matches.IsEmpty() ? 0 : matches.Single();
 
-                if (priorityMap.TryGetValue(tickable.GetType(), out priority))
-                {
-                    _fixedUpdater.AddTask(tickable, priority);
-                }
-                else
-                {
-                    _fixedUpdater.AddTask(tickable);
-                }
+                _fixedUpdater.AddTask(tickable, priority);
             }
         }
 
@@ -106,20 +104,14 @@ namespace Zenject
                     "Expected type '{0}' to drive from ITickable while checking priorities in TickableHandler", type.Name());
             }
 
-            var priorityMap = _priorities.ToDictionary(x => x.First, x => x.Second);
-
             foreach (var tickable in _tickables)
             {
-                int priority;
+                // Note that we use zero for unspecified priority
+                // This is nice because you can use negative or positive for before/after unspecified
+                var matches = _priorities.Where(x => tickable.GetType().DerivesFromOrEqual(x.First)).Select(x => x.Second).ToList();
+                int priority = matches.IsEmpty() ? 0 : matches.Single();
 
-                if (priorityMap.TryGetValue(tickable.GetType(), out priority))
-                {
-                    _updater.AddTask(tickable, priority);
-                }
-                else
-                {
-                    _updater.AddTask(tickable);
-                }
+                _updater.AddTask(tickable, priority);
             }
         }
 
@@ -133,26 +125,20 @@ namespace Zenject
                     "Expected type '{0}' to drive from ILateTickable while checking priorities in TickableHandler", type.Name());
             }
 
-            var priorityMap = _latePriorities.ToDictionary(x => x.First, x => x.Second);
-
             foreach (var tickable in _lateTickables)
             {
-                int priority;
+                // Note that we use zero for unspecified priority
+                // This is nice because you can use negative or positive for before/after unspecified
+                var matches = _latePriorities.Where(x => tickable.GetType().DerivesFromOrEqual(x.First)).Select(x => x.Second).ToList();
+                int priority = matches.IsEmpty() ? 0 : matches.Single();
 
-                if (priorityMap.TryGetValue(tickable.GetType(), out priority))
-                {
-                    _lateUpdater.AddTask(tickable, priority);
-                }
-                else
-                {
-                    _lateUpdater.AddTask(tickable);
-                }
+                _lateUpdater.AddTask(tickable, priority);
             }
         }
 
         void UpdateLateTickable(ILateTickable tickable)
         {
-            //using (ProfileBlock.Start("{0}.LateTick()".With(tickable.GetType().Name())))
+            using (ProfileBlock.Start("{0}.LateTick()".Fmt(tickable.GetType().Name())))
             {
                 tickable.LateTick();
             }
@@ -160,7 +146,7 @@ namespace Zenject
 
         void UpdateFixedTickable(IFixedTickable tickable)
         {
-            //using (ProfileBlock.Start("{0}.FixedTick()".With(tickable.GetType().Name())))
+            using (ProfileBlock.Start("{0}.FixedTick()".Fmt(tickable.GetType().Name())))
             {
                 tickable.FixedTick();
             }
@@ -168,33 +154,23 @@ namespace Zenject
 
         void UpdateTickable(ITickable tickable)
         {
-            //using (ProfileBlock.Start("{0}.Tick()".With(tickable.GetType().Name())))
+            using (ProfileBlock.Start("{0}.Tick()".Fmt(tickable.GetType().Name())))
             {
                 tickable.Tick();
             }
         }
 
-        public void Add(ITickable tickable)
-        {
-            _updater.AddTask(tickable);
-        }
-
-        public void Add(ITickable tickable, int priority)
+        public void Add(ITickable tickable, int priority = 0)
         {
             _updater.AddTask(tickable, priority);
         }
 
-        public void AddLate(ILateTickable tickable)
+        public void AddLate(ILateTickable tickable, int priority = 0)
         {
-            _lateUpdater.AddTask(tickable);
+            _lateUpdater.AddTask(tickable, priority);
         }
 
-        public void AddFixed(IFixedTickable tickable)
-        {
-            _fixedUpdater.AddTask(tickable);
-        }
-
-        public void AddFixed(IFixedTickable tickable, int priority)
+        public void AddFixed(IFixedTickable tickable, int priority = 0)
         {
             _fixedUpdater.AddTask(tickable, priority);
         }

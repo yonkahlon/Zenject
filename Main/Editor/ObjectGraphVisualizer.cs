@@ -19,8 +19,6 @@ namespace Zenject
             DiContainer container, string outputPath,
             IEnumerable<Type> externalIgnoreTypes, IEnumerable<Type> contractTypes)
         {
-#if !UNITY_WEBPLAYER
-
             // Output the entire object graph to file
             var graph = CalculateObjectGraph(container, contractTypes);
 
@@ -57,7 +55,6 @@ namespace Zenject
             resultStr += " }";
 
             System.IO.File.WriteAllText(outputPath, resultStr);
-#endif
         }
 
         static bool ShouldIgnoreType(Type type, List<Type> ignoreTypes)

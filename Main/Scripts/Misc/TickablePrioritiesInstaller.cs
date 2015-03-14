@@ -17,7 +17,9 @@ namespace Zenject
 
         public override void InstallBindings()
         {
-            int priorityCount = 1;
+            // All tickables without explicit priorities assigned are given priority of zero,
+            // so put all of these before that (ie. negative)
+            int priorityCount = -1 * _tickables.Count;
 
             foreach (var tickableType in _tickables)
             {

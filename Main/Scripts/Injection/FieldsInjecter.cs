@@ -74,7 +74,7 @@ namespace Zenject
             {
                 throw new ZenjectResolveException(
                     "Passed unnecessary parameters when injecting into type '{0}'. \nExtra Parameters: {1}\nObject graph:\n{2}"
-                        .With(injectable.GetType().Name(), String.Join(",", extraArgMap.Select(x => x.Type.Name()).ToArray()), DiContainer.GetCurrentObjectGraph()));
+                        .Fmt(injectable.GetType().Name(), String.Join(",", extraArgMap.Select(x => x.Type.Name()).ToArray()), DiContainer.GetCurrentObjectGraph()));
             }
 
             foreach (var methodInfo in typeInfo.PostInjectMethods)

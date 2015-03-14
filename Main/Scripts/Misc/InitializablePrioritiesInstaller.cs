@@ -17,7 +17,9 @@ namespace Zenject
 
         public override void InstallBindings()
         {
-            int priorityCount = 1;
+            // All initializables without explicit priorities assigned are given priority of zero,
+            // so put all of these before that (ie. negative)
+            int priorityCount = -1 * _initializables.Count;
 
             foreach (var initializableType in _initializables)
             {

@@ -57,6 +57,8 @@ namespace Zenject
                 CompositionRoot.AfterInstallHooks += postBindings;
             }
 
+            Assert.That(Application.CanStreamedLevelBeLoaded(levelName), "Unable to load level '{0}'", levelName);
+
             if (isAdditive)
             {
                 Application.LoadLevelAdditive(levelName);

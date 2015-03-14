@@ -16,7 +16,9 @@ namespace Zenject
 
         public override void InstallBindings()
         {
-            int priorityCount = 1;
+            // All disposables without explicit priorities assigned are given priority of zero,
+            // so put all of these before that (ie. negative)
+            int priorityCount = -1 * _disposables.Count;
 
             foreach (var disposableType in _disposables)
             {

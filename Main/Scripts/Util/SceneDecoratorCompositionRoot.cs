@@ -1,7 +1,5 @@
-using System;
-using UnityEngine;
-using System.Linq;
 using ModestTree;
+using UnityEngine;
 
 namespace Zenject
 {
@@ -10,7 +8,13 @@ namespace Zenject
         public string SceneName;
 
         [SerializeField]
-        public DecoratorInstaller[] Installers;
+        public DecoratorInstaller[] DecoratorInstallers;
+
+        [SerializeField]
+        public MonoInstaller[] PreInstallers;
+
+        [SerializeField]
+        public MonoInstaller[] PostInstallers;
 
         public void Awake()
         {
@@ -26,22 +30,26 @@ namespace Zenject
             // built into the scene get injected
             transform.parent = container.Resolve<CompositionRoot>().transform;
 
-            ProcessInstallers(container, true);
+            CompositionRootHelper.InstallSceneInstallers(container, PreInstallers);
+
+            ProcessDecoratorInstallers(container, true);
         }
 
         public void AddPostBindings(DiContainer container)
         {
-            ProcessInstallers(container, false);
+            CompositionRootHelper.InstallSceneInstallers(container, PostInstallers);
+
+            ProcessDecoratorInstallers(container, false);
         }
 
-        void ProcessInstallers(DiContainer container, bool isBefore)
+        void ProcessDecoratorInstallers(DiContainer container, bool isBefore)
         {
-            if (Installers == null)
+            if (DecoratorInstallers == null)
             {
                 return;
             }
 
-            foreach (var installer in Installers)
+            foreach (var installer in DecoratorInstallers)
             {
                 if (installer == null)
                 {

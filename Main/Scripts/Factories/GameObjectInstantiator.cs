@@ -48,7 +48,7 @@ namespace Zenject
             // This is good so that the entire object graph is
             // contained underneath it, which is useful for cases
             // where you need to delete the entire object graph
-            gameObj.transform.parent = _rootTransform;
+            gameObj.transform.SetParent(_rootTransform, false);
 
             gameObj.SetActive(true);
 
@@ -94,7 +94,7 @@ namespace Zenject
             Component requestedScript = null;
 
             // Inject on the children first since the parent objects are more likely to use them in their post inject methods
-            foreach (var component in gameObj.GetComponentsInChildren<Component>().OrderByDescending(x => GetDepthLevel(x.transform)))
+            foreach (var component in gameObj.GetComponentsInChildren<Component>().OrderByDescending(x => x == null ? int.MinValue : GetDepthLevel(x.transform)))
             {
                 if (component != null)
                 {
@@ -119,7 +119,7 @@ namespace Zenject
             if (requestedScript == null)
             {
                 throw new ZenjectResolveException(
-                    "Could not find component with type '{0}' when instantiating new game object".With(componentType));
+                    "Could not find component with type '{0}' when instantiating new game object".Fmt(componentType));
             }
 
             return requestedScript;
@@ -128,7 +128,7 @@ namespace Zenject
         public object Instantiate(Type type, string name)
         {
             var gameObj = new GameObject(name);
-            gameObj.transform.parent = _rootTransform;
+            gameObj.transform.SetParent(_rootTransform, false);
 
             var component = gameObj.AddComponent(type);
 
@@ -148,7 +148,7 @@ namespace Zenject
         public GameObject Instantiate(string name)
         {
             var gameObj = new GameObject(name);
-            gameObj.transform.parent = _rootTransform;
+            gameObj.transform.SetParent(_rootTransform, false);
 
             return gameObj;
         }
