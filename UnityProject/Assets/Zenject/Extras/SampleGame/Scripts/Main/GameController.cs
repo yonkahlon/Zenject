@@ -41,7 +41,7 @@ namespace Asteroids
         public void Initialize()
         {
             Physics.gravity = Vector3.zero;
-            Screen.showCursor = false;
+            Cursor.visible = false;
             GameEvent.ShipCrashed += OnShipCrashed;
 
             Debug.Log("Started Game");
