@@ -2,11 +2,11 @@ using System;
 using System.Collections.Generic;
 using Zenject;
 using NUnit.Framework;
-using Zenject.Tests;
+using ModestTree.Tests;
 using TestAssert=NUnit.Framework.Assert;
 using System.Linq;
 
-namespace Zenject.Tests
+namespace ModestTree.Tests.Zenject
 {
     [TestFixture]
     public class TestTestUtil

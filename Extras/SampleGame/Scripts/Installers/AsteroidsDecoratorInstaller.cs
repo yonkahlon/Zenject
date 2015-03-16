@@ -23,7 +23,7 @@ namespace Asteroids
         public override void PostInstallBindings()
         {
             // Rebinds should occur as a post-install binding so that they have a chance to override
-            Container.Rebind<ShipStateMoving.Settings>().ToSingle(OverrideMoveSettings);
+            Container.Rebind<ShipStateMoving.Settings>().ToSingleInstance(OverrideMoveSettings);
         }
     }
 

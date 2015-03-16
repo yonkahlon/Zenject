@@ -4,7 +4,7 @@ using Zenject;
 using NUnit.Framework;
 using TestAssert=NUnit.Framework.Assert;
 
-namespace Zenject.Tests
+namespace ModestTree.Tests.Zenject
 {
     [TestFixture]
     public class TestResolveMany : TestWithContainer

@@ -19,19 +19,14 @@ namespace Zenject
             return null;
         }
 
-        public override bool HasInstance(Type contractType)
+        public override object GetInstance(InjectContext context)
         {
-            return false;
+            return _container.Resolve(context);
         }
 
-        public override object GetInstance(Type contractType, InjectContext context)
+        public override IEnumerable<ZenjectResolveException> ValidateBinding(InjectContext context)
         {
-            return _container.Resolve(contractType, context);
-        }
-
-        public override IEnumerable<ZenjectResolveException> ValidateBinding(Type contractType, InjectContext context)
-        {
-            return _container.ValidateResolve(contractType, context);
+            return _container.ValidateResolve(context);
         }
     }
 }

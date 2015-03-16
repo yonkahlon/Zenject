@@ -6,9 +6,8 @@ using UnityEngine;
 using TestAssert = NUnit.Framework.Assert;
 using Zenject;
 using System.Linq;
-using ModestTree;
 
-namespace Zenject.Tests
+namespace ModestTree.Tests.Zenject
 {
     [TestFixture]
     public class TestValidateInstaller
@@ -113,6 +112,10 @@ namespace Zenject.Tests
             container.Bind<Bar>().ToSingle();
 
             TestAssert.That(container.ValidateResolve<List<IFoo>>().IsEmpty());
+
+            // Should not throw
+            nestedContainer.Resolve<List<IFoo>>();
+
             TestAssert.That(nestedContainer.ValidateResolve<List<IFoo>>().IsEmpty());
         }
 

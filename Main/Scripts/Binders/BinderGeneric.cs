@@ -5,23 +5,19 @@ namespace Zenject
 {
     public class BinderGeneric<TContract> : Binder
     {
-        public BinderGeneric(DiContainer container)
-            : base(container, typeof(TContract))
+        public BinderGeneric(DiContainer container, string identifier)
+            : base(container, typeof(TContract), identifier)
         {
         }
 
         public BindingConditionSetter ToLookup<TConcrete>() where TConcrete : TContract
         {
-            return ToMethod((c, ctx) => c.Resolve<TConcrete>());
+            return ToLookup<TConcrete>(null);
         }
 
-        public BindingConditionSetter ToLookup<TConcrete>(object identifier) where TConcrete : TContract
+        public BindingConditionSetter ToLookup<TConcrete>(string identifier) where TConcrete : TContract
         {
-            return ToMethod((c, ctx) => c.Resolve<TConcrete>(
-                new InjectContext(_container, typeof(TConcrete))
-                {
-                    Identifier = identifier,
-                }));
+            return ToMethod((c, ctx) => c.Resolve<TConcrete>(ctx.ChangeMemberType(typeof(TConcrete)).ChangeId(identifier)));
         }
 
         public BindingConditionSetter ToMethod(Func<DiContainer, InjectContext, TContract> method)
@@ -32,6 +28,11 @@ namespace Zenject
         public BindingConditionSetter ToGetter<TObj>(Func<TObj, TContract> method)
         {
             return ToMethod((c, ctx) => method(c.Resolve<TObj>()));
+        }
+
+        public BindingConditionSetter ToGetter<TObj>(string identifier, Func<TObj, TContract> method)
+        {
+            return ToMethod((c, ctx) => method(c.Resolve<TObj>(identifier)));
         }
     }
 }

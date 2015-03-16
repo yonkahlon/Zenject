@@ -3,9 +3,8 @@ using System.Collections.Generic;
 using Zenject;
 using NUnit.Framework;
 using TestAssert=NUnit.Framework.Assert;
-using ModestTree;
 
-namespace Zenject.Tests
+namespace ModestTree.Tests.Zenject
 {
     [TestFixture]
     public class TestSameConstructorArgumentType : TestWithContainer

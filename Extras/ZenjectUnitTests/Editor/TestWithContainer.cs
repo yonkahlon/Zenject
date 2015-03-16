@@ -5,7 +5,7 @@ using System.Text;
 using Zenject;
 using NUnit.Framework;
 
-namespace Zenject.Tests
+namespace ModestTree.Tests.Zenject
 {
     public class TestWithContainer
     {
@@ -24,13 +24,13 @@ namespace Zenject.Tests
         {
             _container = new DiContainer();
 
-            RegisterBindings();
+            InstallBindings();
 
             _container.InstallInstallers();
             FieldsInjecter.Inject(_container, this);
         }
 
-        protected virtual void RegisterBindings()
+        protected virtual void InstallBindings()
         {
         }
 

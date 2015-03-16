@@ -4,9 +4,8 @@ using Zenject;
 using NUnit.Framework;
 using TestAssert=NUnit.Framework.Assert;
 using System.Linq;
-using ModestTree;
 
-namespace Zenject.Tests
+namespace ModestTree.Tests.Zenject
 {
     [TestFixture]
     public class TestConditionsTarget : TestWithContainer
@@ -32,7 +31,7 @@ namespace Zenject.Tests
         public override void Setup()
         {
             base.Setup();
-            Container.Bind<Test0>().ToSingle().When(r => r.EnclosingType == typeof(Test2));
+            Container.Bind<Test0>().ToSingle().When(r => r.ParentType == typeof(Test2));
         }
 
         [Test]

@@ -3,9 +3,8 @@ using System.Collections.Generic;
 using Zenject;
 using NUnit.Framework;
 using TestAssert=NUnit.Framework.Assert;
-using ModestTree;
 
-namespace Zenject.Tests
+namespace ModestTree.Tests.Zenject
 {
     [TestFixture]
     public class TestPostInjectCall : TestWithContainer
@@ -123,8 +122,8 @@ namespace Zenject.Tests
 
             Container.Resolve<IFoo>();
 
-            //Log.Info("FooBase.BaseCallOrder = {0}".With(FooBase.BaseCallOrder));
-            //Log.Info("FooDerived.DerivedCallOrder = {0}".With(FooDerived.DerivedCallOrder));
+            //Log.Info("FooBase.BaseCallOrder = {0}".Fmt(FooBase.BaseCallOrder));
+            //Log.Info("FooDerived.DerivedCallOrder = {0}".Fmt(FooDerived.DerivedCallOrder));
 
             TestAssert.AreEqual(FooBase.BaseCallOrder, 0);
             TestAssert.AreEqual(FooDerived.DerivedCallOrder, 1);

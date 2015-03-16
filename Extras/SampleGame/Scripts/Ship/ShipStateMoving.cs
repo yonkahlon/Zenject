@@ -15,7 +15,7 @@ namespace Asteroids
 
         public ShipStateMoving(
             Settings settings, Ship ship,
-            [Inject(Cameras.Main)]
+            [Inject("Main")]
             Camera mainCamera)
             : base(ship)
         {

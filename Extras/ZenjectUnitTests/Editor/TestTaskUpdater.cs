@@ -5,7 +5,7 @@ using NUnit.Framework;
 using UnityEngine;
 using TestAssert = NUnit.Framework.Assert;
 using Zenject;
-using Zenject.Tests;
+using ModestTree.Tests.Zenject;
 using System.Linq;
 using ModestTree;
 
@@ -21,7 +21,7 @@ namespace Zenject
         {
             _container = new DiContainer();
 
-            _container.Bind<TaskUpdater<ITickable>>().ToSingle(new TaskUpdater<ITickable>(t => t.Tick()));
+            _container.Bind<TaskUpdater<ITickable>>().ToSingleInstance(new TaskUpdater<ITickable>(t => t.Tick()));
         }
 
         public void BindTickable<TTickable>(int priority) where TTickable : ITickable

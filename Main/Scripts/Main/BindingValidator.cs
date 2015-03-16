@@ -7,32 +7,24 @@ namespace Zenject
 {
     internal static class BindingValidator
     {
-        public static IEnumerable<ZenjectResolveException> ValidateContract(
-            DiContainer container, Type contractType)
+        public static IEnumerable<ZenjectResolveException> ValidateContract(DiContainer container, InjectContext context)
         {
-            return ValidateContract(
-                container, contractType, new InjectContext(container));
-        }
-
-        public static IEnumerable<ZenjectResolveException> ValidateContract(
-            DiContainer container, Type contractType, InjectContext context)
-        {
-            var matches = container.GetProviderMatches(contractType, context);
+            var matches = container.GetProviderMatches(context);
 
             if (matches.Count == 1)
             {
-                foreach (var error in matches.Single().ValidateBinding(contractType, context))
+                foreach (var error in matches.Single().ValidateBinding(context))
                 {
                     yield return error;
                 }
             }
             else
             {
-                if (ReflectionUtil.IsGenericList(contractType))
+                if (ReflectionUtil.IsGenericList(context.MemberType))
                 {
-                    var subType = contractType.GetGenericArguments().Single();
+                    var subContext = context.ChangeMemberType(context.MemberType.GetGenericArguments().Single());
 
-                    matches = container.GetProviderMatches(subType, context);
+                    matches = container.GetProviderMatches(subContext);
 
                     if (matches.IsEmpty())
                     {
@@ -40,7 +32,7 @@ namespace Zenject
                         {
                             if (container.FallbackProvider != null)
                             {
-                                foreach (var error in container.FallbackProvider.ValidateBinding(contractType, context))
+                                foreach (var error in container.FallbackProvider.ValidateBinding(context))
                                 {
                                     yield return error;
                                 }
@@ -50,8 +42,8 @@ namespace Zenject
                                 yield return new ZenjectResolveException(
                                     "Could not find dependency with type 'List<{0}>'{1}.  If the empty list is also valid, you can allow this by using the [InjectOptional] attribute.' \nObject graph:\n{2}"
                                     .Fmt(
-                                        subType.Name(),
-                                        (context.EnclosingType == null ? "" : " when injecting into '{0}'".Fmt(context.EnclosingType.Name())),
+                                        subContext.MemberType.Name(),
+                                        (context.ParentType == null ? "" : " when injecting into '{0}'".Fmt(context.ParentType.Name())),
                                         DiContainer.GetCurrentObjectGraph()));
                             }
                         }
@@ -60,7 +52,7 @@ namespace Zenject
                     {
                         foreach (var match in matches)
                         {
-                            foreach (var error in match.ValidateBinding(contractType, context))
+                            foreach (var error in match.ValidateBinding(context))
                             {
                                 yield return error;
                             }
@@ -75,7 +67,7 @@ namespace Zenject
                         {
                             if (container.FallbackProvider != null)
                             {
-                                foreach (var error in container.FallbackProvider.ValidateBinding(contractType, context))
+                                foreach (var error in container.FallbackProvider.ValidateBinding(context))
                                 {
                                     yield return error;
                                 }
@@ -85,8 +77,8 @@ namespace Zenject
                                 yield return new ZenjectResolveException(
                                     "Could not find required dependency with type '{0}'{1} \nObject graph:\n{2}"
                                     .Fmt(
-                                        contractType.Name(),
-                                        (context.EnclosingType == null ? "" : " when injecting into '{0}'".Fmt(context.EnclosingType.Name())),
+                                        context.MemberType.Name(),
+                                        (context.ParentType == null ? "" : " when injecting into '{0}'".Fmt(context.ParentType.Name())),
                                         DiContainer.GetCurrentObjectGraph()));
                             }
                         }
@@ -95,8 +87,8 @@ namespace Zenject
                             yield return new ZenjectResolveException(
                                 "Found multiple matches when only one was expected for dependency with type '{0}'{1} \nObject graph:\n{2}"
                                 .Fmt(
-                                    contractType.Name(),
-                                    (context.EnclosingType == null ? "" : " when injecting into '{0}'".Fmt(context.EnclosingType.Name())),
+                                    context.MemberType.Name(),
+                                    (context.ParentType == null ? "" : " when injecting into '{0}'".Fmt(context.ParentType.Name())),
                                     DiContainer.GetCurrentObjectGraph()));
                         }
                     }
@@ -114,18 +106,16 @@ namespace Zenject
 
                 foreach (var dependInfo in typeInfo.AllInjectables)
                 {
-                    Assert.IsEqual(dependInfo.EnclosingType, concreteType);
+                    Assert.IsEqual(dependInfo.ParentType, concreteType);
 
-                    if (TryTakingFromExtras(dependInfo.ContractType, extrasList))
+                    if (TryTakingFromExtras(dependInfo.MemberType, extrasList))
                     {
                         continue;
                     }
 
-                    var context = new InjectContext(
-                        container, dependInfo, DiContainer.LookupsInProgress.ToList(), null);
+                    var context = dependInfo.CreateInjectContext(container, null);
 
-                    foreach (var error in ValidateContract(
-                        container, dependInfo.ContractType, context))
+                    foreach (var error in ValidateContract(container, context))
                     {
                         yield return error;
                     }

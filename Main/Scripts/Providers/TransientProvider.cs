@@ -23,19 +23,14 @@ namespace Zenject
             return _concreteType;
         }
 
-        public override bool HasInstance(Type contractType)
-        {
-            return false;
-        }
-
-        public override object GetInstance(Type contractType, InjectContext context)
+        public override object GetInstance(InjectContext context)
         {
             if (_instantiator == null)
             {
                 _instantiator = _container.Resolve<Instantiator>();
             }
 
-            var obj = _instantiator.Instantiate(GetTypeToInstantiate(contractType));
+            var obj = _instantiator.Instantiate(GetTypeToInstantiate(context.MemberType));
             Assert.That(obj != null);
             return obj;
         }
@@ -53,7 +48,7 @@ namespace Zenject
             return _concreteType;
         }
 
-        public override IEnumerable<ZenjectResolveException> ValidateBinding(Type contractType, InjectContext context)
+        public override IEnumerable<ZenjectResolveException> ValidateBinding(InjectContext context)
         {
             return BindingValidator.ValidateObjectGraph(_container, _concreteType);
         }

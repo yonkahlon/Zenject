@@ -14,7 +14,7 @@ namespace Zenject
     // - Build object graphs via Resolve() method
     public class DiContainer
     {
-        readonly Dictionary<Type, List<ProviderBase>> _providers = new Dictionary<Type, List<ProviderBase>>();
+        readonly Dictionary<BindingId, List<ProviderBase>> _providers = new Dictionary<BindingId, List<ProviderBase>>();
         readonly SingletonProviderMap _singletonMap;
 
         static Stack<Type> _lookupsInProgress = new Stack<Type>();
@@ -79,7 +79,7 @@ namespace Zenject
             }
         }
 
-        public IEnumerable<Type> AllContracts
+        public IEnumerable<BindingId> AllContracts
         {
             get
             {
@@ -274,7 +274,12 @@ namespace Zenject
 
         public ValueBinder<TContract> BindValue<TContract>() where TContract : struct
         {
-            return new ValueBinder<TContract>(this);
+            return BindValue<TContract>(null);
+        }
+
+        public ValueBinder<TContract> BindValue<TContract>(string identifier) where TContract : struct
+        {
+            return new ValueBinder<TContract>(this, identifier);
         }
 
         public ReferenceBinder<TContract> Rebind<TContract>() where TContract : class
@@ -283,15 +288,27 @@ namespace Zenject
             return Bind<TContract>();
         }
 
-        public ReferenceBinder<TContract> Bind<TContract>() where TContract : class
+        public ReferenceBinder<TContract> Bind<TContract>()
+            where TContract : class
         {
-            return new ReferenceBinder<TContract>(this, _singletonMap);
+            return Bind<TContract>(null);
+        }
+
+        public ReferenceBinder<TContract> Bind<TContract>(string identifier)
+            where TContract : class
+        {
+            return new ReferenceBinder<TContract>(this, identifier, _singletonMap);
         }
 
         // Note that this can include open generic types as well such as List<>
         public BinderUntyped Bind(Type contractType)
         {
-            return new BinderUntyped(this, contractType, _singletonMap);
+            return Bind(contractType, null);
+        }
+
+        public BinderUntyped Bind(Type contractType, string identifier)
+        {
+            return new BinderUntyped(this, contractType, identifier, _singletonMap);
         }
 
         public BindScope CreateScope()
@@ -305,22 +322,23 @@ namespace Zenject
             return new LookupInProgressAdder(this, type);
         }
 
-        public void RegisterProvider(ProviderBase provider, Type contractType)
+        public void RegisterProvider(
+            ProviderBase provider, BindingId bindingId)
         {
-            if (_providers.ContainsKey(contractType))
+            if (_providers.ContainsKey(bindingId))
             {
                 // Prevent duplicate singleton bindings:
-                if (_providers[contractType].Find(item => ReferenceEquals(item, provider)) != null)
+                if (_providers[bindingId].Find(item => ReferenceEquals(item, provider)) != null)
                 {
                     throw new ZenjectException(
-                        "Found duplicate singleton binding for contract '{0}'".Fmt(contractType));
+                        "Found duplicate singleton binding for contract '{0}' and id '{1}'".Fmt(bindingId.Type, bindingId.Identifier));
                 }
 
-                _providers[contractType].Add(provider);
+                _providers[bindingId].Add(provider);
             }
             else
             {
-                _providers.Add(contractType, new List<ProviderBase> {provider});
+                _providers.Add(bindingId, new List<ProviderBase> {provider});
             }
         }
 
@@ -336,9 +354,9 @@ namespace Zenject
             Assert.That(numRemoved > 0, "Tried to unregister provider that was not registered");
 
             // Remove any empty contracts
-            foreach (var contractType in _providers.Where(x => x.Value.IsEmpty()).Select(x => x.Key).ToList())
+            foreach (var bindingId in _providers.Where(x => x.Value.IsEmpty()).Select(x => x.Key).ToList())
             {
-                _providers.Remove(contractType);
+                _providers.Remove(bindingId);
             }
 
             provider.Dispose();
@@ -348,29 +366,34 @@ namespace Zenject
 
         public IEnumerable<ZenjectResolveException> ValidateValidatables(params Type[] ignoreTypes)
         {
-            var injectCtx = new InjectContext(this);
-
             foreach (var pair in _providers)
             {
-                if (ignoreTypes.Where(i => pair.Key.DerivesFromOrEqual(i)).Any())
+                var bindingId = pair.Key;
+
+                if (ignoreTypes.Where(i => bindingId.Type.DerivesFromOrEqual(i)).Any())
                 {
                     continue;
                 }
 
+                // Validate all IValidatableFactory's
                 List<ProviderBase> validatableFactoryProviders;
 
-                if (pair.Key.DerivesFrom<IValidatableFactory>())
+                var providers = pair.Value;
+
+                if (bindingId.Type.DerivesFrom<IValidatableFactory>())
                 {
-                    validatableFactoryProviders = pair.Value;
+                    validatableFactoryProviders = providers;
                 }
                 else
                 {
-                    validatableFactoryProviders = pair.Value.Where(x => x.GetInstanceType().DerivesFrom<IValidatableFactory>()).ToList();
+                    validatableFactoryProviders = providers.Where(x => x.GetInstanceType().DerivesFrom<IValidatableFactory>()).ToList();
                 }
+
+                var injectCtx = new InjectContext(this, bindingId.Type, bindingId.Identifier);
 
                 foreach (var provider in validatableFactoryProviders)
                 {
-                    var factory = (IValidatableFactory)provider.GetInstance(pair.Key, injectCtx);
+                    var factory = (IValidatableFactory)provider.GetInstance(injectCtx);
 
                     var type = factory.ConstructedType;
                     var providedArgs = factory.ProvidedTypes;
@@ -381,15 +404,16 @@ namespace Zenject
                     }
                 }
 
+                // Validate all IValidatable's
                 List<ProviderBase> validatableProviders;
 
-                if (pair.Key.DerivesFrom<IValidatable>())
+                if (bindingId.Type.DerivesFrom<IValidatable>())
                 {
-                    validatableProviders = pair.Value;
+                    validatableProviders = providers;
                 }
                 else
                 {
-                    validatableProviders = pair.Value.Where(x => x.GetInstanceType().DerivesFrom<IValidatable>()).ToList();
+                    validatableProviders = providers.Where(x => x.GetInstanceType().DerivesFrom<IValidatable>()).ToList();
                 }
 
                 Assert.That(validatableFactoryProviders.Intersect(validatableProviders).IsEmpty(),
@@ -397,7 +421,7 @@ namespace Zenject
 
                 foreach (var provider in validatableProviders)
                 {
-                    var factory = (IValidatable)provider.GetInstance(pair.Key, injectCtx);
+                    var factory = (IValidatable)provider.GetInstance(injectCtx);
 
                     foreach (var error in factory.Validate())
                     {
@@ -411,28 +435,15 @@ namespace Zenject
         // Throws ZenjectResolveException if there is a problem
         // Note: If you just want to know whether a binding exists for the given TContract,
         // use HasBinding instead
+        // Returns all ZenjectResolveExceptions found
         public IEnumerable<ZenjectResolveException> ValidateResolve<TContract>()
         {
-            return ValidateResolve(typeof(TContract));
+            return ValidateResolve(new InjectContext(this, typeof(TContract)));
         }
 
-        // Walk the object graph for the given type
-        // Throws ZenjectResolveException if there is a problem
-        public IEnumerable<ZenjectResolveException> ValidateResolve(Type contractType)
+        public IEnumerable<ZenjectResolveException> ValidateResolve(InjectContext context)
         {
-            return ValidateResolve(contractType, new InjectContext(this));
-        }
-
-        public IEnumerable<ZenjectResolveException> ValidateResolve<TContract>(InjectContext context)
-        {
-            return ValidateResolve(typeof(TContract), context);
-        }
-
-        // Walk the object graph for the given type
-        // Returns all ZenjectResolveExceptions found
-        public IEnumerable<ZenjectResolveException> ValidateResolve(Type contractType, InjectContext context)
-        {
-            return BindingValidator.ValidateContract(this, contractType, context);
+            return BindingValidator.ValidateContract(this, context);
         }
 
         public IEnumerable<ZenjectResolveException> ValidateObjectGraph<TConcrete>(params Type[] extras)
@@ -462,65 +473,30 @@ namespace Zenject
             return BindingValidator.ValidateObjectGraph(this, contractType, extras);
         }
 
-        public List<TContract> ResolveMany<TContract>()
-        {
-            return ResolveMany<TContract>(false);
-        }
-
-        public List<TContract> ResolveMany<TContract>(bool optional)
-        {
-            var context = new InjectContext(this);
-            context.Optional = optional;
-            return ResolveMany<TContract>(context);
-        }
-
-        public List<TContract> ResolveMany<TContract>(InjectContext context)
-        {
-            return (List<TContract>) ResolveMany(typeof(TContract), context);
-        }
-
-        public object ResolveMany(Type contract)
-        {
-            return ResolveMany(contract, new InjectContext(this));
-        }
-
         // Wrap IEnumerable<> to avoid LINQ mistakes
-        internal List<ProviderBase> GetProviderMatches(Type contractType)
+        internal List<ProviderBase> GetProviderMatches(InjectContext context)
         {
-            return GetProviderMatches(contractType, new InjectContext(this));
-        }
-
-        // Wrap IEnumerable<> to avoid LINQ mistakes
-        internal List<ProviderBase> GetProviderMatches(Type contractType, InjectContext context)
-        {
-            return GetProviderMatchesInternal(contractType, context).ToList();
-        }
-
-        IEnumerable<ProviderBase> GetProviderMatchesInternal(Type contractType)
-        {
-            return GetProviderMatchesInternal(
-                contractType, new InjectContext(this));
+            return GetProviderMatchesInternal(context).ToList();
         }
 
         // Be careful with this method since it is a coroutine
-        IEnumerable<ProviderBase> GetProviderMatchesInternal(
-            Type contractType, InjectContext context)
+        IEnumerable<ProviderBase> GetProviderMatchesInternal(InjectContext context)
         {
-            return GetProvidersForContract(contractType).Where(x => x.Matches(context));
+            return GetProvidersForContract(context.BindingId).Where(x => x.Matches(context));
         }
 
-        internal IEnumerable<ProviderBase> GetProvidersForContract(Type contractType)
+        internal IEnumerable<ProviderBase> GetProvidersForContract(BindingId bindingId)
         {
             List<ProviderBase> providers;
 
-            if (_providers.TryGetValue(contractType, out providers))
+            if (_providers.TryGetValue(bindingId, out providers))
             {
                 return providers;
             }
 
             // If we are asking for a List<int>, we should also match for any providers that are bound to the open generic type List<>
             // Currently it only matches one and not the other - not totally sure if this is better than returning both
-            if (contractType.IsGenericType && _providers.TryGetValue(contractType.GetGenericTypeDefinition(), out providers))
+            if (bindingId.Type.IsGenericType && _providers.TryGetValue(new BindingId(bindingId.Type.GetGenericTypeDefinition(), bindingId.Identifier), out providers))
             {
                 return providers;
             }
@@ -528,16 +504,11 @@ namespace Zenject
             return Enumerable.Empty<ProviderBase>();
         }
 
-        public bool HasBinding(Type contract)
-        {
-            return HasBinding(contract, new InjectContext(this));
-        }
-
-        public bool HasBinding(Type contract, InjectContext context)
+        public bool HasBinding(InjectContext context)
         {
             List<ProviderBase> providers;
 
-            if (!_providers.TryGetValue(contract, out providers))
+            if (!_providers.TryGetValue(context.BindingId, out providers))
             {
                 return false;
             }
@@ -545,44 +516,57 @@ namespace Zenject
             return providers.Where(x => x.Matches(context)).HasAtLeast(1);
         }
 
-        public bool HasBinding<TContract>()
+        public List<TContract> ResolveMany<TContract>()
         {
-            return HasBinding(typeof(TContract));
+            return ResolveMany<TContract>(false);
         }
 
-        public object ResolveMany(Type contractType, InjectContext context)
+        public List<TContract> ResolveMany<TContract>(bool optional)
+        {
+            var context = new InjectContext(this, typeof(TContract), null, optional);
+            return ResolveMany<TContract>(context);
+        }
+
+        public List<TContract> ResolveMany<TContract>(InjectContext context)
+        {
+            Assert.IsEqual(context.MemberType, typeof(TContract));
+            return (List<TContract>) ResolveMany(context);
+        }
+
+        public object ResolveMany(InjectContext context)
         {
             // Note that different types can map to the same provider (eg. a base type to a concrete class and a concrete class to itself)
 
-            var matches = GetProviderMatchesInternal(contractType, context).ToList();
+            var matches = GetProviderMatchesInternal(context).ToList();
 
             if (matches.Any())
             {
                 return ReflectionUtil.CreateGenericList(
-                    contractType, matches.Select(x => x.GetInstance(contractType, context)).ToArray());
+                    context.MemberType, matches.Select(x => x.GetInstance(context)).ToArray());
             }
 
             if (!context.Optional)
             {
                 if (_fallbackProvider != null)
                 {
-                    var listType = typeof(List<>).MakeGenericType(contractType);
+                    var listType = typeof(List<>).MakeGenericType(context.MemberType);
+                    var subContext = context.ChangeMemberType(listType);
 
-                    return _fallbackProvider.GetInstance(listType, context);
+                    return _fallbackProvider.GetInstance(subContext);
                 }
 
                 throw new ZenjectResolveException(
-                    "Could not find required dependency with type '" + contractType.Name() + "' \nObject graph:\n" + GetCurrentObjectGraph());
+                    "Could not find required dependency with type '" + context.MemberType.Name() + "' \nObject graph:\n" + GetCurrentObjectGraph());
             }
 
-            return ReflectionUtil.CreateGenericList(contractType, new object[] {});
+            return ReflectionUtil.CreateGenericList(context.MemberType, new object[] {});
         }
 
-        public List<Type> ResolveTypeMany(Type contract)
+        public List<Type> ResolveTypeMany(InjectContext context)
         {
-            if (_providers.ContainsKey(contract))
+            if (_providers.ContainsKey(context.BindingId))
             {
-                return _providers[contract].Select(x => x.GetInstanceType()).Where(x => x != null).ToList();
+                return _providers[context.BindingId].Select(x => x.GetInstanceType()).Where(x => x != null).ToList();
             }
 
             return new List<Type> {};
@@ -596,16 +580,18 @@ namespace Zenject
         // as we go
         public void InstallInstallers()
         {
+            var injectCtx = new InjectContext(this, typeof(IInstaller), null);
+
             while (true)
             {
-                var provider = GetProviderMatchesInternal(typeof(IInstaller)).FirstOrDefault();
+                var provider = GetProviderMatchesInternal(injectCtx).FirstOrDefault();
 
                 if (provider == null)
                 {
                     break;
                 }
 
-                var installer = (IInstaller)provider.GetInstance(typeof(IInstaller), new InjectContext(this));
+                var installer = (IInstaller)provider.GetInstance(injectCtx);
 
                 Assert.IsNotNull(installer);
 
@@ -622,63 +608,62 @@ namespace Zenject
             }
         }
 
-        internal object Resolve(InjectableInfo injectInfo)
-        {
-            return Resolve(injectInfo, null);
-        }
-
-        internal object Resolve(
-            InjectableInfo injectInfo, object targetInstance)
-        {
-            var context = new InjectContext(
-                this, injectInfo, LookupsInProgress.ToList(), targetInstance);
-
-            return Resolve(injectInfo.ContractType, context);
-        }
-
         // Return single instance of requested type or assert
         public TContract Resolve<TContract>()
         {
-            return Resolve<TContract>(new InjectContext(this));
+            return Resolve<TContract>((string)null);
+        }
+
+        public TContract Resolve<TContract>(string identifier)
+        {
+            return Resolve<TContract>(new InjectContext(this, typeof(TContract), identifier));
+        }
+
+        public object Resolve(Type contractType)
+        {
+            return Resolve(new InjectContext(this, contractType, null));
+        }
+
+        public object Resolve(Type contractType, string identifier)
+        {
+            return Resolve(new InjectContext(this, contractType, identifier));
         }
 
         public TContract Resolve<TContract>(InjectContext context)
         {
-            return (TContract) Resolve(typeof(TContract), context);
+            Assert.IsEqual(context.MemberType, typeof(TContract));
+            return (TContract) Resolve(context);
         }
 
-        public object Resolve(Type contract)
-        {
-            return Resolve(contract, new InjectContext(this));
-        }
-
-        public object Resolve(Type contractType, InjectContext context)
+        public object Resolve(InjectContext context)
         {
             // Note that different types can map to the same provider (eg. a base type to a concrete class and a concrete class to itself)
 
-            var providers = GetProviderMatchesInternal(contractType, context).ToList();
+            var providers = GetProviderMatchesInternal(context).ToList();
 
             if (providers.IsEmpty())
             {
                 // If it's a generic list then try matching multiple instances to its generic type
-                if (ReflectionUtil.IsGenericList(contractType))
+                if (ReflectionUtil.IsGenericList(context.MemberType))
                 {
-                    var subType = contractType.GetGenericArguments().Single();
-                    return ResolveMany(subType, context);
+                    var subType = context.MemberType.GetGenericArguments().Single();
+                    var subContext = context.ChangeMemberType(subType);
+
+                    return ResolveMany(subContext);
                 }
 
                 if (!context.Optional)
                 {
                     if (_fallbackProvider != null)
                     {
-                        return _fallbackProvider.GetInstance(contractType, context);
+                        return _fallbackProvider.GetInstance(context);
                     }
 
                     throw new ZenjectResolveException(
                         "Unable to resolve type '{0}'{1}. \nObject graph:\n{2}"
                         .Fmt(
-                            contractType.Name() + (context.Identifier == null ? "" : " with ID '" + context.Identifier.ToString() + "'"),
-                            (context.EnclosingType == null ? "" : " while building object with type '{0}'".Fmt(context.EnclosingType.Name())),
+                            context.MemberType.Name() + (context.Identifier == null ? "" : " with ID '" + context.Identifier.ToString() + "'"),
+                            (context.ParentType == null ? "" : " while building object with type '{0}'".Fmt(context.ParentType.Name())),
                             GetCurrentObjectGraph()));
                 }
 
@@ -689,23 +674,29 @@ namespace Zenject
                 throw new ZenjectResolveException(
                     "Found multiple matches when only one was expected for type '{0}'{1}. \nObject graph:\n {2}"
                     .Fmt(
-                        contractType.Name(),
-                        (context.EnclosingType == null ? "" : " while building object with type '{0}'".Fmt(context.EnclosingType.Name())),
+                        context.MemberType.Name(),
+                        (context.ParentType == null ? "" : " while building object with type '{0}'".Fmt(context.ParentType.Name())),
                         GetCurrentObjectGraph()));
             }
             else
             {
-                return providers.Single().GetInstance(contractType, context);
+                return providers.Single().GetInstance(context);
             }
         }
 
         public bool Unbind<TContract>()
         {
-            List<ProviderBase> providersToRemove;
+            return Unbind<TContract>(null);
+        }
 
-            if (_providers.TryGetValue(typeof(TContract), out providersToRemove))
+        public bool Unbind<TContract>(string identifier)
+        {
+            List<ProviderBase> providersToRemove;
+            var bindingId = new BindingId(typeof(TContract), identifier);
+
+            if (_providers.TryGetValue(bindingId, out providersToRemove))
             {
-                _providers.Remove(typeof(TContract));
+                _providers.Remove(bindingId);
 
                 // Only dispose if the provider is not bound to another type
                 foreach (var provider in providersToRemove)
@@ -731,7 +722,7 @@ namespace Zenject
         {
             foreach (var injectMember in TypeAnalyzer.GetInfo(contract).AllInjectables)
             {
-                yield return injectMember.ContractType;
+                yield return injectMember.MemberType;
             }
         }
 
@@ -757,6 +748,18 @@ namespace Zenject
             Type concreteType, params object[] constructorArgs)
         {
             return _instantiator.Instantiate(concreteType, constructorArgs);
+        }
+
+        // Helper methods
+        public bool HasBinding<TContract>()
+        {
+            return HasBinding<TContract>(null);
+        }
+
+        public bool HasBinding<TContract>(string identifier)
+        {
+            return HasBinding(
+                new InjectContext(this, typeof(TContract), identifier));
         }
     }
 }

@@ -16,33 +16,24 @@ namespace Zenject
             _provider = provider;
         }
 
-        public void As(object identifier)
-        {
-            _provider.Identifier = identifier;
-        }
-
-        public IdentifierSetter When(BindingCondition condition)
+        public void When(BindingCondition condition)
         {
             _provider.Condition = condition;
-            return new IdentifierSetter(_provider);
         }
 
-        public IdentifierSetter WhenInjectedIntoInstance(object instance)
+        public void WhenInjectedIntoInstance(object instance)
         {
-            _provider.Condition = r => ReferenceEquals(r.EnclosingInstance, instance);
-            return new IdentifierSetter(_provider);
+            _provider.Condition = r => ReferenceEquals(r.ParentInstance, instance);
         }
 
-        public IdentifierSetter WhenInjectedInto(params Type[] targets)
+        public void WhenInjectedInto(params Type[] targets)
         {
-            _provider.Condition = r => targets.Where(x => r.EnclosingType != null && r.EnclosingType.DerivesFromOrEqual(x)).Any();
-            return new IdentifierSetter(_provider);
+            _provider.Condition = r => targets.Where(x => r.ParentType != null && r.ParentType.DerivesFromOrEqual(x)).Any();
         }
 
-        public IdentifierSetter WhenInjectedInto<T>()
+        public void WhenInjectedInto<T>()
         {
-            _provider.Condition = r => r.EnclosingType != null && r.EnclosingType.DerivesFromOrEqual(typeof(T));
-            return new IdentifierSetter(_provider);
+            _provider.Condition = r => r.ParentType != null && r.ParentType.DerivesFromOrEqual(typeof(T));
         }
     }
 }

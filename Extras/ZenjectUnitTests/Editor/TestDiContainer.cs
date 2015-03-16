@@ -2,11 +2,11 @@ using System;
 using System.Collections.Generic;
 using Zenject;
 using NUnit.Framework;
-using Zenject.Tests;
+using ModestTree.Tests;
 using TestAssert=NUnit.Framework.Assert;
 using System.Linq;
 
-namespace Zenject.Tests
+namespace ModestTree.Tests.Zenject
 {
     [TestFixture]
     public class TestDiContainer
@@ -45,7 +45,7 @@ namespace Zenject.Tests
 
         void AssertHasContracts(IEnumerable<Type> expectedValues)
         {
-            var contractList = _container.AllContracts.ToList();
+            var contractList = _container.AllContracts.Select(x => x.Type).ToList();
             var expectedList = GetStandardTypeInclusions().Concat(expectedValues).ToList();
 
             TestAssert.That(
@@ -56,7 +56,7 @@ namespace Zenject.Tests
 
         List<Type> GetStandardTypeInclusions()
         {
-            return new List<Type>() { typeof(Instantiator), typeof(DiContainer) };
+            return new List<Type>() { typeof(Instantiator), typeof(DiContainer), typeof(SingletonProviderMap) };
         }
 
         [Test]

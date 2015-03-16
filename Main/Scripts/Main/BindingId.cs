@@ -6,17 +6,15 @@ using UnityEngine;
 
 namespace Zenject
 {
-    public class SingletonId : IEquatable<SingletonId>
+    public class BindingId : IEquatable<BindingId>
     {
         public readonly Type Type;
         public readonly string Identifier;
-        public readonly GameObject Prefab;
 
-        public SingletonId(string identifier, Type type, GameObject prefab)
+        public BindingId(Type type, string identifier)
         {
-            Identifier = identifier;
             Type = type;
-            Prefab = prefab;
+            Identifier = identifier;
         }
 
         public override int GetHashCode()
@@ -26,16 +24,15 @@ namespace Zenject
                 int hash = 17;
                 hash = hash * 29 + this.Type.GetHashCode();
                 hash = hash * 29 + (this.Identifier == null ? 0 : this.Identifier.GetHashCode());
-                hash = hash * 29 + (UnityUtil.IsNull(this.Prefab) ? 0 : this.Prefab.GetHashCode());
                 return hash;
             }
         }
 
         public override bool Equals(object other)
         {
-            if (other is SingletonId)
+            if (other is BindingId)
             {
-                SingletonId otherId = (SingletonId)other;
+                BindingId otherId = (BindingId)other;
                 return otherId == this;
             }
             else
@@ -44,17 +41,17 @@ namespace Zenject
             }
         }
 
-        public bool Equals(SingletonId that)
+        public bool Equals(BindingId that)
         {
             return this == that;
         }
 
-        public static bool operator ==(SingletonId left, SingletonId right)
+        public static bool operator ==(BindingId left, BindingId right)
         {
-            return left.Type == right.Type && object.Equals(left.Prefab, right.Prefab) && object.Equals(left.Identifier, right.Identifier);
+            return left.Type == right.Type && object.Equals(left.Identifier, right.Identifier);
         }
 
-        public static bool operator !=(SingletonId left, SingletonId right)
+        public static bool operator !=(BindingId left, BindingId right)
         {
             return !left.Equals(right);
         }

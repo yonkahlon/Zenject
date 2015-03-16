@@ -63,14 +63,14 @@ namespace Asteroids
 
             Container.Bind<ShipStateFactory>().ToSingle();
 
-            // Here's another way to create game objects dynamically, by using ToTransientFromPrefab
+            // Here's another way to create game objects dynamically, by using ToTransientPrefab
             // We prefer to use ITickable / IInitializable in favour of the Monobehaviour methods
             // so we just use a monobehaviour wrapper class here to pass in asset data
-            Container.Bind<ShipHooks>().ToTransientFromPrefab<ShipHooks>(SceneSettings.Ship.Prefab).WhenInjectedInto<Ship>();
+            Container.Bind<ShipHooks>().ToTransientPrefab<ShipHooks>(SceneSettings.Ship.Prefab).WhenInjectedInto<Ship>();
 
             // In this game there is only one camera so an enum isn't necessary
             // but used here to show how it would work if there were multiple
-            Container.Bind<Camera>().ToSingle(SceneSettings.MainCamera).As(Cameras.Main);
+            Container.Bind<Camera>("Main").ToSingleInstance(SceneSettings.MainCamera);
 
             Container.Bind<Ship>().ToSingle();
             Container.Bind<ITickable>().ToSingle<Ship>();
@@ -79,12 +79,12 @@ namespace Asteroids
 
         void InstallSettings()
         {
-            Container.Bind<ShipStateMoving.Settings>().ToSingle(SceneSettings.Ship.StateMoving);
-            Container.Bind<ShipStateDead.Settings>().ToSingle(SceneSettings.Ship.StateDead);
-            Container.Bind<ShipStateWaitingToStart.Settings>().ToSingle(SceneSettings.Ship.StateStarting);
+            Container.Bind<ShipStateMoving.Settings>().ToSingleInstance(SceneSettings.Ship.StateMoving);
+            Container.Bind<ShipStateDead.Settings>().ToSingleInstance(SceneSettings.Ship.StateDead);
+            Container.Bind<ShipStateWaitingToStart.Settings>().ToSingleInstance(SceneSettings.Ship.StateStarting);
 
-            Container.Bind<AsteroidManager.Settings>().ToSingle(SceneSettings.Asteroid.Spawner);
-            Container.Bind<Asteroid.Settings>().ToSingle(SceneSettings.Asteroid.General);
+            Container.Bind<AsteroidManager.Settings>().ToSingleInstance(SceneSettings.Asteroid.Spawner);
+            Container.Bind<Asteroid.Settings>().ToSingleInstance(SceneSettings.Asteroid.General);
         }
 
         // We don't need to include these bindings but often its nice to have

@@ -51,13 +51,14 @@ namespace Zenject
             {
                 object value;
 
-                if (InstantiateUtil.PopValueWithType(extraArgMap, injectInfo.ContractType, out value))
+                if (InstantiateUtil.PopValueWithType(extraArgMap, injectInfo.MemberType, out value))
                 {
                     injectInfo.Setter(injectable, value);
                 }
                 else
                 {
-                    value = container.Resolve(injectInfo, injectable);
+                    value = container.Resolve(
+                        injectInfo.CreateInjectContext(container, injectable));
 
                     if (injectInfo.Optional && value == null)
                     {

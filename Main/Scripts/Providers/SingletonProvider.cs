@@ -24,22 +24,17 @@ namespace Zenject
             _creator.DecRefCount();
         }
 
-        public override bool HasInstance(Type contractType)
-        {
-            return _creator.HasInstance();
-        }
-
         public override Type GetInstanceType()
         {
             return _creator.GetInstanceType();
         }
 
-        public override object GetInstance(Type contractType, InjectContext context)
+        public override object GetInstance(InjectContext context)
         {
-            return _creator.GetInstance(contractType);
+            return _creator.GetInstance(context.MemberType);
         }
 
-        public override IEnumerable<ZenjectResolveException> ValidateBinding(Type contractType, InjectContext context)
+        public override IEnumerable<ZenjectResolveException> ValidateBinding(InjectContext context)
         {
             // Can't validate custom methods so assume they work
             if (_creator.HasInstance() || _creator.HasCustomCreateMethod)
