@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using Zenject;
 using NUnit.Framework;
-using TestAssert=NUnit.Framework.Assert;
+using ModestTree;
+using Assert=ModestTree.Assert;
 
-namespace ModestTree.Tests.Zenject
+namespace Zenject.Tests
 {
     [TestFixture]
     public class ZenjectProfileTest
@@ -94,7 +95,7 @@ namespace ModestTree.Tests.Zenject
 
             //Log.InfoFormat("time = {0}", stopwatch.Elapsed.TotalSeconds);
 
-            //TestAssert.That(false);
+            //Assert.That(false);
         }
     }
 }

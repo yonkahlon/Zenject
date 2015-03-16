@@ -2,9 +2,10 @@ using System;
 using System.Collections.Generic;
 using Zenject;
 using NUnit.Framework;
-using TestAssert=NUnit.Framework.Assert;
+using ModestTree;
+using Assert=ModestTree.Assert;
 
-namespace ModestTree.Tests.Zenject
+namespace Zenject.Tests
 {
     [TestFixture]
     public class TestPostInjectCall : TestWithContainer
@@ -42,10 +43,10 @@ namespace ModestTree.Tests.Zenject
             [PostInject]
             public void Init()
             {
-                TestAssert.That(!HasInitialized);
-                TestAssert.IsNotNull(test1);
-                TestAssert.IsNotNull(test0);
-                TestAssert.IsNotNull(_test2);
+                Assert.That(!HasInitialized);
+                Assert.IsNotNull(test1);
+                Assert.IsNotNull(test0);
+                Assert.IsNotNull(_test2);
                 HasInitialized = true;
             }
 
@@ -64,10 +65,10 @@ namespace ModestTree.Tests.Zenject
             Container.Bind<Test2>().ToSingle();
             Container.Bind<Test3>().ToSingle();
 
-            TestAssert.That(Container.ValidateResolve<Test3>().IsEmpty());
+            Assert.That(Container.ValidateResolve<Test3>().IsEmpty());
             var test3 = Container.Resolve<Test3>();
-            TestAssert.That(test3.HasInitialized);
-            TestAssert.That(test3.HasInitialized2);
+            Assert.That(test3.HasInitialized);
+            Assert.That(test3.HasInitialized2);
         }
 
         public class SimpleBase
@@ -92,7 +93,7 @@ namespace ModestTree.Tests.Zenject
 
             var simple = Container.Resolve<SimpleBase>();
 
-            TestAssert.That(simple.WasCalled);
+            Assert.That(simple.WasCalled);
         }
 
         [Test]
@@ -100,13 +101,13 @@ namespace ModestTree.Tests.Zenject
         {
             Container.Bind<IFoo>().ToSingle<FooDerived>();
 
-            TestAssert.That(Container.ValidateResolve<IFoo>().IsEmpty());
+            Assert.That(Container.ValidateResolve<IFoo>().IsEmpty());
             var foo = Container.Resolve<IFoo>();
 
-            TestAssert.That(((FooDerived)foo).WasDerivedCalled);
-            TestAssert.That(((FooBase)foo).WasBaseCalled);
-            TestAssert.That(((FooDerived)foo).WasDerivedCalled2);
-            TestAssert.That(((FooBase)foo).WasBaseCalled2);
+            Assert.That(((FooDerived)foo).WasDerivedCalled);
+            Assert.That(((FooBase)foo).WasBaseCalled);
+            Assert.That(((FooDerived)foo).WasDerivedCalled2);
+            Assert.That(((FooBase)foo).WasBaseCalled2);
         }
 
         [Test]
@@ -125,9 +126,9 @@ namespace ModestTree.Tests.Zenject
             //Log.Info("FooBase.BaseCallOrder = {0}".Fmt(FooBase.BaseCallOrder));
             //Log.Info("FooDerived.DerivedCallOrder = {0}".Fmt(FooDerived.DerivedCallOrder));
 
-            TestAssert.AreEqual(FooBase.BaseCallOrder, 0);
-            TestAssert.AreEqual(FooDerived.DerivedCallOrder, 1);
-            TestAssert.AreEqual(FooDerived2.Derived2CallOrder, 2);
+            Assert.IsEqual(FooBase.BaseCallOrder, 0);
+            Assert.IsEqual(FooDerived.DerivedCallOrder, 1);
+            Assert.IsEqual(FooDerived2.Derived2CallOrder, 2);
         }
 
         static int _initOrder;
@@ -145,7 +146,7 @@ namespace ModestTree.Tests.Zenject
             [PostInject]
             void TestBase()
             {
-                TestAssert.That(!WasBaseCalled);
+                Assert.That(!WasBaseCalled);
                 WasBaseCalled = true;
                 BaseCallOrder = _initOrder++;
             }
@@ -153,7 +154,7 @@ namespace ModestTree.Tests.Zenject
             [PostInject]
             public virtual void TestVirtual1()
             {
-                TestAssert.That(!WasBaseCalled2);
+                Assert.That(!WasBaseCalled2);
                 WasBaseCalled2 = true;
             }
         }
@@ -167,7 +168,7 @@ namespace ModestTree.Tests.Zenject
             [PostInject]
             void TestDerived()
             {
-                TestAssert.That(!WasDerivedCalled);
+                Assert.That(!WasDerivedCalled);
                 WasDerivedCalled = true;
                 DerivedCallOrder = _initOrder++;
             }
@@ -175,7 +176,7 @@ namespace ModestTree.Tests.Zenject
             public override void TestVirtual1()
             {
                 base.TestVirtual1();
-                TestAssert.That(!WasDerivedCalled2);
+                Assert.That(!WasDerivedCalled2);
                 WasDerivedCalled2 = true;
             }
         }
@@ -188,7 +189,7 @@ namespace ModestTree.Tests.Zenject
             [PostInject]
             public void TestVirtual2()
             {
-                TestAssert.That(!WasDerived2Called);
+                Assert.That(!WasDerived2Called);
                 WasDerived2Called = true;
                 Derived2CallOrder = _initOrder++;
             }

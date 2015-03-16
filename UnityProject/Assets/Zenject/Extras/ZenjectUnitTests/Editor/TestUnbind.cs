@@ -1,8 +1,9 @@
 using System;
-using TestAssert=NUnit.Framework.Assert;
 using NUnit.Framework;
+using ModestTree;
+using Assert=ModestTree.Assert;
 
-namespace ModestTree.Tests.Zenject
+namespace Zenject.Tests
 {
     [TestFixture]
     public class TestUnbind : TestWithContainer
@@ -20,11 +21,11 @@ namespace ModestTree.Tests.Zenject
         {
             Container.Bind<IFoo>().ToSingle<Foo>();
 
-            TestAssert.That(Container.ValidateResolve<IFoo>().IsEmpty());
+            Assert.That(Container.ValidateResolve<IFoo>().IsEmpty());
 
             Container.Unbind<IFoo>();
 
-            TestAssert.That(!Container.ValidateResolve<IFoo>().IsEmpty());
+            Assert.That(!Container.ValidateResolve<IFoo>().IsEmpty());
         }
     }
 }

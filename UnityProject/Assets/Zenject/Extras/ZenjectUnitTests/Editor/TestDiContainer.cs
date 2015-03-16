@@ -2,11 +2,11 @@ using System;
 using System.Collections.Generic;
 using Zenject;
 using NUnit.Framework;
-using ModestTree.Tests;
-using TestAssert=NUnit.Framework.Assert;
 using System.Linq;
+using ModestTree;
+using Assert=ModestTree.Assert;
 
-namespace ModestTree.Tests.Zenject
+namespace Zenject.Tests
 {
     [TestFixture]
     public class TestDiContainer
@@ -37,7 +37,7 @@ namespace ModestTree.Tests.Zenject
             var concreteList = _container.AllConcreteTypes.ToList();
             var expectedList = GetStandardTypeInclusions().Concat(expectedValues).ToList();
 
-            TestAssert.That(
+            Assert.That(
                 TestListComparer.ContainSameElements(
                     concreteList, expectedList),
                     "Unexpected list: " + TestListComparer.PrintList(concreteList) + "\nExpected: " + TestListComparer.PrintList(expectedList));
@@ -48,7 +48,7 @@ namespace ModestTree.Tests.Zenject
             var contractList = _container.AllContracts.Select(x => x.Type).ToList();
             var expectedList = GetStandardTypeInclusions().Concat(expectedValues).ToList();
 
-            TestAssert.That(
+            Assert.That(
                 TestListComparer.ContainSameElements(
                     contractList, expectedList),
                     "Unexpected list: " + TestListComparer.PrintList(contractList) + "\nExpected: " + TestListComparer.PrintList(expectedList));
@@ -56,7 +56,11 @@ namespace ModestTree.Tests.Zenject
 
         List<Type> GetStandardTypeInclusions()
         {
-            return new List<Type>() { typeof(Instantiator), typeof(DiContainer), typeof(SingletonProviderMap) };
+            return new List<Type>()
+            {
+                typeof(Instantiator), typeof(DiContainer), typeof(SingletonInstanceHelper),
+                typeof(PrefabSingletonProviderMap), typeof(SingletonProviderMap)
+            };
         }
 
         [Test]

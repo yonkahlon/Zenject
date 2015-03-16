@@ -2,10 +2,11 @@ using System;
 using System.Collections.Generic;
 using Zenject;
 using NUnit.Framework;
-using TestAssert=NUnit.Framework.Assert;
 using System.Linq;
+using ModestTree;
+using Assert=ModestTree.Assert;
 
-namespace ModestTree.Tests.Zenject
+namespace Zenject.Tests
 {
     [TestFixture]
     public class TestDuplicateInjection : TestWithContainer
@@ -29,10 +30,10 @@ namespace ModestTree.Tests.Zenject
 
             Container.Bind<Test1>().ToSingle();
 
-            TestAssert.Throws<ZenjectResolveException>(
+            Assert.Throws<ZenjectResolveException>(
                 delegate { Container.Resolve<Test1>(); });
 
-            TestAssert.That(Container.ValidateResolve<Test1>().Any());
+            Assert.That(Container.ValidateResolve<Test1>().Any());
         }
     }
 }

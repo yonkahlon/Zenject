@@ -2,10 +2,11 @@ using System;
 using System.Collections.Generic;
 using Zenject;
 using NUnit.Framework;
-using TestAssert=NUnit.Framework.Assert;
 using System.Linq;
+using ModestTree;
+using Assert=ModestTree.Assert;
 
-namespace ModestTree.Tests.Zenject
+namespace Zenject.Tests
 {
     [TestFixture]
     public class TestParameters : TestWithContainer
@@ -28,14 +29,14 @@ namespace ModestTree.Tests.Zenject
             var factory1 = new FactoryUntyped<Test1>(Container);
             var test1 = factory1.Create(5, 10);
 
-            TestAssert.That(test1 != null);
-            TestAssert.That(test1.f1 == 5 && test1.f2 == 10);
+            Assert.That(test1 != null);
+            Assert.That(test1.f1 == 5 && test1.f2 == 10);
 
             var factory2 = new FactoryUntyped<Test1>(Container);
             var test2 = factory2.Create(10, 5);
 
-            TestAssert.That(test2 != null);
-            TestAssert.That(test2.f1 == 10 && test2.f2 == 5);
+            Assert.That(test2 != null);
+            Assert.That(test2.f1 == 10 && test2.f2 == 5);
         }
 
         [Test]
@@ -43,10 +44,10 @@ namespace ModestTree.Tests.Zenject
         {
             Container.Bind<Test1>().ToTransient();
 
-            TestAssert.Throws<ZenjectResolveException>(
+            Assert.Throws<ZenjectResolveException>(
                 delegate { Container.Resolve<Test1>(); });
 
-            TestAssert.That(Container.ValidateResolve<Test1>().Any());
+            Assert.That(Container.ValidateResolve<Test1>().Any());
         }
     }
 }

@@ -1,9 +1,10 @@
 using System;
 using NUnit.Framework;
-using TestAssert=NUnit.Framework.Assert;
 //using Moq;
+using ModestTree;
+using Assert=ModestTree.Assert;
 
-namespace ModestTree.Tests.Zenject
+namespace Zenject.Tests
 {
     [TestFixture]
     public class TestMoq
@@ -14,10 +15,10 @@ namespace ModestTree.Tests.Zenject
             //var container = new DiContainer();
             //container.Bind<IFoo>().ToMock();
 
-            //TestAssert.That(container.ValidateResolve<IFoo>().IsEmpty());
+            //Assert.That(container.ValidateResolve<IFoo>().IsEmpty());
             //var foo = container.Resolve<IFoo>();
 
-            //TestAssert.AreEqual(foo.GetBar(), 0);
+            //Assert.IsEqual(foo.GetBar(), 0);
         }
 
         public interface IFoo

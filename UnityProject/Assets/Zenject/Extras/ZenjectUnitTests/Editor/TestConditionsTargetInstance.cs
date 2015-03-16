@@ -2,9 +2,10 @@ using System;
 using System.Collections.Generic;
 using Zenject;
 using NUnit.Framework;
-using TestAssert = NUnit.Framework.Assert;
+using ModestTree;
+using Assert=ModestTree.Assert;
 
-namespace ModestTree.Tests.Zenject
+namespace Zenject.Tests
 {
     [TestFixture]
     public class TestConditionsTargetInstance : TestWithContainer
@@ -35,7 +36,7 @@ namespace ModestTree.Tests.Zenject
         {
             FieldsInjecter.Inject(Container, _test1);
 
-            TestAssert.That(_test1.test0 != null);
+            Assert.That(_test1.test0 != null);
         }
     }
 }

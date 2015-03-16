@@ -2,9 +2,10 @@ using System;
 using System.Collections.Generic;
 using Zenject;
 using NUnit.Framework;
-using TestAssert=NUnit.Framework.Assert;
+using ModestTree;
+using Assert=ModestTree.Assert;
 
-namespace ModestTree.Tests.Zenject
+namespace Zenject.Tests
 {
     [TestFixture]
     public class TestPropertyInjection : TestWithContainer
@@ -35,11 +36,11 @@ namespace ModestTree.Tests.Zenject
             Container.Bind<Test2>().ToSingle();
             Container.Bind<Test1>().To(test1);
 
-            TestAssert.That(Container.ValidateResolve<Test2>().IsEmpty());
+            Assert.That(Container.ValidateResolve<Test2>().IsEmpty());
             var test2 = Container.Resolve<Test2>();
 
-            TestAssert.AreEqual(test2.val2, test1);
-            TestAssert.AreEqual(test2.GetVal4(), test1);
+            Assert.IsEqual(test2.val2, test1);
+            Assert.IsEqual(test2.GetVal4(), test1);
         }
 
         [Test]

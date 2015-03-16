@@ -20,11 +20,13 @@ namespace Zenject
         DiContainer _container;
         List<ProviderBase> _scopedProviders = new List<ProviderBase>();
         SingletonProviderMap _singletonMap;
+        PrefabSingletonProviderMap _prefabSingletonMap;
 
-        internal BindScope(DiContainer container, SingletonProviderMap singletonMap)
+        internal BindScope(DiContainer container, SingletonProviderMap singletonMap, PrefabSingletonProviderMap prefabSingletonMap)
         {
             _container = container;
             _singletonMap = singletonMap;
+            _prefabSingletonMap = prefabSingletonMap;
         }
 
         public BinderUntyped Bind(Type contractType)
@@ -34,7 +36,7 @@ namespace Zenject
 
         public BinderUntyped Bind(Type contractType, string identifier)
         {
-            return new CustomScopeUntypedBinder(this, contractType, identifier, _container, _singletonMap);
+            return new CustomScopeUntypedBinder(this, contractType, identifier, _container, _singletonMap, _prefabSingletonMap);
         }
 
         public ReferenceBinder<TContract> Bind<TContract>() where TContract : class
@@ -44,7 +46,7 @@ namespace Zenject
 
         public ReferenceBinder<TContract> Bind<TContract>(string identifier) where TContract : class
         {
-            return new CustomScopeReferenceBinder<TContract>(this, identifier, _container, _singletonMap);
+            return new CustomScopeReferenceBinder<TContract>(this, identifier, _container, _singletonMap, _prefabSingletonMap);
         }
 
         public ValueBinder<TContract> BindValue<TContract>() where TContract : struct
@@ -108,8 +110,8 @@ namespace Zenject
 
             public CustomScopeReferenceBinder(
                 BindScope owner, string identifier,
-                DiContainer container, SingletonProviderMap singletonMap)
-                : base(container, identifier, singletonMap)
+                DiContainer container, SingletonProviderMap singletonMap, PrefabSingletonProviderMap prefabSingletonMap)
+                : base(container, identifier, singletonMap, prefabSingletonMap)
             {
                 _owner = owner;
             }
@@ -127,8 +129,8 @@ namespace Zenject
 
             public CustomScopeUntypedBinder(
                 BindScope owner, Type contractType, string identifier,
-                DiContainer container, SingletonProviderMap singletonMap)
-                : base(container, contractType, identifier, singletonMap)
+                DiContainer container, SingletonProviderMap singletonMap, PrefabSingletonProviderMap prefabSingletonMap)
+                : base(container, contractType, identifier, singletonMap, prefabSingletonMap)
             {
                 _owner = owner;
             }

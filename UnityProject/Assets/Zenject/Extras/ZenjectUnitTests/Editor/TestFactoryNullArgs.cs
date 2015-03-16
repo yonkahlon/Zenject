@@ -2,10 +2,11 @@ using System;
 using System.Collections.Generic;
 using Zenject;
 using NUnit.Framework;
-using TestAssert=NUnit.Framework.Assert;
 using System.Linq;
+using ModestTree;
+using Assert=ModestTree.Assert;
 
-namespace ModestTree.Tests.Zenject
+namespace Zenject.Tests
 {
     [TestFixture]
     public class TestFactoryUsingIFactory : TestWithContainer
@@ -30,7 +31,7 @@ namespace ModestTree.Tests.Zenject
 
             var result = Container.Resolve<IFactory<ITest>>().Create();
 
-            TestAssert.That(result.GetType() == typeof(Test2));
+            Assert.That(result.GetType() == typeof(Test2));
         }
     }
 
