@@ -3,13 +3,12 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using NUnit.Framework;
 using UnityEngine;
-using TestAssert = NUnit.Framework.Assert;
 using Zenject;
-using ModestTree.Tests.Zenject;
 using System.Linq;
 using ModestTree;
+using Assert=ModestTree.Assert;
 
-namespace Zenject
+namespace Zenject.Tests
 {
     [TestFixture]
     public class TestTaskUpdater
@@ -33,8 +32,8 @@ namespace Zenject
         [Test]
         public void TestTickablesAreOptional()
         {
-            TestAssert.That(_container.ValidateResolve<TaskUpdater<ITickable>>().IsEmpty());
-            TestAssert.IsNotNull(_container.Resolve<TaskUpdater<ITickable>>());
+            Assert.That(_container.ValidateResolve<TaskUpdater<ITickable>>().IsEmpty());
+            Assert.IsNotNull(_container.Resolve<TaskUpdater<ITickable>>());
         }
 
         [Test]
@@ -49,33 +48,33 @@ namespace Zenject
             BindTickable<Tickable1>(0);
             BindTickable<Tickable2>(1);
 
-            TestAssert.That(_container.ValidateResolve<TaskUpdater<ITickable>>().IsEmpty());
+            Assert.That(_container.ValidateResolve<TaskUpdater<ITickable>>().IsEmpty());
             var kernel = _container.Resolve<TaskUpdater<ITickable>>();
 
-            TestAssert.That(_container.ValidateResolve<Tickable1>().IsEmpty());
+            Assert.That(_container.ValidateResolve<Tickable1>().IsEmpty());
             var tick1 = _container.Resolve<Tickable1>();
-            TestAssert.That(_container.ValidateResolve<Tickable2>().IsEmpty());
+            Assert.That(_container.ValidateResolve<Tickable2>().IsEmpty());
             var tick2 = _container.Resolve<Tickable2>();
-            TestAssert.That(_container.ValidateResolve<Tickable3>().IsEmpty());
+            Assert.That(_container.ValidateResolve<Tickable3>().IsEmpty());
             var tick3 = _container.Resolve<Tickable3>();
 
             int tickCount = 0;
 
             tick1.TickCalled += delegate
             {
-                TestAssert.AreEqual(tickCount, 0);
+                Assert.IsEqual(tickCount, 0);
                 tickCount++;
             };
 
             tick2.TickCalled += delegate
             {
-                TestAssert.AreEqual(tickCount, 1);
+                Assert.IsEqual(tickCount, 1);
                 tickCount++;
             };
 
             tick3.TickCalled += delegate
             {
-                TestAssert.AreEqual(tickCount, 2);
+                Assert.IsEqual(tickCount, 2);
                 tickCount++;
             };
 

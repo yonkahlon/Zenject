@@ -2,10 +2,11 @@ using System;
 using System.Collections.Generic;
 using Zenject;
 using NUnit.Framework;
-using TestAssert=NUnit.Framework.Assert;
 using System.Linq;
+using ModestTree;
+using Assert=ModestTree.Assert;
 
-namespace ModestTree.Tests.Zenject
+namespace Zenject.Tests
 {
     [TestFixture]
     public class TestMultiBind : TestWithContainer
@@ -45,10 +46,10 @@ namespace ModestTree.Tests.Zenject
             Container.Bind<Test1>().ToSingle<Test3>();
             Container.Bind<TestImpl1>().ToSingle();
 
-            TestAssert.That(Container.ValidateResolve<TestImpl1>().IsEmpty());
+            Assert.That(Container.ValidateResolve<TestImpl1>().IsEmpty());
             var test1 = Container.Resolve<TestImpl1>();
 
-            TestAssert.That(test1.tests.Count == 2);
+            Assert.That(test1.tests.Count == 2);
         }
 
         [Test]
@@ -57,10 +58,10 @@ namespace ModestTree.Tests.Zenject
             Container.Bind<TestImpl1>().ToSingle();
 
             // optional list dependencies should be declared as optional
-            TestAssert.Throws<ZenjectResolveException>(
+            Assert.Throws<ZenjectResolveException>(
                 delegate { Container.Resolve<TestImpl1>(); });
 
-            TestAssert.That(Container.ValidateResolve<TestImpl1>().Any());
+            Assert.That(Container.ValidateResolve<TestImpl1>().Any());
         }
 
         [Test]
@@ -68,10 +69,10 @@ namespace ModestTree.Tests.Zenject
         {
             Container.Bind<TestImpl1>().ToSingle();
 
-            TestAssert.Throws<ZenjectResolveException>(
+            Assert.Throws<ZenjectResolveException>(
                 delegate { Container.Resolve<TestImpl1>(); });
 
-            TestAssert.That(Container.ValidateResolve<Test2>().Any());
+            Assert.That(Container.ValidateResolve<Test2>().Any());
         }
 
         [Test]
@@ -81,9 +82,9 @@ namespace ModestTree.Tests.Zenject
             Container.Bind<Test1>().ToSingle<Test3>();
             Container.Bind<TestImpl2>().ToSingle();
 
-            TestAssert.That(Container.ValidateResolve<TestImpl2>().IsEmpty());
+            Assert.That(Container.ValidateResolve<TestImpl2>().IsEmpty());
             var test = Container.Resolve<TestImpl2>();
-            TestAssert.That(test.tests.Count == 2);
+            Assert.That(test.tests.Count == 2);
         }
     }
 }

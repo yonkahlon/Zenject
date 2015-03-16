@@ -79,6 +79,8 @@ namespace Zenject
             Type componentType, GameObject template, params object[] args)
         {
             Assert.That(template != null, "Null template found when instantiating game object");
+
+            // It could be an interface so this may fail in valid cases:
             Assert.That(componentType.DerivesFrom<Component>());
 
             var gameObj = (GameObject)GameObject.Instantiate(template);

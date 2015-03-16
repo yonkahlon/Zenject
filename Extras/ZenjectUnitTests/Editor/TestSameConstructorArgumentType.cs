@@ -2,9 +2,10 @@ using System;
 using System.Collections.Generic;
 using Zenject;
 using NUnit.Framework;
-using TestAssert=NUnit.Framework.Assert;
+using ModestTree;
+using Assert=ModestTree.Assert;
 
-namespace ModestTree.Tests.Zenject
+namespace Zenject.Tests
 {
     [TestFixture]
     public class TestSameConstructorArgumentType : TestWithContainer
@@ -35,13 +36,13 @@ namespace ModestTree.Tests.Zenject
 
             Container.Bind<FactoryUntyped<Test1>>().ToSingle();
 
-            TestAssert.That(Container.ValidateResolve<FactoryUntyped<Test1>>().IsEmpty());
+            Assert.That(Container.ValidateResolve<FactoryUntyped<Test1>>().IsEmpty());
             var factory = Container.Resolve<FactoryUntyped<Test1>>();
 
             var test = factory.Create(t1, 5.0f, t2);
 
-            TestAssert.That(ReferenceEquals(test.t1, t1));
-            TestAssert.That(ReferenceEquals(test.t2, t2));
+            Assert.That(ReferenceEquals(test.t1, t1));
+            Assert.That(ReferenceEquals(test.t2, t2));
         }
     }
 }

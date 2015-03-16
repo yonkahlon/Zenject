@@ -2,10 +2,11 @@ using System;
 using System.Collections.Generic;
 using Zenject;
 using NUnit.Framework;
-using TestAssert=NUnit.Framework.Assert;
 using System.Linq;
+using ModestTree;
+using Assert=ModestTree.Assert;
 
-namespace ModestTree.Tests.Zenject
+namespace Zenject.Tests
 {
     [TestFixture]
     public class TestFactory : TestWithContainer
@@ -44,7 +45,7 @@ namespace ModestTree.Tests.Zenject
             var factory = Container.Resolve<Test2.Factory>();
             var test = factory.Create(5, new Test1());
 
-            TestAssert.That(test.value == 5);
+            Assert.That(test.value == 5);
         }
     }
 }

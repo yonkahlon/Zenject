@@ -7,13 +7,15 @@ namespace Zenject
     public class BinderUntyped : Binder
     {
         readonly protected SingletonProviderMap _singletonMap;
+        readonly protected PrefabSingletonProviderMap _prefabSingletonMap;
 
         public BinderUntyped(
-            DiContainer container, Type contractType, 
-            string identifier, SingletonProviderMap singletonMap)
+            DiContainer container, Type contractType,
+            string identifier, SingletonProviderMap singletonMap, PrefabSingletonProviderMap prefabSingletonMap)
             : base(container, contractType, identifier)
         {
             _singletonMap = singletonMap;
+            _prefabSingletonMap = prefabSingletonMap;
         }
 
         public BindingConditionSetter ToTransient(Type concreteType)
@@ -187,7 +189,7 @@ namespace Zenject
                 throw new ZenjectBindException("Received null prefab while binding type '{0}'".Fmt(concreteType.Name()));
             }
 
-            return ToProvider(_singletonMap.CreateProviderFromPrefab(identifier, typeof(TConcrete), prefab));
+            return ToProvider(_prefabSingletonMap.CreateProvider(identifier, typeof(TConcrete), prefab));
         }
 
         // Note: Here we assume that the contract is a component on the given prefab

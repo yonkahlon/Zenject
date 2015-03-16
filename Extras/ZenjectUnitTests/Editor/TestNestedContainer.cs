@@ -2,10 +2,11 @@ using System;
 using System.Collections.Generic;
 using Zenject;
 using NUnit.Framework;
-using TestAssert=NUnit.Framework.Assert;
 using System.Linq;
+using ModestTree;
+using Assert=ModestTree.Assert;
 
-namespace ModestTree.Tests.Zenject
+namespace Zenject.Tests
 {
     [TestFixture]
     public class TestNestedContainer : TestWithContainer
@@ -36,23 +37,23 @@ namespace ModestTree.Tests.Zenject
         {
             var nestedContainer = new DiContainer();
 
-            TestAssert.Throws<ZenjectResolveException>(() => nestedContainer.Resolve<IFoo>());
-            TestAssert.Throws<ZenjectResolveException>(() => Container.Resolve<IFoo>());
+            Assert.Throws<ZenjectResolveException>(() => nestedContainer.Resolve<IFoo>());
+            Assert.Throws<ZenjectResolveException>(() => Container.Resolve<IFoo>());
 
             Container.Bind<IFoo>().ToSingle<Foo>();
 
-            TestAssert.Throws<ZenjectResolveException>(() => nestedContainer.Resolve<IFoo>());
-            TestAssert.AreEqual(Container.Resolve<IFoo>().GetBar(), 0);
+            Assert.Throws<ZenjectResolveException>(() => nestedContainer.Resolve<IFoo>());
+            Assert.IsEqual(Container.Resolve<IFoo>().GetBar(), 0);
 
             nestedContainer.FallbackProvider = new DiContainerProvider(Container);
 
-            TestAssert.AreEqual(nestedContainer.Resolve<IFoo>().GetBar(), 0);
-            TestAssert.AreEqual(Container.Resolve<IFoo>().GetBar(), 0);
+            Assert.IsEqual(nestedContainer.Resolve<IFoo>().GetBar(), 0);
+            Assert.IsEqual(Container.Resolve<IFoo>().GetBar(), 0);
 
             nestedContainer.Bind<IFoo>().ToSingle<Foo2>();
 
-            TestAssert.AreEqual(nestedContainer.Resolve<IFoo>().GetBar(), 1);
-            TestAssert.AreEqual(Container.Resolve<IFoo>().GetBar(), 0);
+            Assert.IsEqual(nestedContainer.Resolve<IFoo>().GetBar(), 1);
+            Assert.IsEqual(Container.Resolve<IFoo>().GetBar(), 0);
         }
     }
 }

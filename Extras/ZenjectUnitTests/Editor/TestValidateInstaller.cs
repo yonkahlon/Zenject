@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using NUnit.Framework;
 using UnityEngine;
-using TestAssert = NUnit.Framework.Assert;
 using Zenject;
 using System.Linq;
+using ModestTree;
+using Assert=ModestTree.Assert;
 
-namespace ModestTree.Tests.Zenject
+namespace Zenject.Tests
 {
     [TestFixture]
     public class TestValidateInstaller
@@ -20,7 +21,7 @@ namespace ModestTree.Tests.Zenject
             container.Bind<IFoo>().ToSingle<Foo>();
             container.Bind<Bar>().ToSingle();
 
-            TestAssert.That(container.ValidateResolve<IFoo>().IsEmpty());
+            Assert.That(container.ValidateResolve<IFoo>().IsEmpty());
         }
 
         [Test]
@@ -31,7 +32,7 @@ namespace ModestTree.Tests.Zenject
             container.Bind<IFoo>().ToSingle<Foo>();
             //container.Bind<Bar>().ToSingle();
 
-            TestAssert.That(!container.ValidateResolve<IFoo>().IsEmpty());
+            Assert.That(!container.ValidateResolve<IFoo>().IsEmpty());
         }
 
         [Test]
@@ -46,7 +47,7 @@ namespace ModestTree.Tests.Zenject
 
             container.Bind<Qux>().ToSingle();
 
-            TestAssert.That(container.ValidateResolve<Qux>().IsEmpty());
+            Assert.That(container.ValidateResolve<Qux>().IsEmpty());
         }
 
         [Test]
@@ -56,7 +57,7 @@ namespace ModestTree.Tests.Zenject
 
             container.Bind<Foo>().ToSingle();
 
-            TestAssert.That(container.ValidateObjectGraph<Foo>(typeof(Bar)).IsEmpty());
+            Assert.That(container.ValidateObjectGraph<Foo>(typeof(Bar)).IsEmpty());
         }
 
         [Test]
@@ -66,7 +67,7 @@ namespace ModestTree.Tests.Zenject
 
             container.Bind<Foo>().ToSingle();
 
-            TestAssert.That(!container.ValidateObjectGraph<Foo>().IsEmpty());
+            Assert.That(!container.ValidateObjectGraph<Foo>().IsEmpty());
         }
 
         [Test]
@@ -76,7 +77,7 @@ namespace ModestTree.Tests.Zenject
 
             container.Bind<Foo>().ToSingle();
 
-            TestAssert.That(!container.ValidateObjectGraph<Foo>(typeof(Bar), typeof(string)).IsEmpty());
+            Assert.That(!container.ValidateObjectGraph<Foo>(typeof(Bar), typeof(string)).IsEmpty());
         }
 
         [Test]
@@ -88,11 +89,11 @@ namespace ModestTree.Tests.Zenject
             nestedContainer.FallbackProvider = new DiContainerProvider(container);
 
             // Should fail without Bar<> bound
-            TestAssert.That(!nestedContainer.ValidateObjectGraph<Foo>().IsEmpty());
+            Assert.That(!nestedContainer.ValidateObjectGraph<Foo>().IsEmpty());
 
             container.Bind<Bar>().ToSingle();
 
-            TestAssert.That(nestedContainer.ValidateObjectGraph<Foo>().IsEmpty());
+            Assert.That(nestedContainer.ValidateObjectGraph<Foo>().IsEmpty());
         }
 
         [Test]
@@ -106,17 +107,17 @@ namespace ModestTree.Tests.Zenject
             container.Bind<IFoo>().ToSingle<Foo>();
             container.Bind<IFoo>().ToSingle<Foo2>();
 
-            TestAssert.That(!container.ValidateResolve<List<IFoo>>().IsEmpty());
-            TestAssert.That(!nestedContainer.ValidateResolve<List<IFoo>>().IsEmpty());
+            Assert.That(!container.ValidateResolve<List<IFoo>>().IsEmpty());
+            Assert.That(!nestedContainer.ValidateResolve<List<IFoo>>().IsEmpty());
 
             container.Bind<Bar>().ToSingle();
 
-            TestAssert.That(container.ValidateResolve<List<IFoo>>().IsEmpty());
+            Assert.That(container.ValidateResolve<List<IFoo>>().IsEmpty());
 
             // Should not throw
             nestedContainer.Resolve<List<IFoo>>();
 
-            TestAssert.That(nestedContainer.ValidateResolve<List<IFoo>>().IsEmpty());
+            Assert.That(nestedContainer.ValidateResolve<List<IFoo>>().IsEmpty());
         }
 
         interface IFoo

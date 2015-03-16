@@ -2,10 +2,11 @@ using System;
 using System.Collections.Generic;
 using Zenject;
 using NUnit.Framework;
-using TestAssert=NUnit.Framework.Assert;
 using System.Linq;
+using ModestTree;
+using Assert=ModestTree.Assert;
 
-namespace ModestTree.Tests.Zenject
+namespace Zenject.Tests
 {
     [TestFixture]
     public class TestConditionsIdentifier : TestWithContainer
@@ -44,10 +45,10 @@ namespace ModestTree.Tests.Zenject
         {
             Container.Bind<Test0>().ToTransient();
 
-            TestAssert.Throws<ZenjectResolveException>(
+            Assert.Throws<ZenjectResolveException>(
                 delegate { Container.Resolve<Test1>(); });
 
-            TestAssert.That(Container.ValidateResolve<Test1>().Any());
+            Assert.That(Container.ValidateResolve<Test1>().Any());
         }
 
         [Test]
@@ -55,10 +56,10 @@ namespace ModestTree.Tests.Zenject
         {
             Container.Bind<Test0>().ToTransient();
 
-            TestAssert.Throws<ZenjectResolveException>(
+            Assert.Throws<ZenjectResolveException>(
                 delegate { Container.Resolve<Test2>(); });
 
-            TestAssert.That(Container.ValidateResolve<Test2>().Any());
+            Assert.That(Container.ValidateResolve<Test2>().Any());
         }
 
         [Test]
@@ -67,10 +68,10 @@ namespace ModestTree.Tests.Zenject
             Container.Bind<Test0>().ToTransient();
             Container.Bind<Test0>().ToTransient();
 
-            TestAssert.Throws<ZenjectResolveException>(
+            Assert.Throws<ZenjectResolveException>(
                 delegate { Container.Resolve<Test1>(); });
 
-            TestAssert.That(Container.ValidateResolve<Test2>().Any());
+            Assert.That(Container.ValidateResolve<Test2>().Any());
         }
 
         [Test]
@@ -82,7 +83,7 @@ namespace ModestTree.Tests.Zenject
             // Should not throw exceptions
             Container.Resolve<Test1>();
 
-            TestAssert.IsNotNull(Container.Resolve<Test1>());
+            Assert.IsNotNull(Container.Resolve<Test1>());
         }
 
         [Test]
@@ -91,8 +92,8 @@ namespace ModestTree.Tests.Zenject
             Container.Bind<Test0>().To(new Test0());
             Container.Bind<Test0>("foo").To(new Test0());
 
-            TestAssert.That(Container.ValidateResolve<Test2>().IsEmpty());
-            TestAssert.IsNotNull(Container.Resolve<Test2>());
+            Assert.That(Container.ValidateResolve<Test2>().IsEmpty());
+            Assert.IsNotNull(Container.Resolve<Test2>());
         }
 
         class Test3
@@ -115,10 +116,10 @@ namespace ModestTree.Tests.Zenject
             Container.Bind<Test0>().To(new Test0());
             Container.Bind<Test0>("TestValue1").To(new Test0());
 
-            TestAssert.Throws<ZenjectResolveException>(
+            Assert.Throws<ZenjectResolveException>(
                 delegate { Container.Resolve<Test3>(); });
 
-            TestAssert.That(Container.ValidateResolve<Test1>().Any());
+            Assert.That(Container.ValidateResolve<Test1>().Any());
         }
 
         [Test]
@@ -130,7 +131,7 @@ namespace ModestTree.Tests.Zenject
             // No exceptions
             Container.Resolve<Test3>();
 
-            TestAssert.IsNotNull(Container.Resolve<Test3>());
+            Assert.IsNotNull(Container.Resolve<Test3>());
         }
 
         [Test]
@@ -139,10 +140,10 @@ namespace ModestTree.Tests.Zenject
             Container.Bind<Test0>().To(new Test0());
             Container.Bind<Test0>("TestValue1").To(new Test0());
 
-            TestAssert.Throws<ZenjectResolveException>(
+            Assert.Throws<ZenjectResolveException>(
                 delegate { Container.Resolve<Test3>(); });
 
-            TestAssert.That(Container.ValidateResolve<Test3>().Any());
+            Assert.That(Container.ValidateResolve<Test3>().Any());
         }
 
         [Test]
@@ -151,8 +152,8 @@ namespace ModestTree.Tests.Zenject
             Container.Bind<Test0>().To(new Test0());
             Container.Bind<Test0>("TestValue3").To(new Test0());
 
-            TestAssert.That(Container.ValidateResolve<Test4>().IsEmpty());
-            TestAssert.IsNotNull(Container.Resolve<Test4>());
+            Assert.That(Container.ValidateResolve<Test4>().IsEmpty());
+            Assert.IsNotNull(Container.Resolve<Test4>());
         }
     }
 }

@@ -2,10 +2,11 @@ using System;
 using System.Collections.Generic;
 using Zenject;
 using NUnit.Framework;
-using TestAssert=NUnit.Framework.Assert;
 using System.Linq;
+using ModestTree;
+using Assert=ModestTree.Assert;
 
-namespace ModestTree.Tests.Zenject
+namespace Zenject.Tests
 {
     [TestFixture]
     public class TestConditionsFieldName : TestWithContainer
@@ -40,10 +41,10 @@ namespace ModestTree.Tests.Zenject
         {
             Container.Bind<Test2>().ToSingle();
 
-            TestAssert.Throws<ZenjectResolveException>(
+            Assert.Throws<ZenjectResolveException>(
                 delegate { Container.Resolve<Test2>(); });
 
-            TestAssert.That(Container.ValidateResolve<Test2>().Any());
+            Assert.That(Container.ValidateResolve<Test2>().Any());
         }
 
         [Test]
@@ -51,10 +52,10 @@ namespace ModestTree.Tests.Zenject
         {
             Container.Bind<Test1>().ToSingle();
 
-            TestAssert.That(Container.ValidateResolve<Test1>().IsEmpty());
+            Assert.That(Container.ValidateResolve<Test1>().IsEmpty());
             var test1 = Container.Resolve<Test1>();
 
-            TestAssert.That(test1 != null);
+            Assert.That(test1 != null);
         }
     }
 }

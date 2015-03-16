@@ -60,6 +60,22 @@ namespace ModestTree
             IsEqual(left, right, "");
         }
 
+        [Conditional("UNITY_EDITOR")]
+        public static void Throws<TException>(Action action)
+            where TException : Exception
+        {
+            try
+            {
+                action();
+            }
+            catch (TException e)
+            {
+                return;
+            }
+
+            TriggerAssert(string.Format("Expected to receive exception of type '{0}' but nothing was thrown", typeof(TException).Name));
+        }
+
         // Use AssertEquals to get better error output (with values)
         [Conditional("UNITY_EDITOR")]
         public static void IsEqual(object left, object right, Func<string> messageGenerator)

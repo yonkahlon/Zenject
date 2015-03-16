@@ -33,7 +33,7 @@ namespace Zenject
         readonly List<Tuple<Type, int>> _latePriorities = null;
 
         [Inject]
-        readonly SingletonProviderMap _singletonProviderMap = null;
+        readonly SingletonInstanceHelper _singletonInstanceHelper = null;
 
         TaskUpdater<ITickable> _updater;
         TaskUpdater<IFixedTickable> _fixedUpdater;
@@ -57,15 +57,9 @@ namespace Zenject
 
         void WarnForMissingBindings()
         {
-            var ignoredTypes = new Type[] {};
-
             var boundTypes = _tickables.Select(x => x.GetType()).Distinct();
 
-            var unboundTypes = _singletonProviderMap.Creators
-                .Select(x => x.GetInstanceType())
-                .Where(x => x.DerivesFrom<ITickable>())
-                .Distinct()
-                .Where(x => !boundTypes.Contains(x) && !ignoredTypes.Contains(x));
+            var unboundTypes = _singletonInstanceHelper.GetSingletonInstances<ITickable>(boundTypes);
 
             foreach (var objType in unboundTypes)
             {

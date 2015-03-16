@@ -1,10 +1,11 @@
 using System.Collections.Generic;
 using Zenject;
 using NUnit.Framework;
-using TestAssert=NUnit.Framework.Assert;
 using System.Linq;
+using ModestTree;
+using Assert=ModestTree.Assert;
 
-namespace ModestTree.Tests.Zenject
+namespace Zenject.Tests
 {
     [TestFixture]
     public class TestGenericContract : TestWithContainer
@@ -24,13 +25,13 @@ namespace ModestTree.Tests.Zenject
             Container.Bind(typeof(Test1<>)).ToSingle();
 
             var test1 = Container.Resolve<Test1<int>>();
-            TestAssert.That(test1.Data == 0);
+            Assert.That(test1.Data == 0);
             test1.Data = 5;
 
             var test2 = Container.Resolve<Test1<int>>();
 
-            TestAssert.That(test2 == test1);
-            TestAssert.That(test1.Data == 5);
+            Assert.That(test2 == test1);
+            Assert.That(test1.Data == 5);
         }
 
         [Test]
@@ -39,11 +40,11 @@ namespace ModestTree.Tests.Zenject
             Container.Bind(typeof(Test1<>)).ToTransient();
 
             var test1 = Container.Resolve<Test1<int>>();
-            TestAssert.That(test1.Data == 0);
+            Assert.That(test1.Data == 0);
 
             var test2 = Container.Resolve<Test1<int>>();
-            TestAssert.That(test2.Data == 0);
-            TestAssert.That(test2 != test1);
+            Assert.That(test2.Data == 0);
+            Assert.That(test2 != test1);
 
             Container.Resolve<Test1<string>>();
             Container.Resolve<Test1<List<int>>>();

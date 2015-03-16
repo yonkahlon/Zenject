@@ -35,5 +35,10 @@ namespace Zenject
         {
             _provider.Condition = r => r.ParentType != null && r.ParentType.DerivesFromOrEqual(typeof(T));
         }
+
+        public void WhenNotInjectedInto<T>()
+        {
+            _provider.Condition = r => r.ParentType == null || !r.ParentType.DerivesFromOrEqual(typeof(T));
+        }
     }
 }

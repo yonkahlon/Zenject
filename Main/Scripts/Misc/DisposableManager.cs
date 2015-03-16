@@ -7,8 +7,7 @@ namespace Zenject
 {
     public class DisposableManager : IDisposable
     {
-        readonly SingletonProviderMap _singletonProviderMap;
-
+        readonly SingletonInstanceHelper _singletonInstanceHelper;
         List<DisposableInfo> _disposables = new List<DisposableInfo>();
         bool _disposed;
 
@@ -17,9 +16,9 @@ namespace Zenject
             List<IDisposable> disposables,
             [InjectOptional]
             List<Tuple<Type, int>> priorities,
-            SingletonProviderMap singletonProviderMap)
+            SingletonInstanceHelper singletonInstanceHelper)
         {
-            _singletonProviderMap = singletonProviderMap;
+            _singletonInstanceHelper = singletonInstanceHelper;
 
             foreach (var disposable in disposables)
             {
@@ -70,14 +69,9 @@ namespace Zenject
         void WarnForMissingBindings()
         {
             var ignoredTypes = new Type[] { typeof(DisposableManager) };
-
             var boundTypes = _disposables.Select(x => x.Disposable.GetType()).Distinct();
 
-            var unboundTypes = _singletonProviderMap.Creators
-                .Select(x => x.GetInstanceType())
-                .Where(x => x.DerivesFrom<IDisposable>())
-                .Distinct()
-                .Where(x => !boundTypes.Contains(x) && !ignoredTypes.Contains(x));
+            var unboundTypes = _singletonInstanceHelper.GetSingletonInstances<IDisposable>(boundTypes.Concat(ignoredTypes));
 
             foreach (var objType in unboundTypes)
             {

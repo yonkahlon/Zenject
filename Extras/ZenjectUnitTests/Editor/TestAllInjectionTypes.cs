@@ -2,9 +2,10 @@ using System;
 using System.Collections.Generic;
 using Zenject;
 using NUnit.Framework;
-using TestAssert=NUnit.Framework.Assert;
+using ModestTree;
+using Assert=ModestTree.Assert;
 
-namespace ModestTree.Tests.Zenject
+namespace Zenject.Tests
 {
     [TestFixture]
     public class TestAllInjectionTypes : TestWithContainer
@@ -16,11 +17,11 @@ namespace ModestTree.Tests.Zenject
             Container.Bind<Test0>().To(new Test0());
             Container.Bind<IFoo>().ToSingle<FooDerived>();
 
-            TestAssert.That(Container.ValidateResolve<IFoo>().IsEmpty());
+            Assert.That(Container.ValidateResolve<IFoo>().IsEmpty());
             var foo = Container.Resolve<IFoo>();
 
-            TestAssert.That(foo.DidPostInjectBase);
-            TestAssert.That(foo.DidPostInjectDerived);
+            Assert.That(foo.DidPostInjectBase);
+            Assert.That(foo.DidPostInjectDerived);
         }
 
         class Test0
@@ -108,19 +109,19 @@ namespace ModestTree.Tests.Zenject
             [PostInject]
             public void PostInjectBase()
             {
-                TestAssert.IsNull(BaseStaticFieldPublic);
-                TestAssert.IsNull(BaseStaticFieldPrivate);
-                TestAssert.IsNull(BaseStaticFieldProtected);
-                TestAssert.IsNull(BaseStaticPropertyPublic);
-                TestAssert.IsNull(BaseStaticPropertyPrivate);
-                TestAssert.IsNull(BaseStaticPropertyProtected);
+                Assert.IsNull(BaseStaticFieldPublic);
+                Assert.IsNull(BaseStaticFieldPrivate);
+                Assert.IsNull(BaseStaticFieldProtected);
+                Assert.IsNull(BaseStaticPropertyPublic);
+                Assert.IsNull(BaseStaticPropertyPrivate);
+                Assert.IsNull(BaseStaticPropertyProtected);
 
-                TestAssert.IsNotNull(BaseFieldPublic);
-                TestAssert.IsNotNull(BaseFieldPrivate);
-                TestAssert.IsNotNull(BaseFieldProtected);
-                TestAssert.IsNotNull(BasePropertyPublic);
-                TestAssert.IsNotNull(BasePropertyPrivate);
-                TestAssert.IsNotNull(BasePropertyProtected);
+                Assert.IsNotNull(BaseFieldPublic);
+                Assert.IsNotNull(BaseFieldPrivate);
+                Assert.IsNotNull(BaseFieldProtected);
+                Assert.IsNotNull(BasePropertyPublic);
+                Assert.IsNotNull(BasePropertyPrivate);
+                Assert.IsNotNull(BasePropertyProtected);
 
                 _didPostInjectBase = true;
             }
@@ -191,20 +192,20 @@ namespace ModestTree.Tests.Zenject
             [PostInject]
             public void PostInject()
             {
-                TestAssert.IsNull(DerivedStaticFieldPublic);
-                TestAssert.IsNull(DerivedStaticFieldPrivate);
-                TestAssert.IsNull(DerivedStaticFieldProtected);
-                TestAssert.IsNull(DerivedStaticPropertyPublic);
-                TestAssert.IsNull(DerivedStaticPropertyPrivate);
-                TestAssert.IsNull(DerivedStaticPropertyProtected);
+                Assert.IsNull(DerivedStaticFieldPublic);
+                Assert.IsNull(DerivedStaticFieldPrivate);
+                Assert.IsNull(DerivedStaticFieldProtected);
+                Assert.IsNull(DerivedStaticPropertyPublic);
+                Assert.IsNull(DerivedStaticPropertyPrivate);
+                Assert.IsNull(DerivedStaticPropertyProtected);
 
-                TestAssert.IsNotNull(DerivedFieldPublic);
-                TestAssert.IsNotNull(DerivedFieldPrivate);
-                TestAssert.IsNotNull(DerivedFieldProtected);
-                TestAssert.IsNotNull(DerivedPropertyPublic);
-                TestAssert.IsNotNull(DerivedPropertyPrivate);
-                TestAssert.IsNotNull(DerivedPropertyProtected);
-                TestAssert.IsNotNull(ConstructorParam);
+                Assert.IsNotNull(DerivedFieldPublic);
+                Assert.IsNotNull(DerivedFieldPrivate);
+                Assert.IsNotNull(DerivedFieldProtected);
+                Assert.IsNotNull(DerivedPropertyPublic);
+                Assert.IsNotNull(DerivedPropertyPrivate);
+                Assert.IsNotNull(DerivedPropertyProtected);
+                Assert.IsNotNull(ConstructorParam);
 
                 _didPostInject = true;
             }

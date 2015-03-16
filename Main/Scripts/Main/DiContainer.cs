@@ -16,6 +16,7 @@ namespace Zenject
     {
         readonly Dictionary<BindingId, List<ProviderBase>> _providers = new Dictionary<BindingId, List<ProviderBase>>();
         readonly SingletonProviderMap _singletonMap;
+        readonly PrefabSingletonProviderMap _prefabSingletonMap;
 
         static Stack<Type> _lookupsInProgress = new Stack<Type>();
 
@@ -29,11 +30,14 @@ namespace Zenject
         public DiContainer()
         {
             _singletonMap = new SingletonProviderMap(this);
+            _prefabSingletonMap = new PrefabSingletonProviderMap(this);
             _instantiator = new Instantiator(this);
 
             Bind<DiContainer>().To(this);
             Bind<Instantiator>().To(_instantiator);
             Bind<SingletonProviderMap>().To(_singletonMap);
+            Bind<PrefabSingletonProviderMap>().To(_prefabSingletonMap);
+            Bind<SingletonInstanceHelper>().To(new SingletonInstanceHelper(_singletonMap));
         }
 
         public IEnumerable<IInstaller> InstalledInstallers
@@ -297,7 +301,7 @@ namespace Zenject
         public ReferenceBinder<TContract> Bind<TContract>(string identifier)
             where TContract : class
         {
-            return new ReferenceBinder<TContract>(this, identifier, _singletonMap);
+            return new ReferenceBinder<TContract>(this, identifier, _singletonMap, _prefabSingletonMap);
         }
 
         // Note that this can include open generic types as well such as List<>
@@ -308,12 +312,12 @@ namespace Zenject
 
         public BinderUntyped Bind(Type contractType, string identifier)
         {
-            return new BinderUntyped(this, contractType, identifier, _singletonMap);
+            return new BinderUntyped(this, contractType, identifier, _singletonMap, _prefabSingletonMap);
         }
 
         public BindScope CreateScope()
         {
-            return new BindScope(this, _singletonMap);
+            return new BindScope(this, _singletonMap, _prefabSingletonMap);
         }
 
         // See comment in LookupInProgressAdder

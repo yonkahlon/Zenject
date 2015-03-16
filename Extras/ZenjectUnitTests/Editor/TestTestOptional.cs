@@ -2,10 +2,11 @@ using System;
 using System.Collections.Generic;
 using Zenject;
 using NUnit.Framework;
-using TestAssert=NUnit.Framework.Assert;
 using System.Linq;
+using ModestTree;
+using Assert=ModestTree.Assert;
 
-namespace ModestTree.Tests.Zenject
+namespace Zenject.Tests
 {
     [TestFixture]
     public class TestTestOptional : TestWithContainer
@@ -37,9 +38,9 @@ namespace ModestTree.Tests.Zenject
         {
             Container.Bind<Test2>().ToSingle();
 
-            TestAssert.That(Container.ValidateResolve<Test2>().Any());
+            Assert.That(Container.ValidateResolve<Test2>().Any());
 
-            TestAssert.Throws<ZenjectResolveException>(
+            Assert.Throws<ZenjectResolveException>(
                 delegate { Container.Resolve<Test2>(); });
         }
 
@@ -48,9 +49,9 @@ namespace ModestTree.Tests.Zenject
         {
             Container.Bind<Test3>().ToSingle();
 
-            TestAssert.That(Container.ValidateResolve<Test3>().IsEmpty());
+            Assert.That(Container.ValidateResolve<Test3>().IsEmpty());
             var test = Container.Resolve<Test3>();
-            TestAssert.That(test.val1 == null);
+            Assert.That(test.val1 == null);
         }
 
         [Test]
@@ -61,8 +62,8 @@ namespace ModestTree.Tests.Zenject
             var test1 = new Test1();
             Container.Bind<Test1>().To(test1);
 
-            TestAssert.That(Container.ValidateResolve<Test3>().IsEmpty());
-            TestAssert.AreEqual(Container.Resolve<Test3>().val1, test1);
+            Assert.That(Container.ValidateResolve<Test3>().IsEmpty());
+            Assert.IsEqual(Container.Resolve<Test3>().val1, test1);
         }
 
         [Test]
@@ -71,11 +72,11 @@ namespace ModestTree.Tests.Zenject
             Container.Bind<Test0>().ToTransient();
 
             // Should not redefine the hard coded value in this case
-            TestAssert.AreEqual(Container.Resolve<Test0>().Val1, 5);
+            Assert.IsEqual(Container.Resolve<Test0>().Val1, 5);
 
             Container.BindValue<int>().To(3);
 
-            TestAssert.AreEqual(Container.Resolve<Test0>().Val1, 3);
+            Assert.IsEqual(Container.Resolve<Test0>().Val1, 3);
         }
 
         class Test4
@@ -102,10 +103,10 @@ namespace ModestTree.Tests.Zenject
         {
             Container.Bind<Test4>().ToSingle();
 
-            TestAssert.Throws<ZenjectResolveException>(
+            Assert.Throws<ZenjectResolveException>(
                 delegate { Container.Resolve<Test4>(); });
 
-            TestAssert.That(Container.ValidateResolve<Test2>().Any());
+            Assert.That(Container.ValidateResolve<Test2>().Any());
         }
 
         [Test]
@@ -113,9 +114,9 @@ namespace ModestTree.Tests.Zenject
         {
             Container.Bind<Test5>().ToSingle();
 
-            TestAssert.That(Container.ValidateResolve<Test5>().IsEmpty());
+            Assert.That(Container.ValidateResolve<Test5>().IsEmpty());
             var test = Container.Resolve<Test5>();
-            TestAssert.That(test.Val1 == null);
+            Assert.That(test.Val1 == null);
         }
 
         class Test6
@@ -131,9 +132,9 @@ namespace ModestTree.Tests.Zenject
             Container.Bind<Test6>().ToSingle();
             Container.Bind<Test2>().ToSingle();
 
-            TestAssert.That(Container.ValidateResolve<Test6>().Any());
+            Assert.That(Container.ValidateResolve<Test6>().Any());
 
-            TestAssert.Throws<ZenjectResolveException>(
+            Assert.Throws<ZenjectResolveException>(
                 delegate { Container.Resolve<Test6>(); });
         }
     }

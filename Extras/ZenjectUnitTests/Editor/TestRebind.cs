@@ -2,10 +2,11 @@ using System;
 using System.Collections.Generic;
 using Zenject;
 using NUnit.Framework;
-using TestAssert=NUnit.Framework.Assert;
 using System.Linq;
+using ModestTree;
+using Assert=ModestTree.Assert;
 
-namespace ModestTree.Tests.Zenject
+namespace Zenject.Tests
 {
     [TestFixture]
     public class TestRebind : TestWithContainer
@@ -27,13 +28,13 @@ namespace ModestTree.Tests.Zenject
         {
             Container.Bind<Test1>().ToSingle<Test2>();
 
-            TestAssert.That(Container.ValidateResolve<Test1>().IsEmpty());
-            TestAssert.That(Container.Resolve<Test1>() is Test2);
+            Assert.That(Container.ValidateResolve<Test1>().IsEmpty());
+            Assert.That(Container.Resolve<Test1>() is Test2);
 
             Container.Rebind<Test1>().ToSingle<Test3>();
 
-            TestAssert.That(Container.ValidateResolve<Test1>().IsEmpty());
-            TestAssert.That(Container.Resolve<Test1>() is Test3);
+            Assert.That(Container.ValidateResolve<Test1>().IsEmpty());
+            Assert.That(Container.Resolve<Test1>() is Test3);
         }
     }
 }

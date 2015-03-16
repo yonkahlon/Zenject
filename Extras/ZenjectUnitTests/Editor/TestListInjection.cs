@@ -2,9 +2,10 @@ using System;
 using System.Collections.Generic;
 using Zenject;
 using NUnit.Framework;
-using TestAssert=NUnit.Framework.Assert;
+using ModestTree;
+using Assert=ModestTree.Assert;
 
-namespace ModestTree.Tests.Zenject
+namespace Zenject.Tests
 {
     [TestFixture]
     public class TestListInjection : TestWithContainer
@@ -50,10 +51,10 @@ namespace ModestTree.Tests.Zenject
         {
             Container.Bind<Test2>().ToSingle();
 
-            TestAssert.That(Container.ValidateResolve<Test2>().IsEmpty());
+            Assert.That(Container.ValidateResolve<Test2>().IsEmpty());
             var result = Container.ResolveMany<Test2>();
 
-            TestAssert.That(result != null);
+            Assert.That(result != null);
         }
 
         [Test]
@@ -72,7 +73,7 @@ namespace ModestTree.Tests.Zenject
 
             var result = Container.ResolveMany<Test4>();
 
-            TestAssert.That(result != null);
+            Assert.That(result != null);
         }
     }
 }

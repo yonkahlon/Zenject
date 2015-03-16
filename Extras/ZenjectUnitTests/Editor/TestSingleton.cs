@@ -2,10 +2,11 @@ using System;
 using System.Collections.Generic;
 using Zenject;
 using NUnit.Framework;
-using TestAssert=NUnit.Framework.Assert;
 using System.Linq;
+using ModestTree;
+using Assert=ModestTree.Assert;
 
-namespace ModestTree.Tests.Zenject
+namespace Zenject.Tests
 {
     [TestFixture]
     public class TestSingleton : TestWithContainer
@@ -28,8 +29,8 @@ namespace ModestTree.Tests.Zenject
         {
             Container.Bind<Foo>().ToSingle();
 
-            TestAssert.That(Container.ValidateResolve<Foo>().IsEmpty());
-            TestAssert.That(Container.Resolve<Foo>().ReturnValue() == 5);
+            Assert.That(Container.ValidateResolve<Foo>().IsEmpty());
+            Assert.That(Container.Resolve<Foo>().ReturnValue() == 5);
         }
 
         [Test]
@@ -37,13 +38,13 @@ namespace ModestTree.Tests.Zenject
         {
             Container.Bind<Foo>().ToSingle();
 
-            TestAssert.That(Container.ValidateResolve<Foo>().IsEmpty());
+            Assert.That(Container.ValidateResolve<Foo>().IsEmpty());
             var test1 = Container.Resolve<Foo>();
-            TestAssert.That(Container.ValidateResolve<Foo>().IsEmpty());
+            Assert.That(Container.ValidateResolve<Foo>().IsEmpty());
             var test2 = Container.Resolve<Foo>();
 
-            TestAssert.That(test1 != null && test2 != null);
-            TestAssert.That(ReferenceEquals(test1, test2));
+            Assert.That(test1 != null && test2 != null);
+            Assert.That(ReferenceEquals(test1, test2));
         }
 
         [Test]
@@ -51,13 +52,13 @@ namespace ModestTree.Tests.Zenject
         {
             Container.Bind(typeof(Foo)).ToSingle();
 
-            TestAssert.That(Container.ValidateResolve<Foo>().IsEmpty());
+            Assert.That(Container.ValidateResolve<Foo>().IsEmpty());
             var test1 = Container.Resolve<Foo>();
-            TestAssert.That(Container.ValidateResolve<Foo>().IsEmpty());
+            Assert.That(Container.ValidateResolve<Foo>().IsEmpty());
             var test2 = Container.Resolve<Foo>();
 
-            TestAssert.That(test1 != null && test2 != null);
-            TestAssert.That(ReferenceEquals(test1, test2));
+            Assert.That(test1 != null && test2 != null);
+            Assert.That(ReferenceEquals(test1, test2));
         }
 
         [Test]
@@ -65,8 +66,8 @@ namespace ModestTree.Tests.Zenject
         {
             Container.Bind<IFoo>().ToSingle<Foo>();
 
-            TestAssert.That(Container.ValidateResolve<IFoo>().IsEmpty());
-            TestAssert.That(Container.Resolve<IFoo>().ReturnValue() == 5);
+            Assert.That(Container.ValidateResolve<IFoo>().IsEmpty());
+            Assert.That(Container.Resolve<IFoo>().ReturnValue() == 5);
         }
 
         [Test]
@@ -74,8 +75,8 @@ namespace ModestTree.Tests.Zenject
         {
             Container.Bind(typeof(IFoo)).ToSingle(typeof(Foo));
 
-            TestAssert.That(Container.ValidateResolve<IFoo>().IsEmpty());
-            TestAssert.That(Container.Resolve<IFoo>().ReturnValue() == 5);
+            Assert.That(Container.ValidateResolve<IFoo>().IsEmpty());
+            Assert.That(Container.Resolve<IFoo>().ReturnValue() == 5);
         }
 
         [Test]
@@ -85,11 +86,11 @@ namespace ModestTree.Tests.Zenject
 
             Container.Bind<IFoo>().To(instance);
 
-            TestAssert.That(Container.ValidateResolve<IFoo>().IsEmpty());
+            Assert.That(Container.ValidateResolve<IFoo>().IsEmpty());
             var builtInstance = Container.Resolve<IFoo>();
 
-            TestAssert.That(ReferenceEquals(builtInstance, instance));
-            TestAssert.That(builtInstance.ReturnValue() == 5);
+            Assert.That(ReferenceEquals(builtInstance, instance));
+            Assert.That(builtInstance.ReturnValue() == 5);
         }
 
         [Test]
@@ -99,11 +100,11 @@ namespace ModestTree.Tests.Zenject
 
             Container.Bind(typeof(IFoo)).To(instance);
 
-            TestAssert.That(Container.ValidateResolve<IFoo>().IsEmpty());
+            Assert.That(Container.ValidateResolve<IFoo>().IsEmpty());
             var builtInstance = Container.Resolve<IFoo>();
 
-            TestAssert.That(ReferenceEquals(builtInstance, instance));
-            TestAssert.That(builtInstance.ReturnValue() == 5);
+            Assert.That(ReferenceEquals(builtInstance, instance));
+            Assert.That(builtInstance.ReturnValue() == 5);
         }
 
         [Test]
@@ -120,10 +121,10 @@ namespace ModestTree.Tests.Zenject
             Container.Bind<Foo>().ToSingle();
             Container.Bind<Foo>().ToSingle();
 
-            TestAssert.Throws<ZenjectResolveException>(
+            Assert.Throws<ZenjectResolveException>(
                 delegate { Container.Resolve<Foo>(); });
 
-            TestAssert.That(Container.ValidateResolve<Foo>().Any());
+            Assert.That(Container.ValidateResolve<Foo>().Any());
         }
 
         [Test]
@@ -132,10 +133,10 @@ namespace ModestTree.Tests.Zenject
             Container.Bind(typeof(Foo)).ToSingle();
             Container.Bind(typeof(Foo)).ToSingle();
 
-            TestAssert.Throws<ZenjectResolveException>(
+            Assert.Throws<ZenjectResolveException>(
                 delegate { Container.Resolve<Foo>(); });
 
-            TestAssert.That(Container.ValidateResolve<Foo>().Any());
+            Assert.That(Container.ValidateResolve<Foo>().Any());
         }
 
         [Test]
@@ -146,9 +147,9 @@ namespace ModestTree.Tests.Zenject
             Container.Bind<Foo>().To(instance);
             Container.Bind<Foo>().To(instance);
 
-            TestAssert.That(Container.ValidateResolve<Foo>().Any());
+            Assert.That(Container.ValidateResolve<Foo>().Any());
 
-            TestAssert.Throws<ZenjectResolveException>(
+            Assert.Throws<ZenjectResolveException>(
                 delegate { Container.Resolve<Foo>(); });
         }
 
@@ -160,9 +161,9 @@ namespace ModestTree.Tests.Zenject
             Container.Bind(typeof(Foo)).To(instance);
             Container.Bind(typeof(Foo)).To(instance);
 
-            TestAssert.That(Container.ValidateResolve<Foo>().Any());
+            Assert.That(Container.ValidateResolve<Foo>().Any());
 
-            TestAssert.Throws<ZenjectResolveException>(
+            Assert.Throws<ZenjectResolveException>(
                 delegate { Container.Resolve<Foo>(); });
         }
 
@@ -190,7 +191,7 @@ namespace ModestTree.Tests.Zenject
             Container.Bind<Foo>().ToSingleInstance(foo);
             Container.Bind<IFoo>().ToSingle<Foo>();
 
-            TestAssert.That(
+            Assert.That(
                 ReferenceEquals(Container.Resolve<IFoo>(), Container.Resolve<Foo>()));
         }
 
@@ -202,7 +203,7 @@ namespace ModestTree.Tests.Zenject
             Container.Bind(typeof(Foo)).ToSingleInstance(foo);
             Container.Bind(typeof(IFoo)).ToSingle<Foo>();
 
-            TestAssert.That(
+            Assert.That(
                 ReferenceEquals(Container.Resolve<IFoo>(), Container.Resolve<Foo>()));
         }
 
@@ -214,7 +215,7 @@ namespace ModestTree.Tests.Zenject
             Container.Bind<Foo>().To(foo);
             Container.Bind<IFoo>().ToSingle<Foo>();
 
-            TestAssert.That(
+            Assert.That(
                 !ReferenceEquals(Container.Resolve<IFoo>(), Container.Resolve<Foo>()));
         }
 
@@ -226,7 +227,7 @@ namespace ModestTree.Tests.Zenject
             Container.Bind(typeof(Foo)).To(foo);
             Container.Bind(typeof(IFoo)).ToSingle<Foo>();
 
-            TestAssert.That(
+            Assert.That(
                 !ReferenceEquals(Container.Resolve<IFoo>(), Container.Resolve<Foo>()));
         }
 
@@ -238,8 +239,8 @@ namespace ModestTree.Tests.Zenject
             Container.Bind(typeof(Foo)).ToSingleMethod((container) => foo);
             Container.Bind(typeof(IFoo)).ToSingle<Foo>();
 
-            TestAssert.That(ReferenceEquals(Container.Resolve<Foo>(), foo));
-            TestAssert.That(ReferenceEquals(Container.Resolve<Foo>(), Container.Resolve<IFoo>()));
+            Assert.That(ReferenceEquals(Container.Resolve<Foo>(), foo));
+            Assert.That(ReferenceEquals(Container.Resolve<Foo>(), Container.Resolve<IFoo>()));
         }
 
         [Test]

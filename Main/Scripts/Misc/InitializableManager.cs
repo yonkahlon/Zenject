@@ -10,7 +10,8 @@ namespace Zenject
     // - Run Initialize() on all Iinitializable's, in the order specified by InitPriority
     public class InitializableManager
     {
-        readonly SingletonProviderMap _singletonProviderMap;
+        readonly SingletonInstanceHelper _singletonInstanceHelper = null;
+
         List<InitializableInfo> _initializables = new List<InitializableInfo>();
 
         public InitializableManager(
@@ -19,9 +20,9 @@ namespace Zenject
             [InjectOptional]
             List<Tuple<Type, int>> priorities,
             DiContainer container,
-            SingletonProviderMap singletonProviderMap)
+            SingletonInstanceHelper singletonInstanceHelper)
         {
-            _singletonProviderMap = singletonProviderMap;
+            _singletonInstanceHelper = singletonInstanceHelper;
 
             if (Assert.IsEnabled)
             {
@@ -41,14 +42,8 @@ namespace Zenject
 
         void WarnForMissingBindings(List<IInitializable> initializables, DiContainer container)
         {
-            var ignoredTypes = new Type[] {};
             var boundTypes = initializables.Select(x => x.GetType()).Distinct();
-
-            var unboundTypes = _singletonProviderMap.Creators
-                .Select(x => x.GetInstanceType())
-                .Where(x => x.DerivesFrom<IInitializable>())
-                .Distinct()
-                .Where(x => !boundTypes.Contains(x) && !ignoredTypes.Contains(x));
+            var unboundTypes = _singletonInstanceHelper.GetSingletonInstances<IInitializable>(boundTypes);
 
             foreach (var objType in unboundTypes)
             {

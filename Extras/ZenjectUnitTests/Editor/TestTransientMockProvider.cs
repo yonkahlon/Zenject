@@ -2,10 +2,11 @@ using System;
 using System.Collections.Generic;
 using Zenject;
 using NUnit.Framework;
-using TestAssert=NUnit.Framework.Assert;
 using System.Linq;
+using ModestTree;
+using Assert=ModestTree.Assert;
 
-namespace ModestTree.Tests.Zenject
+namespace Zenject.Tests
 {
     [TestFixture]
     public class TestTransientMockProvider : TestWithContainer
@@ -24,7 +25,7 @@ namespace ModestTree.Tests.Zenject
 
             //var foo = Container.Resolve<IFoo>();
 
-            //TestAssert.AreEqual(foo.GetBar(), 0);
+            //Assert.IsEqual(foo.GetBar(), 0);
         }
     }
 }

@@ -82,7 +82,7 @@ namespace Zenject
 
                 if (_instance == null)
                 {
-                    throw new ZenjectException(
+                    throw new ZenjectResolveException(
                         "Unable to instantiate type '{0}' in SingletonLazyCreator".Fmt(contractType));
                 }
 
