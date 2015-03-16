@@ -68,7 +68,7 @@ namespace ModestTree
             {
                 action();
             }
-            catch (TException e)
+            catch (TException)
             {
                 return;
             }
