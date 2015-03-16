@@ -7,7 +7,7 @@ namespace Zenject
     public class PrefabSingletonLazyCreator
     {
         int _referenceCount;
-        GameObject _prefab;
+        GameObject _rootObj;
         PrefabSingletonProviderMap _owner;
         DiContainer _container;
         GameObjectInstantiator _gameObjectInstantiator;
@@ -20,13 +20,23 @@ namespace Zenject
             _container = container;
             _owner = owner;
             _id = id;
+
+            Assert.IsNotNull(id.Prefab);
         }
 
         public GameObject Prefab
         {
             get
             {
-                return _prefab;
+                return _id.Prefab;
+            }
+        }
+
+        public GameObject RootObject
+        {
+            get
+            {
+                return _rootObj;
             }
         }
 
@@ -55,7 +65,7 @@ namespace Zenject
 
         public bool ContainsComponent(Type type)
         {
-            return _prefab.GetComponentInChildren(type) != null;
+            return !_id.Prefab.GetComponentsInChildren(type, true).IsEmpty();
         }
 
         public T GetComponent<T>()
@@ -65,18 +75,18 @@ namespace Zenject
 
         public object GetComponent(Type componentType)
         {
-            if (_prefab == null)
+            if (_rootObj == null)
             {
-                _prefab = GameObjectInstantiator.Instantiate(_id.Prefab);
+                _rootObj = GameObjectInstantiator.Instantiate(_id.Prefab);
 
-                if (_prefab == null)
+                if (_rootObj == null)
                 {
                     throw new ZenjectResolveException(
                         "Unable to instantiate prefab in PrefabSingletonLazyCreator");
                 }
             }
 
-            var component = _prefab.GetComponentInChildren(componentType);
+            var component = _rootObj.GetComponentInChildren(componentType);
 
             if (component == null)
             {
@@ -88,4 +98,5 @@ namespace Zenject
         }
     }
 }
+
 
