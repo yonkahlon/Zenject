@@ -5,7 +5,7 @@ namespace Zenject
     [AttributeUsage(AttributeTargets.Constructor | AttributeTargets.Parameter | AttributeTargets.Property | AttributeTargets.Field, AllowMultiple = false)]
     public class InjectAttribute : Attribute
     {
-        public InjectAttribute(object identifier)
+        public InjectAttribute(string identifier)
         {
             Identifier = identifier;
         }
@@ -14,7 +14,7 @@ namespace Zenject
         {
         }
 
-        public object Identifier
+        public string Identifier
         {
             get;
             private set;
@@ -24,7 +24,7 @@ namespace Zenject
     [AttributeUsage(AttributeTargets.Parameter | AttributeTargets.Property | AttributeTargets.Field, AllowMultiple = false)]
     public class InjectOptionalAttribute : Attribute
     {
-        public InjectOptionalAttribute(object identifier)
+        public InjectOptionalAttribute(string identifier)
         {
             Identifier = identifier;
         }
@@ -33,7 +33,7 @@ namespace Zenject
         {
         }
 
-        public object Identifier
+        public string Identifier
         {
             get;
             private set;

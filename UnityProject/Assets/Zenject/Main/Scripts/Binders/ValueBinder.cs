@@ -5,8 +5,8 @@ namespace Zenject
 {
     public class ValueBinder<TContract> : BinderGeneric<TContract> where TContract : struct
     {
-        public ValueBinder(DiContainer container)
-            : base(container)
+        public ValueBinder(DiContainer container, string identifier)
+            : base(container, identifier)
         {
         }
 
@@ -21,7 +21,7 @@ namespace Zenject
 
             // Also bind to nullable primitives
             // this is useful so that we can have optional primitive dependencies
-            _container.RegisterProvider(provider, typeof(Nullable<TContract>));
+            _container.RegisterProvider(provider, new BindingId(typeof(Nullable<TContract>), _bindIdentifier));
 
             return conditionSetter;
         }

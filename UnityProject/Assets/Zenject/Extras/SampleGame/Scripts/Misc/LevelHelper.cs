@@ -75,7 +75,7 @@ namespace Asteroids
         }
 
         public LevelHelper(
-            [Inject(Cameras.Main)]
+            [Inject("Main")]
             Camera camera)
         {
             _camera = camera;

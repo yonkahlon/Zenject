@@ -71,9 +71,9 @@ namespace Zenject
             {
                 object value;
 
-                if (!InstantiateUtil.PopValueWithType(extraArgMap, injectInfo.ContractType, out value))
+                if (!InstantiateUtil.PopValueWithType(extraArgMap, injectInfo.MemberType, out value))
                 {
-                    value = _container.Resolve(injectInfo);
+                    value = _container.Resolve(injectInfo.CreateInjectContext(_container, null));
                 }
 
                 paramValues.Add(value);

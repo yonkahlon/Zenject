@@ -169,32 +169,6 @@ namespace Zenject
             Log.Info("Validation Completed Successfully, Took {0:0.00} Seconds.", secondsElapsed);
             return true;
         }
-
-        [MenuItem("Edit/Zenject/Output Object Graph For Current Scene")]
-        public static void OutputObjectGraphForScene()
-        {
-            if (!EditorApplication.isPlaying)
-            {
-                Log.Error("Zenject error: Must be in play mode to generate object graph.  Hit Play button and try again.");
-                return;
-            }
-
-            DiContainer container;
-            try
-            {
-                container = ZenEditorUtil.GetContainerForCurrentScene();
-            }
-            catch (ZenjectException e)
-            {
-                Log.Error("Unable to find container in current scene. " + e.Message);
-                return;
-            }
-
-            var ignoreTypes = Enumerable.Empty<Type>();
-            var types = container.AllConcreteTypes;
-
-            ZenEditorUtil.OutputObjectGraphForCurrentScene(container, ignoreTypes, types);
-        }
     }
 }
 

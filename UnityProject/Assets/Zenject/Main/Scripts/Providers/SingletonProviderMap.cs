@@ -30,11 +30,12 @@ namespace Zenject
             Assert.That(success);
         }
 
-        SingletonLazyCreator AddCreator<TConcrete>(Func<DiContainer, TConcrete> method)
+        SingletonLazyCreator AddCreatorFromMethod<TConcrete>(
+            string identifier, Func<DiContainer, TConcrete> method)
         {
             SingletonLazyCreator creator;
 
-            var id = new SingletonId(typeof(TConcrete));
+            var id = new SingletonId(identifier, typeof(TConcrete), null);
 
             if (_creators.ContainsKey(id))
             {
@@ -51,11 +52,6 @@ namespace Zenject
             return creator;
         }
 
-        SingletonLazyCreator AddCreator(Type type)
-        {
-            return AddCreator(new SingletonId(type));
-        }
-
         SingletonLazyCreator AddCreator(SingletonId id)
         {
             SingletonLazyCreator creator;
@@ -70,38 +66,30 @@ namespace Zenject
             return creator;
         }
 
-        public ProviderBase CreateProvider<TConcrete>()
+        public ProviderBase CreateProviderFromPrefab(string identifier, Type concreteType, GameObject prefab)
         {
-            return CreateProvider(typeof(TConcrete));
+            return new SingletonProvider(
+                _container, AddCreator(new SingletonId(identifier, concreteType, prefab)));
         }
 
-        public ProviderBase CreateProvider(Type concreteType)
+        public ProviderBase CreateProviderFromMethod<TConcrete>(
+            string identifier, Func<DiContainer, TConcrete> method)
         {
-            return new SingletonProvider(_container, AddCreator(concreteType));
+            return new SingletonProvider(_container, AddCreatorFromMethod(identifier, method));
         }
 
-        public ProviderBase CreateProviderFromPrefab<TConcrete>(GameObject prefab)
-            where TConcrete : Component
+        public ProviderBase CreateProviderFromType(string identifier, Type concreteType)
         {
-            return CreateProviderFromPrefab(typeof(TConcrete), prefab);
+            return new SingletonProvider(
+                _container, AddCreator(new SingletonId(identifier, concreteType, null)));
         }
 
-        public ProviderBase CreateProviderFromPrefab(Type concreteType, GameObject prefab)
+        public ProviderBase CreateProviderFromInstance<TConcrete>(string identifier, TConcrete instance)
         {
-            return new SingletonProvider(_container, AddCreator(new SingletonId(concreteType, prefab)));
+            return CreateProviderFromInstance(identifier, typeof(TConcrete), instance);
         }
 
-        public ProviderBase CreateProvider<TConcrete>(Func<DiContainer, TConcrete> method)
-        {
-            return new SingletonProvider(_container, AddCreator(method));
-        }
-
-        public ProviderBase CreateProvider<TConcrete>(TConcrete instance)
-        {
-            return CreateProvider(typeof(TConcrete), instance);
-        }
-
-        public ProviderBase CreateProvider(Type concreteType, object instance)
+        public ProviderBase CreateProviderFromInstance(string identifier, Type concreteType, object instance)
         {
             Assert.That(instance != null || _container.AllowNullBindings);
 
@@ -110,7 +98,7 @@ namespace Zenject
                 Assert.That(instance.GetType() == concreteType);
             }
 
-            var creator = AddCreator(concreteType);
+            var creator = AddCreator(new SingletonId(identifier, concreteType, null));
 
             if (creator.HasInstance())
             {

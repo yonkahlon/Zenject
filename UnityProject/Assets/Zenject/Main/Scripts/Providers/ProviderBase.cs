@@ -4,7 +4,7 @@ namespace Zenject
 {
     public abstract class ProviderBase : IDisposable
     {
-        object _identifier;
+        string _identifier;
         BindingCondition _condition = delegate { return true; };
 
         public BindingCondition Condition
@@ -15,7 +15,7 @@ namespace Zenject
             }
         }
 
-        public object Identifier
+        public string Identifier
         {
             get
             {
@@ -29,32 +29,16 @@ namespace Zenject
 
         public bool Matches(InjectContext context)
         {
-            // Identifier will be null most of the time
-            return IdentifiersMatch(context.Identifier) && _condition(context);
-        }
-
-        bool IdentifiersMatch(object identifier)
-        {
-            if (_identifier == null)
-            {
-                return identifier == null;
-            }
-
-            return _identifier.Equals(identifier);
+            // Note that identifiers are matches in DiContainer
+            return _condition(context);
         }
 
         // Return null if not applicable (for eg. if instance type is dependent on contractType)
         public abstract Type GetInstanceType();
 
-        // Returns true if this provider already has an instance to return
-        // and false in the case where the provider would create it next time
-        // GetInstance is called
-        // Is not applicable in some cases
-        public abstract bool HasInstance(Type contractType);
+        public abstract object GetInstance(InjectContext context);
 
-        public abstract object GetInstance(Type contractType, InjectContext context);
-
-        public abstract IEnumerable<ZenjectResolveException> ValidateBinding(Type contractType, InjectContext context);
+        public abstract IEnumerable<ZenjectResolveException> ValidateBinding(InjectContext context);
 
         public virtual void Dispose()
         {

@@ -4,9 +4,8 @@ using Zenject;
 using NUnit.Framework;
 using TestAssert=NUnit.Framework.Assert;
 using System.Linq;
-using ModestTree;
 
-namespace Zenject.Tests
+namespace ModestTree.Tests.Zenject
 {
     [TestFixture]
     public class TestConditionsFieldName : TestWithContainer
@@ -33,7 +32,7 @@ namespace Zenject.Tests
         public override void Setup()
         {
             base.Setup();
-            Container.Bind<Test0>().ToSingle().When(r => r.SourceName == "name1");
+            Container.Bind<Test0>().ToSingle().When(r => r.MemberName == "name1");
         }
 
         [Test]

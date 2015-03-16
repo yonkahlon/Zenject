@@ -37,7 +37,7 @@ namespace Zenject
                 GetConstructorInjectables(type, constructor).ToList());
         }
 
-        static IEnumerable<InjectableInfo> GetConstructorInjectables(Type enclosingType, ConstructorInfo constructorInfo)
+        static IEnumerable<InjectableInfo> GetConstructorInjectables(Type parentType, ConstructorInfo constructorInfo)
         {
             if (constructorInfo == null)
             {
@@ -45,11 +45,11 @@ namespace Zenject
             }
 
             return constructorInfo.GetParameters().Select(
-                paramInfo => CreateForConstructorParam(enclosingType, paramInfo));
+                paramInfo => CreateForConstructorParam(parentType, paramInfo));
         }
 
         static InjectableInfo CreateForConstructorParam(
-            Type enclosingType, ParameterInfo paramInfo)
+            Type parentType, ParameterInfo paramInfo)
         {
             var identifier = paramInfo.AllAttributes<InjectAttribute>().Select(x => x.Identifier)
                 .Concat(paramInfo.AllAttributes<InjectOptionalAttribute>().Select(x => x.Identifier)).FirstOrDefault();
@@ -58,9 +58,9 @@ namespace Zenject
             {
                 Optional = paramInfo.HasAttribute(typeof(InjectOptionalAttribute)),
                 Identifier = identifier,
-                SourceName = paramInfo.Name,
-                ContractType = paramInfo.ParameterType,
-                EnclosingType = enclosingType,
+                MemberName = paramInfo.Name,
+                MemberType = paramInfo.ParameterType,
+                ParentType = parentType,
             };
         }
 
@@ -105,7 +105,7 @@ namespace Zenject
             }
         }
 
-        static InjectableInfo CreateForMember(MemberInfo memInfo, Type enclosingType)
+        static InjectableInfo CreateForMember(MemberInfo memInfo, Type parentType)
         {
             var identifier = memInfo.AllAttributes<InjectAttribute>().Select(x => x.Identifier)
                 .Concat(memInfo.AllAttributes<InjectOptionalAttribute>().Select(x => x.Identifier)).FirstOrDefault();
@@ -114,30 +114,30 @@ namespace Zenject
             {
                 Optional = memInfo.HasAttribute(typeof(InjectOptionalAttribute)),
                 Identifier = identifier,
-                SourceName = memInfo.Name,
-                EnclosingType = enclosingType,
+                MemberName = memInfo.Name,
+                ParentType = parentType,
             };
 
             if (memInfo is FieldInfo)
             {
                 var fieldInfo = (FieldInfo)memInfo;
                 info.Setter = ((object injectable, object value) => fieldInfo.SetValue(injectable, value));
-                info.ContractType = fieldInfo.FieldType;
+                info.MemberType = fieldInfo.FieldType;
             }
             else
             {
                 Assert.That(memInfo is PropertyInfo);
                 var propInfo = (PropertyInfo)memInfo;
                 info.Setter = ((object injectable, object value) => propInfo.SetValue(injectable, value, null));
-                info.ContractType = propInfo.PropertyType;
+                info.MemberType = propInfo.PropertyType;
             }
 
             return info;
         }
 
-        static ConstructorInfo GetInjectConstructor(Type enclosingType)
+        static ConstructorInfo GetInjectConstructor(Type parentType)
         {
-            var constructors = enclosingType.GetConstructors(
+            var constructors = parentType.GetConstructors(
                 BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
 
             if (constructors.IsEmpty())

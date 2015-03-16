@@ -28,15 +28,9 @@ namespace Zenject
             return _componentType;
         }
 
-        public override bool HasInstance(Type contractType)
+        public override object GetInstance(InjectContext context)
         {
-            Assert.That(_componentType.DerivesFromOrEqual(contractType));
-            return _instance != null;
-        }
-
-        public override object GetInstance(Type contractType, InjectContext context)
-        {
-            Assert.That(_componentType.DerivesFromOrEqual(contractType));
+            Assert.That(_componentType.DerivesFromOrEqual(context.MemberType));
 
             if (_instance == null)
             {
@@ -52,8 +46,7 @@ namespace Zenject
             return _instance;
         }
 
-        public override IEnumerable<ZenjectResolveException> ValidateBinding(
-            Type contractType, InjectContext context)
+        public override IEnumerable<ZenjectResolveException> ValidateBinding(InjectContext context)
         {
             return BindingValidator.ValidateObjectGraph(_container, _componentType);
         }

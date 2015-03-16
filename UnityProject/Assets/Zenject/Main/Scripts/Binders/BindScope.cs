@@ -29,25 +29,40 @@ namespace Zenject
 
         public BinderUntyped Bind(Type contractType)
         {
-            return new CustomScopeUntypedBinder(this, contractType, _container, _singletonMap);
+            return Bind(contractType, null);
+        }
+
+        public BinderUntyped Bind(Type contractType, string identifier)
+        {
+            return new CustomScopeUntypedBinder(this, contractType, identifier, _container, _singletonMap);
         }
 
         public ReferenceBinder<TContract> Bind<TContract>() where TContract : class
         {
-            return new CustomScopeReferenceBinder<TContract>(this, _container, _singletonMap);
+            return Bind<TContract>((string)null);
+        }
+
+        public ReferenceBinder<TContract> Bind<TContract>(string identifier) where TContract : class
+        {
+            return new CustomScopeReferenceBinder<TContract>(this, identifier, _container, _singletonMap);
         }
 
         public ValueBinder<TContract> BindValue<TContract>() where TContract : struct
         {
-            return new CustomScopeValueBinder<TContract>(this, _container);
+            return BindValue<TContract>((string)null);
+        }
+
+        public ValueBinder<TContract> BindValue<TContract>(string identifier) where TContract : struct
+        {
+            return new CustomScopeValueBinder<TContract>(this, identifier, _container);
         }
 
         // This method is just an alternative way of binding to a dependency of
         // a specific class with a specific identifier
-        public void BindIdentifier<TClass, TParam>(object identifier, TParam value)
+        public void BindIdentifier<TClass, TParam>(string identifier, TParam value)
             where TParam : class
         {
-            Bind(typeof(TParam)).To(value).WhenInjectedInto<TClass>().As(identifier);
+            Bind(typeof(TParam), identifier).To(value).WhenInjectedInto<TClass>();
 
             // We'd pref to do this instead but it fails on web player because Mono
             // seems to interpret TDerived : TBase to require that TDerived != TBase?
@@ -73,9 +88,9 @@ namespace Zenject
             BindScope _owner;
 
             public CustomScopeValueBinder(
-                BindScope owner,
+                BindScope owner, string identifier,
                 DiContainer container)
-                : base(container)
+                : base(container, identifier)
             {
                 _owner = owner;
             }
@@ -92,9 +107,9 @@ namespace Zenject
             BindScope _owner;
 
             public CustomScopeReferenceBinder(
-                BindScope owner,
+                BindScope owner, string identifier,
                 DiContainer container, SingletonProviderMap singletonMap)
-                : base(container, singletonMap)
+                : base(container, identifier, singletonMap)
             {
                 _owner = owner;
             }
@@ -111,9 +126,9 @@ namespace Zenject
             BindScope _owner;
 
             public CustomScopeUntypedBinder(
-                BindScope owner, Type contractType,
+                BindScope owner, Type contractType, string identifier,
                 DiContainer container, SingletonProviderMap singletonMap)
-                : base(container, contractType, singletonMap)
+                : base(container, contractType, identifier, singletonMap)
             {
                 _owner = owner;
             }

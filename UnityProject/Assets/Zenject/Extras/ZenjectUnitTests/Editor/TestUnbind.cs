@@ -1,9 +1,8 @@
 using System;
 using TestAssert=NUnit.Framework.Assert;
 using NUnit.Framework;
-using ModestTree;
 
-namespace Zenject.Tests
+namespace ModestTree.Tests.Zenject
 {
     [TestFixture]
     public class TestUnbind : TestWithContainer

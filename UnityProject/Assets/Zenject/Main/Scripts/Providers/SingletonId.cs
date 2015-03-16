@@ -8,17 +8,14 @@ namespace Zenject
 {
     public class SingletonId : IEquatable<SingletonId>
     {
-        public Type Type;
-        public GameObject Prefab;
+        public readonly Type Type;
+        public readonly string Identifier;
+        public readonly GameObject Prefab;
 
-        public SingletonId(Type type)
+        public SingletonId(string identifier, Type type, GameObject prefab)
         {
+            Identifier = identifier;
             Type = type;
-        }
-
-        public SingletonId(Type type, GameObject prefab)
-            : this(type)
-        {
             Prefab = prefab;
         }
 
@@ -28,6 +25,7 @@ namespace Zenject
             {
                 int hash = 17;
                 hash = hash * 29 + this.Type.GetHashCode();
+                hash = hash * 29 + (this.Identifier == null ? 0 : this.Identifier.GetHashCode());
                 hash = hash * 29 + (UnityUtil.IsNull(this.Prefab) ? 0 : this.Prefab.GetHashCode());
                 return hash;
             }
@@ -37,8 +35,8 @@ namespace Zenject
         {
             if (other is SingletonId)
             {
-                SingletonId otherKey = (SingletonId)other;
-                return otherKey == this;
+                SingletonId otherId = (SingletonId)other;
+                return otherId == this;
             }
             else
             {
@@ -53,7 +51,7 @@ namespace Zenject
 
         public static bool operator ==(SingletonId left, SingletonId right)
         {
-            return left.Type == right.Type && left.Prefab == right.Prefab;
+            return left.Type == right.Type && object.Equals(left.Prefab, right.Prefab) && object.Equals(left.Identifier, right.Identifier);
         }
 
         public static bool operator !=(SingletonId left, SingletonId right)

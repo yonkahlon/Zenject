@@ -4,9 +4,8 @@ using Zenject;
 using NUnit.Framework;
 using TestAssert=NUnit.Framework.Assert;
 using System.Linq;
-using ModestTree;
 
-namespace Zenject.Tests
+namespace ModestTree.Tests.Zenject
 {
     [TestFixture]
     public class TestSingleton : TestWithContainer
@@ -171,16 +170,16 @@ namespace Zenject.Tests
         [ExpectedException(typeof(ZenjectBindException))]
         public void TestToSingleWithInstance()
         {
-            Container.Bind<Foo>().ToSingle(new Foo());
-            Container.Bind<Foo>().ToSingle(new Foo());
+            Container.Bind<Foo>().ToSingleInstance(new Foo());
+            Container.Bind<Foo>().ToSingleInstance(new Foo());
         }
 
         [Test]
         [ExpectedException(typeof(ZenjectBindException))]
         public void TestToSingleWithInstanceUntyped()
         {
-            Container.Bind(typeof(Foo)).ToSingle(new Foo());
-            Container.Bind(typeof(Foo)).ToSingle(new Foo());
+            Container.Bind(typeof(Foo)).ToSingleInstance(new Foo());
+            Container.Bind(typeof(Foo)).ToSingleInstance(new Foo());
         }
 
         [Test]
@@ -188,7 +187,7 @@ namespace Zenject.Tests
         {
             var foo = new Foo();
 
-            Container.Bind<Foo>().ToSingle(foo);
+            Container.Bind<Foo>().ToSingleInstance(foo);
             Container.Bind<IFoo>().ToSingle<Foo>();
 
             TestAssert.That(
@@ -200,7 +199,7 @@ namespace Zenject.Tests
         {
             var foo = new Foo();
 
-            Container.Bind(typeof(Foo)).ToSingle(foo);
+            Container.Bind(typeof(Foo)).ToSingleInstance(foo);
             Container.Bind(typeof(IFoo)).ToSingle<Foo>();
 
             TestAssert.That(

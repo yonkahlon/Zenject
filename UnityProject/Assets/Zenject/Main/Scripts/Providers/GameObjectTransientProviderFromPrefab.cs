@@ -31,19 +31,13 @@ namespace Zenject
             return typeof(T);
         }
 
-        public override bool HasInstance(Type contractType)
+        public override object GetInstance(InjectContext context)
         {
-            Assert.That(typeof(T).DerivesFromOrEqual(contractType));
-            return false;
-        }
-
-        public override object GetInstance(Type contractType, InjectContext context)
-        {
-            Assert.That(typeof(T).DerivesFromOrEqual(contractType));
+            Assert.That(typeof(T).DerivesFromOrEqual(context.MemberType));
             return Instantiator.Instantiate<T>(_template);
         }
 
-        public override IEnumerable<ZenjectResolveException> ValidateBinding(Type contractType, InjectContext context)
+        public override IEnumerable<ZenjectResolveException> ValidateBinding(InjectContext context)
         {
             return BindingValidator.ValidateObjectGraph(_container, typeof(T));
         }
