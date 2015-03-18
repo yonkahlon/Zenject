@@ -63,18 +63,6 @@ namespace Zenject.Tests
         }
 
         [Test]
-        public void TestTooManySpecified()
-        {
-            Container.Bind<Test0>().ToTransient();
-            Container.Bind<Test0>().ToTransient();
-
-            Assert.Throws<ZenjectResolveException>(
-                delegate { Container.Resolve<Test1>(); });
-
-            Assert.That(Container.ValidateResolve<Test2>().Any());
-        }
-
-        [Test]
         public void TestSuccessConstructorInjectionString()
         {
             Container.Bind<Test0>().To(new Test0());
