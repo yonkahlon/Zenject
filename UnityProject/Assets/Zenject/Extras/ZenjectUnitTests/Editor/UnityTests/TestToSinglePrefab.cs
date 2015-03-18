@@ -8,8 +8,8 @@ using Assert=ModestTree.Assert;
 
 namespace Zenject.Tests
 {
-    // The test class FooMonoBehaviour aren't included in the project so this
-    // won't run - left here to show usage
+    // This fails when run in batch mode for some reason because of GameObject.DestroyImmediate
+    // Left here to show usage
     //[TestFixture]
     //public class TestToSinglePrefab : TestWithContainer
     //{
