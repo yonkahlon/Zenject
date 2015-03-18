@@ -1378,6 +1378,7 @@ For general troubleshooting / support, please use the google group which you can
 * Changed identifiers to be strings instead of object to avoid accidental usage
 * Renamed ToSingle(obj) to ToSingleInstance to avoid conflict with specifying an identifier
 * Fixed validation to work properly for ToSinglePrefab
+* Changed to allow using conditions to override a default binding. When multiple providers are found it will now try and use the one with conditions.  So for example you can define a default with `Container.Bind<IFoo>().ToSingle<Foo1>()` and then override for specific classes with `Container.Bind<IFoo>().ToSingle<Foo2>().WhenInjectedInto<Bar>()`, etc.
 
 1.19
 
