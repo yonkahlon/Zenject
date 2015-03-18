@@ -71,19 +71,34 @@ namespace Zenject
                 }
             }
 
+            foreach (var method in typeInfo.PostInjectMethods)
+            {
+                using (ProfileBlock.Start("{0}.{1}()", injectable.GetType(), method.MethodInfo.Name))
+                {
+                    var paramValues = new List<object>();
+
+                    foreach (var injectInfo in method.InjectableInfo)
+                    {
+                        object value;
+
+                        if (!InstantiateUtil.PopValueWithType(extraArgMap, injectInfo.MemberType, out value))
+                        {
+                            value = container.Resolve(
+                                injectInfo.CreateInjectContext(container, injectable));
+                        }
+
+                        paramValues.Add(value);
+                    }
+
+                    method.MethodInfo.Invoke(injectable, paramValues.ToArray());
+                }
+            }
+
             if (shouldUseAll && !extraArgMap.IsEmpty())
             {
                 throw new ZenjectResolveException(
                     "Passed unnecessary parameters when injecting into type '{0}'. \nExtra Parameters: {1}\nObject graph:\n{2}"
-                        .Fmt(injectable.GetType().Name(), String.Join(",", extraArgMap.Select(x => x.Type.Name()).ToArray()), DiContainer.GetCurrentObjectGraph()));
-            }
-
-            foreach (var methodInfo in typeInfo.PostInjectMethods)
-            {
-                using (ProfileBlock.Start("{0}.{1}()", injectable.GetType(), methodInfo.Name))
-                {
-                    methodInfo.Invoke(injectable, new object[0]);
-                }
+                    .Fmt(injectable.GetType().Name(), String.Join(",", extraArgMap.Select(x => x.Type.Name()).ToArray()), DiContainer.GetCurrentObjectGraph()));
             }
         }
     }

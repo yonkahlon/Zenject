@@ -37,7 +37,7 @@ namespace Zenject
             Bind<Instantiator>().To(_instantiator);
             Bind<SingletonProviderMap>().To(_singletonMap);
             Bind<PrefabSingletonProviderMap>().To(_prefabSingletonMap);
-            Bind<SingletonInstanceHelper>().To(new SingletonInstanceHelper(_singletonMap));
+            Bind<SingletonInstanceHelper>().To(new SingletonInstanceHelper(_singletonMap, _prefabSingletonMap));
         }
 
         public IEnumerable<IInstaller> InstalledInstallers
@@ -334,7 +334,7 @@ namespace Zenject
                 // Prevent duplicate singleton bindings:
                 if (_providers[bindingId].Find(item => ReferenceEquals(item, provider)) != null)
                 {
-                    throw new ZenjectException(
+                    throw new ZenjectBindException(
                         "Found duplicate singleton binding for contract '{0}' and id '{1}'".Fmt(bindingId.Type, bindingId.Identifier));
                 }
 
@@ -442,7 +442,12 @@ namespace Zenject
         // Returns all ZenjectResolveExceptions found
         public IEnumerable<ZenjectResolveException> ValidateResolve<TContract>()
         {
-            return ValidateResolve(new InjectContext(this, typeof(TContract)));
+            return ValidateResolve<TContract>((string)null);
+        }
+
+        public IEnumerable<ZenjectResolveException> ValidateResolve<TContract>(string identifier)
+        {
+            return ValidateResolve(new InjectContext(this, typeof(TContract), identifier));
         }
 
         public IEnumerable<ZenjectResolveException> ValidateResolve(InjectContext context)
@@ -522,12 +527,22 @@ namespace Zenject
 
         public List<TContract> ResolveMany<TContract>()
         {
-            return ResolveMany<TContract>(false);
+            return ResolveMany<TContract>(null, false);
+        }
+
+        public List<TContract> ResolveMany<TContract>(string identifier)
+        {
+            return ResolveMany<TContract>(identifier, false);
         }
 
         public List<TContract> ResolveMany<TContract>(bool optional)
         {
-            var context = new InjectContext(this, typeof(TContract), null, optional);
+            return ResolveMany<TContract>(null, optional);
+        }
+
+        public List<TContract> ResolveMany<TContract>(string identifier, bool optional)
+        {
+            var context = new InjectContext(this, typeof(TContract), identifier, optional);
             return ResolveMany<TContract>(context);
         }
 
@@ -564,6 +579,11 @@ namespace Zenject
             }
 
             return ReflectionUtil.CreateGenericList(context.MemberType, new object[] {});
+        }
+
+        public List<Type> ResolveTypeMany(Type type)
+        {
+            return ResolveTypeMany(new InjectContext(this, type, null));
         }
 
         public List<Type> ResolveTypeMany(InjectContext context)

@@ -57,16 +57,6 @@ namespace Zenject
             return gameObj;
         }
 
-        int GetDepthLevel(Transform transform)
-        {
-            if (transform == null)
-            {
-                return 0;
-            }
-
-            return 1 + GetDepthLevel(transform.parent);
-        }
-
         public T Instantiate<T>(
             GameObject template, params object[] args) where T : Component
         {
@@ -95,21 +85,14 @@ namespace Zenject
 
             Component requestedScript = null;
 
-            if (componentType == typeof(Transform))
-            {
-                // Make a special case when we are binding to Transform so that we can bind to the
-                // root of the prefab tree, otherwise we hit the assert below
-                requestedScript = gameObj.transform;
-            }
-
             // Inject on the children first since the parent objects are more likely to use them in their post inject methods
-            foreach (var component in gameObj.GetComponentsInChildren<Component>().OrderByDescending(x => x == null ? int.MinValue : GetDepthLevel(x.transform)))
+            foreach (var component in UnityUtil.GetComponentsInChildrenDepthFirst<Component>(gameObj, false))
             {
                 if (component != null)
                 {
                     var extraArgs = Enumerable.Empty<object>();
 
-                    if (componentType != typeof(Transform) && component.GetType().DerivesFromOrEqual(componentType))
+                    if (component.GetType().DerivesFromOrEqual(componentType))
                     {
                         Assert.IsNull(requestedScript,
                             "Found multiple matches with type '{0}' when instantiating new game object from template '{1}'", componentType, template.name);

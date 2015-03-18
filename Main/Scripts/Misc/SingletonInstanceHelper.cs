@@ -8,11 +8,14 @@ namespace Zenject
 {
     public class SingletonInstanceHelper
     {
+        readonly PrefabSingletonProviderMap _prefabSingletonProviderMap;
         readonly SingletonProviderMap _singletonProviderMap;
 
         public SingletonInstanceHelper(
-            SingletonProviderMap singletonProviderMap)
+            SingletonProviderMap singletonProviderMap,
+            PrefabSingletonProviderMap prefabSingletonProviderMap)
         {
+            _prefabSingletonProviderMap = prefabSingletonProviderMap;
             _singletonProviderMap = singletonProviderMap;
         }
 
@@ -25,7 +28,13 @@ namespace Zenject
                 .Distinct()
                 .Where(x => !ignoreTypes.Contains(x));
 
-            return unboundTypes;
+            var unboundPrefabTypes = _prefabSingletonProviderMap.Creators
+                .SelectMany(x => x.GetAllComponentTypes())
+                .Where(x => x.DerivesFrom<T>())
+                .Distinct()
+                .Where(x => !ignoreTypes.Contains(x));
+
+            return unboundTypes.Concat(unboundPrefabTypes);
         }
     }
 }
