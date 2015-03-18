@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace ModestTree
@@ -77,6 +79,24 @@ namespace ModestTree
             }
 
             return MouseWheelScrollDirections.Up;
+        }
+
+        static int GetDepthLevel(Transform transform)
+        {
+            if (transform == null)
+            {
+                return 0;
+            }
+
+            return 1 + GetDepthLevel(transform.parent);
+        }
+
+        public static IEnumerable<T> GetComponentsInChildrenDepthFirst<T>(GameObject gameObject, bool includeInactive)
+            where T : Component
+        {
+            return gameObject.GetComponentsInChildren<T>(includeInactive)
+                .OrderByDescending(x =>
+                    x == null ? int.MinValue : GetDepthLevel(x.transform));
         }
     }
 }

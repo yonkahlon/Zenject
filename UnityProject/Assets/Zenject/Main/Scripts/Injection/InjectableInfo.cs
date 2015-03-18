@@ -7,18 +7,30 @@ namespace Zenject
     // Or a constructor parameter
     internal class InjectableInfo
     {
-        public bool Optional;
-        public string Identifier;
+        public readonly bool Optional;
+        public readonly string Identifier;
 
         // The field name or property name from source code
-        public string MemberName;
+        public readonly string MemberName;
         // The field type or property type from source code
-        public Type MemberType;
+        public readonly Type MemberType;
 
-        public Type ParentType;
+        public readonly Type ParentType;
 
         // Null for constructor declared dependencies
-        public Action<object, object> Setter;
+        public readonly Action<object, object> Setter;
+
+        public InjectableInfo(
+            bool optional, string identifier, string memberName,
+            Type memberType, Type parentType, Action<object, object> setter)
+        {
+            Optional = optional;
+            Setter = setter;
+            ParentType = parentType;
+            MemberType = memberType;
+            MemberName = memberName;
+            Identifier = identifier;
+        }
 
         public InjectContext CreateInjectContext(DiContainer container, object targetInstance)
         {

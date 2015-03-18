@@ -1,6 +1,8 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 using ModestTree;
+using System.Linq;
 
 namespace Zenject
 {
@@ -63,6 +65,11 @@ namespace Zenject
             }
         }
 
+        public IEnumerable<Type> GetAllComponentTypes()
+        {
+            return _id.Prefab.GetComponentsInChildren<Component>(true).Where(x => x != null).Select(x => x.GetType());
+        }
+
         public bool ContainsComponent(Type type)
         {
             return !_id.Prefab.GetComponentsInChildren(type, true).IsEmpty();
@@ -98,5 +105,3 @@ namespace Zenject
         }
     }
 }
-
-

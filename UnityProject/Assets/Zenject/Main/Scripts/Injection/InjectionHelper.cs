@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using ModestTree;
 using UnityEngine;
 using System.Linq;
 
@@ -18,7 +19,7 @@ namespace Zenject
         public static void InjectChildGameObjects(
             DiContainer container, GameObject gameObject, bool includeInactive, IEnumerable<object> extraArgs)
         {
-            foreach (var monoBehaviour in gameObject.GetComponentsInChildren<MonoBehaviour>(includeInactive))
+            foreach (var monoBehaviour in UnityUtil.GetComponentsInChildrenDepthFirst<MonoBehaviour>(gameObject, includeInactive))
             {
                 InjectMonoBehaviour(container, monoBehaviour, extraArgs);
             }

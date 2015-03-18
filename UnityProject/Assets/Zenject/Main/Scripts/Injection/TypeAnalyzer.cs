@@ -30,7 +30,7 @@ namespace Zenject
 
             return new ZenjectTypeInfo(
                 type,
-                GetPostInjectMethods(type).ToList(),
+                GetPostInjectMethods(type),
                 constructor,
                 GetFieldInjectables(type).ToList(),
                 GetPropertyInjectables(type).ToList(),
@@ -45,26 +45,25 @@ namespace Zenject
             }
 
             return constructorInfo.GetParameters().Select(
-                paramInfo => CreateForConstructorParam(parentType, paramInfo));
+                paramInfo => CreateInjectableInfoForParam(parentType, paramInfo));
         }
 
-        static InjectableInfo CreateForConstructorParam(
+        static InjectableInfo CreateInjectableInfoForParam(
             Type parentType, ParameterInfo paramInfo)
         {
             var identifier = paramInfo.AllAttributes<InjectAttribute>().Select(x => x.Identifier)
                 .Concat(paramInfo.AllAttributes<InjectOptionalAttribute>().Select(x => x.Identifier)).FirstOrDefault();
 
-            return new InjectableInfo()
-            {
-                Optional = paramInfo.HasAttribute(typeof(InjectOptionalAttribute)),
-                Identifier = identifier,
-                MemberName = paramInfo.Name,
-                MemberType = paramInfo.ParameterType,
-                ParentType = parentType,
-            };
+            return new InjectableInfo(
+                paramInfo.HasAttribute(typeof(InjectOptionalAttribute)),
+                identifier,
+                paramInfo.Name,
+                paramInfo.ParameterType,
+                parentType,
+                null);
         }
 
-        static IEnumerable<MethodInfo> GetPostInjectMethods(Type type)
+        static List<PostInjectableInfo> GetPostInjectMethods(Type type)
         {
             // Note that unlike with fields and properties we use GetCustomAttributes
             // This is so that we can ignore inherited attributes, which is necessary
@@ -78,7 +77,22 @@ namespace Zenject
 
             // Order by base classes first
             // This is how constructors work so it makes more sense
-            return methods.OrderBy(x => heirarchyList.IndexOf(x.DeclaringType));
+            var values = methods.OrderBy(x => heirarchyList.IndexOf(x.DeclaringType));
+
+            var postInjectInfos = new List<PostInjectableInfo>();
+
+            foreach (var methodInfo in values)
+            {
+                var paramsInfo = methodInfo.GetParameters();
+
+                postInjectInfos.Add(
+                    new PostInjectableInfo(
+                        methodInfo,
+                        paramsInfo.Select(paramInfo =>
+                            CreateInjectableInfoForParam(type, paramInfo)).ToList()));
+            }
+
+            return postInjectInfos;
         }
 
         static IEnumerable<InjectableInfo> GetPropertyInjectables(Type type)
@@ -110,29 +124,30 @@ namespace Zenject
             var identifier = memInfo.AllAttributes<InjectAttribute>().Select(x => x.Identifier)
                 .Concat(memInfo.AllAttributes<InjectOptionalAttribute>().Select(x => x.Identifier)).FirstOrDefault();
 
-            var info = new InjectableInfo()
-            {
-                Optional = memInfo.HasAttribute(typeof(InjectOptionalAttribute)),
-                Identifier = identifier,
-                MemberName = memInfo.Name,
-                ParentType = parentType,
-            };
+            Type memberType;
+            Action<object, object> setter;
 
             if (memInfo is FieldInfo)
             {
                 var fieldInfo = (FieldInfo)memInfo;
-                info.Setter = ((object injectable, object value) => fieldInfo.SetValue(injectable, value));
-                info.MemberType = fieldInfo.FieldType;
+                setter = ((object injectable, object value) => fieldInfo.SetValue(injectable, value));
+                memberType = fieldInfo.FieldType;
             }
             else
             {
                 Assert.That(memInfo is PropertyInfo);
                 var propInfo = (PropertyInfo)memInfo;
-                info.Setter = ((object injectable, object value) => propInfo.SetValue(injectable, value, null));
-                info.MemberType = propInfo.PropertyType;
+                setter = ((object injectable, object value) => propInfo.SetValue(injectable, value, null));
+                memberType = propInfo.PropertyType;
             }
 
-            return info;
+            return new InjectableInfo(
+                memInfo.HasAttribute(typeof(InjectOptionalAttribute)),
+                identifier,
+                memInfo.Name,
+                memberType,
+                parentType,
+                setter);
         }
 
         static ConstructorInfo GetInjectConstructor(Type parentType)
@@ -152,89 +167,6 @@ namespace Zenject
             }
 
             return constructors[0];
-        }
-    }
-
-    internal class ZenjectTypeInfo
-    {
-        readonly List<MethodInfo> _postInjectMethods;
-        readonly List<InjectableInfo> _constructorInjectables;
-        readonly List<InjectableInfo> _fieldInjectables;
-        readonly List<InjectableInfo> _propertyInjectables;
-        readonly ConstructorInfo _injectConstructor;
-        readonly Type _typeAnalyzed;
-
-        public ZenjectTypeInfo(
-            Type typeAnalyzed,
-            List<MethodInfo> postInjectMethods,
-            ConstructorInfo injectConstructor,
-            List<InjectableInfo> fieldInjectables,
-            List<InjectableInfo> propertyInjectables,
-            List<InjectableInfo> constructorInjectables)
-        {
-            _postInjectMethods = postInjectMethods;
-            _fieldInjectables = fieldInjectables;
-            _propertyInjectables = propertyInjectables;
-            _constructorInjectables = constructorInjectables;
-            _injectConstructor = injectConstructor;
-            _typeAnalyzed = typeAnalyzed;
-        }
-
-        public Type TypeAnalyzed
-        {
-            get
-            {
-                return _typeAnalyzed;
-            }
-        }
-
-        public IEnumerable<MethodInfo> PostInjectMethods
-        {
-            get
-            {
-                return _postInjectMethods;
-            }
-        }
-
-        public IEnumerable<InjectableInfo> AllInjectables
-        {
-            get
-            {
-                return _constructorInjectables.Concat(_fieldInjectables).Concat(_propertyInjectables);
-            }
-        }
-
-        public IEnumerable<InjectableInfo> FieldInjectables
-        {
-            get
-            {
-                return _fieldInjectables;
-            }
-        }
-
-        public IEnumerable<InjectableInfo> PropertyInjectables
-        {
-            get
-            {
-                return _propertyInjectables;
-            }
-        }
-
-        public IEnumerable<InjectableInfo> ConstructorInjectables
-        {
-            get
-            {
-                return _constructorInjectables;
-            }
-        }
-
-        // May be null
-        public ConstructorInfo InjectConstructor
-        {
-            get
-            {
-                return _injectConstructor;
-            }
         }
     }
 }
