@@ -693,19 +693,32 @@ namespace Zenject
 
                 return null;
             }
-            else if (providers.Count > 1)
+
+            ProviderBase provider;
+
+            if (providers.Count > 1)
             {
-                throw new ZenjectResolveException(
-                    "Found multiple matches when only one was expected for type '{0}'{1}. \nObject graph:\n {2}"
-                    .Fmt(
-                        context.MemberType.Name(),
-                        (context.ParentType == null ? "" : " while building object with type '{0}'".Fmt(context.ParentType.Name())),
-                        GetCurrentObjectGraph()));
+                // If we find multiple providers and we are looking for just one, then
+                // choose the one with a condition before giving up and throwing an exception
+                // This is nice because it allows us to bind a default and then override with conditions
+                provider = providers.Where(x => x.Condition != null).OnlyOrDefault();
+
+                if (provider == null)
+                {
+                    throw new ZenjectResolveException(
+                        "Found multiple matches when only one was expected for type '{0}'{1}. \nObject graph:\n {2}"
+                        .Fmt(
+                            context.MemberType.Name(),
+                            (context.ParentType == null ? "" : " while building object with type '{0}'".Fmt(context.ParentType.Name())),
+                            GetCurrentObjectGraph()));
+                }
             }
             else
             {
-                return providers.Single().GetInstance(context);
+                provider = providers.Single();
             }
+
+            return provider.GetInstance(context);
         }
 
         public bool Unbind<TContract>()
@@ -787,3 +800,4 @@ namespace Zenject
         }
     }
 }
+
