@@ -1,14 +1,19 @@
 using System;
 using System.Collections.Generic;
+
 namespace Zenject
 {
     public abstract class ProviderBase : IDisposable
     {
         string _identifier;
-        BindingCondition _condition = delegate { return true; };
+        BindingCondition _condition = null;
 
         public BindingCondition Condition
         {
+            get
+            {
+                return _condition;
+            }
             set
             {
                 _condition = value;
@@ -30,7 +35,7 @@ namespace Zenject
         public bool Matches(InjectContext context)
         {
             // Note that identifiers are matches in DiContainer
-            return _condition(context);
+            return _condition == null || _condition(context);
         }
 
         // Return null if not applicable (for eg. if instance type is dependent on contractType)
@@ -45,3 +50,4 @@ namespace Zenject
         }
     }
 }
+
