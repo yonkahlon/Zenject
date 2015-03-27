@@ -1642,6 +1642,12 @@ IFoo GetFoo(DiContainer container, InjectContext ctx)
     return container.Instantiate<Foo3>();
 }
 
+// Using lambda syntax
+Container.Bind<Foo>().ToMethod((ctx) => new Foo());
+
+// This is equivalent to ToTransient
+Container.Bind<Foo>().ToMethod((ctx) => ctx.Container.Instantiate<Foo>());
+
 ///////////// ToGetter
 
 // Bind to a property on another dependency
@@ -1715,6 +1721,8 @@ public class Norf
 }
 
 // Bind a globally accessible string with the name 'PlayerName'
+// A better option might be to create a Settings object and bind that
+// instead however
 Container.BindValue<string>("PlayerName").To("name of the player");
 
 ///////////// Conditions
