@@ -31,7 +31,7 @@ namespace Zenject
 
         public override object GetInstance(InjectContext context)
         {
-            return _creator.GetInstance(context.MemberType);
+            return _creator.GetInstance(context);
         }
 
         public override IEnumerable<ZenjectResolveException> ValidateBinding(InjectContext context)

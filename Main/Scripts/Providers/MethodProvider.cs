@@ -7,13 +7,11 @@ namespace Zenject
 {
     public class MethodProvider<T> : ProviderBase
     {
-        readonly DiContainer _container;
-        readonly Func<DiContainer, InjectContext, T> _method;
+        readonly Func<InjectContext, T> _method;
 
-        public MethodProvider(Func<DiContainer, InjectContext, T> method, DiContainer container)
+        public MethodProvider(Func<InjectContext, T> method)
         {
             _method = method;
-            _container = container;
         }
 
         public override Type GetInstanceType()
@@ -24,7 +22,7 @@ namespace Zenject
         public override object GetInstance(InjectContext context)
         {
             Assert.That(typeof(T).DerivesFromOrEqual(context.MemberType));
-            var obj = _method(_container, context);
+            var obj = _method(context);
 
             Assert.That(obj != null, () =>
                 "Method provider returned null when looking up type '{0}'. \nObject graph:\n{1}".Fmt(typeof(T).Name(), DiContainer.GetCurrentObjectGraph()));

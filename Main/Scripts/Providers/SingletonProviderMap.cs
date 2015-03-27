@@ -30,7 +30,7 @@ namespace Zenject
         }
 
         SingletonLazyCreator AddCreatorFromMethod<TConcrete>(
-            string identifier, Func<DiContainer, TConcrete> method)
+            string identifier, Func<InjectContext, TConcrete> method)
         {
             SingletonLazyCreator creator;
 
@@ -43,7 +43,7 @@ namespace Zenject
             }
 
             creator = new SingletonLazyCreator(
-                _container, this, id, (container) => method(container));
+                _container, this, id, (context) => method(context));
 
             _creators.Add(id, creator);
 
@@ -66,7 +66,7 @@ namespace Zenject
         }
 
         public ProviderBase CreateProviderFromMethod<TConcrete>(
-            string identifier, Func<DiContainer, TConcrete> method)
+            string identifier, Func<InjectContext, TConcrete> method)
         {
             return new SingletonProvider(_container, AddCreatorFromMethod(identifier, method));
         }
