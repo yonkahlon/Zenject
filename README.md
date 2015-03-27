@@ -1369,9 +1369,18 @@ For general troubleshooting / support, please use the google group which you can
 
 ## <a id="release-notes"></a>Release Notes
 
+2.1
+* Simplified interface a bit more by moving more methods into DiContainer such as Inject and Instantiate.  Moved all helper methods into extension methods for readability. Deleted FieldsInjector and Instantiator classes as part of this
+* Renamed DiContainer.To() method to ToInstance since I had witnessed some confusion with it for new users.  Did the same with ToSingleInstance
+* Added support for using Zenject outside of Unity by building with the ZEN_NOT_UNITY3D define set
+* Bug fix - Validation was not working in some cases for prefabs.
+* Renamed some of the parameters in InjectContext for better understandability.
+* Renamed DiContainer.ResolveMany to DiContainer.ResolveAll
+* Added 'InjectFullScene' flag to CompositionRoot to allow injecting across the entire unity scene instead of just objects underneath the CompositionRoot
+
 2.0
 
-* Added ability to inject dependencies via parameters to the [PostInject] method
+* Added ability to inject dependencies via parameters to the [PostInject] method just like it does with constructors.  Especially useful for MonoBehaviours.
 * Fixed the order that [PostInject] methods are called in for prefabs
 * Changed singletons created via ToSinglePrefab to identify based on identifier and prefab and not component type. This allows things like ToSingle<Foo>(prefab1) and ToSingle<Bar>(prefab1) to use the same prefab, so you can map singletons to multiple components on the same prefab. This also works with interfaces.
 * Removed '.As()' method in favour of specifying the identifier in the first Bind() statement
