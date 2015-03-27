@@ -1,14 +1,18 @@
 using System;
 using System.Collections.Generic;
 using ModestTree;
-using UnityEngine;
 using System.Linq;
+using ModestTree.Util;
+#if !ZEN_NOT_UNITY3D
+using UnityEngine;
+#endif
 
 namespace Zenject
 {
     // Helper class to manually fill in dependencies on given objects
     public static class InjectionHelper
     {
+#if !ZEN_NOT_UNITY3D
         // Inject dependencies into child game objects
         public static void InjectChildGameObjects(
             DiContainer container, GameObject gameObject, bool includeInactive = false)
@@ -46,9 +50,10 @@ namespace Zenject
             {
                 using (container.PushLookup(component.GetType()))
                 {
-                    FieldsInjecter.Inject(container, component, extraArgs);
+                    container.Inject(component, extraArgs);
                 }
             }
         }
+#endif
     }
 }

@@ -93,8 +93,8 @@ namespace Zenject.Tests
             Container.Bind<Test4>().ToSingle();
             Container.Bind<Test1>().ToTransient();
 
-            Container.Bind<Test0>().To(t0a).When(c => c.ParentTypes.Contains(typeof(Test3)));
-            Container.Bind<Test0>().To(t0b).When(c => c.ParentTypes.Contains(typeof(Test4)));
+            Container.Bind<Test0>().ToInstance(t0a).When(c => c.ParentTypes.Contains(typeof(Test3)));
+            Container.Bind<Test0>().ToInstance(t0b).When(c => c.ParentTypes.Contains(typeof(Test4)));
 
             Assert.That(Container.ValidateResolve<Test3>().IsEmpty());
             var test3 = Container.Resolve<Test3>();

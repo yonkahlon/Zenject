@@ -1,3 +1,5 @@
+#if !ZEN_NOT_UNITY3D
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,7 +25,7 @@ namespace Zenject
             {
                 int hash = 17;
                 hash = hash * 29 + (this.Identifier == null ? 0 : this.Identifier.GetHashCode());
-                hash = hash * 29 + (UnityUtil.IsNull(this.Prefab) ? 0 : this.Prefab.GetHashCode());
+                hash = hash * 29 + (ZenUtil.IsNull(this.Prefab) ? 0 : this.Prefab.GetHashCode());
                 return hash;
             }
         }
@@ -57,3 +59,5 @@ namespace Zenject
         }
     }
 }
+
+#endif

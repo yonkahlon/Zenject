@@ -43,7 +43,7 @@ namespace Zenject.Tests
         {
             Container.Bind<Test1>().ToSingle();
 
-            Container.ResolveMany<Test1>();
+            Container.ResolveAll<Test1>();
         }
 
         [Test]
@@ -52,7 +52,7 @@ namespace Zenject.Tests
             Container.Bind<Test2>().ToSingle();
 
             Assert.That(Container.ValidateResolve<Test2>().IsEmpty());
-            var result = Container.ResolveMany<Test2>();
+            var result = Container.ResolveAll<Test2>();
 
             Assert.That(result != null);
         }
@@ -63,7 +63,7 @@ namespace Zenject.Tests
         {
             Container.Bind<Test3>().ToSingle();
 
-            Container.ResolveMany<Test3>();
+            Container.ResolveAll<Test3>();
         }
 
         [Test]
@@ -71,7 +71,7 @@ namespace Zenject.Tests
         {
             Container.Bind<Test4>().ToSingle();
 
-            var result = Container.ResolveMany<Test4>();
+            var result = Container.ResolveAll<Test4>();
 
             Assert.That(result != null);
         }

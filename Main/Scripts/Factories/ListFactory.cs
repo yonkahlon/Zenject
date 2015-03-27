@@ -8,12 +8,11 @@ namespace Zenject
 {
     public class ListFactory<T>
     {
-        readonly Instantiator _instantiator;
+        readonly DiContainer _container;
         List<Type> _implTypes;
 
         public ListFactory(
-            List<Type> implTypes,
-            Instantiator instantiator)
+            List<Type> implTypes, DiContainer container)
         {
             foreach (var type in implTypes)
             {
@@ -21,7 +20,7 @@ namespace Zenject
             }
 
             _implTypes = implTypes;
-            _instantiator = instantiator;
+            _container = container;
         }
 
         public static void Bind()
@@ -34,7 +33,7 @@ namespace Zenject
 
             foreach (var type in _implTypes)
             {
-                list.Add(_instantiator.Instantiate<T>(type, constructorArgs));
+                list.Add(_container.Instantiate<T>(type, constructorArgs));
             }
 
             return list;

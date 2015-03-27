@@ -4,8 +4,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using UnityEngine;
 using ModestTree;
+using ModestTree.Util;
+using ModestTree.Util.Debugging;
+
+#if !ZEN_NOT_UNITY3D
+using UnityEngine;
+#endif
 
 namespace Zenject
 {
@@ -16,28 +21,26 @@ namespace Zenject
     {
         readonly Dictionary<BindingId, List<ProviderBase>> _providers = new Dictionary<BindingId, List<ProviderBase>>();
         readonly SingletonProviderMap _singletonMap;
-        readonly PrefabSingletonProviderMap _prefabSingletonMap;
 
         static Stack<Type> _lookupsInProgress = new Stack<Type>();
 
         bool _allowNullBindings;
 
         ProviderBase _fallbackProvider;
-        Instantiator _instantiator;
 
         readonly List<IInstaller> _installedInstallers = new List<IInstaller>();
 
         public DiContainer()
         {
             _singletonMap = new SingletonProviderMap(this);
-            _prefabSingletonMap = new PrefabSingletonProviderMap(this);
-            _instantiator = new Instantiator(this);
 
-            Bind<DiContainer>().To(this);
-            Bind<Instantiator>().To(_instantiator);
-            Bind<SingletonProviderMap>().To(_singletonMap);
-            Bind<PrefabSingletonProviderMap>().To(_prefabSingletonMap);
-            Bind<SingletonInstanceHelper>().To(new SingletonInstanceHelper(_singletonMap, _prefabSingletonMap));
+            this.Bind<DiContainer>().ToInstance(this);
+            this.Bind<SingletonProviderMap>().ToInstance(_singletonMap);
+
+#if !ZEN_NOT_UNITY3D
+            this.Bind<PrefabSingletonProviderMap>().ToSingle<PrefabSingletonProviderMap>();
+#endif
+            this.Bind<SingletonInstanceHelper>().ToSingle<SingletonInstanceHelper>();
         }
 
         public IEnumerable<IInstaller> InstalledInstallers
@@ -120,167 +123,6 @@ namespace Zenject
             return _lookupsInProgress.Select(t => t.Name()).Reverse().Aggregate((i, str) => i + "\n" + str);
         }
 
-        public BindingConditionSetter BindGameObjectFactory<T>(GameObject prefab)
-            // This would be useful but fails with VerificationException's in webplayer builds for some reason
-            //where T : GameObjectFactory
-            where T : class
-        {
-            if (prefab == null)
-            {
-                throw new ZenjectBindException(
-                    "Null prefab provided to BindGameObjectFactory for type '{0}'".Fmt(typeof(T).Name()));
-            }
-
-            // We could bind the factory ToSingle but doing it this way is better
-            // since it allows us to have multiple game object factories that
-            // use different prefabs and have them injected into different places
-            return Bind<T>().ToMethod((c, ctx) => c.Instantiate<T>(prefab));
-        }
-
-        public BindingConditionSetter BindFactoryToMethodUntyped<TContract>(Func<DiContainer, object[], TContract> method)
-        {
-            return Bind<IFactoryUntyped<TContract>>().To(new FactoryMethodUntyped<TContract>(this, method));
-        }
-
-        public BindingConditionSetter BindFactoryToMethod<TContract>(Func<DiContainer, TContract> method)
-        {
-            return Bind<IFactory<TContract>>().ToMethod((c, ctx) => c.Instantiate<FactoryMethod<TContract>>(method));
-        }
-
-        public BindingConditionSetter BindFactoryToMethod<TParam1, TContract>(Func<DiContainer, TParam1, TContract> method)
-        {
-            return Bind<IFactory<TParam1, TContract>>().ToMethod((c, ctx) => c.Instantiate<FactoryMethod<TParam1, TContract>>(method));
-        }
-
-        public BindingConditionSetter BindFactoryToMethod<TParam1, TParam2, TContract>(Func<DiContainer, TParam1, TParam2, TContract> method)
-        {
-            return Bind<IFactory<TParam1, TParam2, TContract>>().ToMethod((c, ctx) => c.Instantiate<FactoryMethod<TParam1, TParam2, TContract>>(method));
-        }
-
-        public BindingConditionSetter BindFactoryToMethod<TParam1, TParam2, TParam3, TContract>(Func<DiContainer, TParam1, TParam2, TParam3, TContract> method)
-        {
-            return Bind<IFactory<TParam1, TParam2, TParam3, TContract>>().ToMethod((c, ctx) => c.Instantiate<FactoryMethod<TParam1, TParam2, TParam3, TContract>>(method));
-        }
-
-        public BindingConditionSetter BindFactory<TContract>()
-        {
-            return Bind<IFactory<TContract>>().ToSingle<Factory<TContract>>();
-        }
-
-        public BindingConditionSetter BindFactory<TParam1, TContract>()
-        {
-            return Bind<IFactory<TParam1, TContract>>().ToSingle<Factory<TParam1, TContract>>();
-        }
-
-        public BindingConditionSetter BindFactory<TParam1, TParam2, TContract>()
-        {
-            return Bind<IFactory<TParam1, TParam2, TContract>>().ToSingle<Factory<TParam1, TParam2, TContract>>();
-        }
-
-        public BindingConditionSetter BindFactory<TParam1, TParam2, TParam3, TContract>()
-        {
-            return Bind<IFactory<TParam1, TParam2, TParam3, TContract>>().ToSingle<Factory<TParam1, TParam2, TParam3, TContract>>();
-        }
-
-        // Bind IFactory<TContract> such that it creates instances of type TConcrete
-        public BindingConditionSetter BindFactoryToFactory<TContract, TConcrete>()
-            where TConcrete : TContract
-        {
-            return BindFactoryToMethod<TContract>((c) => c.Resolve<IFactory<TConcrete>>().Create());
-        }
-
-        public BindingConditionSetter BindFactoryToFactory<TParam1, TContract, TConcrete>()
-            where TConcrete : TContract
-        {
-            return BindFactoryToMethod<TParam1, TContract>((c, param1) => c.Resolve<IFactory<TParam1, TConcrete>>().Create(param1));
-        }
-
-        public BindingConditionSetter BindFactoryToFactory<TParam1, TParam2, TContract, TConcrete>()
-            where TConcrete : TContract
-        {
-            return BindFactoryToMethod<TParam1, TParam2, TContract>((c, param1, param2) => c.Resolve<IFactory<TParam1, TParam2, TConcrete>>().Create(param1, param2));
-        }
-
-        public BindingConditionSetter BindFactoryToFactory<TParam1, TParam2, TParam3, TContract, TConcrete>()
-            where TConcrete : TContract
-        {
-            return BindFactoryToMethod<TParam1, TParam2, TParam3, TContract>((c, param1, param2, param3) => c.Resolve<IFactory<TParam1, TParam2, TParam3, TConcrete>>().Create(param1, param2, param3));
-        }
-
-        public BindingConditionSetter BindFactoryToCustomFactory<TContract, TConcrete, TFactory>()
-            where TFactory : IFactory<TConcrete>
-            where TConcrete : TContract
-        {
-            return BindFactoryToMethod<TContract>((c) => c.Resolve<TFactory>().Create());
-        }
-
-        // Bind IFactory<TContract> to the given factory
-        public BindingConditionSetter BindFactoryToCustomFactory<TParam1, TContract, TConcrete, TFactory>()
-            where TFactory : IFactory<TParam1, TConcrete>
-            where TConcrete : TContract
-        {
-            return BindFactoryToMethod<TParam1, TContract>((c, param1) => c.Resolve<TFactory>().Create(param1));
-        }
-
-        // This occurs so often that we might as well have a convenience method
-        public BindingConditionSetter BindFactoryUntyped<TContract>()
-        {
-            if (typeof(TContract).DerivesFrom(typeof(MonoBehaviour)))
-            {
-                throw new ZenjectBindException(
-                    "Error while binding factory for type '{0}'. Must use version of BindFactory which includes a reference to a prefab you wish to instantiate"
-                    .Fmt(typeof(TContract).Name()));
-            }
-
-            return Bind<IFactoryUntyped<TContract>>().ToSingle<FactoryUntyped<TContract>>();
-        }
-
-        public BindingConditionSetter BindFactoryUntyped<TContract, TConcrete>() where TConcrete : TContract
-        {
-            if (typeof(TContract).DerivesFrom(typeof(MonoBehaviour)))
-            {
-                throw new ZenjectBindException(
-                    "Error while binding factory for type '{0}'. Must use version of BindFactory which includes a reference to a prefab you wish to instantiate"
-                    .Fmt(typeof(TConcrete).Name()));
-            }
-
-            return Bind<IFactoryUntyped<TContract>>().ToSingle<FactoryUntyped<TContract, TConcrete>>();
-        }
-
-        public BindingConditionSetter BindFactoryForPrefab<TContract>(GameObject prefab) where TContract : Component
-        {
-            if (prefab == null)
-            {
-                throw new ZenjectBindException(
-                    "Null prefab provided to BindFactoryForPrefab for type '{0}'".Fmt(typeof(TContract).Name()));
-            }
-
-            // We could use ToSingleMethod here but then we'd have issues when using .When() conditionals to inject
-            // multiple factories in different places
-            return Bind<IFactory<TContract>>()
-                .ToMethod((container, ctx) => container.Instantiate<GameObjectFactory<TContract>>(prefab));
-        }
-
-        public void BindAllInterfacesToSingle<TConcrete>()
-            where TConcrete : class
-        {
-            BindAllInterfacesToSingle(typeof(TConcrete));
-        }
-
-        public void BindAllInterfacesToSingle(Type concreteType)
-        {
-            foreach (var interfaceType in concreteType.GetInterfaces())
-            {
-                Assert.That(concreteType.DerivesFrom(interfaceType));
-                Bind(interfaceType).ToSingle(concreteType);
-            }
-        }
-
-        public ValueBinder<TContract> BindValue<TContract>() where TContract : struct
-        {
-            return BindValue<TContract>(null);
-        }
-
         public ValueBinder<TContract> BindValue<TContract>(string identifier) where TContract : struct
         {
             return new ValueBinder<TContract>(this, identifier);
@@ -288,36 +130,25 @@ namespace Zenject
 
         public ReferenceBinder<TContract> Rebind<TContract>() where TContract : class
         {
-            Unbind<TContract>();
-            return Bind<TContract>();
-        }
-
-        public ReferenceBinder<TContract> Bind<TContract>()
-            where TContract : class
-        {
-            return Bind<TContract>(null);
+            this.Unbind<TContract>();
+            return this.Bind<TContract>();
         }
 
         public ReferenceBinder<TContract> Bind<TContract>(string identifier)
             where TContract : class
         {
-            return new ReferenceBinder<TContract>(this, identifier, _singletonMap, _prefabSingletonMap);
+            return new ReferenceBinder<TContract>(this, identifier, _singletonMap);
         }
 
         // Note that this can include open generic types as well such as List<>
-        public BinderUntyped Bind(Type contractType)
-        {
-            return Bind(contractType, null);
-        }
-
         public BinderUntyped Bind(Type contractType, string identifier)
         {
-            return new BinderUntyped(this, contractType, identifier, _singletonMap, _prefabSingletonMap);
+            return new BinderUntyped(this, contractType, identifier, _singletonMap);
         }
 
         public BindScope CreateScope()
         {
-            return new BindScope(this, _singletonMap, _prefabSingletonMap);
+            return new BindScope(this, _singletonMap);
         }
 
         // See comment in LookupInProgressAdder
@@ -440,35 +271,9 @@ namespace Zenject
         // Note: If you just want to know whether a binding exists for the given TContract,
         // use HasBinding instead
         // Returns all ZenjectResolveExceptions found
-        public IEnumerable<ZenjectResolveException> ValidateResolve<TContract>()
-        {
-            return ValidateResolve<TContract>((string)null);
-        }
-
-        public IEnumerable<ZenjectResolveException> ValidateResolve<TContract>(string identifier)
-        {
-            return ValidateResolve(new InjectContext(this, typeof(TContract), identifier));
-        }
-
         public IEnumerable<ZenjectResolveException> ValidateResolve(InjectContext context)
         {
             return BindingValidator.ValidateContract(this, context);
-        }
-
-        public IEnumerable<ZenjectResolveException> ValidateObjectGraph<TConcrete>(params Type[] extras)
-        {
-            return ValidateObjectGraph(typeof(TConcrete), extras);
-        }
-
-        public IEnumerable<ZenjectResolveException> ValidateObjectGraphsForTypes(params Type[] types)
-        {
-            foreach (var type in types)
-            {
-                foreach (var error in ValidateObjectGraph(type))
-                {
-                    yield return error;
-                }
-            }
         }
 
         public IEnumerable<ZenjectResolveException> ValidateObjectGraph(Type contractType, params Type[] extras)
@@ -525,34 +330,7 @@ namespace Zenject
             return providers.Where(x => x.Matches(context)).HasAtLeast(1);
         }
 
-        public List<TContract> ResolveMany<TContract>()
-        {
-            return ResolveMany<TContract>(null, false);
-        }
-
-        public List<TContract> ResolveMany<TContract>(string identifier)
-        {
-            return ResolveMany<TContract>(identifier, false);
-        }
-
-        public List<TContract> ResolveMany<TContract>(bool optional)
-        {
-            return ResolveMany<TContract>(null, optional);
-        }
-
-        public List<TContract> ResolveMany<TContract>(string identifier, bool optional)
-        {
-            var context = new InjectContext(this, typeof(TContract), identifier, optional);
-            return ResolveMany<TContract>(context);
-        }
-
-        public List<TContract> ResolveMany<TContract>(InjectContext context)
-        {
-            Assert.IsEqual(context.MemberType, typeof(TContract));
-            return (List<TContract>) ResolveMany(context);
-        }
-
-        public object ResolveMany(InjectContext context)
+        public IList ResolveAll(InjectContext context)
         {
             // Note that different types can map to the same provider (eg. a base type to a concrete class and a concrete class to itself)
 
@@ -571,7 +349,7 @@ namespace Zenject
                     var listType = typeof(List<>).MakeGenericType(context.MemberType);
                     var subContext = context.ChangeMemberType(listType);
 
-                    return _fallbackProvider.GetInstance(subContext);
+                    return (IList)_fallbackProvider.GetInstance(subContext);
                 }
 
                 throw new ZenjectResolveException(
@@ -581,12 +359,7 @@ namespace Zenject
             return ReflectionUtil.CreateGenericList(context.MemberType, new object[] {});
         }
 
-        public List<Type> ResolveTypeMany(Type type)
-        {
-            return ResolveTypeMany(new InjectContext(this, type, null));
-        }
-
-        public List<Type> ResolveTypeMany(InjectContext context)
+        public List<Type> ResolveTypeAll(InjectContext context)
         {
             if (_providers.ContainsKey(context.BindingId))
             {
@@ -633,32 +406,6 @@ namespace Zenject
         }
 
         // Return single instance of requested type or assert
-        public TContract Resolve<TContract>()
-        {
-            return Resolve<TContract>((string)null);
-        }
-
-        public TContract Resolve<TContract>(string identifier)
-        {
-            return Resolve<TContract>(new InjectContext(this, typeof(TContract), identifier));
-        }
-
-        public object Resolve(Type contractType)
-        {
-            return Resolve(new InjectContext(this, contractType, null));
-        }
-
-        public object Resolve(Type contractType, string identifier)
-        {
-            return Resolve(new InjectContext(this, contractType, identifier));
-        }
-
-        public TContract Resolve<TContract>(InjectContext context)
-        {
-            Assert.IsEqual(context.MemberType, typeof(TContract));
-            return (TContract) Resolve(context);
-        }
-
         public object Resolve(InjectContext context)
         {
             // Note that different types can map to the same provider (eg. a base type to a concrete class and a concrete class to itself)
@@ -673,7 +420,7 @@ namespace Zenject
                     var subType = context.MemberType.GetGenericArguments().Single();
                     var subContext = context.ChangeMemberType(subType);
 
-                    return ResolveMany(subContext);
+                    return ResolveAll(subContext);
                 }
 
                 if (!context.Optional)
@@ -721,11 +468,6 @@ namespace Zenject
             return provider.GetInstance(context);
         }
 
-        public bool Unbind<TContract>()
-        {
-            return Unbind<TContract>(null);
-        }
-
         public bool Unbind<TContract>(string identifier)
         {
             List<ProviderBase> providersToRemove;
@@ -750,11 +492,6 @@ namespace Zenject
             return false;
         }
 
-        public IEnumerable<Type> GetDependencyContracts<TContract>()
-        {
-            return GetDependencyContracts(typeof(TContract));
-        }
-
         public IEnumerable<Type> GetDependencyContracts(Type contract)
         {
             foreach (var injectMember in TypeAnalyzer.GetInfo(contract).AllInjectables)
@@ -763,41 +500,136 @@ namespace Zenject
             }
         }
 
-        // Same as Instantiate except you can pas in null value
+        // Same as Instantiate except you can pass in null value
         // however the type for each parameter needs to be explicitly provided in this case
-        public T InstantiateExplicit<T>(List<TypeValuePair> extraArgList)
-        {
-            return _instantiator.InstantiateExplicit<T>(extraArgList);
-        }
-
         public object InstantiateExplicit(
-            Type concreteType, List<TypeValuePair> extraArgList)
+            Type concreteType, List<TypeValuePair> extraArgMap)
         {
-            return _instantiator.InstantiateExplicit(concreteType, extraArgList);
-        }
-
-        public T Instantiate<T>(params object[] constructorArgs)
-        {
-            return _instantiator.Instantiate<T>(constructorArgs);
+            using (ProfileBlock.Start("Zenject.Instantiate({0})", concreteType))
+            {
+                using (PushLookup(concreteType))
+                {
+                    return Instantiate(concreteType, extraArgMap);
+                }
+            }
         }
 
         public object Instantiate(
-            Type concreteType, params object[] constructorArgs)
+            Type concreteType, IEnumerable<TypeValuePair> extraArgMapParam)
         {
-            return _instantiator.Instantiate(concreteType, constructorArgs);
+#if !ZEN_NOT_UNITY3D
+            Assert.That(!concreteType.DerivesFrom<UnityEngine.Component>(),
+                "Error occurred while instantiating object of type '{0}'. Instantiator should not be used to create new mono behaviours.  Must use GameObjectInstantiator, GameObjectFactory, or GameObject.Instantiate.", concreteType.Name());
+#endif
+
+            var typeInfo = TypeAnalyzer.GetInfo(concreteType);
+
+            if (typeInfo.InjectConstructor == null)
+            {
+                throw new ZenjectResolveException(
+                    "More than one or zero constructors found for type '{0}' when creating dependencies.  Use one [Inject] attribute to specify which to use.".Fmt(concreteType));
+            }
+
+            // Make a copy since we remove from it below
+            var extraArgMap = extraArgMapParam.ToList();
+            var paramValues = new List<object>();
+
+            foreach (var injectInfo in typeInfo.ConstructorInjectables)
+            {
+                object value;
+
+                if (!InstantiateUtil.PopValueWithType(extraArgMap, injectInfo.MemberType, out value))
+                {
+                    value = Resolve(injectInfo.CreateInjectContext(this, null));
+                }
+
+                paramValues.Add(value);
+            }
+
+            object newObj;
+
+            try
+            {
+                using (ProfileBlock.Start("{0}.{0}()", concreteType))
+                {
+                    newObj = typeInfo.InjectConstructor.Invoke(paramValues.ToArray());
+                }
+            }
+            catch (Exception e)
+            {
+                throw new ZenjectResolveException(
+                    "Error occurred while instantiating object with type '{0}'".Fmt(concreteType.Name()), e);
+            }
+
+            Inject(newObj, extraArgMap, true, typeInfo);
+
+            return newObj;
         }
 
-        // Helper methods
-        public bool HasBinding<TContract>()
+        // Iterate over fields/properties on the given object and inject any with the [Inject] attribute
+        internal void Inject(
+            object injectable, IEnumerable<TypeValuePair> extraArgMapParam,
+            bool shouldUseAll, ZenjectTypeInfo typeInfo)
         {
-            return HasBinding<TContract>(null);
-        }
+            Assert.IsEqual(typeInfo.TypeAnalyzed, injectable.GetType());
+            Assert.That(injectable != null);
 
-        public bool HasBinding<TContract>(string identifier)
-        {
-            return HasBinding(
-                new InjectContext(this, typeof(TContract), identifier));
+            // Make a copy since we remove from it below
+            var extraArgMap = extraArgMapParam.ToList();
+
+            foreach (var injectInfo in typeInfo.FieldInjectables.Concat(typeInfo.PropertyInjectables))
+            {
+                object value;
+
+                if (InstantiateUtil.PopValueWithType(extraArgMap, injectInfo.MemberType, out value))
+                {
+                    injectInfo.Setter(injectable, value);
+                }
+                else
+                {
+                    value = Resolve(
+                        injectInfo.CreateInjectContext(this, injectable));
+
+                    if (injectInfo.Optional && value == null)
+                    {
+                        // Do not override in this case so it retains the hard-coded value
+                    }
+                    else
+                    {
+                        injectInfo.Setter(injectable, value);
+                    }
+                }
+            }
+
+            foreach (var method in typeInfo.PostInjectMethods)
+            {
+                using (ProfileBlock.Start("{0}.{1}()", injectable.GetType(), method.MethodInfo.Name))
+                {
+                    var paramValues = new List<object>();
+
+                    foreach (var injectInfo in method.InjectableInfo)
+                    {
+                        object value;
+
+                        if (!InstantiateUtil.PopValueWithType(extraArgMap, injectInfo.MemberType, out value))
+                        {
+                            value = Resolve(
+                                injectInfo.CreateInjectContext(this, injectable));
+                        }
+
+                        paramValues.Add(value);
+                    }
+
+                    method.MethodInfo.Invoke(injectable, paramValues.ToArray());
+                }
+            }
+
+            if (shouldUseAll && !extraArgMap.IsEmpty())
+            {
+                throw new ZenjectResolveException(
+                    "Passed unnecessary parameters when injecting into type '{0}'. \nExtra Parameters: {1}\nObject graph:\n{2}"
+                    .Fmt(injectable.GetType().Name(), String.Join(",", extraArgMap.Select(x => x.Type.Name()).ToArray()), DiContainer.GetCurrentObjectGraph()));
+            }
         }
     }
 }
-

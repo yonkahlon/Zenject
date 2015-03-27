@@ -58,8 +58,11 @@ namespace Zenject.Tests
         {
             return new List<Type>()
             {
-                typeof(Instantiator), typeof(DiContainer), typeof(SingletonInstanceHelper),
-                typeof(PrefabSingletonProviderMap), typeof(SingletonProviderMap)
+                typeof(DiContainer), typeof(SingletonInstanceHelper),
+#if !ZEN_NOT_UNITY3D
+                typeof(PrefabSingletonProviderMap),
+#endif
+                typeof(SingletonProviderMap)
             };
         }
 
@@ -69,8 +72,8 @@ namespace Zenject.Tests
             _container.Bind<IFoo>().ToSingle<Foo>();
             _container.Bind<IFoo>().ToSingle<Foo2>();
 
-            _container.Bind<Bar>().To(new Bar());
-            _container.Bind<Bar>().To(new Bar());
+            _container.Bind<Bar>().ToInstance(new Bar());
+            _container.Bind<Bar>().ToInstance(new Bar());
 
             AssertHasContracts(
                 new List<Type>() { typeof(Bar), typeof(IFoo) });

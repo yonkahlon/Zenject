@@ -60,7 +60,7 @@ namespace Zenject.Tests
             Container.Bind<IFoo>().ToSingle<Foo0>("foo3");
             Container.Bind<IFoo>().ToSingle<Foo0>("foo4");
 
-            Assert.IsEqual(Container.ResolveMany<IFoo>().Count, 4);
+            Assert.IsEqual(Container.ResolveAll<IFoo>().Count, 4);
         }
     }
 }

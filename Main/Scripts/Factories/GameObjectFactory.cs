@@ -1,3 +1,7 @@
+#if !ZEN_NOT_UNITY3D
+
+#if !ZEN_NOT_UNITY3D
+
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -92,3 +96,7 @@ namespace Zenject
         }
     }
 }
+
+#endif
+
+#endif

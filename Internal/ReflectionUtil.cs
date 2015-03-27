@@ -2,13 +2,11 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
-using UnityEngine;
-using Debug = UnityEngine.Debug;
 using System.Linq;
 using System.Reflection;
 using System.Text;
 
-namespace ModestTree
+namespace ModestTree.Util
 {
     public static class ReflectionUtil
     {
@@ -76,32 +74,6 @@ namespace ModestTree
             }
 
             return toList;
-        }
-
-        // Returns more intuitive defaults
-        // eg. An empty string rather than null
-        // An empty collection (eg. List<>) rather than null
-        public static object GetSmartDefaultValue(Type type)
-        {
-            if (type == typeof(string))
-            {
-                return "";
-            }
-            else if (type == typeof(Quaternion))
-            {
-                return Quaternion.identity;
-            }
-            else if (type.IsGenericType)
-            {
-                var genericType = type.GetGenericTypeDefinition();
-
-                if (genericType == typeof(List<>) || genericType == typeof(Dictionary<,>))
-                {
-                    return Activator.CreateInstance(type);
-                }
-            }
-
-            return type.GetDefaultValue();
         }
     }
 }

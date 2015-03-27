@@ -1,7 +1,9 @@
+#if !ZEN_NOT_UNITY3D
+
 using System;
 using System.Collections.Generic;
-using UnityEngine;
 using ModestTree;
+using UnityEngine;
 
 namespace Zenject
 {
@@ -9,7 +11,7 @@ namespace Zenject
     {
         public static void InstallStandardInstaller(DiContainer container, GameObject rootObj)
         {
-            container.Bind<GameObject>().To(rootObj).WhenInjectedInto<StandardUnityInstaller>();
+            container.Bind<GameObject>().ToInstance(rootObj).WhenInjectedInto<StandardUnityInstaller>();
             container.Bind<IInstaller>().ToSingle<StandardUnityInstaller>();
             container.InstallInstallers();
             Assert.That(!container.HasBinding<IInstaller>());
@@ -34,8 +36,8 @@ namespace Zenject
                     // At the very least they will need the container injected but
                     // they might also have some configuration passed from another
                     // scene as well
-                    FieldsInjecter.Inject(container, installer);
-                    container.Bind<IInstaller>().To(installer);
+                    container.Inject(installer);
+                    container.Bind<IInstaller>().ToInstance(installer);
 
                     // Install this installer and also any other installers that it installs
                     container.InstallInstallers();
@@ -46,3 +48,5 @@ namespace Zenject
         }
     }
 }
+
+#endif

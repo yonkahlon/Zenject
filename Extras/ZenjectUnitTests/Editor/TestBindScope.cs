@@ -22,7 +22,7 @@ namespace Zenject.Tests
             {
                 var test1 = new Test0();
 
-                scope.Bind<Test0>().To(test1);
+                scope.Bind<Test0>().ToInstance(test1);
 
                 Assert.That(Container.ValidateResolve<Test0>().IsEmpty());
                 Assert.That(ReferenceEquals(test1, Container.Resolve<Test0>()));
@@ -50,7 +50,7 @@ namespace Zenject.Tests
             {
                 var test0Local = new Test0();
 
-                scope.Bind<Test0>().To(test0Local);
+                scope.Bind<Test0>().ToInstance(test0Local);
                 scope.Bind<Test1>().ToSingle();
 
                 Assert.That(Container.ValidateResolve<Test0>().IsEmpty());

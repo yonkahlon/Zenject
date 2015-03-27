@@ -23,7 +23,7 @@ namespace Zenject.Tests
         {
             var foo = new Foo();
 
-            Container.Bind<Foo>().To(foo);
+            Container.Bind<Foo>().ToInstance(foo);
             Container.Bind<IFoo>().ToLookup<Foo>();
 
             Assert.IsEqual(Container.Resolve<IFoo>(), Container.Resolve<Foo>());
@@ -34,7 +34,7 @@ namespace Zenject.Tests
         {
             var foo = new Foo();
 
-            Container.Bind<Foo>("foo").To(foo);
+            Container.Bind<Foo>("foo").ToInstance(foo);
             Container.Bind<IFoo>().ToLookup<Foo>("foo");
 
             Container.Resolve<IFoo>();
@@ -47,7 +47,7 @@ namespace Zenject.Tests
         {
             var foo = new Foo();
 
-            Container.Bind<Foo>("foo").To(foo);
+            Container.Bind<Foo>("foo").ToInstance(foo);
             Container.Bind<IFoo>().ToLookup<Foo>();
 
             Assert.Throws<ZenjectResolveException>(

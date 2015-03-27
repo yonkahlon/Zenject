@@ -2,11 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using NUnit.Framework;
-using UnityEngine;
 using Zenject;
 using System.Linq;
 using ModestTree;
 using Assert=ModestTree.Assert;
+using ModestTree.Util;
 
 namespace Zenject.Tests
 {
@@ -26,7 +26,7 @@ namespace Zenject.Tests
         public void BindTickable<TTickable>(int priority) where TTickable : ITickable
         {
             _container.Bind<ITickable>().ToSingle<TTickable>();
-            _container.Bind<Tuple<Type, int>>().To(Tuple.New(typeof(TTickable), priority));
+            _container.Bind<Tuple<Type, int>>().ToInstance(Tuple.New(typeof(TTickable), priority));
         }
 
         [Test]

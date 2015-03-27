@@ -1,9 +1,11 @@
+#if !ZEN_NOT_UNITY3D
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace ModestTree
+namespace ModestTree.Util
 {
     public enum MouseWheelScrollDirections
     {
@@ -14,16 +16,6 @@ namespace ModestTree
 
     public static class UnityUtil
     {
-        // Due to the way that Unity overrides the Equals operator,
-        // normal null checks such as (x == null) do not always work as
-        // expected
-        // In those cases you can use this function which will also
-        // work with non-unity objects
-        public static bool IsNull(System.Object obj)
-        {
-            return obj == null || obj.Equals(null);
-        }
-
         public static bool IsAltKeyDown
         {
             get
@@ -98,5 +90,32 @@ namespace ModestTree
                 .OrderByDescending(x =>
                     x == null ? int.MinValue : GetDepthLevel(x.transform));
         }
+
+        // Returns more intuitive defaults
+        // eg. An empty string rather than null
+        // An empty collection (eg. List<>) rather than null
+        public static object GetSmartDefaultValue(Type type)
+        {
+            if (type == typeof(string))
+            {
+                return "";
+            }
+            else if (type == typeof(Quaternion))
+            {
+                return Quaternion.identity;
+            }
+            else if (type.IsGenericType)
+            {
+                var genericType = type.GetGenericTypeDefinition();
+
+                if (genericType == typeof(List<>) || genericType == typeof(Dictionary<,>))
+                {
+                    return Activator.CreateInstance(type);
+                }
+            }
+
+            return type.GetDefaultValue();
+        }
     }
 }
+#endif

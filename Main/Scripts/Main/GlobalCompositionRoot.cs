@@ -1,3 +1,5 @@
+#if !ZEN_NOT_UNITY3D
+
 #pragma warning disable 414
 using ModestTree;
 
@@ -79,3 +81,5 @@ namespace Zenject
         }
     }
 }
+
+#endif

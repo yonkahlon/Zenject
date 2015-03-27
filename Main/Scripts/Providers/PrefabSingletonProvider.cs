@@ -1,3 +1,5 @@
+#if !ZEN_NOT_UNITY3D
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -55,3 +57,4 @@ namespace Zenject
     }
 }
 
+#endif

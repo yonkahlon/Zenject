@@ -1,43 +1,62 @@
 using System;
-using UnityEngine;
 using ModestTree;
+
+#if !ZEN_NOT_UNITY3D
+using UnityEngine;
+#endif
 
 namespace Zenject
 {
     public class ReferenceBinder<TContract> : BinderGeneric<TContract> where TContract : class
     {
         readonly protected SingletonProviderMap _singletonMap;
-        readonly protected PrefabSingletonProviderMap _prefabSingletonMap;
 
         public ReferenceBinder(
             DiContainer container, string identifier,
-            SingletonProviderMap singletonMap, PrefabSingletonProviderMap prefabSingletonMap)
+            SingletonProviderMap singletonMap)
             : base(container, identifier)
         {
             _singletonMap = singletonMap;
-            _prefabSingletonMap = prefabSingletonMap;
         }
 
         public BindingConditionSetter ToTransient()
         {
+#if !ZEN_NOT_UNITY3D
             if (_contractType.DerivesFrom(typeof(Component)))
             {
                 throw new ZenjectBindException(
                     "Should not use ToTransient for Monobehaviours (when binding type '{0}'), you probably want either ToLookup or ToTransientFromPrefab"
                     .Fmt(_contractType.Name()));
             }
+#endif
 
             return ToProvider(new TransientProvider(_container, typeof(TContract)));
         }
 
+        public BindingConditionSetter ToTransient(Type type)
+        {
+#if !ZEN_NOT_UNITY3D
+            if (type.DerivesFrom(typeof(Component)))
+            {
+                throw new ZenjectBindException(
+                    "Should not use ToTransient for Monobehaviours (when binding type '{0}'), you probably want either ToLookup or ToTransientFromPrefab"
+                    .Fmt(type.Name()));
+            }
+#endif
+
+            return ToProvider(new TransientProvider(_container, type));
+        }
+
         public BindingConditionSetter ToTransient<TConcrete>() where TConcrete : TContract
         {
+#if !ZEN_NOT_UNITY3D
             if (typeof(TConcrete).DerivesFrom(typeof(Component)))
             {
                 throw new ZenjectBindException(
                     "Should not use ToTransient for Monobehaviours (when binding type '{0}' to '{1}'), you probably want either ToLookup or ToTransientFromPrefab"
                     .Fmt(_contractType.Name(), typeof(TConcrete).Name()));
             }
+#endif
 
             return ToProvider(new TransientProvider(_container, typeof(TConcrete)));
         }
@@ -51,12 +70,14 @@ namespace Zenject
         {
             Assert.That(typeof(TContract) != typeof(string));
 
+#if !ZEN_NOT_UNITY3D
             if (_contractType.DerivesFrom(typeof(Component)))
             {
                 throw new ZenjectBindException(
                     "Should not use ToSingle for Monobehaviours (when binding type '{0}'), you probably want either ToLookup or ToSingleFromPrefab or ToSingleGameObject"
                     .Fmt(_contractType.Name()));
             }
+#endif
 
             return ToProvider(_singletonMap.CreateProviderFromType(singletonIdentifier, typeof(TContract)));
         }
@@ -66,12 +87,14 @@ namespace Zenject
         {
             Assert.That(typeof(TContract) != typeof(string));
 
+#if !ZEN_NOT_UNITY3D
             if (typeof(TConcrete).DerivesFrom(typeof(Component)))
             {
                 throw new ZenjectBindException(
                     "Should not use ToSingle for Monobehaviours (when binding type '{0}' to '{1}'), you probably want either ToLookup or ToSingleFromPrefab or ToSingleGameObject"
                     .Fmt(_contractType.Name(), typeof(TConcrete).Name()));
             }
+#endif
 
             return ToProvider(_singletonMap.CreateProviderFromType(singletonIdentifier, typeof(TConcrete)));
         }
@@ -87,10 +110,10 @@ namespace Zenject
             return ToProvider(_singletonMap.CreateProviderFromType(singletonIdentifier, concreteType));
         }
 
-        public BindingConditionSetter To<TConcrete>(TConcrete instance)
+        public BindingConditionSetter ToInstance<TConcrete>(TConcrete instance)
             where TConcrete : TContract
         {
-            if (UnityUtil.IsNull(instance) && !_container.AllowNullBindings)
+            if (ZenUtil.IsNull(instance) && !_container.AllowNullBindings)
             {
                 string message;
 
@@ -113,7 +136,7 @@ namespace Zenject
         public BindingConditionSetter ToSingleInstance<TConcrete>(string singletonIdentifier, TConcrete instance)
             where TConcrete : TContract
         {
-            if (UnityUtil.IsNull(instance) && !_container.AllowNullBindings)
+            if (ZenUtil.IsNull(instance) && !_container.AllowNullBindings)
             {
                 string message;
 
@@ -133,19 +156,51 @@ namespace Zenject
             return ToProvider(_singletonMap.CreateProviderFromInstance(singletonIdentifier, instance));
         }
 
+        public BindingConditionSetter ToSingleMethod<TConcrete>(string singletonIdentifier, Func<DiContainer, TConcrete> method)
+            where TConcrete : TContract
+        {
+            return ToProvider(_singletonMap.CreateProviderFromMethod(singletonIdentifier, method));
+        }
+
+        // ToSingleMethod
+        public BindingConditionSetter ToSingleMethod<TConcrete>(Func<DiContainer, TConcrete> method)
+            where TConcrete : TContract
+        {
+            return ToSingleMethod<TConcrete>(null, method);
+        }
+
+        public BindingConditionSetter ToSingleInstance<TConcrete>(TConcrete instance)
+            where TConcrete : TContract
+        {
+            return ToSingleInstance<TConcrete>(null, instance);
+        }
+
+        public BindingConditionSetter ToSingleType(Type concreteType)
+        {
+            return ToSingleType(null, concreteType);
+        }
+
+        public BindingConditionSetter ToSingle<TConcrete>()
+            where TConcrete : TContract
+        {
+            return ToSingle<TConcrete>(null);
+        }
+
+#if !ZEN_NOT_UNITY3D
         // Note that concreteType here could be an interface as well
         public BindingConditionSetter ToSinglePrefab(Type concreteType, string singletonIdentifier, GameObject prefab)
         {
             Assert.That(concreteType.DerivesFromOrEqual<TContract>());
 
-            if (UnityUtil.IsNull(prefab))
+            if (ZenUtil.IsNull(prefab))
             {
                 throw new ZenjectBindException(
                     "Received null prefab while binding type '{0}'".Fmt(concreteType.Name()));
             }
 
+            var prefabSingletonMap = _container.Resolve<PrefabSingletonProviderMap>();
             return ToProvider(
-                _prefabSingletonMap.CreateProvider(singletonIdentifier, concreteType, prefab));
+                prefabSingletonMap.CreateProvider(singletonIdentifier, concreteType, prefab));
         }
 
         // Note: Here we assume that the contract is a component on the given prefab
@@ -153,7 +208,7 @@ namespace Zenject
             where TConcrete : Component, TContract
         {
             // We have to cast to object otherwise we get SecurityExceptions when this function is run outside of unity
-            if (UnityUtil.IsNull(prefab))
+            if (ZenUtil.IsNull(prefab))
             {
                 throw new ZenjectBindException("Received null prefab while binding type '{0}'".Fmt(typeof(TConcrete).Name()));
             }
@@ -185,12 +240,6 @@ namespace Zenject
             return ToProvider(new MonoBehaviourSingletonProvider(typeof(TConcrete), _container, gameObject));
         }
 
-        public BindingConditionSetter ToSingleMethod<TConcrete>(string singletonIdentifier, Func<DiContainer, TConcrete> method)
-            where TConcrete : TContract
-        {
-            return ToProvider(_singletonMap.CreateProviderFromMethod(singletonIdentifier, method));
-        }
-
         // Helper methods
         // ToSinglePrefab
         public BindingConditionSetter ToSinglePrefab(GameObject prefab)
@@ -215,34 +264,11 @@ namespace Zenject
             return ToSinglePrefab(typeof(TConcrete), identifier, prefab);
         }
 
-        // ToSingleMethod
-        public BindingConditionSetter ToSingleMethod<TConcrete>(Func<DiContainer, TConcrete> method)
-            where TConcrete : TContract
-        {
-            return ToSingleMethod<TConcrete>(null, method);
-        }
-
         // ToSingleGameObject
         public BindingConditionSetter ToSingleGameObject()
         {
             return ToSingleGameObject(_contractType.Name());
         }
-
-        public BindingConditionSetter ToSingleInstance<TConcrete>(TConcrete instance)
-            where TConcrete : TContract
-        {
-            return ToSingleInstance<TConcrete>(null, instance);
-        }
-
-        public BindingConditionSetter ToSingleType(Type concreteType)
-        {
-            return ToSingleType(null, concreteType);
-        }
-
-        public BindingConditionSetter ToSingle<TConcrete>()
-            where TConcrete : TContract
-        {
-            return ToSingle<TConcrete>(null);
-        }
+#endif
     }
 }

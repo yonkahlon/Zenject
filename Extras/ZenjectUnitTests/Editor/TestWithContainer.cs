@@ -29,7 +29,7 @@ namespace Zenject.Tests
             InstallBindings();
 
             _container.InstallInstallers();
-            FieldsInjecter.Inject(_container, this);
+            _container.Inject(this);
         }
 
         protected virtual void InstallBindings()

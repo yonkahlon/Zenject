@@ -1,3 +1,5 @@
+#if !ZEN_NOT_UNITY3D
+
 using System;
 using System.Linq;
 using UnityEngine;
@@ -16,7 +18,7 @@ namespace Zenject
 
             Container.Bind<TickableManager>().ToSingle();
             Container.Bind<GameObjectInstantiator>().ToSingle();
-            Container.Bind<Transform>().To(_root == null ? null : _root.transform)
+            Container.Bind<Transform>().ToInstance(_root == null ? null : _root.transform)
                 .WhenInjectedInto<GameObjectInstantiator>();
 
             Container.Bind<InitializableManager>().ToSingle();
@@ -27,3 +29,5 @@ namespace Zenject
         }
     }
 }
+
+#endif

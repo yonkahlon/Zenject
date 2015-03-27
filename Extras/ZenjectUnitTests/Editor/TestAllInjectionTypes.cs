@@ -14,7 +14,7 @@ namespace Zenject.Tests
         // Test all variations of injection
         public void TestCase1()
         {
-            Container.Bind<Test0>().To(new Test0());
+            Container.Bind<Test0>().ToInstance(new Test0());
             Container.Bind<IFoo>().ToSingle<FooDerived>();
 
             Assert.That(Container.ValidateResolve<IFoo>().IsEmpty());

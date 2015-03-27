@@ -1,5 +1,6 @@
 using System;
 using ModestTree;
+using ModestTree.Util;
 
 namespace Zenject
 {
@@ -13,7 +14,7 @@ namespace Zenject
 
         public static void BindTickablePriority<TTickable>(DiContainer container, int priority)
         {
-            container.Bind<Tuple<Type, int>>().To(Tuple.New(typeof(TTickable), priority));
+            container.Bind<Tuple<Type, int>>().ToInstance(Tuple.New(typeof(TTickable), priority));
         }
     }
 }

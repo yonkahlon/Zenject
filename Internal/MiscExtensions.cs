@@ -55,11 +55,5 @@ namespace ModestTree
             dictionary.RemoveWithConfirm(key);
             return val;
         }
-
-        public static void AddWithConfirm<T>(this HashSet<T> set, T item)
-        {
-            bool removed = set.Add(item);
-            Assert.That(removed);
-        }
     }
 }
