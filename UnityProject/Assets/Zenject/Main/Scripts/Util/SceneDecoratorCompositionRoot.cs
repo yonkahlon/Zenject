@@ -1,4 +1,7 @@
+#if !ZEN_NOT_UNITY3D
+
 using ModestTree;
+using ModestTree.Util.Debugging;
 using UnityEngine;
 
 namespace Zenject
@@ -79,3 +82,5 @@ namespace Zenject
         }
     }
 }
+
+#endif

@@ -1,5 +1,4 @@
 using System;
-using UnityEngine;
 using ModestTree;
 
 namespace Zenject
@@ -10,8 +9,6 @@ namespace Zenject
         object _instance;
         SingletonProviderMap _owner;
         DiContainer _container;
-        Instantiator _instantiator;
-        GameObjectInstantiator _gameObjInstantiator;
         bool _hasInstance;
         Func<DiContainer, object> _createMethod;
         SingletonId _id;
@@ -100,25 +97,7 @@ namespace Zenject
             }
 
             var concreteType = GetTypeToInstantiate(contractType);
-
-            if (!UnityUtil.IsNull(_id.Prefab))
-            {
-                Assert.That(concreteType.DerivesFrom<Component>(), "Expected '{0}' to derive from 'Component'", concreteType.Name);
-
-                if (_gameObjInstantiator == null)
-                {
-                    _gameObjInstantiator = _container.Resolve<GameObjectInstantiator>();
-                }
-
-                return _gameObjInstantiator.Instantiate(_id.Type, _id.Prefab);
-            }
-
-            if (_instantiator == null)
-            {
-                _instantiator = _container.Resolve<Instantiator>();
-            }
-
-            return _instantiator.Instantiate(concreteType);
+            return _container.Instantiate(concreteType);
         }
 
         Type GetTypeToInstantiate(Type contractType)

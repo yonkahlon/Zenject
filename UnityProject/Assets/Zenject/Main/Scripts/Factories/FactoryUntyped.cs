@@ -10,7 +10,6 @@ namespace Zenject
     public class FactoryUntyped<TContract, TConcrete> : IFactoryUntyped<TContract> where TConcrete : TContract
     {
         readonly DiContainer _container;
-        Instantiator _instantiator;
 
         public FactoryUntyped(DiContainer container)
         {
@@ -19,12 +18,7 @@ namespace Zenject
 
         public virtual TContract Create(params object[] constructorArgs)
         {
-            if (_instantiator == null)
-            {
-                _instantiator = _container.Resolve<Instantiator>();
-            }
-
-            return _instantiator.Instantiate<TConcrete>(constructorArgs);
+            return _container.Instantiate<TConcrete>(constructorArgs);
         }
 
         public IEnumerable<ZenjectResolveException> Validate(params Type[] extras)
@@ -38,7 +32,6 @@ namespace Zenject
     {
         readonly DiContainer _container;
         readonly Type _concreteType;
-        Instantiator _instantiator;
 
         [Inject]
         public FactoryUntyped(DiContainer container)
@@ -61,12 +54,7 @@ namespace Zenject
 
         public virtual TContract Create(params object[] constructorArgs)
         {
-            if (_instantiator == null)
-            {
-                _instantiator = _container.Resolve<Instantiator>();
-            }
-
-            return (TContract)_instantiator.Instantiate(_concreteType, constructorArgs);
+            return (TContract)_container.Instantiate(_concreteType, constructorArgs);
         }
 
         public IEnumerable<ZenjectResolveException> Validate(params Type[] extras)

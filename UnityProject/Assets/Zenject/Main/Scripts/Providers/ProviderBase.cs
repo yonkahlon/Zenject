@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-
 namespace Zenject
 {
     public abstract class ProviderBase : IDisposable
@@ -50,4 +49,3 @@ namespace Zenject
         }
     }
 }
-

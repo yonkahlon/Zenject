@@ -1,8 +1,10 @@
+#if !ZEN_NOT_UNITY3D
+
 using System;
 using System.Collections.Generic;
-using UnityEngine;
 using ModestTree;
 using System.Linq;
+using UnityEngine;
 
 namespace Zenject
 {
@@ -105,3 +107,5 @@ namespace Zenject
         }
     }
 }
+
+#endif

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using ModestTree;
+using ModestTree.Util;
 
 namespace Zenject
 {
@@ -40,14 +41,11 @@ namespace Zenject
 
             _disposables = _disposables.OrderBy(x => x.Priority).ToList();
 
-            if (Assert.IsEnabled)
-            {
-                WarnForMissingBindings();
+            WarnForMissingBindings();
 
-                foreach (var disposable in _disposables.Select(x => x.Disposable).GetDuplicates())
-                {
-                    Assert.That(false, "Found duplicate IDisposable with type '{0}'".Fmt(disposable.GetType()));
-                }
+            foreach (var disposable in _disposables.Select(x => x.Disposable).GetDuplicates())
+            {
+                Assert.That(false, "Found duplicate IDisposable with type '{0}'".Fmt(disposable.GetType()));
             }
 
             foreach (var disposable in _disposables)
@@ -71,7 +69,7 @@ namespace Zenject
             var ignoredTypes = new Type[] { typeof(DisposableManager) };
             var boundTypes = _disposables.Select(x => x.Disposable.GetType()).Distinct();
 
-            var unboundTypes = _singletonInstanceHelper.GetSingletonInstances<IDisposable>(boundTypes.Concat(ignoredTypes));
+            var unboundTypes = _singletonInstanceHelper.GetActiveSingletonTypesDerivingFrom<IDisposable>(boundTypes.Concat(ignoredTypes));
 
             foreach (var objType in unboundTypes)
             {

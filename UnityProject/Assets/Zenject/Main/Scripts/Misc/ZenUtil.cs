@@ -5,13 +5,27 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Diagnostics;
-using UnityEngine;
 using ModestTree;
+
+#if !ZEN_NOT_UNITY3D
+using UnityEngine;
+#endif
 
 namespace Zenject
 {
     public class ZenUtil
     {
+        // Due to the way that Unity overrides the Equals operator,
+        // normal null checks such as (x == null) do not always work as
+        // expected
+        // In those cases you can use this function which will also
+        // work with non-unity objects
+        public static bool IsNull(System.Object obj)
+        {
+            return obj == null || obj.Equals(null);
+        }
+
+#if !ZEN_NOT_UNITY3D
         public static void LoadScene(string levelName)
         {
             LoadSceneInternal(levelName, false, null, null);
@@ -94,5 +108,6 @@ namespace Zenject
                 InjectionHelper.InjectChildGameObjects(parentContainer, newObject);
             }
         }
+#endif
     }
 }

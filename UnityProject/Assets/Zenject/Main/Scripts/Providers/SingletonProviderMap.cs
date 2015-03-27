@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
 using ModestTree;
 
 namespace Zenject
@@ -35,7 +34,7 @@ namespace Zenject
         {
             SingletonLazyCreator creator;
 
-            var id = new SingletonId(identifier, typeof(TConcrete), null);
+            var id = new SingletonId(identifier, typeof(TConcrete));
 
             if (_creators.ContainsKey(id))
             {
@@ -66,12 +65,6 @@ namespace Zenject
             return creator;
         }
 
-        public ProviderBase CreateProviderFromPrefab(string identifier, Type concreteType, GameObject prefab)
-        {
-            return new SingletonProvider(
-                _container, AddCreator(new SingletonId(identifier, concreteType, prefab)));
-        }
-
         public ProviderBase CreateProviderFromMethod<TConcrete>(
             string identifier, Func<DiContainer, TConcrete> method)
         {
@@ -81,7 +74,7 @@ namespace Zenject
         public ProviderBase CreateProviderFromType(string identifier, Type concreteType)
         {
             return new SingletonProvider(
-                _container, AddCreator(new SingletonId(identifier, concreteType, null)));
+                _container, AddCreator(new SingletonId(identifier, concreteType)));
         }
 
         public ProviderBase CreateProviderFromInstance<TConcrete>(string identifier, TConcrete instance)
@@ -98,7 +91,7 @@ namespace Zenject
                 Assert.That(instance.GetType() == concreteType);
             }
 
-            var creator = AddCreator(new SingletonId(identifier, concreteType, null));
+            var creator = AddCreator(new SingletonId(identifier, concreteType));
 
             if (creator.HasInstance())
             {

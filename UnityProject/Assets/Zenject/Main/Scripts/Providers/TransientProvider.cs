@@ -10,8 +10,6 @@ namespace Zenject
         readonly Type _concreteType;
         readonly DiContainer _container;
 
-        Instantiator _instantiator;
-
         public TransientProvider(DiContainer container, Type concreteType)
         {
             _container = container;
@@ -25,12 +23,7 @@ namespace Zenject
 
         public override object GetInstance(InjectContext context)
         {
-            if (_instantiator == null)
-            {
-                _instantiator = _container.Resolve<Instantiator>();
-            }
-
-            var obj = _instantiator.Instantiate(GetTypeToInstantiate(context.MemberType));
+            var obj = _container.Instantiate(GetTypeToInstantiate(context.MemberType));
             Assert.That(obj != null);
             return obj;
         }

@@ -92,14 +92,14 @@ namespace Asteroids
         void InitPriorities()
         {
             Container.Bind<IInstaller>().ToSingle<InitializablePrioritiesInstaller>();
-            Container.Bind<List<Type>>().To(InitializablesOrder)
+            Container.Bind<List<Type>>().ToInstance(InitializablesOrder)
                 .WhenInjectedInto<InitializablePrioritiesInstaller>();
 
             Container.Bind<IInstaller>().ToSingle<TickablePrioritiesInstaller>();
-            Container.Bind<List<Type>>().To(TickablesOrder).WhenInjectedInto<TickablePrioritiesInstaller>();
+            Container.Bind<List<Type>>().ToInstance(TickablesOrder).WhenInjectedInto<TickablePrioritiesInstaller>();
 
             Container.Bind<IInstaller>().ToSingle<FixedTickablePrioritiesInstaller>();
-            Container.Bind<List<Type>>().To(FixedTickablesOrder).WhenInjectedInto<FixedTickablePrioritiesInstaller>();
+            Container.Bind<List<Type>>().ToInstance(FixedTickablesOrder).WhenInjectedInto<FixedTickablePrioritiesInstaller>();
         }
 
         [Serializable]

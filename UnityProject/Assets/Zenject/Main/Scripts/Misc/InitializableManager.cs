@@ -1,8 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
 using ModestTree;
+using ModestTree.Util;
+using ModestTree.Util.Debugging;
 
 namespace Zenject
 {
@@ -24,10 +25,7 @@ namespace Zenject
         {
             _singletonInstanceHelper = singletonInstanceHelper;
 
-            if (Assert.IsEnabled)
-            {
-                WarnForMissingBindings(initializables, container);
-            }
+            WarnForMissingBindings(initializables, container);
 
             foreach (var initializable in initializables)
             {
@@ -43,7 +41,7 @@ namespace Zenject
         void WarnForMissingBindings(List<IInitializable> initializables, DiContainer container)
         {
             var boundTypes = initializables.Select(x => x.GetType()).Distinct();
-            var unboundTypes = _singletonInstanceHelper.GetSingletonInstances<IInitializable>(boundTypes);
+            var unboundTypes = _singletonInstanceHelper.GetActiveSingletonTypesDerivingFrom<IInitializable>(boundTypes);
 
             foreach (var objType in unboundTypes)
             {
@@ -55,12 +53,9 @@ namespace Zenject
         {
             _initializables = _initializables.OrderBy(x => x.Priority).ToList();
 
-            if (Assert.IsEnabled)
+            foreach (var initializable in _initializables.Select(x => x.Initializable).GetDuplicates())
             {
-                foreach (var initializable in _initializables.Select(x => x.Initializable).GetDuplicates())
-                {
-                    Assert.That(false, "Found duplicate IInitializable with type '{0}'".Fmt(initializable.GetType()));
-                }
+                Assert.That(false, "Found duplicate IInitializable with type '{0}'".Fmt(initializable.GetType()));
             }
 
             foreach (var initializable in _initializables)

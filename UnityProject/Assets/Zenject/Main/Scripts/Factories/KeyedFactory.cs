@@ -1,8 +1,9 @@
 using System;
 using System.Collections.Generic;
 using Zenject;
-using System.Linq;
+using ModestTree.Util;
 using ModestTree;
+using System.Linq;
 
 namespace Zenject
 {
@@ -81,7 +82,7 @@ namespace Zenject
         protected static BindingConditionSetter AddBindingInternal<TDerived>(DiContainer container, TKey key)
             where TDerived : TBase
         {
-            return container.Bind<Tuple<TKey, Type>>().To(Tuple.New(key, typeof(TDerived)));
+            return container.Bind<Tuple<TKey, Type>>().ToInstance(Tuple.New(key, typeof(TDerived)));
         }
     }
 

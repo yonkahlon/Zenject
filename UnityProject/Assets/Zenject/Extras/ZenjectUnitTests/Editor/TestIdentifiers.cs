@@ -63,7 +63,7 @@ namespace Zenject.Tests
             Assert.Throws<ZenjectResolveException>(
                 delegate { Container.Resolve<Test0>("foo"); });
 
-            Assert.IsEqual(Container.ResolveMany<Test0>("foo").Count, 2);
+            Assert.IsEqual(Container.ResolveAll<Test0>("foo").Count, 2);
         }
     }
 }

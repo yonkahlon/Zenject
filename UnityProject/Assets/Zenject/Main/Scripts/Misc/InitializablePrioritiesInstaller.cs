@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Zenject;
 using ModestTree;
+using ModestTree.Util;
 
 namespace Zenject
 {
@@ -41,7 +42,7 @@ namespace Zenject
             Assert.That(initializableType.DerivesFrom<IInitializable>(),
                 "Expected type '{0}' to derive from IInitializable", initializableType.Name());
 
-            container.Bind<Tuple<Type, int>>().To(
+            container.Bind<Tuple<Type, int>>().ToInstance(
                 Tuple.New(initializableType, priorityCount)).WhenInjectedInto<InitializableManager>();
         }
     }

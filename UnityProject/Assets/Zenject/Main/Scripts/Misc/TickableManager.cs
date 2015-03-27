@@ -1,8 +1,9 @@
 using System;
 using System.Collections.Generic;
-using UnityEngine;
 using System.Linq;
 using ModestTree;
+using ModestTree.Util;
+using ModestTree.Util.Debugging;
 
 namespace Zenject
 {
@@ -59,7 +60,7 @@ namespace Zenject
         {
             var boundTypes = _tickables.Select(x => x.GetType()).Distinct();
 
-            var unboundTypes = _singletonInstanceHelper.GetSingletonInstances<ITickable>(boundTypes);
+            var unboundTypes = _singletonInstanceHelper.GetActiveSingletonTypesDerivingFrom<ITickable>(boundTypes);
 
             foreach (var objType in unboundTypes)
             {

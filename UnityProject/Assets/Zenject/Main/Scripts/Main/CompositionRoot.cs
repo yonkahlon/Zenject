@@ -1,10 +1,13 @@
+#if !ZEN_NOT_UNITY3D
+
 #pragma warning disable 414
 using ModestTree;
 
 using System;
 using System.Collections.Generic;
-using UnityEngine;
+using ModestTree.Util.Debugging;
 using System.Linq;
+using UnityEngine;
 
 namespace Zenject
 {
@@ -68,7 +71,7 @@ namespace Zenject
             var container = new DiContainer();
             container.AllowNullBindings = allowNullBindings;
             container.FallbackProvider = new DiContainerProvider(parentContainer);
-            container.Bind<CompositionRoot>().To(this);
+            container.Bind<CompositionRoot>().ToInstance(this);
 
             if (BeforeInstallHooks != null)
             {
@@ -101,3 +104,5 @@ namespace Zenject
         }
     }
 }
+
+#endif

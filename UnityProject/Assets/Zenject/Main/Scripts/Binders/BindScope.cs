@@ -20,13 +20,11 @@ namespace Zenject
         DiContainer _container;
         List<ProviderBase> _scopedProviders = new List<ProviderBase>();
         SingletonProviderMap _singletonMap;
-        PrefabSingletonProviderMap _prefabSingletonMap;
 
-        internal BindScope(DiContainer container, SingletonProviderMap singletonMap, PrefabSingletonProviderMap prefabSingletonMap)
+        internal BindScope(DiContainer container, SingletonProviderMap singletonMap)
         {
             _container = container;
             _singletonMap = singletonMap;
-            _prefabSingletonMap = prefabSingletonMap;
         }
 
         public BinderUntyped Bind(Type contractType)
@@ -36,7 +34,7 @@ namespace Zenject
 
         public BinderUntyped Bind(Type contractType, string identifier)
         {
-            return new CustomScopeUntypedBinder(this, contractType, identifier, _container, _singletonMap, _prefabSingletonMap);
+            return new CustomScopeUntypedBinder(this, contractType, identifier, _container, _singletonMap);
         }
 
         public ReferenceBinder<TContract> Bind<TContract>() where TContract : class
@@ -46,7 +44,7 @@ namespace Zenject
 
         public ReferenceBinder<TContract> Bind<TContract>(string identifier) where TContract : class
         {
-            return new CustomScopeReferenceBinder<TContract>(this, identifier, _container, _singletonMap, _prefabSingletonMap);
+            return new CustomScopeReferenceBinder<TContract>(this, identifier, _container, _singletonMap);
         }
 
         public ValueBinder<TContract> BindValue<TContract>() where TContract : struct
@@ -64,7 +62,7 @@ namespace Zenject
         public void BindIdentifier<TClass, TParam>(string identifier, TParam value)
             where TParam : class
         {
-            Bind(typeof(TParam), identifier).To(value).WhenInjectedInto<TClass>();
+            Bind(typeof(TParam), identifier).ToInstance(value).WhenInjectedInto<TClass>();
 
             // We'd pref to do this instead but it fails on web player because Mono
             // seems to interpret TDerived : TBase to require that TDerived != TBase?
@@ -110,8 +108,8 @@ namespace Zenject
 
             public CustomScopeReferenceBinder(
                 BindScope owner, string identifier,
-                DiContainer container, SingletonProviderMap singletonMap, PrefabSingletonProviderMap prefabSingletonMap)
-                : base(container, identifier, singletonMap, prefabSingletonMap)
+                DiContainer container, SingletonProviderMap singletonMap)
+                : base(container, identifier, singletonMap)
             {
                 _owner = owner;
             }
@@ -129,8 +127,8 @@ namespace Zenject
 
             public CustomScopeUntypedBinder(
                 BindScope owner, Type contractType, string identifier,
-                DiContainer container, SingletonProviderMap singletonMap, PrefabSingletonProviderMap prefabSingletonMap)
-                : base(container, contractType, identifier, singletonMap, prefabSingletonMap)
+                DiContainer container, SingletonProviderMap singletonMap)
+                : base(container, contractType, identifier, singletonMap)
             {
                 _owner = owner;
             }

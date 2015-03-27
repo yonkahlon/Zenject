@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using UnityEngine;
 using System.Linq;
 using ModestTree;
 
@@ -8,33 +7,32 @@ namespace Zenject
 {
     public class SingletonInstanceHelper
     {
-        readonly PrefabSingletonProviderMap _prefabSingletonProviderMap;
-        readonly SingletonProviderMap _singletonProviderMap;
+#if !ZEN_NOT_UNITY3D
+        [Inject]
+        readonly PrefabSingletonProviderMap _prefabSingletonProviderMap = null;
+#endif
 
-        public SingletonInstanceHelper(
-            SingletonProviderMap singletonProviderMap,
-            PrefabSingletonProviderMap prefabSingletonProviderMap)
-        {
-            _prefabSingletonProviderMap = prefabSingletonProviderMap;
-            _singletonProviderMap = singletonProviderMap;
-        }
+        [Inject]
+        readonly SingletonProviderMap _singletonProviderMap = null;
 
-        public IEnumerable<Type> GetSingletonInstances<T>(
+        public IEnumerable<Type> GetActiveSingletonTypesDerivingFrom<T>(
             IEnumerable<Type> ignoreTypes)
         {
             var unboundTypes = _singletonProviderMap.Creators
                 .Select(x => x.GetInstanceType())
                 .Where(x => x.DerivesFrom<T>())
-                .Distinct()
                 .Where(x => !ignoreTypes.Contains(x));
 
+#if ZEN_NOT_UNITY3D
+            return unboundTypes.Distinct();
+#else
             var unboundPrefabTypes = _prefabSingletonProviderMap.Creators
                 .SelectMany(x => x.GetAllComponentTypes())
                 .Where(x => x.DerivesFrom<T>())
-                .Distinct()
                 .Where(x => !ignoreTypes.Contains(x));
 
-            return unboundTypes.Concat(unboundPrefabTypes);
+            return unboundTypes.Concat(unboundPrefabTypes).Distinct();
+#endif
         }
     }
 }

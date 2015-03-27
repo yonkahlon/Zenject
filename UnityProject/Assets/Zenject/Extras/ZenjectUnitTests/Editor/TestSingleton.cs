@@ -84,7 +84,7 @@ namespace Zenject.Tests
         {
             IFoo instance = new Foo();
 
-            Container.Bind<IFoo>().To(instance);
+            Container.Bind<IFoo>().ToInstance(instance);
 
             Assert.That(Container.ValidateResolve<IFoo>().IsEmpty());
             var builtInstance = Container.Resolve<IFoo>();
@@ -98,7 +98,7 @@ namespace Zenject.Tests
         {
             IFoo instance = new Foo();
 
-            Container.Bind(typeof(IFoo)).To(instance);
+            Container.Bind(typeof(IFoo)).ToInstance(instance);
 
             Assert.That(Container.ValidateResolve<IFoo>().IsEmpty());
             var builtInstance = Container.Resolve<IFoo>();
@@ -144,8 +144,8 @@ namespace Zenject.Tests
         {
             var instance = new Foo();
 
-            Container.Bind<Foo>().To(instance);
-            Container.Bind<Foo>().To(instance);
+            Container.Bind<Foo>().ToInstance(instance);
+            Container.Bind<Foo>().ToInstance(instance);
 
             Assert.That(Container.ValidateResolve<Foo>().Any());
 
@@ -158,8 +158,8 @@ namespace Zenject.Tests
         {
             var instance = new Foo();
 
-            Container.Bind(typeof(Foo)).To(instance);
-            Container.Bind(typeof(Foo)).To(instance);
+            Container.Bind(typeof(Foo)).ToInstance(instance);
+            Container.Bind(typeof(Foo)).ToInstance(instance);
 
             Assert.That(Container.ValidateResolve<Foo>().Any());
 
@@ -212,7 +212,7 @@ namespace Zenject.Tests
         {
             var foo = new Foo();
 
-            Container.Bind<Foo>().To(foo);
+            Container.Bind<Foo>().ToInstance(foo);
             Container.Bind<IFoo>().ToSingle<Foo>();
 
             Assert.That(
@@ -224,7 +224,7 @@ namespace Zenject.Tests
         {
             var foo = new Foo();
 
-            Container.Bind(typeof(Foo)).To(foo);
+            Container.Bind(typeof(Foo)).ToInstance(foo);
             Container.Bind(typeof(IFoo)).ToSingle<Foo>();
 
             Assert.That(

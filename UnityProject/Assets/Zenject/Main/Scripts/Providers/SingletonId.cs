@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using ModestTree;
-using UnityEngine;
 
 namespace Zenject
 {
@@ -10,13 +9,11 @@ namespace Zenject
     {
         public readonly Type Type;
         public readonly string Identifier;
-        public readonly GameObject Prefab;
 
-        public SingletonId(string identifier, Type type, GameObject prefab)
+        public SingletonId(string identifier, Type type)
         {
             Identifier = identifier;
             Type = type;
-            Prefab = prefab;
         }
 
         public override int GetHashCode()
@@ -26,7 +23,6 @@ namespace Zenject
                 int hash = 17;
                 hash = hash * 29 + this.Type.GetHashCode();
                 hash = hash * 29 + (this.Identifier == null ? 0 : this.Identifier.GetHashCode());
-                hash = hash * 29 + (UnityUtil.IsNull(this.Prefab) ? 0 : this.Prefab.GetHashCode());
                 return hash;
             }
         }
@@ -51,7 +47,7 @@ namespace Zenject
 
         public static bool operator ==(SingletonId left, SingletonId right)
         {
-            return left.Type == right.Type && object.Equals(left.Prefab, right.Prefab) && object.Equals(left.Identifier, right.Identifier);
+            return left.Type == right.Type && object.Equals(left.Identifier, right.Identifier);
         }
 
         public static bool operator !=(SingletonId left, SingletonId right)
