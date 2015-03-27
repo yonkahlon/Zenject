@@ -65,7 +65,7 @@ namespace Zenject
             if (InjectFullScene)
             {
                 var rootGameObjects = GameObject.FindObjectsOfType<Transform>()
-                    .Where(x => x.parent == null && x.GetComponent<GlobalCompositionRoot>() == null)
+                    .Where(x => x.parent == null && x.GetComponent<GlobalCompositionRoot>() == null && (x.GetComponent<CompositionRoot>() == null || x == this.transform))
                     .Select(x => x.gameObject).ToList();
 
                 foreach (var rootObj in rootGameObjects)
