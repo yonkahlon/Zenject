@@ -101,10 +101,22 @@ namespace Zenject
             return container.BindValue<TContract>(null);
         }
 
+        public static BindingConditionSetter BindInstance<TContract>(this DiContainer container, string identifier, TContract obj)
+            where TContract : class
+        {
+            return container.Bind<TContract>(identifier).ToInstance(obj);
+        }
+
         public static BindingConditionSetter BindInstance<TContract>(this DiContainer container, TContract obj)
             where TContract : class
         {
             return container.Bind<TContract>().ToInstance(obj);
+        }
+
+        public static BindingConditionSetter BindValueInstance<TContract>(this DiContainer container, TContract value)
+            where TContract : struct
+        {
+            return container.BindValue<TContract>().To(value);
         }
 
         public static ReferenceBinder<TContract> Bind<TContract>(this DiContainer container)

@@ -123,7 +123,8 @@ namespace Zenject
             return _lookupsInProgress.Select(t => t.Name()).Reverse().Aggregate((i, str) => i + "\n" + str);
         }
 
-        public ValueBinder<TContract> BindValue<TContract>(string identifier) where TContract : struct
+        public ValueBinder<TContract> BindValue<TContract>(string identifier)
+            where TContract : struct
         {
             return new ValueBinder<TContract>(this, identifier);
         }

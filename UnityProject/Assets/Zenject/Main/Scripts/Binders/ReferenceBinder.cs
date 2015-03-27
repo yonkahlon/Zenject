@@ -99,7 +99,7 @@ namespace Zenject
             return ToProvider(_singletonMap.CreateProviderFromType(singletonIdentifier, typeof(TConcrete)));
         }
 
-        public BindingConditionSetter ToSingleType(string singletonIdentifier, Type concreteType)
+        public BindingConditionSetter ToSingle(string singletonIdentifier, Type concreteType)
         {
             if (!concreteType.DerivesFromOrEqual(_contractType))
             {
@@ -175,9 +175,9 @@ namespace Zenject
             return ToSingleInstance<TConcrete>(null, instance);
         }
 
-        public BindingConditionSetter ToSingleType(Type concreteType)
+        public BindingConditionSetter ToSingle(Type concreteType)
         {
-            return ToSingleType(null, concreteType);
+            return ToSingle(null, concreteType);
         }
 
         public BindingConditionSetter ToSingle<TConcrete>()
