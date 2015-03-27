@@ -19,6 +19,7 @@ namespace Zenject
         public static Action<DiContainer> AfterInstallHooks;
 
         public bool OnlyInjectWhenActive = true;
+        public bool InjectFullScene = false;
 
         [SerializeField]
         public MonoInstaller[] Installers = new MonoInstaller[0];
@@ -61,7 +62,22 @@ namespace Zenject
                 false, GlobalCompositionRoot.Instance.Container, _staticInstallers);
             _staticInstallers.Clear();
 
-            InjectionHelper.InjectChildGameObjects(_container, gameObject, !OnlyInjectWhenActive);
+            if (InjectFullScene)
+            {
+                var rootGameObjects = GameObject.FindObjectsOfType<Transform>()
+                    .Where(x => x.parent == null && x.GetComponent<GlobalCompositionRoot>() == null)
+                    .Select(x => x.gameObject).ToList();
+
+                foreach (var rootObj in rootGameObjects)
+                {
+                    InjectionHelper.InjectChildGameObjects(_container, rootObj, !OnlyInjectWhenActive);
+                }
+            }
+            else
+            {
+                InjectionHelper.InjectChildGameObjects(_container, gameObject, !OnlyInjectWhenActive);
+            }
+
             _dependencyRoot = _container.Resolve<IDependencyRoot>();
         }
 

@@ -220,6 +220,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   OnlyInjectWhenActive: 1
+  InjectFullScene: 0
   Installers:
   - {fileID: 805392157}
 --- !u!114 &805392157
