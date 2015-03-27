@@ -1,5 +1,5 @@
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<link rel="stylesheet" id="theme" href="Github.css"></head><body><p><img src="Main/ZenjectLogo.png?raw=true" alt="Zenject" width="600px" height="134px"></p>
+<link rel="stylesheet" id="theme" href="Github.css"></head><body><p><img src="ZenjectLogo.png" alt="Zenject" width="600px" height="134px"></p>
 <h1 id="dependency-injection-framework-for-unity3d">Dependency Injection Framework for Unity3D</h1>
 <h2 id="table-of-contents">Table Of Contents</h2>
 <ul>
@@ -48,6 +48,7 @@
 <li><a href="#faq-performance">How is Performance?</a></li>
 </ul>
 </li>
+<li><a href="#cheatsheet">Cheat Sheet</a></li>
 <li><a href="#further-help">Further Help</a></li>
 <li><a href="#release-notes">Release Notes</a></li>
 <li><a href="#license">License</a></li>
@@ -61,6 +62,7 @@
 <p>Tested in Unity 3D on the following platforms: PC/Mac/Linux, iOS, Android, WP8, and Webplayer</p>
 <p>This project is open source.  You can find the official repository <a href="https://github.com/modesttree/Zenject">here</a>.</p>
 <p>For general troubleshooting / support, please use the google group which you can find <a href="https://groups.google.com/forum/#!forum/zenject/">here</a>.  If you have found a bug, you are also welcome to create an issue on the <a href="https://github.com/modesttree/Zenject">github page</a>, or a pull request if you have a fix / extension.  You can also follow <a href="https://twitter.com/Zenject">@Zenject</a> on twitter for updates.  Finally, you can also email me directly at svermeulen@modesttree.com</p>
+<p><strong>Quick Start</strong>:  If you are already familiar with dependency injection and are more interested in the syntax than anything else, you might want to start by looking over the <a href="#cheatsheet">cheatsheet</a> at the bottom of this page, which shows a bunch of typical example cases of usage.</p>
 <h2 id="-a-id-features-a-features"><a id="features"></a>Features</h2>
 <ul>
 <li>Injection into normal C# classes or MonoBehaviours</li>
@@ -89,7 +91,7 @@
 <p>Finally, I will just say that if you don't have experience with DI frameworks, and are writing object oriented code, then trust me, you will thank me later!  Once you learn how to write properly loosely coupled code using DI, there is simply no going back.</p>
 <h2 id="-a-id-theory-a-theory"><a id="theory"></a>Theory</h2>
 <p>When writing an individual class to achieve some functionality, it will likely need to interact with other classes in the system to achieve its goals.  One way to do this is to have the class itself create its dependencies, by calling concrete constructors:</p>
-<pre><code><span class="keyword">public</span> <span class="keyword">class</span> Foo
+<pre><code class="lang-csharp"><span class="keyword">public</span> <span class="keyword">class</span> Foo
 {
     ISomeService _service;
 
@@ -104,9 +106,10 @@
         ...
     }
 }
-</code></pre><p>This works fine for small projects, but as your project grows it starts to get unwieldy.  The class Foo is tightly coupled to class 'SomeService'.  If we decide later that we want to use a different concrete implementation then we have to go back into the Foo class to change it.</p>
+</code></pre>
+<p>This works fine for small projects, but as your project grows it starts to get unwieldy.  The class Foo is tightly coupled to class 'SomeService'.  If we decide later that we want to use a different concrete implementation then we have to go back into the Foo class to change it.</p>
 <p>After thinking about this, often you come to the realization that ultimately, Foo shouldn't bother itself with the details of choosing the specific implementation of the service.  All Foo should care about is fulfilling its own specific responsibilities.  As long as the service fulfills the abstract interface required by Foo, Foo is happy.  Our class then becomes:</p>
-<pre><code><span class="keyword">public</span> <span class="keyword">class</span> Foo
+<pre><code class="lang-csharp"><span class="keyword">public</span> <span class="keyword">class</span> Foo
 {
     ISomeService _service;
 
@@ -121,8 +124,9 @@
         ...
     }
 }
-</code></pre><p>This is better, but now whatever class is creating Foo (let's call it Bar) has the problem of filling in Foo's extra dependencies:</p>
-<pre><code><span class="keyword">public</span> <span class="keyword">class</span> Bar
+</code></pre>
+<p>This is better, but now whatever class is creating Foo (let's call it Bar) has the problem of filling in Foo's extra dependencies:</p>
+<pre><code class="lang-csharp"><span class="keyword">public</span> <span class="keyword">class</span> Bar
 {
     <span class="keyword">public</span> <span class="keyword">void</span> DoSomething()
     {
@@ -131,8 +135,9 @@
         ...
     }
 }
-</code></pre><p>And class Bar probably also doesn't really care about what specific implementation of SomeService Foo uses.  Therefore we push the dependency up again:</p>
-<pre><code><span class="keyword">public</span> <span class="keyword">class</span> Bar
+</code></pre>
+<p>And class Bar probably also doesn't really care about what specific implementation of SomeService Foo uses.  Therefore we push the dependency up again:</p>
+<pre><code class="lang-csharp"><span class="keyword">public</span> <span class="keyword">class</span> Bar
 {
     ISomeService _service;
 
@@ -148,7 +153,8 @@
         ...
     }
 }
-</code></pre><p>So we find that it is useful to push the responsibility of deciding which specific implementations of which classes to use further and further up in the 'object graph' of the application.  Taking this to an extreme, we arrive at the entry point of the application, at which point all dependencies must be satisfied before things start.  The dependency injection lingo for this part of the application is called the 'composition root'.</p>
+</code></pre>
+<p>So we find that it is useful to push the responsibility of deciding which specific implementations of which classes to use further and further up in the 'object graph' of the application.  Taking this to an extreme, we arrive at the entry point of the application, at which point all dependencies must be satisfied before things start.  The dependency injection lingo for this part of the application is called the 'composition root'.</p>
 <h2 id="-a-id-misconceptions-a-misconceptions"><a id="misconceptions"></a>Misconceptions</h2>
 <p>There are many misconceptions about DI, due to the fact that it can be tricky to fully wrap your head around at first.  It will take time and experience before it fully 'clicks'.</p>
 <p>As shown in the above example, DI can be used to easily swap different implementations of a given interface (in the example this was ISomeService).  However, this is only one of many benefits that DI offers.</p>
@@ -162,9 +168,10 @@
 </ul>
 <h2 id="-a-id-overview-of-the-zenject-api-a-overview-of-the-zenject-api"><a id="overview-of-the-zenject-api"></a>Overview Of The Zenject API</h2>
 <p>What follows is a general overview of how DI patterns are applied using Zenject.  For further documentation I highly recommend the sample project itself (a kind of asteroids clone, which you can find by opening "Extras/SampleGame/Asteroids.unity").  I would recommend using that for reference after reading over these concepts.</p>
+<p>You may also find the <a href="#cheatsheet">cheatsheet</a> at the bottom of this page helpful in understanding some typical usage scenarios.</p>
 <p>The unit tests may also be helpful to show usage for each specific feature (which you can find by extracting Extras/ZenjectUnitTests.zip)</p>
 <h2 id="-a-id-hello-world-example-a-hello-world-example"><a id="hello-world-example"></a>Hello World Example</h2>
-<pre><code>using Zenject;
+<pre><code class="lang-csharp">using Zenject;
 using UnityEngine;
 using System.Collections;
 
@@ -193,7 +200,8 @@ public <span class="class"><span class="keyword">class</span> <span class="title
         }
     }
 }
-</code></pre><p>You can run this example by doing the following:</p>
+</code></pre>
+<p>You can run this example by doing the following:</p>
 <ul>
 <li>Copy and paste the above code into a file named 'TestInstaller'</li>
 <li>Create a new scene in Unity</li>
@@ -211,99 +219,135 @@ public <span class="class"><span class="keyword">class</span> <span class="title
 <p>In Zenject, dependency mapping is done by adding bindings to something called a container.  The container should then 'know' how to create all the object instances in our application, by recursively resolving all dependencies for a given object.</p>
 <p>When the container is asked to construct an instance of a given type, it uses C# reflection to find the list of constructor arguments, and all fields/properties that are marked with an [Inject] attribute.  It then attempts to resolve each of these required dependencies, which it uses to call the constructor and create the new instance.</p>
 <p>Each Zenject application therefore must tell the container how to resolve each of these dependencies, which is done via Bind commands.  The format for the bind command can be any of the following:</p>
+<p>Note that you can find more examples in the <a href="#cheatsheet">cheatsheet</a> section below.</p>
 <ol>
-<li><p><strong>ToSingle</strong> - Inject as singleton</p>
-<pre><code> Container.Bind<span class="tag">&lt;<span class="title">Foo</span>&gt;</span>().ToSingle();
-</code></pre><p> When a type is bound using ToSingle this will construct one and only one instance of Foo and use that everywhere that has Foo as a dependency</p>
-<p> You may also bind the singleton instance to one or more interfaces:</p>
-<pre><code> Container.Bind<span class="tag">&lt;<span class="title">IFoo</span>&gt;</span>().ToSingle<span class="tag">&lt;<span class="title">Foo</span>&gt;</span>();
- Container.Bind<span class="tag">&lt;<span class="title">IBar</span>&gt;</span>().ToSingle<span class="tag">&lt;<span class="title">Foo</span>&gt;</span>();
-</code></pre><p> This will cause any dependencies of type IFoo or IBar to use the same instance of Foo.  Of course, Foo must implement both IFoo and IBar for this to compile.  However, with only the above two lines the Foo singleton will not be accessible directly.  You can achieve this by using another line to uses ToSingle directly:</p>
-<pre><code> Container.Bind<span class="tag">&lt;<span class="title">Foo</span>&gt;</span>().ToSingle();
- Container.Bind<span class="tag">&lt;<span class="title">IFoo</span>&gt;</span>().ToSingle<span class="tag">&lt;<span class="title">Foo</span>&gt;</span>();
- Container.Bind<span class="tag">&lt;<span class="title">IBar</span>&gt;</span>().ToSingle<span class="tag">&lt;<span class="title">Foo</span>&gt;</span>();
-</code></pre><p> Note again that the same instance will be used for all dependencies that take Foo, IFoo, or IBar.</p>
-</li>
-<li><p><strong>ToTransient</strong> - Inject as newly created object</p>
-<pre><code> Container.Bind<span class="tag">&lt;<span class="title">Foo</span>&gt;</span>().ToTransient();
-</code></pre><p> In this case a new instance of Foo will be generated each time it is injected. Similar to ToSingle, you can bind via an interface as well:</p>
-<pre><code> Container.Bind<span class="tag">&lt;<span class="title">IFoo</span>&gt;</span>().ToTransient<span class="tag">&lt;<span class="title">Foo</span>&gt;</span>();
-</code></pre></li>
-<li><p><strong>ToSinglePrefab</strong> - Inject from unity prefab as singleton</p>
-<pre><code> Container.Bind<span class="tag">&lt;<span class="title">FooMonoBehaviour</span>&gt;</span>().ToSinglePrefab(PrefabGameObject);
-</code></pre><p> This will instantiate a new instance of the given prefab, and then search the newly created game object for the given component (in this case FooMonoBehaviour).</p>
-<p> Also, because it is ToSingle it will only instantiate the prefab once, and otherwise use the same instance of FooMonoBehaviour.</p>
-<p> You can also bind multiple singletons to the same prefab.  For example:</p>
-<pre><code> Container.Bind<span class="tag">&lt;<span class="title">FooMonoBehaviour</span>&gt;</span>().ToSinglePrefab(PrefabGameObject);
- Container.Bind<span class="tag">&lt;<span class="title">BarMonoBehaviour</span>&gt;</span>().ToSinglePrefab(PrefabGameObject);
-</code></pre><p> This will result in the prefab <code>PrefabGameObject</code> being instantiated once, and then searched for monobehaviour's <code>FooMonoBehaviour</code> and <code>BarMonoBehaviour</code></p>
-</li>
-<li><p><strong>ToTransientPrefab</strong> - Inject from unity prefab as newly created object</p>
-<pre><code> Container.Bind<span class="tag">&lt;<span class="title">FooMonoBehaviour</span>&gt;</span>().ToTransientPrefab<span class="tag">&lt;<span class="title">FooMonoBehaviour</span>&gt;</span>(PrefabGameObject);
-</code></pre><p> This works similar to ToSinglePrefab except it will instantiate a new instance of the given prefab every time the dependency is injected.</p>
-</li>
-<li><p><strong>ToSingleGameObject</strong> - Inject MonoBehaviour.</p>
-<pre><code>Container.Bind<span class="tag">&lt;<span class="title">FooMonoBehaviour</span>&gt;</span>().ToSingleGameObject();
-</code></pre><p>This binding will create a new game object and attach the given FooMonoBehaviour.  Also note that since it is ToSingle that it will use the same instance everywhere that has FooMonoBehaviour as a dependency</p>
-</li>
+<li><strong>ToSingle</strong> - Inject as singleton</li>
+</ol>
+<pre><code class="lang-csharp">Container.Bind<span class="tag">&lt;<span class="title">Foo</span>&gt;</span>().ToSingle();
+</code></pre>
+<p>When a type is bound using ToSingle this will construct one and only one instance of Foo and use that everywhere that has Foo as a dependency</p>
+<p>You may also bind the singleton instance to one or more interfaces:</p>
+<pre><code class="lang-csharp">Container.Bind<span class="tag">&lt;<span class="title">IFoo</span>&gt;</span>().ToSingle<span class="tag">&lt;<span class="title">Foo</span>&gt;</span>();
+Container.Bind<span class="tag">&lt;<span class="title">IBar</span>&gt;</span>().ToSingle<span class="tag">&lt;<span class="title">Foo</span>&gt;</span>();
+</code></pre>
+<p>This will cause any dependencies of type IFoo or IBar to use the same instance of Foo.  Of course, Foo must implement both IFoo and IBar for this to compile.  However, with only the above two lines the Foo singleton will not be accessible directly.  You can achieve this by using another line to uses ToSingle directly:</p>
+<pre><code class="lang-csharp">Container.Bind<span class="tag">&lt;<span class="title">Foo</span>&gt;</span>().ToSingle();
+Container.Bind<span class="tag">&lt;<span class="title">IFoo</span>&gt;</span>().ToSingle<span class="tag">&lt;<span class="title">Foo</span>&gt;</span>();
+Container.Bind<span class="tag">&lt;<span class="title">IBar</span>&gt;</span>().ToSingle<span class="tag">&lt;<span class="title">Foo</span>&gt;</span>();
+</code></pre>
+<p>Note again that the same instance will be used for all dependencies that take Foo, IFoo, or IBar.</p>
+<ol>
+<li><strong>ToInstance</strong> - Inject as a specific instance</li>
+</ol>
+<pre><code class="lang-csharp">Container.Bind<span class="tag">&lt;<span class="title">Foo</span>&gt;</span>().ToInstance(new Foo());
+Container.Bind<span class="tag">&lt;<span class="title">string</span>&gt;</span>().ToInstance("foo");
+// Or with shortcut:
+Container.BindInstance(new Bar());
+</code></pre>
+<p>In this case the given instance will be used for every dependency with the given type</p>
+<ol>
+<li><strong>ToTransient</strong> - Inject as newly created object</li>
+</ol>
+<pre><code class="lang-csharp">Container.Bind<span class="tag">&lt;<span class="title">Foo</span>&gt;</span>().ToTransient();
+</code></pre>
+<p>In this case a new instance of Foo will be generated each time it is injected. Similar to ToSingle, you can bind via an interface as well:</p>
+<pre><code class="lang-csharp">Container.Bind<span class="tag">&lt;<span class="title">IFoo</span>&gt;</span>().ToTransient<span class="tag">&lt;<span class="title">Foo</span>&gt;</span>();
+</code></pre>
+<ol>
+<li><strong>ToSinglePrefab</strong> - Inject from unity prefab as singleton</li>
+</ol>
+<pre><code class="lang-csharp">Container.Bind<span class="tag">&lt;<span class="title">FooMonoBehaviour</span>&gt;</span>().ToSinglePrefab(PrefabGameObject);
+</code></pre>
+<pre><code>This will instantiate a new instance <span class="keyword">of</span> the given prefab, <span class="keyword">and</span> <span class="keyword">then</span> search the newly created game <span class="keyword">object</span> <span class="keyword">for</span> the given component (<span class="keyword">in</span> this <span class="keyword">case</span> FooMonoBehaviour).
+
+Also, because it is ToSingle it will only instantiate the prefab once, <span class="keyword">and</span> otherwise use the same instance <span class="keyword">of</span> FooMonoBehaviour.
+
+You can also bind multiple singletons <span class="keyword">to</span> the same prefab.  <span class="keyword">For</span> example:
+</code></pre><pre><code class="lang-csharp">Container.Bind<span class="tag">&lt;<span class="title">FooMonoBehaviour</span>&gt;</span>().ToSinglePrefab(PrefabGameObject);
+Container.Bind<span class="tag">&lt;<span class="title">BarMonoBehaviour</span>&gt;</span>().ToSinglePrefab(PrefabGameObject);
+</code></pre>
+<pre><code>This will result <span class="keyword">in</span> the prefab `PrefabGameObject` being instantiated once, <span class="keyword">and</span> then searched <span class="keyword">for</span> monobehavio<span class="string">ur's `FooMonoBehaviour` and `BarMonoBehaviour`
+</span></code></pre><ol>
+<li><strong>ToTransientPrefab</strong> - Inject from unity prefab as newly created object</li>
+</ol>
+<pre><code class="lang-csharp">Container.Bind<span class="tag">&lt;<span class="title">FooMonoBehaviour</span>&gt;</span>().ToTransientPrefab<span class="tag">&lt;<span class="title">FooMonoBehaviour</span>&gt;</span>(PrefabGameObject);
+</code></pre>
+<pre><code>This works similar <span class="keyword">to</span> ToSinglePrefab <span class="keyword">except</span> it will instantiate a new instance <span class="keyword">of</span> the given prefab every time the dependency is injected.
+</code></pre><ol>
+<li><strong>ToSingleGameObject</strong> - Inject MonoBehaviour.</li>
+</ol>
+<pre><code class="lang-csharp">Container.Bind<span class="tag">&lt;<span class="title">FooMonoBehaviour</span>&gt;</span>().ToSingleGameObject();
+</code></pre>
+<pre><code>This binding will <span class="operator"><span class="keyword">create</span> a new game object <span class="keyword">and</span> attach the given FooMonoBehaviour.  Also note that since it <span class="keyword">is</span> ToSingle that it will use the same instance everywhere that has FooMonoBehaviour <span class="keyword">as</span> a dependency
+</span></code></pre><ol>
 <li><p><strong>ToMethod</strong> - Inject using a custom method</p>
 <p>This binding allows you to customize creation logic yourself by defining a method:</p>
-<pre><code>Container.Bind<span class="tag">&lt;<span class="title">IFoo</span>&gt;</span>().ToMethod(SomeMethod);
+</li>
+</ol>
+<pre><code class="lang-csharp">Container.Bind<span class="tag">&lt;<span class="title">IFoo</span>&gt;</span>().ToMethod(SomeMethod);
+</code></pre>
+<pre><code class="lang-csharp"><span class="keyword">public</span> IFoo SomeMethod(InjectContext context)
+{
+    ...
+    <span class="keyword">return</span> <span class="keyword">new</span> Foo();
+}
+</code></pre>
+<ol>
+<li><strong>ToGetter</strong> - Inject by getter.</li>
+</ol>
+<p>This method can be useful if you want to bind to a property of another object.</p>
+<pre><code class="lang-csharp">Container.Bind<span class="tag">&lt;<span class="title">IFoo</span>&gt;</span>().ToSingle<span class="tag">&lt;<span class="title">Foo</span>&gt;</span>()
+Container.Bind<span class="tag">&lt;<span class="title">Bar</span>&gt;</span>().ToGetter<span class="tag">&lt;<span class="title">IFoo</span>&gt;</span>(x =&gt; x.GetBar())
+</code></pre>
+<ol>
+<li><strong>ToLookup</strong> - Inject by recursive resolve.</li>
+</ol>
+<pre><code class="lang-csharp">Container.Bind<span class="tag">&lt;<span class="title">IFoo</span>&gt;</span>().ToLookup<span class="tag">&lt;<span class="title">IBar</span>&gt;</span>()
+Container.Bind<span class="tag">&lt;<span class="title">IBar</span>&gt;</span>().ToLookup<span class="tag">&lt;<span class="title">Foo</span>&gt;</span>()
+</code></pre>
+<p>In some cases it is useful to be able to bind an interface to another interface.  However, you cannot use ToSingle or ToTransient because they both require concrete types.</p>
+<p>In the example code above we assume that Foo inherits from IBar, which inherits from IFoo.  The result here will be that all dependencies for IFoo will be bound to whatever IBar is bound to (in this case, Foo).</p>
+<p>You can also supply an identifier to the ToLookup() method.  See <a href="#identifiers">here</a> section for details on identifiers.</p>
+<ol>
+<li><strong>BindValue</strong> - Inject primitive values</li>
+</ol>
+<pre><code class="lang-csharp">Container.BindValue<span class="tag">&lt;<span class="title">float</span>&gt;</span>().To(1.5f);
+Container.BindValue<span class="tag">&lt;<span class="title">int</span>&gt;</span>().To(42);
+</code></pre>
+<p>Primitive types such as int, float, struct, etc. are treated specially in Zenject.  Note that when binding to primitives you will almost certaintly want to specify the type that the binding is for using <code>WhenInjectedInto</code> (described <a href="#conditional-bindings">below</a>).  I'll also add that while it can be useful to inject primitives for configuration settings it is often better to inject a "settings" object instead.  There are other advantages to this approach as well as described <a href="#using-the-unity-inspector-to-configure-settings">here</a>.</p>
+<ol>
+<li><strong>Rebind</strong> - Override existing binding</li>
+</ol>
+<pre><code class="lang-csharp">Container.Rebind<span class="tag">&lt;<span class="title">IFoo</span>&gt;</span>().To<span class="tag">&lt;<span class="title">Foo</span>&gt;</span>();
+</code></pre>
+<p>The Rebind function can be used to override any existing bindings that were added previously.  It will first clear all previous bindings and then add the new binding.  This method is especially useful for tests, where you often want to use almost all the same bindings used in production, except override a few specific bindings.</p>
+<ol>
+<li><strong>Untyped Bindings</strong></li>
+</ol>
+<pre><code class="lang-csharp">Container.Bind(<span class="keyword">typeof</span>(IFoo)).ToSingle(<span class="keyword">typeof</span>(Foo));
+</code></pre>
+<p>In some cases it is not possible to use the generic versions of the Bind&lt;&gt; functions.  In these cases a non-generic version is provided, which works by taking in a Type value as a parameter.</p>
+<ol>
+<li><strong>BindAllInterfacesToSingle</strong> - This function can be used to automatically bind any interfaces that it finds on the given type.</li>
+</ol>
+<pre><code class="lang-csharp">public <span class="class"><span class="keyword">class</span> <span class="title">Foo</span> :</span> ITickable, IInitializable
+{
+    ...
+}
 
 ...
 
-public IFoo SomeMethod(DiContainer container)
-{
-    ...
-    return new Foo();
-}
-</code></pre></li>
-<li><p><strong>ToGetter</strong> - Inject by getter.</p>
-<p>This method can be useful if you want to bind to a property of another object.</p>
-<pre><code>Container.Bind<span class="tag">&lt;<span class="title">IFoo</span>&gt;</span>().ToSingle<span class="tag">&lt;<span class="title">Foo</span>&gt;</span>()
-Container.Bind<span class="tag">&lt;<span class="title">Bar</span>&gt;</span>().ToGetter<span class="tag">&lt;<span class="title">IFoo</span>&gt;</span>(x =&gt; x.GetBar())
-</code></pre></li>
-<li><p><strong>ToLookup</strong> - Inject by recursive resolve.</p>
-<pre><code>Container.Bind<span class="tag">&lt;<span class="title">IFoo</span>&gt;</span>().ToLookup<span class="tag">&lt;<span class="title">IBar</span>&gt;</span>()
-Container.Bind<span class="tag">&lt;<span class="title">IBar</span>&gt;</span>().ToLookup<span class="tag">&lt;<span class="title">Foo</span>&gt;</span>()
-</code></pre><p>In some cases it is useful to be able to bind an interface to another interface.  However, you cannot use ToSingle or ToTransient because they both require concrete types.</p>
-<p>In the example code above we assume that Foo inherits from IBar, which inherits from IFoo.  The result here will be that all dependencies for IFoo will be bound to whatever IBar is bound to (in this case, Foo).</p>
-<p>You can also supply an identifier to the ToLookup() method.  See <a href="#identifiers">here</a> section for details on identifiers.</p>
-</li>
-<li><p><strong>BindValue</strong> - Inject primitive values</p>
-<pre><code> Container.BindValue<span class="tag">&lt;<span class="title">float</span>&gt;</span>().To(1.5f);
- Container.BindValue<span class="tag">&lt;<span class="title">int</span>&gt;</span>().To(42);
-</code></pre><p> Primitive types such as int, float, struct, etc. are treated specially in Zenject.  Note that when binding to primitives you will almost certaintly want to specify the type that the binding is for using <code>WhenInjectedInto</code> (described <a href="#conditional-bindings">below</a>).  I'll also add that while it can be useful to inject primitives for configuration settings it is often better to inject a "settings" object instead.  There are other advantages to this approach as well as described <a href="#using-the-unity-inspector-to-configure-settings">here</a>.</p>
-</li>
-<li><p><strong>Rebind</strong> - Override existing binding</p>
-<pre><code> Container.Rebind<span class="tag">&lt;<span class="title">IFoo</span>&gt;</span>().To<span class="tag">&lt;<span class="title">Foo</span>&gt;</span>();
-</code></pre><p> The Rebind function can be used to override any existing bindings that were added previously.  It will first clear all previous bindings and then add the new binding.  This method is especially useful for tests, where you often want to use almost all the same bindings used in production, except override a few specific bindings.</p>
-</li>
-<li><p><strong>Untyped Bindings</strong></p>
-<pre><code> Container.Bind(<span class="keyword">typeof</span>(IFoo)).ToSingle(<span class="keyword">typeof</span>(Foo));
-</code></pre><p> In some cases it is not possible to use the generic versions of the Bind&lt;&gt; functions.  In these cases a non-generic version is provided, which works by taking in a Type value as a parameter.</p>
-</li>
-<li><p><strong>BindAllInterfacesToSingle</strong> - This function can be used to automatically bind any interfaces that it finds on the given type.</p>
-<pre><code> public <span class="class"><span class="keyword">class</span> <span class="title">Foo</span> :</span> ITickable, IInitializable
- {
-     ...
- }
-
- ...
-
- Container.Bind&lt;Foo&gt;().ToSingle();
- Container.BindAllInterfacesToSingle&lt;Foo&gt;();
-</code></pre></li>
-</ol>
+Container.Bind&lt;Foo&gt;().ToSingle();
+Container.BindAllInterfacesToSingle&lt;Foo&gt;();
+</code></pre>
 <p>The above is equivalent to the following:</p>
-<pre><code>    Container.Bind<span class="tag">&lt;<span class="title">Foo</span>&gt;</span>().ToSingle();
-    Container.Bind<span class="tag">&lt;<span class="title">ITickable</span>&gt;</span>().ToSingle<span class="tag">&lt;<span class="title">Foo</span>&gt;</span>();
-    Container.Bind<span class="tag">&lt;<span class="title">IInitializable</span>&gt;</span>().ToSingle<span class="tag">&lt;<span class="title">Foo</span>&gt;</span>();
-</code></pre><h2 id="-a-id-list-bindings-a-list-bindings"><a id="list-bindings"></a>List Bindings</h2>
+<pre><code class="lang-csharp">Container.Bind<span class="tag">&lt;<span class="title">Foo</span>&gt;</span>().ToSingle();
+Container.Bind<span class="tag">&lt;<span class="title">ITickable</span>&gt;</span>().ToSingle<span class="tag">&lt;<span class="title">Foo</span>&gt;</span>();
+Container.Bind<span class="tag">&lt;<span class="title">IInitializable</span>&gt;</span>().ToSingle<span class="tag">&lt;<span class="title">Foo</span>&gt;</span>();
+</code></pre>
+<h2 id="-a-id-list-bindings-a-list-bindings"><a id="list-bindings"></a>List Bindings</h2>
 <p>When Zenject finds multiple bindings for the same type, it interprets that to be a list.  So, in the example code below, Bar would get a list containing a new instance of Foo1, Foo2, and Foo3:</p>
-<pre><code>...
-
-// In an installer somewhere
+<pre><code class="lang-csharp">// In an installer somewhere
 Container.Bind<span class="tag">&lt;<span class="title">IFoo</span>&gt;</span>().ToSingle<span class="tag">&lt;<span class="title">Foo1</span>&gt;</span>();
 Container.Bind<span class="tag">&lt;<span class="title">IFoo</span>&gt;</span>().ToSingle<span class="tag">&lt;<span class="title">Foo2</span>&gt;</span>();
 Container.Bind<span class="tag">&lt;<span class="title">IFoo</span>&gt;</span>().ToSingle<span class="tag">&lt;<span class="title">Foo3</span>&gt;</span>();
@@ -316,16 +360,18 @@ public class Bar
     {
     }
 }
-</code></pre><p>Also worth noting is that if you try and declare a single dependency of IFoo (like Bar below) and there are multiple bindings for it, then Zenject will throw an exception, since Zenject doesn't know which instance of IFoo to use.  Also, if the empty list is valid, then you should mark your List constructor parameter (or [Inject] field) as optional (see <a href="#optional-binding">here</a> for details).</p>
-<pre><code><span class="title">public</span> class Bar
+</code></pre>
+<p>Also worth noting is that if you try and declare a single dependency of IFoo (like Bar below) and there are multiple bindings for it, then Zenject will throw an exception, since Zenject doesn't know which instance of IFoo to use.  Also, if the empty list is valid, then you should mark your List constructor parameter (or [Inject] field) as optional (see <a href="#optional-binding">here</a> for details).</p>
+<pre><code class="lang-csharp"><span class="title">public</span> class Bar
 {
     <span class="title">public</span> Bar(IFoo foo)
     {
     }
 }
-</code></pre><h2 id="-a-id-optional-binding-a-optional-binding"><a id="optional-binding"></a>Optional Binding</h2>
+</code></pre>
+<h2 id="-a-id-optional-binding-a-optional-binding"><a id="optional-binding"></a>Optional Binding</h2>
 <p>You can declare some dependencies as optional as follows:</p>
-<pre><code><span class="keyword">public</span> <span class="keyword">class</span> Bar
+<pre><code class="lang-csharp"><span class="keyword">public</span> <span class="keyword">class</span> Bar
 {
     <span class="keyword">public</span> Bar(
         [InjectOptional]
@@ -334,9 +380,10 @@ public class Bar
         ...
     }
 }
-</code></pre><p>In this case, if IFoo is not bound in any installers, then it will be passed as null.</p>
+</code></pre>
+<p>In this case, if IFoo is not bound in any installers, then it will be passed as null.</p>
 <p>Note that when declaring dependencies with primitive types as optional, they will be given their default value (eg. 0 for ints).  However, if you need to distinguish between being given a default value and the primitive dependency not being specified, you can do this as well by declaring it as nullable:</p>
-<pre><code>public <span class="class"><span class="keyword">class</span> <span class="title">Bar</span></span>
+<pre><code class="lang-csharp">public <span class="class"><span class="keyword">class</span> <span class="title">Bar</span></span>
 {
     int _foo;
 
@@ -360,9 +407,10 @@ public class Bar
 
 <span class="regexp">//</span> <span class="constant">Can</span> leave this commented <span class="keyword">or</span> <span class="keyword">not</span> <span class="keyword">and</span> it will still work
 /<span class="regexp">/ Container.BindValue&lt;int&gt;().To(1);
-</span></code></pre><h2 id="-a-id-identifiers-a-identifiers"><a id="identifiers"></a>Identifiers</h2>
+</span></code></pre>
+<h2 id="-a-id-identifiers-a-identifiers"><a id="identifiers"></a>Identifiers</h2>
 <p>You can also give a name to your binding by supplying it as a parameter to the Bind() method.  For example:</p>
-<pre><code>Container.Bind<span class="tag">&lt;<span class="title">IFoo</span>&gt;</span>("foo").ToSingle<span class="tag">&lt;<span class="title">Foo1</span>&gt;</span>();
+<pre><code class="lang-csharp">Container.Bind<span class="tag">&lt;<span class="title">IFoo</span>&gt;</span>("foo").ToSingle<span class="tag">&lt;<span class="title">Foo1</span>&gt;</span>();
 Container.Bind<span class="tag">&lt;<span class="title">IFoo</span>&gt;</span>().ToSingle<span class="tag">&lt;<span class="title">Foo2</span>&gt;</span>();
 
 ...
@@ -377,9 +425,10 @@ public class Bar2
 {
     IFoo _foo;
 }
-</code></pre><p>In this example, the Bar1 class will be given an instance of Foo1, and the Bar2 class will use the default version of IFoo which is bound to Foo2.</p>
+</code></pre>
+<p>In this example, the Bar1 class will be given an instance of Foo1, and the Bar2 class will use the default version of IFoo which is bound to Foo2.</p>
 <p>Note also that you can add a name constructor arguments as well, for example:</p>
-<pre><code><span class="title">public</span> class Bar
+<pre><code class="lang-csharp"><span class="title">public</span> class Bar
 {
     <span class="title">Foo</span> _foo;
 
@@ -388,8 +437,9 @@ public class Bar2
     {
     }
 }
-</code></pre><p>You can also do the same with [PostInject] parameters:</p>
-<pre><code><span class="keyword">public</span> <span class="keyword">class</span> Bar
+</code></pre>
+<p>You can also do the same with [PostInject] parameters:</p>
+<pre><code class="lang-csharp"><span class="keyword">public</span> <span class="keyword">class</span> Bar
 {
     Foo _foo;
 
@@ -403,28 +453,35 @@ public class Bar2
     {
     }
 }
-</code></pre><p>It is also possible to supply an identifier to the ToSingle methods as well.  This allows you to force Zenject to create multiple singletons instead of just one.  Normally, the singleton is uniquely identified based on the type given as generic argument to the ToSingle&lt;&gt; method.  So for example:</p>
-<pre><code>Container.Bind<span class="tag">&lt;<span class="title">IFoo</span>&gt;</span>().ToSingle<span class="tag">&lt;<span class="title">Foo</span>&gt;</span>();
+</code></pre>
+<p>It is also possible to supply an identifier to the ToSingle methods as well.  This allows you to force Zenject to create multiple singletons instead of just one.  Normally, the singleton is uniquely identified based on the type given as generic argument to the ToSingle&lt;&gt; method.  So for example:</p>
+<pre><code class="lang-csharp">Container.Bind<span class="tag">&lt;<span class="title">IFoo</span>&gt;</span>().ToSingle<span class="tag">&lt;<span class="title">Foo</span>&gt;</span>();
 Container.Bind<span class="tag">&lt;<span class="title">IBar</span>&gt;</span>().ToSingle<span class="tag">&lt;<span class="title">Foo</span>&gt;</span>();
 Container.Bind<span class="tag">&lt;<span class="title">IQux</span>&gt;</span>().ToSingle<span class="tag">&lt;<span class="title">Qux</span>&gt;</span>();
-</code></pre><p>In the above code, both uses of <code>ToSingle&lt;Foo&gt;()</code> will be bound to the same instance.  Only one instance of Foo will be created.</p>
-<pre><code>Container.Bind<span class="tag">&lt;<span class="title">IFoo</span>&gt;</span>().ToSingle<span class="tag">&lt;<span class="title">Foo</span>&gt;</span>("foo1");
+</code></pre>
+<p>In the above code, both uses of <code>ToSingle&lt;Foo&gt;()</code> will be bound to the same instance.  Only one instance of Foo will be created.</p>
+<pre><code class="lang-csharp">Container.Bind<span class="tag">&lt;<span class="title">IFoo</span>&gt;</span>().ToSingle<span class="tag">&lt;<span class="title">Foo</span>&gt;</span>("foo1");
 Container.Bind<span class="tag">&lt;<span class="title">IBar</span>&gt;</span>().ToSingle<span class="tag">&lt;<span class="title">Foo</span>&gt;</span>("foo2");
-</code></pre><p>In this case, two instances will be created.</p>
+</code></pre>
+<p>In this case, two instances will be created.</p>
 <p>Something else worth noting is that the behaviour of ToSinglePrefab works slightly differently from the above.  Given the following:</p>
-<pre><code>Container.Bind<span class="tag">&lt;<span class="title">IFoo</span>&gt;</span>().ToSingleFromPrefab<span class="tag">&lt;<span class="title">Foo</span>&gt;</span>(MyPrefab);
+<pre><code class="lang-csharp">Container.Bind<span class="tag">&lt;<span class="title">IFoo</span>&gt;</span>().ToSingleFromPrefab<span class="tag">&lt;<span class="title">Foo</span>&gt;</span>(MyPrefab);
 Container.Bind<span class="tag">&lt;<span class="title">IBar</span>&gt;</span>().ToSingleFromPrefab<span class="tag">&lt;<span class="title">Bar</span>&gt;</span>(MyPrefab);
-</code></pre><p>It will only instantiate the prefab MyPrefab once.  The generic parameter given to ToSingleFromPrefab can be interpreted as "Search the instantiated prefab for this component".  If instead, you want Zenject to instantiate a new instance of the prefab for each ToSingleFromPrefab binding, then you can do that as well by supplying an identifier to the ToSingleFromPrefab function like so:</p>
-<pre><code>Container.Bind<span class="tag">&lt;<span class="title">IFoo</span>&gt;</span>().ToSingleFromPrefab<span class="tag">&lt;<span class="title">Foo</span>&gt;</span>("foo", MyPrefab);
+</code></pre>
+<p>It will only instantiate the prefab MyPrefab once.  The generic parameter given to ToSingleFromPrefab can be interpreted as "Search the instantiated prefab for this component".  If instead, you want Zenject to instantiate a new instance of the prefab for each ToSingleFromPrefab binding, then you can do that as well by supplying an identifier to the ToSingleFromPrefab function like so:</p>
+<pre><code class="lang-csharp">Container.Bind<span class="tag">&lt;<span class="title">IFoo</span>&gt;</span>().ToSingleFromPrefab<span class="tag">&lt;<span class="title">Foo</span>&gt;</span>("foo", MyPrefab);
 Container.Bind<span class="tag">&lt;<span class="title">IBar</span>&gt;</span>().ToSingleFromPrefab<span class="tag">&lt;<span class="title">Bar</span>&gt;</span>("bar", MyPrefab);
-</code></pre><p>Now two instances of the prefab will be created.</p>
+</code></pre>
+<p>Now two instances of the prefab will be created.</p>
 <h2 id="-a-id-conditional-bindings-a-conditional-bindings"><a id="conditional-bindings"></a>Conditional Bindings</h2>
 <p>In many cases you will want to restrict where a given dependency is injected.  You can do this using the following syntax:</p>
-<pre><code>Container.Bind<span class="tag">&lt;<span class="title">IFoo</span>&gt;</span>().ToSingle<span class="tag">&lt;<span class="title">Foo1</span>&gt;</span>().WhenInjectedInto<span class="tag">&lt;<span class="title">Bar1</span>&gt;</span>();
+<pre><code class="lang-csharp">Container.Bind<span class="tag">&lt;<span class="title">IFoo</span>&gt;</span>().ToSingle<span class="tag">&lt;<span class="title">Foo1</span>&gt;</span>().WhenInjectedInto<span class="tag">&lt;<span class="title">Bar1</span>&gt;</span>();
 Container.Bind<span class="tag">&lt;<span class="title">IFoo</span>&gt;</span>().ToSingle<span class="tag">&lt;<span class="title">Foo2</span>&gt;</span>().WhenInjectedInto<span class="tag">&lt;<span class="title">Bar2</span>&gt;</span>();
-</code></pre><p>Note that <code>WhenInjectedInto</code> is simple shorthand for the following.  You can use the more general <code>When()</code> method for more complex conditionals.  For example, this is equivalent to WhenInjectedInto:</p>
-<pre><code>Container.Bind<span class="tag">&lt;<span class="title">IFoo</span>&gt;</span>().ToSingle<span class="tag">&lt;<span class="title">Foo</span>&gt;</span>().When(context =&gt; context.ParentType == typeof(Bar));
-</code></pre><p>The InjectContext class (which is passed as the <code>context</code> parameter above) contains the following information that you can use in your conditional:</p>
+</code></pre>
+<p>Note that <code>WhenInjectedInto</code> is simple shorthand for the following.  You can use the more general <code>When()</code> method for more complex conditionals.  For example, this is equivalent to WhenInjectedInto:</p>
+<pre><code class="lang-csharp">Container.Bind<span class="tag">&lt;<span class="title">IFoo</span>&gt;</span>().ToSingle<span class="tag">&lt;<span class="title">Foo</span>&gt;</span>().When(context =&gt; context.ParentType == typeof(Bar));
+</code></pre>
+<p>The InjectContext class (which is passed as the <code>context</code> parameter above) contains the following information that you can use in your conditional:</p>
 <ul>
 <li><code>Type ParentType</code> - The type of the newly instantiated object, which we are injecting dependencies into.</li>
 <li><code>object ParentInstance</code> - The newly instantiated instance that is having its dependencies filled.  Note that this is only available when injecting fields or into [PostInject] and null for constructor parameters</li>
@@ -437,22 +494,24 @@ Container.Bind<span class="tag">&lt;<span class="title">IFoo</span>&gt;</span>()
 <h2 id="-a-id-itickable-a-itickable"><a id="itickable"></a>ITickable</h2>
 <p>I prefer to avoid the extra weight of MonoBehaviours when possible in favour of just normal C# classes.  Zenject allows you to do this much more easily by providing interfaces that mirror functionality that you would normally need to use a MonoBehaviour for.</p>
 <p>For example, if you have code that needs to run per frame, then you can implement the ITickable interface:</p>
-<pre><code>public <span class="class"><span class="keyword">class</span> <span class="title">Ship</span> :</span> ITickable
+<pre><code class="lang-csharp">public <span class="class"><span class="keyword">class</span> <span class="title">Ship</span> :</span> ITickable
 {
     public void Tick()
     {
         // Perform per frame tasks
     }
 }
-</code></pre><p>Then it's just a matter of including the following in one of your installers:</p>
-<pre><code>Container.Bind<span class="tag">&lt;<span class="title">ITickable</span>&gt;</span>().ToSingle<span class="tag">&lt;<span class="title">Ship</span>&gt;</span>();
-</code></pre><p>Note that the order that Tick() is called on all ITickables is also configurable, as outlined <a href="#update--initialization-order">here</a>.</p>
+</code></pre>
+<p>Then it's just a matter of including the following in one of your installers:</p>
+<pre><code class="lang-csharp">Container.Bind<span class="tag">&lt;<span class="title">ITickable</span>&gt;</span>().ToSingle<span class="tag">&lt;<span class="title">Ship</span>&gt;</span>();
+</code></pre>
+<p>Note that the order that Tick() is called on all ITickables is also configurable, as outlined <a href="#update--initialization-order">here</a>.</p>
 <h2 id="-a-id-iinitializable-and-postinject-a-iinitializable-and-postinject"><a id="iinitializable-and-postinject"></a>IInitializable and PostInject</h2>
 <p>If you have some initialization that needs to occur on a given object, you can include this code in the constructor.  However, this means that the initialization logic would occur in the middle of the object graph being constructed, so it may not be ideal.</p>
 <p>One alternative is to implement IInitializable, and then perform initialization logic in an Initialize() method.  This method would be called immediately after the entire object graph is constructed.  This is also nice because the initialization order is customizable in a similar way to ITickable, as explained <a href="#update--initialization-order">here</a>.</p>
 <p>IInitializable works well for start-up initialization, but what about for objects that are created dynamically via factories?  (see <a href="#dynamic-object-graph-validation">this section</a> for what I'm referring to here).</p>
 <p>In these cases you can mark any methods that you want to be called after injection occurs with a [PostInject] attribute:</p>
-<pre><code><span class="keyword">public</span> <span class="keyword">class</span> Foo
+<pre><code class="lang-csharp"><span class="keyword">public</span> <span class="keyword">class</span> Foo
 {
     [Inject]
     IBar _bar;
@@ -465,9 +524,10 @@ Container.Bind<span class="tag">&lt;<span class="title">IFoo</span>&gt;</span>()
         ...
     }
 }
-</code></pre><p>This still has the drawback that it is called in the middle of object graph construction, but can be useful in many cases.  In particular, if you are using property injection (which isn't generally recommended but necessary in some cases) then you will not have your dependencies in the constructor, and therefore you will need to define a [PostInject] method in this case.</p>
+</code></pre>
+<p>This still has the drawback that it is called in the middle of object graph construction, but can be useful in many cases.  In particular, if you are using property injection (which isn't generally recommended but necessary in some cases) then you will not have your dependencies in the constructor, and therefore you will need to define a [PostInject] method in this case.</p>
 <p>You will also want to use [PostInject] for MonoBehaviours, since MonoBehaviours cannot have constructors.  You may also include injected parameters in any [PostInject] method in the same way you would for constructors.  For example:</p>
-<pre><code>public <span class="class"><span class="keyword">class</span> <span class="title">Foo</span> :</span> MonoBehaviour
+<pre><code class="lang-csharp">public <span class="class"><span class="keyword">class</span> <span class="title">Foo</span> :</span> MonoBehaviour
 {
     IBar _bar;
 
@@ -480,11 +540,12 @@ Container.Bind<span class="tag">&lt;<span class="title">IFoo</span>&gt;</span>()
         ...
     }
 }
-</code></pre><p>Using [PostInject] to inject dependencies is the recommended approach for MonoBehaviours.</p>
+</code></pre>
+<p>Using [PostInject] to inject dependencies is the recommended approach for MonoBehaviours.</p>
 <p>In the case where there are multiple [PostInject] methods on a given object, they are called in the order of Base class to Derived class.</p>
 <h2 id="-a-id-implementing-idisposable-a-implementing-idisposable"><a id="implementing-idisposable"></a>Implementing IDisposable</h2>
 <p>If you have external resources that you want to clean up when the app closes, the scene changes, or for whatever reason the composition root object is destroyed, you can do the following:</p>
-<pre><code>public <span class="class"><span class="keyword">class</span> <span class="title">Logger</span> :</span> IInitializable, IDisposable
+<pre><code class="lang-csharp">public <span class="class"><span class="keyword">class</span> <span class="title">Logger</span> :</span> IInitializable, IDisposable
 {
     FileStream _outStream;
 
@@ -503,18 +564,21 @@ Container.Bind<span class="tag">&lt;<span class="title">IFoo</span>&gt;</span>()
         _outStream.Close();
     }
 }
-</code></pre><p>Then in your installer you can include:</p>
-<pre><code>Container.Bind<span class="tag">&lt;<span class="title">Logger</span>&gt;</span>().ToSingle();
+</code></pre>
+<p>Then in your installer you can include:</p>
+<pre><code class="lang-csharp">Container.Bind<span class="tag">&lt;<span class="title">Logger</span>&gt;</span>().ToSingle();
 Container.Bind<span class="tag">&lt;<span class="title">IInitializable</span>&gt;</span>().ToSingle<span class="tag">&lt;<span class="title">Logger</span>&gt;</span>();
 Container.Bind<span class="tag">&lt;<span class="title">IDisposable</span>&gt;</span>().ToSingle<span class="tag">&lt;<span class="title">Logger</span>&gt;</span>();
-</code></pre><p>Or you can use the following shortcut:</p>
-<pre><code>Container.Bind<span class="tag">&lt;<span class="title">Logger</span>&gt;</span>().ToSingle();
+</code></pre>
+<p>Or you can use the following shortcut:</p>
+<pre><code class="lang-csharp">Container.Bind<span class="tag">&lt;<span class="title">Logger</span>&gt;</span>().ToSingle();
 Container.BindAllInterfacesToSingle<span class="tag">&lt;<span class="title">Logger</span>&gt;</span>();
-</code></pre><p>This works because when the scene changes or your unity application is closed, the unity event OnDestroy() is called on all MonoBehaviours, including the CompositionRoot class, which then triggers all objects that are bound to IDisposable</p>
+</code></pre>
+<p>This works because when the scene changes or your unity application is closed, the unity event OnDestroy() is called on all MonoBehaviours, including the CompositionRoot class, which then triggers all objects that are bound to IDisposable</p>
 <p>Note that this example may or may not be a good idea (for example, the file will be left open if your app crashes), but illustrates the point  :)</p>
 <h2 id="-a-id-installers-a-installers"><a id="installers"></a>Installers</h2>
 <p>Often, there is some collection of related bindings for each sub-system and so it makes sense to group those bindings into a re-usable object.  In Zenject this re-usable object is called an Installer.  You can define a new installer as follows:</p>
-<pre><code>public class FooInstaller : MonoInstaller
+<pre><code class="lang-csharp">public class FooInstaller : MonoInstaller
 {
     public override void InstallBindings()
     {
@@ -522,10 +586,11 @@ Container.BindAllInterfacesToSingle<span class="tag">&lt;<span class="title">Log
         Container.Bind<span class="tag">&lt;<span class="title">IInitializable</span>&gt;</span>().ToSingle<span class="tag">&lt;<span class="title">Foo</span>&gt;</span>();
     }
 }
-</code></pre><p>You add bindings by overriding the InstallBindings method, which is called by the CompositionRoot when your scene starts up.  MonoInstaller is a MonoBehaviour so you can add FooInstaller by attaching it to a GameObject.  Since it is a GameObject you can also add public members to it to configure your installer from the Unity inspector.  However, note that in order for your installer to be used it must be attached to the Installers property of the CompositionRoot object.</p>
+</code></pre>
+<p>You add bindings by overriding the InstallBindings method, which is called by the CompositionRoot when your scene starts up.  MonoInstaller is a MonoBehaviour so you can add FooInstaller by attaching it to a GameObject.  Since it is a GameObject you can also add public members to it to configure your installer from the Unity inspector.  However, note that in order for your installer to be used it must be attached to the Installers property of the CompositionRoot object.</p>
 <p>In many cases you want to have your installer derive from MonoInstaller.  There is also another base class called Installer which you can use in cases where you do not need it to be a MonoBehaviour.</p>
 <p>It can also be nice to use Installer since this allows you to "include" it from another installer. For example:</p>
-<pre><code>public <span class="class"><span class="keyword">class</span> <span class="title">BarInstaller</span> :</span> Installer
+<pre><code class="lang-csharp">public <span class="class"><span class="keyword">class</span> <span class="title">BarInstaller</span> :</span> Installer
 {
     public override void InstallBindings()
     {
@@ -540,7 +605,8 @@ public <span class="class"><span class="keyword">class</span> <span class="title
         Container.Bind&lt;IInstaller&gt;().ToSingle&lt;BarInstaller&gt;();
     }
 }
-</code></pre><p>This way you don't need to have an instance of BarInstaller in your scene in order to use it.  After the CompositionRoot calls InstallBindings it will then instantiate and call any extra installers that have bound to IInstaller.</p>
+</code></pre>
+<p>This way you don't need to have an instance of BarInstaller in your scene in order to use it.  After the CompositionRoot calls InstallBindings it will then instantiate and call any extra installers that have bound to IInstaller.</p>
 <p>One of the main reasons we use installers as opposed to just having all our bindings declared all at once for each scene, is to make them re-usable.  So how then do we use the same installer in multiple scenes?</p>
 <p>The recommended way of doing this is to use unity prefabs.  After attaching your MonoInstaller to a gameobject in your scene, you can then create a prefab out of it.  This is nice because it allows you to share any configuration that you've done in the inspector on the MonoInstaller across scenes (and also have per-scene overrides if you want)</p>
 <p>Installers that simply implement Installer instead of MonoInstaller can be simply bound as described above, to re-use in different scenes.</p>
@@ -596,12 +662,22 @@ public <span class="class"><span class="keyword">class</span> <span class="title
 <li>One issue that often arises when using Zenject is that a game object is instantiated dynamically, and then one of the monobehaviours on that game object attempts to use one of its injected field dependencies in its Start() or Awake() methods.  Often in these cases the dependency will still be null, as if it was never injected.  The issue here is that Zenject cannot fill in the dependencies until after the call to GameObject.Instantiate completes, and in most cases GameObject.Instantiate will call the Start() and Awake() methods.  The solution is to use neither Start() or Awake() and instead define a new method and mark it with a [PostInject] attribute.  This will guarantee that all dependencies have been resolved before executing the method.</li>
 </ul>
 </li>
+<li><p><strong>Injecting For Root Game Objects</strong></p>
+<ul>
+<li>By default, Zenject will only inject on MonoBehaviours that are placed underneath the CompositionRoot.  This allows for having multiple independent Composition Roots (note: this isn't recommended in 95% of cases however).  If you want root-level game objects to be injected, you can do this too by enabling the 'InjectFullScene' flag on the CompositionRoot in your scene.</li>
+</ul>
+</li>
+<li><p><strong>Using Zenject outside of Unity</strong></p>
+<ul>
+<li>Zenject is primarily designed to work within Unity3D.  However, it can also be used as a general purpose DI framework outside of Unity3D.  In order to do this, you just have to build Zenject with the define ZEN_NOT_UNITY3D enabled.</li>
+</ul>
+</li>
 </ul>
 <p>Please feel free to submit any other sources of confusion to svermeulen@modesttree.com and I will add it here.</p>
 <h2 id="-a-id-update-initialization-order-a-update-initialization-order"><a id="update--initialization-order"></a>Update / Initialization Order</h2>
 <p>In many cases, especially for small projects, the order that classes update or initialize in does not matter.  However, in larger projects update or initialization order can become an issue.  This can especially be an issue in Unity, since it is often difficult to predict in what order the Start(), Awake(), or Update() methods will be called in.  Unfortunately, Unity does not have an easy way to control this (besides in Edit -&gt; Project Settings -&gt; Script Execution Order, though that is pretty awkward to use)</p>
 <p>In Zenject, by default, ITickables and IInitializables are updated in the order that they are added, however for cases where the update or initialization order matters, there is a much better way:  By specifying their priorities explicitly in the installer.  For example, in the sample project you can find this code in the scene installer:</p>
-<pre><code>public class AsteroidsInstaller : MonoInstaller
+<pre><code class="lang-csharp">public class AsteroidsInstaller : MonoInstaller
 {
     ...
 
@@ -629,11 +705,13 @@ public <span class="class"><span class="keyword">class</span> <span class="title
         typeof(GameController),
     };
 }
-</code></pre><p>This way, you won't hit a wall at the end of the project due to some unforeseen order-dependency.</p>
+</code></pre>
+<p>This way, you won't hit a wall at the end of the project due to some unforeseen order-dependency.</p>
 <p>You can also assign priorities one class at a time using the following helper method:</p>
-<pre><code>InitializablePrioritiesInstaller.BindPriority(Container, typeof(Foo), -100);
+<pre><code class="lang-csharp">InitializablePrioritiesInstaller.BindPriority(Container, typeof(Foo), -100);
 Container.Bind<span class="tag">&lt;<span class="title">IInitializable</span>&gt;</span>().ToSingle<span class="tag">&lt;<span class="title">Bar</span>&gt;</span>();
-</code></pre><p>Note that any ITickables, IInitializables, or IDisposable's that are not assigned a priority are automatically given the priority of zero.  This allows you to have classes with explicit priorities executed either before or after the unspecified classes.  For example, the above code would result in 'Foo.Initialize' being called before 'Bar.Initialize'.  If you instead gave it 100 instead of -100, it would be executed afterwards.</p>
+</code></pre>
+<p>Note that any ITickables, IInitializables, or IDisposable's that are not assigned a priority are automatically given the priority of zero.  This allows you to have classes with explicit priorities executed either before or after the unspecified classes.  For example, the above code would result in 'Foo.Initialize' being called before 'Bar.Initialize'.  If you instead gave it 100 instead of -100, it would be executed afterwards.</p>
 <h2 id="-a-id-object-graph-validation-a-object-graph-validation"><a id="object-graph-validation"></a>Object Graph Validation</h2>
 <p>The usual workflow when setting up bindings using a DI framework is something like this:</p>
 <ul>
@@ -649,7 +727,7 @@ Container.Bind<span class="tag">&lt;<span class="title">IInitializable</span>&gt
 <h2 id="-a-id-creating-objects-dynamically-a-creating-objects-dynamically"><a id="creating-objects-dynamically"></a>Creating Objects Dynamically</h2>
 <p>One of the things that often confuses people new to dependency injection is the question of how to create new objects dynamically, after the app/game has fully started up and all the IInitializable objects have had their Initialize() method called.  For example, if you are writing a game in which you are spawning new enemies throughout the game, then you will want to construct a new object graph for the 'enemy' class.  How to do this?  The answer: Factories.</p>
 <p>Remember that an important part of dependency injection is to reserve use of the container to strictly the "Composition Root Layer".  The container class (DiContainer) is included as a dependency in itself automatically so there is nothing stopping you from ignoring this rule and injecting the container into any classes that you want.  For example, the following code will work:</p>
-<pre><code><span class="keyword">public</span> <span class="keyword">class</span> Enemy
+<pre><code class="lang-csharp"><span class="keyword">public</span> <span class="keyword">class</span> Enemy
 {
     DiContainer Container;
 
@@ -667,9 +745,10 @@ Container.Bind<span class="tag">&lt;<span class="title">IInitializable</span>&gt
         etc.
     }
 }
-</code></pre><p>HOWEVER, the above code is an example of an anti-pattern.  This will work, and you can use the container to get access to all other classes in your app, however if you do this you will not really be taking advantage of the power of dependency injection.  This is known, by the way, as <a href="http://blog.ploeh.dk/2010/02/03/ServiceLocatorisanAnti-Pattern/">Service Locator Pattern</a>.</p>
+</code></pre>
+<p>HOWEVER, the above code is an example of an anti-pattern.  This will work, and you can use the container to get access to all other classes in your app, however if you do this you will not really be taking advantage of the power of dependency injection.  This is known, by the way, as <a href="http://blog.ploeh.dk/2010/02/03/ServiceLocatorisanAnti-Pattern/">Service Locator Pattern</a>.</p>
 <p>Of course, the dependency injection way of doing this would be the following:</p>
-<pre><code><span class="keyword">public</span> <span class="keyword">class</span> Enemy
+<pre><code class="lang-csharp"><span class="keyword">public</span> <span class="keyword">class</span> Enemy
 {
     Player _player;
 
@@ -685,9 +764,10 @@ Container.Bind<span class="tag">&lt;<span class="title">IInitializable</span>&gt
         ...
     }
 }
-</code></pre><p>The only exception to this rule is within factories and installers.  Again, factories and installers make up what we refer to as the "composition root layer".</p>
+</code></pre>
+<p>The only exception to this rule is within factories and installers.  Again, factories and installers make up what we refer to as the "composition root layer".</p>
 <p>For example, if you have a class responsible for spawning new enemies, before DI you might do something like this:</p>
-<pre><code><span class="keyword">public</span> <span class="keyword">class</span> EnemySpawner
+<pre><code class="lang-csharp"><span class="keyword">public</span> <span class="keyword">class</span> EnemySpawner
 {
     List&lt;Enemy&gt; _enemies = <span class="keyword">new</span> List&lt;Enemy&gt;();
 
@@ -700,9 +780,10 @@ Container.Bind<span class="tag">&lt;<span class="title">IInitializable</span>&gt
         }
     }
 }
-</code></pre><p>This will not work however, since in our case the Enemy class requires a reference to the Player class in its constructor.  We could add a dependency to the Player class to the EnemySpawner class, but then we have the problem described <a href="#theory">above</a>.  The EnemySpawner class doesn't care about filling in the dependencies for the Enemy class.  All the EnemySpawner class cares about is getting a new Enemy instance.</p>
+</code></pre>
+<p>This will not work however, since in our case the Enemy class requires a reference to the Player class in its constructor.  We could add a dependency to the Player class to the EnemySpawner class, but then we have the problem described <a href="#theory">above</a>.  The EnemySpawner class doesn't care about filling in the dependencies for the Enemy class.  All the EnemySpawner class cares about is getting a new Enemy instance.</p>
 <p>The recommended way to do this in Zenject is the following:</p>
-<pre><code><span class="keyword">public</span> <span class="keyword">class</span> Enemy
+<pre><code class="lang-csharp"><span class="keyword">public</span> <span class="keyword">class</span> Enemy
 {
     Player _player;
 
@@ -737,13 +818,15 @@ Container.Bind<span class="tag">&lt;<span class="title">IInitializable</span>&gt
         }
     }
 }
-</code></pre><p>Then in your installer, you would include:</p>
-<pre><code>Container.Bind<span class="tag">&lt;<span class="title">Enemy.Factory</span>&gt;</span>().ToSingle();
-</code></pre><p>By using Enemy.Factory above, all the dependencies for the Enemy class (such as the Player) will be automatically filled in.</p>
+</code></pre>
+<p>Then in your installer, you would include:</p>
+<pre><code class="lang-csharp">Container.Bind<span class="tag">&lt;<span class="title">Enemy.Factory</span>&gt;</span>().ToSingle();
+</code></pre>
+<p>By using Enemy.Factory above, all the dependencies for the Enemy class (such as the Player) will be automatically filled in.</p>
 <p>There is no requirement that the Enemy.Factory class be a subclass of Enemy, however we have found this to be a very useful convention.  Enemy.Factory is empty and simply derives from the built-in Zenject Factory&lt;&gt; class, which handles the work of using the DiContainer to construct a new instance of Enemy.</p>
 <p>Also note that by using the built-in Zenject Factory&lt;&gt; class, the Enemy class will be automatically validated as well.  So if the constructor of the Enemy class includes a type that is missing a binding, this error can be caught before running your app, by simply running validation.  Validation can be especially useful for dynamically created objects, because otherwise you may not catch the error until the factory is invoked at some point during runtime.  See <a href="#dynamic-object-graph-validation">this section</a> for more details on Validation.</p>
 <p>However, in more complex examples, the EnemySpawner class may wish to pass in custom constructor arguments as well. For example, let's say we want to randomize the speed of each Enemy to add some interesting variation to our game.  Our enemy class becomes:</p>
-<pre><code><span class="keyword">public</span> <span class="keyword">class</span> Enemy
+<pre><code class="lang-csharp"><span class="keyword">public</span> <span class="keyword">class</span> Enemy
 {
     Player _player;
     <span class="keyword">float</span> _runSpeed;
@@ -779,10 +862,11 @@ Container.Bind<span class="tag">&lt;<span class="title">IInitializable</span>&gt
         }
     }
 }
-</code></pre><p>The dynamic parameters that are provided to the Enemy constructor are declared by using generic arguments to the Factory&lt;&gt; base class of Enemy.Factory.  This will add a method to Enemy.Factory that takes the parameters with the given types.</p>
+</code></pre>
+<p>The dynamic parameters that are provided to the Enemy constructor are declared by using generic arguments to the Factory&lt;&gt; base class of Enemy.Factory.  This will add a method to Enemy.Factory that takes the parameters with the given types.</p>
 <h2 id="-a-id-game-object-factories-a-game-object-factories"><a id="game-object-factories"></a>Game Object Factories</h2>
 <p>You can also use the same approach as described <a href="#creating-objects-dynamically">above</a> to create factories that construct game objects.  For example:</p>
-<pre><code>public <span class="class"><span class="keyword">class</span> <span class="title">FooMonoBehaviour</span> :</span> MonoBehaviour
+<pre><code class="lang-csharp">public <span class="class"><span class="keyword">class</span> <span class="title">FooMonoBehaviour</span> :</span> MonoBehaviour
 {
     ...
 
@@ -790,8 +874,9 @@ Container.Bind<span class="tag">&lt;<span class="title">IInitializable</span>&gt
     {
     }
 }
-</code></pre><p>The only difference here is that this factory requires a prefab to be installed on it.  There is a convenience method that you can use to handle both installing the prefab and also declaring FooMonoBehaviour.Factory as a singleton:</p>
-<pre><code>public override void InstallBindings()
+</code></pre>
+<p>The only difference here is that this factory requires a prefab to be installed on it.  There is a convenience method that you can use to handle both installing the prefab and also declaring FooMonoBehaviour.Factory as a singleton:</p>
+<pre><code class="lang-csharp">public override void InstallBindings()
 {
     ...
 
@@ -799,10 +884,11 @@ Container.Bind<span class="tag">&lt;<span class="title">IInitializable</span>&gt
 
     ...
 }
-</code></pre><p>Now classes can simply declare a constructor parameter of type FooMonoBehaviour.Factory and by calling the Create() method, construct new instances of a given prefab.</p>
+</code></pre>
+<p>Now classes can simply declare a constructor parameter of type FooMonoBehaviour.Factory and by calling the Create() method, construct new instances of a given prefab.</p>
 <h2 id="-a-id-custom-factories-a-custom-factories"><a id="custom-factories"></a>Custom Factories</h2>
 <p>You may also use your own custom factory.  This is often necessary when you want to construct an instance of an interface at runtime.  In this case you do not want to refer to a concrete factory class (eg. Enemy.Factory) as described above.</p>
-<pre><code><span class="keyword">public</span> <span class="keyword">enum</span> Difficulties
+<pre><code class="lang-csharp"><span class="keyword">public</span> <span class="keyword">enum</span> Difficulties
 {
     Easy,
     Hard,
@@ -844,12 +930,14 @@ Container.Bind<span class="tag">&lt;<span class="title">IInitializable</span>&gt
         <span class="keyword">return</span> _container.Instantiate&lt;Dog&gt;(speed);
     }
 }
-</code></pre><p>And then in our installer we would include:</p>
-<pre><code>Container.Bind<span class="tag">&lt;<span class="title">EnemyFactory</span>&gt;</span>().ToSingle();
+</code></pre>
+<p>And then in our installer we would include:</p>
+<pre><code class="lang-csharp">Container.Bind<span class="tag">&lt;<span class="title">EnemyFactory</span>&gt;</span>().ToSingle();
 Container.BindValue<span class="tag">&lt;<span class="title">Difficulties</span>&gt;</span>().To(Difficulties.Easy);
-</code></pre><p>This way we can change the type of enemy we spawn by simply changing the difficulty bound in the installer.</p>
+</code></pre>
+<p>This way we can change the type of enemy we spawn by simply changing the difficulty bound in the installer.</p>
 <p>One issue with the above implementation is that it will not be validated properly.  Any constructor parameters added to the Dog or Demon classes that cannot be resolved will not be detected until runtime.  If you wish to address this you can implement it the following way:</p>
-<pre><code><span class="title">public</span> class EnemyFactory : IValidatable
+<pre><code class="lang-csharp"><span class="title">public</span> class EnemyFactory : IValidatable
 {
     <span class="title">DiContainer</span> _container;
     <span class="title">Difficulties</span> _difficulty;
@@ -876,12 +964,13 @@ Container.BindValue<span class="tag">&lt;<span class="title">Difficulties</span>
             .Concat(_container.ValidateObjectGraph&lt;Demon&gt;(typeof(float)));
     }
 }
-</code></pre><p>This is optional but can be nice if you are fan of validation.  The parameters provided to the ValidateObjectGraph method indicate the dependencies that can be skipped for validation.  This should include any runtime parameters.</p>
+</code></pre>
+<p>This is optional but can be nice if you are fan of validation.  The parameters provided to the ValidateObjectGraph method indicate the dependencies that can be skipped for validation.  This should include any runtime parameters.</p>
 <p>Note that we are injecting the DiContainer directly into the EnemyFactory class, which is generally a bad thing to do but ok in this case because it is a factory (and therefore part of the "composition root layer")</p>
 <h2 id="-a-id-using-bindscope-a-using-bindscope"><a id="using-bindscope"></a>Using BindScope</h2>
 <p>In the real world there can sometimes be complex construction that needs to occur in your custom factory classes.  In some of these cases it can be useful to use a feature called BindScope.</p>
 <p>For example, suppose one day we decide to add further runtime constructor arguments to the Enemy class:</p>
-<pre><code><span class="keyword">public</span> <span class="keyword">class</span> Enemy
+<pre><code class="lang-csharp"><span class="keyword">public</span> <span class="keyword">class</span> Enemy
 {
     <span class="keyword">public</span> Enemy(EnemyWeapon weapon)
     {
@@ -896,8 +985,9 @@ Container.BindValue<span class="tag">&lt;<span class="title">Difficulties</span>
         ...
     }
 }
-</code></pre><p>And let's say we want the damage of the EnemyWeapon class to be specified by the EnemySpawner class.  How do we pass that argument down to EnemyWeapon?  In this case it might be easiest to create the EnemyWeapon class first and then pass it to the factory.  However, for the sake of this example let's pretend we want to create the EnemyClass in one call to Instantiate</p>
-<pre><code>public class EnemyFactory
+</code></pre>
+<p>And let's say we want the damage of the EnemyWeapon class to be specified by the EnemySpawner class.  How do we pass that argument down to EnemyWeapon?  In this case it might be easiest to create the EnemyWeapon class first and then pass it to the factory.  However, for the sake of this example let's pretend we want to create the EnemyClass in one call to Instantiate</p>
+<pre><code class="lang-csharp">public class EnemyFactory
 {
     DiContainer _container;
 
@@ -915,11 +1005,12 @@ Container.BindValue<span class="tag">&lt;<span class="title">Difficulties</span>
         }
     }
 }
-</code></pre><p>BindScope can be used in factories to temporarily configure the container in a similar way that's done in installers.  This can be useful when creating complex object graphs at runtime.  After the function returns, whatever bindings you added in the using{} block are automatically removed.  BindScope can also be used to specify injection identifiers as well.</p>
+</code></pre>
+<p>BindScope can be used in factories to temporarily configure the container in a similar way that's done in installers.  This can be useful when creating complex object graphs at runtime.  After the function returns, whatever bindings you added in the using{} block are automatically removed.  BindScope can also be used to specify injection identifiers as well.</p>
 <h2 id="-a-id-injecting-data-across-scenes-a-injecting-data-across-scenes"><a id="injecting-data-across-scenes"></a>Injecting data across scenes</h2>
 <p>In some cases it's useful to pass arguments from one scene to another.  The way Unity allows us to do this by default is fairly awkward.  Your options are to create a persistent GameObject and call DontDestroyOnLoad() to keep it alive when changing scenes, or use global static classes to temporarily store the data.</p>
 <p>Let's pretend you want to specify a 'level' string to the next scene.  You have the following class that requires the input:</p>
-<pre><code>public <span class="class"><span class="keyword">class</span> <span class="title">LevelHandler</span> :</span> IInitializable
+<pre><code class="lang-csharp">public <span class="class"><span class="keyword">class</span> <span class="title">LevelHandler</span> :</span> IInitializable
 {
     readonly string _startLevel;
 
@@ -944,15 +1035,17 @@ Container.BindValue<span class="tag">&lt;<span class="title">Difficulties</span>
         ...
     }
 }
-</code></pre><p>You can load the scene containing <code>LessonStandaloneStart</code> and specify a particular level by using the following syntax:</p>
-<pre><code>ZenUtil.LoadScene("NameOfSceneToLoad",
+</code></pre>
+<p>You can load the scene containing <code>LessonStandaloneStart</code> and specify a particular level by using the following syntax:</p>
+<pre><code class="lang-csharp">ZenUtil.LoadScene("NameOfSceneToLoad",
     delegate (DiContainer container)
     {
         container.Bind<span class="tag">&lt;<span class="title">string</span>&gt;</span>("StartLevelName").To("custom_level").WhenInjectedInto<span class="tag">&lt;<span class="title">LevelHandler</span>&gt;</span>();
     });
-</code></pre><p>Note that you can still run the scene directly, in which case it will default to using "level01".  This is possible because we are using the InjectOptional flag.</p>
+</code></pre>
+<p>Note that you can still run the scene directly, in which case it will default to using "level01".  This is possible because we are using the InjectOptional flag.</p>
 <p>An alternative and arguably cleaner way to do this would be to customize the installer itself rather than the LevelHandler class.  In this case we can write our LevelHandler class like this (without the [InjectOptional] flag)</p>
-<pre><code>public <span class="class"><span class="keyword">class</span> <span class="title">LevelHandler</span> :</span> IInitializable
+<pre><code class="lang-csharp">public <span class="class"><span class="keyword">class</span> <span class="title">LevelHandler</span> :</span> IInitializable
 {
     readonly string _startLevel;
 
@@ -968,8 +1061,9 @@ Container.BindValue<span class="tag">&lt;<span class="title">Difficulties</span>
         ...
     }
 }
-</code></pre><p>Then, in the installer for our scene we can include the following:</p>
-<pre><code>public <span class="class"><span class="keyword">class</span> <span class="title">GameInstaller</span> :</span> Installer
+</code></pre>
+<p>Then, in the installer for our scene we can include the following:</p>
+<pre><code class="lang-csharp">public <span class="class"><span class="keyword">class</span> <span class="title">GameInstaller</span> :</span> Installer
 {
     [InjectOptional]
     public string LevelName = <span class="string">"default_level"</span>;
@@ -983,17 +1077,19 @@ Container.BindValue<span class="tag">&lt;<span class="title">Difficulties</span>
         ...
     }
 }
-</code></pre><p>Then, instead of injecting directly into the LevelHandler we can inject into the installer instead.</p>
-<pre><code>ZenUtil.LoadScene("NameOfSceneToLoad",
+</code></pre>
+<p>Then, instead of injecting directly into the LevelHandler we can inject into the installer instead.</p>
+<pre><code class="lang-csharp">ZenUtil.LoadScene("NameOfSceneToLoad",
     delegate (DiContainer container)
     {
         container.Bind<span class="tag">&lt;<span class="title">string</span>&gt;</span>().To("level02").WhenInjectedInto<span class="tag">&lt;<span class="title">GameInstaller</span>&gt;</span>();
     });
-</code></pre><p>Note that in this case I didn't need to use the "LevelName" identifier since there is only one string injected into the GameInstaller class.</p>
+</code></pre>
+<p>Note that in this case I didn't need to use the "LevelName" identifier since there is only one string injected into the GameInstaller class.</p>
 <p>Some people have also found it useful to separate out content into different scenes and then load each scene additively using the Unity method <code>Application.LoadLevelAdditive</code>.  In some cases it's useful to have the dependencies in the new scene resolved using the container of the original scene.  To achieve this, you can call <code>ZenUtil.LoadSceneAdditiveWithContainer</code> and pass in your scene's container.  Note however that it is assumed in this case that the new scene does not have its own container + Composition Root.</p>
 <h2 id="-a-id-using-the-unity-inspector-to-configure-settings-a-using-the-unity-inspector-to-configure-settings"><a id="using-the-unity-inspector-to-configure-settings"></a>Using the Unity Inspector To Configure Settings</h2>
 <p>One implication of writing most of your code as normal C# classes instead of MonoBehaviour's is that you lose the ability to configure data on them using the inspector.  You can however still take advantage of this in Zenject by using the following pattern, as seen in the sample project:</p>
-<pre><code><span class="keyword">public</span> <span class="keyword">class</span> AsteroidsInstaller : MonoInstaller
+<pre><code class="lang-csharp"><span class="keyword">public</span> <span class="keyword">class</span> AsteroidsInstaller : MonoInstaller
 {
     <span class="keyword">public</span> Settings SceneSettings;
 
@@ -1012,7 +1108,8 @@ Container.BindValue<span class="tag">&lt;<span class="title">Difficulties</span>
         ...
     }
 }
-</code></pre><p>Note that if you follow this method, you will have to make sure to always include the [Serializable] attribute on your settings wrappers, otherwise they won't show up in the Unity inspector.</p>
+</code></pre>
+<p>Note that if you follow this method, you will have to make sure to always include the [Serializable] attribute on your settings wrappers, otherwise they won't show up in the Unity inspector.</p>
 <p>To see this in action, start the asteroids scene and try adjusting <code>Ship -&gt; State Moving -&gt; Move Speed</code> setting and watch live as your ship changes speed.</p>
 <h2 id="-a-id-global-bindings-a-global-bindings"><a id="global-bindings"></a>Global Bindings</h2>
 <p>This all works great for each individual scene, but what if have dependencies that you wish to persist permanently across all scenes?  In Zenject you can do this by adding installers to the global container.</p>
@@ -1029,8 +1126,7 @@ Container.BindValue<span class="tag">&lt;<span class="title">Difficulties</span>
 <li>Type in the scene you want to 'decorate' in the 'Scene Name' field of SceneDecoratorCompositionRoot</li>
 <li>Create a new C# script with the following contents, then add your the MonoBehaviour to your scene and drag it to the Installers property of SceneDecoratorCompositionRoot</li>
 </ul>
-<p>.</p>
-<pre><code>public <span class="class"><span class="keyword">class</span> <span class="title">ExampleDecoratorInstaller</span> :</span> DecoratorInstaller
+<pre><code class="lang-csharp">public <span class="class"><span class="keyword">class</span> <span class="title">ExampleDecoratorInstaller</span> :</span> DecoratorInstaller
 {
     public override void PostInstallBindings()
     {
@@ -1055,12 +1151,13 @@ public <span class="class"><span class="keyword">class</span> <span class="title
         }
     }
 }
-</code></pre><p>If you run your scene it should now behave exactly like the scene you entered in 'Scene Name' except with the added functionality in your decorator installer.</p>
+</code></pre>
+<p>If you run your scene it should now behave exactly like the scene you entered in 'Scene Name' except with the added functionality in your decorator installer.</p>
 <p>The PostInstallBindings method is useful when you want to override a binding in the main scene using 'Rebind'.  And PreInstallBindings is necessary if you want to inject data into the installers in the main scene. For a better example see the asteroids project that comes with Zenject (open 'AsteroidsDecoratorExample' scene).</p>
 <p>Note also that Zenject validate (using CTRL+SHIFT+V or the menu item via Edit-&gt;Zenject-&gt;Validate Current Scene) also works with decorator scenes.</p>
 <h2 id="-a-id-auto-mocking-using-moq-a-auto-mocking-using-moq"><a id="auto-mocking-using-moq"></a>Auto-Mocking using Moq</h2>
 <p>One of the really cool features of DI is the fact that it makes testing code much, much easier.  This is because you can easily substitute one dependency for another by using a different Composition Root.  For example, if you only want to test a particular class (let's call it Foo) and don't care about testing its dependencies, you might write 'mocks' for them so that you can isolate Foo specifically.</p>
-<pre><code><span class="keyword">public</span> <span class="keyword">class</span> Foo
+<pre><code class="lang-csharp"><span class="keyword">public</span> <span class="keyword">class</span> Foo
 {
     IWebServer _webServer;
 
@@ -1076,7 +1173,8 @@ public <span class="class"><span class="keyword">class</span> <span class="title
         ...
     }
 }
-</code></pre><p>In this example, we have a class Foo that interacts with a web server to retrieve content.  This would normally be very difficult to test for the following reasons:</p>
+</code></pre>
+<p>In this example, we have a class Foo that interacts with a web server to retrieve content.  This would normally be very difficult to test for the following reasons:</p>
 <ul>
 <li>You would have to set up an environment where it can properly connect to a web server (configuring ports, urls, etc.)</li>
 <li>Running the test could be slower and limit how much testing you can do</li>
@@ -1084,33 +1182,38 @@ public <span class="class"><span class="keyword">class</span> <span class="title
 <li>You can't easily configure the values returned from the web server to test sending various inputs to the Foo class</li>
 </ul>
 <p>However, if we create a mock class for IWebServer then we can address all these problems:</p>
-<pre><code>public <span class="class"><span class="keyword">class</span> <span class="title">MockWebServer</span> :</span> IWebServer
+<pre><code class="lang-csharp">public <span class="class"><span class="keyword">class</span> <span class="title">MockWebServer</span> :</span> IWebServer
 {
     ...
 }
-</code></pre><p>Then hook it up in our installer:</p>
-<pre><code>Container.Bind<span class="tag">&lt;<span class="title">IWebServer</span>&gt;</span>().ToSingle<span class="tag">&lt;<span class="title">MockWebServer</span>&gt;</span>();
-</code></pre><p>Then you can implement the fields of the IWebServer interface and configure them based on what you want to test on Foo. Hopefully You can see how this can make life when writing tests much easier.</p>
+</code></pre>
+<p>Then hook it up in our installer:</p>
+<pre><code class="lang-csharp">Container.Bind<span class="tag">&lt;<span class="title">IWebServer</span>&gt;</span>().ToSingle<span class="tag">&lt;<span class="title">MockWebServer</span>&gt;</span>();
+</code></pre>
+<p>Then you can implement the fields of the IWebServer interface and configure them based on what you want to test on Foo. Hopefully You can see how this can make life when writing tests much easier.</p>
 <p>Zenject also allows you to even avoid having to write the MockWebServer class in favour of using a library called "Moq" which does all the work for you.</p>
 <p>Note that by default, Auto-mocking is not enabled in Zenject.  If you wish to use the auto-mocking feature then you need to go to your Zenject install directory and extract the contents of "Extras/ZenjectAutoMocking.zip".  Note also that AutoMocking is incompatible with webplayer builds, and you will also need to change your "Api Compatibility Level" from ".NET 2.0 Subset" to ".NET 2.0" (you can find this in PC build settings)</p>
 <p>After extracting the auto mocking package it is just a matter of using the following syntax to mock out various parts of your project:</p>
-<pre><code>Container.Bind<span class="tag">&lt;<span class="title">IFoo</span>&gt;</span>().ToMock();
-</code></pre><p>However, this approach will not allow you to take advantage of the advanced features of Moq.  For more advanced usages, see the documentation for Moq</p>
+<pre><code class="lang-csharp">Container.Bind<span class="tag">&lt;<span class="title">IFoo</span>&gt;</span>().ToMock();
+</code></pre>
+<p>However, this approach will not allow you to take advantage of the advanced features of Moq.  For more advanced usages, see the documentation for Moq</p>
 <h2 id="-a-id-nested-containers-a-nested-containers-fallbackprovider"><a id="nested-containers"></a>Nested Containers / FallbackProvider</h2>
 <p>Every DiContainer exposes a FallbackProvider property, which by default is null.  In cases where the container is unable to resolve a dependency, the container will first try using the FallbackProvider before throwing a ZenjectResolveException.</p>
 <p>This allows for the ability to define nested sub-containers by executing the following:</p>
-<pre><code>Container.FallbackProvider = <span class="keyword">new</span> DiContainerProvider(_nestedContainer);
-</code></pre><p>Nested sub-containers can be useful in some rare cases.  For example, if you are creating a word processor it may be useful to have a sub-container for each tab that represents a separate document.  Nested sub-containers is also the way that the Global Composition Root works under the hood.  In the future we plan to add more support for this kind of thing.</p>
+<pre><code class="lang-csharp">Container.FallbackProvider = <span class="keyword">new</span> DiContainerProvider(_nestedContainer);
+</code></pre>
+<p>Nested sub-containers can be useful in some rare cases.  For example, if you are creating a word processor it may be useful to have a sub-container for each tab that represents a separate document.  Nested sub-containers is also the way that the Global Composition Root works under the hood.  In the future we plan to add more support for this kind of thing.</p>
 <p>There are other uses for FallbackProvider as well.</p>
 <p>For example, if you are writing test code and want to automatically auto-mock missing dependencies, you can do the following:</p>
-<pre><code>Container.FallbackProvider = <span class="keyword">new</span> TransientMockProvider(Container);
-</code></pre><p>Or, perhaps you wish to write custom logic to handle cases of missing dependencies.  You can do that as well, by writing a custom "Provider" class and setting it to be used as the FallbackProvider</p>
+<pre><code class="lang-csharp">Container.FallbackProvider = <span class="keyword">new</span> TransientMockProvider(Container);
+</code></pre>
+<p>Or, perhaps you wish to write custom logic to handle cases of missing dependencies.  You can do that as well, by writing a custom "Provider" class and setting it to be used as the FallbackProvider</p>
 <h2 id="-a-id-visualizing-object-graphs-automatically-a-visualizing-object-graphs-automatically"><a id="visualizing-object-graphs-automatically"></a>Visualizing Object Graphs Automatically</h2>
 <p>Zenject allows users to generate UML-style images of the object graphs for their applications.  You can do this simply by running your Zenject-driven app, then selecting from the menu <code>Assets -&gt; Zenject -&gt; Output Object Graph For Current Scene</code>.  You will be prompted for a location to save the generated image file.</p>
 <p>Note that you will need to have graphviz installed for this to work (which you can find <a href="http://www.graphviz.org/">here</a>).  You will be prompted to choose the location the first time.</p>
 <p>The result is two files (Foo.dot and Foo.png).  The dot file is included in case you want to add custom graphviz commands.  As an example, this is the graph that is generated when run on the sample project:</p>
 <p>However, admittedly, I personally haven't gotten a lot of mileage out of this feature.  When I have found it useful it's when I first encounter a lot of unfamiliar code.  Reading a visual diagram can be easier than reading the code in some cases.</p>
-<p><img src="UnityProject/Assets/Zenject/Main/ExampleObjectGraph.png?raw=true" alt="Example Object Graph" width="600px" height="127px"></p>
+<p><img src="ExampleObjectGraph.png" alt="Example Object Graph" width="600px" height="127px"></p>
 <h2 id="-a-id-questions-a-frequently-asked-questions"><a id="questions"></a>Frequently Asked Questions</h2>
 <ul>
 <li><p><strong><a id="faq-performance"></a>How is performance?</strong></p>
@@ -1118,12 +1221,305 @@ public <span class="class"><span class="keyword">class</span> <span class="title
 <p>  Zenject uses C# reflection which is typically slow, but in Zenject this work is cached so any performance hits only occur once for each class type.  In other words, Zenject avoids costly reflection operations by making a trade-off between performance and memory to ensure good performance.</p>
 </li>
 </ul>
+<h2 id="-a-id-cheatsheet-a-installers-cheat-sheet"><a id="cheatsheet"></a>Installers Cheat-Sheet</h2>
+<p>Below are a bunch of randomly assorted examples of bindings that you might include in one of your installers.</p>
+<pre><code class="lang-csharp">
+///////////// ToTransient
+
+// Create a new instance of Foo for every class that asks for it
+Container.Bind<span class="tag">&lt;<span class="title">Foo</span>&gt;</span>().ToTransient();
+
+// Create a new instance of Foo for every class that asks for an IFoo
+Container.Bind<span class="tag">&lt;<span class="title">IFoo</span>&gt;</span>().ToTransient<span class="tag">&lt;<span class="title">Foo</span>&gt;</span>();
+
+// Non generic versions
+Container.Bind(typeof(IFoo)).ToTransient();
+Container.Bind(typeof(IFoo)).ToTransient(typeof(Foo));
+
+///////////// ToSingle
+
+// Create one definitive instance of Foo and re-use that for every class that asks for it
+Container.Bind<span class="tag">&lt;<span class="title">Foo</span>&gt;</span>().ToSingle();
+
+// Create one definitive instance of Foo and re-use that for every class that asks for IFoo
+Container.Bind<span class="tag">&lt;<span class="title">IFoo</span>&gt;</span>().ToSingle<span class="tag">&lt;<span class="title">Foo</span>&gt;</span>();
+
+// In this example, the same instance of Foo will be used for all three cases
+Container.Bind<span class="tag">&lt;<span class="title">Foo</span>&gt;</span>().ToSingle();
+Container.Bind<span class="tag">&lt;<span class="title">IFoo</span>&gt;</span>().ToSingle<span class="tag">&lt;<span class="title">Foo</span>&gt;</span>();
+Container.Bind<span class="tag">&lt;<span class="title">IBar</span>&gt;</span>().ToSingle<span class="tag">&lt;<span class="title">Foo</span>&gt;</span>();
+
+// Non generic versions
+Container.Bind(typeof(Foo)).ToSingle();
+Container.Bind(typeof(IFoo)).ToSingle(typeof(Foo));
+
+///////////// BindAllInterfacesToSingle
+
+// Bind all interfaces that Foo implements to a new singleton of type Foo
+Container.BindAllInterfacesToSingle<span class="tag">&lt;<span class="title">Foo</span>&gt;</span>();
+// So for example if Foo implements ITickable and IInitializable then the above
+// line is equivalent to this:
+Container.Bind<span class="tag">&lt;<span class="title">ITickable</span>&gt;</span>().ToSingle<span class="tag">&lt;<span class="title">Foo</span>&gt;</span>();
+Container.Bind<span class="tag">&lt;<span class="title">IInitializable</span>&gt;</span>().ToSingle<span class="tag">&lt;<span class="title">Foo</span>&gt;</span>();
+
+///////////// ToInstance
+
+// Use the given instance everywhere that Foo is used
+Container.Bind<span class="tag">&lt;<span class="title">Foo</span>&gt;</span>().ToInstance(new Foo());
+
+// This is simply a shortcut for the above binding
+// This can be a bit nicer since the type argument can be deduced from the parameter
+Container.BindInstance(new Foo());
+
+// Note that ToInstance is different from ToSingle because it does allow multiple bindings
+// and you can't re-use the same instance in multiple bindings like you can with ToSingle
+// For example, the following is allowed and will match any constructor parameters of type List<span class="tag">&lt;<span class="title">Foo</span>&gt;</span>
+// (and throw an exception for parameters that ask for a single Foo)
+Container.Bind<span class="tag">&lt;<span class="title">Foo</span>&gt;</span>().ToInstance(new Foo());
+Container.Bind<span class="tag">&lt;<span class="title">Foo</span>&gt;</span>().ToInstance(new Foo());
+
+///////////// ToSingleInstance
+
+// Use the given instance everywhere Foo is requested and ensure that it is the only Foo that is created
+Container.Bind<span class="tag">&lt;<span class="title">Foo</span>&gt;</span>().ToSingleInstance(new Foo());
+
+// We assume here that Foo implements both IFoo and IBar
+// This will result in the given instance of Foo used for all three cases
+Container.Bind<span class="tag">&lt;<span class="title">IFoo</span>&gt;</span>().ToSingleInstance(new Foo());
+Container.Bind<span class="tag">&lt;<span class="title">IBar</span>&gt;</span>().ToSingle<span class="tag">&lt;<span class="title">Foo</span>&gt;</span>();
+Container.Bind<span class="tag">&lt;<span class="title">Foo</span>&gt;</span>().ToSingle();
+
+///////////// BindValue
+
+// Use the number 10 every time an int is requested
+// You'd never really want to do this, you should almost always use a When condition for primitive values (see conditions section below)
+Container.BindValue<span class="tag">&lt;<span class="title">int</span>&gt;</span>().To(10);
+Container.BindValue<span class="tag">&lt;<span class="title">bool</span>&gt;</span>().To(false);
+
+// These are the same as above
+// This can be a bit nicer though since the type argument can be deduced from the parameter
+// Again though, be careful to use conditions to limit the scope of usage for values
+// or consider using a Settings object as described above
+Container.BindValueInstance(10);
+Container.BindValueInstance(false);
+
+///////////// ToMethod
+
+// Create instance of Foo when requested, using the given method
+// Note that for more complex construction scenarios, you might consider using a factory
+// instead
+Container.Bind<span class="tag">&lt;<span class="title">Foo</span>&gt;</span>().ToMethod(GetFoo);
+
+Foo GetFoo(InjectContext ctx)
+{
+    return new Foo();
+}
+
+// Randomly return one of several different implementations of IFoo
+// We use Instantiate here instead of just new so that Foo1 gets its members injected
+Container.Bind<span class="tag">&lt;<span class="title">IFoo</span>&gt;</span>().ToMethod(GetFoo);
+
+IFoo GetFoo(InjectContext ctx)
+{
+    switch (Random.Range(0, 3))
+    {
+        case 0:
+            return ctx.Container.Instantiate<span class="tag">&lt;<span class="title">Foo1</span>&gt;</span>();
+
+        case 1:
+            return ctx.Container.Instantiate<span class="tag">&lt;<span class="title">Foo2</span>&gt;</span>();
+    }
+
+    return ctx.Container.Instantiate<span class="tag">&lt;<span class="title">Foo3</span>&gt;</span>();
+}
+
+// Using lambda syntax
+Container.Bind<span class="tag">&lt;<span class="title">Foo</span>&gt;</span>().ToMethod((ctx) =&gt; new Foo());
+
+// This is equivalent to ToTransient
+Container.Bind<span class="tag">&lt;<span class="title">Foo</span>&gt;</span>().ToMethod((ctx) =&gt; ctx.Container.Instantiate<span class="tag">&lt;<span class="title">Foo</span>&gt;</span>());
+
+///////////// ToGetter
+
+// Bind to a property on another dependency
+// This can be helpful to reduce coupling between classes
+Container.Bind<span class="tag">&lt;<span class="title">Foo</span>&gt;</span>().ToSingle();
+
+Container.Bind<span class="tag">&lt;<span class="title">Bar</span>&gt;</span>().ToGetter<span class="tag">&lt;<span class="title">Foo</span>&gt;</span>(foo =&gt; foo.GetBar());
+
+// Another example using values
+Container.BindValue<span class="tag">&lt;<span class="title">string</span>&gt;</span>().ToGetter<span class="tag">&lt;<span class="title">Foo</span>&gt;</span>(foo =&gt; foo.GetTitle());
+
+///////////// ToSingleGameObject
+
+// Create a new game object at the root of the scene, add the Foo MonoBehaviour to it, and name it "Foo"
+Container.Bind<span class="tag">&lt;<span class="title">Foo</span>&gt;</span>().ToSingleGameObject("Foo");
+
+// Bind to an interface instead
+Container.Bind<span class="tag">&lt;<span class="title">IFoo</span>&gt;</span>().ToSingleGameObject<span class="tag">&lt;<span class="title">Foo</span>&gt;</span>("Foo");
+
+///////////// ToSinglePrefab
+
+// Create a new game object at the root of the scene using the given prefab
+// It is assumed that the Foo is a MonoBehaviour here and that Foo has been
+// previously added to the prefab
+// After zenject creates a new GameObject from the given prefab, it will
+// search the prefab for a component of type 'Foo' and return that
+GameObject fooPrefab;
+Container.Bind<span class="tag">&lt;<span class="title">Foo</span>&gt;</span>().ToSinglePrefab(fooPrefab);
+
+// Bind to interface instead
+Container.Bind<span class="tag">&lt;<span class="title">IFoo</span>&gt;</span>().ToSinglePrefab<span class="tag">&lt;<span class="title">Foo</span>&gt;</span>(fooPrefab);
+
+// Note that in this case only one prefab will be instantiated and re-used
+// for all three bindings
+// (Prefab singletons are uniquely identified by their prefab)
+Container.Bind<span class="tag">&lt;<span class="title">Foo</span>&gt;</span>().ToSinglePrefab(fooPrefab);
+Container.Bind<span class="tag">&lt;<span class="title">IInitializable</span>&gt;</span>().ToSinglePrefab<span class="tag">&lt;<span class="title">Foo</span>&gt;</span>(fooPrefab);
+Container.Bind<span class="tag">&lt;<span class="title">ITickable</span>&gt;</span>().ToSinglePrefab<span class="tag">&lt;<span class="title">Foo</span>&gt;</span>(fooPrefab);
+
+///////////// ToTransientPrefab
+
+// Instantiate a new copy of 'fooPrefab' every time an instance of Foo is
+// requested by a constructor parameter, injected field, etc.
+GameObject fooPrefab;
+Container.Bind<span class="tag">&lt;<span class="title">Foo</span>&gt;</span>().ToTransientPrefab(fooPrefab);
+
+// Bind to interface instead
+Container.Bind<span class="tag">&lt;<span class="title">IFoo</span>&gt;</span>().ToTransientPrefab<span class="tag">&lt;<span class="title">Foo</span>&gt;</span>(fooPrefab);
+
+///////////// Identifiers
+
+// By default this will use 'Qux' for every place that requires an instance of IFoo
+// But also allow for classes to use FooA or FooB by using identifiers
+Container.Bind<span class="tag">&lt;<span class="title">IFoo</span>&gt;</span>().ToSingle<span class="tag">&lt;<span class="title">Qux</span>&gt;</span>();
+Container.Bind<span class="tag">&lt;<span class="title">IFoo</span>&gt;</span>("FooA").ToSingle<span class="tag">&lt;<span class="title">Bar</span>&gt;</span>();
+Container.Bind<span class="tag">&lt;<span class="title">IFoo</span>&gt;</span>("FooB").ToSingle<span class="tag">&lt;<span class="title">Baz</span>&gt;</span>();
+
+public class Norf
+{
+    // Uses Qux
+    [Inject]
+    IFoo _foo;
+
+    // Uses Bar
+    [Inject("FooA")]
+    IFoo _foo;
+
+    // Uses Baz if it exists, otherwise leaves it as null
+    [InjectOptional("FooB")]
+    IFoo _foo;
+}
+
+// Bind a globally accessible string with the name 'PlayerName'
+// A better option might be to create a Settings object and bind that
+// instead however
+Container.BindValue<span class="tag">&lt;<span class="title">string</span>&gt;</span>("PlayerName").To("name of the player");
+
+///////////// Conditions
+
+// This will only allow dependencies on Foo by the Bar class
+Container.Bind<span class="tag">&lt;<span class="title">Foo</span>&gt;</span>().ToSingle().WhenInjectedInto<span class="tag">&lt;<span class="title">Bar</span>&gt;</span>();
+
+// Use different implementations of IFoo dependending on which
+// class is being injected
+Container.Bind<span class="tag">&lt;<span class="title">IFoo</span>&gt;</span>().ToSingle<span class="tag">&lt;<span class="title">Foo1</span>&gt;</span>().WhenInjectedInto<span class="tag">&lt;<span class="title">Bar</span>&gt;</span>();
+Container.Bind<span class="tag">&lt;<span class="title">IFoo</span>&gt;</span>().ToSingle<span class="tag">&lt;<span class="title">Foo2</span>&gt;</span>().WhenInjectedInto<span class="tag">&lt;<span class="title">Qux</span>&gt;</span>();
+
+// Use "Foo1" as the default implementation except when injecting into
+// class Qux, in which case use Foo2
+Container.Bind<span class="tag">&lt;<span class="title">IFoo</span>&gt;</span>().ToSingle<span class="tag">&lt;<span class="title">Foo1</span>&gt;</span>();
+Container.Bind<span class="tag">&lt;<span class="title">IFoo</span>&gt;</span>().ToSingle<span class="tag">&lt;<span class="title">Foo2</span>&gt;</span>().WhenInjectedInto<span class="tag">&lt;<span class="title">Qux</span>&gt;</span>();
+
+// Allow depending on Foo in only a few select classes
+Container.Bind<span class="tag">&lt;<span class="title">Foo</span>&gt;</span>().ToSingle().WhenInjectedInto(typeof(Bar), typeof(Qux), typeof(Baz));
+
+// Supply "my game" for any strings that are injected into the Gui class with the identifier "Title"
+Container.BindInstance("Title", "my game").WhenInjectedInto<span class="tag">&lt;<span class="title">Gui</span>&gt;</span>();
+
+// Supply 5 for all ints that are injected into the Gui class
+Container.BindInstance(5).WhenInjectedInto<span class="tag">&lt;<span class="title">Gui</span>&gt;</span>();
+
+// Supply 5 for all ints that are injected into a parameter or field
+// inside type Gui that is named 'width'
+// This is usually not a good idea since the name of a field can change
+// easily and break the binding but shown here as an example  :)
+Container.BindInstance(5.0f).When(ctx =&gt;
+    ctx.ParentType == typeof(Gui) &amp;&amp; ctx.MemberName == "width");
+
+// Create a new 'Foo' for every class that is created as part of the
+// construction of the 'Bar' class
+// So if Bar has a constructor parameter of type Qux, and Qux has
+// a constructor parameter of type IFoo, a new Foo will be created
+// for that case
+Container.Bind<span class="tag">&lt;<span class="title">IFoo</span>&gt;</span>().ToTransient<span class="tag">&lt;<span class="title">Foo</span>&gt;</span>().When(
+    ctx =&gt; ctx.ParentTypes.Contains(typeof(Bar)));
+
+///////////// ToLookup
+
+// This will result in IBar, IFoo, and Foo, all being bound to the same instance of
+// Foo which is assume to exist somewhere on the given prefab
+GameObject fooPrefab;
+Container.Bind<span class="tag">&lt;<span class="title">Foo</span>&gt;</span>().ToSinglePrefab(fooPrefab);
+Container.Bind<span class="tag">&lt;<span class="title">IBar</span>&gt;</span>().ToLookup<span class="tag">&lt;<span class="title">Foo</span>&gt;</span>()
+Container.Bind<span class="tag">&lt;<span class="title">IFoo</span>&gt;</span>().ToLookup<span class="tag">&lt;<span class="title">IBar</span>&gt;</span>()
+
+// This is result in the same as the above
+GameObject fooPrefab;
+Container.Bind<span class="tag">&lt;<span class="title">Foo</span>&gt;</span>().ToSinglePrefab(fooPrefab);
+Container.Bind<span class="tag">&lt;<span class="title">IBar</span>&gt;</span>().ToSinglePrefab<span class="tag">&lt;<span class="title">Foo</span>&gt;</span>(fooPrefab);
+Container.Bind<span class="tag">&lt;<span class="title">IFoo</span>&gt;</span>().ToSinglePrefab<span class="tag">&lt;<span class="title">Foo</span>&gt;</span>(fooPrefab);
+
+///////////// Rebind
+
+// Rebind can be used to override previous bindings
+// This will result in IFoo being bound to only Bar
+// The binding to Foo will have been removed
+// Normally the order that the bindings occur in doesn't
+// matter at all, but Rebind does create an order-dependency
+// so use with caution
+Container.Bind<span class="tag">&lt;<span class="title">IFoo</span>&gt;</span>().ToSingle<span class="tag">&lt;<span class="title">Foo</span>&gt;</span>();
+Container.Rebind<span class="tag">&lt;<span class="title">IFoo</span>&gt;</span>().ToSingle<span class="tag">&lt;<span class="title">Bar</span>&gt;</span>();
+
+///////////// Manual Use of Container
+
+// This will fill in any parameters marked as [Inject] and also call the [PostInject]
+// function
+foo = new Foo();
+Container.Inject(foo);
+
+// Return an instance for IFoo, using the bindings that have been added previously
+// Internally it is what is triggered when you fill in a constructor parameter of type IFoo
+// Note: It will throw an exception if it cannot find a match
+Container.Resolve<span class="tag">&lt;<span class="title">IFoo</span>&gt;</span>();
+
+// Same as the above except returns null when it can't find the given type
+Container.TryResolve<span class="tag">&lt;<span class="title">IFoo</span>&gt;</span>();
+
+// Return a list of 2 instances of type Foo
+Container.BindInstance(new Foo());
+Container.BindInstance(new Foo());
+var foos = Container.ResolveAll<span class="tag">&lt;<span class="title">IFoo</span>&gt;</span>();
+
+// Instantiate a new instance of Foo and inject on any of its members
+Container.Instantiate<span class="tag">&lt;<span class="title">Foo</span>&gt;</span>();
+</code></pre>
 <h2 id="-a-id-further-help-a-further-help"><a id="further-help"></a>Further Help</h2>
 <p>For general troubleshooting / support, please use the google group which you can find <a href="https://groups.google.com/forum/#!forum/zenject/">here</a>.  If you have found a bug, you are also welcome to create an issue on the <a href="https://github.com/modesttree/Zenject">github page</a>, or a pull request if you have a fix / extension.  Finally, you can also email me directly at svermeulen@modesttree.com</p>
 <h2 id="-a-id-release-notes-a-release-notes"><a id="release-notes"></a>Release Notes</h2>
+<p>2.1</p>
+<ul>
+<li>Simplified interface a bit more by moving more methods into DiContainer such as Inject and Instantiate.  Moved all helper methods into extension methods for readability. Deleted FieldsInjector and Instantiator classes as part of this</li>
+<li>Renamed DiContainer.To() method to ToInstance since I had witnessed some confusion with it for new users.  Did the same with ToSingleInstance</li>
+<li>Added support for using Zenject outside of Unity by building with the ZEN_NOT_UNITY3D define set</li>
+<li>Bug fix - Validation was not working in some cases for prefabs.</li>
+<li>Renamed some of the parameters in InjectContext for better understandability.</li>
+<li>Renamed DiContainer.ResolveMany to DiContainer.ResolveAll</li>
+<li>Added 'InjectFullScene' flag to CompositionRoot to allow injecting across the entire unity scene instead of just objects underneath the CompositionRoot</li>
+</ul>
 <p>2.0</p>
 <ul>
-<li>Added ability to inject dependencies via parameters to the [PostInject] method</li>
+<li>Added ability to inject dependencies via parameters to the [PostInject] method just like it does with constructors.  Especially useful for MonoBehaviours.</li>
 <li>Fixed the order that [PostInject] methods are called in for prefabs</li>
 <li>Changed singletons created via ToSinglePrefab to identify based on identifier and prefab and not component type. This allows things like ToSingle<foo>(prefab1) and ToSingle<bar>(prefab1) to use the same prefab, so you can map singletons to multiple components on the same prefab. This also works with interfaces.</bar></foo></li>
 <li>Removed '.As()' method in favour of specifying the identifier in the first Bind() statement</li>

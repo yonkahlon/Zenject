@@ -350,7 +350,7 @@ Container.Bind<IFoo>().ToMethod(SomeMethod);
 ```
 
 ```csharp
-public IFoo SomeMethod(DiContainer container)
+public IFoo SomeMethod(InjectContext context)
 {
     ...
     return new Foo();
@@ -1619,7 +1619,7 @@ Container.BindValueInstance(false);
 // instead
 Container.Bind<Foo>().ToMethod(GetFoo);
 
-Foo GetFoo(DiContainer container, InjectContext ctx)
+Foo GetFoo(InjectContext ctx)
 {
     return new Foo();
 }
@@ -1628,18 +1628,18 @@ Foo GetFoo(DiContainer container, InjectContext ctx)
 // We use Instantiate here instead of just new so that Foo1 gets its members injected
 Container.Bind<IFoo>().ToMethod(GetFoo);
 
-IFoo GetFoo(DiContainer container, InjectContext ctx)
+IFoo GetFoo(InjectContext ctx)
 {
     switch (Random.Range(0, 3))
     {
         case 0:
-            return container.Instantiate<Foo1>();
+            return ctx.Container.Instantiate<Foo1>();
 
         case 1:
-            return container.Instantiate<Foo2>();
+            return ctx.Container.Instantiate<Foo2>();
     }
 
-    return container.Instantiate<Foo3>();
+    return ctx.Container.Instantiate<Foo3>();
 }
 
 // Using lambda syntax
