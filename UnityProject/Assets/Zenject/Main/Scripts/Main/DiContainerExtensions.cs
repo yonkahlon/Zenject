@@ -28,7 +28,7 @@ namespace Zenject
             // We could bind the factory ToSingle but doing it this way is better
             // since it allows us to have multiple game object factories that
             // use different prefabs and have them injected into different places
-            return container.Bind<T>().ToMethod((c, ctx) => c.Instantiate<T>(prefab));
+            return container.Bind<T>().ToMethod((ctx) => ctx.Container.Instantiate<T>(prefab));
         }
 
         public static BindingConditionSetter BindFactoryForPrefab<TContract>(
@@ -43,7 +43,7 @@ namespace Zenject
             // We could use ToSingleMethod here but then we'd have issues when using .When() conditionals to inject
             // multiple factories in different places
             return container.Bind<IFactory<TContract>>()
-                .ToMethod((c, ctx) => c.Instantiate<GameObjectFactory<TContract>>(prefab));
+                .ToMethod((ctx) => ctx.Container.Instantiate<GameObjectFactory<TContract>>(prefab));
         }
 #endif
 
@@ -274,22 +274,22 @@ namespace Zenject
 
         public static BindingConditionSetter BindFactoryToMethod<TContract>(this DiContainer container, Func<DiContainer, TContract> method)
         {
-            return container.Bind<IFactory<TContract>>().ToMethod((c, ctx) => c.Instantiate<FactoryMethod<TContract>>(method));
+            return container.Bind<IFactory<TContract>>().ToMethod((ctx) => ctx.Container.Instantiate<FactoryMethod<TContract>>(method));
         }
 
         public static BindingConditionSetter BindFactoryToMethod<TParam1, TContract>(this DiContainer container, Func<DiContainer, TParam1, TContract> method)
         {
-            return container.Bind<IFactory<TParam1, TContract>>().ToMethod((c, ctx) => c.Instantiate<FactoryMethod<TParam1, TContract>>(method));
+            return container.Bind<IFactory<TParam1, TContract>>().ToMethod((ctx) => ctx.Container.Instantiate<FactoryMethod<TParam1, TContract>>(method));
         }
 
         public static BindingConditionSetter BindFactoryToMethod<TParam1, TParam2, TContract>(this DiContainer container, Func<DiContainer, TParam1, TParam2, TContract> method)
         {
-            return container.Bind<IFactory<TParam1, TParam2, TContract>>().ToMethod((c, ctx) => c.Instantiate<FactoryMethod<TParam1, TParam2, TContract>>(method));
+            return container.Bind<IFactory<TParam1, TParam2, TContract>>().ToMethod((ctx) => ctx.Container.Instantiate<FactoryMethod<TParam1, TParam2, TContract>>(method));
         }
 
         public static BindingConditionSetter BindFactoryToMethod<TParam1, TParam2, TParam3, TContract>(this DiContainer container, Func<DiContainer, TParam1, TParam2, TParam3, TContract> method)
         {
-            return container.Bind<IFactory<TParam1, TParam2, TParam3, TContract>>().ToMethod((c, ctx) => c.Instantiate<FactoryMethod<TParam1, TParam2, TParam3, TContract>>(method));
+            return container.Bind<IFactory<TParam1, TParam2, TParam3, TContract>>().ToMethod((ctx) => ctx.Container.Instantiate<FactoryMethod<TParam1, TParam2, TParam3, TContract>>(method));
         }
 
         public static BindingConditionSetter BindFactory<TContract>(this DiContainer container)

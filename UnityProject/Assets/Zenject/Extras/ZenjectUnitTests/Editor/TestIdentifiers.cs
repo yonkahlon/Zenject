@@ -42,7 +42,7 @@ namespace Zenject.Tests
         [Test]
         public void TestBasic3()
         {
-            Container.Bind<Test0>("foo").ToMethod((c, ctx) => new Test0());
+            Container.Bind<Test0>("foo").ToMethod((ctx) => new Test0());
 
             Assert.Throws<ZenjectResolveException>(
                 delegate { Container.Resolve<Test0>(); });

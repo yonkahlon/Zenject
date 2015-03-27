@@ -10,12 +10,12 @@ namespace Zenject
         SingletonProviderMap _owner;
         DiContainer _container;
         bool _hasInstance;
-        Func<DiContainer, object> _createMethod;
+        Func<InjectContext, object> _createMethod;
         SingletonId _id;
 
         public SingletonLazyCreator(
             DiContainer container, SingletonProviderMap owner,
-            SingletonId id, Func<DiContainer, object> createMethod = null)
+            SingletonId id, Func<InjectContext, object> createMethod = null)
         {
             _container = container;
             _owner = owner;
@@ -71,16 +71,16 @@ namespace Zenject
             return _id.Type;
         }
 
-        public object GetInstance(Type contractType)
+        public object GetInstance(InjectContext context)
         {
             if (!_hasInstance)
             {
-                _instance = Instantiate(contractType);
+                _instance = Instantiate(context);
 
                 if (_instance == null)
                 {
                     throw new ZenjectResolveException(
-                        "Unable to instantiate type '{0}' in SingletonLazyCreator".Fmt(contractType));
+                        "Unable to instantiate type '{0}' in SingletonLazyCreator".Fmt(context.MemberType));
                 }
 
                 _hasInstance = true;
@@ -89,14 +89,14 @@ namespace Zenject
             return _instance;
         }
 
-        object Instantiate(Type contractType)
+        object Instantiate(InjectContext context)
         {
             if (_createMethod != null)
             {
-                return _createMethod(_container);
+                return _createMethod(context);
             }
 
-            var concreteType = GetTypeToInstantiate(contractType);
+            var concreteType = GetTypeToInstantiate(context.MemberType);
             return _container.Instantiate(concreteType);
         }
 

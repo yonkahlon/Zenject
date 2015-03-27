@@ -156,14 +156,14 @@ namespace Zenject
             return ToProvider(_singletonMap.CreateProviderFromInstance(singletonIdentifier, instance));
         }
 
-        public BindingConditionSetter ToSingleMethod<TConcrete>(string singletonIdentifier, Func<DiContainer, TConcrete> method)
+        public BindingConditionSetter ToSingleMethod<TConcrete>(string singletonIdentifier, Func<InjectContext, TConcrete> method)
             where TConcrete : TContract
         {
             return ToProvider(_singletonMap.CreateProviderFromMethod(singletonIdentifier, method));
         }
 
         // ToSingleMethod
-        public BindingConditionSetter ToSingleMethod<TConcrete>(Func<DiContainer, TConcrete> method)
+        public BindingConditionSetter ToSingleMethod<TConcrete>(Func<InjectContext, TConcrete> method)
             where TConcrete : TContract
         {
             return ToSingleMethod<TConcrete>(null, method);
