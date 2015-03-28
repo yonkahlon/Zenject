@@ -36,7 +36,7 @@ namespace Asteroids
         // it to the list of installers in the inspector of CompositionRoot) to re-use it
         void InstallIncludes()
         {
-            //Container.Bind<IInstaller>().ToSingle<MyCustomInstaller>();
+            //Container.Install<MyCustomInstaller>();
         }
 
         void InstallAsteroids()
@@ -91,15 +91,15 @@ namespace Asteroids
         // control over initialization-order and update-order
         void InitPriorities()
         {
-            Container.Bind<IInstaller>().ToSingle<InitializablePrioritiesInstaller>();
             Container.Bind<List<Type>>().ToInstance(InitializablesOrder)
                 .WhenInjectedInto<InitializablePrioritiesInstaller>();
+            Container.Install<InitializablePrioritiesInstaller>();
 
-            Container.Bind<IInstaller>().ToSingle<TickablePrioritiesInstaller>();
             Container.Bind<List<Type>>().ToInstance(TickablesOrder).WhenInjectedInto<TickablePrioritiesInstaller>();
+            Container.Install<TickablePrioritiesInstaller>();
 
-            Container.Bind<IInstaller>().ToSingle<FixedTickablePrioritiesInstaller>();
             Container.Bind<List<Type>>().ToInstance(FixedTickablesOrder).WhenInjectedInto<FixedTickablePrioritiesInstaller>();
+            Container.Install<FixedTickablePrioritiesInstaller>();
         }
 
         [Serializable]

@@ -7,10 +7,15 @@ namespace Zenject
 {
     public abstract class DecoratorInstaller : MonoBehaviour
     {
-        public DiContainer Container
+        [Inject]
+        DiContainer _container = null;
+
+        protected DiContainer Container
         {
-            get;
-            set;
+            get
+            {
+                return _container;
+            }
         }
 
         public virtual void PreInstallBindings()

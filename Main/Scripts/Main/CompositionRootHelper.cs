@@ -12,9 +12,7 @@ namespace Zenject
         public static void InstallStandardInstaller(DiContainer container, GameObject rootObj)
         {
             container.Bind<GameObject>().ToInstance(rootObj).WhenInjectedInto<StandardUnityInstaller>();
-            container.Bind<IInstaller>().ToSingle<StandardUnityInstaller>();
-            container.InstallInstallers();
-            Assert.That(!container.HasBinding<IInstaller>());
+            container.Install<StandardUnityInstaller>();
         }
 
         public static void InstallSceneInstallers(
@@ -30,19 +28,7 @@ namespace Zenject
 
                 if (installer.IsEnabled)
                 {
-                    // The installers that are part of the scene are monobehaviours
-                    // and therefore were not created via Zenject and therefore do
-                    // not have their members injected
-                    // At the very least they will need the container injected but
-                    // they might also have some configuration passed from another
-                    // scene as well
-                    container.Inject(installer);
-                    container.Bind<IInstaller>().ToInstance(installer);
-
-                    // Install this installer and also any other installers that it installs
-                    container.InstallInstallers();
-
-                    Assert.That(!container.HasBinding<IInstaller>());
+                    container.Install(installer);
                 }
             }
         }
