@@ -50,7 +50,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="InstallersListInspector.cs" />
     <Compile Include="ObjectGraphVisualizer.cs" />
     <Compile Include="UnityInspectorListEditor.cs" />
     <Compile Include="ZenEditorUtil.cs" />
