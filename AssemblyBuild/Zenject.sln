@@ -1,13 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.30723.0
+VisualStudioVersion = 12.0.31101.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zenject", "..\UnityProject\Assets\Zenject\Main\Scripts\Zenject.csproj", "{46F25A62-2E29-48CB-95F3-BDBCB0976DDC}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zenject-editor", "..\UnityProject\Assets\Zenject\Main\Editor\Zenject-editor.csproj", "{B71F2201-3382-46B3-A9C6-219A72954905}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zenject-tests", "..\UnityProject\Assets\Zenject\Extras\ZenjectUnitTests\Scripts\Zenject-tests.csproj", "{EF08837B-4702-42A0-9BF9-8223F680E9DA}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zenject-tests", "..\UnityProject\Assets\Zenject\Extras\ZenjectUnitTests\Editor\Zenject-tests.csproj", "{34E27462-3046-4DC7-A7FA-45E4F4F7D413}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,10 +23,10 @@ Global
 		{B71F2201-3382-46B3-A9C6-219A72954905}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B71F2201-3382-46B3-A9C6-219A72954905}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B71F2201-3382-46B3-A9C6-219A72954905}.Release|Any CPU.Build.0 = Release|Any CPU
-		{EF08837B-4702-42A0-9BF9-8223F680E9DA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{EF08837B-4702-42A0-9BF9-8223F680E9DA}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{EF08837B-4702-42A0-9BF9-8223F680E9DA}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{EF08837B-4702-42A0-9BF9-8223F680E9DA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{34E27462-3046-4DC7-A7FA-45E4F4F7D413}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{34E27462-3046-4DC7-A7FA-45E4F4F7D413}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{34E27462-3046-4DC7-A7FA-45E4F4F7D413}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{34E27462-3046-4DC7-A7FA-45E4F4F7D413}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
