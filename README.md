@@ -777,7 +777,7 @@ public class FooInstaller : MonoInstaller
 }
 ```
 
-This way you don't need to have an instance of BarInstaller in your scene in order to use it.  After the CompositionRoot calls InstallBindings it will then instantiate and call any extra installers that have bound to IInstaller.
+This way you don't need to have an instance of BarInstaller in your scene in order to use it.  Any calls to Container.Install will immediately instantiate the given installer type and then call InstallBindings on it.  This will repeat for any installers that this installer installs.  Note also that it will only install the same installer once so you can make repeated calls to Container.Install<YourInstallerType>.
 
 One of the main reasons we use installers as opposed to just having all our bindings declared all at once for each scene, is to make them re-usable.  So how then do we use the same installer in multiple scenes?
 
@@ -792,7 +792,7 @@ A Zenject driven application is executed by the following steps:
 * Composition Root is started (via Unity Awake() method)
 * Composition Root creates a new DiContainer object to be used to contain all instances used in the scene
 * Composition Root iterates through all the Installers that have been added to it via the Unity Inspector, and updates them to point to the new DiContainer.  It then calls InstallBindings() on each installer.
-* Each Installer then registers different sets of dependencies directly on to the given DiContainer by calling one of the Bind<> methods.  Note that the order that this binding occurs should not generally matter. Each installer may also include other installers by binding to the IInstaller interface.  Each installer can also add bindings to configure other installers, however note that in this case order might actually matter, since you will have to make sure that code configuring other installers is executed before the installers that you are configuring! You can control the order by simply re-ordering the Installers property of the CompositionRoot
+* Each Installer then registers different sets of dependencies directly on to the given DiContainer by calling one of the Bind<> methods.  Note that the order that this binding occurs should not generally matter. Each installer may also include other installers by calling Container.Install. Each installer can also add bindings to configure other installers, however note that in this case order might actually matter, since you will have to make sure that code configuring other installers is executed before the installers that you are configuring! You can control the order by simply re-ordering the Installers property of the CompositionRoot
 * The Composition Root then traverses the entire scene hierarchy and injects all MonoBehaviours with their dependencies. Since MonoBehaviours are instantiated by Unity we cannot use constructor injection in this case and therefore [PostInject] injection, field injection or property injection must be used instead.  Any methods on these MonoBehaviour's marked with [PostInject] are called at this point as well.
 * After filling in the scene dependencies the Composition Root then retrieves the instance of IDependencyRoot, which contains the objects that handle the ITickable/IInitializable/IDisposable interfaces.
 * If any required dependencies cannot be resolved, a ZenjectResolveException is thrown
@@ -1790,6 +1790,20 @@ Container.Bind<IFoo>().ToSinglePrefab<Foo>(fooPrefab);
 Container.Bind<IFoo>().ToSingle<Foo>();
 Container.Rebind<IFoo>().ToSingle<Bar>();
 
+///////////// Installing Other Installers
+
+// Immediately call InstallBindings() on FooInstaller
+Container.Install<FooInstaller>();
+
+// Before calling FooInstaller, configure a property of it
+Container.BindInstance("foo").WhenInjectedInto<FooInstaller>();
+Container.Install<FooInstaller>();
+
+// After calling FooInstaller, override one of its bindings
+// We assume here that FooInstaller binds IFoo to something
+Container.Install<FooInstaller>();
+Container.Rebind<IFoo>().ToSingle<Bar>();
+
 ///////////// Manual Use of Container
 
 // This will fill in any parameters marked as [Inject] and also call the [PostInject]
@@ -1812,6 +1826,8 @@ var foos = Container.ResolveAll<IFoo>();
 
 // Instantiate a new instance of Foo and inject on any of its members
 Container.Instantiate<Foo>();
+
+
 ```
 
 ## <a id="further-help"></a>Further Help
@@ -1819,6 +1835,9 @@ Container.Instantiate<Foo>();
 For general troubleshooting / support, please use the google group which you can find [here](https://groups.google.com/forum/#!forum/zenject/).  If you have found a bug, you are also welcome to create an issue on the [github page](https://github.com/modesttree/Zenject), or a pull request if you have a fix / extension.  Finally, you can also email me directly at svermeulen@modesttree.com
 
 ## <a id="release-notes"></a>Release Notes
+
+2.2
+* Changed the way installers invoke other installers.  Previously you would Bind them to IInstaller and now you call Container.Install<MyInstaller> instead.  This is better because it allows you to immediately call Rebind<> afterwards
 
 2.1
 * Simplified interface a bit more by moving more methods into DiContainer such as Inject and Instantiate.  Moved all helper methods into extension methods for readability. Deleted FieldsInjector and Instantiator classes as part of this
