@@ -602,11 +602,11 @@ public <span class="class"><span class="keyword">class</span> <span class="title
 {
     public override void InstallBindings()
     {
-        Container.Bind&lt;IInstaller&gt;().ToSingle&lt;BarInstaller&gt;();
+        Container.Install&lt;BarInstaller&gt;();
     }
 }
 </code></pre>
-<p>This way you don't need to have an instance of BarInstaller in your scene in order to use it.  After the CompositionRoot calls InstallBindings it will then instantiate and call any extra installers that have bound to IInstaller.</p>
+<p>This way you don't need to have an instance of BarInstaller in your scene in order to use it.  Any calls to Container.Install will immediately instantiate the given installer type and then call InstallBindings on it.  This will repeat for any installers that this installer installs.  Note also that it will only install the same installer once so you can make repeated calls to Container.Install<yourinstallertype>.</yourinstallertype></p>
 <p>One of the main reasons we use installers as opposed to just having all our bindings declared all at once for each scene, is to make them re-usable.  So how then do we use the same installer in multiple scenes?</p>
 <p>The recommended way of doing this is to use unity prefabs.  After attaching your MonoInstaller to a gameobject in your scene, you can then create a prefab out of it.  This is nice because it allows you to share any configuration that you've done in the inspector on the MonoInstaller across scenes (and also have per-scene overrides if you want)</p>
 <p>Installers that simply implement Installer instead of MonoInstaller can be simply bound as described above, to re-use in different scenes.</p>
@@ -616,7 +616,7 @@ public <span class="class"><span class="keyword">class</span> <span class="title
 <li>Composition Root is started (via Unity Awake() method)</li>
 <li>Composition Root creates a new DiContainer object to be used to contain all instances used in the scene</li>
 <li>Composition Root iterates through all the Installers that have been added to it via the Unity Inspector, and updates them to point to the new DiContainer.  It then calls InstallBindings() on each installer.</li>
-<li>Each Installer then registers different sets of dependencies directly on to the given DiContainer by calling one of the Bind&lt;&gt; methods.  Note that the order that this binding occurs should not generally matter. Each installer may also include other installers by binding to the IInstaller interface.  Each installer can also add bindings to configure other installers, however note that in this case order might actually matter, since you will have to make sure that code configuring other installers is executed before the installers that you are configuring! You can control the order by simply re-ordering the Installers property of the CompositionRoot</li>
+<li>Each Installer then registers different sets of dependencies directly on to the given DiContainer by calling one of the Bind&lt;&gt; methods.  Note that the order that this binding occurs should not generally matter. Each installer may also include other installers by calling Container.Install. Each installer can also add bindings to configure other installers, however note that in this case order might actually matter, since you will have to make sure that code configuring other installers is executed before the installers that you are configuring! You can control the order by simply re-ordering the Installers property of the CompositionRoot</li>
 <li>The Composition Root then traverses the entire scene hierarchy and injects all MonoBehaviours with their dependencies. Since MonoBehaviours are instantiated by Unity we cannot use constructor injection in this case and therefore [PostInject] injection, field injection or property injection must be used instead.  Any methods on these MonoBehaviour's marked with [PostInject] are called at this point as well.</li>
 <li>After filling in the scene dependencies the Composition Root then retrieves the instance of IDependencyRoot, which contains the objects that handle the ITickable/IInitializable/IDisposable interfaces.</li>
 <li>If any required dependencies cannot be resolved, a ZenjectResolveException is thrown</li>
@@ -683,13 +683,13 @@ public <span class="class"><span class="keyword">class</span> <span class="title
 
     void InitPriorities()
     {
-        Container.Bind<span class="tag">&lt;<span class="title">IInstaller</span>&gt;</span>().ToSingle<span class="tag">&lt;<span class="title">InitializablePrioritiesInstaller</span>&gt;</span>();
         Container.Bind<span class="tag">&lt;<span class="title">List&lt;Type</span>&gt;</span>&gt;().To(InitializablesOrder)
             .WhenInjectedInto<span class="tag">&lt;<span class="title">InitializablePrioritiesInstaller</span>&gt;</span>();
+        Container.Install<span class="tag">&lt;<span class="title">InitializablePrioritiesInstaller</span>&gt;</span>();
 
-        Container.Bind<span class="tag">&lt;<span class="title">IInstaller</span>&gt;</span>().ToSingle<span class="tag">&lt;<span class="title">TickablePrioritiesInstaller</span>&gt;</span>();
         Container.Bind<span class="tag">&lt;<span class="title">List&lt;Type</span>&gt;</span>&gt;().To(Tickables)
             .WhenInjectedInto<span class="tag">&lt;<span class="title">TickablePrioritiesInstaller</span>&gt;</span>();
+        Container.Install<span class="tag">&lt;<span class="title">TickablePrioritiesInstaller</span>&gt;</span>();
     }
 
     static List<span class="tag">&lt;<span class="title">Type</span>&gt;</span> InitializablesOrder = new List<span class="tag">&lt;<span class="title">Type</span>&gt;</span>()
@@ -1481,6 +1481,20 @@ Container.Bind<span class="tag">&lt;<span class="title">IFoo</span>&gt;</span>()
 Container.Bind<span class="tag">&lt;<span class="title">IFoo</span>&gt;</span>().ToSingle<span class="tag">&lt;<span class="title">Foo</span>&gt;</span>();
 Container.Rebind<span class="tag">&lt;<span class="title">IFoo</span>&gt;</span>().ToSingle<span class="tag">&lt;<span class="title">Bar</span>&gt;</span>();
 
+///////////// Installing Other Installers
+
+// Immediately call InstallBindings() on FooInstaller
+Container.Install<FooInstaller>();
+
+// Before calling FooInstaller, configure a property of it
+Container.BindInstance("foo").WhenInjectedInto<FooInstaller>();
+Container.Install<FooInstaller>();
+
+// After calling FooInstaller, override one of its bindings
+// We assume here that FooInstaller binds IFoo to something
+Container.Install<FooInstaller>();
+Container.Rebind<IFoo>().ToSingle<Bar>();
+
 ///////////// Manual Use of Container
 
 // This will fill in any parameters marked as [Inject] and also call the [PostInject]
@@ -1507,6 +1521,10 @@ Container.Instantiate<span class="tag">&lt;<span class="title">Foo</span>&gt;</s
 <h2 id="-a-id-further-help-a-further-help"><a id="further-help"></a>Further Help</h2>
 <p>For general troubleshooting / support, please use the google group which you can find <a href="https://groups.google.com/forum/#!forum/zenject/">here</a>.  If you have found a bug, you are also welcome to create an issue on the <a href="https://github.com/modesttree/Zenject">github page</a>, or a pull request if you have a fix / extension.  Finally, you can also email me directly at svermeulen@modesttree.com</p>
 <h2 id="-a-id-release-notes-a-release-notes"><a id="release-notes"></a>Release Notes</h2>
+<p>2.2</p>
+<ul>
+<li>Changed the way installers invoke other installers.  Previously you would Bind them to IInstaller and now you call Container.Install<myinstaller> instead.  This is better because it allows you to immediately call Rebind&lt;&gt; afterwards</myinstaller></li>
+</ul>
 <p>2.1</p>
 <ul>
 <li>Simplified interface a bit more by moving more methods into DiContainer such as Inject and Instantiate.  Moved all helper methods into extension methods for readability. Deleted FieldsInjector and Instantiator classes as part of this</li>
