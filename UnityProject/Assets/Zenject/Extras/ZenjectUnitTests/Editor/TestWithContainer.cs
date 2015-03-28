@@ -27,9 +27,6 @@ namespace Zenject.Tests
             _container = new DiContainer();
 
             InstallBindings();
-
-            _container.InstallInstallers();
-            _container.Inject(this);
         }
 
         protected virtual void InstallBindings()

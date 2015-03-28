@@ -772,7 +772,7 @@ public class FooInstaller : MonoInstaller
 {
     public override void InstallBindings()
     {
-        Container.Bind<IInstaller>().ToSingle<BarInstaller>();
+        Container.Install<BarInstaller>();
     }
 }
 ```
@@ -849,13 +849,13 @@ public class AsteroidsInstaller : MonoInstaller
 
     void InitPriorities()
     {
-        Container.Bind<IInstaller>().ToSingle<InitializablePrioritiesInstaller>();
         Container.Bind<List<Type>>().To(InitializablesOrder)
             .WhenInjectedInto<InitializablePrioritiesInstaller>();
+        Container.Install<InitializablePrioritiesInstaller>();
 
-        Container.Bind<IInstaller>().ToSingle<TickablePrioritiesInstaller>();
         Container.Bind<List<Type>>().To(Tickables)
             .WhenInjectedInto<TickablePrioritiesInstaller>();
+        Container.Install<TickablePrioritiesInstaller>();
     }
 
     static List<Type> InitializablesOrder = new List<Type>()

@@ -138,12 +138,16 @@ namespace Zenject
         public ReferenceBinder<TContract> Bind<TContract>(string identifier)
             where TContract : class
         {
+            Assert.That(!typeof(TContract).DerivesFromOrEqual<IInstaller>(),
+                "Deprecated usage of Bind<IInstaller>, use Install<IInstaller> instead");
             return new ReferenceBinder<TContract>(this, identifier, _singletonMap);
         }
 
         // Note that this can include open generic types as well such as List<>
         public BinderUntyped Bind(Type contractType, string identifier)
         {
+            Assert.That(!contractType.DerivesFromOrEqual<IInstaller>(),
+                "Deprecated usage of Bind<IInstaller>, use Install<IInstaller> instead");
             return new BinderUntyped(this, contractType, identifier, _singletonMap);
         }
 
@@ -370,37 +374,24 @@ namespace Zenject
             return new List<Type> {};
         }
 
-        // Installing installers works a bit differently than just Resolving all of
-        // them and then calling InstallBindings() on each
-        // This is because we want to allow installers to "include" other installers
-        // And we also want earlier installers to be able to configure later installers
-        // So we need to Resolve() one at a time, removing each installer binding
-        // as we go
-        public void InstallInstallers()
+        public void Install(IInstaller installer)
         {
-            var injectCtx = new InjectContext(this, typeof(IInstaller), null);
-
-            while (true)
+            if (_installedInstallers.Where(x => x.GetType() == installer.GetType()).IsEmpty())
+            // Do not install the same installer twice
             {
-                var provider = GetProviderMatchesInternal(injectCtx).FirstOrDefault();
+                _installedInstallers.Add(installer);
+                this.Inject(installer);
+                installer.InstallBindings();
+            }
+        }
 
-                if (provider == null)
-                {
-                    break;
-                }
-
-                var installer = (IInstaller)provider.GetInstance(injectCtx);
-
-                Assert.IsNotNull(installer);
-
-                UnregisterProvider(provider);
-
-                if (_installedInstallers.Where(x => x.GetType() == installer.GetType()).Any())
-                {
-                    // Do not install the same installer twice
-                    continue;
-                }
-
+        public void Install<T>()
+            where T : IInstaller
+        {
+            if (_installedInstallers.Where(x => x.GetType() == typeof(T)).IsEmpty())
+            // Do not install the same installer twice
+            {
+                var installer = this.Instantiate<T>();
                 installer.InstallBindings();
                 _installedInstallers.Add(installer);
             }
@@ -528,7 +519,7 @@ namespace Zenject
             if (typeInfo.InjectConstructor == null)
             {
                 throw new ZenjectResolveException(
-                    "More than one or zero constructors found for type '{0}' when creating dependencies.  Use one [Inject] attribute to specify which to use.".Fmt(concreteType));
+                    "More than one (or zero) constructors found for type '{0}' when creating dependencies.  Use one [Inject] attribute to specify which to use.".Fmt(concreteType));
             }
 
             // Make a copy since we remove from it below

@@ -23,7 +23,7 @@ namespace Zenject.Tests
             public static int Count;
             public override void InstallBindings()
             {
-                Container.Bind<IInstaller>().ToSingle<Test0>();
+                Container.Install<Test0>();
                 Count++;
             }
         }
@@ -33,7 +33,7 @@ namespace Zenject.Tests
             public static int Count;
             public override void InstallBindings()
             {
-                Container.Bind<IInstaller>().ToSingle<Test0>();
+                Container.Install<Test0>();
                 Count++;
             }
         }
@@ -51,10 +51,8 @@ namespace Zenject.Tests
         [Test]
         public void Test()
         {
-            Container.Bind<IInstaller>().ToSingle<Test1>();
-            Container.Bind<IInstaller>().ToSingle<Test2>();
-
-            Container.InstallInstallers();
+            Container.Install<Test1>();
+            Container.Install<Test2>();
 
             Assert.That(Test1.Count == 1);
             Assert.That(Test2.Count == 1);

@@ -62,7 +62,7 @@ namespace Zenject
 
                 if (installer.enabled)
                 {
-                    installer.Container = container;
+                    container.Inject(installer);
 
                     if (isBefore)
                     {
@@ -72,11 +72,6 @@ namespace Zenject
                     {
                         installer.PostInstallBindings();
                     }
-
-                    // Install this installer and also any other installers that it installs
-                    container.InstallInstallers();
-
-                    Assert.That(!container.HasBinding<IInstaller>());
                 }
             }
         }
