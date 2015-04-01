@@ -17,7 +17,7 @@ namespace Zenject
     // Responsibilities:
     // - Expose methods to configure object graph via Bind() methods
     // - Build object graphs via Resolve() method
-    public class DiContainer
+    public class DiContainer : IInstantiator
     {
         readonly Dictionary<BindingId, List<ProviderBase>> _providers = new Dictionary<BindingId, List<ProviderBase>>();
         readonly SingletonProviderMap _singletonMap;
@@ -35,6 +35,7 @@ namespace Zenject
             _singletonMap = new SingletonProviderMap(this);
 
             this.Bind<DiContainer>().ToInstance(this);
+            this.Bind<IInstantiator>().ToInstance(this);
             this.Bind<SingletonProviderMap>().ToInstance(_singletonMap);
 
 #if !ZEN_NOT_UNITY3D

@@ -74,28 +74,6 @@ namespace Zenject
                 InstantiateUtil.CreateTypeValueList(additional), shouldUseAll, typeInfo);
         }
 
-        public static T Instantiate<T>(
-            this DiContainer container, params object[] extraArgs)
-        {
-            return (T)container.Instantiate(typeof(T), extraArgs);
-        }
-
-        public static object Instantiate(
-            this DiContainer container, Type concreteType, params object[] extraArgs)
-        {
-            Assert.That(!extraArgs.Contains(null),
-                "Null value given to factory constructor arguments when instantiating object with type '{0}'. In order to use null use InstantiateExplicit", concreteType);
-
-            return container.InstantiateExplicit(
-                concreteType, InstantiateUtil.CreateTypeValueList(extraArgs));
-        }
-
-        // This is used instead of Instantiate to support specifying null values
-        public static T InstantiateExplicit<T>(this DiContainer container, List<TypeValuePair> extraArgMap)
-        {
-            return (T)container.InstantiateExplicit(typeof(T), extraArgMap);
-        }
-
         public static ValueBinder<TContract> BindValue<TContract>(this DiContainer container) where TContract : struct
         {
             return container.BindValue<TContract>(null);
