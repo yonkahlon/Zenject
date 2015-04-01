@@ -35,7 +35,7 @@ namespace Zenject.Tests
         void AssertHasConcreteTypes(IEnumerable<Type> expectedValues)
         {
             var concreteList = _container.AllConcreteTypes.ToList();
-            var expectedList = GetStandardTypeInclusions().Concat(expectedValues).ToList();
+            var expectedList = GetStandardConcreteTypeInclusions().Concat(expectedValues).ToList();
 
             Assert.That(
                 TestListComparer.ContainSameElements(
@@ -46,7 +46,7 @@ namespace Zenject.Tests
         void AssertHasContracts(IEnumerable<Type> expectedValues)
         {
             var contractList = _container.AllContracts.Select(x => x.Type).ToList();
-            var expectedList = GetStandardTypeInclusions().Concat(expectedValues).ToList();
+            var expectedList = GetStandardContractTypeInclusions().Concat(expectedValues).ToList();
 
             Assert.That(
                 TestListComparer.ContainSameElements(
@@ -54,7 +54,19 @@ namespace Zenject.Tests
                     "Unexpected list: " + TestListComparer.PrintList(contractList) + "\nExpected: " + TestListComparer.PrintList(expectedList));
         }
 
-        List<Type> GetStandardTypeInclusions()
+        List<Type> GetStandardContractTypeInclusions()
+        {
+            return new List<Type>()
+            {
+                typeof(IInstantiator), typeof(DiContainer), typeof(SingletonInstanceHelper),
+#if !ZEN_NOT_UNITY3D
+                typeof(PrefabSingletonProviderMap),
+#endif
+                typeof(SingletonProviderMap)
+            };
+        }
+
+        List<Type> GetStandardConcreteTypeInclusions()
         {
             return new List<Type>()
             {
