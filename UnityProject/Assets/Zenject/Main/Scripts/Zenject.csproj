@@ -85,6 +85,7 @@
     <Compile Include="Main\GlobalCompositionRoot.cs" />
     <Compile Include="Main\GlobalInstallerConfig.cs" />
     <Compile Include="Main\IInstaller.cs" />
+    <Compile Include="Main\IInstantiator.cs" />
     <Compile Include="Main\Installer.cs" />
     <Compile Include="Main\MonoInstaller.cs" />
     <Compile Include="..\..\Internal\MiscExtensions.cs" />
