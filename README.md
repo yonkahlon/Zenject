@@ -1764,6 +1764,22 @@ Container.BindInstance(5.0f).When(ctx =>
 Container.Bind<IFoo>().ToTransient<Foo>().When(
     ctx => ctx.ParentTypes.Contains(typeof(Bar)));
 
+///////////// Complex conditions example
+
+var foo1 = new Foo();
+var foo2 = new Foo();
+
+Container.Bind<Bar>("Bar1").ToTransient();
+Container.Bind<Bar>("Bar2").ToTransient();
+
+// Here we use the 'ParentContexts' property of inject context to sync multiple corresponding identifiers
+Container.BindInstance(foo1).When(c => c.ParentContexts.Where(x => x.MemberType == typeof(Bar) && x.Identifier == "Bar1").Any());
+Container.BindInstance(foo2).When(c => c.ParentContexts.Where(x => x.MemberType == typeof(Bar) && x.Identifier == "Bar2").Any());
+
+// This results in:
+// Container.Resolve<Bar>("Bar1").Foo == foo1
+// Container.Resolve<Bar>("Bar2").Foo == foo2
+
 ///////////// ToLookup
 
 // This will result in IBar, IFoo, and Foo, all being bound to the same instance of
@@ -1835,6 +1851,11 @@ Container.Instantiate<Foo>();
 For general troubleshooting / support, please use the google group which you can find [here](https://groups.google.com/forum/#!forum/zenject/).  If you have found a bug, you are also welcome to create an issue on the [github page](https://github.com/modesttree/Zenject), or a pull request if you have a fix / extension.  Finally, you can also email me directly at svermeulen@modesttree.com
 
 ## <a id="release-notes"></a>Release Notes
+
+2.3
+* Added "ParentContexts" property to InjectContext, to allow very complex conditional bindings that involve potentially several identifiers, etc.
+* Removed InjectionHelper class and moved methods into DiContainer to simplify API and also to be more discoverable
+* Added ability to build dlls for use in outside unity from the assembly build solution
 
 2.2
 * Changed the way installers invoke other installers.  Previously you would Bind them to IInstaller and now you call Container.Install<MyInstaller> instead.  This is better because it allows you to immediately call Rebind<> afterwards
