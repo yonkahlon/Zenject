@@ -150,11 +150,6 @@ namespace Zenject
             return new InjectContext(
                 Container, newMemberType, Identifier, Optional, ObjectType, ObjectInstance, MemberName, ParentContext);
         }
-
-        public InjectContext ChangeId(string newIdentifier)
-        {
-            return new InjectContext(
-                Container, MemberType, newIdentifier, Optional, ObjectType, ObjectInstance, MemberName, ParentContext);
-        }
     }
 }
+

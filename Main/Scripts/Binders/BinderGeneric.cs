@@ -16,7 +16,10 @@ namespace Zenject
 
         public BindingConditionSetter ToLookup<TConcrete>(string identifier) where TConcrete : TContract
         {
-            return ToMethod((ctx) => ctx.Container.Resolve<TConcrete>(ctx.ChangeMemberType(typeof(TConcrete)).ChangeId(identifier)));
+            return ToMethod((ctx) => ctx.Container.Resolve<TConcrete>(
+                new InjectContext(
+                    ctx.Container, typeof(TConcrete), identifier,
+                    false, ctx.ObjectType, ctx.ObjectInstance, ctx.MemberName, ctx)));
         }
 
         public BindingConditionSetter ToMethod(Func<InjectContext, TContract> method)
@@ -26,12 +29,16 @@ namespace Zenject
 
         public BindingConditionSetter ToGetter<TObj>(Func<TObj, TContract> method)
         {
-            return ToMethod((ctx) => method(ctx.Container.Resolve<TObj>()));
+            return ToGetter<TObj>(null, method);
         }
 
         public BindingConditionSetter ToGetter<TObj>(string identifier, Func<TObj, TContract> method)
         {
-            return ToMethod((ctx) => method(ctx.Container.Resolve<TObj>(identifier)));
+            return ToMethod((ctx) => method(ctx.Container.Resolve<TObj>(
+                new InjectContext(
+                    ctx.Container, typeof(TObj), identifier,
+                    false, ctx.ObjectType, ctx.ObjectInstance, ctx.MemberName, ctx))));
         }
     }
 }
+
