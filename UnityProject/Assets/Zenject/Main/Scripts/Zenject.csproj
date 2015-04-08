@@ -34,6 +34,28 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Not Unity Debug|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>..\..\..\..\..\..\AssemblyBuild\Bin\Not Unity Debug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;ZEN_NOT_UNITY3D</DefineConstants>
+    <DebugType>full</DebugType>
+    <IntermediateOutputPath>..\..\..\..\..\..\AssemblyBuild\Temp\Debug\</IntermediateOutputPath>
+    <BaseIntermediateOutputPath>..\..\..\..\..\..\AssemblyBuild\Temp\Debug\</BaseIntermediateOutputPath>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Not Unity Release|AnyCPU'">
+    <OutputPath>..\..\..\..\..\..\AssemblyBuild\Bin\Not Unity Release\</OutputPath>
+    <DefineConstants>TRACE;ZEN_NOT_UNITY3D</DefineConstants>
+    <Optimize>true</Optimize>
+    <IntermediateOutputPath>..\..\..\..\..\..\AssemblyBuild\Temp\Debug\</IntermediateOutputPath>
+    <BaseIntermediateOutputPath>..\..\..\..\..\..\AssemblyBuild\Temp\Debug\</BaseIntermediateOutputPath>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -41,7 +63,10 @@
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
-    <Reference Include="UnityEngine">
+    <Reference Include="UnityEngine" Condition="'$(Configuration)'=='Debug'">
+      <HintPath>..\..\..\..\..\AssemblyBuild\Libraries\Unity\UnityEngine.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine" Condition="'$(Configuration)'=='Release'">
       <HintPath>..\..\..\..\..\AssemblyBuild\Libraries\Unity\UnityEngine.dll</HintPath>
     </Reference>
   </ItemGroup>

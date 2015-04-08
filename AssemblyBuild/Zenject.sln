@@ -12,19 +12,31 @@ EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
+		Not Unity Debug|Any CPU = Not Unity Debug|Any CPU
+		Not Unity Release|Any CPU = Not Unity Release|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{46F25A62-2E29-48CB-95F3-BDBCB0976DDC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{46F25A62-2E29-48CB-95F3-BDBCB0976DDC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{46F25A62-2E29-48CB-95F3-BDBCB0976DDC}.Not Unity Debug|Any CPU.ActiveCfg = Not Unity Debug|Any CPU
+		{46F25A62-2E29-48CB-95F3-BDBCB0976DDC}.Not Unity Debug|Any CPU.Build.0 = Not Unity Debug|Any CPU
+		{46F25A62-2E29-48CB-95F3-BDBCB0976DDC}.Not Unity Release|Any CPU.ActiveCfg = Not Unity Release|Any CPU
+		{46F25A62-2E29-48CB-95F3-BDBCB0976DDC}.Not Unity Release|Any CPU.Build.0 = Not Unity Release|Any CPU
 		{46F25A62-2E29-48CB-95F3-BDBCB0976DDC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{46F25A62-2E29-48CB-95F3-BDBCB0976DDC}.Release|Any CPU.Build.0 = Release|Any CPU
 		{B71F2201-3382-46B3-A9C6-219A72954905}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{B71F2201-3382-46B3-A9C6-219A72954905}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B71F2201-3382-46B3-A9C6-219A72954905}.Not Unity Debug|Any CPU.ActiveCfg = Release|Any CPU
+		{B71F2201-3382-46B3-A9C6-219A72954905}.Not Unity Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B71F2201-3382-46B3-A9C6-219A72954905}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B71F2201-3382-46B3-A9C6-219A72954905}.Release|Any CPU.Build.0 = Release|Any CPU
 		{34E27462-3046-4DC7-A7FA-45E4F4F7D413}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{34E27462-3046-4DC7-A7FA-45E4F4F7D413}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{34E27462-3046-4DC7-A7FA-45E4F4F7D413}.Not Unity Debug|Any CPU.ActiveCfg = Not Unity Debug|Any CPU
+		{34E27462-3046-4DC7-A7FA-45E4F4F7D413}.Not Unity Debug|Any CPU.Build.0 = Not Unity Debug|Any CPU
+		{34E27462-3046-4DC7-A7FA-45E4F4F7D413}.Not Unity Release|Any CPU.ActiveCfg = Not Unity Release|Any CPU
+		{34E27462-3046-4DC7-A7FA-45E4F4F7D413}.Not Unity Release|Any CPU.Build.0 = Not Unity Release|Any CPU
 		{34E27462-3046-4DC7-A7FA-45E4F4F7D413}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{34E27462-3046-4DC7-A7FA-45E4F4F7D413}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
