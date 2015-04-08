@@ -36,7 +36,7 @@ namespace Zenject
 
         public override object GetInstance(InjectContext context)
         {
-            return _creator.GetComponent(_concreteType);
+            return _creator.GetComponent(_concreteType, context);
         }
 
         public override IEnumerable<ZenjectResolveException> ValidateBinding(InjectContext context)

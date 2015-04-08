@@ -46,7 +46,7 @@ namespace Zenject
                     //"Tried to instantiate a MonoBehaviour with type '{0}' during validation. Object graph: {1}", _componentType, DiContainer.GetCurrentObjectGraph());
 
                 // We don't use the generic version here to avoid duplicate generic arguments to binder
-                _instance = _instantiator.Instantiate(_componentType, _name);
+                _instance = _instantiator.Instantiate(_componentType, _name, context);
                 Assert.IsNotNull(_instance);
             }
 
