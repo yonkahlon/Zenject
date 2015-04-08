@@ -59,6 +59,14 @@ namespace Zenject
             this DiContainer container, GameObject gameObject,
             bool recursive, bool includeInactive, IEnumerable<object> extraArgs)
         {
+            container.InjectGameObject(
+                gameObject, recursive, includeInactive, extraArgs, null);
+        }
+
+        public static void InjectGameObject(
+            this DiContainer container, GameObject gameObject,
+            bool recursive, bool includeInactive, IEnumerable<object> extraArgs, InjectContext context)
+        {
             IEnumerable<MonoBehaviour> components;
 
             if (recursive)
@@ -80,7 +88,7 @@ namespace Zenject
                 // null if monobehaviour link is broken
                 if (component != null)
                 {
-                    container.Inject(component, extraArgs);
+                    container.Inject(component, extraArgs, context);
                 }
             }
         }
@@ -91,9 +99,22 @@ namespace Zenject
             container.Inject(injectable, Enumerable.Empty<object>());
         }
 
+        public static void Inject(this DiContainer container, object injectable, InjectContext context)
+        {
+            container.Inject(
+                injectable, Enumerable.Empty<object>(), false,
+                TypeAnalyzer.GetInfo(injectable.GetType()), context);
+        }
+
         public static void Inject(this DiContainer container, object injectable, IEnumerable<object> additional)
         {
             container.Inject(injectable, additional, false);
+        }
+
+        public static void Inject(this DiContainer container, object injectable, IEnumerable<object> additional, InjectContext context)
+        {
+            container.Inject(injectable, additional, false,
+                TypeAnalyzer.GetInfo(injectable.GetType()), context);
         }
 
         public static void Inject(this DiContainer container, object injectable, IEnumerable<object> additional, bool shouldUseAll)

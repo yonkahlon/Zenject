@@ -77,16 +77,11 @@ namespace Zenject
             return !_id.Prefab.GetComponentsInChildren(type, true).IsEmpty();
         }
 
-        public T GetComponent<T>()
-        {
-            return (T)GetComponent(typeof(T));
-        }
-
-        public object GetComponent(Type componentType)
+        public object GetComponent(Type componentType, InjectContext context)
         {
             if (_rootObj == null)
             {
-                _rootObj = GameObjectInstantiator.Instantiate(_id.Prefab);
+                _rootObj = GameObjectInstantiator.InstantiateWithContext(_id.Prefab, context);
 
                 if (_rootObj == null)
                 {

@@ -25,7 +25,8 @@ namespace Zenject
 
         // Add a monobehaviour to an existing game object
         // Note: gameobject here is not a prefab prototype, it is an instance
-        public TContract AddMonobehaviour<TContract>(GameObject gameObject, params object[] args) where TContract : Component
+        public TContract AddMonobehaviour<TContract>(
+            GameObject gameObject, params object[] args) where TContract : Component
         {
             return (TContract)AddMonobehaviour(typeof(TContract), gameObject, args);
         }
@@ -45,6 +46,12 @@ namespace Zenject
         // Without returning any particular monobehaviour
         public GameObject Instantiate(GameObject template, params object[] args)
         {
+            return InstantiateWithContext(template, null, args);
+        }
+
+        public GameObject InstantiateWithContext(
+            GameObject template, InjectContext context, params object[] args)
+        {
             var gameObj = (GameObject)GameObject.Instantiate(template);
 
             // By default parent to comp root
@@ -55,7 +62,7 @@ namespace Zenject
 
             gameObj.SetActive(true);
 
-            _container.InjectGameObject(gameObj, true, false, args);
+            _container.InjectGameObject(gameObj, true, false, args, context);
 
             return gameObj;
         }
@@ -122,6 +129,11 @@ namespace Zenject
 
         public object Instantiate(Type type, string name)
         {
+            return Instantiate(type, name, new InjectContext(_container, type));
+        }
+
+        public object Instantiate(Type type, string name, InjectContext context)
+        {
             var gameObj = new GameObject(name);
             gameObj.transform.SetParent(_rootTransform, false);
 
@@ -134,7 +146,7 @@ namespace Zenject
 
             if (type.DerivesFrom(typeof(Component)))
             {
-                _container.Inject((Component)component);
+                _container.Inject((Component)component, context);
             }
 
             return component;
