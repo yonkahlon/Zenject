@@ -105,7 +105,7 @@ namespace Zenject
                 Assert.That(newObject.GetComponent<CompositionRoot>() == null,
                     "LoadSceneAdditiveWithContainer does not expect a container to exist in the loaded scene");
 
-                InjectionHelper.InjectChildGameObjects(parentContainer, newObject);
+                parentContainer.InjectGameObject(newObject);
             }
         }
 #endif

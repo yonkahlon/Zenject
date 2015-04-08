@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using ModestTree;
 
 namespace Zenject
@@ -97,7 +98,8 @@ namespace Zenject
             }
 
             var concreteType = GetTypeToInstantiate(context.MemberType);
-            return _container.Instantiate(concreteType);
+            return _container.InstantiateExplicit(
+                concreteType, new List<TypeValuePair>(), context);
         }
 
         Type GetTypeToInstantiate(Type contractType)

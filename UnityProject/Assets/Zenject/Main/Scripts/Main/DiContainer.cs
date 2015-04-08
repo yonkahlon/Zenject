@@ -22,13 +22,13 @@ namespace Zenject
         readonly Dictionary<BindingId, List<ProviderBase>> _providers = new Dictionary<BindingId, List<ProviderBase>>();
         readonly SingletonProviderMap _singletonMap;
 
-        static Stack<Type> _lookupsInProgress = new Stack<Type>();
-
         bool _allowNullBindings;
 
         ProviderBase _fallbackProvider;
 
         readonly List<IInstaller> _installedInstallers = new List<IInstaller>();
+
+        readonly Stack<Type> _instantiatesInProgress = new Stack<Type>();
 
         public DiContainer()
         {
@@ -104,26 +104,6 @@ namespace Zenject
             }
         }
 
-        // This is the list of concrete types that are in the current object graph
-        // Useful for error messages (and complex binding conditions)
-        internal static Stack<Type> LookupsInProgress
-        {
-            get
-            {
-                return _lookupsInProgress;
-            }
-        }
-
-        internal static string GetCurrentObjectGraph()
-        {
-            if (_lookupsInProgress.Count == 0)
-            {
-                return "";
-            }
-
-            return _lookupsInProgress.Select(t => t.Name()).Reverse().Aggregate((i, str) => i + "\n" + str);
-        }
-
         public ValueBinder<TContract> BindValue<TContract>(string identifier)
             where TContract : struct
         {
@@ -155,12 +135,6 @@ namespace Zenject
         public BindScope CreateScope()
         {
             return new BindScope(this, _singletonMap);
-        }
-
-        // See comment in LookupInProgressAdder
-        internal LookupInProgressAdder PushLookup(Type type)
-        {
-            return new LookupInProgressAdder(this, type);
         }
 
         public void RegisterProvider(
@@ -239,7 +213,7 @@ namespace Zenject
                     var type = factory.ConstructedType;
                     var providedArgs = factory.ProvidedTypes;
 
-                    foreach (var error in ValidateObjectGraph(type, providedArgs))
+                    foreach (var error in ValidateObjectGraph(type, injectCtx, providedArgs))
                     {
                         yield return error;
                     }
@@ -282,7 +256,15 @@ namespace Zenject
             return BindingValidator.ValidateContract(this, context);
         }
 
-        public IEnumerable<ZenjectResolveException> ValidateObjectGraph(Type contractType, params Type[] extras)
+        public IEnumerable<ZenjectResolveException> ValidateObjectGraph(
+            Type contractType, params Type[] extras)
+        {
+            return ValidateObjectGraph(
+                contractType, new InjectContext(this, contractType), extras);
+        }
+
+        public IEnumerable<ZenjectResolveException> ValidateObjectGraph(
+            Type contractType, InjectContext context, params Type[] extras)
         {
             if (contractType.IsAbstract)
             {
@@ -290,7 +272,7 @@ namespace Zenject
                     "Expected contract type '{0}' to be non-abstract".Fmt(contractType.Name()));
             }
 
-            return BindingValidator.ValidateObjectGraph(this, contractType, extras);
+            return BindingValidator.ValidateObjectGraph(this, contractType, context, extras);
         }
 
         // Wrap IEnumerable<> to avoid LINQ mistakes
@@ -359,7 +341,7 @@ namespace Zenject
                 }
 
                 throw new ZenjectResolveException(
-                    "Could not find required dependency with type '" + context.MemberType.Name() + "' \nObject graph:\n" + GetCurrentObjectGraph());
+                    "Could not find required dependency with type '" + context.MemberType.Name() + "' \nObject graph:\n" + context.GetObjectGraphString());
             }
 
             return ReflectionUtil.CreateGenericList(context.MemberType, new object[] {});
@@ -427,8 +409,8 @@ namespace Zenject
                         "Unable to resolve type '{0}'{1}. \nObject graph:\n{2}"
                         .Fmt(
                             context.MemberType.Name() + (context.Identifier == null ? "" : " with ID '" + context.Identifier.ToString() + "'"),
-                            (context.ParentType == null ? "" : " while building object with type '{0}'".Fmt(context.ParentType.Name())),
-                            GetCurrentObjectGraph()));
+                            (context.ObjectType == null ? "" : " while building object with type '{0}'".Fmt(context.ObjectType.Name())),
+                            context.GetObjectGraphString()));
                 }
 
                 return null;
@@ -449,8 +431,8 @@ namespace Zenject
                         "Found multiple matches when only one was expected for type '{0}'{1}. \nObject graph:\n {2}"
                         .Fmt(
                             context.MemberType.Name(),
-                            (context.ParentType == null ? "" : " while building object with type '{0}'".Fmt(context.ParentType.Name())),
-                            GetCurrentObjectGraph()));
+                            (context.ObjectType == null ? "" : " while building object with type '{0}'".Fmt(context.ObjectType.Name())),
+                            context.GetObjectGraphString()));
                 }
             }
             else
@@ -496,19 +478,31 @@ namespace Zenject
         // Same as Instantiate except you can pass in null value
         // however the type for each parameter needs to be explicitly provided in this case
         public object InstantiateExplicit(
-            Type concreteType, List<TypeValuePair> extraArgMap)
+            Type concreteType, List<TypeValuePair> extraArgMap, InjectContext currentContext)
         {
             using (ProfileBlock.Start("Zenject.Instantiate({0})", concreteType))
             {
-                using (PushLookup(concreteType))
+                if (_instantiatesInProgress.Contains(concreteType))
                 {
-                    return Instantiate(concreteType, extraArgMap);
+                    throw new ZenjectResolveException(
+                        "Circular dependency detected! \nObject graph:\n" + currentContext.GetObjectGraphString());
+                }
+
+                _instantiatesInProgress.Push(concreteType);
+                try
+                {
+                    return InstantiateInternal(concreteType, extraArgMap, currentContext);
+                }
+                finally
+                {
+                    Assert.That(_instantiatesInProgress.Peek() == concreteType);
+                    _instantiatesInProgress.Pop();
                 }
             }
         }
 
-        public object Instantiate(
-            Type concreteType, IEnumerable<TypeValuePair> extraArgMapParam)
+        object InstantiateInternal(
+            Type concreteType, IEnumerable<TypeValuePair> extraArgMapParam, InjectContext currentContext)
         {
 #if !ZEN_NOT_UNITY3D
             Assert.That(!concreteType.DerivesFrom<UnityEngine.Component>(),
@@ -533,7 +527,7 @@ namespace Zenject
 
                 if (!InstantiateUtil.PopValueWithType(extraArgMap, injectInfo.MemberType, out value))
                 {
-                    value = Resolve(injectInfo.CreateInjectContext(this, null));
+                    value = Resolve(injectInfo.CreateInjectContext(this, currentContext, null));
                 }
 
                 paramValues.Add(value);
@@ -554,7 +548,7 @@ namespace Zenject
                     "Error occurred while instantiating object with type '{0}'".Fmt(concreteType.Name()), e);
             }
 
-            Inject(newObj, extraArgMap, true, typeInfo);
+            Inject(newObj, extraArgMap, true, typeInfo, currentContext);
 
             return newObj;
         }
@@ -562,10 +556,15 @@ namespace Zenject
         // Iterate over fields/properties on the given object and inject any with the [Inject] attribute
         internal void Inject(
             object injectable, IEnumerable<TypeValuePair> extraArgMapParam,
-            bool shouldUseAll, ZenjectTypeInfo typeInfo)
+            bool shouldUseAll, ZenjectTypeInfo typeInfo, InjectContext context)
         {
             Assert.IsEqual(typeInfo.TypeAnalyzed, injectable.GetType());
             Assert.That(injectable != null);
+
+#if !ZEN_NOT_UNITY3D
+            Assert.That(injectable.GetType() != typeof(GameObject),
+                "Use InjectGameObject to Inject game objects instead of Inject method");
+#endif
 
             // Make a copy since we remove from it below
             var extraArgMap = extraArgMapParam.ToList();
@@ -581,7 +580,7 @@ namespace Zenject
                 else
                 {
                     value = Resolve(
-                        injectInfo.CreateInjectContext(this, injectable));
+                        injectInfo.CreateInjectContext(this, context, injectable));
 
                     if (injectInfo.Optional && value == null)
                     {
@@ -607,7 +606,7 @@ namespace Zenject
                         if (!InstantiateUtil.PopValueWithType(extraArgMap, injectInfo.MemberType, out value))
                         {
                             value = Resolve(
-                                injectInfo.CreateInjectContext(this, injectable));
+                                injectInfo.CreateInjectContext(this, context, injectable));
                         }
 
                         paramValues.Add(value);
@@ -621,7 +620,7 @@ namespace Zenject
             {
                 throw new ZenjectResolveException(
                     "Passed unnecessary parameters when injecting into type '{0}'. \nExtra Parameters: {1}\nObject graph:\n{2}"
-                    .Fmt(injectable.GetType().Name(), String.Join(",", extraArgMap.Select(x => x.Type.Name()).ToArray()), DiContainer.GetCurrentObjectGraph()));
+                    .Fmt(injectable.GetType().Name(), String.Join(",", extraArgMap.Select(x => x.Type.Name()).ToArray()), context.GetObjectGraphString()));
             }
         }
     }

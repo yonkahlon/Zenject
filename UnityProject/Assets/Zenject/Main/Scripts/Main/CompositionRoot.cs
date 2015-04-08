@@ -68,12 +68,12 @@ namespace Zenject
 
                 foreach (var rootObj in rootGameObjects)
                 {
-                    InjectionHelper.InjectChildGameObjects(_container, rootObj, !OnlyInjectWhenActive);
+                    _container.InjectGameObject(rootObj, true, !OnlyInjectWhenActive);
                 }
             }
             else
             {
-                InjectionHelper.InjectChildGameObjects(_container, gameObject, !OnlyInjectWhenActive);
+                _container.InjectGameObject(gameObject, true, !OnlyInjectWhenActive);
             }
 
             _dependencyRoot = _container.Resolve<IDependencyRoot>();

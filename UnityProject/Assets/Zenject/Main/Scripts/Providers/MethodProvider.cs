@@ -25,7 +25,7 @@ namespace Zenject
             var obj = _method(context);
 
             Assert.That(obj != null, () =>
-                "Method provider returned null when looking up type '{0}'. \nObject graph:\n{1}".Fmt(typeof(T).Name(), DiContainer.GetCurrentObjectGraph()));
+                "Method provider returned null when looking up type '{0}'. \nObject graph:\n{1}".Fmt(typeof(T).Name(), context.GetObjectGraphString()));
 
             return obj;
         }

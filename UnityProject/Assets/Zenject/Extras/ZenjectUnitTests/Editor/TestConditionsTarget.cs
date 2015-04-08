@@ -32,7 +32,7 @@ namespace Zenject.Tests
         public override void Setup()
         {
             base.Setup();
-            Container.Bind<Test0>().ToSingle().When(r => r.ParentType == typeof(Test2));
+            Container.Bind<Test0>().ToSingle().When(r => r.ObjectType == typeof(Test2));
         }
 
         [Test]

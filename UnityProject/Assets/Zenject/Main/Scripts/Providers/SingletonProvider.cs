@@ -43,7 +43,7 @@ namespace Zenject
                 return Enumerable.Empty<ZenjectResolveException>();
             }
 
-            return BindingValidator.ValidateObjectGraph(_container, GetInstanceType());
+            return BindingValidator.ValidateObjectGraph(_container, GetInstanceType(), context);
         }
     }
 }
