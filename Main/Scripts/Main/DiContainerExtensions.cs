@@ -6,6 +6,7 @@ using ModestTree;
 #if !ZEN_NOT_UNITY3D
 using UnityEngine;
 #endif
+using ModestTree.Util;
 
 namespace Zenject
 {
@@ -45,6 +46,44 @@ namespace Zenject
             return container.Bind<IFactory<TContract>>()
                 .ToMethod((ctx) => ctx.Container.Instantiate<GameObjectFactory<TContract>>(prefab));
         }
+
+        // Inject dependencies into child game objects
+        public static void InjectGameObject(
+            this DiContainer container, GameObject gameObject,
+            bool recursive = true, bool includeInactive = false)
+        {
+            container.InjectGameObject(gameObject, recursive, includeInactive, Enumerable.Empty<object>());
+        }
+
+        public static void InjectGameObject(
+            this DiContainer container, GameObject gameObject,
+            bool recursive, bool includeInactive, IEnumerable<object> extraArgs)
+        {
+            IEnumerable<MonoBehaviour> components;
+
+            if (recursive)
+            {
+                components = UnityUtil.GetComponentsInChildrenDepthFirst<MonoBehaviour>(gameObject, includeInactive);
+            }
+            else
+            {
+                if (!includeInactive && !gameObject.activeSelf)
+                {
+                    return;
+                }
+
+                components = gameObject.GetComponents<MonoBehaviour>();
+            }
+
+            foreach (var component in components)
+            {
+                // null if monobehaviour link is broken
+                if (component != null)
+                {
+                    container.Inject(component, extraArgs);
+                }
+            }
+        }
 #endif
 
         public static void Inject(this DiContainer container, object injectable)
@@ -59,19 +98,21 @@ namespace Zenject
 
         public static void Inject(this DiContainer container, object injectable, IEnumerable<object> additional, bool shouldUseAll)
         {
-            container.Inject(injectable, additional, shouldUseAll, TypeAnalyzer.GetInfo(injectable.GetType()));
+            container.Inject(
+                injectable, additional, shouldUseAll,
+                TypeAnalyzer.GetInfo(injectable.GetType()), new InjectContext(container, injectable.GetType(), null));
         }
 
         internal static void Inject(
             this DiContainer container, object injectable,
-            IEnumerable<object> additional, bool shouldUseAll, ZenjectTypeInfo typeInfo)
+            IEnumerable<object> additional, bool shouldUseAll, ZenjectTypeInfo typeInfo, InjectContext context)
         {
             Assert.That(!additional.Contains(null),
                 "Null value given to injection argument list. In order to use null you must provide a List<TypeValuePair> and not just a list of objects");
 
             container.Inject(
                 injectable,
-                InstantiateUtil.CreateTypeValueList(additional), shouldUseAll, typeInfo);
+                InstantiateUtil.CreateTypeValueList(additional), shouldUseAll, typeInfo, context);
         }
 
         public static ValueBinder<TContract> BindValue<TContract>(this DiContainer container) where TContract : struct
@@ -113,7 +154,8 @@ namespace Zenject
             return container.ValidateResolve<TContract>((string)null);
         }
 
-        public static IEnumerable<ZenjectResolveException> ValidateObjectGraph<TConcrete>(this DiContainer container, params Type[] extras)
+        public static IEnumerable<ZenjectResolveException> ValidateObjectGraph<TConcrete>(
+            this DiContainer container, params Type[] extras)
         {
             return container.ValidateObjectGraph(typeof(TConcrete), extras);
         }

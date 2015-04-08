@@ -37,7 +37,7 @@ namespace Zenject
         {
             Assert.That(behaviourType.DerivesFrom<Component>());
             var monoBehaviour = (Component)gameObject.AddComponent(behaviourType);
-            InjectionHelper.InjectMonoBehaviour(_container, monoBehaviour, args);
+            _container.Inject(monoBehaviour, args);
             return monoBehaviour;
         }
 
@@ -55,7 +55,7 @@ namespace Zenject
 
             gameObj.SetActive(true);
 
-            InjectionHelper.InjectChildGameObjects(_container, gameObj, false, args);
+            _container.InjectGameObject(gameObj, true, false, args);
 
             return gameObj;
         }
@@ -103,7 +103,7 @@ namespace Zenject
                         extraArgs = args;
                     }
 
-                    InjectionHelper.InjectMonoBehaviour(_container, component, extraArgs);
+                    _container.Inject(component, extraArgs);
                 }
                 else
                 {
@@ -134,7 +134,7 @@ namespace Zenject
 
             if (type.DerivesFrom(typeof(Component)))
             {
-                InjectionHelper.InjectMonoBehaviour(_container, (Component)component);
+                _container.Inject((Component)component);
             }
 
             return component;

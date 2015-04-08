@@ -45,11 +45,11 @@ namespace Zenject
             {
                 yield return new ZenjectResolveException(
                     "Could not find component of type '{0}' in prefab with name '{1}' \nObject graph:\n{2}"
-                    .Fmt(_concreteType.Name(), _creator.Prefab.name, DiContainer.GetCurrentObjectGraph()));
+                    .Fmt(_concreteType.Name(), _creator.Prefab.name, context.GetObjectGraphString()));
                 yield break;
             }
 
-            foreach (var err in BindingValidator.ValidateObjectGraph(_container, _concreteType))
+            foreach (var err in BindingValidator.ValidateObjectGraph(_container, _concreteType, context))
             {
                 yield return err;
             }

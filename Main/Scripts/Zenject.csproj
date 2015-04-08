@@ -17,9 +17,9 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <IntermediateOutputPath>..\..\..\..\..\AssemblyBuild\Temp\Debug\</IntermediateOutputPath>
-    <BaseIntermediateOutputPath>..\..\..\..\..\AssemblyBuild\Temp\Debug\</BaseIntermediateOutputPath>
-    <OutputPath>..\..\..\..\..\AssemblyBuild\Bin\Debug\</OutputPath>
+    <IntermediateOutputPath>..\..\..\..\..\..\AssemblyBuild\Temp\Debug\</IntermediateOutputPath>
+    <BaseIntermediateOutputPath>..\..\..\..\..\..\AssemblyBuild\Temp\Debug\</BaseIntermediateOutputPath>
+    <OutputPath>..\..\..\..\..\..\AssemblyBuild\Bin\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -27,9 +27,9 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <IntermediateOutputPath>..\..\..\..\..\AssemblyBuild\Temp\Release\</IntermediateOutputPath>
-    <BaseIntermediateOutputPath>..\..\..\..\..\AssemblyBuild\Temp\Release\</BaseIntermediateOutputPath>
-    <OutputPath>..\..\..\..\..\AssemblyBuild\Bin\Release\</OutputPath>
+    <IntermediateOutputPath>..\..\..\..\..\..\AssemblyBuild\Temp\Release\</IntermediateOutputPath>
+    <BaseIntermediateOutputPath>..\..\..\..\..\..\AssemblyBuild\Temp\Release\</BaseIntermediateOutputPath>
+    <OutputPath>..\..\..\..\..\..\AssemblyBuild\Bin\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -71,7 +71,6 @@
     <Compile Include="Factories\KeyedFactory.cs" />
     <Compile Include="Factories\ListFactory.cs" />
     <Compile Include="Injection\InjectableInfo.cs" />
-    <Compile Include="Injection\InjectionHelper.cs" />
     <Compile Include="Injection\TypeAnalyzer.cs" />
     <Compile Include="Injection\ZenjectTypeInfo.cs" />
     <Compile Include="..\..\Internal\LinqExtensions.cs" />
@@ -98,7 +97,6 @@
     <Compile Include="Misc\InitializablePrioritiesInstaller.cs" />
     <Compile Include="Misc\ITickable.cs" />
     <Compile Include="Misc\KernelUtil.cs" />
-    <Compile Include="Misc\LookupInProgressAdder.cs" />
     <Compile Include="Misc\SingletonInstanceHelper.cs" />
     <Compile Include="Misc\StandardUnityInstaller.cs" />
     <Compile Include="Misc\TaskUpdater.cs" />

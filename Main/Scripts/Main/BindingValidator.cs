@@ -44,8 +44,8 @@ namespace Zenject
                                     "Could not find dependency with type 'List<{0}>'{1}.  If the empty list is also valid, you can allow this by using the [InjectOptional] attribute.' \nObject graph:\n{2}"
                                     .Fmt(
                                         subContext.MemberType.Name(),
-                                        (context.ParentType == null ? "" : " when injecting into '{0}'".Fmt(context.ParentType.Name())),
-                                        DiContainer.GetCurrentObjectGraph()));
+                                        (context.ObjectType == null ? "" : " when injecting into '{0}'".Fmt(context.ObjectType.Name())),
+                                        context.GetObjectGraphString()));
                             }
                         }
                     }
@@ -79,8 +79,8 @@ namespace Zenject
                                     "Could not find required dependency with type '{0}'{1} \nObject graph:\n{2}"
                                     .Fmt(
                                         context.MemberType.Name(),
-                                        (context.ParentType == null ? "" : " when injecting into '{0}'".Fmt(context.ParentType.Name())),
-                                        DiContainer.GetCurrentObjectGraph()));
+                                        (context.ObjectType == null ? "" : " when injecting into '{0}'".Fmt(context.ObjectType.Name())),
+                                        context.GetObjectGraphString()));
                             }
                         }
                         else
@@ -89,8 +89,8 @@ namespace Zenject
                                 "Found multiple matches when only one was expected for dependency with type '{0}'{1} \nObject graph:\n{2}"
                                 .Fmt(
                                     context.MemberType.Name(),
-                                    (context.ParentType == null ? "" : " when injecting into '{0}'".Fmt(context.ParentType.Name())),
-                                    DiContainer.GetCurrentObjectGraph()));
+                                    (context.ObjectType == null ? "" : " when injecting into '{0}'".Fmt(context.ObjectType.Name())),
+                                    context.GetObjectGraphString()));
                         }
                     }
                 }
@@ -98,36 +98,33 @@ namespace Zenject
         }
 
         public static IEnumerable<ZenjectResolveException> ValidateObjectGraph(
-            DiContainer container, Type concreteType, params Type[] extras)
+            DiContainer container, Type concreteType, InjectContext currentContext, params Type[] extras)
         {
-            using (container.PushLookup(concreteType))
+            var typeInfo = TypeAnalyzer.GetInfo(concreteType);
+            var extrasList = extras.ToList();
+
+            foreach (var dependInfo in typeInfo.AllInjectables)
             {
-                var typeInfo = TypeAnalyzer.GetInfo(concreteType);
-                var extrasList = extras.ToList();
+                Assert.IsEqual(dependInfo.ObjectType, concreteType);
 
-                foreach (var dependInfo in typeInfo.AllInjectables)
+                if (TryTakingFromExtras(dependInfo.MemberType, extrasList))
                 {
-                    Assert.IsEqual(dependInfo.ParentType, concreteType);
-
-                    if (TryTakingFromExtras(dependInfo.MemberType, extrasList))
-                    {
-                        continue;
-                    }
-
-                    var context = dependInfo.CreateInjectContext(container, null);
-
-                    foreach (var error in ValidateContract(container, context))
-                    {
-                        yield return error;
-                    }
+                    continue;
                 }
 
-                if (!extrasList.IsEmpty())
+                var context = dependInfo.CreateInjectContext(container, currentContext, null);
+
+                foreach (var error in ValidateContract(container, context))
                 {
-                    yield return new ZenjectResolveException(
-                        "Found unnecessary extra parameters passed when injecting into '{0}' with types '{1}'.  \nObject graph:\n{2}"
-                        .Fmt(concreteType.Name(), String.Join(",", extrasList.Select(x => x.Name()).ToArray()), DiContainer.GetCurrentObjectGraph()));
+                    yield return error;
                 }
+            }
+
+            if (!extrasList.IsEmpty())
+            {
+                yield return new ZenjectResolveException(
+                    "Found unnecessary extra parameters passed when injecting into '{0}' with types '{1}'.  \nObject graph:\n{2}"
+                    .Fmt(concreteType.Name(), String.Join(",", extrasList.Select(x => x.Name()).ToArray()), currentContext.GetObjectGraphString()));
             }
         }
 

@@ -15,29 +15,29 @@ namespace Zenject
         // The field type or property type from source code
         public readonly Type MemberType;
 
-        public readonly Type ParentType;
+        public readonly Type ObjectType;
 
         // Null for constructor declared dependencies
         public readonly Action<object, object> Setter;
 
         public InjectableInfo(
             bool optional, string identifier, string memberName,
-            Type memberType, Type parentType, Action<object, object> setter)
+            Type memberType, Type objectType, Action<object, object> setter)
         {
             Optional = optional;
             Setter = setter;
-            ParentType = parentType;
+            ObjectType = objectType;
             MemberType = memberType;
             MemberName = memberName;
             Identifier = identifier;
         }
 
-        public InjectContext CreateInjectContext(DiContainer container, object targetInstance)
+        public InjectContext CreateInjectContext(
+            DiContainer container, InjectContext currentContext, object targetInstance)
         {
             return new InjectContext(
                 container, MemberType, Identifier, Optional,
-                ParentType, targetInstance, MemberName,
-                DiContainer.LookupsInProgress.ToList());
+                ObjectType, targetInstance, MemberName, currentContext);
         }
     }
 }

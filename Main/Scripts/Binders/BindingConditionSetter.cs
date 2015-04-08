@@ -23,22 +23,22 @@ namespace Zenject
 
         public void WhenInjectedIntoInstance(object instance)
         {
-            _provider.Condition = r => ReferenceEquals(r.ParentInstance, instance);
+            _provider.Condition = r => ReferenceEquals(r.ObjectInstance, instance);
         }
 
         public void WhenInjectedInto(params Type[] targets)
         {
-            _provider.Condition = r => targets.Where(x => r.ParentType != null && r.ParentType.DerivesFromOrEqual(x)).Any();
+            _provider.Condition = r => targets.Where(x => r.ObjectType != null && r.ObjectType.DerivesFromOrEqual(x)).Any();
         }
 
         public void WhenInjectedInto<T>()
         {
-            _provider.Condition = r => r.ParentType != null && r.ParentType.DerivesFromOrEqual(typeof(T));
+            _provider.Condition = r => r.ObjectType != null && r.ObjectType.DerivesFromOrEqual(typeof(T));
         }
 
         public void WhenNotInjectedInto<T>()
         {
-            _provider.Condition = r => r.ParentType == null || !r.ParentType.DerivesFromOrEqual(typeof(T));
+            _provider.Condition = r => r.ObjectType == null || !r.ObjectType.DerivesFromOrEqual(typeof(T));
         }
     }
 }

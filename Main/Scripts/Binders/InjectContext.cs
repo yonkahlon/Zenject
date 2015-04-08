@@ -1,16 +1,26 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using ModestTree;
 
 namespace Zenject
 {
     public class InjectContext
     {
         // The type of the object which is having its members injected
-        public readonly Type ParentType;
+        // NOTE: This is null for root calls to Resolve<> or Instantiate<>
+        public readonly Type ObjectType;
+
+        // Parent context that triggered the creation of ObjectType
+        // This can be used for very complex conditions using parent info such as identifiers, types, etc.
+        // Note that ParentContext.MemberType is not necessarily the same as ObjectType,
+        // since the ObjectType could be a derived type from ParentContext.MemberType
+        public readonly InjectContext ParentContext;
 
         // The instance which is having its members injected
         // Note that this is null when injecting into the constructor
-        public readonly object ParentInstance;
+        public readonly object ObjectInstance;
 
         // Identifier - most of the time this is null
         // It will match 'foo' in this example: Container.Bind("foo")
@@ -21,9 +31,6 @@ namespace Zenject
 
         // The type of the constructor parameter, field or property
         public readonly Type MemberType;
-
-        // List of all types that are in the process of being injected
-        public readonly List<Type> ParentTypes;
 
         // When optional, null is a valid value to be returned
         public readonly bool Optional;
@@ -36,22 +43,22 @@ namespace Zenject
 
         public InjectContext(
             DiContainer container, Type memberType, string identifier, bool optional,
-            Type parentType, object parentInstance, string memberName, List<Type> parentTypes)
+            Type objectType, object objectInstance, string memberName, InjectContext parentContext)
         {
-            ParentType = parentType;
-            ParentInstance = parentInstance;
+            ObjectType = objectType;
+            ObjectInstance = objectInstance;
             Identifier = identifier;
             MemberName = memberName;
             MemberType = memberType;
-            ParentTypes = parentTypes;
             Optional = optional;
             Container = container;
             BindingId = new BindingId(memberType, identifier);
+            ParentContext = parentContext;
         }
 
         public InjectContext(
-            DiContainer container, Type memberType, string identifier, bool optional, Type parentType, object parentInstance)
-            : this(container, memberType, identifier, optional, parentType, parentInstance, "", new List<Type>())
+            DiContainer container, Type memberType, string identifier, bool optional, Type objectType, object objectInstance)
+            : this(container, memberType, identifier, optional, objectType, objectInstance, "", null)
         {
         }
 
@@ -73,16 +80,81 @@ namespace Zenject
         {
         }
 
+        public IEnumerable<InjectContext> ParentContexts
+        {
+            get
+            {
+                if (ParentContext == null)
+                {
+                    yield break;
+                }
+
+                yield return ParentContext;
+
+                foreach (var context in ParentContext.ParentContexts)
+                {
+                    yield return context;
+                }
+            }
+        }
+
+        public IEnumerable<InjectContext> ParentContextsAndSelf
+        {
+            get
+            {
+                yield return this;
+
+                foreach (var context in ParentContexts)
+                {
+                    yield return context;
+                }
+            }
+        }
+
+        // This will return the types of all the objects that are being injected
+        // So if you have class Foo which has constructor parameter of type IBar,
+        // and IBar resolves to Bar, this will be equal to (Bar, Foo)
+        public IEnumerable<Type> AllObjectTypes
+        {
+            get
+            {
+                foreach (var context in ParentContextsAndSelf)
+                {
+                    if (context.ObjectType != null)
+                    {
+                        yield return context.ObjectType;
+                    }
+                }
+            }
+        }
+
+        public string GetObjectGraphString()
+        {
+            var result = new StringBuilder();
+
+            foreach (var context in ParentContextsAndSelf.Reverse())
+            {
+                if (context.ObjectType == null)
+                {
+                    continue;
+                }
+
+                result.AppendLine(context.ObjectType.Name());
+            }
+
+            return result.ToString();
+        }
+
         public InjectContext ChangeMemberType(Type newMemberType)
         {
             return new InjectContext(
-                Container, newMemberType, Identifier, Optional, ParentType, ParentInstance, MemberName, ParentTypes);
+                Container, newMemberType, Identifier, Optional, ObjectType, ObjectInstance, MemberName, ParentContext);
         }
 
         public InjectContext ChangeId(string newIdentifier)
         {
             return new InjectContext(
-                Container, MemberType, newIdentifier, Optional, ParentType, ParentInstance, MemberName, ParentTypes);
+                Container, MemberType, newIdentifier, Optional, ObjectType, ObjectInstance, MemberName, ParentContext);
         }
     }
 }

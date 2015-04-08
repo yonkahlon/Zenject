@@ -37,12 +37,12 @@ namespace Zenject
             if (_instance == null)
             {
                 Assert.That(!_container.AllowNullBindings,
-                    "Tried to instantiate a MonoBehaviour with type '{0}' during validation. Object graph: {1}", _componentType, DiContainer.GetCurrentObjectGraph());
+                    "Tried to instantiate a MonoBehaviour with type '{0}' during validation. Object graph: {1}", _componentType, context.GetObjectGraphString());
 
                 _instance = _gameObject.AddComponent(_componentType);
                 Assert.That(_instance != null);
 
-                InjectionHelper.InjectMonoBehaviour(_container, _instance);
+                _container.Inject(_instance);
             }
 
             return _instance;
@@ -50,7 +50,7 @@ namespace Zenject
 
         public override IEnumerable<ZenjectResolveException> ValidateBinding(InjectContext context)
         {
-            return BindingValidator.ValidateObjectGraph(_container, _componentType);
+            return BindingValidator.ValidateObjectGraph(_container, _componentType, context);
         }
     }
 }
