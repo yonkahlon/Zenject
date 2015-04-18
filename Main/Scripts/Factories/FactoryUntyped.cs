@@ -9,11 +9,20 @@ namespace Zenject
     // Instantiate given concrete class
     public class FactoryUntyped<TContract, TConcrete> : IFactoryUntyped<TContract> where TConcrete : TContract
     {
-        readonly DiContainer _container;
+        [Inject]
+        DiContainer _container;
 
-        public FactoryUntyped(DiContainer container)
+        // So it can be created without using container
+        public DiContainer Container
         {
-            _container = container;
+            get
+            {
+                return _container;
+            }
+            set
+            {
+                _container = value;
+            }
         }
 
         public virtual TContract Create(params object[] constructorArgs)
@@ -30,26 +39,50 @@ namespace Zenject
     // Instantiate given contract class
     public class FactoryUntyped<TContract> : IFactoryUntyped<TContract>
     {
-        readonly DiContainer _container;
-        readonly Type _concreteType;
-
         [Inject]
-        public FactoryUntyped(DiContainer container)
+        DiContainer _container;
+
+        [InjectOptional]
+        Type _concreteType;
+
+        // So it can be created without using container
+        public DiContainer Container
         {
-            _container = container;
-            _concreteType = typeof(TContract);
+            get
+            {
+                return _container;
+            }
+            set
+            {
+                _container = value;
+            }
         }
 
-        public FactoryUntyped(DiContainer container, Type concreteType)
+        public Type ConcreteType
         {
-            if (!concreteType.DerivesFromOrEqual(typeof(TContract)))
+            get
             {
-                throw new ZenjectResolveException(
-                    "Expected type '{0}' to derive from '{1}'".Fmt(concreteType.Name(), typeof(TContract).Name()));
+                return _concreteType;
+            }
+            set
+            {
+                _concreteType = value;
+            }
+        }
+
+        [PostInject]
+        void Initialize()
+        {
+            if (_concreteType == null)
+            {
+                _concreteType = typeof(TContract);
             }
 
-            _container = container;
-            _concreteType = concreteType;
+            if (!_concreteType.DerivesFromOrEqual(typeof(TContract)))
+            {
+                throw new ZenjectResolveException(
+                    "Expected type '{0}' to derive from '{1}'".Fmt(_concreteType.Name(), typeof(TContract).Name()));
+            }
         }
 
         public virtual TContract Create(params object[] constructorArgs)

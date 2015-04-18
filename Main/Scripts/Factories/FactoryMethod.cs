@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using ModestTree.Util;
 
 namespace Zenject
 {
@@ -100,6 +101,31 @@ namespace Zenject
         public TValue Create(TParam1 param1, TParam2 param2, TParam3 param3)
         {
             return _method(_container, param1, param2, param3);
+        }
+    }
+
+    // Three parameters
+    public sealed class FactoryMethod<TParam1, TParam2, TParam3, TParam4, TValue> : IValidatableFactory, IFactory<TParam1, TParam2, TParam3, TParam4, TValue>
+    {
+        [Inject]
+        DiContainer _container = null;
+
+        [Inject]
+        readonly Func<DiContainer, TParam1, TParam2, TParam3, TParam4, TValue> _method = null;
+
+        public Type ConstructedType
+        {
+            get { return typeof(TValue); }
+        }
+
+        public Type[] ProvidedTypes
+        {
+            get { return new Type[] { typeof(TParam1), typeof(TParam2), typeof(TParam3), typeof(TParam4) }; }
+        }
+
+        public TValue Create(TParam1 param1, TParam2 param2, TParam3 param3, TParam4 param4)
+        {
+            return _method(_container, param1, param2, param3, param4);
         }
     }
 }

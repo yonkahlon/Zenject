@@ -42,8 +42,7 @@ namespace Zenject.Tests
             Container.Bind<Test2>().ToSingle();
 
             var val = new Test1();
-            var factory = new FactoryUntyped<Test2>(Container);
-            var test1 = factory.Create(val);
+            var test1 = Container.Instantiate<Test2>(val);
 
             Assert.That(test1.val == val);
         }

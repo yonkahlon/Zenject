@@ -26,14 +26,12 @@ namespace Zenject.Tests
         [Test]
         public void TestExtraParametersSameType()
         {
-            var factory1 = new FactoryUntyped<Test1>(Container);
-            var test1 = factory1.Create(5, 10);
+            var test1 = Container.Instantiate<Test1>(5, 10);
 
             Assert.That(test1 != null);
             Assert.That(test1.f1 == 5 && test1.f2 == 10);
 
-            var factory2 = new FactoryUntyped<Test1>(Container);
-            var test2 = factory2.Create(10, 5);
+            var test2 = Container.Instantiate<Test1>(10, 5);
 
             Assert.That(test2 != null);
             Assert.That(test2.f1 == 10 && test2.f2 == 5);

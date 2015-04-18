@@ -14,39 +14,6 @@ namespace Zenject
     public static class DiContainerExtensions
     {
 #if !ZEN_NOT_UNITY3D
-        public static BindingConditionSetter BindGameObjectFactory<T>(
-            this DiContainer container, GameObject prefab)
-            // This would be useful but fails with VerificationException's in webplayer builds for some reason
-            //where T : GameObjectFactory
-            where T : class
-        {
-            if (prefab == null)
-            {
-                throw new ZenjectBindException(
-                    "Null prefab provided to BindGameObjectFactory for type '{0}'".Fmt(typeof(T).Name()));
-            }
-
-            // We could bind the factory ToSingle but doing it this way is better
-            // since it allows us to have multiple game object factories that
-            // use different prefabs and have them injected into different places
-            return container.Bind<T>().ToMethod((ctx) => ctx.Container.Instantiate<T>(prefab));
-        }
-
-        public static BindingConditionSetter BindFactoryForPrefab<TContract>(
-            this DiContainer container, GameObject prefab) where TContract : Component
-        {
-            if (prefab == null)
-            {
-                throw new ZenjectBindException(
-                    "Null prefab provided to BindFactoryForPrefab for type '{0}'".Fmt(typeof(TContract).Name()));
-            }
-
-            // We could use ToSingleMethod here but then we'd have issues when using .When() conditionals to inject
-            // multiple factories in different places
-            return container.Bind<IFactory<TContract>>()
-                .ToMethod((ctx) => ctx.Container.Instantiate<GameObjectFactory<TContract>>(prefab));
-        }
-
         // Inject dependencies into child game objects
         public static void InjectGameObject(
             this DiContainer container, GameObject gameObject,
@@ -308,120 +275,6 @@ namespace Zenject
             return container.ValidateResolve(new InjectContext(container, typeof(TContract), identifier));
         }
 
-        public static BindingConditionSetter BindFactoryToMethodUntyped<TContract>(this DiContainer container, Func<DiContainer, object[], TContract> method)
-        {
-            return container.Bind<IFactoryUntyped<TContract>>().ToInstance(new FactoryMethodUntyped<TContract>(container, method));
-        }
-
-        public static BindingConditionSetter BindFactoryToMethod<TContract>(this DiContainer container, Func<DiContainer, TContract> method)
-        {
-            return container.Bind<IFactory<TContract>>().ToMethod((ctx) => ctx.Container.Instantiate<FactoryMethod<TContract>>(method));
-        }
-
-        public static BindingConditionSetter BindFactoryToMethod<TParam1, TContract>(this DiContainer container, Func<DiContainer, TParam1, TContract> method)
-        {
-            return container.Bind<IFactory<TParam1, TContract>>().ToMethod((ctx) => ctx.Container.Instantiate<FactoryMethod<TParam1, TContract>>(method));
-        }
-
-        public static BindingConditionSetter BindFactoryToMethod<TParam1, TParam2, TContract>(this DiContainer container, Func<DiContainer, TParam1, TParam2, TContract> method)
-        {
-            return container.Bind<IFactory<TParam1, TParam2, TContract>>().ToMethod((ctx) => ctx.Container.Instantiate<FactoryMethod<TParam1, TParam2, TContract>>(method));
-        }
-
-        public static BindingConditionSetter BindFactoryToMethod<TParam1, TParam2, TParam3, TContract>(this DiContainer container, Func<DiContainer, TParam1, TParam2, TParam3, TContract> method)
-        {
-            return container.Bind<IFactory<TParam1, TParam2, TParam3, TContract>>().ToMethod((ctx) => ctx.Container.Instantiate<FactoryMethod<TParam1, TParam2, TParam3, TContract>>(method));
-        }
-
-        public static BindingConditionSetter BindFactory<TContract>(this DiContainer container)
-        {
-            return container.Bind<IFactory<TContract>>().ToSingle<Factory<TContract>>();
-        }
-
-        public static BindingConditionSetter BindFactory<TParam1, TContract>(this DiContainer container)
-        {
-            return container.Bind<IFactory<TParam1, TContract>>().ToSingle<Factory<TParam1, TContract>>();
-        }
-
-        public static BindingConditionSetter BindFactory<TParam1, TParam2, TContract>(this DiContainer container)
-        {
-            return container.Bind<IFactory<TParam1, TParam2, TContract>>().ToSingle<Factory<TParam1, TParam2, TContract>>();
-        }
-
-        public static BindingConditionSetter BindFactory<TParam1, TParam2, TParam3, TContract>(this DiContainer container)
-        {
-            return container.Bind<IFactory<TParam1, TParam2, TParam3, TContract>>().ToSingle<Factory<TParam1, TParam2, TParam3, TContract>>();
-        }
-
-        // Bind IFactory<TContract> such that it creates instances of type TConcrete
-        public static BindingConditionSetter BindFactoryToFactory<TContract, TConcrete>(this DiContainer container)
-            where TConcrete : TContract
-        {
-            return container.BindFactoryToMethod<TContract>((c) => c.Resolve<IFactory<TConcrete>>().Create());
-        }
-
-        public static BindingConditionSetter BindFactoryToFactory<TParam1, TContract, TConcrete>(this DiContainer container)
-            where TConcrete : TContract
-        {
-            return container.BindFactoryToMethod<TParam1, TContract>((c, param1) => c.Resolve<IFactory<TParam1, TConcrete>>().Create(param1));
-        }
-
-        public static BindingConditionSetter BindFactoryToFactory<TParam1, TParam2, TContract, TConcrete>(this DiContainer container)
-            where TConcrete : TContract
-        {
-            return container.BindFactoryToMethod<TParam1, TParam2, TContract>((c, param1, param2) => c.Resolve<IFactory<TParam1, TParam2, TConcrete>>().Create(param1, param2));
-        }
-
-        public static BindingConditionSetter BindFactoryToFactory<TParam1, TParam2, TParam3, TContract, TConcrete>(this DiContainer container)
-            where TConcrete : TContract
-        {
-            return container.BindFactoryToMethod<TParam1, TParam2, TParam3, TContract>((c, param1, param2, param3) => c.Resolve<IFactory<TParam1, TParam2, TParam3, TConcrete>>().Create(param1, param2, param3));
-        }
-
-        public static BindingConditionSetter BindFactoryToCustomFactory<TContract, TConcrete, TFactory>(this DiContainer container)
-            where TFactory : IFactory<TConcrete>
-            where TConcrete : TContract
-        {
-            return container.BindFactoryToMethod<TContract>((c) => c.Resolve<TFactory>().Create());
-        }
-
-        // Bind IFactory<TContract> to the given factory
-        public static BindingConditionSetter BindFactoryToCustomFactory<TParam1, TContract, TConcrete, TFactory>(this DiContainer container)
-            where TFactory : IFactory<TParam1, TConcrete>
-            where TConcrete : TContract
-        {
-            return container.BindFactoryToMethod<TParam1, TContract>((c, param1) => c.Resolve<TFactory>().Create(param1));
-        }
-
-        // This occurs so often that we might as well have a convenience method
-        public static BindingConditionSetter BindFactoryUntyped<TContract>(this DiContainer container)
-        {
-#if !ZEN_NOT_UNITY3D
-            if (typeof(TContract).DerivesFrom(typeof(MonoBehaviour)))
-            {
-                throw new ZenjectBindException(
-                    "Error while binding factory for type '{0}'. Must use version of BindFactory which includes a reference to a prefab you wish to instantiate"
-                    .Fmt(typeof(TContract).Name()));
-            }
-#endif
-
-            return container.Bind<IFactoryUntyped<TContract>>().ToSingle<FactoryUntyped<TContract>>();
-        }
-
-        public static BindingConditionSetter BindFactoryUntyped<TContract, TConcrete>(this DiContainer container) where TConcrete : TContract
-        {
-#if !ZEN_NOT_UNITY3D
-            if (typeof(TContract).DerivesFrom(typeof(MonoBehaviour)))
-            {
-                throw new ZenjectBindException(
-                    "Error while binding factory for type '{0}'. Must use version of BindFactory which includes a reference to a prefab you wish to instantiate"
-                    .Fmt(typeof(TConcrete).Name()));
-            }
-#endif
-
-            return container.Bind<IFactoryUntyped<TContract>>().ToSingle<FactoryUntyped<TContract, TConcrete>>();
-        }
-
         public static void BindAllInterfacesToSingle<TConcrete>(this DiContainer container)
             where TConcrete : class
         {
@@ -436,5 +289,25 @@ namespace Zenject
                 container.Bind(interfaceType).ToSingle(concreteType);
             }
         }
+
+#if !ZEN_NOT_UNITY3D
+        public static BindingConditionSetter BindGameObjectFactory<T>(
+            this DiContainer container, GameObject prefab)
+            // This would be useful but fails with VerificationException's in webplayer builds for some reason
+            //where T : GameObjectFactory
+            where T : class
+        {
+            if (prefab == null)
+            {
+                throw new ZenjectBindException(
+                    "Null prefab provided to BindGameObjectFactory for type '{0}'".Fmt(typeof(T).Name()));
+            }
+
+            // We could bind the factory ToSingle but doing it this way is better
+            // since it allows us to have multiple game object factories that
+            // use different prefabs and have them injected into different places
+            return container.Bind<T>().ToMethod((ctx) => ctx.Container.Instantiate<T>(prefab));
+        }
+#endif
     }
 }

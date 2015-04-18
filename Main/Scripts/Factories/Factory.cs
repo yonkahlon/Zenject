@@ -6,6 +6,8 @@ namespace Zenject
     // Zero parameters
     public class Factory<T> : IValidatableFactory, IFactory<T>
     {
+        // Use inject rather than a constructor parameter so that
+        // derived classes aren't also forced to create a constructor
         [Inject]
         DiContainer _container = null;
 
