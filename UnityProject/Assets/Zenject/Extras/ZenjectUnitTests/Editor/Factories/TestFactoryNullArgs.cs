@@ -9,33 +9,6 @@ using Assert=ModestTree.Assert;
 namespace Zenject.Tests
 {
     [TestFixture]
-    public class TestFactoryUsingIFactory : TestWithContainer
-    {
-        public interface ITest
-        {
-        }
-
-        class Test2 : ITest
-        {
-            public class Factory : Factory<Test2>
-            {
-            }
-        }
-
-        [Test]
-        public void Test()
-        {
-            Container.Bind<Test2.Factory>().ToSingle();
-
-            Container.BindFactoryToCustomFactory<ITest, Test2, Test2.Factory>();
-
-            var result = Container.Resolve<IFactory<ITest>>().Create();
-
-            Assert.That(result.GetType() == typeof(Test2));
-        }
-    }
-
-    [TestFixture]
     public class TestFactoryNullArgs : TestWithContainer
     {
         public interface ITest

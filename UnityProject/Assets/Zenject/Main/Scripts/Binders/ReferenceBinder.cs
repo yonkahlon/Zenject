@@ -74,7 +74,7 @@ namespace Zenject
             if (_contractType.DerivesFrom(typeof(Component)))
             {
                 throw new ZenjectBindException(
-                    "Should not use ToSingle for Monobehaviours (when binding type '{0}'), you probably want either ToLookup or ToSingleFromPrefab or ToSingleGameObject"
+                    "Should not use ToSingle for Monobehaviours (when binding type '{0}'), you probably want either ToLookup or ToSinglePrefab or ToSingleGameObject"
                     .Fmt(_contractType.Name()));
             }
 #endif
@@ -91,7 +91,7 @@ namespace Zenject
             if (typeof(TConcrete).DerivesFrom(typeof(Component)))
             {
                 throw new ZenjectBindException(
-                    "Should not use ToSingle for Monobehaviours (when binding type '{0}' to '{1}'), you probably want either ToLookup or ToSingleFromPrefab or ToSingleGameObject"
+                    "Should not use ToSingle for Monobehaviours (when binding type '{0}' to '{1}'), you probably want either ToLookup or ToSinglePrefab or ToSingleGameObject"
                     .Fmt(_contractType.Name(), typeof(TConcrete).Name()));
             }
 #endif

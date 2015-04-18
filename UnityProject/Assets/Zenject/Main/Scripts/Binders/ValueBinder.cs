@@ -2,7 +2,8 @@ using System;
 
 namespace Zenject
 {
-    public class ValueBinder<TContract> : BinderGeneric<TContract> where TContract : struct
+    public class ValueBinder<TContract> : BinderGeneric<TContract>
+        where TContract : struct
     {
         public ValueBinder(DiContainer container, string identifier)
             : base(container, identifier)

@@ -1,9 +1,8 @@
 #if !ZEN_NOT_UNITY3D
 
-#if !ZEN_NOT_UNITY3D
-
 using System;
 using System.Collections.Generic;
+using ModestTree;
 using UnityEngine;
 
 namespace Zenject
@@ -23,11 +22,17 @@ namespace Zenject
     }
 
     public class GameObjectFactory<TValue> : GameObjectFactory, IFactory<TValue>
-         where TValue : Component
+        // We can't do this because of the way IFactoryBinder works
+        //where TValue : Component
     {
+        public GameObjectFactory()
+        {
+            Assert.That(typeof(TValue).DerivesFrom<Component>());
+        }
+
         public virtual TValue Create()
         {
-            return _instantiator.Instantiate<TValue>(_prefab);
+            return (TValue)_instantiator.Instantiate(typeof(TValue), _prefab);
         }
 
         public override IEnumerable<ZenjectResolveException> Validate()
@@ -38,11 +43,17 @@ namespace Zenject
 
     // One parameter
     public class GameObjectFactory<TParam1, TValue> : GameObjectFactory, IFactory<TParam1, TValue>
-        where TValue : Component
+        // We can't do this because of the way IFactoryBinder works
+        //where TValue : Component
     {
+        public GameObjectFactory()
+        {
+            Assert.That(typeof(TValue).DerivesFrom<Component>());
+        }
+
         public virtual TValue Create(TParam1 param)
         {
-            return _instantiator.Instantiate<TValue>(_prefab, param);
+            return (TValue)_instantiator.Instantiate(typeof(TValue), _prefab, param);
         }
 
         public override IEnumerable<ZenjectResolveException> Validate()
@@ -53,11 +64,17 @@ namespace Zenject
 
     // Two parameters
     public class GameObjectFactory<TParam1, TParam2, TValue> : GameObjectFactory, IFactory<TParam1, TParam2, TValue>
-        where TValue : Component
+        // We can't do this because of the way IFactoryBinder works
+        //where TValue : Component
     {
+        public GameObjectFactory()
+        {
+            Assert.That(typeof(TValue).DerivesFrom<Component>());
+        }
+
         public virtual TValue Create(TParam1 param1, TParam2 param2)
         {
-            return _instantiator.Instantiate<TValue>(_prefab, param1, param2);
+            return (TValue)_instantiator.Instantiate(typeof(TValue), _prefab, param1, param2);
         }
 
         public override IEnumerable<ZenjectResolveException> Validate()
@@ -68,11 +85,17 @@ namespace Zenject
 
     // Three parameters
     public class GameObjectFactory<TParam1, TParam2, TParam3, TValue> : GameObjectFactory, IFactory<TParam1, TParam2, TParam3, TValue>
-        where TValue : Component
+        // We can't do this because of the way IFactoryBinder works
+        //where TValue : Component
     {
+        public GameObjectFactory()
+        {
+            Assert.That(typeof(TValue).DerivesFrom<Component>());
+        }
+
         public virtual TValue Create(TParam1 param1, TParam2 param2, TParam3 param3)
         {
-            return _instantiator.Instantiate<TValue>(_prefab, param1, param2, param3);
+            return (TValue)_instantiator.Instantiate(typeof(TValue), _prefab, param1, param2, param3);
         }
 
         public override IEnumerable<ZenjectResolveException> Validate()
@@ -83,11 +106,17 @@ namespace Zenject
 
     // Four parameters
     public class GameObjectFactory<TParam1, TParam2, TParam3, TParam4, TValue> : GameObjectFactory, IFactory<TParam1, TParam2, TParam3, TParam4, TValue>
-        where TValue : Component
+        // We can't do this because of the way IFactoryBinder works
+        //where TValue : Component
     {
+        public GameObjectFactory()
+        {
+            Assert.That(typeof(TValue).DerivesFrom<Component>());
+        }
+
         public virtual TValue Create(TParam1 param1, TParam2 param2, TParam3 param3, TParam4 param4)
         {
-            return _instantiator.Instantiate<TValue>(_prefab, param1, param2, param3, param4);
+            return (TValue)_instantiator.Instantiate(typeof(TValue), _prefab, param1, param2, param3, param4);
         }
 
         public override IEnumerable<ZenjectResolveException> Validate()
@@ -96,7 +125,5 @@ namespace Zenject
         }
     }
 }
-
-#endif
 
 #endif

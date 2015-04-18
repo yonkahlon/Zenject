@@ -104,6 +104,42 @@ namespace Zenject
             }
         }
 
+        public IFactoryUntypedBinder<TContract> BindIFactoryUntyped<TContract>(string identifier = null)
+            where TContract : class
+        {
+            return new IFactoryUntypedBinder<TContract>(this, identifier);
+        }
+
+        public IFactoryBinder<TContract> BindIFactory<TContract>(string identifier = null)
+            where TContract : class
+        {
+            return new IFactoryBinder<TContract>(this, identifier);
+        }
+
+        public IFactoryBinder<TParam1, TContract> BindIFactory<TParam1, TContract>(string identifier = null)
+            where TContract : class
+        {
+            return new IFactoryBinder<TParam1, TContract>(this, identifier);
+        }
+
+        public IFactoryBinder<TParam1, TParam2, TContract> BindIFactory<TParam1, TParam2, TContract>(string identifier = null)
+            where TContract : class
+        {
+            return new IFactoryBinder<TParam1, TParam2, TContract>(this, identifier);
+        }
+
+        public IFactoryBinder<TParam1, TParam2, TParam3, TContract> BindIFactory<TParam1, TParam2, TParam3, TContract>(string identifier = null)
+            where TContract : class
+        {
+            return new IFactoryBinder<TParam1, TParam2, TParam3, TContract>(this, identifier);
+        }
+
+        public IFactoryBinder<TParam1, TParam2, TParam3, TParam4, TContract> BindIFactory<TParam1, TParam2, TParam3, TParam4, TContract>(string identifier = null)
+            where TContract : class
+        {
+            return new IFactoryBinder<TParam1, TParam2, TParam3, TParam4, TContract>(this, identifier);
+        }
+
         public ValueBinder<TContract> BindValue<TContract>(string identifier)
             where TContract : struct
         {
@@ -485,7 +521,7 @@ namespace Zenject
                 if (_instantiatesInProgress.Contains(concreteType))
                 {
                     throw new ZenjectResolveException(
-                        "Circular dependency detected! \nObject graph:\n" + currentContext.GetObjectGraphString());
+                        "Circular dependency detected! \nObject graph:\n" + concreteType.Name() + "\n" + currentContext.GetObjectGraphString());
                 }
 
                 _instantiatesInProgress.Push(concreteType);
