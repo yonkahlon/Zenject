@@ -2040,6 +2040,9 @@ For general troubleshooting / support, please use the google group which you can
 
 ## <a id="release-notes"></a>Release Notes
 
+2.4
+* Refactored the way IFactory is used to be a lot cleaner. It now uses a kind of fluent syntax through its own bind method BindIFactory<>
+
 2.3
 * Added "ParentContexts" property to InjectContext, to allow very complex conditional bindings that involve potentially several identifiers, etc.
 * Removed InjectionHelper class and moved methods into DiContainer to simplify API and also to be more discoverable
