@@ -53,6 +53,12 @@ namespace Zenject
                 .ToMethod(c => new FactoryNested<TContract, TConcrete>(c.Container.Resolve<IFactory<TConcrete>>()));
         }
 
+        public BindingConditionSetter ToCustomFactory<TFactory>()
+            where TFactory : IFactory<TContract>
+        {
+            return _container.Bind<IFactory<TContract>>(_identifier).ToTransient<TFactory>();
+        }
+
         public BindingConditionSetter ToCustomFactory<TConcrete, TFactory>()
             where TFactory : IFactory<TConcrete>
             where TConcrete : TContract
@@ -119,6 +125,12 @@ namespace Zenject
                 .ToMethod(c =>
                     new FactoryNested<TParam1, TContract, TConcrete>(
                         c.Container.Resolve<IFactory<TParam1, TConcrete>>()));
+        }
+
+        public BindingConditionSetter ToCustomFactory<TFactory>()
+            where TFactory : IFactory<TParam1, TContract>
+        {
+            return _container.Bind<IFactory<TParam1, TContract>>(_identifier).ToTransient<TFactory>();
         }
 
         public BindingConditionSetter ToCustomFactory<TConcrete, TFactory>()
@@ -191,6 +203,12 @@ namespace Zenject
                         c.Container.Resolve<IFactory<TParam1, TParam2, TConcrete>>()));
         }
 
+        public BindingConditionSetter ToCustomFactory<TFactory>()
+            where TFactory : IFactory<TParam1, TParam2, TContract>
+        {
+            return _container.Bind<IFactory<TParam1, TParam2, TContract>>(_identifier).ToTransient<TFactory>();
+        }
+
         public BindingConditionSetter ToCustomFactory<TConcrete, TFactory>()
             where TFactory : IFactory<TParam1, TParam2, TConcrete>
             where TConcrete : TContract
@@ -259,6 +277,12 @@ namespace Zenject
                 .ToMethod(c =>
                     new FactoryNested<TParam1, TParam2, TParam3, TContract, TConcrete>(
                         c.Container.Resolve<IFactory<TParam1, TParam2, TParam3, TConcrete>>()));
+        }
+
+        public BindingConditionSetter ToCustomFactory<TFactory>()
+            where TFactory : IFactory<TParam1, TParam2, TParam3, TContract>
+        {
+            return _container.Bind<IFactory<TParam1, TParam2, TParam3, TContract>>(_identifier).ToTransient<TFactory>();
         }
 
         public BindingConditionSetter ToCustomFactory<TConcrete, TFactory>()
@@ -330,6 +354,12 @@ namespace Zenject
                 .ToMethod(c =>
                     new FactoryNested<TParam1, TParam2, TParam3, TParam4, TContract, TConcrete>(
                         c.Container.Resolve<IFactory<TParam1, TParam2, TParam3, TParam4, TConcrete>>()));
+        }
+
+        public BindingConditionSetter ToCustomFactory<TFactory>()
+            where TFactory : IFactory<TParam1, TParam2, TParam3, TParam4, TContract>
+        {
+            return _container.Bind<IFactory<TParam1, TParam2, TParam3, TParam4, TContract>>(_identifier).ToTransient<TFactory>();
         }
 
         public BindingConditionSetter ToCustomFactory<TConcrete, TFactory>()
