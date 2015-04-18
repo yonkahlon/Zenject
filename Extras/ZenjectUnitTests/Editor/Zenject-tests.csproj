@@ -71,10 +71,10 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
     <Reference Include="UnityEngine" Condition="'$(Configuration)'=='Debug'">
-        <HintPath>..\..\..\..\..\AssemblyBuild\Libraries\Unity\UnityEngine.dll</HintPath>
+      <HintPath>..\..\..\..\..\AssemblyBuild\Libraries\Unity\UnityEngine.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine" Condition="'$(Configuration)'=='Release'">
-        <HintPath>..\..\..\..\..\AssemblyBuild\Libraries\Unity\UnityEngine.dll</HintPath>
+      <HintPath>..\..\..\..\..\AssemblyBuild\Libraries\Unity\UnityEngine.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -84,12 +84,20 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Factories\TestFactory.cs" />
+    <Compile Include="Factories\TestFactoryNullArgs.cs" />
+    <Compile Include="Factories\TestIFactory.cs" />
+    <Compile Include="Factories\TestIFactoryUntyped.cs" />
     <Compile Include="TestAllInjectionTypes.cs" />
     <Compile Include="TestBaseClassPropertyInjection.cs" />
     <Compile Include="TestBindScope.cs" />
     <Compile Include="TestBothInterfaceAndConcreteBoundToSameSingleton.cs" />
     <Compile Include="TestCircularDependencies.cs" />
     <Compile Include="TestConditionsBasic.cs" />
+    <Compile Include="TestConditionsComplex.cs" />
     <Compile Include="TestConditionsFieldName.cs" />
     <Compile Include="TestConditionsIdentifier.cs" />
     <Compile Include="TestConditionsParents.cs" />
@@ -98,8 +106,6 @@
     <Compile Include="TestConstructorInjection.cs" />
     <Compile Include="TestDiContainer.cs" />
     <Compile Include="TestDuplicateInjection.cs" />
-    <Compile Include="TestFactory.cs" />
-    <Compile Include="TestFactoryNullArgs.cs" />
     <Compile Include="TestGenericContract.cs" />
     <Compile Include="TestIdentifiers.cs" />
     <Compile Include="TestListComparer.cs" />
@@ -131,10 +137,9 @@
     <Compile Include="TestUnbind.cs" />
     <Compile Include="TestValidateInstaller.cs" />
     <Compile Include="TestWithContainer.cs" />
+    <Compile Include="UnityTests\TestToSingleGameObject.cs" />
+    <Compile Include="UnityTests\TestToSinglePrefab.cs" />
     <Compile Include="ZenjectProfileTest.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
