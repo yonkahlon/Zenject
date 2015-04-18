@@ -30,6 +30,7 @@
         * <a href="#object-graph-validation">Object Graph Validation</a>
         * <a href="#creating-objects-dynamically">Creating Objects Dynamically</a>
         * <a href="#game-object-factories">Game Object Factories</a>
+        * <a href="#abstract-factories">Abstract Factories</a>
         * <a href="#custom-factories">Custom Factories</a>
         * <a href="#using-bindscope">Using BindScope</a>
         * <a href="#injecting-data-across-scenes">Injecting Data Across Scenes</a>
@@ -1100,9 +1101,174 @@ public override void InstallBindings()
 
 Now classes can simply declare a constructor parameter of type FooMonoBehaviour.Factory and by calling the Create() method, construct new instances of a given prefab.
 
+## <a id="abstract-factories"></a>Abstract Factories
+
+The above description of factories is great for most cases, however, there are times you do not want to depend directly on a concrete class and instead want your factory to return an interface instead.  This kind of factory is called an Abstract Factory, and it works a bit differently in Zenject from the standard factory as described above.
+
+Let's create an example scenario, where we have multiple different implementations of a given interface:
+
+```csharp
+
+public interface IPathFindingStrategy
+{
+    ...
+}
+
+public class AStarPathFindingStrategy : IPathFindingStrategy
+{
+    ...
+}
+
+public class RandomPathFindingStrategy : IPathFindingStrategy
+{
+    ...
+}
+
+public class GameController
+{
+    IFactory<IPathFindingStrategy> _strategyFactory;
+    IPathFindingStrategy _pathFindingStrategy;
+
+    public GameController(IFactory<IPathFindingStrategy> strategyFactory)
+    {
+        _strategyFactory = strategyFactory;
+    }
+
+    public void InitPathFinding()
+    {
+        _pathFindingStrategy = _strategyFactory.Create();
+
+        ...
+    }
+}
+
+```
+
+For the sake of this example, let's also assume that we have to create the instance of IPathFindingStrategy at runtime.  Otherwise it would be as simple as executing `Container.Bind<IPathFindingStrategy>().ToSingle<TheImplementationWeWant>();` in one of our installers.
+
+So instead, what we want to create is a dependency of type `IFactory<IPathFindingStrategy>` that creates an instance of the implementation that we want to use when its Create() method is called, for use in the `GameController` class above.
+
+Let's say we want to use the `AStarPathFindingStrategy` implementation. The installer here looks like this:
+
+```csharp
+
+public class GameInstaller : Installer
+{
+    public void InstallBindings()
+    {
+        ...
+
+        Container.BindIFactory<IPathFindingStrategy>().ToFactory<AStarPathFindingStrategy>();
+
+        ...
+    }
+}
+
+```
+
+Because of the fact that there are a number of different ways to define what is returned by a given `IFactory<>`, it has it's own bind method called `BindIFactory<>`.  This method takes one generic parameter that defines the generic parameter that you want to use for `IFactory<>`, and then provides a number of different methods that you can choose from to define what is returned by the `IFactory<>` that you're creating.
+
+In the example installer above, our bind command maps our abstract factory `IFactory<IPathFindingStrategy>` to a concrete factory that returns a new instance of type `AStarPathFindingStrategy`.
+
+Note that you can also pass runtime parameters by supplying extra generic arguments to the `BindIFactory<>` method.  For example, if our implementations of `IPathFindingStrategy` both required a constructor parameter of type `string`, our binding would look like this instead:
+
+```csharp
+Container.BindIFactory<string, IPathFindingStrategy>().ToFactory<AStarPathFindingStrategy>();
+```
+
+This would result in a dependency of type `IFactory<string, IPathFindingStrategy>` with a Create() method that takes a string parameter.
+
+Included below are the other methods that you can choose from when using the `BindIFactory<>` method:
+
+1. **ToMethod([method])** - Create dynamic dependency from a method
+
+Results in a dependency of type `IFactory<TContract>` that invokes the given method.  Method must return a new instance of type `TContract`.
+
+```csharp
+// Examples
+Container.BindIFactory<IFoo>().ToMethod(MyMethod);
+
+// Using a lambda:
+Container.BindIFactory<IFoo>().ToMethod(c => new Foo());
+
+// With a parameter:
+Container.BindIFactory<string, IFoo>().ToMethod((text, c) => new Foo(text));
+```
+
+2. **ToInstance<TContract>** - Create dynamic dependency from an existing instance
+
+Results in a dependency of type `IFactory<TContract>` that just returns the given instance
+
+```csharp
+// Example:
+Container.BindIFactory<IFoo>().ToInstance(new Foo());
+```
+
+3. **ToFactory** - Create dynamic dependency for a concrete type
+
+Results in a dependency of type `IFactory<TContract>` that will create a new instance of type `TContract`.  `TContract` must be a concrete class in this case.
+
+```csharp
+// Example:
+Container.BindIFactory<Foo>().ToFactory();
+
+// With some parameters:
+Container.BindIFactory<string, int, int, Foo>().ToFactory();
+```
+
+In this example, any calls to `IFactory<Foo>.Create()` will return a new instance of type `Foo`.  Again, this of course requires that the generic argument to `BindIFactory<>` be non-abstract.
+
+4. **ToFactory&lt;TConcrete&gt;** - Create dynamic dependency for an abstract type
+
+Results in a dependency of type `IFactory<TContract>` that will create a new instance of type `TConcrete`.  `TConcrete` must derive from `TContract` in this case.
+
+```csharp
+// Example:
+Container.BindIFactory<IFoo>().ToFactory<Foo>();
+
+// With some parameters
+Container.BindIFactory<string, int, IFoo>().ToFactory<Foo>();
+```
+
+5. **ToIFactory&lt;TConcrete&gt;** - Create dynamic dependency via lookup on another factory
+
+Results in a dependency of type IFactory<TContract> that will return an instance of type TConcrete.  It does this by looking up IFactory<TConcrete> and calling Create() to create an instance of type TConcrete.  TConcrete must derive from TContract for this binding.  Also, it is assumed that IFactory<TConcrete> is declared in a separate binding.
+
+```csharp
+// First create a simple binding for IFactory<Foo>
+Container.BindIFactory<Foo>().ToFactory();
+
+// Now create a binding for IFactory<IFoo> that uses the above binding
+Container.BindIFactory<IFoo>().ToIFactory<Foo>();
+```
+
+6. **ToCustomFactory<TContract, TConcrete, TFactory>** - Create dynamic dependency using user created factory class
+
+Results in a dependency of type IFactory<TContract> that will return an instance of type TConcrete using the given factory of type TFactory.  It is assumed that TFactory is declared in another binding.  TFactory must also derive from IFactory<TConcrete> for this to work
+
+```csharp
+// Map IFoo to our custom factory Foo.Factory
+Container.BindIFactory<IFoo>().ToCustomFactory<Foo, MyCustomFooFactory>();
+
+public class MyCustomFooFactory : IFactory<IFoo>
+{
+    ...
+}
+```
+
+7. **ToPrefab<TMonoBehaviour>(prefab)** - Create dynamic MonoBehaviour using given prefab
+
+TMonoBehaviour = Derives from MonoBehaviour
+
+Results in a dependency of type IFactory<TMonoBehaviour> that can be used to create instances of the given prefab.  After instantiating the given prefab, the factory will search it for a component of type 'TMonoBehaviour' and then return that from the Create() method
+
+```csharp
+Container.BindIFactory<IFoo>().ToPrefab<FooMonoBehaviour>(prefab);
+```
+
 ## <a id="custom-factories"></a>Custom Factories
 
-You may also use your own custom factory.  This is often necessary when you want to construct an instance of an interface at runtime.  In this case you do not want to refer to a concrete factory class (eg. Enemy.Factory) as described above.
+If you do not want to use the abstract factory method as described above, or if you want to have 100% control of how your object is instantiated, you could also create a custom factory.  For example:
 
 ```csharp
 public enum Difficulties
@@ -1158,7 +1324,26 @@ Container.BindValue<Difficulties>().To(Difficulties.Easy);
 
 This way we can change the type of enemy we spawn by simply changing the difficulty bound in the installer.
 
-One issue with the above implementation is that it will not be validated properly.  Any constructor parameters added to the Dog or Demon classes that cannot be resolved will not be detected until runtime.  If you wish to address this you can implement it the following way:
+Or, if you do not want your code to depend on `EnemyFactory` directly, you could change it to this instead:
+
+```csharp
+public class EnemyFactory : IFactory<IEnemy>
+{
+    ...
+}
+
+...
+
+Container.BindIFactory<IEnemy>().ToCustomFactory<EnemyFactory>();
+```
+
+Note also that this is equivalent to the following:
+
+```csharp
+Container.Bind<IFactory<IEnemy>>().ToTransient<EnemyFactory>();
+```
+
+One issue with the above implementations is that they will not be validated properly.  Any constructor parameters added to the Dog or Demon classes that cannot be resolved will not be detected until runtime.  If you wish to address this you can implement it the following way:
 
 ```csharp
 public class EnemyFactory : IValidatable
