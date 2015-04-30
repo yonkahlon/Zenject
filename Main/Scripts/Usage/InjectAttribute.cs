@@ -1,8 +1,11 @@
 using System;
+using JetBrains.Annotations;
 
 namespace Zenject
 {
-    [AttributeUsage(AttributeTargets.Constructor | AttributeTargets.Parameter | AttributeTargets.Property | AttributeTargets.Field, AllowMultiple = false)]
+    [AttributeUsage(AttributeTargets.Constructor | AttributeTargets.Parameter |
+                    AttributeTargets.Property | AttributeTargets.Field),
+     MeansImplicitUse(ImplicitUseKindFlags.Assign)]
     public class InjectAttribute : Attribute
     {
         public InjectAttribute(string identifier)
@@ -14,11 +17,6 @@ namespace Zenject
         {
         }
 
-        public string Identifier
-        {
-            get;
-            private set;
-        }
+        public string Identifier { get; private set; }
     }
 }
-
