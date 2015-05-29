@@ -1,3 +1,4 @@
+
 <img src="UnityProject/Assets/Zenject/Main/ZenjectLogo.png?raw=true" alt="Zenject" width="600px" height="134px"/>
 
 # Dependency Injection Framework for Unity3D
@@ -1419,7 +1420,7 @@ public class EnemyFactory
     {
         using (BindScope scope = Container.CreateScope())
         {
-            scope.Bind<float>().ToSingle(weaponDamage).WhenInjectedInto<EnemyWeapon>();
+            scope.BindValueInstance(weaponDamage).WhenInjectedInto<EnemyWeapon>();
             return _container.Instantiate<Enemy>();
         }
     }
@@ -1540,7 +1541,7 @@ public class AsteroidsInstaller : MonoInstaller
     public override void InstallBindings()
     {
         ...
-        Container.Bind<ShipStateMoving.Settings>().ToSingle(SceneSettings.StateMoving);
+        Container.BindInstance(SceneSettings.StateMoving);
         ...
     }
 
