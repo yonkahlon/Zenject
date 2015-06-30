@@ -1,11 +1,12 @@
 using System;
-using JetBrains.Annotations;
+//using JetBrains.Annotations;
 
 namespace Zenject
 {
     [AttributeUsage(AttributeTargets.Constructor | AttributeTargets.Parameter |
-                    AttributeTargets.Property | AttributeTargets.Field),
-     MeansImplicitUse(ImplicitUseKindFlags.Assign)]
+                    AttributeTargets.Property | AttributeTargets.Field)]
+    // Uncomment for use with ReSharper
+    // MeansImplicitUse(ImplicitUseKindFlags.Assign)]
     public class InjectAttribute : Attribute
     {
         public InjectAttribute(string identifier)
