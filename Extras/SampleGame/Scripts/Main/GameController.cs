@@ -44,7 +44,7 @@ namespace Asteroids
 #if UNITY_5_0
             Cursor.visible = false;
 #else
-            Screen.showCursor = false;
+            Cursor.visible = false;
 #endif
             GameEvent.ShipCrashed += OnShipCrashed;
 
