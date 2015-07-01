@@ -41,7 +41,7 @@ namespace Zenject
 
         public override IEnumerable<ZenjectResolveException> ValidateBinding(InjectContext context)
         {
-            return BindingValidator.ValidateObjectGraph(_container, typeof(T), context);
+            return BindingValidator.ValidateObjectGraph(_container, typeof(T), context, null);
         }
     }
 }

@@ -98,7 +98,7 @@ namespace Zenject
         }
 
         public static IEnumerable<ZenjectResolveException> ValidateObjectGraph(
-            DiContainer container, Type concreteType, InjectContext currentContext, params Type[] extras)
+            DiContainer container, Type concreteType, InjectContext currentContext, string concreteIdentifier, params Type[] extras)
         {
             var typeInfo = TypeAnalyzer.GetInfo(concreteType);
             var extrasList = extras.ToList();
@@ -112,7 +112,7 @@ namespace Zenject
                     continue;
                 }
 
-                var context = dependInfo.CreateInjectContext(container, currentContext, null);
+                var context = dependInfo.CreateInjectContext(container, currentContext, null, concreteIdentifier);
 
                 foreach (var error in ValidateContract(container, context))
                 {

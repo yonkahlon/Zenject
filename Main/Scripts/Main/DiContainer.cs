@@ -23,6 +23,7 @@ namespace Zenject
         readonly SingletonProviderMap _singletonMap;
 
         bool _allowNullBindings;
+        bool _checkForCircularDependencies;
 
         ProviderBase _fallbackProvider;
 
@@ -30,8 +31,10 @@ namespace Zenject
 
         readonly Stack<Type> _instantiatesInProgress = new Stack<Type>();
 
-        public DiContainer()
+        public DiContainer(bool checkForCircularDependencies = true)
         {
+            _checkForCircularDependencies = checkForCircularDependencies;
+
             _singletonMap = new SingletonProviderMap(this);
 
             this.Bind<DiContainer>().ToInstance(this);
@@ -308,7 +311,7 @@ namespace Zenject
                     "Expected contract type '{0}' to be non-abstract".Fmt(contractType.Name()));
             }
 
-            return BindingValidator.ValidateObjectGraph(this, contractType, context, extras);
+            return BindingValidator.ValidateObjectGraph(this, contractType, context, null, extras);
         }
 
         // Wrap IEnumerable<> to avoid LINQ mistakes
@@ -407,10 +410,17 @@ namespace Zenject
         public void Install<T>()
             where T : IInstaller
         {
-            if (_installedInstallers.Where(x => x.GetType() == typeof(T)).IsEmpty())
+            Install(typeof(T));
+        }
+
+        public void Install(Type installerType)
+        {
+            Assert.That(installerType.DerivesFrom<IInstaller>());
+
+            if (_installedInstallers.Where(x => x.GetType() == installerType).IsEmpty())
             // Do not install the same installer twice
             {
-                var installer = this.Instantiate<T>();
+                var installer = (IInstaller)this.Instantiate(installerType);
                 installer.InstallBindings();
                 _installedInstallers.Add(installer);
             }
@@ -514,31 +524,38 @@ namespace Zenject
         // Same as Instantiate except you can pass in null value
         // however the type for each parameter needs to be explicitly provided in this case
         public object InstantiateExplicit(
-            Type concreteType, List<TypeValuePair> extraArgMap, InjectContext currentContext)
+            Type concreteType, List<TypeValuePair> extraArgMap, InjectContext currentContext, string concreteIdentifier)
         {
             using (ProfileBlock.Start("Zenject.Instantiate({0})", concreteType))
             {
-                if (_instantiatesInProgress.Contains(concreteType))
+                if (_checkForCircularDependencies)
                 {
-                    throw new ZenjectResolveException(
-                        "Circular dependency detected! \nObject graph:\n" + concreteType.Name() + "\n" + currentContext.GetObjectGraphString());
-                }
+                    if (_instantiatesInProgress.Contains(concreteType))
+                    {
+                        throw new ZenjectResolveException(
+                            "Circular dependency detected! \nObject graph:\n" + concreteType.Name() + "\n" + currentContext.GetObjectGraphString());
+                    }
 
-                _instantiatesInProgress.Push(concreteType);
-                try
-                {
-                    return InstantiateInternal(concreteType, extraArgMap, currentContext);
+                    _instantiatesInProgress.Push(concreteType);
+                    try
+                    {
+                        return InstantiateInternal(concreteType, extraArgMap, currentContext, concreteIdentifier);
+                    }
+                    finally
+                    {
+                        Assert.That(_instantiatesInProgress.Peek() == concreteType);
+                        _instantiatesInProgress.Pop();
+                    }
                 }
-                finally
+                else
                 {
-                    Assert.That(_instantiatesInProgress.Peek() == concreteType);
-                    _instantiatesInProgress.Pop();
+                    return InstantiateInternal(concreteType, extraArgMap, currentContext, concreteIdentifier);
                 }
             }
         }
 
         object InstantiateInternal(
-            Type concreteType, IEnumerable<TypeValuePair> extraArgMapParam, InjectContext currentContext)
+            Type concreteType, IEnumerable<TypeValuePair> extraArgMapParam, InjectContext currentContext, string concreteIdentifier)
         {
 #if !ZEN_NOT_UNITY3D
             Assert.That(!concreteType.DerivesFrom<UnityEngine.Component>(),
@@ -563,7 +580,7 @@ namespace Zenject
 
                 if (!InstantiateUtil.PopValueWithType(extraArgMap, injectInfo.MemberType, out value))
                 {
-                    value = Resolve(injectInfo.CreateInjectContext(this, currentContext, null));
+                    value = Resolve(injectInfo.CreateInjectContext(this, currentContext, null, concreteIdentifier));
                 }
 
                 paramValues.Add(value);
@@ -584,7 +601,7 @@ namespace Zenject
                     "Error occurred while instantiating object with type '{0}'".Fmt(concreteType.Name()), e);
             }
 
-            Inject(newObj, extraArgMap, true, typeInfo, currentContext);
+            Inject(newObj, extraArgMap, true, typeInfo, currentContext, concreteIdentifier);
 
             return newObj;
         }
@@ -592,7 +609,7 @@ namespace Zenject
         // Iterate over fields/properties on the given object and inject any with the [Inject] attribute
         internal void Inject(
             object injectable, IEnumerable<TypeValuePair> extraArgMapParam,
-            bool shouldUseAll, ZenjectTypeInfo typeInfo, InjectContext context)
+            bool shouldUseAll, ZenjectTypeInfo typeInfo, InjectContext context, string concreteIdentifier)
         {
             Assert.IsEqual(typeInfo.TypeAnalyzed, injectable.GetType());
             Assert.That(injectable != null);
@@ -616,7 +633,7 @@ namespace Zenject
                 else
                 {
                     value = Resolve(
-                        injectInfo.CreateInjectContext(this, context, injectable));
+                        injectInfo.CreateInjectContext(this, context, injectable, concreteIdentifier));
 
                     if (injectInfo.Optional && value == null)
                     {
@@ -642,7 +659,7 @@ namespace Zenject
                         if (!InstantiateUtil.PopValueWithType(extraArgMap, injectInfo.MemberType, out value))
                         {
                             value = Resolve(
-                                injectInfo.CreateInjectContext(this, context, injectable));
+                                injectInfo.CreateInjectContext(this, context, injectable, concreteIdentifier));
                         }
 
                         paramValues.Add(value);

@@ -100,7 +100,7 @@ namespace Zenject
 
             container.Inject(
                 injectable,
-                InstantiateUtil.CreateTypeValueList(additional), shouldUseAll, typeInfo, context);
+                InstantiateUtil.CreateTypeValueList(additional), shouldUseAll, typeInfo, context, null);
         }
 
         public static ValueBinder<TContract> BindValue<TContract>(this DiContainer container) where TContract : struct

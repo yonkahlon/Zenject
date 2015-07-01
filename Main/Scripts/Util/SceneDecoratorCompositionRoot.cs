@@ -1,5 +1,6 @@
 #if !ZEN_NOT_UNITY3D
 
+using System;
 using ModestTree;
 using ModestTree.Util.Debugging;
 using UnityEngine;
@@ -19,9 +20,18 @@ namespace Zenject
         [SerializeField]
         public MonoInstaller[] PostInstallers;
 
+        Action<DiContainer> _beforeInstallHooks;
+        Action<DiContainer> _afterInstallHooks;
+
         public void Awake()
         {
             DontDestroyOnLoad(gameObject);
+
+            _beforeInstallHooks = CompositionRoot.BeforeInstallHooks;
+            CompositionRoot.BeforeInstallHooks = null;
+
+            _afterInstallHooks = CompositionRoot.AfterInstallHooks;
+            CompositionRoot.AfterInstallHooks = null;
 
             ZenUtil.LoadScene(
                 SceneName, AddPreBindings, AddPostBindings);
@@ -29,6 +39,12 @@ namespace Zenject
 
         public void AddPreBindings(DiContainer container)
         {
+            if (_beforeInstallHooks != null)
+            {
+                _beforeInstallHooks(container);
+                _beforeInstallHooks = null;
+            }
+
             // Make our scene graph a child of the new CompositionRoot so any monobehaviour's that are
             // built into the scene get injected
             transform.parent = container.Resolve<CompositionRoot>().transform;
@@ -43,6 +59,12 @@ namespace Zenject
             CompositionRootHelper.InstallSceneInstallers(container, PostInstallers);
 
             ProcessDecoratorInstallers(container, false);
+
+            if (_afterInstallHooks != null)
+            {
+                _afterInstallHooks(container);
+                _afterInstallHooks = null;
+            }
         }
 
         void ProcessDecoratorInstallers(DiContainer container, bool isBefore)

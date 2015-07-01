@@ -24,6 +24,14 @@ namespace Zenject
             _createMethod = createMethod;
         }
 
+        public SingletonId Id
+        {
+            get
+            {
+                return _id;
+            }
+        }
+
         public bool HasCustomCreateMethod
         {
             get
@@ -98,8 +106,9 @@ namespace Zenject
             }
 
             var concreteType = GetTypeToInstantiate(context.MemberType);
+
             return _container.InstantiateExplicit(
-                concreteType, new List<TypeValuePair>(), context);
+                concreteType, new List<TypeValuePair>(), context, _id.Identifier);
         }
 
         Type GetTypeToInstantiate(Type contractType)

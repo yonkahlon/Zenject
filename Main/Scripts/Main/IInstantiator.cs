@@ -12,8 +12,9 @@ namespace Zenject
 {
     public interface IInstantiator
     {
+        // For most cases you can pass in currentContext and concreteIdentifier as null
         object InstantiateExplicit(
-            Type concreteType, List<TypeValuePair> extraArgMap, InjectContext currentContext);
+            Type concreteType, List<TypeValuePair> extraArgMap, InjectContext currentContext, string concreteIdentifier);
     }
 
     public static class InstantiatorExtensions
@@ -45,7 +46,7 @@ namespace Zenject
             this DiContainer container, Type concreteType, List<TypeValuePair> extraArgMap)
         {
             return container.InstantiateExplicit(
-                concreteType, extraArgMap, new InjectContext(container, concreteType, null));
+                concreteType, extraArgMap, new InjectContext(container, concreteType, null), null);
         }
     }
 }

@@ -23,8 +23,24 @@ namespace Zenject
         public readonly object ObjectInstance;
 
         // Identifier - most of the time this is null
-        // It will match 'foo' in this example: Container.Bind("foo")
+        // It will match 'foo' in this example:
+        //      ... In an installer somewhere:
+        //          Container.Bind<Foo>("foo").ToSingle();
+        //      ...
+        //      ... In a constructor:
+        //          public Foo([Inject("foo") Foo foo)
         public readonly string Identifier;
+
+        // ConcreteIdentifier - most of the time this is null
+        // It will match 'foo' in this example:
+        //      ... In an installer somewhere:
+        //          Container.Bind<Foo>().ToSingle("foo");
+        //          Container.Bind<ITickable>().ToSingle<Foo>("foo");
+        //      ...
+        // This allows you to create When() conditionals like this:
+        //      ...
+        //          Container.BindInstance("some text").When(c => c.ConcreteIdentifier == "foo");
+        public readonly string ConcreteIdentifier;
 
         // The constructor parameter name, or field name, or property name
         public readonly string MemberName;
@@ -43,17 +59,25 @@ namespace Zenject
 
         public InjectContext(
             DiContainer container, Type memberType, string identifier, bool optional,
-            Type objectType, object objectInstance, string memberName, InjectContext parentContext)
+            Type objectType, object objectInstance, string memberName, InjectContext parentContext, string concreteIdentifier)
         {
             ObjectType = objectType;
             ObjectInstance = objectInstance;
             Identifier = identifier;
+            ConcreteIdentifier = concreteIdentifier;
             MemberName = memberName;
             MemberType = memberType;
             Optional = optional;
             Container = container;
             BindingId = new BindingId(memberType, identifier);
             ParentContext = parentContext;
+        }
+
+        public InjectContext(
+            DiContainer container, Type memberType, string identifier, bool optional,
+            Type objectType, object objectInstance, string memberName, InjectContext parentContext)
+            : this(container, memberType, identifier, optional, objectType, objectInstance, memberName, parentContext, null)
+        {
         }
 
         public InjectContext(
@@ -148,7 +172,13 @@ namespace Zenject
         public InjectContext ChangeMemberType(Type newMemberType)
         {
             return new InjectContext(
-                Container, newMemberType, Identifier, Optional, ObjectType, ObjectInstance, MemberName, ParentContext);
+                Container, newMemberType, Identifier, Optional, ObjectType, ObjectInstance, MemberName, ParentContext, ConcreteIdentifier);
+        }
+
+        public InjectContext ChangeConcreteIdentifier(string concreteIdentifier)
+        {
+            return new InjectContext(
+                Container, MemberType, Identifier, Optional, ObjectType, ObjectInstance, MemberName, ParentContext, concreteIdentifier);
         }
     }
 }
