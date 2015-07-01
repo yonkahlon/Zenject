@@ -49,7 +49,7 @@ namespace Zenject
                 yield break;
             }
 
-            foreach (var err in BindingValidator.ValidateObjectGraph(_container, _concreteType, context))
+            foreach (var err in BindingValidator.ValidateObjectGraph(_container, _concreteType, context, null))
             {
                 yield return err;
             }

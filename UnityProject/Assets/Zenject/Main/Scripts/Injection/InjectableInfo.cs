@@ -33,11 +33,11 @@ namespace Zenject
         }
 
         public InjectContext CreateInjectContext(
-            DiContainer container, InjectContext currentContext, object targetInstance)
+            DiContainer container, InjectContext currentContext, object targetInstance, string concreteIdentifier)
         {
             return new InjectContext(
                 container, MemberType, Identifier, Optional,
-                ObjectType, targetInstance, MemberName, currentContext);
+                ObjectType, targetInstance, MemberName, currentContext, concreteIdentifier);
         }
     }
 }

@@ -240,6 +240,7 @@ namespace Zenject
         }
 
         // Creates a new game object and adds the given type as a new component on it
+        // NOTE! The string given here is just a name and not a singleton identifier
         public BindingConditionSetter ToSingleGameObject(string name)
         {
             if (!_contractType.IsSubclassOf(typeof(MonoBehaviour)))
@@ -251,6 +252,7 @@ namespace Zenject
         }
 
         // Creates a new game object and adds the given type as a new component on it
+        // NOTE! The string given here is just a name and not a singleton identifier
         public BindingConditionSetter ToSingleGameObject<TConcrete>(string name) where TConcrete : MonoBehaviour
         {
             var concreteType = typeof(TConcrete);

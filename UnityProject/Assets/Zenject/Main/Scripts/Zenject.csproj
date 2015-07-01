@@ -92,7 +92,6 @@
     <Compile Include="Binders\ValueBinder.cs" />
     <Compile Include="Exceptions\ZenjectException.cs" />
     <Compile Include="Factories\Factory.cs" />
-    <Compile Include="Factories\FactoryCustom.cs" />
     <Compile Include="Factories\FactoryMethod.cs" />
     <Compile Include="Factories\FactoryMethodUntyped.cs" />
     <Compile Include="Factories\FactoryNested.cs" />
