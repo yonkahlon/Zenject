@@ -260,7 +260,7 @@ Each Zenject application therefore must tell the container how to resolve each o
 
 Note that you can find more examples in the <a href="#cheatsheet">cheatsheet</a> section below.
 
-### **ToSingle** - Inject as singleton
+**ToSingle** - Inject as singleton
 
 ```csharp
 Container.Bind<Foo>().ToSingle();
@@ -285,7 +285,7 @@ Container.Bind<IBar>().ToSingle<Foo>();
 
 Note again that the same instance will be used for all dependencies that take Foo, IFoo, or IBar.
 
-### **ToInstance** - Inject as a specific instance
+**ToInstance** - Inject as a specific instance
 
 ```csharp
 Container.Bind<Foo>().ToInstance(new Foo());
@@ -298,7 +298,7 @@ Container.BindInstance(new Bar());
 
 In this case the given instance will be used for every dependency with the given type
 
-### **ToTransient** - Inject as newly created object
+**ToTransient** - Inject as newly created object
 
 ```csharp
 Container.Bind<Foo>().ToTransient();
@@ -310,7 +310,7 @@ In this case a new instance of Foo will be generated each time it is injected. S
 Container.Bind<IFoo>().ToTransient<Foo>();
 ```
 
-### **ToSinglePrefab** - Inject by instantiating a unity prefab once and using that everywhere
+**ToSinglePrefab** - Inject by instantiating a unity prefab once and using that everywhere
 
 ```csharp
 Container.Bind<FooMonoBehaviour>().ToSinglePrefab(PrefabGameObject);
@@ -329,7 +329,7 @@ Container.Bind<BarMonoBehaviour>().ToSinglePrefab(PrefabGameObject);
 
 This will result in the prefab `PrefabGameObject` being instantiated once, and then searched for monobehaviour's `FooMonoBehaviour` and `BarMonoBehaviour`
 
-### **ToTransientPrefab** - Inject by instantiating a unity prefab each time
+**ToTransientPrefab** - Inject by instantiating a unity prefab each time
 
 ```csharp
 Container.Bind<FooMonoBehaviour>().ToTransientPrefab<FooMonoBehaviour>(PrefabGameObject);
@@ -337,7 +337,7 @@ Container.Bind<FooMonoBehaviour>().ToTransientPrefab<FooMonoBehaviour>(PrefabGam
 
 This works similar to ToSinglePrefab except it will instantiate a new instance of the given prefab every time the dependency is injected.
 
-###  **ToSingleGameObject** - Inject by instantiating a new game object and using that everywhere
+**ToSingleGameObject** - Inject by instantiating a new game object and using that everywhere
 
 ```csharp
 Container.Bind<FooMonoBehaviour>().ToSingleGameObject();
@@ -345,7 +345,7 @@ Container.Bind<FooMonoBehaviour>().ToSingleGameObject();
 
 This binding will create a new game object and attach the given FooMonoBehaviour.  Also note that since it is ToSingle that it will use the same instance everywhere that has FooMonoBehaviour as a dependency
 
-###  **ToMethod** - Inject using a custom method
+**ToMethod** - Inject using a custom method
 
 This binding allows you to customize creation logic yourself by defining a method:
 
@@ -361,7 +361,7 @@ public IFoo SomeMethod(InjectContext context)
 }
 ```
 
-###  **ToGetter** - Inject by getter.
+**ToGetter** - Inject by getter.
 
 This method can be useful if you want to bind to a property of another object.
 
@@ -370,7 +370,7 @@ Container.Bind<IFoo>().ToSingle<Foo>()
 Container.Bind<Bar>().ToGetter<IFoo>(x => x.GetBar())
 ```
 
-###  **ToLookup** - Inject by recursive resolve.
+**ToLookup** - Inject by recursive resolve.
 
 ```csharp
 Container.Bind<IFoo>().ToLookup<IBar>()
@@ -383,7 +383,7 @@ In the example code above we assume that Foo inherits from IBar, which inherits 
 
 You can also supply an identifier to the ToLookup() method.  See <a href="#identifiers">here</a> section for details on identifiers.
 
-### **Rebind** - Override existing binding
+**Rebind** - Override existing binding
 
 ```csharp
 Container.Rebind<IFoo>().To<Foo>();
@@ -391,7 +391,7 @@ Container.Rebind<IFoo>().To<Foo>();
 
 The Rebind function can be used to override any existing bindings that were added previously.  It will first clear all previous bindings and then add the new binding.  This method is especially useful for tests, where you often want to use almost all the same bindings used in production, except override a few specific bindings.
 
-### **Untyped Bindings**
+**Untyped Bindings**
 
 ```csharp
 Container.Bind(typeof(IFoo)).ToSingle(typeof(Foo));
@@ -399,7 +399,7 @@ Container.Bind(typeof(IFoo)).ToSingle(typeof(Foo));
 
 In some cases it is not possible to use the generic versions of the Bind<> functions.  In these cases a non-generic version is provided, which works by taking in a Type value as a parameter.
 
-### **BindAllInterfacesToSingle**
+**BindAllInterfacesToSingle**
 
 This function can be used to automatically bind any interfaces that it finds on the given type.
 
