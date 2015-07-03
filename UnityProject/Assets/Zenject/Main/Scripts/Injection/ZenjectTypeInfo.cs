@@ -7,7 +7,7 @@ using ModestTree;
 
 namespace Zenject
 {
-    internal class PostInjectableInfo
+    public class PostInjectableInfo
     {
         public readonly MethodInfo MethodInfo;
         public readonly ReadOnlyCollection<InjectableInfo> InjectableInfo;
@@ -20,7 +20,7 @@ namespace Zenject
         }
     }
 
-    internal class ZenjectTypeInfo
+    public class ZenjectTypeInfo
     {
         readonly List<PostInjectableInfo> _postInjectMethods;
         readonly List<InjectableInfo> _constructorInjectables;

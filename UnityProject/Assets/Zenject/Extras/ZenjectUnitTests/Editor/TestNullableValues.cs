@@ -24,7 +24,7 @@ namespace Zenject.Tests
         public void RunTest1()
         {
             Container.Bind<Test2>().ToSingle();
-            Container.BindValue<int>().To(1);
+            Container.Bind<int>().ToInstance(1);
 
             Assert.That(Container.ValidateResolve<Test2>().IsEmpty());
             var test1 = Container.Resolve<Test2>();

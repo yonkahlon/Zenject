@@ -37,30 +37,19 @@ namespace Zenject
             return new CustomScopeUntypedBinder(this, contractType, identifier, _container, _singletonMap);
         }
 
-        public ReferenceBinder<TContract> Bind<TContract>() where TContract : class
+        public BinderGeneric<TContract> Bind<TContract>()
         {
             return Bind<TContract>((string)null);
         }
 
-        public ReferenceBinder<TContract> Bind<TContract>(string identifier) where TContract : class
+        public BinderGeneric<TContract> Bind<TContract>(string identifier)
         {
-            return new CustomScopeReferenceBinder<TContract>(this, identifier, _container, _singletonMap);
-        }
-
-        public ValueBinder<TContract> BindValue<TContract>() where TContract : struct
-        {
-            return BindValue<TContract>((string)null);
-        }
-
-        public ValueBinder<TContract> BindValue<TContract>(string identifier) where TContract : struct
-        {
-            return new CustomScopeValueBinder<TContract>(this, identifier, _container);
+            return new CustomScopeBinder<TContract>(this, identifier, _container, _singletonMap);
         }
 
         // This method is just an alternative way of binding to a dependency of
         // a specific class with a specific identifier
         public void BindIdentifier<TClass, TParam>(string identifier, TParam value)
-            where TParam : class
         {
             Bind(typeof(TParam), identifier).ToInstance(value).WhenInjectedInto<TClass>();
 
@@ -83,30 +72,11 @@ namespace Zenject
             }
         }
 
-        class CustomScopeValueBinder<TContract> : ValueBinder<TContract> where TContract : struct
+        class CustomScopeBinder<TContract> : BinderGeneric<TContract>
         {
             BindScope _owner;
 
-            public CustomScopeValueBinder(
-                BindScope owner, string identifier,
-                DiContainer container)
-                : base(container, identifier)
-            {
-                _owner = owner;
-            }
-
-            public override BindingConditionSetter ToProvider(ProviderBase provider)
-            {
-                _owner.AddProvider(provider);
-                return base.ToProvider(provider);
-            }
-        }
-
-        class CustomScopeReferenceBinder<TContract> : ReferenceBinder<TContract> where TContract : class
-        {
-            BindScope _owner;
-
-            public CustomScopeReferenceBinder(
+            public CustomScopeBinder(
                 BindScope owner, string identifier,
                 DiContainer container, SingletonProviderMap singletonMap)
                 : base(container, identifier, singletonMap)

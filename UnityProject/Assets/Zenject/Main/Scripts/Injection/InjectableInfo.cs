@@ -5,7 +5,7 @@ namespace Zenject
 {
     // An injectable is a field or property with [Inject] attribute
     // Or a constructor parameter
-    internal class InjectableInfo
+    public class InjectableInfo
     {
         public readonly bool Optional;
         public readonly string Identifier;

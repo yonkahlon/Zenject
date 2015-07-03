@@ -86,6 +86,15 @@ namespace Zenject.Tests
         }
 
         [Test]
+        public void TestToCustomFactory1()
+        {
+            Container.Bind<Test2.Factory>().ToSingle();
+            Container.BindIFactory<Test2>().ToCustomFactory<Test2.Factory>();
+
+            Assert.IsNotNull(Container.Resolve<IFactory<Test2>>().Create() is Test2);
+        }
+
+        [Test]
         public void TestToCustomFactory()
         {
             Container.Bind<Test2.Factory>().ToSingle();

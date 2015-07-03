@@ -82,7 +82,8 @@ namespace Zenject
         public DiContainer CreateContainer(
             bool allowNullBindings, DiContainer parentContainer, List<IInstaller> extraInstallers)
         {
-            var container = new DiContainer();
+            var container = new DiContainer(this.transform);
+
             container.AllowNullBindings = allowNullBindings;
             container.FallbackProvider = new DiContainerProvider(parentContainer);
             container.Bind<CompositionRoot>().ToInstance(this);

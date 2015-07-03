@@ -17,7 +17,7 @@ namespace Asteroids
         {
             Container.Bind<ITickable>().ToSingle<TestHotKeysAdder>();
             // Do not spawn asteroids automatically
-            Container.BindValue<bool>().To(false).WhenInjectedInto<AsteroidManager>();
+            Container.Bind<bool>().ToInstance(false).WhenInjectedInto<AsteroidManager>();
         }
 
         public override void PostInstallBindings()

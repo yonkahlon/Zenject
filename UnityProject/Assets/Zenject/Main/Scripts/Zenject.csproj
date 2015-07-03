@@ -88,8 +88,6 @@
     <Compile Include="Binders\IFactoryBinder.cs" />
     <Compile Include="Binders\IFactoryUntypedBinder.cs" />
     <Compile Include="Binders\InjectContext.cs" />
-    <Compile Include="Binders\ReferenceBinder.cs" />
-    <Compile Include="Binders\ValueBinder.cs" />
     <Compile Include="Exceptions\ZenjectException.cs" />
     <Compile Include="Factories\Factory.cs" />
     <Compile Include="Factories\FactoryMethod.cs" />
@@ -97,7 +95,6 @@
     <Compile Include="Factories\FactoryNested.cs" />
     <Compile Include="Factories\FactoryUntyped.cs" />
     <Compile Include="Factories\GameObjectFactory.cs" />
-    <Compile Include="Factories\GameObjectInstantiator.cs" />
     <Compile Include="Factories\IFactory.cs" />
     <Compile Include="Factories\IFactoryUntyped.cs" />
     <Compile Include="Factories\InstantiateUtil.cs" />
@@ -113,12 +110,13 @@
     <Compile Include="Main\CompositionRoot.cs" />
     <Compile Include="Main\CompositionRootHelper.cs" />
     <Compile Include="Main\DiContainer.cs" />
-    <Compile Include="Main\DiContainerExtensions.cs" />
     <Compile Include="Main\GlobalCompositionRoot.cs" />
     <Compile Include="Main\GlobalInstallerConfig.cs" />
+    <Compile Include="Main\IBinder.cs" />
     <Compile Include="Main\IInstaller.cs" />
     <Compile Include="Main\IInstantiator.cs" />
     <Compile Include="Main\Installer.cs" />
+    <Compile Include="Main\IResolver.cs" />
     <Compile Include="Main\MonoInstaller.cs" />
     <Compile Include="Misc\DisposableManager.cs" />
     <Compile Include="Misc\DisposablePrioritiesInstaller.cs" />
@@ -156,6 +154,7 @@
     <Compile Include="Usage\InjectAttribute.cs" />
     <Compile Include="Usage\InjectOptionalAttribute.cs" />
     <Compile Include="Usage\PostInjectAttribute.cs" />
+    <Compile Include="Util\AutoBindInstaller.cs" />
     <Compile Include="Util\DecoratorInstaller.cs" />
     <Compile Include="Util\SceneDecoratorCompositionRoot.cs" />
     <Compile Include="Util\UnityUtil.cs" />

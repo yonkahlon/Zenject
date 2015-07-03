@@ -74,7 +74,7 @@ namespace Zenject.Tests
             // Should not redefine the hard coded value in this case
             Assert.IsEqual(Container.Resolve<Test0>().Val1, 5);
 
-            Container.BindValue<int>().To(3);
+            Container.Bind<int>().ToInstance(3);
 
             Assert.IsEqual(Container.Resolve<Test0>().Val1, 3);
         }

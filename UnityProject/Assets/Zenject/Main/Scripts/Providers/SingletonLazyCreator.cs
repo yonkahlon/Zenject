@@ -6,13 +6,14 @@ namespace Zenject
 {
     internal class SingletonLazyCreator
     {
+        readonly DiContainer _container;
+        readonly SingletonProviderMap _owner;
+        readonly Func<InjectContext, object> _createMethod;
+        readonly SingletonId _id;
+
         int _referenceCount;
         object _instance;
-        SingletonProviderMap _owner;
-        DiContainer _container;
         bool _hasInstance;
-        Func<InjectContext, object> _createMethod;
-        SingletonId _id;
 
         public SingletonLazyCreator(
             DiContainer container, SingletonProviderMap owner,
@@ -84,31 +85,37 @@ namespace Zenject
         {
             if (!_hasInstance)
             {
-                _instance = Instantiate(context);
-
-                if (_instance == null)
+                if (_createMethod != null)
                 {
-                    throw new ZenjectResolveException(
-                        "Unable to instantiate type '{0}' in SingletonLazyCreator".Fmt(context.MemberType));
-                }
+                    _instance = _createMethod(context);
 
-                _hasInstance = true;
+                    if (_instance == null)
+                    {
+                        throw new ZenjectResolveException(
+                            "Unable to instantiate type '{0}' in SingletonLazyCreator".Fmt(context.MemberType));
+                    }
+
+                    _hasInstance = true;
+                }
+                else
+                {
+                    var concreteType = GetTypeToInstantiate(context.MemberType);
+
+                    bool autoInject = false;
+                    _instance = _container.InstantiateExplicit(
+                        concreteType, new List<TypeValuePair>(), context, _id.Identifier, autoInject);
+
+                    Assert.IsNotNull(_instance);
+
+                    _hasInstance = true;
+
+                    // Inject after we've instantiated and set the _hasInstance flag so that we can support circular dependencies
+                    // as PostInject or field parameters
+                    _container.Inject(_instance);
+                }
             }
 
             return _instance;
-        }
-
-        object Instantiate(InjectContext context)
-        {
-            if (_createMethod != null)
-            {
-                return _createMethod(context);
-            }
-
-            var concreteType = GetTypeToInstantiate(context.MemberType);
-
-            return _container.InstantiateExplicit(
-                concreteType, new List<TypeValuePair>(), context, _id.Identifier);
         }
 
         Type GetTypeToInstantiate(Type contractType)

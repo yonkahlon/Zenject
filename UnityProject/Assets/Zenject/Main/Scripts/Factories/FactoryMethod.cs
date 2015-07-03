@@ -111,7 +111,7 @@ namespace Zenject
         DiContainer _container = null;
 
         [Inject]
-        readonly ModestTree.Util.Func<DiContainer, TParam1, TParam2, TParam3, TParam4, TValue> _method = null;
+        readonly Func<DiContainer, TParam1, TParam2, TParam3, TParam4, TValue> _method = null;
 
         public Type ConstructedType
         {

@@ -24,7 +24,7 @@ namespace Zenject
         public override object GetInstance(InjectContext context)
         {
             var obj = _container.InstantiateExplicit(
-                GetTypeToInstantiate(context.MemberType), new List<TypeValuePair>(), context, null);
+                GetTypeToInstantiate(context.MemberType), new List<TypeValuePair>(), context, null, true);
             Assert.That(obj != null);
             return obj;
         }
