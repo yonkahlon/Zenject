@@ -9,7 +9,6 @@ namespace Asteroids
     public class ShipStateDead : ShipState
     {
         Settings _settings;
-        float _elapsedTime;
         GameObjectInstantiator _gameObjectCreator;
         GameObject _shipBroken;
         GameObject _shipExplosion;
