@@ -127,7 +127,9 @@ namespace Zenject
 
         void UpdateLateTickable(ILateTickable tickable)
         {
+#if PROFILING_ENABLED
             using (ProfileBlock.Start("{0}.LateTick()".Fmt(tickable.GetType().Name())))
+#endif
             {
                 tickable.LateTick();
             }
@@ -135,7 +137,9 @@ namespace Zenject
 
         void UpdateFixedTickable(IFixedTickable tickable)
         {
+#if PROFILING_ENABLED
             using (ProfileBlock.Start("{0}.FixedTick()".Fmt(tickable.GetType().Name())))
+#endif
             {
                 tickable.FixedTick();
             }
@@ -143,7 +147,9 @@ namespace Zenject
 
         void UpdateTickable(ITickable tickable)
         {
+#if PROFILING_ENABLED
             using (ProfileBlock.Start("{0}.Tick()".Fmt(tickable.GetType().Name())))
+#endif
             {
                 tickable.Tick();
             }

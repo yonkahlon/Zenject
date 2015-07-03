@@ -64,7 +64,9 @@ namespace Zenject
 
                 try
                 {
+#if PROFILING_ENABLED
                     using (ProfileBlock.Start("{0}.Initialize()", initializable.Initializable.GetType().Name()))
+#endif
                     {
                         initializable.Initializable.Initialize();
                     }

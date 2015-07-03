@@ -565,7 +565,9 @@ namespace Zenject
         public object InstantiateExplicit(
             Type concreteType, List<TypeValuePair> extraArgMap, InjectContext currentContext, string concreteIdentifier, bool autoInject)
         {
+#if PROFILING_ENABLED
             using (ProfileBlock.Start("Zenject.Instantiate({0})", concreteType))
+#endif
             {
                 if (_checkForCircularDependencies)
                 {
@@ -629,7 +631,9 @@ namespace Zenject
 
             try
             {
+#if PROFILING_ENABLED
                 using (ProfileBlock.Start("{0}.{0}()", concreteType))
+#endif
                 {
                     newObj = typeInfo.InjectConstructor.Invoke(paramValues.ToArray());
                 }
@@ -699,7 +703,9 @@ namespace Zenject
 
             foreach (var method in typeInfo.PostInjectMethods)
             {
+#if PROFILING_ENABLED
                 using (ProfileBlock.Start("{0}.{1}()", injectable.GetType(), method.MethodInfo.Name))
+#endif
                 {
                     var paramValues = new List<object>();
 
