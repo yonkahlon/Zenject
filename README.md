@@ -1177,7 +1177,7 @@ This would result in a dependency of type `IFactory<string, IPathFindingStrategy
 
 Included below are the other methods that you can choose from when using the `BindIFactory<>` method:
 
-1. **ToMethod([method])** - Create dynamic dependency from a method
+**ToMethod([method])** - Create dynamic dependency from a method
 
 Results in a dependency of type `IFactory<TContract>` that invokes the given method.  Method must return a new instance of type `TContract`.
 
@@ -1192,7 +1192,7 @@ Container.BindIFactory<IFoo>().ToMethod(c => new Foo());
 Container.BindIFactory<string, IFoo>().ToMethod((text, c) => new Foo(text));
 ```
 
-2. **ToInstance<TContract>** - Create dynamic dependency from an existing instance
+**ToInstance<TContract>** - Create dynamic dependency from an existing instance
 
 Results in a dependency of type `IFactory<TContract>` that just returns the given instance
 
@@ -1201,7 +1201,7 @@ Results in a dependency of type `IFactory<TContract>` that just returns the give
 Container.BindIFactory<IFoo>().ToInstance(new Foo());
 ```
 
-3. **ToFactory** - Create dynamic dependency for a concrete type
+**ToFactory** - Create dynamic dependency for a concrete type
 
 Results in a dependency of type `IFactory<TContract>` that will create a new instance of type `TContract`.  `TContract` must be a concrete class in this case.
 
@@ -1215,7 +1215,7 @@ Container.BindIFactory<string, int, int, Foo>().ToFactory();
 
 In this example, any calls to `IFactory<Foo>.Create()` will return a new instance of type `Foo`.  Again, this of course requires that the generic argument to `BindIFactory<>` be non-abstract.
 
-4. **ToFactory&lt;TConcrete&gt;** - Create dynamic dependency for an abstract type
+**ToFactory&lt;TConcrete&gt;** - Create dynamic dependency for an abstract type
 
 Results in a dependency of type `IFactory<TContract>` that will create a new instance of type `TConcrete`.  `TConcrete` must derive from `TContract` in this case.
 
@@ -1227,7 +1227,7 @@ Container.BindIFactory<IFoo>().ToFactory<Foo>();
 Container.BindIFactory<string, int, IFoo>().ToFactory<Foo>();
 ```
 
-5. **ToIFactory&lt;TConcrete&gt;** - Create dynamic dependency via lookup on another factory
+**ToIFactory&lt;TConcrete&gt;** - Create dynamic dependency via lookup on another factory
 
 Results in a dependency of type IFactory<TContract> that will return an instance of type TConcrete.  It does this by looking up IFactory<TConcrete> and calling Create() to create an instance of type TConcrete.  TConcrete must derive from TContract for this binding.  Also, it is assumed that IFactory<TConcrete> is declared in a separate binding.
 
@@ -1239,7 +1239,7 @@ Container.BindIFactory<Foo>().ToFactory();
 Container.BindIFactory<IFoo>().ToIFactory<Foo>();
 ```
 
-6. **ToCustomFactory<TContract, TConcrete, TFactory>** - Create dynamic dependency using user created factory class
+**ToCustomFactory<TContract, TConcrete, TFactory>** - Create dynamic dependency using user created factory class
 
 Results in a dependency of type IFactory<TContract> that will return an instance of type TConcrete using the given factory of type TFactory.  It is assumed that TFactory is declared in another binding.  TFactory must also derive from IFactory<TConcrete> for this to work
 
@@ -1253,7 +1253,7 @@ public class MyCustomFooFactory : IFactory<IFoo>
 }
 ```
 
-7. **ToPrefab<TMonoBehaviour>(prefab)** - Create dynamic MonoBehaviour using given prefab
+**ToPrefab<TMonoBehaviour>(prefab)** - Create dynamic MonoBehaviour using given prefab
 
 TMonoBehaviour = Derives from MonoBehaviour
 
