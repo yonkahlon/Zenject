@@ -260,7 +260,7 @@ Each Zenject application therefore must tell the container how to resolve each o
 
 Note that you can find more examples in the <a href="#cheatsheet">cheatsheet</a> section below.
 
-1. **ToSingle** - Inject as singleton
+### **ToSingle** - Inject as singleton
 
 ```csharp
 Container.Bind<Foo>().ToSingle();
@@ -285,7 +285,7 @@ Container.Bind<IBar>().ToSingle<Foo>();
 
 Note again that the same instance will be used for all dependencies that take Foo, IFoo, or IBar.
 
-2. **ToInstance** - Inject as a specific instance
+### **ToInstance** - Inject as a specific instance
 
 ```csharp
 Container.Bind<Foo>().ToInstance(new Foo());
@@ -298,7 +298,7 @@ Container.BindInstance(new Bar());
 
 In this case the given instance will be used for every dependency with the given type
 
-3. **ToTransient** - Inject as newly created object
+### **ToTransient** - Inject as newly created object
 
 ```csharp
 Container.Bind<Foo>().ToTransient();
@@ -310,7 +310,7 @@ In this case a new instance of Foo will be generated each time it is injected. S
 Container.Bind<IFoo>().ToTransient<Foo>();
 ```
 
-4. **ToSinglePrefab** - Inject from unity prefab as singleton
+### **ToSinglePrefab** - Inject by instantiating a unity prefab once and using that everywhere
 
 ```csharp
 Container.Bind<FooMonoBehaviour>().ToSinglePrefab(PrefabGameObject);
@@ -327,27 +327,27 @@ Container.Bind<FooMonoBehaviour>().ToSinglePrefab(PrefabGameObject);
 Container.Bind<BarMonoBehaviour>().ToSinglePrefab(PrefabGameObject);
 ```
 
-    This will result in the prefab `PrefabGameObject` being instantiated once, and then searched for monobehaviour's `FooMonoBehaviour` and `BarMonoBehaviour`
+This will result in the prefab `PrefabGameObject` being instantiated once, and then searched for monobehaviour's `FooMonoBehaviour` and `BarMonoBehaviour`
 
-5. **ToTransientPrefab** - Inject from unity prefab as newly created object
+### **ToTransientPrefab** - Inject by instantiating a unity prefab each time
 
 ```csharp
 Container.Bind<FooMonoBehaviour>().ToTransientPrefab<FooMonoBehaviour>(PrefabGameObject);
 ```
 
-    This works similar to ToSinglePrefab except it will instantiate a new instance of the given prefab every time the dependency is injected.
+This works similar to ToSinglePrefab except it will instantiate a new instance of the given prefab every time the dependency is injected.
 
-6.  **ToSingleGameObject** - Inject MonoBehaviour.
+###  **ToSingleGameObject** - Inject by instantiating a new game object and using that everywhere
 
 ```csharp
 Container.Bind<FooMonoBehaviour>().ToSingleGameObject();
 ```
 
-    This binding will create a new game object and attach the given FooMonoBehaviour.  Also note that since it is ToSingle that it will use the same instance everywhere that has FooMonoBehaviour as a dependency
+This binding will create a new game object and attach the given FooMonoBehaviour.  Also note that since it is ToSingle that it will use the same instance everywhere that has FooMonoBehaviour as a dependency
 
-7.  **ToMethod** - Inject using a custom method
+###  **ToMethod** - Inject using a custom method
 
-    This binding allows you to customize creation logic yourself by defining a method:
+This binding allows you to customize creation logic yourself by defining a method:
 
 ```csharp
 Container.Bind<IFoo>().ToMethod(SomeMethod);
@@ -361,7 +361,7 @@ public IFoo SomeMethod(InjectContext context)
 }
 ```
 
-8.  **ToGetter** - Inject by getter.
+###  **ToGetter** - Inject by getter.
 
 This method can be useful if you want to bind to a property of another object.
 
@@ -370,7 +370,7 @@ Container.Bind<IFoo>().ToSingle<Foo>()
 Container.Bind<Bar>().ToGetter<IFoo>(x => x.GetBar())
 ```
 
-9.  **ToLookup** - Inject by recursive resolve.
+###  **ToLookup** - Inject by recursive resolve.
 
 ```csharp
 Container.Bind<IFoo>().ToLookup<IBar>()
@@ -383,16 +383,7 @@ In the example code above we assume that Foo inherits from IBar, which inherits 
 
 You can also supply an identifier to the ToLookup() method.  See <a href="#identifiers">here</a> section for details on identifiers.
 
-10. **BindValue** - Inject primitive values
-
-```csharp
-Container.BindValue<float>().To(1.5f);
-Container.BindValue<int>().To(42);
-```
-
-Primitive types such as int, float, struct, etc. are treated specially in Zenject.  Note that when binding to primitives you will almost certaintly want to specify the type that the binding is for using `WhenInjectedInto` (described <a href="#conditional-bindings">below</a>).  I'll also add that while it can be useful to inject primitives for configuration settings it is often better to inject a "settings" object instead.  There are other advantages to this approach as well as described <a href="#using-the-unity-inspector-to-configure-settings">here</a>.
-
-11. **Rebind** - Override existing binding
+### **Rebind** - Override existing binding
 
 ```csharp
 Container.Rebind<IFoo>().To<Foo>();
@@ -400,7 +391,7 @@ Container.Rebind<IFoo>().To<Foo>();
 
 The Rebind function can be used to override any existing bindings that were added previously.  It will first clear all previous bindings and then add the new binding.  This method is especially useful for tests, where you often want to use almost all the same bindings used in production, except override a few specific bindings.
 
-12. **Untyped Bindings**
+### **Untyped Bindings**
 
 ```csharp
 Container.Bind(typeof(IFoo)).ToSingle(typeof(Foo));
@@ -408,7 +399,9 @@ Container.Bind(typeof(IFoo)).ToSingle(typeof(Foo));
 
 In some cases it is not possible to use the generic versions of the Bind<> functions.  In these cases a non-generic version is provided, which works by taking in a Type value as a parameter.
 
-13. **BindAllInterfacesToSingle** - This function can be used to automatically bind any interfaces that it finds on the given type.
+### **BindAllInterfacesToSingle**
+
+This function can be used to automatically bind any interfaces that it finds on the given type.
 
 ```csharp
 public class Foo : ITickable, IInitializable
@@ -505,7 +498,7 @@ public class Bar
 ...
 
 // Can leave this commented or not and it will still work
-// Container.BindValue<int>().To(1);
+// Container.Bind<int>().ToInstance(1);
 ```
 
 ## <a id="identifiers"></a>Identifiers
@@ -582,7 +575,7 @@ Container.Bind<IBar>().ToSingle<Foo>("foo2");
 
 In this case, two instances will be created.
 
-Something else worth noting is that the behaviour of ToSinglePrefab works slightly differently from the above.  Given the following:
+Something else worth noting is that the behaviour of ToSinglePrefab works similarly.  Given the following:
 
 ```csharp
 Container.Bind<IFoo>().ToSingleFromPrefab<Foo>(MyPrefab);
@@ -610,22 +603,23 @@ Container.Bind<IFoo>().ToSingle<Foo2>().WhenInjectedInto<Bar2>();
 Note that `WhenInjectedInto` is simple shorthand for the following.  You can use the more general `When()` method for more complex conditionals.  For example, this is equivalent to WhenInjectedInto:
 
 ```csharp
-Container.Bind<IFoo>().ToSingle<Foo>().When(context => context.ParentType == typeof(Bar));
+Container.Bind<IFoo>().ToSingle<Foo>().When(context => context.ObjectType == typeof(Bar));
 ```
 
 The InjectContext class (which is passed as the `context` parameter above) contains the following information that you can use in your conditional:
 
-* `Type ParentType` - The type of the newly instantiated object, which we are injecting dependencies into.
-* `object ParentInstance` - The newly instantiated instance that is having its dependencies filled.  Note that this is only available when injecting fields or into [PostInject] and null for constructor parameters
+* `Type ObjectType` - The type of the newly instantiated object, which we are injecting dependencies into.  Note that this is null for root calls to Resolve<> or Instantiate<>
+* `object ObjectInstance` - The newly instantiated instance that is having its dependencies filled.  Note that this is only available when injecting fields or into [PostInject] and null for constructor parameters
 * `string Identifier` - This will be null in most cases and set to whatever is given as a parameter to the [Inject] attribute.  For example, `[Inject("foo")] _foo` will result in `Identifier` being equal to the string "foo".
+* `string ConcreteIdentifier` - This will be null in most cases and set to whatever is given as the string identifier to the ToSingle<> (or similar) methods.
 * `string MemberName` - The name of the field or parameter that we are injecting into.  This can be used, for example, in the case where you have multiple constructor parameters that are strings.  However, using the parameter or field name can be error prone since other programmers may refactor it to use a different name.  In many cases it's better to use an explicit identifier
 * `Type MemberType` - The type of the field or parameter that we are injecting into.
-* `List<Type> ParentTypes` - This contains the entire object graph that precedes the current class being created.  For example, dependency A might be created, which requires an instance of B, which requires an instance of C.  In this case, the InjectContext given for any fields when creating C will contains the list `{typeof(A), typeof(B)}`.
+* `InjectContext ParentContext` - This contains information on the entire object graph that precedes the current class being created.  For example, dependency A might be created, which requires an instance of B, which requires an instance of C.  You could use this field to inject different values into C, based on some condition about A.  This can be used to create very complex conditions using any combination of parent context information.  Note also that ParentContext.MemberType is not necessarily the same as ObjectType, since the ObjectType could be a derived type from ParentContext.MemberType
 * `bool Optional` - True if the [InjectOptional] parameter is declared on the field being injected
 
 ## <a id="itickable"></a>ITickable
 
-I prefer to avoid the extra weight of MonoBehaviours when possible in favour of just normal C# classes.  Zenject allows you to do this much more easily by providing interfaces that mirror functionality that you would normally need to use a MonoBehaviour for.
+I personally prefer to avoid the extra weight of MonoBehaviours when possible in favour of just normal C# classes.  Zenject allows you to do this much more easily by providing interfaces that mirror functionality that you would normally need to use a MonoBehaviour for.
 
 For example, if you have code that needs to run per frame, then you can implement the ITickable interface:
 
@@ -673,7 +667,7 @@ public class Foo
 }
 ```
 
-This still has the drawback that it is called in the middle of object graph construction, but can be useful in many cases.  In particular, if you are using property injection (which isn't generally recommended but necessary in some cases) then you will not have your dependencies in the constructor, and therefore you will need to define a [PostInject] method in this case.
+This still has the drawback that it is called in the middle of object graph construction, but can be useful in many cases.  In particular, if you are using property injection (which isn't generally recommended but necessary in some cases) then you will not have your dependencies in the constructor, and therefore you will need to define a [PostInject] method in this case.  Another case where field-injection and PostInject injection is useful is when you have circular dependencies, which don't make sense for constructor injection
 
 You will also want to use [PostInject] for MonoBehaviours, since MonoBehaviours cannot have constructors.  You may also include injected parameters in any [PostInject] method in the same way you would for constructors.  For example:
 
@@ -695,7 +689,7 @@ public class Foo : MonoBehaviour
 
 Using [PostInject] to inject dependencies is the recommended approach for MonoBehaviours.
 
-In the case where there are multiple [PostInject] methods on a given object, they are called in the order of Base class to Derived class.
+Note that in the case where there are multiple [PostInject] methods on a given object, they are called in the order of Base class to Derived class.
 
 ## <a id="implementing-idisposable"></a>Implementing IDisposable
 
@@ -797,7 +791,7 @@ A Zenject driven application is executed by the following steps:
 * Composition Root creates a new DiContainer object to be used to contain all instances used in the scene
 * Composition Root iterates through all the Installers that have been added to it via the Unity Inspector, and updates them to point to the new DiContainer.  It then calls InstallBindings() on each installer.
 * Each Installer then registers different sets of dependencies directly on to the given DiContainer by calling one of the Bind<> methods.  Note that the order that this binding occurs should not generally matter. Each installer may also include other installers by calling Container.Install. Each installer can also add bindings to configure other installers, however note that in this case order might actually matter, since you will have to make sure that code configuring other installers is executed before the installers that you are configuring! You can control the order by simply re-ordering the Installers property of the CompositionRoot
-* The Composition Root then traverses the entire scene hierarchy and injects all MonoBehaviours with their dependencies. Since MonoBehaviours are instantiated by Unity we cannot use constructor injection in this case and therefore [PostInject] injection, field injection or property injection must be used instead.  Any methods on these MonoBehaviour's marked with [PostInject] are called at this point as well.
+* The Composition Root then traverses all game object descendants (or the entire scene if 'Inject on Full Scene' property is checked in the inspector) and injects all MonoBehaviours with their dependencies. Since MonoBehaviours are instantiated by Unity we cannot use constructor injection in this case and therefore [PostInject] injection, field injection or property injection must be used instead.  Any methods on these MonoBehaviour's marked with [PostInject] are called at this point as well.
 * After filling in the scene dependencies the Composition Root then retrieves the instance of IDependencyRoot, which contains the objects that handle the ITickable/IInitializable/IDisposable interfaces.
 * If any required dependencies cannot be resolved, a ZenjectResolveException is thrown
 * Initialize() is called on all IInitializable objects in the order specified in the installers
@@ -811,14 +805,14 @@ A Zenject driven application is executed by the following steps:
 * The container should *only* be referenced in the composition root "layer".  Note that factories are part of this layer and the container can be referenced there (which is necessary to create objects at runtime).  For example, see ShipStateFactory in the sample project.  See <a href="#dynamic-object-graph-validation">here</a> for more details on this.
 * Prefer constructor injection or [PostInject] injection to field or property injection.
     * Constructor/[PostInject] injection forces the dependency to only be resolved once, at class creation, which is usually what you want.  In many cases you don't want to expose a public property with your internal dependencies (although you can also [Inject] on private fields/properties)
-    * Constructor/[PostInject] injection guarantees no circular dependencies between classes, which is generally a bad thing to do
+    * Constructor injection guarantees no circular dependencies between classes, which is generally a bad thing to do.  You can do this however using [PostInject] or field injection if necessary.
     * Constructor/[PostInject] injection is more portable for cases where you decide to re-use the code without a DI framework such as Zenject.  You can do the same with public properties but it's more error prone (it's easier to forget to initialize one field and leave the object in an invalid state)
     * Finally, Constructor/[PostInject] injection makes it clear what all the dependencies of a class are when another programmer is reading the code.  They can simply look at the parameter list of the method.
 
 ## <a id="gotchas"></a>Gotchas / Miscellaneous Tips and Tricks
 
 * **Do not use GameObject.Instantiate if you want your objects to have their dependencies injected**
-    * If you want to create a prefab yourself, you can use the provided zenject class GameObjectInstantiator, which will automatically fill in any fields that are marked with the [Inject] attribute.
+    * If you want to create a prefab yourself, you can use either IInstantiator interface (which is automatically included in every container) or the DiContainer directly, which will automatically fill in any fields that are marked with the [Inject] attribute.  The IInstantiator interface contains various methods to create from prefabs or create from empty game objects, etc.
     * You can also use GameObjectFactory as suggested <a href="#game-object-factories">in this section</a>
 
 * **Do not use IInitializable, ITickable and IDisposable for dynamically created objects**
@@ -836,12 +830,12 @@ A Zenject driven application is executed by the following steps:
     * By default, Zenject will only inject on MonoBehaviours that are placed underneath the CompositionRoot.  This allows for having multiple independent Composition Roots (note: this isn't recommended in 95% of cases however).  If you want root-level game objects to be injected, you can do this too by enabling the 'InjectFullScene' flag on the CompositionRoot in your scene.
 
 * **Using Zenject outside of Unity**
-    * Zenject is primarily designed to work within Unity3D.  However, it can also be used as a general purpose DI framework outside of Unity3D.  In order to do this, you just have to build Zenject with the define ZEN_NOT_UNITY3D enabled.
+    * Zenject is primarily designed to work within Unity3D.  However, it can also be used as a general purpose DI framework outside of Unity3D.  In order to do this, you just have to build Zenject with the define ZEN_NOT_UNITY3D enabled.  Note also that if multi-threading support (for eg. if used with ASP.NET MVC) then you will have to pass an additional flag to your container to disable checks for circular dependencies (you should also note that BindScope() is not supported with multiple threads)
 
 * **Lazily instantiated objects and the object graph**
-    * Zenject will only instantiate any objects that are referenced in the object graph that is generated based on the bindings that you've invoked in your installer.  Internally, how it works is that Zenject has one single class that represents the root of the entire object graph.  For unity projects this is typically the 'UnityDependencyRoot' class.  This class has a dependency on all ITickable, IInitializable, and IDisposable objects.  This is important to understand because it means that any class that you bind to ITickable, IInitializable, or IDisposable will always be created as part of the initial object graph of your application.  And only otherwise will your class be lazily instantiated when referenced by another class.
+    * Zenject will only instantiate any objects that are referenced in the object graph that is generated based on the bindings that you've invoked in your installer.  Internally, how it works is that Zenject has one single class that represents the root of the entire object graph (aka IDependencyRoot).  For unity projects this is typically the 'UnityDependencyRoot' class.  This class has a dependency on all ITickable, IInitializable, and IDisposable objects.  This is important to understand because it means that any class that you bind to ITickable, IInitializable, or IDisposable will always be created as part of the initial object graph of your application.  And only otherwise will your class be lazily instantiated when referenced by another class.
 
-Please feel free to submit any other sources of confusion to svermeulen@modesttree.com and I will add it here.
+Please feel free to submit any other sources of confusion to sfvermeulen@gmail.com and I will add it here.
 
 ## <a id="update--initialization-order"></a>Update / Initialization Order
 
@@ -856,11 +850,11 @@ public class AsteroidsInstaller : MonoInstaller
 
     void InitPriorities()
     {
-        Container.Bind<List<Type>>().To(InitializablesOrder)
+        Container.Bind<List<Type>>().ToInstance(InitializablesOrder)
             .WhenInjectedInto<InitializablePrioritiesInstaller>();
         Container.Install<InitializablePrioritiesInstaller>();
 
-        Container.Bind<List<Type>>().To(Tickables)
+        Container.Bind<List<Type>>().ToInstance(Tickables)
             .WhenInjectedInto<TickablePrioritiesInstaller>();
         Container.Install<TickablePrioritiesInstaller>();
     }
@@ -903,7 +897,7 @@ The usual workflow when setting up bindings using a DI framework is something li
 
 This works ok for small projects, but as the complexity of your project grows it is often a tedious process.  The problem gets worse if the startup time of your application is particularly bad, or when the resolve errors only occur from factories at various points at runtime.  What would be great is some tool to analyze your object graph and tell you exactly where all the missing bindings are, without requiring the cost of firing up your whole app.
 
-You can do this in Zenject out-of-the-box by executing the menu item `Edit -> Zenject -> Validate Current Scene` or simply hitting CTRL+SHIFT+V with the scene open that you want to validate.  This will execute all installers for the current scene and construct a fully bound container.   It will then iterate through the object graphs and verify that all bindings can be found (without actually instantiating any of them).
+You can do this in Zenject out-of-the-box by executing the menu item `Edit -> Zenject -> Validate Current Scene` or simply hitting CTRL+SHIFT+V with the scene open that you want to validate.  This will execute all installers for the current scene and construct a fully bound container (with null values for all instances).   It will then iterate through the object graphs and verify that all bindings can be found (without actually instantiating any of them).
 
 Also, if you happen to be a fan of automated testing (as I am) then you can include calls to this menu item as part of your testing suite.
 
@@ -1027,7 +1021,7 @@ Container.Bind<Enemy.Factory>().ToSingle();
 
 By using Enemy.Factory above, all the dependencies for the Enemy class (such as the Player) will be automatically filled in.
 
-There is no requirement that the Enemy.Factory class be a subclass of Enemy, however we have found this to be a very useful convention.  Enemy.Factory is empty and simply derives from the built-in Zenject Factory<> class, which handles the work of using the DiContainer to construct a new instance of Enemy.
+There is no requirement that the Enemy.Factory class be a nested class within Enemy, however we have found this to be a very useful convention.  Enemy.Factory is empty and simply derives from the built-in Zenject Factory<> class, which handles the work of using the DiContainer to construct a new instance of Enemy.
 
 Also note that by using the built-in Zenject Factory<> class, the Enemy class will be automatically validated as well.  So if the constructor of the Enemy class includes a type that is missing a binding, this error can be caught before running your app, by simply running validation.  Validation can be especially useful for dynamically created objects, because otherwise you may not catch the error until the factory is invoked at some point during runtime.  See <a href="#dynamic-object-graph-validation">this section</a> for more details on Validation.
 
@@ -1322,7 +1316,7 @@ And then in our installer we would include:
 
 ```csharp
 Container.Bind<EnemyFactory>().ToSingle();
-Container.BindValue<Difficulties>().To(Difficulties.Easy);
+Container.Bind<Difficulties>().ToInstance(Difficulties.Easy);
 ```
 
 This way we can change the type of enemy we spawn by simply changing the difficulty bound in the installer.
@@ -1382,6 +1376,8 @@ This is optional but can be nice if you are fan of validation.  The parameters p
 
 Note that we are injecting the DiContainer directly into the EnemyFactory class, which is generally a bad thing to do but ok in this case because it is a factory (and therefore part of the "composition root layer")
 
+For another real world example on factories, see [this reddit thread](https://www.reddit.com/r/Zenject/comments/3brroe/questionsimple_ftg_with_mvc_pattern/)
+
 ## <a id="using-bindscope"></a>Using BindScope
 
 In the real world there can sometimes be complex construction that needs to occur in your custom factory classes.  In some of these cases it can be useful to use a feature called BindScope.
@@ -1422,7 +1418,7 @@ public class EnemyFactory
     {
         using (BindScope scope = Container.CreateScope())
         {
-            scope.BindValueInstance(weaponDamage).WhenInjectedInto<EnemyWeapon>();
+            scope.BindInstance(weaponDamage).WhenInjectedInto<EnemyWeapon>();
             return _container.Instantiate<Enemy>();
         }
     }
@@ -1471,7 +1467,7 @@ You can load the scene containing `LessonStandaloneStart` and specify a particul
 ZenUtil.LoadScene("NameOfSceneToLoad",
     delegate (DiContainer container)
     {
-        container.Bind<string>("StartLevelName").To("custom_level").WhenInjectedInto<LevelHandler>();
+        container.Bind<string>("StartLevelName").ToInstance("custom_level").WhenInjectedInto<LevelHandler>();
     });
 ```
 
@@ -1511,7 +1507,7 @@ public class GameInstaller : Installer
     public override void InstallBindings()
     {
         ...
-        Container.Bind<string>().To(LevelName).WhenInjectedInto<LevelHandler>();
+        Container.Bind<string>().ToInstance(LevelName).WhenInjectedInto<LevelHandler>();
         ...
     }
 }
@@ -1523,7 +1519,7 @@ Then, instead of injecting directly into the LevelHandler we can inject into the
 ZenUtil.LoadScene("NameOfSceneToLoad",
     delegate (DiContainer container)
     {
-        container.Bind<string>().To("level02").WhenInjectedInto<GameInstaller>();
+        container.Bind<string>().ToInstance("level02").WhenInjectedInto<GameInstaller>();
     });
 ```
 
@@ -1789,19 +1785,19 @@ Container.Bind<IFoo>().ToSingleInstance(new Foo());
 Container.Bind<IBar>().ToSingle<Foo>();
 Container.Bind<Foo>().ToSingle();
 
-///////////// BindValue
+///////////// Binding primitive types
 
 // Use the number 10 every time an int is requested
 // You'd never really want to do this, you should almost always use a When condition for primitive values (see conditions section below)
-Container.BindValue<int>().To(10);
-Container.BindValue<bool>().To(false);
+Container.Bind<int>().ToInstance(10);
+Container.Bind<bool>().ToInstance(false);
 
 // These are the same as above
 // This can be a bit nicer though since the type argument can be deduced from the parameter
 // Again though, be careful to use conditions to limit the scope of usage for values
 // or consider using a Settings object as described above
-Container.BindValueInstance(10);
-Container.BindValueInstance(false);
+Container.BindInstance(10);
+Container.BindInstance(false);
 
 ///////////// ToMethod
 
@@ -1848,7 +1844,7 @@ Container.Bind<Foo>().ToSingle();
 Container.Bind<Bar>().ToGetter<Foo>(foo => foo.GetBar());
 
 // Another example using values
-Container.BindValue<string>().ToGetter<Foo>(foo => foo.GetTitle());
+Container.Bind<string>().ToGetter<Foo>(foo => foo.GetTitle());
 
 ///////////// ToSingleGameObject
 
@@ -1914,7 +1910,7 @@ public class Norf
 // Bind a globally accessible string with the name 'PlayerName'
 // A better option might be to create a Settings object and bind that
 // instead however
-Container.BindValue<string>("PlayerName").To("name of the player");
+Container.Bind<string>("PlayerName").ToInstance("name of the player");
 
 ///////////// Conditions
 
@@ -1945,7 +1941,7 @@ Container.BindInstance(5).WhenInjectedInto<Gui>();
 // This is usually not a good idea since the name of a field can change
 // easily and break the binding but shown here as an example  :)
 Container.BindInstance(5.0f).When(ctx =>
-    ctx.ParentType == typeof(Gui) && ctx.MemberName == "width");
+    ctx.ObjectType == typeof(Gui) && ctx.MemberName == "width");
 
 // Create a new 'Foo' for every class that is created as part of the
 // construction of the 'Bar' class
@@ -1953,7 +1949,7 @@ Container.BindInstance(5.0f).When(ctx =>
 // a constructor parameter of type IFoo, a new Foo will be created
 // for that case
 Container.Bind<IFoo>().ToTransient<Foo>().When(
-    ctx => ctx.ParentTypes.Contains(typeof(Bar)));
+    ctx => ctx.AllObjectTypes.Contains(typeof(Bar)));
 
 ///////////// Complex conditions example
 
@@ -2034,6 +2030,14 @@ var foos = Container.ResolveAll<IFoo>();
 // Instantiate a new instance of Foo and inject on any of its members
 Container.Instantiate<Foo>();
 
+// Instantiate a new prefab and have any injectables filled in on the prefab
+GameObject go = Container.InstantiatePrefab(prefab);
+
+// Instantiate a new prefab and return a specific monobehaviour
+Foo foo = Container.InstantiatePrefabForComponent<Foo>(prefab);
+
+// Add a new component to an existing game object
+Foo foo = Container.InstantiateComponent<Foo>(gameObject);
 
 ```
 
@@ -2042,6 +2046,13 @@ Container.Instantiate<Foo>();
 For general troubleshooting / support, please use the [zenject subreddit](http://www.reddit.com/r/zenject) or the [zenject google group](https://groups.google.com/forum/#!forum/zenject/).  If you have found a bug, you are also welcome to create an issue on the [github page](https://github.com/modesttree/Zenject), or a pull request if you have a fix / extension.  You can also follow [@Zenject](https://twitter.com/Zenject) on twitter for updates.  Finally, you can also email me directly at sfvermeulen@gmail.com
 
 ## <a id="release-notes"></a>Release Notes
+
+2.5
+* Added support for circular dependencies in the PostInject method or as fields (just not constructor parameters)
+* Fixed issue with identifiers that was occurring when having both [Inject] and [InjectOptional] attributes on a field/constructor parameter.  Now requires that only one be set
+* Removed BindValue in favour of just using Bind for both reference and value types for simplicity
+* Removed GameObjectInstantiator class since it was pretty awkward and confusing.  Moved methods directly into IInstantiator/DiContainer.  See IInstantiator class.
+* Extracted IResolver and IBinder interfaces from DiContainer
 
 2.4
 * Refactored the way IFactory is used to be a lot cleaner. It now uses a kind of fluent syntax through its own bind method BindIFactory<>
