@@ -71,7 +71,7 @@ __Quick Start__:  If you are already familiar with dependency injection and are 
 * Field injection
 * Property injection
 * Injection via [PostInject] method
-* Conditional Binding Including Named injections
+* Conditional Binding (eg. by name, by parent type, etc.)
 * Optional Dependencies
 * Support For Building Dynamic Object Graphs At Runtime Using Factories
 * Auto-Mocking using the Moq library
@@ -84,7 +84,7 @@ __Quick Start__:  If you are already familiar with dependency injection and are 
 
 Unity is a fantastic game engine, however the approach that new developers are encouraged to take does not lend itself well to writing large, flexible, or scalable code bases.  In particular, the default way that Unity manages dependencies between different game components can often be awkward and error prone.
 
-Having worked on non-unity projects that use dependency management frameworks (such as Ninject, which Zenject takes a lot of inspiration from), the problem irked me enough that I decided a custom framework was in order.  Upon googling for solutions, I found a series of great articles by Sebastiano Mandalà outlining the problem, which I strongly recommend that everyone read before firing up Zenject:
+Having worked on non-unity projects that use dependency management frameworks (such as Ninject, which Zenject takes a lot of inspiration from), the problem irked me enough that I decided a custom framework was necessary.  Upon googling for solutions, I found a series of great articles by Sebastiano Mandalà outlining the problem, which I strongly recommend that everyone read before firing up Zenject:
 
 * [http://blog.sebaslab.com/ioc-container-for-unity3d-part-1/](http://blog.sebaslab.com/ioc-container-for-unity3d-part-1/)
 * [http://blog.sebaslab.com/ioc-container-for-unity3d-part-2/](http://blog.sebaslab.com/ioc-container-for-unity3d-part-2/)
@@ -290,6 +290,8 @@ Note again that the same instance will be used for all dependencies that take Fo
 ```csharp
 Container.Bind<Foo>().ToInstance(new Foo());
 Container.Bind<string>().ToInstance("foo");
+Container.Bind<int>().ToInstance(42);
+
 // Or with shortcut:
 Container.BindInstance(new Bar());
 ```
@@ -314,11 +316,11 @@ Container.Bind<IFoo>().ToTransient<Foo>();
 Container.Bind<FooMonoBehaviour>().ToSinglePrefab(PrefabGameObject);
 ```
 
-    This will instantiate a new instance of the given prefab, and then search the newly created game object for the given component (in this case FooMonoBehaviour).
+This will instantiate a new instance of the given prefab, and then search the newly created game object for the given component (in this case FooMonoBehaviour).
 
-    Also, because it is ToSingle it will only instantiate the prefab once, and otherwise use the same instance of FooMonoBehaviour.
+Also, because it is ToSingle it will only instantiate the prefab once, and otherwise use the same instance of FooMonoBehaviour.
 
-    You can also bind multiple singletons to the same prefab.  For example:
+You can also bind multiple singletons to the same prefab.  For example:
 
 ```csharp
 Container.Bind<FooMonoBehaviour>().ToSinglePrefab(PrefabGameObject);

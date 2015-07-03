@@ -2,17 +2,10 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using Zenject;
 
 namespace ModestTree
 {
-    public class AssertException : Exception
-    {
-        public AssertException(string message)
-            : base(message)
-        {
-        }
-    }
-
     public static class Assert
     {
         public static bool IsEnabled
@@ -28,7 +21,7 @@ namespace ModestTree
             }
         }
 
-        [Conditional("UNITY_EDITOR")]
+        //[Conditional("UNITY_EDITOR")]
         public static void That(bool condition)
         {
             if (!condition)
@@ -37,13 +30,13 @@ namespace ModestTree
             }
         }
 
-        [Conditional("UNITY_EDITOR")]
+        //[Conditional("UNITY_EDITOR")]
         public static void IsType<T>(object obj)
         {
             IsType<T>(obj, "");
         }
 
-        [Conditional("UNITY_EDITOR")]
+        //[Conditional("UNITY_EDITOR")]
         public static void IsType<T>(object obj, string message)
         {
             if (!(obj is T))
@@ -53,13 +46,13 @@ namespace ModestTree
         }
 
         // Use AssertEquals to get better error output (with values)
-        [Conditional("UNITY_EDITOR")]
+        //[Conditional("UNITY_EDITOR")]
         public static void IsEqual(object left, object right)
         {
             IsEqual(left, right, "");
         }
 
-        [Conditional("UNITY_EDITOR")]
+        //[Conditional("UNITY_EDITOR")]
         public static void Throws<TException>(Action action)
             where TException : Exception
         {
@@ -76,7 +69,7 @@ namespace ModestTree
         }
 
         // Use AssertEquals to get better error output (with values)
-        [Conditional("UNITY_EDITOR")]
+        //[Conditional("UNITY_EDITOR")]
         public static void IsEqual(object left, object right, Func<string> messageGenerator)
         {
             if (!object.Equals(left, right))
@@ -88,7 +81,7 @@ namespace ModestTree
         }
 
         // Use AssertEquals to get better error output (with values)
-        [Conditional("UNITY_EDITOR")]
+        //[Conditional("UNITY_EDITOR")]
         public static void IsEqual(object left, object right, string message)
         {
             if (!object.Equals(left, right))
@@ -100,14 +93,14 @@ namespace ModestTree
         }
 
         // Use Assert.IsNotEqual to get better error output (with values)
-        [Conditional("UNITY_EDITOR")]
+        //[Conditional("UNITY_EDITOR")]
         public static void IsNotEqual(object left, object right)
         {
             IsNotEqual(left, right, "");
         }
 
         // Use Assert.IsNotEqual to get better error output (with values)
-        [Conditional("UNITY_EDITOR")]
+        //[Conditional("UNITY_EDITOR")]
         public static void IsNotEqual(object left, object right, Func<string> messageGenerator)
         {
             if(object.Equals(left, right))
@@ -118,7 +111,7 @@ namespace ModestTree
             }
         }
 
-        [Conditional("UNITY_EDITOR")]
+        //[Conditional("UNITY_EDITOR")]
         public static void IsNull(object val)
         {
             if (val != null)
@@ -127,7 +120,7 @@ namespace ModestTree
             }
         }
 
-        [Conditional("UNITY_EDITOR")]
+        //[Conditional("UNITY_EDITOR")]
         public static void IsNotNull(object val)
         {
             if (val == null)
@@ -136,7 +129,7 @@ namespace ModestTree
             }
         }
 
-        [Conditional("UNITY_EDITOR")]
+        //[Conditional("UNITY_EDITOR")]
         public static void IsNotNull(object val, string message)
         {
             if (val == null)
@@ -145,7 +138,7 @@ namespace ModestTree
             }
         }
 
-        [Conditional("UNITY_EDITOR")]
+        //[Conditional("UNITY_EDITOR")]
         public static void IsNull(object val, string message, params object[] parameters)
         {
             if (val != null)
@@ -154,7 +147,7 @@ namespace ModestTree
             }
         }
 
-        [Conditional("UNITY_EDITOR")]
+        //[Conditional("UNITY_EDITOR")]
         public static void IsNotNull(object val, string message, params object[] parameters)
         {
             if (val == null)
@@ -164,7 +157,7 @@ namespace ModestTree
         }
 
         // Use Assert.IsNotEqual to get better error output (with values)
-        [Conditional("UNITY_EDITOR")]
+        //[Conditional("UNITY_EDITOR")]
         public static void IsNotEqual(object left, object right, string message)
         {
             if (object.Equals(left, right))
@@ -177,7 +170,7 @@ namespace ModestTree
 
         // Pass a function instead of a string for cases that involve a lot of processing to generate a string
         // This way the processing only occurs when the assert fails
-        [Conditional("UNITY_EDITOR")]
+        //[Conditional("UNITY_EDITOR")]
         public static void That(bool condition, Func<string> messageGenerator)
         {
             if (!condition)
@@ -186,7 +179,7 @@ namespace ModestTree
             }
         }
 
-        [Conditional("UNITY_EDITOR")]
+        //[Conditional("UNITY_EDITOR")]
         public static void That(
             bool condition, string message, params object[] parameters)
         {
@@ -196,10 +189,10 @@ namespace ModestTree
             }
         }
 
-        [Conditional("UNITY_EDITOR")]
+        //[Conditional("UNITY_EDITOR")]
         static void TriggerAssert(string message)
         {
-            throw new AssertException(message);
+            throw new ZenjectException(message);
         }
 
         static string FormatString(string format, params object[] parameters)
@@ -232,4 +225,3 @@ namespace ModestTree
         }
     }
 }
-
