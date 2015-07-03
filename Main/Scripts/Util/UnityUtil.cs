@@ -83,7 +83,7 @@ namespace ModestTree.Util
             return 1 + GetDepthLevel(transform.parent);
         }
 
-        public static IEnumerable<T> GetComponentsInChildrenBreadthFirst<T>(GameObject gameObject, bool includeInactive)
+        public static IEnumerable<T> GetComponentsInChildrenTopDown<T>(GameObject gameObject, bool includeInactive)
             where T : Component
         {
             return gameObject.GetComponentsInChildren<T>(includeInactive)
@@ -91,7 +91,7 @@ namespace ModestTree.Util
                     x == null ? int.MinValue : GetDepthLevel(x.transform));
         }
 
-        public static IEnumerable<T> GetComponentsInChildrenDepthFirst<T>(GameObject gameObject, bool includeInactive)
+        public static IEnumerable<T> GetComponentsInChildrenBottomUp<T>(GameObject gameObject, bool includeInactive)
             where T : Component
         {
             return gameObject.GetComponentsInChildren<T>(includeInactive)

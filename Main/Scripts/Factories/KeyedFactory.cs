@@ -12,13 +12,11 @@ namespace Zenject
         [Inject]
         readonly DiContainer _container = null;
 
-        [Inject]
         [InjectOptional]
         readonly List<Tuple<TKey, Type>> _typePairs = null;
 
         Dictionary<TKey, Type> _typeMap;
 
-        [Inject]
         [InjectOptional]
         readonly Type _fallbackType = null;
 

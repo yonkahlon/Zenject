@@ -50,11 +50,25 @@ namespace Zenject
         static InjectableInfo CreateInjectableInfoForParam(
             Type parentType, ParameterInfo paramInfo)
         {
-            var identifier = paramInfo.AllAttributes<InjectAttribute>().Select(x => x.Identifier)
-                .Concat(paramInfo.AllAttributes<InjectOptionalAttribute>().Select(x => x.Identifier)).FirstOrDefault();
+            var injectAttributes = paramInfo.AllAttributes<InjectAttribute>().ToList();
+            var injectOptionalAttributes = paramInfo.AllAttributes<InjectOptionalAttribute>().ToList();
+
+            string identifier = null;
+
+            Assert.That(injectAttributes.IsEmpty() || injectOptionalAttributes.IsEmpty(),
+                "Found both 'InjectOptional' and 'Inject' attributes on type parameter '{0}' of type '{1}'.  Parameter should only have one or the other.", paramInfo.Name, parentType.Name());
+
+            if (injectAttributes.Any())
+            {
+                identifier = injectAttributes.Single().Identifier;
+            }
+            else if (injectOptionalAttributes.Any())
+            {
+                identifier = injectOptionalAttributes.Single().Identifier;
+            }
 
             return new InjectableInfo(
-                paramInfo.HasAttribute(typeof(InjectOptionalAttribute)),
+                injectOptionalAttributes.Any(),
                 identifier,
                 paramInfo.Name,
                 paramInfo.ParameterType,
@@ -120,8 +134,22 @@ namespace Zenject
 
         static InjectableInfo CreateForMember(MemberInfo memInfo, Type parentType)
         {
-            var identifier = memInfo.AllAttributes<InjectAttribute>().Select(x => x.Identifier)
-                .Concat(memInfo.AllAttributes<InjectOptionalAttribute>().Select(x => x.Identifier)).FirstOrDefault();
+            var injectAttributes = memInfo.AllAttributes<InjectAttribute>().ToList();
+            var injectOptionalAttributes = memInfo.AllAttributes<InjectOptionalAttribute>().ToList();
+
+            string identifier = null;
+
+            Assert.That(injectAttributes.IsEmpty() || injectOptionalAttributes.IsEmpty(),
+                "Found both 'InjectOptional' and 'Inject' attributes on type field '{0}' of type '{1}'.  Field should only have one or the other.", memInfo.Name, parentType.Name());
+
+            if (injectAttributes.Any())
+            {
+                identifier = injectAttributes.Single().Identifier;
+            }
+            else if (injectOptionalAttributes.Any())
+            {
+                identifier = injectOptionalAttributes.Single().Identifier;
+            }
 
             Type memberType;
             Action<object, object> setter;
@@ -141,7 +169,7 @@ namespace Zenject
             }
 
             return new InjectableInfo(
-                memInfo.HasAttribute(typeof(InjectOptionalAttribute)),
+                injectOptionalAttributes.Any(),
                 identifier,
                 memInfo.Name,
                 memberType,

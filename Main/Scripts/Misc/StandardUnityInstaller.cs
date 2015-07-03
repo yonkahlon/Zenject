@@ -17,9 +17,6 @@ namespace Zenject
             Container.Bind<IDependencyRoot>().ToSingleMonoBehaviour<UnityDependencyRoot>(_root);
 
             Container.Bind<TickableManager>().ToSingle();
-            Container.Bind<GameObjectInstantiator>().ToSingle();
-            Container.Bind<Transform>().ToInstance(_root == null ? null : _root.transform)
-                .WhenInjectedInto<GameObjectInstantiator>();
 
             Container.Bind<InitializableManager>().ToSingle();
             Container.Bind<DisposableManager>().ToSingle();

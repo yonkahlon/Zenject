@@ -17,22 +17,32 @@ namespace Zenject
     // Responsibilities:
     // - Expose methods to configure object graph via Bind() methods
     // - Build object graphs via Resolve() method
-    public class DiContainer : IInstantiator
+    public class DiContainer : IInstantiator, IResolver, IBinder
     {
         readonly Dictionary<BindingId, List<ProviderBase>> _providers = new Dictionary<BindingId, List<ProviderBase>>();
         readonly SingletonProviderMap _singletonMap;
+        readonly List<IInstaller> _installedInstallers = new List<IInstaller>();
+        readonly Stack<Type> _instantiatesInProgress = new Stack<Type>();
+
+#if !ZEN_NOT_UNITY3D
+        readonly Transform _rootTransform;
+#endif
 
         bool _allowNullBindings;
         bool _checkForCircularDependencies;
-
         ProviderBase _fallbackProvider;
 
-        readonly List<IInstaller> _installedInstallers = new List<IInstaller>();
-
-        readonly Stack<Type> _instantiatesInProgress = new Stack<Type>();
-
-        public DiContainer(bool checkForCircularDependencies = true)
+        // NOTE! For multi-threaded environments, you need to pass in checkForCircularDependencies as false
+        public DiContainer(
+#if !ZEN_NOT_UNITY3D
+            Transform rootTransform = null,
+#endif
+            bool checkForCircularDependencies = true)
         {
+#if !ZEN_NOT_UNITY3D
+            _rootTransform = rootTransform;
+#endif
+
             _checkForCircularDependencies = checkForCircularDependencies;
 
             _singletonMap = new SingletonProviderMap(this);
@@ -47,6 +57,18 @@ namespace Zenject
             this.Bind<SingletonInstanceHelper>().ToSingle<SingletonInstanceHelper>();
         }
 
+        public bool CheckForCircularDependencies
+        {
+            get
+            {
+                return _checkForCircularDependencies;
+            }
+            set
+            {
+                _checkForCircularDependencies = value;
+            }
+        }
+
         public IEnumerable<IInstaller> InstalledInstallers
         {
             get
@@ -54,6 +76,16 @@ namespace Zenject
                 return _installedInstallers;
             }
         }
+
+#if !ZEN_NOT_UNITY3D
+        public Transform RootTransform
+        {
+            get
+            {
+                return _rootTransform;
+            }
+        }
+#endif
 
         // This can be used to handle the case where the given contract is not
         // found in any other providers, and the contract is not optional
@@ -108,59 +140,46 @@ namespace Zenject
         }
 
         public IFactoryUntypedBinder<TContract> BindIFactoryUntyped<TContract>(string identifier = null)
-            where TContract : class
         {
             return new IFactoryUntypedBinder<TContract>(this, identifier);
         }
 
         public IFactoryBinder<TContract> BindIFactory<TContract>(string identifier = null)
-            where TContract : class
         {
             return new IFactoryBinder<TContract>(this, identifier);
         }
 
         public IFactoryBinder<TParam1, TContract> BindIFactory<TParam1, TContract>(string identifier = null)
-            where TContract : class
         {
             return new IFactoryBinder<TParam1, TContract>(this, identifier);
         }
 
         public IFactoryBinder<TParam1, TParam2, TContract> BindIFactory<TParam1, TParam2, TContract>(string identifier = null)
-            where TContract : class
         {
             return new IFactoryBinder<TParam1, TParam2, TContract>(this, identifier);
         }
 
         public IFactoryBinder<TParam1, TParam2, TParam3, TContract> BindIFactory<TParam1, TParam2, TParam3, TContract>(string identifier = null)
-            where TContract : class
         {
             return new IFactoryBinder<TParam1, TParam2, TParam3, TContract>(this, identifier);
         }
 
         public IFactoryBinder<TParam1, TParam2, TParam3, TParam4, TContract> BindIFactory<TParam1, TParam2, TParam3, TParam4, TContract>(string identifier = null)
-            where TContract : class
         {
             return new IFactoryBinder<TParam1, TParam2, TParam3, TParam4, TContract>(this, identifier);
         }
 
-        public ValueBinder<TContract> BindValue<TContract>(string identifier)
-            where TContract : struct
-        {
-            return new ValueBinder<TContract>(this, identifier);
-        }
-
-        public ReferenceBinder<TContract> Rebind<TContract>() where TContract : class
+        public BinderGeneric<TContract> Rebind<TContract>()
         {
             this.Unbind<TContract>();
             return this.Bind<TContract>();
         }
 
-        public ReferenceBinder<TContract> Bind<TContract>(string identifier)
-            where TContract : class
+        public BinderGeneric<TContract> Bind<TContract>(string identifier)
         {
             Assert.That(!typeof(TContract).DerivesFromOrEqual<IInstaller>(),
                 "Deprecated usage of Bind<IInstaller>, use Install<IInstaller> instead");
-            return new ReferenceBinder<TContract>(this, identifier, _singletonMap);
+            return new BinderGeneric<TContract>(this, identifier, _singletonMap);
         }
 
         // Note that this can include open generic types as well such as List<>
@@ -216,6 +235,26 @@ namespace Zenject
             provider.Dispose();
 
             return numRemoved;
+        }
+
+        public IEnumerable<Type> GetDependencyContracts<TContract>()
+        {
+            return GetDependencyContracts(typeof(TContract));
+        }
+
+        public IEnumerable<ZenjectResolveException> ValidateResolve<TContract>()
+        {
+            return ValidateResolve<TContract>((string)null);
+        }
+
+        public IEnumerable<ZenjectResolveException> ValidateObjectGraph<TConcrete>(params Type[] extras)
+        {
+            return ValidateObjectGraph(typeof(TConcrete), extras);
+        }
+
+        public IEnumerable<ZenjectResolveException> ValidateResolve<TContract>(string identifier)
+        {
+            return ValidateResolve(new InjectContext(this, typeof(TContract), identifier));
         }
 
         public IEnumerable<ZenjectResolveException> ValidateValidatables(params Type[] ignoreTypes)
@@ -524,7 +563,7 @@ namespace Zenject
         // Same as Instantiate except you can pass in null value
         // however the type for each parameter needs to be explicitly provided in this case
         public object InstantiateExplicit(
-            Type concreteType, List<TypeValuePair> extraArgMap, InjectContext currentContext, string concreteIdentifier)
+            Type concreteType, List<TypeValuePair> extraArgMap, InjectContext currentContext, string concreteIdentifier, bool autoInject)
         {
             using (ProfileBlock.Start("Zenject.Instantiate({0})", concreteType))
             {
@@ -539,7 +578,7 @@ namespace Zenject
                     _instantiatesInProgress.Push(concreteType);
                     try
                     {
-                        return InstantiateInternal(concreteType, extraArgMap, currentContext, concreteIdentifier);
+                        return InstantiateInternal(concreteType, extraArgMap, currentContext, concreteIdentifier, autoInject);
                     }
                     finally
                     {
@@ -549,13 +588,13 @@ namespace Zenject
                 }
                 else
                 {
-                    return InstantiateInternal(concreteType, extraArgMap, currentContext, concreteIdentifier);
+                    return InstantiateInternal(concreteType, extraArgMap, currentContext, concreteIdentifier, autoInject);
                 }
             }
         }
 
         object InstantiateInternal(
-            Type concreteType, IEnumerable<TypeValuePair> extraArgMapParam, InjectContext currentContext, string concreteIdentifier)
+            Type concreteType, IEnumerable<TypeValuePair> extraArgs, InjectContext currentContext, string concreteIdentifier, bool autoInject)
         {
 #if !ZEN_NOT_UNITY3D
             Assert.That(!concreteType.DerivesFrom<UnityEngine.Component>(),
@@ -571,14 +610,14 @@ namespace Zenject
             }
 
             // Make a copy since we remove from it below
-            var extraArgMap = extraArgMapParam.ToList();
+            var extraArgList = extraArgs.ToList();
             var paramValues = new List<object>();
 
             foreach (var injectInfo in typeInfo.ConstructorInjectables)
             {
                 object value;
 
-                if (!InstantiateUtil.PopValueWithType(extraArgMap, injectInfo.MemberType, out value))
+                if (!InstantiateUtil.PopValueWithType(extraArgList, injectInfo.MemberType, out value))
                 {
                     value = Resolve(injectInfo.CreateInjectContext(this, currentContext, null, concreteIdentifier));
                 }
@@ -601,14 +640,26 @@ namespace Zenject
                     "Error occurred while instantiating object with type '{0}'".Fmt(concreteType.Name()), e);
             }
 
-            Inject(newObj, extraArgMap, true, typeInfo, currentContext, concreteIdentifier);
+            if (autoInject)
+            {
+                InjectExplicit(newObj, extraArgList, true, typeInfo, currentContext, concreteIdentifier);
+            }
+            else
+            {
+                if (!extraArgList.IsEmpty())
+                {
+                    throw new ZenjectResolveException(
+                        "Passed unnecessary parameters when injecting into type '{0}'. \nExtra Parameters: {1}\nObject graph:\n{2}"
+                        .Fmt(newObj.GetType().Name(), String.Join(",", extraArgList.Select(x => x.Type.Name()).ToArray()), currentContext.GetObjectGraphString()));
+                }
+            }
 
             return newObj;
         }
 
         // Iterate over fields/properties on the given object and inject any with the [Inject] attribute
-        internal void Inject(
-            object injectable, IEnumerable<TypeValuePair> extraArgMapParam,
+        public void InjectExplicit(
+            object injectable, IEnumerable<TypeValuePair> extraArgs,
             bool shouldUseAll, ZenjectTypeInfo typeInfo, InjectContext context, string concreteIdentifier)
         {
             Assert.IsEqual(typeInfo.TypeAnalyzed, injectable.GetType());
@@ -620,13 +671,13 @@ namespace Zenject
 #endif
 
             // Make a copy since we remove from it below
-            var extraArgMap = extraArgMapParam.ToList();
+            var extraArgsList = extraArgs.ToList();
 
             foreach (var injectInfo in typeInfo.FieldInjectables.Concat(typeInfo.PropertyInjectables))
             {
                 object value;
 
-                if (InstantiateUtil.PopValueWithType(extraArgMap, injectInfo.MemberType, out value))
+                if (InstantiateUtil.PopValueWithType(extraArgsList, injectInfo.MemberType, out value))
                 {
                     injectInfo.Setter(injectable, value);
                 }
@@ -656,7 +707,7 @@ namespace Zenject
                     {
                         object value;
 
-                        if (!InstantiateUtil.PopValueWithType(extraArgMap, injectInfo.MemberType, out value))
+                        if (!InstantiateUtil.PopValueWithType(extraArgsList, injectInfo.MemberType, out value))
                         {
                             value = Resolve(
                                 injectInfo.CreateInjectContext(this, context, injectable, concreteIdentifier));
@@ -669,12 +720,134 @@ namespace Zenject
                 }
             }
 
-            if (shouldUseAll && !extraArgMap.IsEmpty())
+            if (shouldUseAll && !extraArgsList.IsEmpty())
             {
                 throw new ZenjectResolveException(
                     "Passed unnecessary parameters when injecting into type '{0}'. \nExtra Parameters: {1}\nObject graph:\n{2}"
-                    .Fmt(injectable.GetType().Name(), String.Join(",", extraArgMap.Select(x => x.Type.Name()).ToArray()), context.GetObjectGraphString()));
+                    .Fmt(injectable.GetType().Name(), String.Join(",", extraArgsList.Select(x => x.Type.Name()).ToArray()), context.GetObjectGraphString()));
             }
         }
+
+#if !ZEN_NOT_UNITY3D
+
+        // NOTE: gameobject here is not a prefab prototype, it is an instance
+        public Component InstantiateComponent(
+            Type componentType, GameObject gameObject, params object[] extraArgMap)
+        {
+            Assert.That(componentType.DerivesFrom<Component>());
+
+            var monoBehaviour = (Component)gameObject.AddComponent(componentType);
+            this.Inject(monoBehaviour, extraArgMap);
+            return monoBehaviour;
+        }
+
+        public GameObject InstantiatePrefabExplicit(
+            GameObject prefab, IEnumerable<object> extraArgMap, InjectContext context)
+        {
+            Assert.IsNotNull(_rootTransform);
+
+            var gameObj = (GameObject)GameObject.Instantiate(prefab);
+
+            // By default parent to comp root
+            // This is good so that the entire object graph is
+            // contained underneath it, which is useful for cases
+            // where you need to delete the entire object graph
+            gameObj.transform.SetParent(_rootTransform, false);
+
+            gameObj.SetActive(true);
+
+            this.InjectGameObject(gameObj, true, false, extraArgMap, context);
+
+            return gameObj;
+        }
+
+        // Create a new empty game object under the composition root
+        public GameObject InstantiateGameObject(string name)
+        {
+            Assert.IsNotNull(_rootTransform);
+            var gameObj = new GameObject(name);
+            gameObj.transform.SetParent(_rootTransform, false);
+            return gameObj;
+        }
+
+        public object InstantiateComponentOnNewGameObjectExplicit(
+            Type componentType, string name, List<TypeValuePair> extraArgMap, InjectContext currentContext)
+        {
+            Assert.IsNotNull(_rootTransform);
+
+            Assert.That(componentType.DerivesFrom<Component>(), "Expected type '{0}' to derive from UnityEngine.Component", componentType.Name());
+
+            var gameObj = new GameObject(name);
+
+            gameObj.transform.SetParent(_rootTransform, false);
+
+            if (componentType == typeof(Transform))
+            {
+                Assert.That(extraArgMap.IsEmpty());
+                return gameObj.transform;
+            }
+
+            var component = (Component)gameObj.AddComponent(componentType);
+
+            this.InjectExplicit(component, extraArgMap, currentContext);
+
+            return component;
+        }
+
+        public object InstantiatePrefabForComponentExplicit(
+            Type componentType, GameObject prefab, List<TypeValuePair> extraArgs, InjectContext currentContext)
+        {
+            Assert.IsNotNull(_rootTransform);
+            Assert.That(prefab != null, "Null prefab found when instantiating game object");
+
+            // It could be an interface so this may fail in valid cases so you may want to comment out
+            // Leaving it in for now to catch the more likely scenario of it being a mistake
+            Assert.That(componentType.DerivesFrom<Component>(), "Expected type '{0}' to derive from UnityEngine.Component", componentType.Name());
+
+            var gameObj = (GameObject)GameObject.Instantiate(prefab);
+
+            // By default parent to comp root
+            // This is good so that the entire object graph is
+            // contained underneath it, which is useful for cases
+            // where you need to delete the entire object graph
+            gameObj.transform.SetParent(_rootTransform, false);
+
+            gameObj.SetActive(true);
+
+            Component requestedScript = null;
+
+            // Inject on the children first since the parent objects are more likely to use them in their post inject methods
+            foreach (var component in UnityUtil.GetComponentsInChildrenBottomUp<Component>(gameObj, false))
+            {
+                if (component != null)
+                {
+                    if (component.GetType().DerivesFromOrEqual(componentType))
+                    {
+                        Assert.IsNull(requestedScript,
+                            "Found multiple matches with type '{0}' when instantiating new game object from prefab '{1}'", componentType, prefab.name);
+                        requestedScript = component;
+
+                        this.InjectExplicit(component, extraArgs);
+                    }
+                    else
+                    {
+                        this.Inject(component);
+                    }
+                }
+                else
+                {
+                    Log.Warn("Found null component while instantiating prefab '{0}'.  Possible missing script.", prefab.name);
+                }
+            }
+
+            if (requestedScript == null)
+            {
+                throw new ZenjectResolveException(
+                    "Could not find component with type '{0}' when instantiating new game object".Fmt(componentType));
+            }
+
+            return requestedScript;
+        }
+#endif
     }
 }

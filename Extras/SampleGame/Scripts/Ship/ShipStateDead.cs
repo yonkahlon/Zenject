@@ -9,11 +9,11 @@ namespace Asteroids
     public class ShipStateDead : ShipState
     {
         Settings _settings;
-        GameObjectInstantiator _gameObjectCreator;
+        IInstantiator _gameObjectCreator;
         GameObject _shipBroken;
         GameObject _shipExplosion;
 
-        public ShipStateDead(Settings settings, Ship ship, GameObjectInstantiator gameObjectCreator)
+        public ShipStateDead(Settings settings, Ship ship, IInstantiator gameObjectCreator)
             : base(ship)
         {
             _settings = settings;
@@ -26,10 +26,10 @@ namespace Asteroids
             _ship.ParticleEmitter.emit = false;
             _ship.AudioSource.Play();
 
-            _shipExplosion = _gameObjectCreator.Instantiate(_settings.explosionTemplate);
+            _shipExplosion = _gameObjectCreator.InstantiatePrefab(_settings.explosionTemplate);
             _shipExplosion.transform.position = _ship.Position;
 
-            _shipBroken = _gameObjectCreator.Instantiate(_settings.brokenTemplate);
+            _shipBroken = _gameObjectCreator.InstantiatePrefab(_settings.brokenTemplate);
             _shipBroken.transform.position = _ship.Position;
             _shipBroken.transform.rotation = _ship.Rotation;
 

@@ -12,20 +12,11 @@ namespace Zenject
     {
         DiContainer _container;
         GameObject _template;
-        GameObjectInstantiator _instantiator;
 
         public GameObjectTransientProviderFromPrefab(DiContainer container, GameObject template)
         {
             _container = container;
             _template = template;
-        }
-
-        GameObjectInstantiator Instantiator
-        {
-            get
-            {
-                return _instantiator ?? (_instantiator = _container.Resolve<GameObjectInstantiator>());
-            }
         }
 
         public override Type GetInstanceType()
@@ -36,7 +27,7 @@ namespace Zenject
         public override object GetInstance(InjectContext context)
         {
             Assert.That(typeof(T).DerivesFromOrEqual(context.MemberType));
-            return Instantiator.Instantiate<T>(_template);
+            return _container.InstantiatePrefabForComponent<T>(_template);
         }
 
         public override IEnumerable<ZenjectResolveException> ValidateBinding(InjectContext context)

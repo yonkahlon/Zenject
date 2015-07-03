@@ -22,6 +22,17 @@ namespace Zenject
         {
             _container.RegisterProvider(
                 provider, new BindingId(_contractType, _bindIdentifier));
+
+            if (_contractType.IsValueType)
+            {
+                var nullableType = typeof(Nullable<>).MakeGenericType(_contractType);
+
+                // Also bind to nullable primitives
+                // this is useful so that we can have optional primitive dependencies
+                _container.RegisterProvider(
+                    provider, new BindingId(nullableType, _bindIdentifier));
+            }
+
             return new BindingConditionSetter(provider);
         }
     }

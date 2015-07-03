@@ -9,28 +9,22 @@ namespace Zenject
 {
     public class TickableManager
     {
-        [Inject]
         [InjectOptional]
         readonly List<ITickable> _tickables = null;
 
-        [Inject]
         [InjectOptional]
         readonly List<IFixedTickable> _fixedTickables = null;
 
-        [Inject]
         [InjectOptional]
         readonly List<ILateTickable> _lateTickables = null;
 
-        [Inject]
         [InjectOptional]
         readonly List<Tuple<Type, int>> _priorities = null;
 
-        [Inject("Fixed")]
-        [InjectOptional]
+        [InjectOptional("Fixed")]
         readonly List<Tuple<Type, int>> _fixedPriorities = null;
 
-        [Inject("Late")]
-        [InjectOptional]
+        [InjectOptional("Late")]
         readonly List<Tuple<Type, int>> _latePriorities = null;
 
         [Inject]

@@ -59,7 +59,8 @@ namespace Zenject
         {
             Assert.That(allowNullBindings || gameObj != null);
 
-            var container = new DiContainer();
+            var container = new DiContainer(gameObj == null ? null : gameObj.transform);
+
             container.AllowNullBindings = allowNullBindings;
 
             CompositionRootHelper.InstallStandardInstaller(container, gameObj);

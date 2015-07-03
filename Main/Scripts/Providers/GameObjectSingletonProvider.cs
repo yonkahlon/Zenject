@@ -10,11 +10,11 @@ namespace Zenject
 {
     public class GameObjectSingletonProvider : ProviderBase
     {
-        object _instance;
         readonly string _name;
-        GameObjectInstantiator _instantiator;
-        DiContainer _container;
-        Type _componentType;
+        readonly DiContainer _container;
+        readonly Type _componentType;
+
+        object _instance;
 
         public GameObjectSingletonProvider(
             Type componentType, DiContainer container, string name)
@@ -36,17 +36,13 @@ namespace Zenject
 
             if (_instance == null)
             {
-                if (_instantiator == null)
-                {
-                    _instantiator = _container.Resolve<GameObjectInstantiator>();
-                }
-
                 // This is valid sometimes
                 //Assert.That(!_container.AllowNullBindings,
                     //"Tried to instantiate a MonoBehaviour with type '{0}' during validation. Object graph: {1}", _componentType, DiContainer.GetCurrentObjectGraph());
 
                 // We don't use the generic version here to avoid duplicate generic arguments to binder
-                _instance = _instantiator.Instantiate(_componentType, _name, context);
+                _instance = _container.InstantiateComponentOnNewGameObjectExplicit(
+                    _componentType, _name, new List<TypeValuePair>(), context);
                 Assert.IsNotNull(_instance);
             }
 
