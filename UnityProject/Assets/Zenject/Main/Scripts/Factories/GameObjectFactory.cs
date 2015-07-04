@@ -50,7 +50,7 @@ namespace Zenject
 
         public virtual TValue Create(TParam1 param)
         {
-            return (TValue)_container.Instantiate(typeof(TValue), _prefab, param);
+            return (TValue)_container.InstantiatePrefabForComponent(typeof(TValue), _prefab, param);
         }
 
         public override IEnumerable<ZenjectResolveException> Validate()
@@ -71,7 +71,7 @@ namespace Zenject
 
         public virtual TValue Create(TParam1 param1, TParam2 param2)
         {
-            return (TValue)_container.Instantiate(typeof(TValue), _prefab, param1, param2);
+            return (TValue)_container.InstantiatePrefabForComponent(typeof(TValue), _prefab, param1, param2);
         }
 
         public override IEnumerable<ZenjectResolveException> Validate()
@@ -92,7 +92,7 @@ namespace Zenject
 
         public virtual TValue Create(TParam1 param1, TParam2 param2, TParam3 param3)
         {
-            return (TValue)_container.Instantiate(typeof(TValue), _prefab, param1, param2, param3);
+            return (TValue)_container.InstantiatePrefabForComponent(typeof(TValue), _prefab, param1, param2, param3);
         }
 
         public override IEnumerable<ZenjectResolveException> Validate()
@@ -113,7 +113,7 @@ namespace Zenject
 
         public virtual TValue Create(TParam1 param1, TParam2 param2, TParam3 param3, TParam4 param4)
         {
-            return (TValue)_container.Instantiate(typeof(TValue), _prefab, param1, param2, param3, param4);
+            return (TValue)_container.InstantiatePrefabForComponent(typeof(TValue), _prefab, param1, param2, param3, param4);
         }
 
         public override IEnumerable<ZenjectResolveException> Validate()
@@ -124,3 +124,4 @@ namespace Zenject
 }
 
 #endif
+
