@@ -19,7 +19,7 @@ namespace Zenject
             [InjectOptional]
             List<IInitializable> initializables,
             [InjectOptional]
-            List<Tuple<Type, int>> priorities,
+            List<ModestTree.Util.Tuple<Type, int>> priorities,
             DiContainer container,
             SingletonInstanceHelper singletonInstanceHelper)
         {

@@ -33,8 +33,8 @@ namespace Zenject
             Assert.That(tickableType.DerivesFrom<IFixedTickable>(),
                 "Expected type '{0}' to derive from IFixedTickable", tickableType.Name());
 
-            container.Bind<Tuple<Type, int>>("Fixed").ToInstance(
-                Tuple.New(tickableType, priorityCount)).WhenInjectedInto<TickableManager>();
+            container.Bind<ModestTree.Util.Tuple<Type, int>>("Fixed").ToInstance(
+                ModestTree.Util.Tuple.New(tickableType, priorityCount)).WhenInjectedInto<TickableManager>();
         }
     }
 }

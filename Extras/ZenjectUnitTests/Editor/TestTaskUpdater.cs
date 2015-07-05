@@ -26,7 +26,7 @@ namespace Zenject.Tests
         public void BindTickable<TTickable>(int priority) where TTickable : ITickable
         {
             _container.Bind<ITickable>().ToSingle<TTickable>();
-            _container.Bind<Tuple<Type, int>>().ToInstance(Tuple.New(typeof(TTickable), priority));
+            _container.Bind<ModestTree.Util.Tuple<Type, int>>().ToInstance(ModestTree.Util.Tuple.New(typeof(TTickable), priority));
         }
 
         [Test]
