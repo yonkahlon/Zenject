@@ -16,7 +16,7 @@ namespace Zenject
             [InjectOptional]
             List<IDisposable> disposables,
             [InjectOptional]
-            List<Tuple<Type, int>> priorities,
+            List<ModestTree.Util.Tuple<Type, int>> priorities,
             SingletonInstanceHelper singletonInstanceHelper)
         {
             _singletonInstanceHelper = singletonInstanceHelper;

@@ -42,8 +42,8 @@ namespace Zenject
             Assert.That(initializableType.DerivesFrom<IInitializable>(),
                 "Expected type '{0}' to derive from IInitializable", initializableType.Name());
 
-            container.Bind<Tuple<Type, int>>().ToInstance(
-                Tuple.New(initializableType, priorityCount)).WhenInjectedInto<InitializableManager>();
+            container.Bind<ModestTree.Util.Tuple<Type, int>>().ToInstance(
+                ModestTree.Util.Tuple.New(initializableType, priorityCount)).WhenInjectedInto<InitializableManager>();
         }
     }
 }

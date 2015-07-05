@@ -19,13 +19,13 @@ namespace Zenject
         readonly List<ILateTickable> _lateTickables = null;
 
         [InjectOptional]
-        readonly List<Tuple<Type, int>> _priorities = null;
+        readonly List<ModestTree.Util.Tuple<Type, int>> _priorities = null;
 
         [InjectOptional("Fixed")]
-        readonly List<Tuple<Type, int>> _fixedPriorities = null;
+        readonly List<ModestTree.Util.Tuple<Type, int>> _fixedPriorities = null;
 
         [InjectOptional("Late")]
-        readonly List<Tuple<Type, int>> _latePriorities = null;
+        readonly List<ModestTree.Util.Tuple<Type, int>> _latePriorities = null;
 
         [Inject]
         readonly SingletonInstanceHelper _singletonInstanceHelper = null;
