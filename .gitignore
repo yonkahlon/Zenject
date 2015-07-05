@@ -1,5 +1,7 @@
 *.suo
 *.pidb
+*.unityproj
+/UpgradeLog.htm
 /UnityProject/Assets/Zenject/AddOns.meta
 /UnityProject/Assets/Zenject/AddOns
 
