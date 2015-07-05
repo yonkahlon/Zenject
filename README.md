@@ -43,6 +43,7 @@
         * <a href="#visualizing-object-graphs-automatically">Visualizing Object Graph Automatically</a>
     * <a href="#questions">Frequently Asked Questions</a>
         * <a href="#faq-performance">How is Performance?</a>
+        * <a href="#net-framework">Can I use .NET framework 4.0 and above?</a>
     * <a href="#cheatsheet">Cheat Sheet</a>
     * <a href="#further-help">Further Help</a>
     * <a href="#release-notes">Release Notes</a>
@@ -1713,6 +1714,10 @@ However, admittedly, I personally haven't gotten a lot of mileage out of this fe
     DI can affect start-up time when it builds the initial object graph. However it can also affect performance any time you instantiate new objects at run time.
 
     Zenject uses C# reflection which is typically slow, but in Zenject this work is cached so any performance hits only occur once for each class type.  In other words, Zenject avoids costly reflection operations by making a trade-off between performance and memory to ensure good performance.
+
+* **<a id="net-framework"></a>Can I use .NET framework 4.0 and above?**
+
+    By default Unity uses .NET framework 3.5 and so Zenject assumes that this is what you want.  If you are compiling Zenject with a version greater than this, this is fine, but you'll have to either delete or comment out the contents of Func.cs.
 
 ## <a id="cheatsheet"></a>Installers Cheat-Sheet
 
