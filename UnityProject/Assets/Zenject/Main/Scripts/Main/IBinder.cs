@@ -22,13 +22,23 @@ namespace Zenject
 
         BinderGeneric<TContract> Rebind<TContract>();
 
-        IFactoryBinder<TParam1, TParam2, TParam3, TParam4, TContract> BindIFactory<TParam1, TParam2, TParam3, TParam4, TContract>(string identifier = null);
-        IFactoryBinder<TParam1, TParam2, TParam3, TContract> BindIFactory<TParam1, TParam2, TParam3, TContract>(string identifier = null);
-        IFactoryBinder<TParam1, TParam2, TContract> BindIFactory<TParam1, TParam2, TContract>(string identifier = null);
-        IFactoryBinder<TParam1, TContract> BindIFactory<TParam1, TContract>(string identifier = null);
-        IFactoryBinder<TContract> BindIFactory<TContract>(string identifier = null);
+        IFactoryBinder<TParam1, TParam2, TParam3, TParam4, TContract> BindIFactory<TParam1, TParam2, TParam3, TParam4, TContract>(string identifier);
+        IFactoryBinder<TParam1, TParam2, TParam3, TParam4, TContract> BindIFactory<TParam1, TParam2, TParam3, TParam4, TContract>();
 
-        IFactoryUntypedBinder<TContract> BindIFactoryUntyped<TContract>(string identifier = null);
+        IFactoryBinder<TParam1, TParam2, TParam3, TContract> BindIFactory<TParam1, TParam2, TParam3, TContract>(string identifier);
+        IFactoryBinder<TParam1, TParam2, TParam3, TContract> BindIFactory<TParam1, TParam2, TParam3, TContract>();
+
+        IFactoryBinder<TParam1, TParam2, TContract> BindIFactory<TParam1, TParam2, TContract>(string identifier);
+        IFactoryBinder<TParam1, TParam2, TContract> BindIFactory<TParam1, TParam2, TContract>();
+
+        IFactoryBinder<TParam1, TContract> BindIFactory<TParam1, TContract>(string identifier);
+        IFactoryBinder<TParam1, TContract> BindIFactory<TParam1, TContract>();
+
+        IFactoryBinder<TContract> BindIFactory<TContract>(string identifier);
+        IFactoryBinder<TContract> BindIFactory<TContract>();
+
+        IFactoryUntypedBinder<TContract> BindIFactoryUntyped<TContract>(string identifier);
+        IFactoryUntypedBinder<TContract> BindIFactoryUntyped<TContract>();
     }
 
     public static class BinderExtensions

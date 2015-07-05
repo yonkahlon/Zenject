@@ -17,12 +17,18 @@ namespace Zenject
 
         public SingletonLazyCreator(
             DiContainer container, SingletonProviderMap owner,
-            SingletonId id, Func<InjectContext, object> createMethod = null)
+            SingletonId id, Func<InjectContext, object> createMethod)
         {
             _container = container;
             _owner = owner;
             _id = id;
             _createMethod = createMethod;
+        }
+
+        public SingletonLazyCreator(
+            DiContainer container, SingletonProviderMap owner, SingletonId id)
+            : this(container, owner, id, null)
+        {
         }
 
         public SingletonId Id

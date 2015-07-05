@@ -155,19 +155,34 @@ namespace Zenject
             }
         }
 
-        public void Add(ITickable tickable, int priority = 0)
+        public void Add(ITickable tickable, int priority)
         {
             _updater.AddTask(tickable, priority);
         }
 
-        public void AddLate(ILateTickable tickable, int priority = 0)
+        public void Add(ITickable tickable)
+        {
+            Add(tickable, 0);
+        }
+
+        public void AddLate(ILateTickable tickable, int priority)
         {
             _lateUpdater.AddTask(tickable, priority);
         }
 
-        public void AddFixed(IFixedTickable tickable, int priority = 0)
+        public void AddLate(ILateTickable tickable)
+        {
+            AddLate(tickable, 0);
+        }
+
+        public void AddFixed(IFixedTickable tickable, int priority)
         {
             _fixedUpdater.AddTask(tickable, priority);
+        }
+
+        public void AddFixed(IFixedTickable tickable)
+        {
+            _fixedUpdater.AddTask(tickable, 0);
         }
 
         public void Remove(ITickable tickable)

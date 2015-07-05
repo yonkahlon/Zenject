@@ -29,10 +29,21 @@ namespace Zenject
 #if !ZEN_NOT_UNITY3D
         // Inject dependencies into child game objects
         public static void InjectGameObject(
-            this IResolver container, GameObject gameObject,
-            bool recursive = true, bool includeInactive = false)
+            this IResolver container, GameObject gameObject, bool recursive, bool includeInactive)
         {
             container.InjectGameObject(gameObject, recursive, includeInactive, Enumerable.Empty<object>());
+        }
+
+        public static void InjectGameObject(
+            this IResolver container, GameObject gameObject, bool recursive)
+        {
+            container.InjectGameObject(gameObject, recursive, false);
+        }
+
+        public static void InjectGameObject(
+            this IResolver container, GameObject gameObject)
+        {
+            container.InjectGameObject(gameObject, true, false);
         }
 
         public static void InjectGameObject(
