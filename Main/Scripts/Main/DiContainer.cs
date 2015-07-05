@@ -32,12 +32,12 @@ namespace Zenject
         bool _checkForCircularDependencies;
         ProviderBase _fallbackProvider;
 
-        // NOTE! For multi-threaded environments, you need to pass in checkForCircularDependencies as false
+        // NOTE! For multi-threaded environments outside unity, you need to pass in checkForCircularDependencies as false
         public DiContainer(
 #if !ZEN_NOT_UNITY3D
-            Transform rootTransform = null,
+            Transform rootTransform,
 #endif
-            bool checkForCircularDependencies = true)
+            bool checkForCircularDependencies)
         {
 #if !ZEN_NOT_UNITY3D
             _rootTransform = rootTransform;
@@ -55,6 +55,22 @@ namespace Zenject
             this.Bind<PrefabSingletonProviderMap>().ToSingle<PrefabSingletonProviderMap>();
 #endif
             this.Bind<SingletonInstanceHelper>().ToSingle<SingletonInstanceHelper>();
+        }
+
+#if !ZEN_NOT_UNITY3D
+        public DiContainer(Transform rootTransform)
+            : this(rootTransform, true)
+        {
+        }
+#endif
+
+        public DiContainer()
+#if ZEN_NOT_UNITY3D
+            : this(true)
+#else
+            : this(null)
+#endif
+        {
         }
 
         public bool CheckForCircularDependencies
@@ -139,34 +155,64 @@ namespace Zenject
             }
         }
 
-        public IFactoryUntypedBinder<TContract> BindIFactoryUntyped<TContract>(string identifier = null)
+        public IFactoryUntypedBinder<TContract> BindIFactoryUntyped<TContract>(string identifier)
         {
             return new IFactoryUntypedBinder<TContract>(this, identifier);
         }
 
-        public IFactoryBinder<TContract> BindIFactory<TContract>(string identifier = null)
+        public IFactoryUntypedBinder<TContract> BindIFactoryUntyped<TContract>()
+        {
+            return BindIFactoryUntyped<TContract>(null);
+        }
+
+        public IFactoryBinder<TContract> BindIFactory<TContract>(string identifier)
         {
             return new IFactoryBinder<TContract>(this, identifier);
         }
 
-        public IFactoryBinder<TParam1, TContract> BindIFactory<TParam1, TContract>(string identifier = null)
+        public IFactoryBinder<TContract> BindIFactory<TContract>()
+        {
+            return BindIFactory<TContract>(null);
+        }
+
+        public IFactoryBinder<TParam1, TContract> BindIFactory<TParam1, TContract>(string identifier)
         {
             return new IFactoryBinder<TParam1, TContract>(this, identifier);
         }
 
-        public IFactoryBinder<TParam1, TParam2, TContract> BindIFactory<TParam1, TParam2, TContract>(string identifier = null)
+        public IFactoryBinder<TParam1, TContract> BindIFactory<TParam1, TContract>()
+        {
+            return BindIFactory<TParam1, TContract>(null);
+        }
+
+        public IFactoryBinder<TParam1, TParam2, TContract> BindIFactory<TParam1, TParam2, TContract>(string identifier)
         {
             return new IFactoryBinder<TParam1, TParam2, TContract>(this, identifier);
         }
 
-        public IFactoryBinder<TParam1, TParam2, TParam3, TContract> BindIFactory<TParam1, TParam2, TParam3, TContract>(string identifier = null)
+        public IFactoryBinder<TParam1, TParam2, TContract> BindIFactory<TParam1, TParam2, TContract>()
+        {
+            return BindIFactory<TParam1, TParam2, TContract>(null);
+        }
+
+        public IFactoryBinder<TParam1, TParam2, TParam3, TContract> BindIFactory<TParam1, TParam2, TParam3, TContract>(string identifier)
         {
             return new IFactoryBinder<TParam1, TParam2, TParam3, TContract>(this, identifier);
         }
 
-        public IFactoryBinder<TParam1, TParam2, TParam3, TParam4, TContract> BindIFactory<TParam1, TParam2, TParam3, TParam4, TContract>(string identifier = null)
+        public IFactoryBinder<TParam1, TParam2, TParam3, TContract> BindIFactory<TParam1, TParam2, TParam3, TContract>()
+        {
+            return BindIFactory<TParam1, TParam2, TParam3, TContract>(null);
+        }
+
+        public IFactoryBinder<TParam1, TParam2, TParam3, TParam4, TContract> BindIFactory<TParam1, TParam2, TParam3, TParam4, TContract>(string identifier)
         {
             return new IFactoryBinder<TParam1, TParam2, TParam3, TParam4, TContract>(this, identifier);
+        }
+
+        public IFactoryBinder<TParam1, TParam2, TParam3, TParam4, TContract> BindIFactory<TParam1, TParam2, TParam3, TParam4, TContract>()
+        {
+            return BindIFactory<TParam1, TParam2, TParam3, TParam4, TContract>(null);
         }
 
         public BinderGeneric<TContract> Rebind<TContract>()
