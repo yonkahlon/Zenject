@@ -14,12 +14,12 @@ namespace Zenject
     {
         public static DiContainer GetContainerForCurrentScene()
         {
-            var compRoot = GameObject.FindObjectsOfType<CompositionRoot>().OnlyOrDefault();
+            var compRoot = GameObject.FindObjectsOfType<SceneCompositionRoot>().OnlyOrDefault();
 
             if (compRoot == null)
             {
                 throw new ZenjectException(
-                    "Unable to find CompositionRoot in current scene.");
+                    "Unable to find SceneCompositionRoot in current scene.");
             }
 
             return compRoot.Container;
@@ -113,7 +113,7 @@ namespace Zenject
 
         public static IEnumerable<ZenjectResolveException> ValidateCurrentScene()
         {
-            var compRoot = GameObject.FindObjectsOfType<CompositionRoot>().OnlyOrDefault();
+            var compRoot = GameObject.FindObjectsOfType<SceneCompositionRoot>().OnlyOrDefault();
 
             if (compRoot == null || compRoot.Installers.IsEmpty())
             {
@@ -123,7 +123,7 @@ namespace Zenject
             return ZenEditorUtil.ValidateInstallers(compRoot);
         }
 
-        public static IEnumerable<ZenjectResolveException> ValidateInstallers(CompositionRoot compRoot)
+        public static IEnumerable<ZenjectResolveException> ValidateInstallers(SceneCompositionRoot compRoot)
         {
             var globalContainer = GlobalCompositionRoot.CreateContainer(true, null);
             var container = compRoot.CreateContainer(true, globalContainer, new List<IInstaller>());

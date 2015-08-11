@@ -9,12 +9,6 @@ namespace Zenject
 {
     public static class CompositionRootHelper
     {
-        public static void InstallStandardInstaller(DiContainer container, GameObject rootObj)
-        {
-            container.Bind<GameObject>().ToInstance(rootObj).WhenInjectedInto<StandardUnityInstaller>();
-            container.Install<StandardUnityInstaller>();
-        }
-
         public static void InstallSceneInstallers(
             DiContainer container, IEnumerable<IInstaller> installers)
         {
