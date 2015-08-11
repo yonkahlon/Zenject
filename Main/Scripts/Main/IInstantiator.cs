@@ -9,7 +9,12 @@ using UnityEngine;
 
 namespace Zenject
 {
-    // Note that probably want to use the generic versions of these methods in InstantiatorExtensions
+    // NOTE: See InstantiatorExtensions for the generic methods that you likely want to use.  Here's the ones you will most likely care about:
+    //    - Instantiate<> - Use this to create any non-monobehaviour
+    //    - InstantiateComponent<> - Add new monobehaviour to existing game object and fill in its dependencies
+    //    - InstantiatePrefab - Create a new game object from a prefab and fill in dependencies for all children
+    //    - InstantiatePrefabForComponent<> - Same as InstantiatePrefab but returns a component after it's initialized
+    //    - InstantiateComponentOnNewGameObject<> - Create a new game object, and add the given component to it, and fill in dependencies
     public interface IInstantiator
     {
         // For most cases you can pass in currentContext and concreteIdentifier as null
