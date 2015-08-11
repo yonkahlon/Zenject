@@ -35,7 +35,11 @@ public class TestResultRenderer
     public void ShowResults()
     {
         m_ShowResults = true;
-        Cursor.visible = true;
+#if UNITY_5
+            Cursor.visible = false;
+#else
+        Screen.showCursor = false;
+#endif
     }
 
     public void AddResults(string sceneName, ITestResult result)
