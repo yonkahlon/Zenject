@@ -8,6 +8,7 @@ using UnityEngine;
 
 namespace Zenject
 {
+    [System.Diagnostics.DebuggerStepThrough]
     public class PrefabSingletonId : IEquatable<PrefabSingletonId>
     {
         public readonly string Identifier;

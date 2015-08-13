@@ -29,21 +29,17 @@ namespace Zenject
 #endif
 
         bool _allowNullBindings;
-        bool _checkForCircularDependencies;
         ProviderBase _fallbackProvider;
 
-        // NOTE! For multi-threaded environments outside unity, you need to pass in checkForCircularDependencies as false
-        public DiContainer(
-#if !ZEN_NOT_UNITY3D
-            Transform rootTransform,
+#if ZEN_NOT_UNITY3D
+        public DiContainer()
+#else
+        public DiContainer(Transform rootTransform)
 #endif
-            bool checkForCircularDependencies)
         {
 #if !ZEN_NOT_UNITY3D
             _rootTransform = rootTransform;
 #endif
-
-            _checkForCircularDependencies = checkForCircularDependencies;
 
             _singletonMap = new SingletonProviderMap(this);
 
@@ -58,30 +54,23 @@ namespace Zenject
         }
 
 #if !ZEN_NOT_UNITY3D
-        public DiContainer(Transform rootTransform)
-            : this(rootTransform, true)
-        {
-        }
-#endif
-
         public DiContainer()
-#if ZEN_NOT_UNITY3D
-            : this(true)
-#else
             : this(null)
-#endif
         {
         }
+#endif
 
-        public bool CheckForCircularDependencies
+        bool CheckForCircularDependencies
         {
             get
             {
-                return _checkForCircularDependencies;
-            }
-            set
-            {
-                _checkForCircularDependencies = value;
+#if ZEN_MULTITHREADING
+                // When multithreading is supported we can't use a static field to track the lookup
+                // TODO: We could look at the inject context though
+                return false;
+#else
+                return true;
+#endif
             }
         }
 
@@ -305,7 +294,8 @@ namespace Zenject
 
         public IEnumerable<ZenjectResolveException> ValidateValidatables(params Type[] ignoreTypes)
         {
-            foreach (var pair in _providers)
+            // Use ToList() to allow use of CreateScope
+            foreach (var pair in _providers.ToList())
             {
                 var bindingId = pair.Key;
 
@@ -488,7 +478,21 @@ namespace Zenject
             {
                 _installedInstallers.Add(installer);
                 this.Inject(installer);
+                InstallInstallerInternal(installer);
+            }
+        }
+
+        void InstallInstallerInternal(IInstaller installer)
+        {
+            try
+            {
                 installer.InstallBindings();
+            }
+            catch (Exception e)
+            {
+                // This context information is really helpful when bind commands fail
+                throw new Exception(
+                    "Error occurred while running installer '{0}'".Fmt(installer.GetType().Name()), e);
             }
         }
 
@@ -506,7 +510,7 @@ namespace Zenject
             // Do not install the same installer twice
             {
                 var installer = (IInstaller)this.Instantiate(installerType);
-                installer.InstallBindings();
+                InstallInstallerInternal(installer);
                 _installedInstallers.Add(installer);
             }
         }
@@ -615,7 +619,7 @@ namespace Zenject
             using (ProfileBlock.Start("Zenject.Instantiate({0})", concreteType))
 #endif
             {
-                if (_checkForCircularDependencies)
+                if (CheckForCircularDependencies)
                 {
                     if (_instantiatesInProgress.Contains(concreteType))
                     {

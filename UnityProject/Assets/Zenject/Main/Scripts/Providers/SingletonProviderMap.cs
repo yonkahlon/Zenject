@@ -5,6 +5,7 @@ using ModestTree;
 
 namespace Zenject
 {
+    [System.Diagnostics.DebuggerStepThrough]
     public class SingletonProviderMap
     {
         Dictionary<SingletonId, SingletonLazyCreator> _creators = new Dictionary<SingletonId, SingletonLazyCreator>();
@@ -88,7 +89,8 @@ namespace Zenject
 
             if (instance != null)
             {
-                Assert.That(instance.GetType() == concreteType);
+                Assert.That(instance.GetType().DerivesFromOrEqual(concreteType),
+                    "Expected instance to be type '{0}' but found type '{1}'", concreteType, instance.GetType());
             }
 
             var creator = AddCreator(new SingletonId(identifier, concreteType));

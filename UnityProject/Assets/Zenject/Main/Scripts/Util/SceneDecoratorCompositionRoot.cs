@@ -7,6 +7,7 @@ using UnityEngine;
 
 namespace Zenject
 {
+    [System.Diagnostics.DebuggerStepThrough]
     public sealed class SceneDecoratorCompositionRoot : MonoBehaviour
     {
         public string SceneName;
@@ -76,11 +77,7 @@ namespace Zenject
 
             foreach (var installer in DecoratorInstallers)
             {
-                if (installer == null)
-                {
-                    Log.Warn("Found null installer in composition root");
-                    continue;
-                }
+                Assert.IsNotNull(installer, "Found null installer in composition root");
 
                 if (installer.enabled)
                 {
