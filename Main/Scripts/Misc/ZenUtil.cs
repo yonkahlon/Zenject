@@ -13,6 +13,7 @@ using UnityEngine;
 
 namespace Zenject
 {
+    [System.Diagnostics.DebuggerStepThrough]
     public class ZenUtil
     {
         // Due to the way that Unity overrides the Equals operator,

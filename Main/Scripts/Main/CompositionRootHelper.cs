@@ -7,6 +7,7 @@ using UnityEngine;
 
 namespace Zenject
 {
+    [System.Diagnostics.DebuggerStepThrough]
     public static class CompositionRootHelper
     {
         public static void InstallSceneInstallers(
@@ -14,11 +15,7 @@ namespace Zenject
         {
             foreach (var installer in installers)
             {
-                if (installer == null)
-                {
-                    Log.Warn("Found null installer in composition root");
-                    continue;
-                }
+                Assert.IsNotNull(installer, "Found null installer in composition root");
 
                 if (installer.IsEnabled)
                 {
