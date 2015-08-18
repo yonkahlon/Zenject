@@ -800,15 +800,16 @@ namespace Zenject
         public GameObject InstantiatePrefabExplicit(
             GameObject prefab, IEnumerable<object> extraArgMap, InjectContext context)
         {
-            Assert.IsNotNull(_rootTransform);
-
             var gameObj = (GameObject)GameObject.Instantiate(prefab);
 
-            // By default parent to comp root
-            // This is good so that the entire object graph is
-            // contained underneath it, which is useful for cases
-            // where you need to delete the entire object graph
-            gameObj.transform.SetParent(_rootTransform, false);
+            if (_rootTransform != null)
+            {
+                // By default parent to comp root
+                // This is good so that the entire object graph is
+                // contained underneath it, which is useful for cases
+                // where you need to delete the entire object graph
+                gameObj.transform.SetParent(_rootTransform, false);
+            }
 
             gameObj.SetActive(true);
 
@@ -820,22 +821,27 @@ namespace Zenject
         // Create a new empty game object under the composition root
         public GameObject InstantiateGameObject(string name)
         {
-            Assert.IsNotNull(_rootTransform);
             var gameObj = new GameObject(name);
-            gameObj.transform.SetParent(_rootTransform, false);
+
+            if (_rootTransform != null)
+            {
+                gameObj.transform.SetParent(_rootTransform, false);
+            }
+
             return gameObj;
         }
 
         public object InstantiateComponentOnNewGameObjectExplicit(
             Type componentType, string name, List<TypeValuePair> extraArgMap, InjectContext currentContext)
         {
-            Assert.IsNotNull(_rootTransform);
-
             Assert.That(componentType.DerivesFrom<Component>(), "Expected type '{0}' to derive from UnityEngine.Component", componentType.Name());
 
             var gameObj = new GameObject(name);
 
-            gameObj.transform.SetParent(_rootTransform, false);
+            if (_rootTransform != null)
+            {
+                gameObj.transform.SetParent(_rootTransform, false);
+            }
 
             if (componentType == typeof(Transform))
             {
@@ -853,7 +859,6 @@ namespace Zenject
         public object InstantiatePrefabForComponentExplicit(
             Type componentType, GameObject prefab, List<TypeValuePair> extraArgs, InjectContext currentContext)
         {
-            Assert.IsNotNull(_rootTransform);
             Assert.That(prefab != null, "Null prefab found when instantiating game object");
 
             // It could be an interface so this may fail in valid cases so you may want to comment out
@@ -862,11 +867,14 @@ namespace Zenject
 
             var gameObj = (GameObject)GameObject.Instantiate(prefab);
 
-            // By default parent to comp root
-            // This is good so that the entire object graph is
-            // contained underneath it, which is useful for cases
-            // where you need to delete the entire object graph
-            gameObj.transform.SetParent(_rootTransform, false);
+            if (_rootTransform != null)
+            {
+                // By default parent to comp root
+                // This is good so that the entire object graph is
+                // contained underneath it, which is useful for cases
+                // where you need to delete the entire object graph
+                gameObj.transform.SetParent(_rootTransform, false);
+            }
 
             gameObj.SetActive(true);
 
@@ -1299,3 +1307,4 @@ namespace Zenject
 #endif
     }
 }
+
