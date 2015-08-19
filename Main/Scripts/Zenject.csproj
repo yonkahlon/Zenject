@@ -161,6 +161,7 @@
     <Compile Include="Util\DecoratorInstaller.cs" />
     <Compile Include="Util\SceneDecoratorCompositionRoot.cs" />
     <Compile Include="Util\UnityUtil.cs" />
+    <Compile Include="Providers\MethodProviderUntyped.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
