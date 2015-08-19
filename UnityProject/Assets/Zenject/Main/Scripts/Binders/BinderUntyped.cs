@@ -195,6 +195,17 @@ namespace Zenject
             return ToProvider(new MethodProvider<TConcrete>(method));
         }
 
+        public BindingConditionSetter ToMethod(Type returnType, Func<InjectContext, object> method)
+        {
+            if (!returnType.DerivesFromOrEqual(_contractType))
+            {
+                throw new ZenjectBindException(
+                    "Invalid type given during bind command.  Expected type '{0}' to derive from type '{1}'".Fmt(returnType, _contractType.Name()));
+            }
+
+            return ToProvider(new MethodProviderUntyped(returnType, method));
+        }
+
 #if !ZEN_NOT_UNITY3D
         // Note: Here we assume that the contract is a component on the given prefab
         public BindingConditionSetter ToSingleFromPrefab<TConcrete>(GameObject prefab)
