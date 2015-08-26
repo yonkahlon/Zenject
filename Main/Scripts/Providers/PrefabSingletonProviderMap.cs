@@ -47,10 +47,11 @@ namespace Zenject
             return creator;
         }
 
-        public ProviderBase CreateProvider(string identifier, Type concreteType, GameObject prefab)
+        public ProviderBase CreateProvider(
+            string identifier, Type concreteType, GameObject prefab, string resourcePath)
         {
             return new PrefabSingletonProvider(
-                _container, concreteType, AddCreator(new PrefabSingletonId(identifier, prefab)));
+                _container, concreteType, AddCreator(new PrefabSingletonId(identifier, prefab, resourcePath)));
         }
     }
 }

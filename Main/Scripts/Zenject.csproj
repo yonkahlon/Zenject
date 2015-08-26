@@ -141,8 +141,10 @@
     <Compile Include="Providers\DiContainerProvider.cs" />
     <Compile Include="Providers\GameObjectSingletonProvider.cs" />
     <Compile Include="Providers\GameObjectTransientProviderFromPrefab.cs" />
+    <Compile Include="Providers\GameObjectTransientProviderFromPrefabResource.cs" />
     <Compile Include="Providers\InstanceProvider.cs" />
     <Compile Include="Providers\MethodProvider.cs" />
+    <Compile Include="Providers\MethodProviderUntyped.cs" />
     <Compile Include="Providers\MonoBehaviourSingletonProvider.cs" />
     <Compile Include="Providers\PrefabSingletonId.cs" />
     <Compile Include="Providers\PrefabSingletonLazyCreator.cs" />
@@ -161,7 +163,6 @@
     <Compile Include="Util\DecoratorInstaller.cs" />
     <Compile Include="Util\SceneDecoratorCompositionRoot.cs" />
     <Compile Include="Util\UnityUtil.cs" />
-    <Compile Include="Providers\MethodProviderUntyped.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.

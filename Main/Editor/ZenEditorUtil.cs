@@ -35,33 +35,15 @@ namespace Zenject
         public static void ValidateAllScenesFromScript()
         {
             var activeScenes = UnityEditor.EditorBuildSettings.scenes.Where(x => x.enabled).Select(x => x.ToString()).ToList();
-            ValidateScenesThenExit(activeScenes, 25);
-        }
-
-        public static void ValidateScenesThenExit(List<string> sceneNames, int maxErrors)
-        {
-            var errors = ValidateScenes(sceneNames, maxErrors);
-
-            if (errors.IsEmpty())
-            {
-                // 0 = no errors
-                EditorApplication.Exit(0);
-            }
-            else
-            {
-                Log.Error("Found {0} validation errors!", errors.Count == maxErrors ? ("over " + maxErrors.ToString()) : errors.Count.ToString());
-
-                foreach (var err in errors)
-                {
-                    Log.ErrorException(err);
-                }
-
-                // 1 = errors occurred
-                EditorApplication.Exit(1);
-            }
+            ValidateScenes(activeScenes, 25, true);
         }
 
         public static List<ZenjectResolveException> ValidateScenes(List<string> sceneNames, int maxErrors)
+        {
+            return ValidateScenes(sceneNames, maxErrors, false);
+        }
+
+        public static List<ZenjectResolveException> ValidateScenes(List<string> sceneNames, int maxErrors, bool exitAfter)
         {
             var errors = new List<ZenjectResolveException>();
             var activeScenes = sceneNames
@@ -83,6 +65,12 @@ namespace Zenject
             if (errors.IsEmpty())
             {
                 Log.Trace("Successfully validated all {0} scenes", activeScenes.Count);
+
+                if (exitAfter)
+                {
+                    // 0 = no errors
+                    EditorApplication.Exit(0);
+                }
             }
             else
             {
@@ -91,6 +79,12 @@ namespace Zenject
                 foreach (var err in errors)
                 {
                     Log.ErrorException(err);
+                }
+
+                if (exitAfter)
+                {
+                    // 1 = errors occurred
+                    EditorApplication.Exit(1);
                 }
             }
 
