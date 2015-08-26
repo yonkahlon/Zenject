@@ -57,7 +57,12 @@ namespace Zenject
         GameObject InstantiatePrefab(
             GameObject prefab, params object[] args);
 
+        // Create a new game object from a resource path and fill in dependencies for all children
+        GameObject InstantiatePrefabResource(
+            string resourcePath, params object[] args);
+
         /////////////// InstantiatePrefabForComponent
+
         // Same as InstantiatePrefab but returns a component after it's initialized
 
         T InstantiatePrefabForComponent<T>(
@@ -72,6 +77,21 @@ namespace Zenject
 
         object InstantiatePrefabForComponentExplicit(
             Type concreteType, GameObject prefab, List<TypeValuePair> extraArgMap);
+
+        /////////////// InstantiatePrefabResourceForComponent
+
+        T InstantiatePrefabResourceForComponent<T>(
+            string resourcePath, params object[] extraArgs);
+
+        object InstantiatePrefabResourceForComponent(
+            Type concreteType, string resourcePath, params object[] extraArgs);
+
+        // This is used instead of Instantiate to support specifying null values
+        T InstantiatePrefabResourceForComponentExplicit<T>(
+            string resourcePath, List<TypeValuePair> extraArgMap);
+
+        object InstantiatePrefabResourceForComponentExplicit(
+            Type concreteType, string resourcePath, List<TypeValuePair> extraArgMap);
 
         /////////////// InstantiateComponentOnNewGameObject
         // Create a new game object, and add the given component to it, and fill in dependencies

@@ -75,14 +75,11 @@ namespace Zenject
 
         static IEnumerable<IInstaller> GetGlobalInstallers()
         {
-            var installerConfig = (GlobalInstallerConfig)Resources.Load("ZenjectGlobalCompositionRoot", typeof(GlobalInstallerConfig));
+            // Allow either naming convention
+            var installerConfigs1 = Resources.LoadAll("ZenjectGlobalCompositionRoot", typeof(GlobalInstallerConfig));
+            var installerConfigs2 = Resources.LoadAll("ZenjectGlobalInstallers", typeof(GlobalInstallerConfig));
 
-            if (installerConfig == null)
-            {
-                return Enumerable.Empty<IInstaller>();
-            }
-
-            return installerConfig.Installers;
+            return installerConfigs1.Concat(installerConfigs2).Cast<GlobalInstallerConfig>().SelectMany(x => x.Installers).Cast<IInstaller>();
         }
     }
 }

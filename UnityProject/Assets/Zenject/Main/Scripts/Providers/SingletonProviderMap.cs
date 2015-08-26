@@ -78,11 +78,6 @@ namespace Zenject
                 _container, AddCreator(new SingletonId(identifier, concreteType)));
         }
 
-        public ProviderBase CreateProviderFromInstance<TConcrete>(string identifier, TConcrete instance)
-        {
-            return CreateProviderFromInstance(identifier, typeof(TConcrete), instance);
-        }
-
         public ProviderBase CreateProviderFromInstance(string identifier, Type concreteType, object instance)
         {
             Assert.That(instance != null || _container.AllowNullBindings);

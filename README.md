@@ -330,13 +330,33 @@ Container.Bind<BarMonoBehaviour>().ToSinglePrefab(PrefabGameObject);
 
 This will result in the prefab `PrefabGameObject` being instantiated once, and then searched for monobehaviour's `FooMonoBehaviour` and `BarMonoBehaviour`
 
+**ToSinglePrefabResource** - Load prefab via resources folder
+
+Same as ToSinglePrefab except loads the prefab using a path in Resources folder
+
+```csharp
+Container.Bind<FooMonoBehaviour>().ToSinglePrefabResource("MyDirectory/MyPrefab");
+```
+
+In this example, I've placed my prefab at Assets/Resources/MyDirectory/MyPrefab.prefab.  By doing this I don't have to pass in a GameObject and can refer to it by the path within the resources folder.
+
 **ToTransientPrefab** - Inject by instantiating a unity prefab each time
 
 ```csharp
-Container.Bind<FooMonoBehaviour>().ToTransientPrefab<FooMonoBehaviour>(PrefabGameObject);
+Container.Bind<FooMonoBehaviour>().ToTransientPrefab(PrefabGameObject);
 ```
 
 This works similar to ToSinglePrefab except it will instantiate a new instance of the given prefab every time the dependency is injected.
+
+**ToTransientPrefabResource** - Load prefab via resources folder
+
+Same as ToTransientPrefab except loads the prefab using a path in Resources folder
+
+```csharp
+Container.Bind<FooMonoBehaviour>().ToTransientPrefabResource("MyDirectory/MyPrefab");
+```
+
+In the above example, I've placed my prefab at Assets/Resources/MyDirectory/MyPrefab.prefab.  By doing this I don't have to pass in a GameObject and can refer to it by the path within the resources folder.
 
 **ToSingleGameObject** - Inject by instantiating a new game object and using that everywhere
 

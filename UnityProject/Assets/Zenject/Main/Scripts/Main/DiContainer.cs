@@ -797,6 +797,14 @@ namespace Zenject
             return monoBehaviour;
         }
 
+        public GameObject InstantiatePrefabResourceExplicit(
+            string resourcePath, IEnumerable<object> extraArgMap, InjectContext context)
+        {
+            var prefab = (GameObject)Resources.Load(resourcePath);
+            Assert.IsNotNull(prefab, "Could not find prefab at resource location '{0}'".Fmt(resourcePath));
+            return InstantiatePrefabExplicit(prefab, extraArgMap, context);
+        }
+
         public GameObject InstantiatePrefabExplicit(
             GameObject prefab, IEnumerable<object> extraArgMap, InjectContext context)
         {
@@ -854,6 +862,15 @@ namespace Zenject
             this.InjectExplicit(component, extraArgMap, currentContext);
 
             return component;
+        }
+
+        public object InstantiatePrefabResourceForComponentExplicit(
+            Type componentType, string resourcePath, List<TypeValuePair> extraArgs, InjectContext currentContext)
+        {
+            var prefab = (GameObject)Resources.Load(resourcePath);
+            Assert.IsNotNull(prefab, "Could not find prefab at resource location '{0}'".Fmt(resourcePath));
+            return InstantiatePrefabForComponentExplicit(
+                componentType, prefab, extraArgs, currentContext);
         }
 
         public object InstantiatePrefabForComponentExplicit(
@@ -960,6 +977,12 @@ namespace Zenject
             return InstantiatePrefabExplicit(prefab, args, null);
         }
 
+        public GameObject InstantiatePrefabResource(
+            string resourcePath, params object[] args)
+        {
+            return InstantiatePrefabResourceExplicit(resourcePath, args, null);
+        }
+
         /////////////// InstantiatePrefabForComponent
 
         public T InstantiatePrefabForComponent<T>(
@@ -990,6 +1013,39 @@ namespace Zenject
         {
             return InstantiatePrefabForComponentExplicit(
                 concreteType, prefab, extraArgMap, new InjectContext(this, concreteType, null));
+        }
+
+
+        /////////////// InstantiatePrefabForComponent
+
+        public T InstantiatePrefabResourceForComponent<T>(
+            string resourcePath, params object[] extraArgs)
+        {
+            return (T)InstantiatePrefabResourceForComponent(typeof(T), resourcePath, extraArgs);
+        }
+
+        public object InstantiatePrefabResourceForComponent(
+            Type concreteType, string resourcePath, params object[] extraArgs)
+        {
+            Assert.That(!extraArgs.Contains(null),
+            "Null value given to factory constructor arguments when instantiating object with type '{0}'. In order to use null use InstantiatePrefabForComponentExplicit", concreteType);
+
+            return InstantiatePrefabResourceForComponentExplicit(
+                concreteType, resourcePath, InstantiateUtil.CreateTypeValueList(extraArgs));
+        }
+
+        // This is used instead of Instantiate to support specifying null values
+        public T InstantiatePrefabResourceForComponentExplicit<T>(
+            string resourcePath, List<TypeValuePair> extraArgMap)
+        {
+            return (T)InstantiatePrefabResourceForComponentExplicit(typeof(T), resourcePath, extraArgMap);
+        }
+
+        public object InstantiatePrefabResourceForComponentExplicit(
+            Type concreteType, string resourcePath, List<TypeValuePair> extraArgMap)
+        {
+            return InstantiatePrefabResourceForComponentExplicit(
+                concreteType, resourcePath, extraArgMap, new InjectContext(this, concreteType, null));
         }
 
         /////////////// InstantiateComponentOnNewGameObject
@@ -1307,4 +1363,3 @@ namespace Zenject
 #endif
     }
 }
-
