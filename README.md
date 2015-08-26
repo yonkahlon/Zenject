@@ -340,6 +340,15 @@ Container.Bind<FooMonoBehaviour>().ToSinglePrefabResource("MyDirectory/MyPrefab"
 
 In this example, I've placed my prefab at Assets/Resources/MyDirectory/MyPrefab.prefab.  By doing this I don't have to pass in a GameObject and can refer to it by the path within the resources folder.
 
+Note that you can re-use the same singleton instance for multiple monobehaviours that exist on the prefab.
+
+```csharp
+Container.Bind<FooMonoBehaviour>().ToSinglePrefabResource("MyDirectory/MyPrefab");
+Container.Bind<BarMonoBehaviour>().ToSinglePrefabResource("MyDirectory/MyPrefab");
+```
+
+In the above example, the prefab will only be instantiated once.
+
 **ToTransientPrefab** - Inject by instantiating a unity prefab each time
 
 ```csharp
