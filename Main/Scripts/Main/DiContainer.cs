@@ -1342,6 +1342,22 @@ namespace Zenject
             }
         }
 
+        public void BindAllInterfacesToInstance<TConcrete>(TConcrete value)
+        {
+            BindAllInterfacesToInstance(typeof(TConcrete), value);
+        }
+
+        public void BindAllInterfacesToInstance(Type concreteType, object value)
+        {
+            Assert.That((value == null && AllowNullBindings) || value.GetType().DerivesFromOrEqual(concreteType));
+
+            foreach (var interfaceType in concreteType.GetInterfaces())
+            {
+                Assert.That(concreteType.DerivesFrom(interfaceType));
+                Bind(interfaceType).ToInstance(concreteType, value);
+            }
+        }
+
 #if !ZEN_NOT_UNITY3D
         public BindingConditionSetter BindGameObjectFactory<T>(
             GameObject prefab)

@@ -151,6 +151,7 @@
     <Compile Include="Providers\PrefabSingletonProvider.cs" />
     <Compile Include="Providers\PrefabSingletonProviderMap.cs" />
     <Compile Include="Providers\ProviderBase.cs" />
+    <Compile Include="Providers\ResourceProvider.cs" />
     <Compile Include="Providers\SingletonId.cs" />
     <Compile Include="Providers\SingletonLazyCreator.cs" />
     <Compile Include="Providers\SingletonProvider.cs" />
