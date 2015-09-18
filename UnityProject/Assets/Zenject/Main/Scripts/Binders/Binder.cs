@@ -283,7 +283,7 @@ namespace Zenject
                     false, ctx.ObjectType, ctx.ObjectInstance, ctx.MemberName, ctx))));
         }
 
-        protected BindingConditionSetter ToInstance(Type concreteType, object instance)
+        public BindingConditionSetter ToInstance(Type concreteType, object instance)
         {
             if (ZenUtil.IsNull(instance) && !_container.AllowNullBindings)
             {
@@ -344,6 +344,22 @@ namespace Zenject
         protected BindingConditionSetter ToSingleMonoBehaviourBase<TConcrete>(GameObject gameObject)
         {
             return ToProvider(new MonoBehaviourSingletonProvider(typeof(TConcrete), _container, gameObject));
+        }
+
+        public BindingConditionSetter ToResource(string resourcePath)
+        {
+            return ToResource(_contractType, resourcePath);
+        }
+
+        public BindingConditionSetter ToResource(Type concreteType, string resourcePath)
+        {
+            if (!concreteType.DerivesFromOrEqual(_contractType))
+            {
+                throw new ZenjectBindException(
+                    "Invalid type given during bind command.  Expected type '{0}' to derive from type '{1}'".Fmt(concreteType.Name(), _contractType.Name()));
+            }
+
+            return ToProvider(new ResourceProvider(concreteType, resourcePath));
         }
 #endif
     }

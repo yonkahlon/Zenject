@@ -24,10 +24,12 @@ namespace Zenject
         // For cases where you have game objects that aren't referenced anywhere but still want them to be
         // created on startup
         [InjectOptional]
-        public List<MonoBehaviour> _initialObjects = null;
+        public List<object> _initialObjects = null;
 
-        [PostInject]
-        public void Initialize()
+        // We initialize on Start() here instead of Awake() because some parts of unity don't appear to have been
+        // fully initialized until Start().  For example, you can't change transform.localPosition and then
+        // expect transform.position to update according until Start()
+        public void Start()
         {
             _initializableManager.Initialize();
         }
