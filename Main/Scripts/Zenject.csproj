@@ -103,6 +103,7 @@
     <Compile Include="Factories\IValidatableFactory.cs" />
     <Compile Include="Factories\KeyedFactory.cs" />
     <Compile Include="Factories\ListFactory.cs" />
+    <Compile Include="Factories\PrefabFactory.cs" />
     <Compile Include="Injection\InjectableInfo.cs" />
     <Compile Include="Injection\TypeAnalyzer.cs" />
     <Compile Include="Injection\ZenjectTypeInfo.cs" />
