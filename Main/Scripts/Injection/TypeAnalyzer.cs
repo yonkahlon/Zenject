@@ -73,7 +73,7 @@ namespace Zenject
             }
 
             return new InjectableInfo(
-                injectOptionalAttributes.Any(),
+                paramInfo.IsOptional || injectOptionalAttributes.Any(),
                 identifier,
                 paramInfo.Name,
                 paramInfo.ParameterType,
