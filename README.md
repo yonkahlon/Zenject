@@ -2081,6 +2081,18 @@ For general troubleshooting / support, please use the [zenject subreddit](http:/
 
 ## <a id="release-notes"></a>Release Notes
 
+2.6
+* Added new bind methods: ToResource, ToTransientPrefabResource, ToSinglePrefabResource
+* Added ability to have multiple sets of global installers
+* Fixed support for using zenject with .NET 4.5
+* Created abstract base class CompositionRoot for both SceneCompositionRoot and GlobalCompositionRoot
+* Better support for using the same DiContainer from multiple threads
+* Added back custom list inspector handler to make it easier to re-arrange etc.
+* Removed the extension methods on DiContainer to avoid a gotcha that occurs when not including 'using Zenject
+* Changed to allow having a null root transform given to DiContainer
+* Changed to assume any parameters with hard coded default values (eg: int x = 5) are InjectOptional
+* Fixed bug with asteroids project which was causing exceptions to be thrown on the second run due to the use of tags
+
 2.5
 * Added support for circular dependencies in the PostInject method or as fields (just not constructor parameters)
 * Fixed issue with identifiers that was occurring when having both [Inject] and [InjectOptional] attributes on a field/constructor parameter.  Now requires that only one be set
