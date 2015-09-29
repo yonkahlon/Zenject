@@ -15,6 +15,8 @@
     * <a href="#overview-of-the-zenject-api">Overview of the Zenject API</a>
         * <a href="#hello-world-example">Hello World Example</a>
         * <a href="#binding">Binding</a>
+        * <a href="#inject-methods">Inject Methods</a>
+        * <a href="#bind-methods">Bind Methods</a>
         * <a href="#list-bindings">List Bindings</a>
         * <a href="#optional-binding">Optional Binding</a>
         * <a href="#conditional-bindings">Conditional Bindings</a>
@@ -71,14 +73,15 @@ __Quick Start__:  If you are already familiar with dependency injection and are 
 * Constructor injection (can tag constructor if there are multiple)
 * Field injection
 * Property injection
-* Injection via [PostInject] method
-* Conditional Binding (eg. by name, by parent type, etc.)
-* Optional Dependencies
-* Support For Building Dynamic Object Graphs At Runtime Using Factories
-* Auto-Mocking using the Moq library
+* Injection via [PostInject] method parameters
+* Conditional binding (eg. by name, by parent type, etc.)
+* Optional dependencies
+* Support for building dynamic object graphs at runtime using factories
 * Injection across different Unity scenes
+* "Scene Decorators" which allow adding functionality to a different scene
+* Ability to validate object graphs at editor time including dynamic object graphs created via factories
+* Auto-Mocking using the Moq library
 * Ability to print entire object graph as a UML image automatically
-* Ability to validate object graphs at editor time including dynamic object graphs
 * Nested Containers
 
 ## <a id="history"></a>History
@@ -189,7 +192,7 @@ Another common mistake that people new to DI make is that they extract interface
 
 Other benefits include:
 
-* Testability - Writing automated unit tests or user-driven tests becomes very easy, because it is just a matter of writing a different 'composition root' which wires up the dependencies in a different way.  Want to only test one subsystem?  Simply create a new composition root.  Zenject also has some support for avoiding code duplication in the composition root itself (described below). In cases where you can't easily separate out a specific sub-system to test, you can also creates 'mocks' for the sub-systems that you don't care about. (more detail <a href="#auto-mocking-using-moq">below</a>)
+* Testability - Writing automated unit tests or user-driven tests becomes very easy, because it is just a matter of writing a different 'composition root' which wires up the dependencies in a different way.  Want to only test one subsystem?  Simply create a new composition root.  Zenject also has some support for avoiding code duplication in the composition root itself (using Installers - described below). In cases where you can't easily separate out a specific sub-system to test, you can also creates 'mocks' for the sub-systems that you don't care about. (more detail <a href="#auto-mocking-using-moq">below</a>)
 * Refactorability - When code is loosely coupled, as is the case when using DI properly, the entire code base is much more resilient to changes.  You can completely change parts of the code base without having those changes wreak havoc on other parts.
 * Encourages modular code - When using a DI framework you will naturally follow better design practices, because it forces you to think about the interfaces between classes.
 
@@ -257,11 +260,106 @@ In Zenject, dependency mapping is done by adding bindings to something called a 
 
 When the container is asked to construct an instance of a given type, it uses C# reflection to find the list of constructor arguments, and all fields/properties that are marked with an [Inject] attribute.  It then attempts to resolve each of these required dependencies, which it uses to call the constructor and create the new instance.
 
-Each Zenject application therefore must tell the container how to resolve each of these dependencies, which is done via Bind commands.  The format for the bind command can be any of the following:
+Each Zenject application therefore must tell the container how to resolve each of these dependencies, which is done via Bind commands.  For example, given the following class:
+
+```csharp
+public class Foo
+{
+    IBar _bar;
+
+    public Foo(IBar bar)
+    {
+        _bar = bar;
+    }
+}
+```
+
+You can fill in the dependencies for this class with the following binding:
+
+```csharp
+Container.Bind<Foo>().ToSingle();
+```
+
+This tells Zenject that every class that requires a dependency of type Foo should use the same instance, which it will automatically create when needed.
+
+## <a id="inject-methods"></a>Inject Methods
+
+There are many different ways of binding types on the container, which are documented in the <a href="#bind-methods">next section</a>.  There are also several ways of having these dependencies injected into your classes. These are:
+
+1 - **Constructor Injection**
+
+```csharp
+public class Foo
+{
+    IBar _bar;
+
+    public Foo(IBar bar)
+    {
+        _bar = bar;
+    }
+}
+```
+
+Here, the IBar dependency is injected via the constructor.  Constructor Injection is the recommended approach when possible (except for MonoBehaviour's, in which case PostInject is the recommended approach)
+
+2 - **Field Injection**
+
+```csharp
+public class Foo
+{
+    [Inject]
+    IBar _bar;
+}
+```
+
+Field injection occurs immediately after the constructor is called.  All fields that are marked with the [Inject] attribute are looked up in the container and given a value.  Note that these fields can be private or public and injection will still occur.
+
+3 - **Property Injection**
+
+```csharp
+public class Foo
+{
+    [Inject]
+    public IBar Bar
+    {
+        get;
+        private set;
+    }
+}
+```
+
+Property injection works the same as field injection except is applied to C# properties.  Just like fields, the setter can be private or public in this case.
+
+4 - **PostInject Injection**
+
+```csharp
+public class Foo
+{
+    IBar _bar;
+
+    [PostInject]
+    public Init(IBar bar)
+    {
+        _bar = bar;
+    }
+}
+```
+
+PostInject injection works very similar to constructor injection.  The PostInject methods are called after all other dependencies have been resolved, and can be used to execute initialization logic.  Unlike constructor injection, PostInject methods can make use of any fields that are marked as [Inject] because all other injection methods are guaranteed to have completed before the PostInject methods are called.
+
+You may also pass dependencies in as parameters to the PostInject method similar to how constructor injection works.
+
+Note that there can be any number of PostInject methods.  In this case, they are called in the order of Base class to Derived class.  This can be useful to avoid the need to forward many dependencies from derived classes to the base class via constructor parameters, while also guaranteeing that the base class PostInject completes first, just like how constructors work.
+
+Using [PostInject] to inject dependencies is the recommended approach for MonoBehaviours, since MonoBehaviours cannot have constructors.
+
+## <a id="bind-methods"></a>Bind Methods
+
+See the <a href="#binding">binding section</a> above for a general overview of binding.  The format for the bind command can be any of the following:
 
 Note that you can find more examples in the <a href="#cheatsheet">cheatsheet</a> section below.
 
-**ToSingle** - Inject as singleton
+1 - **ToSingle** - Inject as singleton
 
 ```csharp
 Container.Bind<Foo>().ToSingle();
@@ -286,7 +384,7 @@ Container.Bind<IBar>().ToSingle<Foo>();
 
 Note again that the same instance will be used for all dependencies that take Foo, IFoo, or IBar.
 
-**ToInstance** - Inject as a specific instance
+2 - **ToInstance** - Inject as a specific instance
 
 ```csharp
 Container.Bind<Foo>().ToInstance(new Foo());
@@ -299,7 +397,7 @@ Container.BindInstance(new Bar());
 
 In this case the given instance will be used for every dependency with the given type
 
-**ToTransient** - Inject as newly created object
+3 - **ToTransient** - Inject as newly created object
 
 ```csharp
 Container.Bind<Foo>().ToTransient();
@@ -311,7 +409,7 @@ In this case a new instance of Foo will be generated each time it is injected. S
 Container.Bind<IFoo>().ToTransient<Foo>();
 ```
 
-**ToSinglePrefab** - Inject by instantiating a unity prefab once and using that everywhere
+4 - **ToSinglePrefab** - Inject by instantiating a unity prefab once and using that everywhere
 
 ```csharp
 Container.Bind<FooMonoBehaviour>().ToSinglePrefab(PrefabGameObject);
@@ -330,7 +428,7 @@ Container.Bind<BarMonoBehaviour>().ToSinglePrefab(PrefabGameObject);
 
 This will result in the prefab `PrefabGameObject` being instantiated once, and then searched for monobehaviour's `FooMonoBehaviour` and `BarMonoBehaviour`
 
-**ToSinglePrefabResource** - Load prefab via resources folder
+5 - **ToSinglePrefabResource** - Load prefab via resources folder
 
 Same as ToSinglePrefab except loads the prefab using a path in Resources folder
 
@@ -349,7 +447,7 @@ Container.Bind<BarMonoBehaviour>().ToSinglePrefabResource("MyDirectory/MyPrefab"
 
 In the above example, the prefab will only be instantiated once.
 
-**ToTransientPrefab** - Inject by instantiating a unity prefab each time
+6 - **ToTransientPrefab** - Inject by instantiating a unity prefab each time
 
 ```csharp
 Container.Bind<FooMonoBehaviour>().ToTransientPrefab(PrefabGameObject);
@@ -357,7 +455,7 @@ Container.Bind<FooMonoBehaviour>().ToTransientPrefab(PrefabGameObject);
 
 This works similar to ToSinglePrefab except it will instantiate a new instance of the given prefab every time the dependency is injected.
 
-**ToTransientPrefabResource** - Load prefab via resources folder
+7 - **ToTransientPrefabResource** - Load prefab via resources folder
 
 Same as ToTransientPrefab except loads the prefab using a path in Resources folder
 
@@ -367,7 +465,7 @@ Container.Bind<FooMonoBehaviour>().ToTransientPrefabResource("MyDirectory/MyPref
 
 In the above example, I've placed my prefab at Assets/Resources/MyDirectory/MyPrefab.prefab.  By doing this I don't have to pass in a GameObject and can refer to it by the path within the resources folder.
 
-**ToSingleGameObject** - Inject by instantiating a new game object and using that everywhere
+8 - **ToSingleGameObject** - Inject by instantiating a new game object and using that everywhere
 
 ```csharp
 Container.Bind<FooMonoBehaviour>().ToSingleGameObject();
@@ -375,7 +473,7 @@ Container.Bind<FooMonoBehaviour>().ToSingleGameObject();
 
 This binding will create a new game object and attach the given FooMonoBehaviour.  Also note that since it is ToSingle that it will use the same instance everywhere that has FooMonoBehaviour as a dependency
 
-**ToMethod** - Inject using a custom method
+9 - **ToMethod** - Inject using a custom method
 
 This binding allows you to customize creation logic yourself by defining a method:
 
@@ -391,7 +489,7 @@ public IFoo SomeMethod(InjectContext context)
 }
 ```
 
-**ToGetter** - Inject by getter.
+10 - **ToGetter** - Inject by getter.
 
 This method can be useful if you want to bind to a property of another object.
 
@@ -400,7 +498,7 @@ Container.Bind<IFoo>().ToSingle<Foo>()
 Container.Bind<Bar>().ToGetter<IFoo>(x => x.GetBar())
 ```
 
-**ToLookup** - Inject by recursive resolve.
+11 - **ToLookup** - Inject by recursive resolve.
 
 ```csharp
 Container.Bind<IFoo>().ToLookup<IBar>()
@@ -413,7 +511,7 @@ In the example code above we assume that Foo inherits from IBar, which inherits 
 
 You can also supply an identifier to the ToLookup() method.  See <a href="#identifiers">here</a> section for details on identifiers.
 
-**Rebind** - Override existing binding
+12 - **Rebind** - Override existing binding
 
 ```csharp
 Container.Rebind<IFoo>().To<Foo>();
@@ -421,15 +519,7 @@ Container.Rebind<IFoo>().To<Foo>();
 
 The Rebind function can be used to override any existing bindings that were added previously.  It will first clear all previous bindings and then add the new binding.  This method is especially useful for tests, where you often want to use almost all the same bindings used in production, except override a few specific bindings.
 
-**Untyped Bindings**
-
-```csharp
-Container.Bind(typeof(IFoo)).ToSingle(typeof(Foo));
-```
-
-In some cases it is not possible to use the generic versions of the Bind<> functions.  In these cases a non-generic version is provided, which works by taking in a Type value as a parameter.
-
-**BindAllInterfacesToSingle**
+13 - **BindAllInterfacesToSingle**
 
 This function can be used to automatically bind any interfaces that it finds on the given type.
 
@@ -452,6 +542,14 @@ Container.Bind<Foo>().ToSingle();
 Container.Bind<ITickable>().ToSingle<Foo>();
 Container.Bind<IInitializable>().ToSingle<Foo>();
 ```
+
+**Untyped Bindings**
+
+```csharp
+Container.Bind(typeof(IFoo)).ToSingle(typeof(Foo));
+```
+
+In some cases it is not possible to use the generic versions of the Bind<> functions.  In these cases a non-generic version is provided, which works by taking in a Type value as a parameter.
 
 ## <a id="list-bindings"></a>List Bindings
 
@@ -498,11 +596,33 @@ public class Bar
         ...
     }
 }
+...
+
+// Can leave this commented or not and it will still work
+// Container.Bind<IFoo>().ToSingle();
 ```
 
 In this case, if IFoo is not bound in any installers, then it will be passed as null.
 
-Note that when declaring dependencies with primitive types as optional, they will be given their default value (eg. 0 for ints).  However, if you need to distinguish between being given a default value and the primitive dependency not being specified, you can do this as well by declaring it as nullable:
+Note that when declaring dependencies with primitive types as optional, they will be given their default value (eg. 0 for ints).  You may also assign an explicit default using the standard C# way such as:
+
+```csharp
+public class Bar
+{
+    public Bar(int foo = 5)
+    {
+        ...
+    }
+}
+...
+
+// Can leave this commented or not and it will still work
+// Container.Bind<int>().ToInstance(1);
+```
+
+Note also that the [InjectOptional] is not necessary in this case, since it's already implied by the default value.
+
+Alternatively, you can define the primitive parameter as nullable, and perform logic depending on whether it is supplied or not, such as:
 
 ```csharp
 public class Bar
@@ -549,6 +669,7 @@ public class Bar1
 
 public class Bar2
 {
+    [Inject]
     IFoo _foo;
 }
 ```
