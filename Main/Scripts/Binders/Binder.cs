@@ -272,7 +272,7 @@ namespace Zenject
             return ToMethodBase<TConcrete>((ctx) => ctx.Container.Resolve<TConcrete>(
                 new InjectContext(
                     ctx.Container, typeof(TConcrete), identifier,
-                    false, ctx.ObjectType, ctx.ObjectInstance, ctx.MemberName, ctx)));
+                    false, ctx.ObjectType, ctx.ObjectInstance, ctx.MemberName, ctx, null, ctx.FallBackValue)));
         }
 
         protected BindingConditionSetter ToGetterBase<TObj, TResult>(string identifier, Func<TObj, TResult> method)
@@ -280,7 +280,7 @@ namespace Zenject
             return ToMethodBase((ctx) => method(ctx.Container.Resolve<TObj>(
                 new InjectContext(
                     ctx.Container, typeof(TObj), identifier,
-                    false, ctx.ObjectType, ctx.ObjectInstance, ctx.MemberName, ctx))));
+                    false, ctx.ObjectType, ctx.ObjectInstance, ctx.MemberName, ctx, null, ctx.FallBackValue))));
         }
 
         public BindingConditionSetter ToInstance(Type concreteType, object instance)

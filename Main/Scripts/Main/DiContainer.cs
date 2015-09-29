@@ -533,22 +533,22 @@ namespace Zenject
                     return ResolveAll(subContext);
                 }
 
-                if (!context.Optional)
+                if (context.Optional)
                 {
-                    if (_fallbackProvider != null)
-                    {
-                        return _fallbackProvider.GetInstance(context);
-                    }
-
-                    throw new ZenjectResolveException(
-                        "Unable to resolve type '{0}'{1}. \nObject graph:\n{2}"
-                        .Fmt(
-                            context.MemberType.Name() + (context.Identifier == null ? "" : " with ID '" + context.Identifier.ToString() + "'"),
-                            (context.ObjectType == null ? "" : " while building object with type '{0}'".Fmt(context.ObjectType.Name())),
-                            context.GetObjectGraphString()));
+                    return context.FallBackValue;
                 }
 
-                return null;
+                if (_fallbackProvider != null)
+                {
+                    return _fallbackProvider.GetInstance(context);
+                }
+
+                throw new ZenjectResolveException(
+                    "Unable to resolve type '{0}'{1}. \nObject graph:\n{2}"
+                    .Fmt(
+                        context.MemberType.Name() + (context.Identifier == null ? "" : " with ID '" + context.Identifier.ToString() + "'"),
+                        (context.ObjectType == null ? "" : " while building object with type '{0}'".Fmt(context.ObjectType.Name())),
+                        context.GetObjectGraphString()));
             }
 
             ProviderBase provider;
