@@ -2192,6 +2192,13 @@ For general troubleshooting / support, please use the [zenject subreddit](http:/
 
 ## <a id="release-notes"></a>Release Notes
 
+2.8
+* Fixed to properly use explicit default parameter values in Constructor/PostInject methods.  For eg: public Foo(int bar = 5) should consider bar to be optional and use 5 if not resolved.
+
+2.7
+* Bug fix to ensure global composition root always gets initialized before the scene composition root
+* Changed scene decorators to use LoadLevelAdditive instead of LoadLevel to allow more complex setups involving potentially several decorators within decorators
+
 2.6
 * Added new bind methods: ToResource, ToTransientPrefabResource, ToSinglePrefabResource
 * Added ability to have multiple sets of global installers
