@@ -72,13 +72,16 @@ namespace Zenject
                 identifier = injectOptionalAttributes.Single().Identifier;
             }
 
+            bool isOptionalWithADefaultValue = (paramInfo.Attributes & ParameterAttributes.HasDefault) == ParameterAttributes.HasDefault;
+
             return new InjectableInfo(
-                paramInfo.IsOptional || injectOptionalAttributes.Any(),
+                isOptionalWithADefaultValue || injectOptionalAttributes.Any(),
                 identifier,
                 paramInfo.Name,
                 paramInfo.ParameterType,
                 parentType,
-                null);
+                null,
+                isOptionalWithADefaultValue ? paramInfo.DefaultValue : null);
         }
 
         static List<PostInjectableInfo> GetPostInjectMethods(Type type)
@@ -179,7 +182,8 @@ namespace Zenject
                 memInfo.Name,
                 memberType,
                 parentType,
-                setter);
+                setter,
+                null);
         }
 
         static ConstructorInfo GetInjectConstructor(Type parentType)
