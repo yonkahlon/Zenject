@@ -242,9 +242,9 @@ You can run this example by doing the following:
 * Copy and paste the above code into a file named 'TestInstaller'
 * Create a new scene in Unity
 * Add a new GameObject and name it "CompositionRoot" (though the name does not really matter)
-* Attach the CompositionRoot MonoBehaviour out of Zenject to your new GameObject
+* Attach the "Utils\SceneDecoratorCompositionRoot.cs" MonoBehaviour out of Zenject to your new GameObject
 * Add your TestInstaller script to the scene as well (as its own GameObject or on the same GameObject as the CompositionRoot, it doesn't matter)
-* Add a reference to your TestInstaller to the properties of the CompositionRoot by adding a new row in the inspector of the "Installers" property and then dragging the TestInstaller GameObject to it
+* Add a reference to your TestInstaller to the properties of the CompositionRoot by adding a new row in the inspector of the "Installers" property (Increase "Size" to 1) and then dragging the TestInstaller GameObject to it
 * Validate your scene by either selecting Edit -> Zenject -> Validate Current Scene or hitting CTRL+SHIFT+V.  (note that this step isn't necessary but good practice to get into)
 * Run
 * Observe unity console for output
