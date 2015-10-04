@@ -1748,9 +1748,9 @@ public class TestHotKeysAdder : ITickable
 }
 ```
 
-If you run your scene it should now behave exactly like the scene you entered in 'Scene Name' except with the added functionality in your decorator installer.
+If you run your scene it should now behave exactly like the scene you entered in 'Scene Name' except with the added functionality in your decorator installer.  NOTE: If the scene fails to load, it might be because the scene that you're decoratoring has not been added to the list of levels in build settings.
 
-The PostInstallBindings method is useful when you want to override a binding in the main scene using 'Rebind'.  And PreInstallBindings is necessary if you want to inject data into the installers in the main scene. For a better example see the asteroids project that comes with Zenject (open 'AsteroidsDecoratorExample' scene).
+The PostInstallBindings method is useful when you want to override a binding in the main scene using 'Rebind'.  And PreInstallBindings is necessary if you want to inject data into the installers in the main scene. For a better example see the asteroids project that comes with Zenject (open 'AsteroidsDecoratorExample' scene).  NOTE:  If installing from asset store version, you need to add the 'Asteroids' scene to your build settings so that the scene decorator can find it.
 
 Note also that Zenject validate (using CTRL+SHIFT+V or the menu item via Edit->Zenject->Validate Current Scene) also works with decorator scenes.
 
