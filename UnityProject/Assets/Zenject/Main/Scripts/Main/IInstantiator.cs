@@ -32,6 +32,9 @@ namespace Zenject
         GameObject InstantiatePrefabExplicit(
             GameObject prefab, IEnumerable<object> extraArgMap, InjectContext currentContext);
 
+        GameObject InstantiatePrefabExplicit(
+            GameObject prefab, IEnumerable<object> extraArgMap, InjectContext currentContext, bool includeInactive);
+
         // Instantiate an empty game object and then add a component to it of type 'componentType'
         object InstantiateComponentOnNewGameObjectExplicit(
             Type componentType, string name, List<TypeValuePair> extraArgMap, InjectContext currentContext);
@@ -52,9 +55,21 @@ namespace Zenject
         GameObject InstantiatePrefab(
             GameObject prefab, params object[] args);
 
+        GameObject InstantiatePrefab(
+            bool includeInactive, GameObject prefab, params object[] args);
+
         // Create a new game object from a resource path and fill in dependencies for all children
         GameObject InstantiatePrefabResource(
             string resourcePath, params object[] args);
+
+        GameObject InstantiatePrefabResource(
+            bool includeInactive, string resourcePath, params object[] args);
+
+        GameObject InstantiatePrefabResourceExplicit(
+            string resourcePath, IEnumerable<object> extraArgMap, InjectContext context);
+
+        GameObject InstantiatePrefabResourceExplicit(
+            string resourcePath, IEnumerable<object> extraArgMap, InjectContext context, bool includeInactive);
 
         /////////////// InstantiatePrefabForComponent
 

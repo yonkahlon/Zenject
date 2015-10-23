@@ -800,13 +800,25 @@ namespace Zenject
         public GameObject InstantiatePrefabResourceExplicit(
             string resourcePath, IEnumerable<object> extraArgMap, InjectContext context)
         {
+            return InstantiatePrefabResourceExplicit(resourcePath, extraArgMap, context, false);
+        }
+
+        public GameObject InstantiatePrefabResourceExplicit(
+            string resourcePath, IEnumerable<object> extraArgMap, InjectContext context, bool includeInactive)
+        {
             var prefab = (GameObject)Resources.Load(resourcePath);
             Assert.IsNotNull(prefab, "Could not find prefab at resource location '{0}'".Fmt(resourcePath));
-            return InstantiatePrefabExplicit(prefab, extraArgMap, context);
+            return InstantiatePrefabExplicit(prefab, extraArgMap, context, includeInactive);
         }
 
         public GameObject InstantiatePrefabExplicit(
             GameObject prefab, IEnumerable<object> extraArgMap, InjectContext context)
+        {
+            return InstantiatePrefabExplicit(prefab, extraArgMap, context, false);
+        }
+
+        public GameObject InstantiatePrefabExplicit(
+            GameObject prefab, IEnumerable<object> extraArgMap, InjectContext context, bool includeInactive)
         {
             var gameObj = (GameObject)GameObject.Instantiate(prefab);
 
@@ -821,7 +833,7 @@ namespace Zenject
 
             gameObj.SetActive(true);
 
-            this.InjectGameObject(gameObj, true, false, extraArgMap, context);
+            this.InjectGameObject(gameObj, true, includeInactive, extraArgMap, context);
 
             return gameObj;
         }
@@ -983,10 +995,22 @@ namespace Zenject
             return InstantiatePrefabExplicit(prefab, args, null);
         }
 
+        public GameObject InstantiatePrefab(
+            bool includeInactive, GameObject prefab, params object[] args)
+        {
+            return InstantiatePrefabExplicit(prefab, args, null, includeInactive);
+        }
+
         public GameObject InstantiatePrefabResource(
             string resourcePath, params object[] args)
         {
-            return InstantiatePrefabResourceExplicit(resourcePath, args, null);
+            return InstantiatePrefabResourceExplicit(resourcePath, args, null, false);
+        }
+
+        public GameObject InstantiatePrefabResource(
+            bool includeInactive, string resourcePath, params object[] args)
+        {
+            return InstantiatePrefabResourceExplicit(resourcePath, args, null, includeInactive);
         }
 
         /////////////// InstantiatePrefabForComponent
