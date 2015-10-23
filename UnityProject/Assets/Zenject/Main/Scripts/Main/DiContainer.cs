@@ -876,6 +876,12 @@ namespace Zenject
         public object InstantiatePrefabForComponentExplicit(
             Type componentType, GameObject prefab, List<TypeValuePair> extraArgs, InjectContext currentContext)
         {
+            return InstantiatePrefabForComponentExplicit(componentType, prefab, extraArgs, currentContext, false);
+        }
+
+        public object InstantiatePrefabForComponentExplicit(
+            Type componentType, GameObject prefab, List<TypeValuePair> extraArgs, InjectContext currentContext, bool includeInactive)
+        {
             Assert.That(prefab != null, "Null prefab found when instantiating game object");
 
             // It could be an interface so this may fail in valid cases so you may want to comment out
@@ -898,7 +904,7 @@ namespace Zenject
             Component requestedScript = null;
 
             // Inject on the children first since the parent objects are more likely to use them in their post inject methods
-            foreach (var component in UnityUtil.GetComponentsInChildrenBottomUp<Component>(gameObj, false))
+            foreach (var component in UnityUtil.GetComponentsInChildrenBottomUp<Component>(gameObj, includeInactive))
             {
                 if (component != null)
                 {
@@ -1001,6 +1007,24 @@ namespace Zenject
                 concreteType, prefab, InstantiateUtil.CreateTypeValueList(extraArgs));
         }
 
+        public T InstantiatePrefabForComponent<T>(
+            bool includeInactive, GameObject prefab, params object[] extraArgs)
+        {
+            return (T)InstantiatePrefabForComponent(includeInactive, typeof(T), prefab, extraArgs);
+        }
+
+        public object InstantiatePrefabForComponent(
+            bool includeInactive, Type concreteType, GameObject prefab, params object[] extraArgs)
+        {
+            Assert.That(!extraArgs.Contains(null),
+                "Null value given to factory constructor arguments when instantiating object with type '{0}'. In order to use null use InstantiatePrefabForComponentExplicit", concreteType);
+
+            return InstantiatePrefabForComponentExplicit(
+                concreteType, prefab,
+                InstantiateUtil.CreateTypeValueList(extraArgs),
+                new InjectContext(this, concreteType, null), includeInactive);
+        }
+
         // This is used instead of Instantiate to support specifying null values
         public T InstantiatePrefabForComponentExplicit<T>(
             GameObject prefab, List<TypeValuePair> extraArgMap)
@@ -1015,8 +1039,7 @@ namespace Zenject
                 concreteType, prefab, extraArgMap, new InjectContext(this, concreteType, null));
         }
 
-
-        /////////////// InstantiatePrefabForComponent
+        /////////////// InstantiatePrefabResourceForComponent
 
         public T InstantiatePrefabResourceForComponent<T>(
             string resourcePath, params object[] extraArgs)

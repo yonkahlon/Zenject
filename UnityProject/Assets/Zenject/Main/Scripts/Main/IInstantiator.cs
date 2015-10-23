@@ -32,11 +32,6 @@ namespace Zenject
         GameObject InstantiatePrefabExplicit(
             GameObject prefab, IEnumerable<object> extraArgMap, InjectContext currentContext);
 
-        // Instantiate the given prefab, inject on all MonoBehaviours, then return the instance of 'componentType'
-        // Any arguments supplied are assumed to be used as extra parameters into 'componentType'
-        object InstantiatePrefabForComponentExplicit(
-            Type componentType, GameObject prefab, List<TypeValuePair> extraArgMap, InjectContext currentContext);
-
         // Instantiate an empty game object and then add a component to it of type 'componentType'
         object InstantiateComponentOnNewGameObjectExplicit(
             Type componentType, string name, List<TypeValuePair> extraArgMap, InjectContext currentContext);
@@ -68,8 +63,14 @@ namespace Zenject
         T InstantiatePrefabForComponent<T>(
             GameObject prefab, params object[] extraArgs);
 
+        T InstantiatePrefabForComponent<T>(
+            bool includeInactive, GameObject prefab, params object[] extraArgs);
+
         object InstantiatePrefabForComponent(
             Type concreteType, GameObject prefab, params object[] extraArgs);
+
+        object InstantiatePrefabForComponent(
+            bool includeInactive, Type concreteType, GameObject prefab, params object[] extraArgs);
 
         // This is used instead of Instantiate to support specifying null values
         T InstantiatePrefabForComponentExplicit<T>(
@@ -77,6 +78,14 @@ namespace Zenject
 
         object InstantiatePrefabForComponentExplicit(
             Type concreteType, GameObject prefab, List<TypeValuePair> extraArgMap);
+
+        // Instantiate the given prefab, inject on all MonoBehaviours, then return the instance of 'componentType'
+        // Any arguments supplied are assumed to be used as extra parameters into 'componentType'
+        object InstantiatePrefabForComponentExplicit(
+            Type componentType, GameObject prefab, List<TypeValuePair> extraArgMap, InjectContext currentContext);
+
+        object InstantiatePrefabForComponentExplicit(
+            Type componentType, GameObject prefab, List<TypeValuePair> extraArgMap, InjectContext currentContext, bool includeInactive);
 
         /////////////// InstantiatePrefabResourceForComponent
 
