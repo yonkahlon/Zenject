@@ -976,6 +976,9 @@ A Zenject driven application is executed by the following steps:
 * **Lazily instantiated objects and the object graph**
     * Zenject will only instantiate any objects that are referenced in the object graph that is generated based on the bindings that you've invoked in your installer.  Internally, how it works is that Zenject has one single class that represents the root of the entire object graph (aka IDependencyRoot).  For unity projects this is typically the 'UnityDependencyRoot' class.  This class has a dependency on all ITickable, IInitializable, and IDisposable objects.  This is important to understand because it means that any class that you bind to ITickable, IInitializable, or IDisposable will always be created as part of the initial object graph of your application.  And only otherwise will your class be lazily instantiated when referenced by another class.
 
+* **The order that things occur in is wrong, like injection is occurring too late, or Initialize() event is not called at the right time, etc.**
+    * It may be because the execution order of the Zenject class 'SceneCompositionRoot' is incorrect.  This should always have the earliest or near earliest execution order.  This should already be set by default (since this settings is in the SceneCompositionRoot.cs.meta file). However, if you are compiling Zenject as a DLL or have a unique configuration you may want to make sure, which you can do by going to Edit -> Project Settings -> Script Execution Order and confirming that SceneCompositionRoot is at the top, before the default time.
+
 Please feel free to submit any other sources of confusion to sfvermeulen@gmail.com and I will add it here.
 
 ## <a id="update--initialization-order"></a>Update / Initialization Order
