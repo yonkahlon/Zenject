@@ -28,6 +28,7 @@
     * <a href="#zenject-order-of-operations">Zenject Order Of Operations</a>
     * <a href="#di-rules--guidelines--recommendations">Rules / Guidelines / Recommendations / Gotchas / Miscellaneous Tips and Tricks</a>
     * Advanced Features
+        * <a href="#global-bindings">Global Bindings</a>
         * <a href="#update--initialization-order">Update Order And Initialization Order</a>
         * <a href="#object-graph-validation">Object Graph Validation</a>
         * <a href="#creating-objects-dynamically">Creating Objects Dynamically</a>
@@ -37,7 +38,6 @@
         * <a href="#custom-factories">Custom Factories</a>
         * <a href="#using-bindscope">Using BindScope</a>
         * <a href="#injecting-data-across-scenes">Injecting Data Across Scenes</a>
-        * <a href="#global-bindings">Global Bindings</a>
         * <a href="#scenes-decorator">Scenes Decorators</a>
         * <a href="#auto-mocking-using-moq">Auto-Mocking Using Moq</a>
         * <a href="#nested-containers">Nested Containers / FallbackProvider</a>
@@ -981,6 +981,16 @@ A Zenject driven application is executed by the following steps:
 
 Please feel free to submit any other sources of confusion to sfvermeulen@gmail.com and I will add it here.
 
+## <a id="global-bindings"></a>Global Bindings
+
+This all works great for each individual scene, but what if have dependencies that you wish to persist permanently across all scenes?  In Zenject you can do this by adding installers to the global container.
+
+This works by first add a global composition root and then adding installers to it.  You can create an empty global composition root by selecting Edit -> Zenject -> Create Global Composition Root.  After selecting this menu item you should see a new asset in the root level Resources folder called 'ZenjectGlobalCompositionRoot'.
+
+If you click on this it will display a property for the list of Installers in the same way that it does for the composition root object that is placed in each scene.  The only difference in this case is that the installers you add here must exist in the project as prefabs and cannot exist in any specific scene.  You can then directly reference those prefabs by dragging them into the Installers property of the global composition root.
+
+Then, when you start any scene, the CompositionRoot for the scene will call the global composition root to install the global bindings, before installing any scene specific bindings.  If you load another scene from the first scene, the global composition root will not be called again and the bindings that it added previously will persist into the new scene.  You can declare ITickable / IInitializable / IDisposable objects in your global installers in the same way you do for your scene installers with the result being IInitializable.Initialize is called only once across each play session and IDisposable.Dispose is only called once the application is fully stopped.
+
 ## <a id="update--initialization-order"></a>Update / Initialization Order
 
 In many cases, especially for small projects, the order that classes update or initialize in does not matter.  However, in larger projects update or initialization order can become an issue.  This can especially be an issue in Unity, since it is often difficult to predict in what order the Start(), Awake(), or Update() methods will be called in.  Unfortunately, Unity does not have an easy way to control this (besides in Edit -> Project Settings -> Script Execution Order, though that is pretty awkward to use)
@@ -1700,16 +1710,6 @@ ZenUtil.LoadScene("NameOfSceneToLoad",
 Note that in this case I didn't need to use the "LevelName" identifier since there is only one string injected into the GameInstaller class.
 
 Some people have also found it useful to separate out content into different scenes and then load each scene additively using the Unity method `Application.LoadLevelAdditive`.  In some cases it's useful to have the dependencies in the new scene resolved using the container of the original scene.  To achieve this, you can call `ZenUtil.LoadSceneAdditiveWithContainer` and pass in your scene's container.  Note however that it is assumed in this case that the new scene does not have its own container + Composition Root.
-
-## <a id="global-bindings"></a>Global Bindings
-
-This all works great for each individual scene, but what if have dependencies that you wish to persist permanently across all scenes?  In Zenject you can do this by adding installers to the global container.
-
-This works by first add a global composition root and then adding installers to it.  You can create an empty global composition root by selecting Edit -> Zenject -> Create Global Composition Root.  After selecting this menu item you should see a new asset in the root level Resources folder called 'ZenjectGlobalCompositionRoot'.
-
-If you click on this it will display a property for the list of Installers in the same way that it does for the composition root object that is placed in each scene.  The only difference in this case is that the installers you add here must exist in the project as prefabs and cannot exist in any specific scene.  You can then directly reference those prefabs by dragging them into the Installers property of the global composition root.
-
-Then, when you start any scene, the CompositionRoot for the scene will call the global composition root to install the global bindings, before installing any scene specific bindings.  If you load another scene from the first scene, the global composition root will not be called again and the bindings that it added previously will persist into the new scene.  You can declare ITickable / IInitializable / IDisposable objects in your global installers in the same way you do for your scene installers with the result being IInitializable.Initialize is called only once across each play session and IDisposable.Dispose is only called once the application is fully stopped.
 
 ## <a id="scenes-decorator"></a>Scene Decorators
 
