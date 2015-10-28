@@ -117,7 +117,9 @@ namespace Zenject
 
                     // Inject after we've instantiated and set the _hasInstance flag so that we can support circular dependencies
                     // as PostInject or field parameters
-                    _container.Inject(_instance);
+                    _container.InjectExplicit(
+                        _instance, Enumerable.Empty<TypeValuePair>(), true,
+                        TypeAnalyzer.GetInfo(_instance.GetType()), context, _id.Identifier);
                 }
             }
 
