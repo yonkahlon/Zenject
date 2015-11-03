@@ -3,10 +3,11 @@ using System.Collections.Generic;
 
 namespace Zenject
 {
-    // Derived class should contain all dependencies
-    // for the the given run configuration
-    public interface IDependencyRoot
+    public interface IDependencyRoot : IDisposable
     {
         void Initialize();
+        void Tick();
+        void LateTick();
+        void FixedTick();
     }
 }

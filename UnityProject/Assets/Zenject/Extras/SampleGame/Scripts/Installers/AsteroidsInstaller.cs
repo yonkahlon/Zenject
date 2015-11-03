@@ -23,7 +23,7 @@ namespace Asteroids
             // Install the main game
             InstallAsteroids();
             InstallSettings();
-            InitPriorities();
+            InitExecutionOrder();
         }
 
         // In this example there is only one 'installer' but in larger projects you
@@ -89,17 +89,15 @@ namespace Asteroids
 
         // We don't need to include these bindings but often its nice to have
         // control over initialization-order and update-order
-        void InitPriorities()
+        void InitExecutionOrder()
         {
-            Container.Bind<List<Type>>().ToInstance(InitializablesOrder)
-                .WhenInjectedInto<InitializablePrioritiesInstaller>();
-            Container.Install<InitializablePrioritiesInstaller>();
-
-            Container.Bind<List<Type>>().ToInstance(TickablesOrder).WhenInjectedInto<TickablePrioritiesInstaller>();
-            Container.Install<TickablePrioritiesInstaller>();
-
-            Container.Bind<List<Type>>().ToInstance(FixedTickablesOrder).WhenInjectedInto<FixedTickablePrioritiesInstaller>();
-            Container.Install<FixedTickablePrioritiesInstaller>();
+            Container.Install<ExecutionOrderInstaller>(
+                new List<Type>()
+                {
+                    // Re-arrange this list to control update order
+                    typeof(AsteroidManager),
+                    typeof(GameController),
+                });
         }
 
         [Serializable]
@@ -126,24 +124,5 @@ namespace Asteroids
                 public Asteroid.Settings General;
             }
         }
-
-        static List<Type> InitializablesOrder = new List<Type>()
-        {
-            // Re-arrange this list to control init order
-            typeof(GameController),
-        };
-
-        static List<Type> TickablesOrder = new List<Type>()
-        {
-            // Re-arrange this list to control update order
-            typeof(AsteroidManager),
-            typeof(GameController),
-        };
-
-        static List<Type> FixedTickablesOrder = new List<Type>()
-        {
-            // Re-arrange this list to control update order
-            typeof(AsteroidManager),
-        };
     }
 }

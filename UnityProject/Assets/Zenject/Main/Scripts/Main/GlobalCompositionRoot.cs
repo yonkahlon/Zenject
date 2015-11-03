@@ -25,6 +25,14 @@ namespace Zenject
             }
         }
 
+        public override IDependencyRoot DependencyRoot
+        {
+            get
+            {
+                return _dependencyRoot;
+            }
+        }
+
         public static GlobalCompositionRoot Instance
         {
             get
@@ -38,7 +46,7 @@ namespace Zenject
             }
         }
 
-        public void Awake()
+        protected override void Initialize()
         {
             DontDestroyOnLoad(gameObject);
 
@@ -49,20 +57,13 @@ namespace Zenject
             _dependencyRoot = _container.Resolve<IDependencyRoot>();
         }
 
-        public void InitializeIfNecessary()
+        public void InitializeRootIfNecessary()
         {
             if (!_hasInitialized)
             {
                 _hasInitialized = true;
                 _dependencyRoot.Initialize();
             }
-        }
-
-        // If we're destroyed manually somehow handle that
-        public void OnDestroy()
-        {
-            _instance = null;
-            _dependencyRoot = null;
         }
 
         public static DiContainer CreateContainer(bool allowNullBindings, GlobalCompositionRoot root)
@@ -76,9 +77,9 @@ namespace Zenject
             container.Bind<GlobalCompositionRoot>().ToInstance(root);
             container.Bind<CompositionRoot>().ToInstance(root);
 
-            container.Install<StandardUnityInstaller>();
+            container.Install<StandardInstaller>();
 
-            CompositionRootHelper.InstallSceneInstallers(container, GetGlobalInstallers());
+            container.Install(GetGlobalInstallers());
 
             return container;
         }
