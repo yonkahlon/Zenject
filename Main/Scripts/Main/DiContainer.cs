@@ -1665,7 +1665,7 @@ namespace Zenject
 
         public BindingConditionSetter BindFacadeFactory<TFacade, TFacadeFactory>(
             Action<DiContainer> facadeInstaller)
-            where TFacade : IDependencyRoot
+            where TFacade : IFacade
             where TFacadeFactory : FacadeFactory<TFacade>
         {
             return this.Bind<TFacadeFactory>().ToMethod(
@@ -1674,7 +1674,7 @@ namespace Zenject
 
         public BindingConditionSetter BindFacadeFactory<TParam1, TFacade, TFacadeFactory>(
             Action<DiContainer, TParam1> facadeInstaller)
-            where TFacade : IDependencyRoot
+            where TFacade : IFacade
             where TFacadeFactory : FacadeFactory<TParam1, TFacade>
             where TParam1 : class
         {
@@ -1684,7 +1684,7 @@ namespace Zenject
 
         public BindingConditionSetter BindFacadeFactory<TParam1, TParam2, TFacade, TFacadeFactory>(
             Action<DiContainer, TParam1, TParam2> facadeInstaller)
-            where TFacade : IDependencyRoot
+            where TFacade : IFacade
             where TFacadeFactory : FacadeFactory<TParam1, TParam2, TFacade>
             where TParam1 : class
             where TParam2 : class
@@ -1695,7 +1695,7 @@ namespace Zenject
 
         public BindingConditionSetter BindFacadeFactory<TParam1, TParam2, TParam3, TFacade, TFacadeFactory>(
             Action<DiContainer, TParam1, TParam2, TParam3> facadeInstaller)
-            where TFacade : IDependencyRoot
+            where TFacade : IFacade
             where TFacadeFactory : FacadeFactory<TParam1, TParam2, TParam3, TFacade>
             where TParam1 : class
             where TParam2 : class
@@ -1742,4 +1742,3 @@ namespace Zenject
         }
     }
 }
-

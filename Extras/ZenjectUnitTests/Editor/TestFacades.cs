@@ -6,7 +6,7 @@ namespace Zenject.Tests
     [TestFixture]
     public class TestFacades
     {
-        public class FooFacade : DependencyRoot
+        public class FooFacade : Facade
         {
             public class Factory : FacadeFactory<FooFacade>
             {

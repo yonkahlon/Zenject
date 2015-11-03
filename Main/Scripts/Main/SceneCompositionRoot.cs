@@ -22,7 +22,7 @@ namespace Zenject
         public MonoInstaller[] Installers = new MonoInstaller[0];
 
         DiContainer _container;
-        IDependencyRoot _dependencyRoot = null;
+        IFacade _rootFacade = null;
 
         static List<IInstaller> _staticInstallers = new List<IInstaller>();
 
@@ -34,11 +34,11 @@ namespace Zenject
             }
         }
 
-        public override IDependencyRoot DependencyRoot
+        public override IFacade RootFacade
         {
             get
             {
-                return _dependencyRoot;
+                return _rootFacade;
             }
         }
 
@@ -47,7 +47,7 @@ namespace Zenject
             InitContainer();
             InitialInject();
 
-            _dependencyRoot = _container.Resolve<IDependencyRoot>();
+            _rootFacade = _container.Resolve<IFacade>();
         }
 
         public void Start()
@@ -60,7 +60,7 @@ namespace Zenject
             // object, initializing variables, etc. and treat Start() as the place where more complex initialization occurs,
             // so this is consistent with that convention as well
             GlobalCompositionRoot.Instance.InitializeRootIfNecessary();
-            _dependencyRoot.Initialize();
+            _rootFacade.Initialize();
         }
 
         // This method is used for cases where you need to create the SceneCompositionRoot entirely in code

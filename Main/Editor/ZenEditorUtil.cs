@@ -133,7 +133,7 @@ namespace Zenject
             var globalContainer = GlobalCompositionRoot.CreateContainer(true, null);
             var container = compRoot.CreateContainer(true, globalContainer, new List<IInstaller>());
 
-            foreach (var error in container.ValidateResolve(new InjectContext(container, typeof(IDependencyRoot), null)))
+            foreach (var error in container.ValidateResolve(new InjectContext(container, typeof(IFacade), null)))
             {
                 yield return error;
             }

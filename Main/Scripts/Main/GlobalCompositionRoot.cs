@@ -14,7 +14,7 @@ namespace Zenject
     {
         static GlobalCompositionRoot _instance;
         DiContainer _container;
-        IDependencyRoot _dependencyRoot;
+        IFacade _rootFacade;
         bool _hasInitialized;
 
         public override DiContainer Container
@@ -25,11 +25,11 @@ namespace Zenject
             }
         }
 
-        public override IDependencyRoot DependencyRoot
+        public override IFacade RootFacade
         {
             get
             {
-                return _dependencyRoot;
+                return _rootFacade;
             }
         }
 
@@ -54,7 +54,7 @@ namespace Zenject
             //go.hideFlags = HideFlags.HideInHierarchy;
 
             _container = CreateContainer(false, this);
-            _dependencyRoot = _container.Resolve<IDependencyRoot>();
+            _rootFacade = _container.Resolve<IFacade>();
         }
 
         public void InitializeRootIfNecessary()
@@ -62,7 +62,7 @@ namespace Zenject
             if (!_hasInitialized)
             {
                 _hasInitialized = true;
-                _dependencyRoot.Initialize();
+                _rootFacade.Initialize();
             }
         }
 
