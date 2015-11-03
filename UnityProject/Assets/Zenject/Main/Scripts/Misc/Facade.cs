@@ -5,7 +5,7 @@ using ModestTree.Util;
 namespace Zenject
 {
     [System.Diagnostics.DebuggerStepThrough]
-    public class DependencyRoot : IDependencyRoot
+    public class Facade : IFacade
     {
         [Inject]
         TickableManager _tickableManager = null;

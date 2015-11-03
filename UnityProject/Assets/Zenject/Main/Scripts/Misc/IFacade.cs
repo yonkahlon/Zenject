@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Zenject
 {
-    public interface IDependencyRoot : IDisposable
+    public interface IFacade : IDisposable
     {
         void Initialize();
         void Tick();

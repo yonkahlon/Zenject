@@ -14,7 +14,7 @@ namespace Zenject
             get;
         }
 
-        public abstract IDependencyRoot DependencyRoot
+        public abstract IFacade RootFacade
         {
             get;
         }
@@ -22,12 +22,12 @@ namespace Zenject
         public void Awake()
         {
             Assert.IsNull(Container);
-            Assert.IsNull(DependencyRoot);
+            Assert.IsNull(RootFacade);
 
             Initialize();
 
             Assert.IsNotNull(Container);
-            Assert.IsNotNull(DependencyRoot);
+            Assert.IsNotNull(RootFacade);
         }
 
         public void OnApplicationQuit()
@@ -41,7 +41,7 @@ namespace Zenject
             // changes.  So to address this case, dispose before the OnDestroy event below (OnApplicationQuit
             // is always called before OnDestroy) and then don't call dispose in OnDestroy
             Assert.IsNotNull(!_isDisposed);
-            DependencyRoot.Dispose();
+            RootFacade.Dispose();
             _isDisposed = true;
         }
 
@@ -51,23 +51,23 @@ namespace Zenject
             if (!_isDisposed)
             {
                 _isDisposed = true;
-                DependencyRoot.Dispose();
+                RootFacade.Dispose();
             }
         }
 
         public void Update()
         {
-            DependencyRoot.Tick();
+            RootFacade.Tick();
         }
 
         public void FixedUpdate()
         {
-            DependencyRoot.FixedTick();
+            RootFacade.FixedTick();
         }
 
         public void LateUpdate()
         {
-            DependencyRoot.LateTick();
+            RootFacade.LateTick();
         }
 
         protected abstract void Initialize();

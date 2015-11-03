@@ -120,15 +120,16 @@
     <Compile Include="Main\SceneCompositionRoot.cs" />
     <Compile Include="Misc\DisposableManager.cs" />
     <Compile Include="Misc\ExecutionOrderInstaller.cs" />
+    <Compile Include="Misc\Facade.cs" />
     <Compile Include="Misc\FacadeFactory.cs" />
     <Compile Include="Misc\FixedTickablePrioritiesInstaller.cs" />
+    <Compile Include="Misc\IFacade.cs" />
     <Compile Include="Misc\IInitializable.cs" />
     <Compile Include="Misc\InitializableManager.cs" />
     <Compile Include="Misc\ITickable.cs" />
     <Compile Include="Misc\KernelUtil.cs" />
     <Compile Include="Misc\LateTickablePrioritiesInstaller.cs" />
     <Compile Include="Misc\SingletonInstanceHelper.cs" />
-    <Compile Include="Misc\StandardDependencyRoot.cs" />
     <Compile Include="Misc\StandardInstaller.cs" />
     <Compile Include="Misc\TaskUpdater.cs" />
     <Compile Include="Misc\TickableManager.cs" />
@@ -163,7 +164,6 @@
     <Compile Include="Util\DecoratorInstaller.cs" />
     <Compile Include="Util\SceneDecoratorCompositionRoot.cs" />
     <Compile Include="Util\UnityUtil.cs" />
-    <Compile Include="Misc\IDependencyRoot.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.

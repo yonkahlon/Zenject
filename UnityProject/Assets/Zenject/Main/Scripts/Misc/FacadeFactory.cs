@@ -5,7 +5,7 @@ using ModestTree;
 namespace Zenject
 {
     public abstract class FacadeFactory<TFacade> : IValidatable
-        where TFacade : IDependencyRoot
+        where TFacade : IFacade
     {
         [Inject]
         DiContainer _container = null;
@@ -47,7 +47,7 @@ namespace Zenject
     }
 
     public abstract class FacadeFactory<TParam1, TFacade> : IValidatable
-        where TFacade : IDependencyRoot
+        where TFacade : IFacade
         where TParam1 : class
     {
         [Inject]
@@ -90,7 +90,7 @@ namespace Zenject
     }
 
     public abstract class FacadeFactory<TParam1, TParam2, TFacade> : IValidatable
-        where TFacade : IDependencyRoot
+        where TFacade : IFacade
         where TParam1 : class
         where TParam2 : class
     {
@@ -134,7 +134,7 @@ namespace Zenject
     }
 
     public abstract class FacadeFactory<TParam1, TParam2, TParam3, TFacade> : IValidatable
-        where TFacade : IDependencyRoot
+        where TFacade : IFacade
         where TParam1 : class
         where TParam2 : class
         where TParam3 : class
