@@ -54,7 +54,18 @@ namespace Zenject
                 Log.Trace("Validating Scene '{0}'", sceneInfo.Path);
                 EditorApplication.OpenScene(sceneInfo.Path);
 
-                errors.AddRange(ValidateCurrentScene().Take(maxErrors - errors.Count));
+                var sceneErrors = ValidateCurrentScene().Take(maxErrors - errors.Count).ToList();
+
+                if (sceneErrors.Any())
+                {
+                    Log.Trace("Failed to validate scene '{0}'", sceneInfo.Path);
+                }
+                else
+                {
+                    Log.Trace("Scene '{0}' validated successfully", sceneInfo.Path);
+                }
+
+                errors.AddRange(sceneErrors);
 
                 if (errors.Count >= maxErrors)
                 {
