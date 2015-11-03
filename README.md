@@ -36,11 +36,11 @@
         * <a href="#game-object-factories">Game Object Factories</a>
         * <a href="#abstract-factories">Abstract Factories</a>
         * <a href="#custom-factories">Custom Factories</a>
-        * <a href="#using-bindscope">Using BindScope</a>
         * <a href="#injecting-data-across-scenes">Injecting Data Across Scenes</a>
         * <a href="#scenes-decorator">Scenes Decorators</a>
+        * <a href="#advanced-factory-construction-using-subcontainers">Advanced Factory Construction Using SubContainers</a>
+        * <a href="#sub-containers-and-facades">Sub-Containers and Facades</a>
         * <a href="#auto-mocking-using-moq">Auto-Mocking Using Moq</a>
-        * <a href="#nested-containers">Nested Containers / FallbackProvider</a>
         * <a href="#visualizing-object-graphs-automatically">Visualizing Object Graph Automatically</a>
     * <a href="#questions">Frequently Asked Questions</a>
         * <a href="#faq-performance">How is Performance?</a>
@@ -81,7 +81,8 @@ __Quick Start__:  If you are already familiar with dependency injection and are 
 * Ability to validate object graphs at editor time including dynamic object graphs created via factories
 * Auto-Mocking using the Moq library
 * Ability to print entire object graph as a UML image automatically
-* Nested Containers
+* Nested Containers / Sub-Containers
+* Ability to easily define discrete 'islands' of dependencies using 'Facade' classes
 
 ## <a id="history"></a>History
 
@@ -1562,55 +1563,6 @@ Note that we are injecting the DiContainer directly into the EnemyFactory class,
 
 For another real world example on factories, see [this reddit thread](https://www.reddit.com/r/Zenject/comments/3brroe/questionsimple_ftg_with_mvc_pattern/)
 
-## <a id="using-bindscope"></a>Using BindScope
-
-In the real world there can sometimes be complex construction that needs to occur in your custom factory classes.  In some of these cases it can be useful to use a feature called BindScope.
-
-For example, suppose one day we decide to add further runtime constructor arguments to the Enemy class:
-
-```csharp
-public class Enemy
-{
-    public Enemy(EnemyWeapon weapon)
-    {
-        ...
-    }
-}
-
-public class EnemyWeapon
-{
-    public EnemyWeapon(float damage)
-    {
-        ...
-    }
-}
-```
-
-And let's say we want the damage of the EnemyWeapon class to be specified by the EnemySpawner class.  How do we pass that argument down to EnemyWeapon?  In this case it might be easiest to create the EnemyWeapon class first and then pass it to the factory.  However, for the sake of this example let's pretend we want to create the EnemyClass in one call to Instantiate
-
-```csharp
-public class EnemyFactory
-{
-    DiContainer _container;
-
-    public EnemyFactory(DiContainer container)
-    {
-        _container = container;
-    }
-
-    public Enemy Create(float weaponDamage)
-    {
-        using (BindScope scope = Container.CreateScope())
-        {
-            scope.BindInstance(weaponDamage).WhenInjectedInto<EnemyWeapon>();
-            return _container.Instantiate<Enemy>();
-        }
-    }
-}
-```
-
-BindScope can be used in factories to temporarily configure the container in a similar way that's done in installers.  This can be useful when creating complex object graphs at runtime.  After the function returns, whatever bindings you added in the using{} block are automatically removed.  BindScope can also be used to specify injection identifiers as well.
-
 ## <a id="injecting-data-across-scenes"></a>Injecting data across scenes
 
 In some cases it's useful to pass arguments from one scene to another.  The way Unity allows us to do this by default is fairly awkward.  Your options are to create a persistent GameObject and call DontDestroyOnLoad() to keep it alive when changing scenes, or use global static classes to temporarily store the data.
@@ -1757,6 +1709,171 @@ The PostInstallBindings method is useful when you want to override a binding in 
 
 Note also that Zenject validate (using CTRL+SHIFT+V or the menu item via Edit->Zenject->Validate Current Scene) also works with decorator scenes.
 
+## <a id="advanced-factory-construction-using-subcontainers"></a>Advanced Factory Construction Using SubContainers
+
+In the real world there can sometimes be complex construction that needs to occur in your custom factory classes.  One way to deal with this is to use a temporary sub-container.
+
+For example, suppose one day we decide to add further runtime constructor arguments to the Enemy class:
+
+```csharp
+public class Enemy
+{
+    public Enemy(EnemyWeapon weapon)
+    {
+        ...
+    }
+}
+
+public class EnemyWeapon
+{
+    public EnemyWeapon(float damage)
+    {
+        ...
+    }
+}
+```
+
+And let's say we want the damage of the EnemyWeapon class to be specified by the EnemySpawner class.  How do we pass that argument down to EnemyWeapon?  In this case it might be easiest to create the EnemyWeapon class first and then pass it to the factory.  However, for the sake of this example let's pretend we want to create the EnemyClass in one call to Instantiate
+
+```csharp
+public class EnemyFactory
+{
+    DiContainer _container;
+
+    public EnemyFactory(DiContainer container)
+    {
+        _container = container;
+    }
+
+    public Enemy Create(float weaponDamage)
+    {
+        DiContainer subContainer = Container.CreateSubContainer();
+        subContainer.BindInstance(weaponDamage).WhenInjectedInto<EnemyWeapon>();
+        return subContainer.Instantiate<Enemy>();
+    }
+}
+```
+
+We can use Sub-Containers here to achieve this.  Sub-containers can be used in factories to add complex bindings to the object graph that you are instantiating.  The Container.Instantiate method does allow passing in a list of constructor arguments, but it is limited to just that.  Using Sub-Containers in this way can be thought of a more powerful version of that.  Though of course, SubContainers have a lot more uses than simply factory construction, as explained in the <a href="#sub-containers-and-facades">next section</a>
+
+## <a id="sub-containers-and-facades"></a>Sub-Containers And Facades
+
+In some cases is can be very useful to use multiple containers in the same application.  For example, if you are creating a word processor it may be useful to have a sub-container for each tab that represents a separate document.  This way, you could define a bunch of classes `ToSingle()` and they could all easily reference each other as if they were all singletons.  Another example might be if you are designing an open-world space ship game, you might want each space ship to have it's own container that contains all the class instances responsible for running that specific spaceship.
+
+This is actually how global bindings work.  There is one global container for the entire application, and when a unity scene starts up, it creates a new sub-container "underneath" the global container.  All the bindings that you add in your scene MonoInstaller are bound to your subcontainer.  This allows the dependencies in your scene to automatically get injected with global bindings, because sub-containers automatically inherit all the bindings in its parent (and grandparent, etc.).
+
+A common design pattern that we like to use in relation to sub-containers is the <a href="https://en.wikipedia.org/wiki/Facade_pattern">Facade pattern</a>.  This pattern is used to abstract away a related group of dependencies so that it can be used at a more higher-level from other modules in the code base.  This is relevant here because often when you are defining sub-containers in your application it is very useful to also define a Facade class that is used to interact with this sub-container as a whole.  So, to apply it to the spaceship example above, you might have a SpaceshipFacade class that represents very high-level operations on a spaceship such as "Start", "Take Damage", "Fly to destination", etc.  And then internally, the SpaceshipFacade class can delegate the specific handling of all the parts of these requests to the relevant single-responsibility dependencies.  Let's see what the code would look like in this example (read the comments for an explanation)
+
+    // First we define our facade class to represent all the classes associated with a ship
+    public class ShipFacade : Facade
+    {
+        public class Factory : FacadeFactory<ShipFacade>
+        {
+        }
+    }
+
+    // Now we define a few classes that will be installed into our ship sub-container
+    // This class will just move the ship in a specific direction
+    public class ShipMoveHandler : ITickable
+    {
+        readonly Settings _settings;
+
+        ShipView _view;
+        Vector3 _direction = Vector3.forward;
+
+        public ShipMoveHandler(
+            ShipView view,
+            Settings settings)
+        {
+            _settings = settings;
+            _view = view;
+        }
+
+        public void Tick()
+        {
+            _view.transform.position += _direction * _settings.Speed * Time.deltaTime;
+        }
+
+        [Serializable]
+        public class Settings
+        {
+            public float Speed;
+        }
+    }
+
+    // We define an empty monobehaviour that will allow use to manipulate the game object
+    // that contains the ship mesh, animations, etc.
+    // This would contain references to all the different parts of the model that we're
+    // interested in and would be added to our ship prefab
+    public class ShipView : MonoBehaviour
+    {
+    }
+
+    // We also need to define a class that will contain our ship facade
+    public class GameController : IInitializable, ITickable
+    {
+        readonly ShipFacade.Factory _shipFactory;
+        ShipFacade _ship;
+
+        public GameController(ShipFacade.Factory shipFactory)
+        {
+            _shipFactory = shipFactory;
+        }
+
+        public void Initialize()
+        {
+            // Note that all the IInitializable's will automatically have their Initialize
+            // methods call here so there is no need to do it ourselves
+            _ship = _shipFactory.Create();
+        }
+
+        public void Tick()
+        {
+            // However, the facade class must have its Tick() called manually
+            // in order to have any ITickable's in the container get their Tick() methods called
+            _ship.Tick();
+        }
+    }
+
+    // Finally, we install everything!
+    public class GameInstaller : MonoInstaller
+    {
+        [SerializeField]
+        Settings _settings;
+
+        public override void InstallBindings()
+        {
+            // Add our main game class
+            Container.Bind<IInitializable>().ToSingle<GameController>();
+            Container.Bind<ITickable>().ToSingle<GameController>();
+            Container.Bind<GameController>().ToSingle();
+
+            // This will result in a binding of type ShipFacade.Factory
+            // Note that you can add conditions to this just like for other bindings
+            Container.BindFacadeFactory<ShipFacade, ShipFacade.Factory>(InstallShipFacade);
+
+            // This could be either bound in the subcontainer or in the main container, it doesn't matter
+            Container.BindInstance(_settings.ShipMoveHandler);
+        }
+
+        // This method will be called to initialize the container every time a new ship is created
+        void InstallShipFacade(DiContainer subContainer)
+        {
+            // Note here that we are using subContainer and NOT Container
+            subContainer.Bind<ITickable>().ToSingle<ShipMoveHandler>();
+            subContainer.Bind<ShipView>().ToSinglePrefab(_settings.ShipPrefab);
+        }
+
+        [Serializable]
+        public class Settings
+        {
+            public GameObject ShipPrefab;
+            public ShipMoveHandler.Settings ShipMoveHandler;
+        }
+    }
+
+By doing the above we can now easily create multiple ship facade's and this will result in new collections of ship-handling classes such as `ShipMoveHandler`.  Within the ship subcontainer, all these classes can treat each other as singletons.  And we can also operate on each individual ship from the main game code by interacting with the ShipFacade, which abstracts away the low level functionality from within the ship.
+
 ## <a id="auto-mocking-using-moq"></a>Auto-Mocking using Moq
 
 One of the really cool features of DI is the fact that it makes testing code much, much easier.  This is because you can easily substitute one dependency for another by using a different Composition Root.  For example, if you only want to test a particular class (let's call it Foo) and don't care about testing its dependencies, you might write 'mocks' for them so that you can isolate Foo specifically.
@@ -1815,28 +1932,6 @@ Container.Bind<IFoo>().ToMock();
 ```
 
 However, this approach will not allow you to take advantage of the advanced features of Moq.  For more advanced usages, see the documentation for Moq
-
-## <a id="nested-containers"></a>Nested Containers / FallbackProvider
-
-Every DiContainer exposes a FallbackProvider property, which by default is null.  In cases where the container is unable to resolve a dependency, the container will first try using the FallbackProvider before throwing a ZenjectResolveException.
-
-This allows for the ability to define nested sub-containers by executing the following:
-
-```csharp
-Container.FallbackProvider = new DiContainerProvider(_nestedContainer);
-```
-
-Nested sub-containers can be useful in some rare cases.  For example, if you are creating a word processor it may be useful to have a sub-container for each tab that represents a separate document.  Nested sub-containers is also the way that the Global Composition Root works under the hood.  In the future we plan to add more support for this kind of thing.
-
-There are other uses for FallbackProvider as well.
-
-For example, if you are writing test code and want to automatically auto-mock missing dependencies, you can do the following:
-
-```csharp
-Container.FallbackProvider = new TransientMockProvider(Container);
-```
-
-Or, perhaps you wish to write custom logic to handle cases of missing dependencies.  You can do that as well, by writing a custom "Provider" class and setting it to be used as the FallbackProvider
 
 ## <a id="visualizing-object-graphs-automatically"></a>Visualizing Object Graphs Automatically
 
