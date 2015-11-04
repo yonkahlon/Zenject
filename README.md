@@ -1763,14 +1763,17 @@ We can use Sub-Containers here to achieve this.  Sub-containers can be used in f
 
 ## <a id="sub-containers-and-facades"></a>Sub-Containers And Facades
 
-In some cases is can be very useful to use multiple containers in the same application.  For example, if you are creating a word processor it may be useful to have a sub-container for each tab that represents a separate document.  This way, you could define a bunch of classes `ToSingle()` and they could all easily reference each other as if they were all singletons.  Another example might be if you are designing an open-world space ship game, you might want each space ship to have it's own container that contains all the class instances responsible for running that specific spaceship.
+In some cases is can be very useful to use multiple containers in the same application.  For example, if you are creating a word processor it may be useful to have a sub-container for each tab that represents a separate document.  This way, you could bind a bunch of classes `ToSingle()` within the sub-container and they could all easily reference each other as if they were all singletons.  Then you could instantiate multiple sub-containers to be used for each document, with each sub-container having unique instances of all the classes that handle each specific document.
+
+Another example might be if you are designing an open-world space ship game, you might want each space ship to have it's own container that contains all the class instances responsible for running that specific spaceship.
 
 This is actually how global bindings work.  There is one global container for the entire application, and when a unity scene starts up, it creates a new sub-container "underneath" the global container.  All the bindings that you add in your scene MonoInstaller are bound to your subcontainer.  This allows the dependencies in your scene to automatically get injected with global bindings, because sub-containers automatically inherit all the bindings in its parent (and grandparent, etc.).
 
-A common design pattern that we like to use in relation to sub-containers is the <a href="https://en.wikipedia.org/wiki/Facade_pattern">Facade pattern</a>.  This pattern is used to abstract away a related group of dependencies so that it can be used at a more higher-level from other modules in the code base.  This is relevant here because often when you are defining sub-containers in your application it is very useful to also define a Facade class that is used to interact with this sub-container as a whole.  So, to apply it to the spaceship example above, you might have a SpaceshipFacade class that represents very high-level operations on a spaceship such as "Start", "Take Damage", "Fly to destination", etc.  And then internally, the SpaceshipFacade class can delegate the specific handling of all the parts of these requests to the relevant single-responsibility dependencies.  Let's see what the code would look like in this example (read the comments for an explanation)
+A common design pattern that we like to use in relation to sub-containers is the <a href="https://en.wikipedia.org/wiki/Facade_pattern">Facade pattern</a>.  This pattern is used to abstract away a related group of dependencies so that it can be used at a more higher-level when used by other modules in the code base.  This is relevant here because often when you are defining sub-containers in your application it is very useful to also define a Facade class that is used to interact with this sub-container as a whole.  So, to apply it to the spaceship example above, you might have a SpaceshipFacade class that represents very high-level operations on a spaceship such as "Start Engine", "Take Damage", "Fly to destination", etc.  And then internally, the SpaceshipFacade class can delegate the specific handling of all the parts of these requests to the relevant single-responsibility dependencies that exist within the sub-container.  Let's see what the code would look like in this example (read the comments for an explanation)
 
 ```csharp
 // First we define our facade class to represent all the classes associated with a ship
+// Facade is a class that is built into zenject
 public class ShipFacade : Facade
 {
     public class Factory : FacadeFactory<ShipFacade>
@@ -1809,8 +1812,9 @@ public class ShipMoveHandler : ITickable
 
 // We define an empty monobehaviour that will allow use to manipulate the game object
 // that contains the ship mesh, animations, etc.
-// This would contain references to all the different parts of the model that we're
-// interested in and would be added to our ship prefab
+// This would normally contain references to all the different parts of the model that we're
+// interested in
+// It is attached to the prefab that we install below in GameInstaller
 public class ShipView : MonoBehaviour
 {
 }
@@ -1879,7 +1883,110 @@ public class GameInstaller : MonoInstaller
 }
 ```
 
-By doing the above we can now easily create multiple ship facade's and this will result in new collections of ship-handling classes such as `ShipMoveHandler`.  Within the ship subcontainer, all these classes can treat each other as singletons.  And we can also operate on each individual ship from the main game code by interacting with the ShipFacade, which abstracts away the low level functionality from within the ship.
+By doing the above we can now easily create multiple ship facade's and this will result in new instances of ship-handling classes such as `ShipMoveHandler` being created for each individual ship.  And within the ship subcontainer, all these classes can treat each other as singletons.  This is very nice, because just like in other examples above, when writing new classes to handle the ship, we don't need to think about where our dependencies come from, we just need to worry about fulfilling our own single responsibilities and then ask for whatever other dependencies we need in our constructor.
+
+Finally, we can also operate on each individual ship from the main game code by interacting with the ShipFacade, which abstracts away the low level functionality from within the ship.
+
+This is a simple example.  In the real-world, almost all facades will take some parameters.  This can be done in a similar way to how parameters are added to the other kinds of factories.   For example, let's say we want to construct the "ShipView" class outside of the facade and then pass that into it.  To make things a bit more interesting, let's also add a high-level method on the ShipFacade.
+
+The code would then just need to be changed to the following:
+
+```csharp
+public class ShipFacade : Facade
+{
+    ShipMoveHandler _moveHandler;
+
+    // Note that the facade class is itself created from inside the subcontainer
+    // and therefore can add dependencies for any of its contents
+    public ShipFacade(ShipMoveHandler moveHandler)
+    {
+        _moveHandler = moveHandler;
+    }
+
+    public void StartEngine()
+    {
+        // Delegate to the engine handler
+        _moveHandler.StartEngine();
+    }
+
+    // Add any parameters that we want to take from outside to the list here
+    public class Factory : FacadeFactory<ShipView, ShipFacade>
+    {
+    }
+}
+
+public class ShipView : MonoBehaviour
+{
+    public class Factory : GameObjectFactory<ShipView>
+    {
+    }
+}
+
+public class GameController : IInitializable, ITickable
+{
+    readonly ShipFacade.Factory _shipFactory;
+    readonly ShipView.Factory _shipViewFactory;
+    ShipFacade _ship;
+
+    public GameController(ShipFacade.Factory shipFactory, ShipView.Factory shipViewFactory)
+    {
+        _shipFactory = shipFactory;
+        _shipViewFactory = shipViewFactory;
+    }
+
+    public void Initialize()
+    {
+        var shipView = _shipViewFactory.Create();
+
+        ...
+
+        _ship = _shipFactory.Create(shipView);
+
+        ....
+
+        _ship.StartEngine();
+    }
+
+    public void Tick()
+    {
+        _ship.Tick();
+    }
+}
+
+public class GameInstaller : MonoInstaller
+{
+    [SerializeField]
+    Settings _settings;
+
+    public override void InstallBindings()
+    {
+        Container.Bind<IInitializable>().ToSingle<GameController>();
+        Container.Bind<ITickable>().ToSingle<GameController>();
+        Container.Bind<GameController>().ToSingle();
+
+        Container.BindGameObjectFactory<ShipView.Factory>(_settings.ShipPrefab);
+        Container.BindFacadeFactory<ShipView, ShipFacade, ShipFacade.Factory>(InstallShipFacade);
+
+        Container.BindInstance(_settings.ShipMoveHandler);
+    }
+
+    // Any parameters passed to the factory are then forwarded to this method
+    // This allows us to bind the parameters however we want
+    // This also allows us to conditionally add different bindings depending on the parameter values
+    void InstallShipFacade(DiContainer subContainer, ShipView view)
+    {
+        subContainer.BindInstance(view);
+        subContainer.Bind<ITickable>().ToSingle<ShipMoveHandler>();
+    }
+
+    [Serializable]
+    public class Settings
+    {
+        public GameObject ShipPrefab;
+        public ShipMoveHandler.Settings ShipMoveHandler;
+    }
+}
+```
 
 ## <a id="auto-mocking-using-moq"></a>Auto-Mocking using Moq
 
