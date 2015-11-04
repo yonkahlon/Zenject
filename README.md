@@ -43,6 +43,7 @@
         * <a href="#auto-mocking-using-moq">Auto-Mocking Using Moq</a>
         * <a href="#visualizing-object-graphs-automatically">Visualizing Object Graph Automatically</a>
     * <a href="#questions">Frequently Asked Questions</a>
+        * <a href="#aot-support">Does this work on AOT platforms such as iOS and WebGL?</a>
         * <a href="#faq-performance">How is Performance?</a>
         * <a href="#net-framework">Can I use .NET framework 4.0 and above?</a>
     * <a href="#cheatsheet">Cheat Sheet</a>
@@ -58,7 +59,7 @@ The following documentation is written to be packaged with Zenject as it appears
 
 Zenject is a lightweight dependency injection framework built specifically to target Unity 3D.  It can be used to turn your Unity 3D application into a collection of loosely-coupled parts with highly segmented responsibilities.  Zenject can then glue the parts together in many different configurations to allow you to easily write, re-use, refactor and test your code in a scalable and extremely flexible way.
 
-Tested in Unity 3D on the following platforms: PC/Mac/Linux, iOS, Android, WP8, Webplayer and WebGL.
+Tested in Unity 3D on the following platforms: PC/Mac/Linux, iOS, Android, WP8, Webplayer and WebGL (See <a href="#aot-support">here</a> for details on WebGL).
 
 This project is open source.  You can find the official repository [here](https://github.com/modesttree/Zenject).
 
@@ -1003,29 +1004,29 @@ public class AsteroidsInstaller : MonoInstaller
 {
     ...
 
-    void InitPriorities()
+    // We don't need to include these bindings but often its nice to have
+    // control over initialization-order and update-order
+    void InitExecutionOrder()
     {
-        Container.Bind<List<Type>>().ToInstance(InitializablesOrder)
-            .WhenInjectedInto<InitializablePrioritiesInstaller>();
-        Container.Install<InitializablePrioritiesInstaller>();
-
-        Container.Bind<List<Type>>().ToInstance(Tickables)
-            .WhenInjectedInto<TickablePrioritiesInstaller>();
-        Container.Install<TickablePrioritiesInstaller>();
+        Container.Install<ExecutionOrderInstaller>(
+            new List<Type>()
+            {
+                // Re-arrange this list to control update order
+                // These classes will be initialized and updated in this order and disposed of in reverse order
+                typeof(AsteroidManager),
+                typeof(GameController),
+            });
     }
 
-    static List<Type> InitializablesOrder = new List<Type>()
-    {
-        // Re-arrange this list to control init order
-        typeof(GameController),
-    };
+    ...
 
-    static List<Type> TickablesOrder = new List<Type>()
+    public override void InstallBindings()
     {
-        // Re-arrange this list to control update order
-        typeof(AsteroidManager),
-        typeof(GameController),
-    };
+        ...
+        InitExecutionOrder();
+        ...
+    }
+
 }
 ```
 
@@ -1034,11 +1035,15 @@ This way, you won't hit a wall at the end of the project due to some unforeseen 
 You can also assign priorities one class at a time using the following helper method:
 
 ```csharp
-InitializablePrioritiesInstaller.BindPriority(Container, typeof(Foo), -100);
+ExecutionOrderInstaller.BindPriority<Foo>(Container, -100);
+Container.Bind<IInitializable>().ToSingle<Foo>();
+Container.Bind<ITickable>().ToSingle<Foo>();
 Container.Bind<IInitializable>().ToSingle<Bar>();
 ```
 
 Note that any ITickables, IInitializables, or IDisposable's that are not assigned a priority are automatically given the priority of zero.  This allows you to have classes with explicit priorities executed either before or after the unspecified classes.  For example, the above code would result in 'Foo.Initialize' being called before 'Bar.Initialize'.  If you instead gave it 100 instead of -100, it would be executed afterwards.
+
+Note also that classes are disposed of in the opposite order.  This is similar to how Unity handles explicit script execution order.
 
 ## <a id="object-graph-validation"></a>Object Graph Validation
 
@@ -1764,113 +1769,115 @@ This is actually how global bindings work.  There is one global container for th
 
 A common design pattern that we like to use in relation to sub-containers is the <a href="https://en.wikipedia.org/wiki/Facade_pattern">Facade pattern</a>.  This pattern is used to abstract away a related group of dependencies so that it can be used at a more higher-level from other modules in the code base.  This is relevant here because often when you are defining sub-containers in your application it is very useful to also define a Facade class that is used to interact with this sub-container as a whole.  So, to apply it to the spaceship example above, you might have a SpaceshipFacade class that represents very high-level operations on a spaceship such as "Start", "Take Damage", "Fly to destination", etc.  And then internally, the SpaceshipFacade class can delegate the specific handling of all the parts of these requests to the relevant single-responsibility dependencies.  Let's see what the code would look like in this example (read the comments for an explanation)
 
-    // First we define our facade class to represent all the classes associated with a ship
-    public class ShipFacade : Facade
-    {
-        public class Factory : FacadeFactory<ShipFacade>
-        {
-        }
-    }
-
-    // Now we define a few classes that will be installed into our ship sub-container
-    // This class will just move the ship in a specific direction
-    public class ShipMoveHandler : ITickable
-    {
-        readonly Settings _settings;
-
-        ShipView _view;
-        Vector3 _direction = Vector3.forward;
-
-        public ShipMoveHandler(
-            ShipView view,
-            Settings settings)
-        {
-            _settings = settings;
-            _view = view;
-        }
-
-        public void Tick()
-        {
-            _view.transform.position += _direction * _settings.Speed * Time.deltaTime;
-        }
-
-        [Serializable]
-        public class Settings
-        {
-            public float Speed;
-        }
-    }
-
-    // We define an empty monobehaviour that will allow use to manipulate the game object
-    // that contains the ship mesh, animations, etc.
-    // This would contain references to all the different parts of the model that we're
-    // interested in and would be added to our ship prefab
-    public class ShipView : MonoBehaviour
+```csharp
+// First we define our facade class to represent all the classes associated with a ship
+public class ShipFacade : Facade
+{
+    public class Factory : FacadeFactory<ShipFacade>
     {
     }
+}
 
-    // We also need to define a class that will contain our ship facade
-    public class GameController : IInitializable, ITickable
+// Now we define a few classes that will be installed into our ship sub-container
+// This class will just move the ship in a specific direction
+public class ShipMoveHandler : ITickable
+{
+    readonly Settings _settings;
+
+    ShipView _view;
+    Vector3 _direction = Vector3.forward;
+
+    public ShipMoveHandler(
+        ShipView view,
+        Settings settings)
     {
-        readonly ShipFacade.Factory _shipFactory;
-        ShipFacade _ship;
-
-        public GameController(ShipFacade.Factory shipFactory)
-        {
-            _shipFactory = shipFactory;
-        }
-
-        public void Initialize()
-        {
-            // Note that all the IInitializable's will automatically have their Initialize
-            // methods call here so there is no need to do it ourselves
-            _ship = _shipFactory.Create();
-        }
-
-        public void Tick()
-        {
-            // However, the facade class must have its Tick() called manually
-            // in order to have any ITickable's in the container get their Tick() methods called
-            _ship.Tick();
-        }
+        _settings = settings;
+        _view = view;
     }
 
-    // Finally, we install everything!
-    public class GameInstaller : MonoInstaller
+    public void Tick()
     {
-        [SerializeField]
-        Settings _settings;
-
-        public override void InstallBindings()
-        {
-            // Add our main game class
-            Container.Bind<IInitializable>().ToSingle<GameController>();
-            Container.Bind<ITickable>().ToSingle<GameController>();
-            Container.Bind<GameController>().ToSingle();
-
-            // This will result in a binding of type ShipFacade.Factory
-            // Note that you can add conditions to this just like for other bindings
-            Container.BindFacadeFactory<ShipFacade, ShipFacade.Factory>(InstallShipFacade);
-
-            // This could be either bound in the subcontainer or in the main container, it doesn't matter
-            Container.BindInstance(_settings.ShipMoveHandler);
-        }
-
-        // This method will be called to initialize the container every time a new ship is created
-        void InstallShipFacade(DiContainer subContainer)
-        {
-            // Note here that we are using subContainer and NOT Container
-            subContainer.Bind<ITickable>().ToSingle<ShipMoveHandler>();
-            subContainer.Bind<ShipView>().ToSinglePrefab(_settings.ShipPrefab);
-        }
-
-        [Serializable]
-        public class Settings
-        {
-            public GameObject ShipPrefab;
-            public ShipMoveHandler.Settings ShipMoveHandler;
-        }
+        _view.transform.position += _direction * _settings.Speed * Time.deltaTime;
     }
+
+    [Serializable]
+    public class Settings
+    {
+        public float Speed;
+    }
+}
+
+// We define an empty monobehaviour that will allow use to manipulate the game object
+// that contains the ship mesh, animations, etc.
+// This would contain references to all the different parts of the model that we're
+// interested in and would be added to our ship prefab
+public class ShipView : MonoBehaviour
+{
+}
+
+// We also need to define a class that will contain our ship facade
+public class GameController : IInitializable, ITickable
+{
+    readonly ShipFacade.Factory _shipFactory;
+    ShipFacade _ship;
+
+    public GameController(ShipFacade.Factory shipFactory)
+    {
+        _shipFactory = shipFactory;
+    }
+
+    public void Initialize()
+    {
+        // Note that all the IInitializable's will automatically have their Initialize
+        // methods call here so there is no need to do it ourselves
+        _ship = _shipFactory.Create();
+    }
+
+    public void Tick()
+    {
+        // However, the facade class must have its Tick() called manually
+        // in order to have any ITickable's in the container get their Tick() methods called
+        _ship.Tick();
+    }
+}
+
+// Finally, we install everything!
+public class GameInstaller : MonoInstaller
+{
+    [SerializeField]
+    Settings _settings;
+
+    public override void InstallBindings()
+    {
+        // Add our main game class
+        Container.Bind<IInitializable>().ToSingle<GameController>();
+        Container.Bind<ITickable>().ToSingle<GameController>();
+        Container.Bind<GameController>().ToSingle();
+
+        // This will result in a binding of type ShipFacade.Factory
+        // Note that you can add conditions to this just like for other bindings
+        Container.BindFacadeFactory<ShipFacade, ShipFacade.Factory>(InstallShipFacade);
+
+        // This could be either bound in the subcontainer or in the main container, it doesn't matter
+        Container.BindInstance(_settings.ShipMoveHandler);
+    }
+
+    // This method will be called to initialize the container every time a new ship is created
+    void InstallShipFacade(DiContainer subContainer)
+    {
+        // Note here that we are using subContainer and NOT Container
+        subContainer.Bind<ITickable>().ToSingle<ShipMoveHandler>();
+        subContainer.Bind<ShipView>().ToSinglePrefab(_settings.ShipPrefab);
+    }
+
+    [Serializable]
+    public class Settings
+    {
+        public GameObject ShipPrefab;
+        public ShipMoveHandler.Settings ShipMoveHandler;
+    }
+}
+```
 
 By doing the above we can now easily create multiple ship facade's and this will result in new collections of ship-handling classes such as `ShipMoveHandler`.  Within the ship subcontainer, all these classes can treat each other as singletons.  And we can also operate on each individual ship from the main game code by interacting with the ShipFacade, which abstracts away the low level functionality from within the ship.
 
@@ -1946,6 +1953,10 @@ However, admittedly, I personally haven't gotten a lot of mileage out of this fe
 <img src="UnityProject/Assets/Zenject/Main/ExampleObjectGraph.png?raw=true" alt="Example Object Graph" width="600px" height="127px"/>
 
 ## <a id="questions"></a>Frequently Asked Questions
+
+* **<a id="aot-support"></a>Does this work on AOT platforms such as iOS and WebGL?**
+
+Yes.  However, there are a few things that you should be aware of for WebGL.  One of the things that Unity's IL2CPP compiler does is strip out any code that is not used.  It calculates what code is used by statically analyzing the code to find usage.  This is great, except that this will miss any methods/types that are not used explicitly.  In particular, any classes that are created solely through Zenject will have their constructors ignored by the IL2CPP compiler.  In order to address this, the [Inject] attribute that is sometimes applied to constructors also serves to automatically mark the constructor to IL2CPP to not strip out.   In other words, to fix this issue all you have to do is mark every constructor that you create through Zenject with an [Inject] attribute when compiling for WebGL.
 
 * **<a id="faq-performance"></a>How is performance?**
 
