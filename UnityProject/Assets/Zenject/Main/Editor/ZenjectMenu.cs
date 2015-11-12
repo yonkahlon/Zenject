@@ -39,7 +39,11 @@ namespace Zenject
         [MenuItem("Edit/Zenject/Validate All Active Scenes")]
         public static bool ValidateAllActiveScenes()
         {
-            var startScene = EditorApplication.currentScene;
+#if UNITY_5_3
+			var startScene = EditorSceneManager.GetActiveScene().path;
+#else
+			var startScene = EditorApplication.currentScene;
+#endif
 
             var activeScenes = UnityEditor.EditorBuildSettings.scenes.Where(x => x.enabled)
                 .Select(x => new { Name = Path.GetFileNameWithoutExtension(x.path), Path = x.path }).ToList();
@@ -50,7 +54,11 @@ namespace Zenject
             {
                 Log.Trace("Validating scene '{0}'...", sceneInfo.Name);
 
-                EditorApplication.OpenScene(sceneInfo.Path);
+#if UNITY_5_3
+				EditorSceneManager.OpenScene(sceneInfo.Path, false);
+#else
+				EditorApplication.OpenScene(sceneInfo.Path);
+#endif
 
                 var compRoot = GameObject.FindObjectsOfType<SceneCompositionRoot>().OnlyOrDefault();
 
@@ -65,7 +73,11 @@ namespace Zenject
                 }
             }
 
-            EditorApplication.OpenScene(startScene);
+#if UNITY_5_3
+			EditorSceneManager.OpenScene(startScene, false);
+#else
+			EditorApplication.OpenScene(startScene);
+#endif
 
             if (failedScenes.IsEmpty())
             {
@@ -113,7 +125,11 @@ namespace Zenject
             // Use finally to ensure we clean up the data added from EditorApplication.OpenSceneAdditive
             try
             {
-                EditorApplication.OpenSceneAdditive(scenePath);
+#if UNITY_5_3
+				EditorSceneManager.OpenScene(scenePath, true);
+#else
+				EditorApplication.OpenSceneAdditive(scenePath);
+#endif
 
                 compRoot = GameObject.FindObjectsOfType<SceneCompositionRoot>().OnlyOrDefault();
 
