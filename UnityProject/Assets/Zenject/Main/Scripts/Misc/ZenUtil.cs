@@ -75,16 +75,22 @@ namespace Zenject
 
             Assert.That(Application.CanStreamedLevelBeLoaded(levelName), "Unable to load level '{0}'", levelName);
 
-            if (isAdditive)
-            {
-                Application.LoadLevelAdditive(levelName);
-            }
-            else
-            {
-                Log.Debug("Starting to load scene '{0}'", levelName);
-                Application.LoadLevel(levelName);
-                Log.Debug("Finished loading scene '{0}'", levelName);
-            }
+#if UNITY_5_3
+            Log.Debug("Starting to load scene '{0}'", levelName);
+			SceneManager.LoadScene(levelName, isAdditive);
+            Log.Debug("Finished loading scene '{0}'", levelName);
+#else
+			if (isAdditive)
+			{
+				Application.LoadLevelAdditive(levelName);
+			}
+			else
+			{
+				Log.Debug("Starting to load scene '{0}'", levelName);
+				Application.LoadLevel(levelName);
+				Log.Debug("Finished loading scene '{0}'", levelName);
+			}
+#endif
         }
 
         // This method can be used to load the given scene and perform injection on its contents
@@ -95,7 +101,11 @@ namespace Zenject
         {
             var rootObjectsBeforeLoad = UnityUtil.GetRootGameObjects();
 
-            Application.LoadLevelAdditive(levelName);
+#if UNITY_5_3
+			SceneManager.LoadScene(levelName, true);
+#else
+			Application.LoadLevelAdditive(levelName);
+#endif
 
             // Wait one frame for objects to be added to the scene heirarchy
             yield return null;
