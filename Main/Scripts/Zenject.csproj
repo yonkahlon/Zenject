@@ -47,7 +47,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Not Unity Release|AnyCPU'">
     <OutputPath>..\..\..\..\..\AssemblyBuild\Bin\Not Unity Release\</OutputPath>
-    <DefineConstants>TRACE;ZEN_NOT_UNITY3D</DefineConstants>
+    <DefineConstants>TRACE;ZEN_NOT_UNITY3D;ZEN_MULTITHREADING</DefineConstants>
     <Optimize>true</Optimize>
     <IntermediateOutputPath>..\..\..\..\..\AssemblyBuild\Temp\Not Unity Release\</IntermediateOutputPath>
     <BaseIntermediateOutputPath>..\..\..\..\..\AssemblyBuild\Temp\Not Unity Release\</BaseIntermediateOutputPath>
