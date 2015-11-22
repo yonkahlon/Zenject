@@ -78,12 +78,13 @@ __Quick Start__:  If you are already familiar with dependency injection and are 
 * Optional dependencies
 * Support for building dynamic object graphs at runtime using factories
 * Injection across different Unity scenes
-* "Scene Decorators" which allow adding functionality to a different scene
+* Support for global, project-wide bindings to apply to all scenes
+* "Scene Decorators" which allow adding functionality to a different scene without changing it directly
 * Ability to validate object graphs at editor time including dynamic object graphs created via factories
-* Auto-Mocking using the Moq library
 * Ability to print entire object graph as a UML image automatically
 * Nested Containers / Sub-Containers
 * Ability to easily define discrete 'islands' of dependencies using 'Facade' classes
+* Auto-Mocking using the Moq library
 
 ## <a id="history"></a>History
 
