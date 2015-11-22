@@ -283,7 +283,7 @@ Container.Bind<Foo>().ToSingle();
 Container.Bind<IBar>().ToSingle<Bar>();
 ```
 
-This tells Zenject that every class that requires a dependency of type Foo should use the same instance, which it will automatically create when needed.  And similarly, any class that requires the IBar interface (like Foo) will given the same instance of type Bar.
+This tells Zenject that every class that requires a dependency of type Foo should use the same instance, which it will automatically create when needed.  And similarly, any class that requires the IBar interface (like Foo) will be given the same instance of type Bar.
 
 ## <a id="inject-methods"></a>Inject Methods
 
@@ -500,7 +500,23 @@ public IFoo SomeMethod(InjectContext context)
 }
 ```
 
-10 - **ToGetter** - Inject by getter.
+10 - **ToSingleMethod** - Inject using a custom method but only call that method once
+
+This binding works similar to `ToMethod` except that the given method will only be called once.  The value returned from the method will then be used for every subsequent request for the given dependency.
+
+```csharp
+Container.Bind<IFoo>().ToSingleMethod(SomeMethod);
+```
+
+```csharp
+public IFoo SomeMethod(InjectContext context)
+{
+    ...
+    return new Foo();
+}
+```
+
+11 - **ToGetter** - Inject by getter.
 
 This method can be useful if you want to bind to a property of another object.
 
@@ -509,7 +525,7 @@ Container.Bind<IFoo>().ToSingle<Foo>()
 Container.Bind<Bar>().ToGetter<IFoo>(x => x.GetBar())
 ```
 
-11 - **ToLookup** - Inject by recursive resolve.
+12 - **ToLookup** - Inject by recursive resolve.
 
 ```csharp
 Container.Bind<IFoo>().ToLookup<IBar>()
@@ -522,7 +538,7 @@ In the example code above we assume that Foo inherits from IBar, which inherits 
 
 You can also supply an identifier to the ToLookup() method.  See <a href="#identifiers">here</a> section for details on identifiers.
 
-12 - **Rebind** - Override existing binding
+13 - **Rebind** - Override existing binding
 
 ```csharp
 Container.Rebind<IFoo>().To<Foo>();
@@ -530,7 +546,7 @@ Container.Rebind<IFoo>().To<Foo>();
 
 The Rebind function can be used to override any existing bindings that were added previously.  It will first clear all previous bindings and then add the new binding.  This method is especially useful for tests, where you often want to use almost all the same bindings used in production, except override a few specific bindings.
 
-13 - **BindAllInterfacesToSingle**
+14 - **BindAllInterfacesToSingle**
 
 This function can be used to automatically bind any interfaces that it finds on the given type.
 
@@ -554,7 +570,41 @@ Container.Bind<ITickable>().ToSingle<Foo>();
 Container.Bind<IInitializable>().ToSingle<Foo>();
 ```
 
-14 - **Untyped Bindings**
+15 - **ToSingleInstance** - Use the given instance as a singleton.
+
+This is very similar to `ToInstance`. In most cases it is recommended to use `ToInstance` but `ToSingleInstance` can still be useful in some rare edge cases.
+
+When using `ToInstance` you can do the following:
+
+    Container.Bind<Foo>().ToInstance(new Foo());
+    Container.Bind<Foo>().ToInstance(new Foo());
+    Container.Bind<Foo>().ToInstance(new Foo());
+
+Or, equivalently:
+
+    Container.BindInstance(new Foo());
+    Container.BindInstance(new Foo());
+    Container.BindInstance(new Foo());
+
+And then have a class that takes all of them as a list like this:
+
+    public class Bar
+    {
+        public Bar(List<Foo> foos)
+        {
+        }
+    }
+
+Therefore, using `ToInstance` doesn't always result in a singleton, although if you only have one call to `ToInstance` then it will essentially behave like a singleton.
+
+On the other hand `ToSingleInstance` will always require that there only be one unique instance, and also allows for binding to multiple interfaces using `ToSingle<>` as shown below:
+
+    Container.Bind<IFoo>().ToSingleInstance(new Foo());
+    // These will use the same instance of Foo as above
+    Container.Bind<IBar>().ToSingle<Foo>();
+    Container.Bind<Foo>().ToSingle();
+
+16 - **Untyped Bindings**
 
 ```csharp
 Container.Bind(typeof(IFoo)).ToSingle(typeof(Foo));
