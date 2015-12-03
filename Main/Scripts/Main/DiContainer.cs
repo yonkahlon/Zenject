@@ -1449,9 +1449,9 @@ namespace Zenject
             }
         }
 
-        public void BindAllInterfacesToInstance<TConcrete>(TConcrete value)
+        public void BindAllInterfacesToInstance(object value)
         {
-            BindAllInterfacesToInstance(typeof(TConcrete), value);
+            BindAllInterfacesToInstance(value.GetType(), value);
         }
 
         public void BindAllInterfacesToInstance(Type concreteType, object value)
