@@ -106,8 +106,10 @@ namespace Zenject
 
         void AddQueuedTasks()
         {
-            foreach (var task in _queuedTasks)
+            for (int i = 0; i < _queuedTasks.Count; i++)
             {
+                var task = _queuedTasks[i];
+
                 if (!task.IsRemoved)
                 {
                     InsertTaskSorted(task);
