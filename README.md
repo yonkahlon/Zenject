@@ -2124,6 +2124,8 @@ However, admittedly, I personally haven't gotten a lot of mileage out of this fe
 
     For some benchmarks on Zenject versus other DI frameworks, see [here](https://github.com/svermeulen/IocPerformance/tree/Zenject).
 
+    Zenject should also produce zero per-frame heap allocations.
+
 * **<a id="net-framework"></a>Can I use .NET framework 4.0 and above?**
 
     By default Unity uses .NET framework 3.5 and so Zenject assumes that this is what you want.  If you are compiling Zenject with a version greater than this, this is fine, but you'll have to either delete or comment out the contents of Func.cs.
