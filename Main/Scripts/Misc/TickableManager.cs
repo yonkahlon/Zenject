@@ -29,9 +29,9 @@ namespace Zenject
         [Inject]
         readonly SingletonInstanceHelper _singletonInstanceHelper = null;
 
-        TaskUpdater<ITickable> _updater;
-        TaskUpdater<IFixedTickable> _fixedUpdater;
-        TaskUpdater<ILateTickable> _lateUpdater;
+        readonly TickablesTaskUpdater _updater = new TickablesTaskUpdater();
+        readonly FixedTickablesTaskUpdater _fixedUpdater = new FixedTickablesTaskUpdater();
+        readonly LateTickablesTaskUpdater _lateUpdater = new LateTickablesTaskUpdater();
 
         [InjectOptional]
         bool _warnForMissing = false;
@@ -59,9 +59,8 @@ namespace Zenject
 
         void WarnForMissingBindings()
         {
-            var boundTypes = _tickables.Select(x => x.GetType()).Distinct();
-
-            var unboundTypes = _singletonInstanceHelper.GetActiveSingletonTypesDerivingFrom<ITickable>(boundTypes);
+            var ignoreTypes = _tickables.Select(x => x.GetType()).Distinct();
+            var unboundTypes = _singletonInstanceHelper.GetActiveSingletonTypesDerivingFrom<ITickable>(ignoreTypes);
 
             foreach (var objType in unboundTypes)
             {
@@ -71,8 +70,6 @@ namespace Zenject
 
         void InitFixedTickables()
         {
-            _fixedUpdater = new TaskUpdater<IFixedTickable>(UpdateFixedTickable);
-
             foreach (var type in _fixedPriorities.Select(x => x.First))
             {
                 Assert.That(type.DerivesFrom<IFixedTickable>(),
@@ -92,8 +89,6 @@ namespace Zenject
 
         void InitTickables()
         {
-            _updater = new TaskUpdater<ITickable>(UpdateTickable);
-
             foreach (var type in _priorities.Select(x => x.First))
             {
                 Assert.That(type.DerivesFrom<ITickable>(),
@@ -113,8 +108,6 @@ namespace Zenject
 
         void InitLateTickables()
         {
-            _lateUpdater = new TaskUpdater<ILateTickable>(UpdateLateTickable);
-
             foreach (var type in _latePriorities.Select(x => x.First))
             {
                 Assert.That(type.DerivesFrom<ILateTickable>(),
@@ -129,36 +122,6 @@ namespace Zenject
                 int priority = matches.IsEmpty() ? 0 : matches.Single();
 
                 _lateUpdater.AddTask(tickable, priority);
-            }
-        }
-
-        void UpdateLateTickable(ILateTickable tickable)
-        {
-#if PROFILING_ENABLED
-            using (ProfileBlock.Start("{0}.LateTick()".Fmt(tickable.GetType().Name())))
-#endif
-            {
-                tickable.LateTick();
-            }
-        }
-
-        void UpdateFixedTickable(IFixedTickable tickable)
-        {
-#if PROFILING_ENABLED
-            using (ProfileBlock.Start("{0}.FixedTick()".Fmt(tickable.GetType().Name())))
-#endif
-            {
-                tickable.FixedTick();
-            }
-        }
-
-        void UpdateTickable(ITickable tickable)
-        {
-#if PROFILING_ENABLED
-            using (ProfileBlock.Start("{0}.Tick()".Fmt(tickable.GetType().Name())))
-#endif
-            {
-                tickable.Tick();
             }
         }
 
@@ -226,3 +189,4 @@ namespace Zenject
         }
     }
 }
+

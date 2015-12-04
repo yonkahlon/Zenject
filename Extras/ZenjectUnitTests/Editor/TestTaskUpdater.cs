@@ -20,7 +20,7 @@ namespace Zenject.Tests
         {
             _container = new DiContainer();
 
-            _container.Bind<TaskUpdater<ITickable>>().ToSingleInstance(new TaskUpdater<ITickable>(t => t.Tick()));
+            _container.Bind<TaskUpdater<ITickable>>().ToSingleInstance(new TickablesTaskUpdater());
         }
 
         public void BindTickable<TTickable>(int priority) where TTickable : ITickable
