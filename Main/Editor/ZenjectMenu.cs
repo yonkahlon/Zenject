@@ -7,6 +7,7 @@ using UnityEngine;
 using System.Linq;
 using Debug = UnityEngine.Debug;
 using ModestTree;
+using UnityEditor.SceneManagement;
 
 namespace Zenject
 {
@@ -55,7 +56,7 @@ namespace Zenject
                 Log.Trace("Validating scene '{0}'...", sceneInfo.Name);
 
 #if UNITY_5_3
-				EditorSceneManager.OpenScene(sceneInfo.Path, false);
+				EditorSceneManager.OpenScene(sceneInfo.Path, OpenSceneMode.Single);
 #else
 				EditorApplication.OpenScene(sceneInfo.Path);
 #endif
@@ -74,7 +75,7 @@ namespace Zenject
             }
 
 #if UNITY_5_3
-			EditorSceneManager.OpenScene(startScene, false);
+			EditorSceneManager.OpenScene(startScene, OpenSceneMode.Single);
 #else
 			EditorApplication.OpenScene(startScene);
 #endif
@@ -126,7 +127,7 @@ namespace Zenject
             try
             {
 #if UNITY_5_3
-				EditorSceneManager.OpenScene(scenePath, true);
+				EditorSceneManager.OpenScene(scenePath, OpenSceneMode.Additive);
 #else
 				EditorApplication.OpenSceneAdditive(scenePath);
 #endif
