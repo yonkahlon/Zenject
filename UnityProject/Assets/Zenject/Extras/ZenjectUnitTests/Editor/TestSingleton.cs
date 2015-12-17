@@ -16,11 +16,19 @@ namespace Zenject.Tests
             int ReturnValue();
         }
 
-        private class Foo : IFoo
+        private class Foo : IFoo, ITickable, IInitializable
         {
             public int ReturnValue()
             {
                 return 5;
+            }
+
+            public void Initialize()
+            {
+            }
+
+            public void Tick()
+            {
             }
         }
 
@@ -184,30 +192,6 @@ namespace Zenject.Tests
         }
 
         [Test]
-        public void TestToSingleWithInstanceIsUnique()
-        {
-            var foo = new Foo();
-
-            Container.Bind<Foo>().ToSingleInstance(foo);
-            Container.Bind<IFoo>().ToSingle<Foo>();
-
-            Assert.That(
-                ReferenceEquals(Container.Resolve<IFoo>(), Container.Resolve<Foo>()));
-        }
-
-        [Test]
-        public void TestToSingleWithInstanceIsUniqueUntyped()
-        {
-            var foo = new Foo();
-
-            Container.Bind(typeof(Foo)).ToSingleInstance(foo);
-            Container.Bind(typeof(IFoo)).ToSingle<Foo>();
-
-            Assert.That(
-                ReferenceEquals(Container.Resolve<IFoo>(), Container.Resolve<Foo>()));
-        }
-
-        [Test]
         public void TestToSingleWithInstance2()
         {
             var foo = new Foo();
@@ -237,21 +221,21 @@ namespace Zenject.Tests
             var foo = new Foo();
 
             Container.Bind(typeof(Foo)).ToSingleMethod((container) => foo);
-            Container.Bind(typeof(IFoo)).ToSingle<Foo>();
 
             Assert.That(ReferenceEquals(Container.Resolve<Foo>(), foo));
-            Assert.That(ReferenceEquals(Container.Resolve<Foo>(), Container.Resolve<IFoo>()));
         }
 
         [Test]
         [ExpectedException(typeof(ZenjectBindException))]
-        public void TestToSingleMethod2()
+        public void TestToSingleMethod1()
         {
             var foo = new Foo();
-            var foo2 = new Foo();
 
             Container.Bind(typeof(Foo)).ToSingleMethod((container) => foo);
-            Container.Bind(typeof(IFoo)).ToSingleMethod((container) => foo2);
+            Container.Bind(typeof(IFoo)).ToSingle<Foo>();
+
+            Assert.That(ReferenceEquals(Container.Resolve<Foo>(), foo));
+            Assert.That(ReferenceEquals(Container.Resolve<Foo>(), Container.Resolve<IFoo>()));
         }
 
         [Test]
@@ -261,7 +245,78 @@ namespace Zenject.Tests
             Container.Bind<Foo>().ToSingle();
             Container.Bind(typeof(IFoo)).ToSingleMethod((container) => new Foo());
         }
+
+        [Test]
+        [ExpectedException(typeof(ZenjectBindException))]
+        public void TestToSingleMethod4()
+        {
+            // Cannot bind different singleton providers
+            Container.Bind<Foo>().ToSingleMethod((container) => new Foo());
+            Container.Bind<Foo>().ToSingle();
+        }
+
+        [Test]
+        [ExpectedException(typeof(ZenjectBindException))]
+        public void TestToSingleMethod5()
+        {
+            Container.Bind<Foo>().ToSingleMethod((container) => new Foo());
+            Container.Bind<Foo>().ToSingleMethod((container) => new Foo());
+        }
+
+        [Test]
+        public void TestToSingleMethod6()
+        {
+            Func<InjectContext, Foo> method = (ctx) => new Foo();
+
+            Container.Bind<Foo>().ToSingleMethod(method);
+            Container.Bind<Foo>().ToSingleMethod(method);
+
+            var foos = Container.ResolveAll<Foo>();
+            Assert.IsEqual(foos[0], foos[1]);
+        }
+
+        [Test]
+        public void TestToSingleFactory()
+        {
+            Container.Bind<Foo>().ToSingleFactory<FooFactory>();
+            Container.Bind<IFoo>().ToSingleFactory<FooFactory, Foo>();
+
+            FooFactory.WasCalled = false;
+
+            var foo = Container.Resolve<Foo>();
+            Assert.That(FooFactory.WasCalled);
+
+            FooFactory.WasCalled = false;
+            var ifoo = Container.Resolve<IFoo>();
+
+            Assert.That(!FooFactory.WasCalled);
+
+            var foo2 = Container.Resolve<Foo>();
+
+            Assert.That(!FooFactory.WasCalled);
+
+            Assert.IsEqual(foo, foo2);
+            Assert.IsEqual(ifoo, foo2);
+        }
+
+        [Test]
+        [ExpectedException(typeof(ZenjectBindException))]
+        public void TestToSingleFactory2()
+        {
+            // Cannot bind different singleton providers
+            Container.Bind<Foo>().ToSingleFactory<FooFactory>();
+            Container.Bind<Foo>().ToSingle();
+        }
+
+        class FooFactory : IFactory<Foo>
+        {
+            public static bool WasCalled;
+
+            public Foo Create()
+            {
+                WasCalled = true;
+                return new Foo();
+            }
+        }
     }
 }
-
-
