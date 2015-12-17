@@ -44,6 +44,11 @@ namespace Zenject
             _afterInstallHooks = SceneCompositionRoot.AfterInstallHooks;
             SceneCompositionRoot.AfterInstallHooks = null;
 
+            // We need to wait one frame before calling GetRootGameObjects in case we are being loaded from another decorator scene
+            // Otherwise, the other decorator scene will assume that the second-nested scene objects are part of the first-nested scene and then
+            // group them before the second nested scene has a chance to
+            yield return null;
+
             var rootObjectsBeforeLoad = UnityUtil.GetRootGameObjects();
 
             ZenUtil.LoadSceneAdditive(
@@ -54,9 +59,11 @@ namespace Zenject
 
             var newlyAddedObjects = UnityUtil.GetRootGameObjects().Except(rootObjectsBeforeLoad);
 
+            var sceneGameObject = new GameObject(SceneName + " (Scene)");
+
             foreach (var obj in newlyAddedObjects)
             {
-                obj.transform.SetParent(this.transform);
+                obj.transform.SetParent(sceneGameObject.transform);
             }
         }
 

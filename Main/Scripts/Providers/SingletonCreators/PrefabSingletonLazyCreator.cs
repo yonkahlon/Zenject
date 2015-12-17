@@ -18,8 +18,7 @@ namespace Zenject
         GameObject _rootObj;
 
         public PrefabSingletonLazyCreator(
-            DiContainer container, PrefabSingletonProviderMap owner,
-            PrefabSingletonId id)
+            DiContainer container, PrefabSingletonProviderMap owner, PrefabSingletonId id)
         {
             _container = container;
             _owner = owner;

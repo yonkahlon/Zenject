@@ -16,24 +16,28 @@ namespace Zenject
 
         public TFacade Create()
         {
-            var facade = CreateSubContainer().Resolve<TFacade>();
+            var facade = CreateSubContainer(_container, _containerInitializer).Resolve<TFacade>();
             facade.Initialize();
             return facade;
         }
 
-        DiContainer CreateSubContainer()
+        // Made static for use by FacadeBinder
+        public static DiContainer CreateSubContainer(
+            DiContainer parentContainer, Action<DiContainer> containerInitializer)
         {
-            Assert.IsNotNull(_containerInitializer);
-            var subContainer = _container.CreateSubContainer();
-            subContainer.AllowNullBindings = _container.AllowNullBindings;
-            _containerInitializer(subContainer);
+            Assert.IsNotNull(containerInitializer);
+            var subContainer = parentContainer.CreateSubContainer();
+            subContainer.IsValidating = parentContainer.IsValidating;
+            containerInitializer(subContainer);
             subContainer.Install<StandardInstaller<TFacade>>();
             return subContainer;
         }
 
-        IEnumerable<ZenjectResolveException> IValidatable.Validate()
+        // Made static for use by FacadeBinder
+        public static IEnumerable<ZenjectResolveException> Validate(
+            DiContainer parentContainer, Action<DiContainer> containerInitializer)
         {
-            var subContainer = CreateSubContainer();
+            var subContainer = CreateSubContainer(parentContainer, containerInitializer);
 
             foreach (var error in subContainer.ValidateResolve<TFacade>())
             {
@@ -44,6 +48,11 @@ namespace Zenject
             {
                 yield return error;
             }
+        }
+
+        IEnumerable<ZenjectResolveException> IValidatable.Validate()
+        {
+            return Validate(_container, _containerInitializer);
         }
     }
 
@@ -67,7 +76,7 @@ namespace Zenject
         {
             Assert.IsNotNull(_containerInitializer);
             var subContainer = _container.CreateSubContainer();
-            subContainer.AllowNullBindings = _container.AllowNullBindings;
+            subContainer.IsValidating = _container.IsValidating;
             _containerInitializer(subContainer, param1);
             subContainer.Install<StandardInstaller<TFacade>>();
             return subContainer;
@@ -109,7 +118,7 @@ namespace Zenject
         {
             Assert.IsNotNull(_containerInitializer);
             var subContainer = _container.CreateSubContainer();
-            subContainer.AllowNullBindings = _container.AllowNullBindings;
+            subContainer.IsValidating = _container.IsValidating;
             _containerInitializer(subContainer, param1, param2);
             subContainer.Install<StandardInstaller<TFacade>>();
             return subContainer;
@@ -151,7 +160,7 @@ namespace Zenject
         {
             Assert.IsNotNull(_containerInitializer);
             var subContainer = _container.CreateSubContainer();
-            subContainer.AllowNullBindings = _container.AllowNullBindings;
+            subContainer.IsValidating = _container.IsValidating;
             _containerInitializer(subContainer, param1, param2, param3);
             subContainer.Install<StandardInstaller<TFacade>>();
             return subContainer;
@@ -193,7 +202,7 @@ namespace Zenject
         {
             Assert.IsNotNull(_containerInitializer);
             var subContainer = _container.CreateSubContainer();
-            subContainer.AllowNullBindings = _container.AllowNullBindings;
+            subContainer.IsValidating = _container.IsValidating;
             _containerInitializer(subContainer, param1, param2, param3, param4);
             subContainer.Install<StandardInstaller<TFacade>>();
             return subContainer;
@@ -235,7 +244,7 @@ namespace Zenject
         {
             Assert.IsNotNull(_containerInitializer);
             var subContainer = _container.CreateSubContainer();
-            subContainer.AllowNullBindings = _container.AllowNullBindings;
+            subContainer.IsValidating = _container.IsValidating;
             _containerInitializer(subContainer, param1, param2, param3, param4, param5);
             subContainer.Install<StandardInstaller<TFacade>>();
             return subContainer;
@@ -277,7 +286,7 @@ namespace Zenject
         {
             Assert.IsNotNull(_containerInitializer);
             var subContainer = _container.CreateSubContainer();
-            subContainer.AllowNullBindings = _container.AllowNullBindings;
+            subContainer.IsValidating = _container.IsValidating;
             _containerInitializer(subContainer, param1, param2, param3, param4, param5, param6);
             subContainer.Install<StandardInstaller<TFacade>>();
             return subContainer;
@@ -319,7 +328,7 @@ namespace Zenject
         {
             Assert.IsNotNull(_containerInitializer);
             var subContainer = _container.CreateSubContainer();
-            subContainer.AllowNullBindings = _container.AllowNullBindings;
+            subContainer.IsValidating = _container.IsValidating;
             _containerInitializer(subContainer, param1, param2, param3, param4, param5, param6, param7);
             subContainer.Install<StandardInstaller<TFacade>>();
             return subContainer;
