@@ -40,6 +40,7 @@
         * <a href="#scenes-decorator">Scenes Decorators</a>
         * <a href="#advanced-factory-construction-using-subcontainers">Advanced Factory Construction Using SubContainers</a>
         * <a href="#sub-containers-and-facades">Sub-Containers and Facades</a>
+        * <a href="#commands-and-signals">Commands And Signals</a>
         * <a href="#auto-mocking-using-moq">Auto-Mocking Using Moq</a>
         * <a href="#visualizing-object-graphs-automatically">Visualizing Object Graph Automatically</a>
     * <a href="#questions">Frequently Asked Questions</a>
@@ -83,6 +84,7 @@ __Quick Start__:  If you are already familiar with dependency injection and are 
 * Ability to validate object graphs at editor time including dynamic object graphs created via factories
 * Ability to print entire object graph as a UML image automatically
 * Nested Containers / Sub-Containers
+* Support for Commands and Signals
 * Ability to easily define discrete 'islands' of dependencies using 'Facade' classes
 * Auto-Mocking using the Moq library
 
@@ -2039,6 +2041,117 @@ public class GameInstaller : MonoInstaller
 }
 ```
 
+## <a id="commands-and-signals"></a>Commands And Signals
+
+Zenject also includes an optional extension that allows you to define "Commands" and "Signals".
+
+A signal can be thought of as a single event, that when triggered will notify a number of listeners.  A command is an object with a single method named `Execute`, that will forward the request to a specific handler.
+
+The advantage of using Signals and Commands is that the result will often be more loosely coupled code.  Given two classes A and B that need to communicate, your options are usually:
+
+1. Directly call a method on B from A.  In this case, B is strongly coupled with A.
+2. Inverse the dependency by having B observe an event on A.  In this case, A is strongly coupled with B.
+
+Both cases result in the classes being coupled in some way.  Now if instead you create a command object, which is called by A and which invokes a method on B, then the result is less coupling.  Granted, A is still coupled to the command class, but ins ome cases that is better than being directly coupled to B.  Using signals works similarly, in that you can remove the coupling by having A trigger a signal, which is observed by B.
+
+Signals are defined like this:
+
+```csharp
+public class GameLoadedSignal : Signal
+{
+    public class Trigger : TriggerBase { }
+}
+```
+
+The trigger class is used to invoke the signal event.  Note that the Signal base class is defined within the Zenject.Commands namespace.
+
+Signals are declared in an installer like this:
+
+```csharp
+Container.BindSignalTrigger<GameLoadedSignal.Trigger, GameLoadedSignal>().WhenInjectedInto<Foo>();
+```
+
+This statement will do the following:
+* Bind the class `GameLoadedSignal` as `ToSingle<>` without a condition.  This means that any class can declare GameLoadedSignal as a dependency.
+* Bind the class `GameLoadedSignal.Trigger` as `ToSingle<>` as well, except it will limit its usage strictly to class `Foo`.
+
+Commands are defined like this
+
+```csharp
+public class ResetSceneCommand : Command { }
+```
+
+Note again that the Command base class is defined within the Zenject.Commands namespace here.
+
+Unlike with signals, there are several different ways of declaring a command in an installer.  Perhaps the simplest way would be the following:
+
+```csharp
+Container.BindCommand<ResetSceneCommand>().HandleWithSingle<ResetSceneHandler>();
+
+public class ResetSceneHandler : ICommandHandler
+{
+    public void Execute()
+    {
+        ... [reset scene] ...
+    }
+}
+```
+
+This bind statement will result in an object of type ResetSceneCommand being added to the container.  Any time a class calls Execute on ResetSceneCommand, it will trigger the Execute method on the ResetSceneHandler class as well.  For example:
+
+```csharp
+public class Foo : ITickable
+{
+    readonly ResetSceneCommand _command;
+
+    public Foo(ResetSceneCommand command)
+    {
+        _command = command;
+    }
+
+    public void Tick()
+    {
+        ...
+        _command.Execute();
+        ...
+    }
+}
+```
+
+We might also want to restrict usage of our command to the Foo class only, which we could do with the following
+
+```csharp
+Container.BindCommand<ResetSceneCommand>().HandleWithSingle<ResetSceneHandler>().WhenInjectedInto<Foo>();
+```
+
+Note that in this case we are using `HandleWithSingle<>` - this means that the same instance of `ResetSceneHandler` will be used every time the command is executed.  Alternatively, you could declare it using `HandleWithTransient<>` which would instantiate a new isntance of `ResetSceneHandler` every time Execute() is called.  For example:
+
+```csharp
+Container.BindCommand<ResetSceneCommand>().HandleWithTransient<ResetSceneHandler>();
+```
+
+This might be useful if the `ResetSceneCommand` class involves some long-running operations that require unique sets of member variables/dependencies.
+
+You can also bind commands directly to methods instead of classes by doing the following:
+
+```csharp
+Container.BindCommand<ResetSceneCommand>().HandleWithSingle<MyOtherHandler>(x => x.ResetScene);
+
+public class ResetSceneHandler
+{
+    public void ResetScene()
+    {
+        ... [reset scene] ...
+    }
+}
+```
+
+This approach does not require that you derive from ICommandHandler at all.  There is also a `HandleWithTransient` version of this which works similarly (instantiates a new instance of MyOtherHandler).
+
+```csharp
+Container.BindCommand<ResetSceneCommand>().HandleWithTransient<MyOtherHandler>(x => x.ResetScene);
+```
+
 ## <a id="auto-mocking-using-moq"></a>Auto-Mocking using Moq
 
 One of the really cool features of DI is the fact that it makes testing code much, much easier.  This is because you can easily substitute one dependency for another by using a different Composition Root.  For example, if you only want to test a particular class (let's call it Foo) and don't care about testing its dependencies, you might write 'mocks' for them so that you can isolate Foo specifically.
@@ -2462,6 +2575,25 @@ Foo foo = Container.InstantiateComponent<Foo>(gameObject);
 For general troubleshooting / support, please use the [zenject subreddit](http://www.reddit.com/r/zenject) or the [zenject google group](https://groups.google.com/forum/#!forum/zenject/).  If you have found a bug, you are also welcome to create an issue on the [github page](https://github.com/modesttree/Zenject), or a pull request if you have a fix / extension.  You can also follow [@Zenject](https://twitter.com/Zenject) on twitter for updates.  Finally, you can also email me directly at sfvermeulen@gmail.com
 
 ## <a id="release-notes"></a>Release Notes
+
+3.2
+- Added the concept of "Commands" and "Signals".  See documentation for details.
+- Fixed validation for decorator scenes that open decorator scenes.
+- Changed to be more strict when using a combination of differents kinds of ToSingle<>, since there should only be one way to create the singleton.
+- Added ToSingleFactory bind method, for cases where you have complex construction requirements and don't want to use ToSingleMethod
+- Changed the way scene decorators work slightly.  It now groups decorated scenes into their own game object parent
+- Removed the InjectFullScene flag on SceneCompositionRoot.  Now always injects on the full scene.
+- Renamed AllowNullBindings to IsValidating so it can be used for other kinds of validation-only logic
+- Renamed BinderUntyped to UntypedBinder and BinderGeneric to GenericBinder
+- Changed to assert if the same installer is installed twice. Before, it used to just skip the second call to Install<>. This seems better because in theory you might want to call the same installer multiple times with different arguments, so it doesn't make sense to assume that you want to skip subsequent calls to Install<>.
+- Added the ability to install MonoInstaller's directly from inside other installers.  In this case it tries to load a prefab from the resources directory before giving up.
+- Added some better error output in a few places
+- Fixed some iOS AOT issues
+- Added BindFacade<> method to DiContainer, to allow creating nested containers without needing to use a factory.
+
+3.1
+- Changes related to upgrading to Unity 5.3
+- Fixed again to make zero heap allocations per frame
 
 3.0
 - Added much better support for nested containers.  It now works more closely to what you might expect:  Any parent dependencies are always inherited in sub-containers, even for optional injectables.  Also removed BindScope and FallbackContainer since these were really just workarounds for this feature missing.  Also added [InjectLocal] attribute for cases where you want to inject dependencies only from the local container.
