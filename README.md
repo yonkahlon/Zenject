@@ -2049,10 +2049,10 @@ A signal can be thought of as a single event, that when triggered will notify a 
 
 The advantage of using Signals and Commands is that the result will often be more loosely coupled code.  Given two classes A and B that need to communicate, your options are usually:
 
-1. Directly call a method on B from A.  In this case, B is strongly coupled with A.
-2. Inverse the dependency by having B observe an event on A.  In this case, A is strongly coupled with B.
+1. Directly call a method on B from A.  In this case, A is strongly coupled with B.
+2. Inverse the dependency by having B observe an event on A.  In this case, B is strongly coupled with A.
 
-Both cases result in the classes being coupled in some way.  Now if instead you create a command object, which is called by A and which invokes a method on B, then the result is less coupling.  Granted, A is still coupled to the command class, but ins ome cases that is better than being directly coupled to B.  Using signals works similarly, in that you can remove the coupling by having A trigger a signal, which is observed by B.
+Both cases result in the classes being coupled in some way.  Now if instead you create a command object, which is called by A and which invokes a method on B, then the result is less coupling.  Granted, A is still coupled to the command class, but in some cases that is better than being directly coupled to B.  Using signals works similarly, in that you can remove the coupling by having A trigger a signal, which is observed by B.
 
 Signals are defined like this:
 
@@ -2068,11 +2068,18 @@ The trigger class is used to invoke the signal event.  Note that the Signal base
 Signals are declared in an installer like this:
 
 ```csharp
-Container.BindSignalTrigger<GameLoadedSignal.Trigger, GameLoadedSignal>().WhenInjectedInto<Foo>();
+
+public override void InstallBindings()
+{
+    ...
+    Container.BindSignalTrigger<GameLoadedSignal.Trigger, GameLoadedSignal>().WhenInjectedInto<Foo>();
+    ...
+}
+
 ```
 
 This statement will do the following:
-* Bind the class `GameLoadedSignal` as `ToSingle<>` without a condition.  This means that any class can declare GameLoadedSignal as a dependency.
+* Bind the class `GameLoadedSignal` as `ToSingle<>` without a condition.  This means that any class can declare `GameLoadedSignal` as a dependency.
 * Bind the class `GameLoadedSignal.Trigger` as `ToSingle<>` as well, except it will limit its usage strictly to class `Foo`.
 
 Commands are defined like this
@@ -2086,7 +2093,12 @@ Note again that the Command base class is defined within the Zenject.Commands na
 Unlike with signals, there are several different ways of declaring a command in an installer.  Perhaps the simplest way would be the following:
 
 ```csharp
-Container.BindCommand<ResetSceneCommand>().HandleWithSingle<ResetSceneHandler>();
+public override void InstallBindings()
+{
+    ...
+    Container.BindCommand<ResetSceneCommand>().HandleWithSingle<ResetSceneHandler>();
+    ...
+}
 
 public class ResetSceneHandler : ICommandHandler
 {
@@ -2097,7 +2109,7 @@ public class ResetSceneHandler : ICommandHandler
 }
 ```
 
-This bind statement will result in an object of type ResetSceneCommand being added to the container.  Any time a class calls Execute on ResetSceneCommand, it will trigger the Execute method on the ResetSceneHandler class as well.  For example:
+This bind statement will result in an object of type `ResetSceneCommand` being added to the container.  Any time a class calls Execute on `ResetSceneCommand`, it will trigger the Execute method on the `ResetSceneHandler` class as well.  For example:
 
 ```csharp
 public class Foo : ITickable
@@ -2121,10 +2133,15 @@ public class Foo : ITickable
 We might also want to restrict usage of our command to the Foo class only, which we could do with the following
 
 ```csharp
-Container.BindCommand<ResetSceneCommand>().HandleWithSingle<ResetSceneHandler>().WhenInjectedInto<Foo>();
+public override void InstallBindings()
+{
+    ...
+    Container.BindCommand<ResetSceneCommand>().HandleWithSingle<ResetSceneHandler>().WhenInjectedInto<Foo>();
+    ...
+}
 ```
 
-Note that in this case we are using `HandleWithSingle<>` - this means that the same instance of `ResetSceneHandler` will be used every time the command is executed.  Alternatively, you could declare it using `HandleWithTransient<>` which would instantiate a new isntance of `ResetSceneHandler` every time Execute() is called.  For example:
+Note that in this case we are using `HandleWithSingle<>` - this means that the same instance of `ResetSceneHandler` will be used every time the command is executed.  Alternatively, you could declare it using `HandleWithTransient<>` which would instantiate a new instance of `ResetSceneHandler` every time Execute() is called.  For example:
 
 ```csharp
 Container.BindCommand<ResetSceneCommand>().HandleWithTransient<ResetSceneHandler>();
@@ -2135,7 +2152,12 @@ This might be useful if the `ResetSceneCommand` class involves some long-running
 You can also bind commands directly to methods instead of classes by doing the following:
 
 ```csharp
-Container.BindCommand<ResetSceneCommand>().HandleWithSingle<MyOtherHandler>(x => x.ResetScene);
+public override void InstallBindings()
+{
+    ...
+    Container.BindCommand<ResetSceneCommand>().HandleWithSingle<MyOtherHandler>(x => x.ResetScene);
+    ...
+}
 
 public class ResetSceneHandler
 {
@@ -2146,7 +2168,7 @@ public class ResetSceneHandler
 }
 ```
 
-This approach does not require that you derive from ICommandHandler at all.  There is also a `HandleWithTransient` version of this which works similarly (instantiates a new instance of MyOtherHandler).
+This approach does not require that you derive from `ICommandHandler` at all.  There is also a `HandleWithTransient` version of this which works similarly (instantiates a new instance of MyOtherHandler).
 
 ```csharp
 Container.BindCommand<ResetSceneCommand>().HandleWithTransient<MyOtherHandler>(x => x.ResetScene);
