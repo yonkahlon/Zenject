@@ -306,18 +306,13 @@ namespace Zenject
 
             var rootObjectsBefore = UnityUtil.GetRootGameObjects();
 
+            OpenSceneAdditive(scenePath);
+
+            var newRootObjects = UnityUtil.GetRootGameObjects().Except(rootObjectsBefore);
+
             // Use finally to ensure we clean up the data added from OpenSceneAdditive
             try
             {
-                OpenSceneAdditive(scenePath);
-
-                var sceneRootObj = new GameObject(sceneName + " (Scene)");
-
-                foreach (var newObject in UnityUtil.GetRootGameObjects().Except(rootObjectsBefore))
-                {
-                    newObject.transform.SetParent(sceneRootObj.transform);
-                }
-
                 var previousBeforeInstallHook = SceneCompositionRoot.BeforeInstallHooks;
                 SceneCompositionRoot.BeforeInstallHooks = (container) =>
                 {
@@ -340,14 +335,14 @@ namespace Zenject
                     }
                 };
 
-                var compRoot = sceneRootObj.GetComponentsInChildren<SceneCompositionRoot>().OnlyOrDefault();
+                var compRoot = newRootObjects.SelectMany(x => x.GetComponentsInChildren<SceneCompositionRoot>()).OnlyOrDefault();
 
                 if (compRoot != null)
                 {
                     return ValidateCompRoot(compRoot, maxErrors);
                 }
 
-                var newDecoratorCompRoot = sceneRootObj.GetComponentsInChildren<SceneDecoratorCompositionRoot>().OnlyOrDefault();
+                var newDecoratorCompRoot = newRootObjects.SelectMany(x => x.GetComponentsInChildren<SceneDecoratorCompositionRoot>()).OnlyOrDefault();
 
                 if (newDecoratorCompRoot != null)
                 {
@@ -362,10 +357,14 @@ namespace Zenject
             }
             finally
             {
-                foreach (var newObject in UnityUtil.GetRootGameObjects().Except(rootObjectsBefore))
+#if UNITY_5_3
+                EditorSceneManager.CloseScene(EditorSceneManager.GetSceneByPath(scenePath), true);
+#else
+                foreach (var newObject in newRootObjects)
                 {
                     GameObject.DestroyImmediate(newObject);
                 }
+#endif
             }
         }
 
