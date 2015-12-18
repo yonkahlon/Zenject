@@ -990,15 +990,15 @@ A Zenject driven application is executed by the following steps:
 1. Composition Root creates a new DiContainer object to be used to contain all instances used in the scene
 1. Composition Root iterates through all the Installers that have been added to it via the Unity Inspector, and updates them to point to the new DiContainer.  It then calls InstallBindings() on each installer.
 1. Each Installer then registers different sets of dependencies directly on to the given DiContainer by calling one of the Bind<> methods.  Note that the order that this binding occurs should not generally matter. Each installer may also include other installers by calling Container.Install<>. Each installer can also add bindings to configure other installers, however note that in this case order might actually matter, since you will have to make sure that code configuring other installers is executed before the installers that you are configuring! You can control the order by simply re-ordering the Installers property of the CompositionRoot
-1. The Composition Root then traverses all game object descendants (or the entire scene if 'Inject on Full Scene' property is checked in the inspector) and injects all MonoBehaviours with their dependencies. Since MonoBehaviours are instantiated by Unity we cannot use constructor injection in this case and therefore [PostInject] injection, field injection or property injection must be used instead.
-1. After filling in the scene dependencies the Composition Root then executes a single resolve for 'IDependencyRoot'.  For unity apps this is UnityDependencyRoot (which implements the IDependencyRoot interface).  The UnityDependencyRoot class has dependencies on TickableManager, InitializableManager, and DisposableManager classes, and therefore Zenject constructs instances of those as well before creating the UnityDependencyRoot.  Those classes contains dependencies for lists of ITickable, IInitializable, and IDisposables.  So once again Zenject resolves all instances bound to any of these interfaces before constructing the manager classes.  This is important to know because it is why when you bind something to ITickable/IInitializable/IDisposable, it is always created at startup.
+1. The Composition Root then injects all MonoBehaviours that are in the scene with their dependencies. Note that since MonoBehaviours are instantiated by Unity we cannot use constructor injection in this case and therefore [PostInject] injection, field injection or property injection must be used instead.
+1. After filling in the scene dependencies the Composition Root then executes a single resolve for 'IFacade'.  This class represents the root of the object graph.  The Facade class by default has dependencies on TickableManager, InitializableManager, and DisposableManager classes, and therefore Zenject constructs instances of those as well before creating the main dependency root.  Those classes contains dependencies for lists of ITickable, IInitializable, and IDisposables.  So once again Zenject resolves all instances bound to any of these interfaces before constructing the manager classes.  This is important to know because it is why when you bind something to ITickable/IInitializable/IDisposable, it is always created at startup.
 1. If any required dependencies cannot be resolved, a ZenjectResolveException is thrown
 1. All other MonoBehaviour's in your scene has their Awake() method called
 1. Unity Start() phase begins
 1. CompositionRoot.Start() method is called.  This will trigger the Initialize() method on all IInitializable objects in the order specified in the installers.  The execution order mentioned above should guarantee that IInitializable.Initialize() occurs before any Start() method in your scene
 1. All other MonoBehaviour's in your scene has their Start() method called
 1. Unity Update() phase begins
-1. UnityDependencyRoot.Update() is called, which results in Tick() being called for all ITickable objects (in the order specified in the installers)
+1. Facade.Update() is called, which results in Tick() being called for all ITickable objects (in the order specified in the installers)
 1. All other MonoBehaviour's in your scene has their Update() method called
 1. Steps 13 - 15 is repeated for LateUpdate
 1. At the same time, Steps 13 - 15 is repeated for FixedUpdate according to the physics timestep
@@ -2061,6 +2061,11 @@ public class GameLoadedSignal : Signal
 {
     public class Trigger : TriggerBase { }
 }
+
+public class GameLoadedSignalWithParameter : Signal<string>
+{
+    public class Trigger : TriggerBase { }
+}
 ```
 
 The trigger class is used to invoke the signal event.  Note that the Signal base class is defined within the Zenject.Commands namespace.
@@ -2074,6 +2079,7 @@ public override void InstallBindings()
     ...
     Container.BindSignalTrigger<GameLoadedSignal.Trigger, GameLoadedSignal>().WhenInjectedInto<Foo>();
     ...
+    Container.BindSignalTrigger<GameLoadedSignalWithParameter.Trigger, GameLoadedSignalWithParameter, string>().WhenInjectedInto<Foo>();
 }
 
 ```
@@ -2086,6 +2092,8 @@ Commands are defined like this
 
 ```csharp
 public class ResetSceneCommand : Command { }
+
+public class ResetSceneCommandWithParameter : Command<string> { }
 ```
 
 Note again that the Command base class is defined within the Zenject.Commands namespace here.
@@ -2097,6 +2105,8 @@ public override void InstallBindings()
 {
     ...
     Container.BindCommand<ResetSceneCommand>().HandleWithSingle<ResetSceneHandler>();
+    ...
+    Container.BindCommand<ResetSceneCommandWithParameter, string>().HandleWithSingle<ResetSceneHandler>();
     ...
 }
 
