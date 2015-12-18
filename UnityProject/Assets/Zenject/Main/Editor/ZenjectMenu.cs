@@ -7,7 +7,9 @@ using UnityEngine;
 using System.Linq;
 using Debug = UnityEngine.Debug;
 using ModestTree;
+#if UNITY_5_3
 using UnityEditor.SceneManagement;
+#endif
 
 namespace Zenject
 {
