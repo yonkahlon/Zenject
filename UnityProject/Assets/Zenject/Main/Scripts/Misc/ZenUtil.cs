@@ -7,7 +7,9 @@ using System.Text;
 using System.Diagnostics;
 using ModestTree;
 using ModestTree.Util;
+#if UNITY_5_3
 using UnityEngine.SceneManagement;
+#endif
 #if !ZEN_NOT_UNITY3D
 using UnityEngine;
 #endif
