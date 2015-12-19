@@ -109,7 +109,7 @@ namespace Zenject.Commands
 
     // Five params
     public class CommandProviderHandlerSingle<TCommand, THandler, TParam1, TParam2, TParam3, TParam4, TParam5>
-        : CommandProviderSingle<TCommand, THandler, Action<TParam1, TParam2, TParam3, TParam4, TParam5>>
+        : CommandProviderSingle<TCommand, THandler, ModestTree.Util.Action<TParam1, TParam2, TParam3, TParam4, TParam5>>
         where TCommand : Command<TParam1, TParam2, TParam3, TParam4, TParam5>
         where THandler : ICommandHandler<TParam1, TParam2, TParam3, TParam4, TParam5>
     {
@@ -118,7 +118,7 @@ namespace Zenject.Commands
         {
         }
 
-        protected override Action<TParam1, TParam2, TParam3, TParam4, TParam5> GetCommandAction(InjectContext context)
+        protected override ModestTree.Util.Action<TParam1, TParam2, TParam3, TParam4, TParam5> GetCommandAction(InjectContext context)
         {
             return (p1, p2, p3, p4, p5) =>
             {
@@ -129,7 +129,7 @@ namespace Zenject.Commands
 
     // Six params
     public class CommandProviderHandlerSingle<TCommand, THandler, TParam1, TParam2, TParam3, TParam4, TParam5, TParam6>
-        : CommandProviderSingle<TCommand, THandler, Action<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6>>
+        : CommandProviderSingle<TCommand, THandler, ModestTree.Util.Action<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6>>
         where TCommand : Command<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6>
         where THandler : ICommandHandler<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6>
     {
@@ -138,7 +138,7 @@ namespace Zenject.Commands
         {
         }
 
-        protected override Action<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6> GetCommandAction(InjectContext context)
+        protected override ModestTree.Util.Action<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6> GetCommandAction(InjectContext context)
         {
             return (p1, p2, p3, p4, p5, p6) =>
             {

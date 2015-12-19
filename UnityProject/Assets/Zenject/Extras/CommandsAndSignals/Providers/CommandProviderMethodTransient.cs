@@ -129,16 +129,16 @@ namespace Zenject.Commands
 
     // Five Parameters
     public class CommandProviderMethodTransient<TCommand, THandler, TParam1, TParam2, TParam3, TParam4, TParam5>
-        : CommandProviderMethodTransientBase<TCommand, THandler, Action<TParam1, TParam2, TParam3, TParam4, TParam5>>
+        : CommandProviderMethodTransientBase<TCommand, THandler, ModestTree.Util.Action<TParam1, TParam2, TParam3, TParam4, TParam5>>
         where TCommand : Command<TParam1, TParam2, TParam3, TParam4, TParam5>
     {
         public CommandProviderMethodTransient(
-            DiContainer container, Func<THandler, Action<TParam1, TParam2, TParam3, TParam4, TParam5>> methodGetter)
+            DiContainer container, Func<THandler, ModestTree.Util.Action<TParam1, TParam2, TParam3, TParam4, TParam5>> methodGetter)
             : base(container, methodGetter)
         {
         }
 
-        protected override Action<TParam1, TParam2, TParam3, TParam4, TParam5> GetCommandAction(InjectContext context)
+        protected override ModestTree.Util.Action<TParam1, TParam2, TParam3, TParam4, TParam5> GetCommandAction(InjectContext context)
         {
             return (p1, p2, p3, p4, p5) =>
             {
@@ -149,16 +149,16 @@ namespace Zenject.Commands
 
     // Six Parameters
     public class CommandProviderMethodTransient<TCommand, THandler, TParam1, TParam2, TParam3, TParam4, TParam5, TParam6>
-        : CommandProviderMethodTransientBase<TCommand, THandler, Action<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6>>
+        : CommandProviderMethodTransientBase<TCommand, THandler, ModestTree.Util.Action<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6>>
         where TCommand : Command<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6>
     {
         public CommandProviderMethodTransient(
-            DiContainer container, Func<THandler, Action<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6>> methodGetter)
+            DiContainer container, Func<THandler, ModestTree.Util.Action<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6>> methodGetter)
             : base(container, methodGetter)
         {
         }
 
-        protected override Action<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6> GetCommandAction(InjectContext context)
+        protected override ModestTree.Util.Action<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6> GetCommandAction(InjectContext context)
         {
             return (p1, p2, p3, p4, p5, p6) =>
             {
