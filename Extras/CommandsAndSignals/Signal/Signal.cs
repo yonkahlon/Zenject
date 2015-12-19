@@ -95,7 +95,7 @@ namespace Zenject.Commands
     // Five Parameters
     public class Signal<TParam1, TParam2, TParam3, TParam4, TParam5> : ISignal
     {
-        public event Action<TParam1, TParam2, TParam3, TParam4, TParam5> Event = delegate {};
+        public event ModestTree.Util.Action<TParam1, TParam2, TParam3, TParam4, TParam5> Event = delegate {};
 
         public class TriggerBase
         {
@@ -112,7 +112,7 @@ namespace Zenject.Commands
     // Six Parameters
     public class Signal<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6> : ISignal
     {
-        public event Action<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6> Event = delegate {};
+        public event ModestTree.Util.Action<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6> Event = delegate {};
 
         public class TriggerBase
         {

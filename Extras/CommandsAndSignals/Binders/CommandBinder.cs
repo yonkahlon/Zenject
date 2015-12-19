@@ -290,7 +290,7 @@ namespace Zenject.Commands
 
     // Five parameters
     [System.Diagnostics.DebuggerStepThrough]
-    public class CommandBinder<TCommand, TParam1, TParam2, TParam3, TParam4, TParam5> : CommandBinderBase<TCommand, Action<TParam1, TParam2, TParam3, TParam4, TParam5>>
+    public class CommandBinder<TCommand, TParam1, TParam2, TParam3, TParam4, TParam5> : CommandBinderBase<TCommand, ModestTree.Util.Action<TParam1, TParam2, TParam3, TParam4, TParam5>>
         where TCommand : Command<TParam1, TParam2, TParam3, TParam4, TParam5>
     {
         public CommandBinder(
@@ -300,14 +300,14 @@ namespace Zenject.Commands
         }
 
         public BindingConditionSetter HandleWithTransient<THandler>(
-            string concreteIdentifier, Func<THandler, Action<TParam1, TParam2, TParam3, TParam4, TParam5>> methodGetter)
+            string concreteIdentifier, Func<THandler, ModestTree.Util.Action<TParam1, TParam2, TParam3, TParam4, TParam5>> methodGetter)
         {
             return ToProvider(
                 new CommandProviderMethodTransient<TCommand, THandler, TParam1, TParam2, TParam3, TParam4, TParam5>(
                     Container, methodGetter));
         }
 
-        public BindingConditionSetter HandleWithTransient<THandler>(Func<THandler, Action<TParam1, TParam2, TParam3, TParam4, TParam5>> methodGetter)
+        public BindingConditionSetter HandleWithTransient<THandler>(Func<THandler, ModestTree.Util.Action<TParam1, TParam2, TParam3, TParam4, TParam5>> methodGetter)
         {
             return HandleWithTransient<THandler>(null, methodGetter);
         }
@@ -327,13 +327,13 @@ namespace Zenject.Commands
         }
 
         public BindingConditionSetter HandleWithSingle<THandler>(
-            string concreteIdentifier, Func<THandler, Action<TParam1, TParam2, TParam3, TParam4, TParam5>> methodGetter)
+            string concreteIdentifier, Func<THandler, ModestTree.Util.Action<TParam1, TParam2, TParam3, TParam4, TParam5>> methodGetter)
         {
             return ToProvider(new CommandProviderMethodSingle<TCommand, THandler, TParam1, TParam2, TParam3, TParam4, TParam5>(
                 Container, methodGetter, CreateSingletonProvider<THandler>(concreteIdentifier)));
         }
 
-        public BindingConditionSetter HandleWithSingle<THandler>(Func<THandler, Action<TParam1, TParam2, TParam3, TParam4, TParam5>> methodGetter)
+        public BindingConditionSetter HandleWithSingle<THandler>(Func<THandler, ModestTree.Util.Action<TParam1, TParam2, TParam3, TParam4, TParam5>> methodGetter)
         {
             return HandleWithSingle<THandler>(null, methodGetter);
         }
@@ -341,7 +341,7 @@ namespace Zenject.Commands
 
     // Six parameters
     [System.Diagnostics.DebuggerStepThrough]
-    public class CommandBinder<TCommand, TParam1, TParam2, TParam3, TParam4, TParam5, TParam6> : CommandBinderBase<TCommand, Action<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6>>
+    public class CommandBinder<TCommand, TParam1, TParam2, TParam3, TParam4, TParam5, TParam6> : CommandBinderBase<TCommand, ModestTree.Util.Action<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6>>
         where TCommand : Command<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6>
     {
         public CommandBinder(
@@ -351,14 +351,14 @@ namespace Zenject.Commands
         }
 
         public BindingConditionSetter HandleWithTransient<THandler>(
-            string concreteIdentifier, Func<THandler, Action<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6>> methodGetter)
+            string concreteIdentifier, Func<THandler, ModestTree.Util.Action<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6>> methodGetter)
         {
             return ToProvider(
                 new CommandProviderMethodTransient<TCommand, THandler, TParam1, TParam2, TParam3, TParam4, TParam5, TParam6>(
                     Container, methodGetter));
         }
 
-        public BindingConditionSetter HandleWithTransient<THandler>(Func<THandler, Action<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6>> methodGetter)
+        public BindingConditionSetter HandleWithTransient<THandler>(Func<THandler, ModestTree.Util.Action<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6>> methodGetter)
         {
             return HandleWithTransient<THandler>(null, methodGetter);
         }
@@ -378,13 +378,13 @@ namespace Zenject.Commands
         }
 
         public BindingConditionSetter HandleWithSingle<THandler>(
-            string concreteIdentifier, Func<THandler, Action<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6>> methodGetter)
+            string concreteIdentifier, Func<THandler, ModestTree.Util.Action<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6>> methodGetter)
         {
             return ToProvider(new CommandProviderMethodSingle<TCommand, THandler, TParam1, TParam2, TParam3, TParam4, TParam5, TParam6>(
                 Container, methodGetter, CreateSingletonProvider<THandler>(concreteIdentifier)));
         }
 
-        public BindingConditionSetter HandleWithSingle<THandler>(Func<THandler, Action<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6>> methodGetter)
+        public BindingConditionSetter HandleWithSingle<THandler>(Func<THandler, ModestTree.Util.Action<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6>> methodGetter)
         {
             return HandleWithSingle<THandler>(null, methodGetter);
         }

@@ -95,10 +95,10 @@ namespace Zenject.Commands
     // Five params
     public abstract class Command<TParam1, TParam2, TParam3, TParam4, TParam5> : ICommand
     {
-        Action<TParam1, TParam2, TParam3, TParam4, TParam5> _handler;
+        ModestTree.Util.Action<TParam1, TParam2, TParam3, TParam4, TParam5> _handler;
 
         [PostInject]
-        public void Construct(Action<TParam1, TParam2, TParam3, TParam4, TParam5> handler)
+        public void Construct(ModestTree.Util.Action<TParam1, TParam2, TParam3, TParam4, TParam5> handler)
         {
             _handler = handler;
         }
@@ -112,10 +112,10 @@ namespace Zenject.Commands
     // Six params
     public abstract class Command<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6> : ICommand
     {
-        Action<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6> _handler;
+        ModestTree.Util.Action<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6> _handler;
 
         [PostInject]
-        public void Construct(Action<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6> handler)
+        public void Construct(ModestTree.Util.Action<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6> handler)
         {
             _handler = handler;
         }

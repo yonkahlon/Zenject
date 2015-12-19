@@ -141,21 +141,21 @@ namespace Zenject.Commands
 
     // Five params
     public class CommandProviderMethodSingle<TCommand, THandler, TParam1, TParam2, TParam3, TParam4, TParam5>
-        : CommandProviderSingle<TCommand, THandler, Action<TParam1, TParam2, TParam3, TParam4, TParam5>>
+        : CommandProviderSingle<TCommand, THandler, ModestTree.Util.Action<TParam1, TParam2, TParam3, TParam4, TParam5>>
         where TCommand : Command<TParam1, TParam2, TParam3, TParam4, TParam5>
     {
-        readonly Func<THandler, Action<TParam1, TParam2, TParam3, TParam4, TParam5>> _methodGetter;
+        readonly Func<THandler, ModestTree.Util.Action<TParam1, TParam2, TParam3, TParam4, TParam5>> _methodGetter;
 
         public CommandProviderMethodSingle(
             DiContainer container,
-            Func<THandler, Action<TParam1, TParam2, TParam3, TParam4, TParam5>> methodGetter,
+            Func<THandler, ModestTree.Util.Action<TParam1, TParam2, TParam3, TParam4, TParam5>> methodGetter,
             ProviderBase singletonProvider)
             : base(container, singletonProvider)
         {
             _methodGetter = methodGetter;
         }
 
-        protected override Action<TParam1, TParam2, TParam3, TParam4, TParam5> GetCommandAction(InjectContext context)
+        protected override ModestTree.Util.Action<TParam1, TParam2, TParam3, TParam4, TParam5> GetCommandAction(InjectContext context)
         {
             return (p1, p2, p3, p4, p5) =>
             {
@@ -168,21 +168,21 @@ namespace Zenject.Commands
 
     // Six params
     public class CommandProviderMethodSingle<TCommand, THandler, TParam1, TParam2, TParam3, TParam4, TParam5, TParam6>
-        : CommandProviderSingle<TCommand, THandler, Action<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6>>
+        : CommandProviderSingle<TCommand, THandler, ModestTree.Util.Action<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6>>
         where TCommand : Command<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6>
     {
-        readonly Func<THandler, Action<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6>> _methodGetter;
+        readonly Func<THandler, ModestTree.Util.Action<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6>> _methodGetter;
 
         public CommandProviderMethodSingle(
             DiContainer container,
-            Func<THandler, Action<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6>> methodGetter,
+            Func<THandler, ModestTree.Util.Action<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6>> methodGetter,
             ProviderBase singletonProvider)
             : base(container, singletonProvider)
         {
             _methodGetter = methodGetter;
         }
 
-        protected override Action<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6> GetCommandAction(InjectContext context)
+        protected override ModestTree.Util.Action<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6> GetCommandAction(InjectContext context)
         {
             return (p1, p2, p3, p4, p5, p6) =>
             {
