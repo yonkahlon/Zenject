@@ -570,9 +570,32 @@ Container.Bind<ITickable>().ToSingle<Foo>();
 Container.Bind<IInitializable>().ToSingle<Foo>();
 ```
 
-15 - **ToSingleInstance** - Use the given instance as a singleton.
+15 - **BindAllInterfacesToInstance**
 
-This is very similar to `ToInstance`. In most cases it is recommended to use `ToInstance` but `ToSingleInstance` can still be useful in some rare edge cases.
+This function works very similar to BindAllInterfacesToSingle.
+
+```csharp
+public class Foo : ITickable, IInitializable
+{
+    ...
+}
+
+...
+
+Container.BindAllInterfacesToInstance(new Foo());
+```
+
+The above is equivalent to the following:
+
+```csharp
+var foo = new Foo();
+Container.Bind<ITickable>().ToInstance(foo);
+Container.Bind<IInitializable>().ToInstance(foo);
+```
+
+16 - **ToSingleInstance** - Use the given instance as a singleton.
+
+This is the same as `ToInstance` except it will ensure that there is only ever one instance for the given type.
 
 When using `ToInstance` you can do the following:
 
@@ -595,22 +618,54 @@ And then have a class that takes all of them as a list like this:
         }
     }
 
-Therefore, using `ToInstance` doesn't always result in a singleton, although if you only have one call to `ToInstance` then it will essentially behave like a singleton.
+Whereas, if you use ToSingleInstance this would trigger an error.
 
-On the other hand `ToSingleInstance` will always require that there only be one unique instance, and also allows for binding to multiple interfaces using `ToSingle<>` as shown below:
+17 - **ToSingleFactory** - Define a custom factory for a singleton
 
-    Container.Bind<IFoo>().ToSingleInstance(new Foo());
-    // These will use the same instance of Foo as above
-    Container.Bind<IBar>().ToSingle<Foo>();
-    Container.Bind<Foo>().ToSingle();
+```csharp
+Container.Bind<IFoo>().ToSingleFactory<MyCustomFactory>();
 
-16 - **Untyped Bindings**
+class MyCustomFactory : IFactory<IFoo>
+{
+    Bar _bar;
+
+    public MyCustomFactory(Bar bar)
+    {
+        _bar = bar;
+    }
+
+    public IFoo Create()
+    {
+        ...
+    }
+}
+```
+
+The `ToSingleFactory` binding can be useful when you want to define a singleton, but it has complex construction logic that you want to define yourself.  You could use `ToSingleMethod`, but this can get ugly if your construction logic itself has its own dependencies that it needs.  Using `ToSingleFactory` for this case is nice because any dependencies that you require for construction can be simply added to the factory constructor
+
+18 - **Untyped Bindings**
 
 ```csharp
 Container.Bind(typeof(IFoo)).ToSingle(typeof(Foo));
 ```
 
 In some cases it is not possible to use the generic versions of the Bind<> functions.  In these cases a non-generic version is provided, which works by taking in a Type value as a parameter.
+
+19 - **BindIFactory** - Bind type `IFactory<>` to a construction method
+
+```csharp
+Container.BindIFactory<IFoo>().ToFactory<Foo>();
+```
+
+This bind method is used to create abstract factories.
+
+The above line result in all dependencies of type `IFactory<IFoo>` being bound to an object that returns type `Foo` when its Create() method is called.
+
+See the <a href="#abstract-factories">abstract factories section</a> for more information on abstract factories.
+
+20 - **BindFacadeFactory** - Declare a nested container facade factory.
+
+See <a href="#sub-containers-and-facades">this section</a> for more details on this binding.
 
 ## <a id="list-bindings"></a>List Bindings
 
