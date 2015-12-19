@@ -2612,6 +2612,10 @@ For general troubleshooting / support, please use the [zenject subreddit](http:/
 - Added some better error output in a few places
 - Fixed some iOS AOT issues
 - Added BindFacade<> method to DiContainer, to allow creating nested containers without needing to use a factory.
+- Added an Open button in scene decorator comp root for easily jumping to the decorated scene
+- Removed support for object graph visualization since I hadn't bothered maintaining it
+- Got the optional Moq extension method ToMock() working again
+- Fixed scene decorators to play more nicely with Unity's own way of handling LoadLevelAdditive.  Decorated scenes are not organized in the scene heirarchy by scene thanks to the Unity 5.3 update
 
 3.1
 - Changes related to upgrading to Unity 5.3
