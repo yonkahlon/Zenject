@@ -42,7 +42,6 @@
         * <a href="#sub-containers-and-facades">Sub-Containers and Facades</a>
         * <a href="#commands-and-signals">Commands And Signals</a>
         * <a href="#auto-mocking-using-moq">Auto-Mocking Using Moq</a>
-        * <a href="#visualizing-object-graphs-automatically">Visualizing Object Graph Automatically</a>
     * <a href="#questions">Frequently Asked Questions</a>
         * <a href="#aot-support">Does this work on AOT platforms such as iOS and WebGL?</a>
         * <a href="#faq-performance">How is Performance?</a>
@@ -2245,18 +2244,6 @@ Container.Bind<IFoo>().ToMock();
 ```
 
 However, this approach will not allow you to take advantage of the advanced features of Moq.  For more advanced usages, see the documentation for Moq
-
-## <a id="visualizing-object-graphs-automatically"></a>Visualizing Object Graphs Automatically
-
-Zenject allows users to generate UML-style images of the object graphs for their applications.  You can do this simply by running your Zenject-driven app, then selecting from the menu `Assets -> Zenject -> Output Object Graph For Current Scene`.  You will be prompted for a location to save the generated image file.
-
-Note that you will need to have graphviz installed for this to work (which you can find [here](http://www.graphviz.org/)).  You will be prompted to choose the location the first time.
-
-The result is two files (Foo.dot and Foo.png).  The dot file is included in case you want to add custom graphviz commands.  As an example, this is the graph that is generated when run on the sample project:
-
-However, admittedly, I personally haven't gotten a lot of mileage out of this feature.  When I have found it useful it's when I first encounter a lot of unfamiliar code.  Reading a visual diagram can be easier than reading the code in some cases.
-
-<img src="UnityProject/Assets/Zenject/Main/ExampleObjectGraph.png?raw=true" alt="Example Object Graph" width="600px" height="127px"/>
 
 ## <a id="questions"></a>Frequently Asked Questions
 
