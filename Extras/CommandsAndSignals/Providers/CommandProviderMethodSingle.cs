@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using ModestTree;
+using ModestTree.Util;
 using System.Linq;
 
 namespace Zenject.Commands
@@ -80,6 +81,114 @@ namespace Zenject.Commands
                 var singleton = GetSingleton(context);
                 Assert.IsNotNull(singleton);
                 _methodGetter(singleton)(p1, p2);
+            };
+        }
+    }
+
+    // Three params
+    public class CommandProviderMethodSingle<TCommand, THandler, TParam1, TParam2, TParam3>
+        : CommandProviderSingle<TCommand, THandler, Action<TParam1, TParam2, TParam3>>
+        where TCommand : Command<TParam1, TParam2, TParam3>
+    {
+        readonly Func<THandler, Action<TParam1, TParam2, TParam3>> _methodGetter;
+
+        public CommandProviderMethodSingle(
+            DiContainer container,
+            Func<THandler, Action<TParam1, TParam2, TParam3>> methodGetter,
+            ProviderBase singletonProvider)
+            : base(container, singletonProvider)
+        {
+            _methodGetter = methodGetter;
+        }
+
+        protected override Action<TParam1, TParam2, TParam3> GetCommandAction(InjectContext context)
+        {
+            return (p1, p2, p3) =>
+            {
+                var singleton = GetSingleton(context);
+                Assert.IsNotNull(singleton);
+                _methodGetter(singleton)(p1, p2, p3);
+            };
+        }
+    }
+
+    // Four params
+    public class CommandProviderMethodSingle<TCommand, THandler, TParam1, TParam2, TParam3, TParam4>
+        : CommandProviderSingle<TCommand, THandler, Action<TParam1, TParam2, TParam3, TParam4>>
+        where TCommand : Command<TParam1, TParam2, TParam3, TParam4>
+    {
+        readonly Func<THandler, Action<TParam1, TParam2, TParam3, TParam4>> _methodGetter;
+
+        public CommandProviderMethodSingle(
+            DiContainer container,
+            Func<THandler, Action<TParam1, TParam2, TParam3, TParam4>> methodGetter,
+            ProviderBase singletonProvider)
+            : base(container, singletonProvider)
+        {
+            _methodGetter = methodGetter;
+        }
+
+        protected override Action<TParam1, TParam2, TParam3, TParam4> GetCommandAction(InjectContext context)
+        {
+            return (p1, p2, p3, p4) =>
+            {
+                var singleton = GetSingleton(context);
+                Assert.IsNotNull(singleton);
+                _methodGetter(singleton)(p1, p2, p3, p4);
+            };
+        }
+    }
+
+    // Five params
+    public class CommandProviderMethodSingle<TCommand, THandler, TParam1, TParam2, TParam3, TParam4, TParam5>
+        : CommandProviderSingle<TCommand, THandler, Action<TParam1, TParam2, TParam3, TParam4, TParam5>>
+        where TCommand : Command<TParam1, TParam2, TParam3, TParam4, TParam5>
+    {
+        readonly Func<THandler, Action<TParam1, TParam2, TParam3, TParam4, TParam5>> _methodGetter;
+
+        public CommandProviderMethodSingle(
+            DiContainer container,
+            Func<THandler, Action<TParam1, TParam2, TParam3, TParam4, TParam5>> methodGetter,
+            ProviderBase singletonProvider)
+            : base(container, singletonProvider)
+        {
+            _methodGetter = methodGetter;
+        }
+
+        protected override Action<TParam1, TParam2, TParam3, TParam4, TParam5> GetCommandAction(InjectContext context)
+        {
+            return (p1, p2, p3, p4, p5) =>
+            {
+                var singleton = GetSingleton(context);
+                Assert.IsNotNull(singleton);
+                _methodGetter(singleton)(p1, p2, p3, p4, p5);
+            };
+        }
+    }
+
+    // Six params
+    public class CommandProviderMethodSingle<TCommand, THandler, TParam1, TParam2, TParam3, TParam4, TParam5, TParam6>
+        : CommandProviderSingle<TCommand, THandler, Action<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6>>
+        where TCommand : Command<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6>
+    {
+        readonly Func<THandler, Action<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6>> _methodGetter;
+
+        public CommandProviderMethodSingle(
+            DiContainer container,
+            Func<THandler, Action<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6>> methodGetter,
+            ProviderBase singletonProvider)
+            : base(container, singletonProvider)
+        {
+            _methodGetter = methodGetter;
+        }
+
+        protected override Action<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6> GetCommandAction(InjectContext context)
+        {
+            return (p1, p2, p3, p4, p5, p6) =>
+            {
+                var singleton = GetSingleton(context);
+                Assert.IsNotNull(singleton);
+                _methodGetter(singleton)(p1, p2, p3, p4, p5, p6);
             };
         }
     }

@@ -10,7 +10,7 @@ using Zenject.Commands;
 namespace Zenject.Tests
 {
     [TestFixture]
-    public class TestCommandsWithParam
+    public class TestCommandsOneParam
     {
         DiContainer _container;
 

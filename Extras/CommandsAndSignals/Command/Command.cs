@@ -1,3 +1,4 @@
+using ModestTree.Util;
 using System;
 
 namespace Zenject.Commands
@@ -6,6 +7,7 @@ namespace Zenject.Commands
     {
     }
 
+    // Zero params
     public abstract class Command : ICommand
     {
         Action _handler;
@@ -22,35 +24,105 @@ namespace Zenject.Commands
         }
     }
 
-    public abstract class Command<T1> : ICommand
+    // One param
+    public abstract class Command<TParam1> : ICommand
     {
-        Action<T1> _handler;
+        Action<TParam1> _handler;
 
         [PostInject]
-        public void Construct(Action<T1> handler)
+        public void Construct(Action<TParam1> handler)
         {
             _handler = handler;
         }
 
-        public void Execute(T1 param1)
+        public void Execute(TParam1 param1)
         {
             _handler(param1);
         }
     }
 
-    public abstract class Command<T1, T2> : ICommand
+    // Two params
+    public abstract class Command<TParam1, TParam2> : ICommand
     {
-        Action<T1, T2> _handler;
+        Action<TParam1, TParam2> _handler;
 
         [PostInject]
-        public void Construct(Action<T1, T2> handler)
+        public void Construct(Action<TParam1, TParam2> handler)
         {
             _handler = handler;
         }
 
-        public void Execute(T1 param1, T2 param2)
+        public void Execute(TParam1 param1, TParam2 param2)
         {
             _handler(param1, param2);
+        }
+    }
+
+    // Three params
+    public abstract class Command<TParam1, TParam2, TParam3> : ICommand
+    {
+        Action<TParam1, TParam2, TParam3> _handler;
+
+        [PostInject]
+        public void Construct(Action<TParam1, TParam2, TParam3> handler)
+        {
+            _handler = handler;
+        }
+
+        public void Execute(TParam1 param1, TParam2 param2, TParam3 param3)
+        {
+            _handler(param1, param2, param3);
+        }
+    }
+
+    // Four params
+    public abstract class Command<TParam1, TParam2, TParam3, TParam4> : ICommand
+    {
+        Action<TParam1, TParam2, TParam3, TParam4> _handler;
+
+        [PostInject]
+        public void Construct(Action<TParam1, TParam2, TParam3, TParam4> handler)
+        {
+            _handler = handler;
+        }
+
+        public void Execute(TParam1 param1, TParam2 param2, TParam3 param3, TParam4 param4)
+        {
+            _handler(param1, param2, param3, param4);
+        }
+    }
+
+    // Five params
+    public abstract class Command<TParam1, TParam2, TParam3, TParam4, TParam5> : ICommand
+    {
+        Action<TParam1, TParam2, TParam3, TParam4, TParam5> _handler;
+
+        [PostInject]
+        public void Construct(Action<TParam1, TParam2, TParam3, TParam4, TParam5> handler)
+        {
+            _handler = handler;
+        }
+
+        public void Execute(TParam1 param1, TParam2 param2, TParam3 param3, TParam4 param4, TParam5 param5)
+        {
+            _handler(param1, param2, param3, param4, param5);
+        }
+    }
+
+    // Six params
+    public abstract class Command<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6> : ICommand
+    {
+        Action<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6> _handler;
+
+        [PostInject]
+        public void Construct(Action<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6> handler)
+        {
+            _handler = handler;
+        }
+
+        public void Execute(TParam1 param1, TParam2 param2, TParam3 param3, TParam4 param4, TParam5 param5, TParam6 param6)
+        {
+            _handler(param1, param2, param3, param4, param5, param6);
         }
     }
 }
