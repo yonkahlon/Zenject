@@ -43,11 +43,20 @@ namespace Asteroids
         void InstallAsteroids()
         {
             Container.Bind<LevelHelper>().ToSingle();
-
+         
+            // ITickable, IFixedTickable, IInitializable and IDisposable are special Zenject interfaces.
+            // Binding a class to any of these interfaces creates an instance of the class at startup.
+            // Binding to any of these interfaces is also necessary to have the method defined in that interface be
+            // called on the implementing class as follows:
+			// Binding to ITickable or IFixedTickable will result in Tick() or FixedTick() being called like Update() or FixedUpdate().
+			// Binding to IInitializable means that Initialize() will be called on startup.
+			// Binding to IDisposable means that Dispose() will be called when the app closes, the scene changes,
+			// or the composition root object is destroyed.
+			
             // Any time you use ToSingle<>, what that means is that the DiContainer will only ever instantiate
             // one instance of the type given inside the ToSingle<>. So in this case, any classes that take ITickable,
             // IFixedTickable, or AsteroidManager as inputs will receive the same instance of AsteroidManager.
-            // We create multiple bindings for ITickable, so dependencies referencing this type must be lists of ITickable.
+            // We create multiple bindings for ITickable, so any dependencies that reference this type must be lists of ITickable.
             Container.Bind<ITickable>().ToSingle<AsteroidManager>();
             Container.Bind<IFixedTickable>().ToSingle<AsteroidManager>();
             Container.Bind<AsteroidManager>().ToSingle();
