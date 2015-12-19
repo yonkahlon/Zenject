@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using ModestTree;
+using ModestTree.Util;
 using System.Linq;
 
 namespace Zenject.Commands
@@ -184,4 +185,209 @@ namespace Zenject.Commands
             return HandleWithSingle<THandler>(null, methodGetter);
         }
     }
+
+    // Three parameters
+    [System.Diagnostics.DebuggerStepThrough]
+    public class CommandBinder<TCommand, TParam1, TParam2, TParam3> : CommandBinderBase<TCommand, Action<TParam1, TParam2, TParam3>>
+        where TCommand : Command<TParam1, TParam2, TParam3>
+    {
+        public CommandBinder(
+            DiContainer container, string identifier, SingletonProviderMap singletonMap)
+            : base(container, identifier, singletonMap)
+        {
+        }
+
+        public BindingConditionSetter HandleWithTransient<THandler>(
+            string concreteIdentifier, Func<THandler, Action<TParam1, TParam2, TParam3>> methodGetter)
+        {
+            return ToProvider(
+                new CommandProviderMethodTransient<TCommand, THandler, TParam1, TParam2, TParam3>(
+                    Container, methodGetter));
+        }
+
+        public BindingConditionSetter HandleWithTransient<THandler>(Func<THandler, Action<TParam1, TParam2, TParam3>> methodGetter)
+        {
+            return HandleWithTransient<THandler>(null, methodGetter);
+        }
+
+        public BindingConditionSetter HandleWithSingle<THandler>()
+            where THandler : ICommandHandler<TParam1, TParam2, TParam3>
+        {
+            return HandleWithSingle<THandler>((string)null);
+        }
+
+        public BindingConditionSetter HandleWithSingle<THandler>(string concreteIdentifier)
+            where THandler : ICommandHandler<TParam1, TParam2, TParam3>
+        {
+            return ToProvider(
+                new CommandProviderHandlerSingle<TCommand, THandler, TParam1, TParam2, TParam3>(
+                    Container, CreateSingletonProvider<THandler>(concreteIdentifier)));
+        }
+
+        public BindingConditionSetter HandleWithSingle<THandler>(
+            string concreteIdentifier, Func<THandler, Action<TParam1, TParam2, TParam3>> methodGetter)
+        {
+            return ToProvider(new CommandProviderMethodSingle<TCommand, THandler, TParam1, TParam2, TParam3>(
+                Container, methodGetter, CreateSingletonProvider<THandler>(concreteIdentifier)));
+        }
+
+        public BindingConditionSetter HandleWithSingle<THandler>(Func<THandler, Action<TParam1, TParam2, TParam3>> methodGetter)
+        {
+            return HandleWithSingle<THandler>(null, methodGetter);
+        }
+    }
+
+    // Four parameters
+    [System.Diagnostics.DebuggerStepThrough]
+    public class CommandBinder<TCommand, TParam1, TParam2, TParam3, TParam4> : CommandBinderBase<TCommand, Action<TParam1, TParam2, TParam3, TParam4>>
+        where TCommand : Command<TParam1, TParam2, TParam3, TParam4>
+    {
+        public CommandBinder(
+            DiContainer container, string identifier, SingletonProviderMap singletonMap)
+            : base(container, identifier, singletonMap)
+        {
+        }
+
+        public BindingConditionSetter HandleWithTransient<THandler>(
+            string concreteIdentifier, Func<THandler, Action<TParam1, TParam2, TParam3, TParam4>> methodGetter)
+        {
+            return ToProvider(
+                new CommandProviderMethodTransient<TCommand, THandler, TParam1, TParam2, TParam3, TParam4>(
+                    Container, methodGetter));
+        }
+
+        public BindingConditionSetter HandleWithTransient<THandler>(Func<THandler, Action<TParam1, TParam2, TParam3, TParam4>> methodGetter)
+        {
+            return HandleWithTransient<THandler>(null, methodGetter);
+        }
+
+        public BindingConditionSetter HandleWithSingle<THandler>()
+            where THandler : ICommandHandler<TParam1, TParam2, TParam3, TParam4>
+        {
+            return HandleWithSingle<THandler>((string)null);
+        }
+
+        public BindingConditionSetter HandleWithSingle<THandler>(string concreteIdentifier)
+            where THandler : ICommandHandler<TParam1, TParam2, TParam3, TParam4>
+        {
+            return ToProvider(
+                new CommandProviderHandlerSingle<TCommand, THandler, TParam1, TParam2, TParam3, TParam4>(
+                    Container, CreateSingletonProvider<THandler>(concreteIdentifier)));
+        }
+
+        public BindingConditionSetter HandleWithSingle<THandler>(
+            string concreteIdentifier, Func<THandler, Action<TParam1, TParam2, TParam3, TParam4>> methodGetter)
+        {
+            return ToProvider(new CommandProviderMethodSingle<TCommand, THandler, TParam1, TParam2, TParam3, TParam4>(
+                Container, methodGetter, CreateSingletonProvider<THandler>(concreteIdentifier)));
+        }
+
+        public BindingConditionSetter HandleWithSingle<THandler>(Func<THandler, Action<TParam1, TParam2, TParam3, TParam4>> methodGetter)
+        {
+            return HandleWithSingle<THandler>(null, methodGetter);
+        }
+    }
+
+    // Five parameters
+    [System.Diagnostics.DebuggerStepThrough]
+    public class CommandBinder<TCommand, TParam1, TParam2, TParam3, TParam4, TParam5> : CommandBinderBase<TCommand, Action<TParam1, TParam2, TParam3, TParam4, TParam5>>
+        where TCommand : Command<TParam1, TParam2, TParam3, TParam4, TParam5>
+    {
+        public CommandBinder(
+            DiContainer container, string identifier, SingletonProviderMap singletonMap)
+            : base(container, identifier, singletonMap)
+        {
+        }
+
+        public BindingConditionSetter HandleWithTransient<THandler>(
+            string concreteIdentifier, Func<THandler, Action<TParam1, TParam2, TParam3, TParam4, TParam5>> methodGetter)
+        {
+            return ToProvider(
+                new CommandProviderMethodTransient<TCommand, THandler, TParam1, TParam2, TParam3, TParam4, TParam5>(
+                    Container, methodGetter));
+        }
+
+        public BindingConditionSetter HandleWithTransient<THandler>(Func<THandler, Action<TParam1, TParam2, TParam3, TParam4, TParam5>> methodGetter)
+        {
+            return HandleWithTransient<THandler>(null, methodGetter);
+        }
+
+        public BindingConditionSetter HandleWithSingle<THandler>()
+            where THandler : ICommandHandler<TParam1, TParam2, TParam3, TParam4, TParam5>
+        {
+            return HandleWithSingle<THandler>((string)null);
+        }
+
+        public BindingConditionSetter HandleWithSingle<THandler>(string concreteIdentifier)
+            where THandler : ICommandHandler<TParam1, TParam2, TParam3, TParam4, TParam5>
+        {
+            return ToProvider(
+                new CommandProviderHandlerSingle<TCommand, THandler, TParam1, TParam2, TParam3, TParam4, TParam5>(
+                    Container, CreateSingletonProvider<THandler>(concreteIdentifier)));
+        }
+
+        public BindingConditionSetter HandleWithSingle<THandler>(
+            string concreteIdentifier, Func<THandler, Action<TParam1, TParam2, TParam3, TParam4, TParam5>> methodGetter)
+        {
+            return ToProvider(new CommandProviderMethodSingle<TCommand, THandler, TParam1, TParam2, TParam3, TParam4, TParam5>(
+                Container, methodGetter, CreateSingletonProvider<THandler>(concreteIdentifier)));
+        }
+
+        public BindingConditionSetter HandleWithSingle<THandler>(Func<THandler, Action<TParam1, TParam2, TParam3, TParam4, TParam5>> methodGetter)
+        {
+            return HandleWithSingle<THandler>(null, methodGetter);
+        }
+    }
+
+    // Six parameters
+    [System.Diagnostics.DebuggerStepThrough]
+    public class CommandBinder<TCommand, TParam1, TParam2, TParam3, TParam4, TParam5, TParam6> : CommandBinderBase<TCommand, Action<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6>>
+        where TCommand : Command<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6>
+    {
+        public CommandBinder(
+            DiContainer container, string identifier, SingletonProviderMap singletonMap)
+            : base(container, identifier, singletonMap)
+        {
+        }
+
+        public BindingConditionSetter HandleWithTransient<THandler>(
+            string concreteIdentifier, Func<THandler, Action<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6>> methodGetter)
+        {
+            return ToProvider(
+                new CommandProviderMethodTransient<TCommand, THandler, TParam1, TParam2, TParam3, TParam4, TParam5, TParam6>(
+                    Container, methodGetter));
+        }
+
+        public BindingConditionSetter HandleWithTransient<THandler>(Func<THandler, Action<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6>> methodGetter)
+        {
+            return HandleWithTransient<THandler>(null, methodGetter);
+        }
+
+        public BindingConditionSetter HandleWithSingle<THandler>()
+            where THandler : ICommandHandler<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6>
+        {
+            return HandleWithSingle<THandler>((string)null);
+        }
+
+        public BindingConditionSetter HandleWithSingle<THandler>(string concreteIdentifier)
+            where THandler : ICommandHandler<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6>
+        {
+            return ToProvider(
+                new CommandProviderHandlerSingle<TCommand, THandler, TParam1, TParam2, TParam3, TParam4, TParam5, TParam6>(
+                    Container, CreateSingletonProvider<THandler>(concreteIdentifier)));
+        }
+
+        public BindingConditionSetter HandleWithSingle<THandler>(
+            string concreteIdentifier, Func<THandler, Action<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6>> methodGetter)
+        {
+            return ToProvider(new CommandProviderMethodSingle<TCommand, THandler, TParam1, TParam2, TParam3, TParam4, TParam5, TParam6>(
+                Container, methodGetter, CreateSingletonProvider<THandler>(concreteIdentifier)));
+        }
+
+        public BindingConditionSetter HandleWithSingle<THandler>(Func<THandler, Action<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6>> methodGetter)
+        {
+            return HandleWithSingle<THandler>(null, methodGetter);
+        }
+    }
+
 }

@@ -6,18 +6,45 @@ namespace Zenject.Commands
     {
     }
 
+    // Zero params
     public interface ICommandHandler : ICommandHandlerBase
     {
         void Execute();
     }
 
-    public interface ICommandHandler<T1> : ICommandHandlerBase
+    // One param
+    public interface ICommandHandler<TParam1> : ICommandHandlerBase
     {
-        void Execute(T1 p1);
+        void Execute(TParam1 p1);
     }
 
-    public interface ICommandHandler<T1, T2> : ICommandHandlerBase
+    // Two params
+    public interface ICommandHandler<TParam1, TParam2> : ICommandHandlerBase
     {
-        void Execute(T1 p1, T2 p2);
+        void Execute(TParam1 p1, TParam2 p2);
+    }
+
+    // Three params
+    public interface ICommandHandler<TParam1, TParam2, TParam3> : ICommandHandlerBase
+    {
+        void Execute(TParam1 p1, TParam2 p2, TParam3 p3);
+    }
+
+    // Four params
+    public interface ICommandHandler<TParam1, TParam2, TParam3, TParam4> : ICommandHandlerBase
+    {
+        void Execute(TParam1 p1, TParam2 p2, TParam3 p3, TParam4 p4);
+    }
+
+    // Five params
+    public interface ICommandHandler<TParam1, TParam2, TParam3, TParam4, TParam5> : ICommandHandlerBase
+    {
+        void Execute(TParam1 p1, TParam2 p2, TParam3 p3, TParam4 p4, TParam5 p5);
+    }
+
+    // Six params
+    public interface ICommandHandler<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6> : ICommandHandlerBase
+    {
+        void Execute(TParam1 p1, TParam2 p2, TParam3 p3, TParam4 p4, TParam5 p5, TParam6 p6);
     }
 }
