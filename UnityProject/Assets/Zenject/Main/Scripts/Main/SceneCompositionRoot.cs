@@ -48,7 +48,7 @@ namespace Zenject
         string GetCurrentSceneName()
         {
 #if UNITY_5_3
-            SceneManager.GetActiveScene().name;
+            return SceneManager.GetActiveScene().name;
 #else
             return Application.loadedLevelName;
 #endif
