@@ -50,7 +50,7 @@ namespace Zenject.Tests
             }
         }
 
-        protected virtual void InstallBindings()
+        public virtual void InstallBindings()
         {
         }
 

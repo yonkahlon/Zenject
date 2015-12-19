@@ -40,8 +40,8 @@
         * <a href="#scenes-decorator">Scenes Decorators</a>
         * <a href="#advanced-factory-construction-using-subcontainers">Advanced Factory Construction Using SubContainers</a>
         * <a href="#sub-containers-and-facades">Sub-Containers and Facades</a>
+        * <a href="#commands-and-signals">Commands And Signals</a>
         * <a href="#auto-mocking-using-moq">Auto-Mocking Using Moq</a>
-        * <a href="#visualizing-object-graphs-automatically">Visualizing Object Graph Automatically</a>
     * <a href="#questions">Frequently Asked Questions</a>
         * <a href="#aot-support">Does this work on AOT platforms such as iOS and WebGL?</a>
         * <a href="#faq-performance">How is Performance?</a>
@@ -83,6 +83,7 @@ __Quick Start__:  If you are already familiar with dependency injection and are 
 * Ability to validate object graphs at editor time including dynamic object graphs created via factories
 * Ability to print entire object graph as a UML image automatically
 * Nested Containers / Sub-Containers
+* Support for Commands and Signals
 * Ability to easily define discrete 'islands' of dependencies using 'Facade' classes
 * Auto-Mocking using the Moq library
 
@@ -244,8 +245,7 @@ You can run this example by doing the following:
 
 * Copy and paste the above code into a file named 'TestInstaller'
 * Create a new scene in Unity
-* Add a new GameObject and name it "CompositionRoot" (though the name does not really matter)
-* Attach the "Utils\SceneDecoratorCompositionRoot.cs" MonoBehaviour out of Zenject to your new GameObject
+* Right Click inside the Hierarchy tab and select Zenject -> Scene Composition Root
 * Add your TestInstaller script to the scene as well (as its own GameObject or on the same GameObject as the CompositionRoot, it doesn't matter)
 * Add a reference to your TestInstaller to the properties of the CompositionRoot by adding a new row in the inspector of the "Installers" property (Increase "Size" to 1) and then dragging the TestInstaller GameObject to it
 * Validate your scene by either selecting Edit -> Zenject -> Validate Current Scene or hitting CTRL+SHIFT+V.  (note that this step isn't necessary but good practice to get into)
@@ -988,15 +988,15 @@ A Zenject driven application is executed by the following steps:
 1. Composition Root creates a new DiContainer object to be used to contain all instances used in the scene
 1. Composition Root iterates through all the Installers that have been added to it via the Unity Inspector, and updates them to point to the new DiContainer.  It then calls InstallBindings() on each installer.
 1. Each Installer then registers different sets of dependencies directly on to the given DiContainer by calling one of the Bind<> methods.  Note that the order that this binding occurs should not generally matter. Each installer may also include other installers by calling Container.Install<>. Each installer can also add bindings to configure other installers, however note that in this case order might actually matter, since you will have to make sure that code configuring other installers is executed before the installers that you are configuring! You can control the order by simply re-ordering the Installers property of the CompositionRoot
-1. The Composition Root then traverses all game object descendants (or the entire scene if 'Inject on Full Scene' property is checked in the inspector) and injects all MonoBehaviours with their dependencies. Since MonoBehaviours are instantiated by Unity we cannot use constructor injection in this case and therefore [PostInject] injection, field injection or property injection must be used instead.
-1. After filling in the scene dependencies the Composition Root then executes a single resolve for 'IDependencyRoot'.  For unity apps this is UnityDependencyRoot (which implements the IDependencyRoot interface).  The UnityDependencyRoot class has dependencies on TickableManager, InitializableManager, and DisposableManager classes, and therefore Zenject constructs instances of those as well before creating the UnityDependencyRoot.  Those classes contains dependencies for lists of ITickable, IInitializable, and IDisposables.  So once again Zenject resolves all instances bound to any of these interfaces before constructing the manager classes.  This is important to know because it is why when you bind something to ITickable/IInitializable/IDisposable, it is always created at startup.
+1. The Composition Root then injects all MonoBehaviours that are in the scene with their dependencies. Note that since MonoBehaviours are instantiated by Unity we cannot use constructor injection in this case and therefore [PostInject] injection, field injection or property injection must be used instead.
+1. After filling in the scene dependencies the Composition Root then executes a single resolve for 'IFacade'.  This class represents the root of the object graph.  The Facade class by default has dependencies on TickableManager, InitializableManager, and DisposableManager classes, and therefore Zenject constructs instances of those as well before creating the main dependency root.  Those classes contains dependencies for lists of ITickable, IInitializable, and IDisposables.  So once again Zenject resolves all instances bound to any of these interfaces before constructing the manager classes.  This is important to know because it is why when you bind something to ITickable/IInitializable/IDisposable, it is always created at startup.
 1. If any required dependencies cannot be resolved, a ZenjectResolveException is thrown
 1. All other MonoBehaviour's in your scene has their Awake() method called
 1. Unity Start() phase begins
 1. CompositionRoot.Start() method is called.  This will trigger the Initialize() method on all IInitializable objects in the order specified in the installers.  The execution order mentioned above should guarantee that IInitializable.Initialize() occurs before any Start() method in your scene
 1. All other MonoBehaviour's in your scene has their Start() method called
 1. Unity Update() phase begins
-1. UnityDependencyRoot.Update() is called, which results in Tick() being called for all ITickable objects (in the order specified in the installers)
+1. Facade.Update() is called, which results in Tick() being called for all ITickable objects (in the order specified in the installers)
 1. All other MonoBehaviour's in your scene has their Update() method called
 1. Steps 13 - 15 is repeated for LateUpdate
 1. At the same time, Steps 13 - 15 is repeated for FixedUpdate according to the physics timestep
@@ -1036,13 +1036,17 @@ Please feel free to submit any other sources of confusion to sfvermeulen@gmail.c
 
 ## <a id="global-bindings"></a>Global Bindings
 
-This all works great for each individual scene, but what if have dependencies that you wish to persist permanently across all scenes?  In Zenject you can do this by adding installers to the global container.
+This all works great for each individual scene, but what if you have dependencies that you wish to persist permanently across all scenes?  In Zenject you can do this by adding installers to a global container.
 
-This works by first add a global composition root and then adding installers to it.  You can create an empty global composition root by selecting Edit -> Zenject -> Create Global Composition Root.  After selecting this menu item you should see a new asset in the root level Resources folder called 'ZenjectGlobalCompositionRoot'.
+To do this, first add a global installers asset to your project directory then add installers to it.  Create or find a folder named Resources in your project tab, then right click and select Create -> Zenject -> Global Installers Asset.  You should then see a new asset in the selected Resources folder called 'ZenjectGlobalInstallers'.
 
-If you click on this it will display a property for the list of Installers in the same way that it does for the composition root object that is placed in each scene.  The only difference in this case is that the installers you add here must exist in the project as prefabs and cannot exist in any specific scene.  You can then directly reference those prefabs by dragging them into the Installers property of the global composition root.
+If you click on this it will display a property for the list of Installers in the same way that it does for the composition root object that is placed in each scene.  The only difference is that the installers you add here must exist in the project as prefabs and cannot exist in any specific scene.  You can then directly reference those prefabs by dragging them into the Installers property of the global installers asset.
 
-Then, when you start any scene, the CompositionRoot for the scene will call the global composition root to install the global bindings, before installing any scene specific bindings.  If you load another scene from the first scene, the global composition root will not be called again and the bindings that it added previously will persist into the new scene.  You can declare ITickable / IInitializable / IDisposable objects in your global installers in the same way you do for your scene installers with the result being IInitializable.Initialize is called only once across each play session and IDisposable.Dispose is only called once the application is fully stopped.
+Note that you can add multiple Global Installers asset's in different resource folders and they will all be installed.
+
+When you start any scene that contains a Scene Composition Root, this will cause every Global Installers Asset in your project to be installed.  This will always occur before any scene specific installers are called.  Note also that this only occurs once.  If you load another scene from the first scene, your global installers will not be called again and the bindings that it added previously will persist into the new scene.  You can declare ITickable / IInitializable / IDisposable objects in your global installers in the same way you do for your scene installers with the result being IInitializable.Initialize is called only once across each play session and IDisposable.Dispose is only called once the application is fully stopped.
+
+This works because the container defined for each scene is nested inside the global container that your global installers bind into.  For more information on nested containers see <a href="#sub-containers-and-facades">here</a>.
 
 ## <a id="update--initialization-order"></a>Update / Initialization Order
 
@@ -2039,6 +2043,149 @@ public class GameInstaller : MonoInstaller
 }
 ```
 
+## <a id="commands-and-signals"></a>Commands And Signals
+
+Zenject also includes an optional extension that allows you to define "Commands" and "Signals".
+
+A signal can be thought of as a single event, that when triggered will notify a number of listeners.  A command is an object with a single method named `Execute`, that will forward the request to a specific handler.
+
+The advantage of using Signals and Commands is that the result will often be more loosely coupled code.  Given two classes A and B that need to communicate, your options are usually:
+
+1. Directly call a method on B from A.  In this case, A is strongly coupled with B.
+2. Inverse the dependency by having B observe an event on A.  In this case, B is strongly coupled with A.
+
+Both cases result in the classes being coupled in some way.  Now if instead you create a command object, which is called by A and which invokes a method on B, then the result is less coupling.  Granted, A is still coupled to the command class, but in some cases that is better than being directly coupled to B.  Using signals works similarly, in that you can remove the coupling by having A trigger a signal, which is observed by B.
+
+Signals are defined like this:
+
+```csharp
+public class GameLoadedSignal : Signal
+{
+    public class Trigger : TriggerBase { }
+}
+
+public class GameLoadedSignalWithParameter : Signal<string>
+{
+    public class Trigger : TriggerBase { }
+}
+```
+
+The trigger class is used to invoke the signal event.  Note that the Signal base class is defined within the Zenject.Commands namespace.
+
+Signals are declared in an installer like this:
+
+```csharp
+
+public override void InstallBindings()
+{
+    ...
+    Container.BindSignalTrigger<GameLoadedSignal.Trigger, GameLoadedSignal>().WhenInjectedInto<Foo>();
+    ...
+    Container.BindSignalTrigger<GameLoadedSignalWithParameter.Trigger, GameLoadedSignalWithParameter, string>().WhenInjectedInto<Foo>();
+}
+
+```
+
+This statement will do the following:
+* Bind the class `GameLoadedSignal` as `ToSingle<>` without a condition.  This means that any class can declare `GameLoadedSignal` as a dependency.
+* Bind the class `GameLoadedSignal.Trigger` as `ToSingle<>` as well, except it will limit its usage strictly to class `Foo`.
+
+Commands are defined like this
+
+```csharp
+public class ResetSceneCommand : Command { }
+
+public class ResetSceneCommandWithParameter : Command<string> { }
+```
+
+Note again that the Command base class is defined within the Zenject.Commands namespace here.
+
+Unlike with signals, there are several different ways of declaring a command in an installer.  Perhaps the simplest way would be the following:
+
+```csharp
+public override void InstallBindings()
+{
+    ...
+    Container.BindCommand<ResetSceneCommand>().HandleWithSingle<ResetSceneHandler>();
+    ...
+    Container.BindCommand<ResetSceneCommandWithParameter, string>().HandleWithSingle<ResetSceneHandler>();
+    ...
+}
+
+public class ResetSceneHandler : ICommandHandler
+{
+    public void Execute()
+    {
+        ... [reset scene] ...
+    }
+}
+```
+
+This bind statement will result in an object of type `ResetSceneCommand` being added to the container.  Any time a class calls Execute on `ResetSceneCommand`, it will trigger the Execute method on the `ResetSceneHandler` class as well.  For example:
+
+```csharp
+public class Foo : ITickable
+{
+    readonly ResetSceneCommand _command;
+
+    public Foo(ResetSceneCommand command)
+    {
+        _command = command;
+    }
+
+    public void Tick()
+    {
+        ...
+        _command.Execute();
+        ...
+    }
+}
+```
+
+We might also want to restrict usage of our command to the Foo class only, which we could do with the following
+
+```csharp
+public override void InstallBindings()
+{
+    ...
+    Container.BindCommand<ResetSceneCommand>().HandleWithSingle<ResetSceneHandler>().WhenInjectedInto<Foo>();
+    ...
+}
+```
+
+Note that in this case we are using `HandleWithSingle<>` - this means that the same instance of `ResetSceneHandler` will be used every time the command is executed.  Alternatively, you could declare it using `HandleWithTransient<>` which would instantiate a new instance of `ResetSceneHandler` every time Execute() is called.  For example:
+
+```csharp
+Container.BindCommand<ResetSceneCommand>().HandleWithTransient<ResetSceneHandler>();
+```
+
+This might be useful if the `ResetSceneCommand` class involves some long-running operations that require unique sets of member variables/dependencies.
+
+You can also bind commands directly to methods instead of classes by doing the following:
+
+```csharp
+public override void InstallBindings()
+{
+    ...
+    Container.BindCommand<ResetSceneCommand>().HandleWithSingle<MyOtherHandler>(x => x.ResetScene);
+    ...
+}
+
+public class ResetSceneHandler
+{
+    public void ResetScene()
+    {
+        ... [reset scene] ...
+    }
+}
+```
+
+This approach does not require that you derive from `ICommandHandler` at all.  There is also a `HandleWithTransient` version of this which works similarly (instantiates a new instance of MyOtherHandler).
+
+```csharp
+Container.BindCommand<ResetSceneCommand>().HandleWithTransient<MyOtherHandler>(x => x.ResetScene);
+```
+
 ## <a id="auto-mocking-using-moq"></a>Auto-Mocking using Moq
 
 One of the really cool features of DI is the fact that it makes testing code much, much easier.  This is because you can easily substitute one dependency for another by using a different Composition Root.  For example, if you only want to test a particular class (let's call it Foo) and don't care about testing its dependencies, you might write 'mocks' for them so that you can isolate Foo specifically.
@@ -2097,18 +2244,6 @@ Container.Bind<IFoo>().ToMock();
 ```
 
 However, this approach will not allow you to take advantage of the advanced features of Moq.  For more advanced usages, see the documentation for Moq
-
-## <a id="visualizing-object-graphs-automatically"></a>Visualizing Object Graphs Automatically
-
-Zenject allows users to generate UML-style images of the object graphs for their applications.  You can do this simply by running your Zenject-driven app, then selecting from the menu `Assets -> Zenject -> Output Object Graph For Current Scene`.  You will be prompted for a location to save the generated image file.
-
-Note that you will need to have graphviz installed for this to work (which you can find [here](http://www.graphviz.org/)).  You will be prompted to choose the location the first time.
-
-The result is two files (Foo.dot and Foo.png).  The dot file is included in case you want to add custom graphviz commands.  As an example, this is the graph that is generated when run on the sample project:
-
-However, admittedly, I personally haven't gotten a lot of mileage out of this feature.  When I have found it useful it's when I first encounter a lot of unfamiliar code.  Reading a visual diagram can be easier than reading the code in some cases.
-
-<img src="UnityProject/Assets/Zenject/Main/ExampleObjectGraph.png?raw=true" alt="Example Object Graph" width="600px" height="127px"/>
 
 ## <a id="questions"></a>Frequently Asked Questions
 
@@ -2462,6 +2597,29 @@ Foo foo = Container.InstantiateComponent<Foo>(gameObject);
 For general troubleshooting / support, please use the [zenject subreddit](http://www.reddit.com/r/zenject) or the [zenject google group](https://groups.google.com/forum/#!forum/zenject/).  If you have found a bug, you are also welcome to create an issue on the [github page](https://github.com/modesttree/Zenject), or a pull request if you have a fix / extension.  You can also follow [@Zenject](https://twitter.com/Zenject) on twitter for updates.  Finally, you can also email me directly at sfvermeulen@gmail.com
 
 ## <a id="release-notes"></a>Release Notes
+
+3.2
+- Added the concept of "Commands" and "Signals".  See documentation for details.
+- Fixed validation for decorator scenes that open decorator scenes.
+- Changed to be more strict when using a combination of differents kinds of ToSingle<>, since there should only be one way to create the singleton.
+- Added ToSingleFactory bind method, for cases where you have complex construction requirements and don't want to use ToSingleMethod
+- Changed the way scene decorators work slightly.  It now groups decorated scenes into their own game object parent
+- Removed the InjectFullScene flag on SceneCompositionRoot.  Now always injects on the full scene.
+- Renamed AllowNullBindings to IsValidating so it can be used for other kinds of validation-only logic
+- Renamed BinderUntyped to UntypedBinder and BinderGeneric to GenericBinder
+- Changed to assert if the same installer is installed twice. Before, it used to just skip the second call to Install<>. This seems better because in theory you might want to call the same installer multiple times with different arguments, so it doesn't make sense to assume that you want to skip subsequent calls to Install<>.
+- Added the ability to install MonoInstaller's directly from inside other installers.  In this case it tries to load a prefab from the resources directory before giving up.
+- Added some better error output in a few places
+- Fixed some iOS AOT issues
+- Added BindFacade<> method to DiContainer, to allow creating nested containers without needing to use a factory.
+- Added an Open button in scene decorator comp root for easily jumping to the decorated scene
+- Removed support for object graph visualization since I hadn't bothered maintaining it
+- Got the optional Moq extension method ToMock() working again
+- Fixed scene decorators to play more nicely with Unity's own way of handling LoadLevelAdditive.  Decorated scenes are not organized in the scene heirarchy by scene thanks to the Unity 5.3 update
+
+3.1
+- Changes related to upgrading to Unity 5.3
+- Fixed again to make zero heap allocations per frame
 
 3.0
 - Added much better support for nested containers.  It now works more closely to what you might expect:  Any parent dependencies are always inherited in sub-containers, even for optional injectables.  Also removed BindScope and FallbackContainer since these were really just workarounds for this feature missing.  Also added [InjectLocal] attribute for cases where you want to inject dependencies only from the local container.
