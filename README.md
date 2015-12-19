@@ -667,6 +667,11 @@ See the <a href="#abstract-factories">abstract factories section</a> for more in
 
 See <a href="#sub-containers-and-facades">this section</a> for more details on this binding.
 
+21 - **BindFacade** - Declare a nested container facade.
+
+See <a href="#sub-containers-and-facades">this section</a> for more details on this binding.
+
+
 ## <a id="list-bindings"></a>List Bindings
 
 When Zenject finds multiple bindings for the same type, it interprets that to be a list.  So, in the example code below, Bar would get a list containing a new instance of Foo1, Foo2, and Foo3:
