@@ -15,7 +15,7 @@ namespace Asteroids
     public class AsteroidsInstaller : MonoInstaller
     {
         [SerializeField]
-        Settings _settings;
+        Settings _settings = null;
 
         public override void InstallBindings()
         {
