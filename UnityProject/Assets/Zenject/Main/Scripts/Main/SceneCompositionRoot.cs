@@ -7,7 +7,10 @@ using System.Linq;
 using ModestTree;
 using ModestTree.Util;
 using UnityEngine;
+
+#if UNITY_5_3
 using UnityEngine.SceneManagement;
+#endif
 
 namespace Zenject
 {
@@ -42,9 +45,18 @@ namespace Zenject
             }
         }
 
+        string GetCurrentSceneName()
+        {
+#if UNITY_5_3
+            SceneManager.GetActiveScene().name;
+#else
+            return Application.loadedLevelName;
+#endif
+        }
+
         protected override void Initialize()
         {
-            Log.Debug("Initializing SceneCompositionRoot in scene '{0}'", SceneManager.GetActiveScene().name);
+            Log.Debug("Initializing SceneCompositionRoot in scene '{0}'", GetCurrentSceneName());
             InitContainer();
             Log.Debug("SceneCompositionRoot: Finished install phase.  Injecting into scene...");
             InitialInject();

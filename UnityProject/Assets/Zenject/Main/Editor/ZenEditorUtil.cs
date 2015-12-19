@@ -8,7 +8,10 @@ using ModestTree.Util;
 using UnityEditor;
 using UnityEngine;
 using ModestTree;
+
+#if UNITY_5_3
 using UnityEditor.SceneManagement;
+#endif
 
 namespace Zenject
 {
