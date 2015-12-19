@@ -82,11 +82,18 @@
       <Project>{46f25a62-2e29-48cb-95f3-bdbcb0976ddc}</Project>
       <Name>Zenject</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\CommandsAndSignals\Zenject.Commands.csproj">
+      <Project>{b543a0b8-2630-424e-b628-53457be4884b}</Project>
+      <Name>Zenject.Commands</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
-  </ItemGroup>
-  <ItemGroup>
+    <Compile Include="CommandsAndSignals\TestCommands.cs" />
+    <Compile Include="CommandsAndSignals\TestCommandsOneParam.cs" />
+    <Compile Include="CommandsAndSignals\TestCommandsSixParams.cs" />
+    <Compile Include="CommandsAndSignals\TestSignals.cs" />
+    <Compile Include="CommandsAndSignals\TestSignalsOneParam.cs" />
+    <Compile Include="CommandsAndSignals\TestSignalsSixParams.cs" />
     <Compile Include="Factories\TestFactory.cs" />
     <Compile Include="Factories\TestFactoryNullArgs.cs" />
     <Compile Include="Factories\TestIFactory.cs" />
@@ -103,8 +110,10 @@
     <Compile Include="TestConditionsTarget.cs" />
     <Compile Include="TestConditionsTargetInstance.cs" />
     <Compile Include="TestConstructorInjection.cs" />
+    <Compile Include="TestConstructorInjectionOptional.cs" />
     <Compile Include="TestDiContainer.cs" />
     <Compile Include="TestDuplicateInjection.cs" />
+    <Compile Include="TestFacades.cs" />
     <Compile Include="TestGenericContract.cs" />
     <Compile Include="TestIdentifiers.cs" />
     <Compile Include="TestListComparer.cs" />
@@ -112,7 +121,6 @@
     <Compile Include="TestMoq.cs" />
     <Compile Include="TestMultiBind.cs" />
     <Compile Include="TestMultiBindAgain.cs" />
-    <Compile Include="TestMultipleInstallers.cs" />
     <Compile Include="TestMultipleInterfaceSameSingle.cs" />
     <Compile Include="TestNestedContainer.cs" />
     <Compile Include="TestNullableValues.cs" />
@@ -126,6 +134,8 @@
     <Compile Include="TestSingleton.cs" />
     <Compile Include="TestSingletonIdentifiers.cs" />
     <Compile Include="TestStructInjection.cs" />
+    <Compile Include="TestSubContainer2.cs" />
+    <Compile Include="TestSubContainers.cs" />
     <Compile Include="TestTaskUpdater.cs" />
     <Compile Include="TestTestOptional.cs" />
     <Compile Include="TestTestUtil.cs" />

@@ -64,12 +64,12 @@ Material:
         second: 0.078125
       data:
         first:
-          name: _SelfIllumStrength
-        second: 1
-      data:
-        first:
           name: _EmissionLM
         second: 0
+      data:
+        first:
+          name: _SelfIllumStrength
+        second: 1
     m_Colors:
       data:
         first:

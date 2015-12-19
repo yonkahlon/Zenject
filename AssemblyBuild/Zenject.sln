@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zenject-editor", "..\UnityP
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zenject-tests", "..\UnityProject\Assets\Zenject\Extras\ZenjectUnitTests\Editor\Zenject-tests.csproj", "{34E27462-3046-4DC7-A7FA-45E4F4F7D413}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zenject.Commands", "..\UnityProject\Assets\Zenject\Extras\CommandsAndSignals\Zenject.Commands.csproj", "{B543A0B8-2630-424E-B628-53457BE4884B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,14 @@ Global
 		{34E27462-3046-4DC7-A7FA-45E4F4F7D413}.Not Unity Release|Any CPU.Build.0 = Not Unity Release|Any CPU
 		{34E27462-3046-4DC7-A7FA-45E4F4F7D413}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{34E27462-3046-4DC7-A7FA-45E4F4F7D413}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B543A0B8-2630-424E-B628-53457BE4884B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B543A0B8-2630-424E-B628-53457BE4884B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B543A0B8-2630-424E-B628-53457BE4884B}.Not Unity Debug|Any CPU.ActiveCfg = Not Unity Debug|Any CPU
+		{B543A0B8-2630-424E-B628-53457BE4884B}.Not Unity Debug|Any CPU.Build.0 = Not Unity Debug|Any CPU
+		{B543A0B8-2630-424E-B628-53457BE4884B}.Not Unity Release|Any CPU.ActiveCfg = Not Unity Release|Any CPU
+		{B543A0B8-2630-424E-B628-53457BE4884B}.Not Unity Release|Any CPU.Build.0 = Not Unity Release|Any CPU
+		{B543A0B8-2630-424E-B628-53457BE4884B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B543A0B8-2630-424E-B628-53457BE4884B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

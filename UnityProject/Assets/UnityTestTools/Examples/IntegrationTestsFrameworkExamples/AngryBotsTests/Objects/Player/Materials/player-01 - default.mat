@@ -45,13 +45,6 @@ Material:
           m_Offset: {x: 0, y: 0}
       data:
         first:
-          name: _Normal
-        second:
-          m_Texture: {fileID: 2800000, guid: 22c4cf005fa3c2e4784103319589fecf, type: 3}
-          m_Scale: {x: 1, y: 1}
-          m_Offset: {x: 0, y: 0}
-      data:
-        first:
           name: _Illum
         second:
           m_Texture: {fileID: 2800000, guid: 1f1714396b92b4bb2a5af74c57cb57f6, type: 3}
@@ -64,11 +57,22 @@ Material:
           m_Texture: {fileID: 2800000, guid: 1af25611ceea0a74a9a88e8b3289738e, type: 3}
           m_Scale: {x: 1, y: 1}
           m_Offset: {x: 0, y: 0}
+      data:
+        first:
+          name: _Normal
+        second:
+          m_Texture: {fileID: 2800000, guid: 22c4cf005fa3c2e4784103319589fecf, type: 3}
+          m_Scale: {x: 1, y: 1}
+          m_Offset: {x: 0, y: 0}
     m_Floats:
       data:
         first:
           name: _Shininess
         second: 47.837315
+      data:
+        first:
+          name: _EmissionLM
+        second: 50
       data:
         first:
           name: _SelfIllumStrength
@@ -77,10 +81,6 @@ Material:
         first:
           name: _RoomReflectionAmount
         second: 2.925373
-      data:
-        first:
-          name: _EmissionLM
-        second: 50
       data:
         first:
           name: _SelfIllumination

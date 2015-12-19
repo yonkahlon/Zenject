@@ -2608,11 +2608,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cameraTransform: {fileID: 0}
-  glowColor:
-    r: 0.32653064
-    g: 0.30357552
-    b: 0.03318388
-    a: 1
+  glowColor: {r: 0.32653064, g: 0.30357552, b: 0.03318388, a: 1}
 --- !u!1002 &11400001
 EditorExtensionImpl:
   serializedVersion: 6
@@ -2757,7 +2753,7 @@ MonoBehaviour:
     onlyOnce: 0
     receivers:
     - receiver: {fileID: 100118}
-      action: 4f6e466f6f7473746570
+      action: OnFootstep
       delay: 0
   animationComponent: {fileID: 11100000}
 --- !u!1002 &11400015
@@ -2801,19 +2797,19 @@ MonoBehaviour:
     onlyOnce: 0
     receivers:
     - receiver: {fileID: 100020}
-      action: 4f6e537461727446697265
+      action: OnStartFire
       delay: 0
     - receiver: {fileID: 100114}
-      action: 4f6e537461727446697265
+      action: OnStartFire
       delay: 0
   mouseUpSignals:
     onlyOnce: 0
     receivers:
     - receiver: {fileID: 100020}
-      action: 4f6e53746f7046697265
+      action: OnStopFire
       delay: 0
     - receiver: {fileID: 100114}
-      action: 4f6e53746f7046697265
+      action: OnStopFire
       delay: 0
 --- !u!1002 &11400019
 EditorExtensionImpl:
@@ -2877,19 +2873,19 @@ MonoBehaviour:
     onlyOnce: 0
     receivers:
     - receiver: {fileID: 100008}
-      action: 4f6e5369676e616c
+      action: OnSignal
       delay: 0
     - receiver: {fileID: 0}
-      action: 4f6e44616d616765
+      action: OnDamage
       delay: 0
   dieSignals:
     onlyOnce: 0
     receivers:
     - receiver: {fileID: 100118}
-      action: 4f6e5369676e616c
+      action: OnSignal
       delay: 0.5
     - receiver: {fileID: 100010}
-      action: 4f6e5369676e616c
+      action: OnSignal
       delay: 0
 --- !u!1002 &11400025
 EditorExtensionImpl:
