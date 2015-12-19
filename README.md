@@ -947,11 +947,13 @@ public class FooInstaller : MonoInstaller
 }
 ```
 
-You add bindings by overriding the InstallBindings method, which is called by the CompositionRoot when your scene starts up.  MonoInstaller is a MonoBehaviour so you can add FooInstaller by attaching it to a GameObject.  Since it is a GameObject you can also add public members to it to configure your installer from the Unity inspector.  However, note that in order for your installer to be used it must be attached to the Installers property of the CompositionRoot object.
+You add bindings by overriding the InstallBindings method, which is called by the CompositionRoot when your scene starts up.  MonoInstaller is a MonoBehaviour so you can add FooInstaller by attaching it to a GameObject.  Since it is a GameObject you can also add public members to it to configure your installer from the Unity inspector, to add references within the scene, references to assets, or simply tuning data.
 
-In many cases you want to have your installer derive from MonoInstaller.  There is also another base class called Installer which you can use in cases where you do not need it to be a MonoBehaviour.
+Note that in order for your installer to be triggered it must be attached to the Installers property of the CompositionRoot object.  This is necessary to be able to control the order that installers are called in (which you can do by dragging rows around in the Installers property).  The order should not usually matter (since nothing is instantiated during the install process) however it can matter in some cases, such as when you configure an Installer from an existing installer (eg: `Container.BindInstance("mysetting").WhenInjectedInto<MyOtherInstaller>()`).
 
-It can also be nice to use Installer since this allows you to "include" it from another installer. For example:
+In many cases you want to have your installer derive from MonoInstaller, so that you can have inspector settings.  There is also another base class called simply `Installer` which you can use in cases where you do not need it to be a MonoBehaviour.
+
+You can also call installers from an existing installer.  For example:
 
 ```csharp
 public class BarInstaller : Installer
@@ -971,13 +973,39 @@ public class FooInstaller : MonoInstaller
 }
 ```
 
-This way you don't need to have an instance of BarInstaller in your scene in order to use it.  Any calls to Container.Install will immediately instantiate the given installer type and then call InstallBindings on it.  This will repeat for any installers that this installer installs.  Note also that it will only install the same installer once so you can make repeated calls to Container.Install<YourInstallerType>.
+Note that in this case BarInstaller is of type Installer and not MonoInstaller, which is why we can simply call `Container.Install<BarInstaller>`.  By using Installer for BarInstaller instead of MonoInstaller, we don't need an instance of BarInstaller in our scene to use it.  Any calls to Container.Install will immediately instantiate the given installer type and then call InstallBindings on it.  This will repeat for any installers that this installer installs.
 
-One of the main reasons we use installers as opposed to just having all our bindings declared all at once for each scene, is to make them re-usable.  So how then do we use the same installer in multiple scenes?
+One of the main reasons we use installers as opposed to just having all our bindings declared all at once for each scene, is to make them re-usable.  This is not a problem for installers of type `Installer` because you can simply call `Container.Install` as described above for every scene you wish to use it in, but then how would we re-use a MonoInstaller in multiple scenes?
 
-The recommended way of doing this is to use unity prefabs.  After attaching your MonoInstaller to a gameobject in your scene, you can then create a prefab out of it.  This is nice because it allows you to share any configuration that you've done in the inspector on the MonoInstaller across scenes (and also have per-scene overrides if you want)
+There are two ways to do this.
 
-Installers that simply implement Installer instead of MonoInstaller can be simply bound as described above, to re-use in different scenes.
+1. Prefabs.  After attaching your MonoInstaller to a gameobject in your scene, you can then create a prefab out of it.  This is nice because it allows you to share any configuration that you've done in the inspector on the MonoInstaller across scenes (and also have per-scene overrides if you want).
+
+2. `Container.Install<>`.  You can also call Container.Install just as we did with BarInstaller above for MonoInstallers.  However, unlike with installers of type `Installer`, Zenject cannot simply create a new instance and then install that, because the MonoInstaller could have inspector settings on it.  To address this, when Container.Install is called with a MonoInstaller, Zenject will follow a naming convention to find the prefab for the MonoInstaller.  For example:
+
+```csharp
+// Note that this is a MonoInstaller and has inspector settings
+public class QuxInstaller : MonoInstaller
+{
+    public string MyConfigurationSetting;
+
+    public override void InstallBindings()
+    {
+        ...
+    }
+}
+
+public class FooInstaller : MonoInstaller
+{
+    public override void InstallBindings()
+    {
+        // When this is called, Zenject will look for a prefab at Resources/Installers/QuxInstaller.prefab and load that
+        Container.Install<QuxInstaller>();
+    }
+}
+```
+
+As mentioned in the above code, Zenject will search for a prefab named QuxInstaller.prefab in all the Resources/Installer directories in your project.  This is sometimes a useful alternative to adding installer prefabs to every scene because it allows you to keep the objects in your scenes extremely light.
 
 ## <a id="zenject-order-of-operations"></a>Zenject Order Of Operations
 
@@ -2603,11 +2631,10 @@ For general troubleshooting / support, please use the [zenject subreddit](http:/
 - Fixed validation for decorator scenes that open decorator scenes.
 - Changed to be more strict when using a combination of differents kinds of ToSingle<>, since there should only be one way to create the singleton.
 - Added ToSingleFactory bind method, for cases where you have complex construction requirements and don't want to use ToSingleMethod
-- Changed the way scene decorators work slightly.  It now groups decorated scenes into their own game object parent
 - Removed the InjectFullScene flag on SceneCompositionRoot.  Now always injects on the full scene.
 - Renamed AllowNullBindings to IsValidating so it can be used for other kinds of validation-only logic
 - Renamed BinderUntyped to UntypedBinder and BinderGeneric to GenericBinder
-- Changed to assert if the same installer is installed twice. Before, it used to just skip the second call to Install<>. This seems better because in theory you might want to call the same installer multiple times with different arguments, so it doesn't make sense to assume that you want to skip subsequent calls to Install<>.
+- Added the ability to install MonoInstaller's directly from inside other installers by calling Container.Install<MyCustomMonoInstaller>().  In this case it tries to load a prefab from Resources/Installers/MyCustomMonoInstaller.prefab before giving up.  This can be helpful to keep scenes incredibly small instead of having many installer prefabs.
 - Added the ability to install MonoInstaller's directly from inside other installers.  In this case it tries to load a prefab from the resources directory before giving up.
 - Added some better error output in a few places
 - Fixed some iOS AOT issues
