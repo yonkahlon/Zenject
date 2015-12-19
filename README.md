@@ -246,8 +246,7 @@ You can run this example by doing the following:
 
 * Copy and paste the above code into a file named 'TestInstaller'
 * Create a new scene in Unity
-* Add a new GameObject and name it "CompositionRoot" (though the name does not really matter)
-* Attach the "Utils\SceneDecoratorCompositionRoot.cs" MonoBehaviour out of Zenject to your new GameObject
+* Right Click inside the Hierarchy tab and select Zenject -> Scene Composition Root
 * Add your TestInstaller script to the scene as well (as its own GameObject or on the same GameObject as the CompositionRoot, it doesn't matter)
 * Add a reference to your TestInstaller to the properties of the CompositionRoot by adding a new row in the inspector of the "Installers" property (Increase "Size" to 1) and then dragging the TestInstaller GameObject to it
 * Validate your scene by either selecting Edit -> Zenject -> Validate Current Scene or hitting CTRL+SHIFT+V.  (note that this step isn't necessary but good practice to get into)
@@ -1038,13 +1037,17 @@ Please feel free to submit any other sources of confusion to sfvermeulen@gmail.c
 
 ## <a id="global-bindings"></a>Global Bindings
 
-This all works great for each individual scene, but what if have dependencies that you wish to persist permanently across all scenes?  In Zenject you can do this by adding installers to the global container.
+This all works great for each individual scene, but what if you have dependencies that you wish to persist permanently across all scenes?  In Zenject you can do this by adding installers to a global container.
 
-This works by first add a global composition root and then adding installers to it.  You can create an empty global composition root by selecting Edit -> Zenject -> Create Global Composition Root.  After selecting this menu item you should see a new asset in the root level Resources folder called 'ZenjectGlobalCompositionRoot'.
+To do this, first add a global installers asset to your project directory then add installers to it.  Create or find a folder named Resources in your project tab, then right click and select Create -> Zenject -> Global Installers Asset.  You should then see a new asset in the selected Resources folder called 'ZenjectGlobalInstallers'.
 
-If you click on this it will display a property for the list of Installers in the same way that it does for the composition root object that is placed in each scene.  The only difference in this case is that the installers you add here must exist in the project as prefabs and cannot exist in any specific scene.  You can then directly reference those prefabs by dragging them into the Installers property of the global composition root.
+If you click on this it will display a property for the list of Installers in the same way that it does for the composition root object that is placed in each scene.  The only difference is that the installers you add here must exist in the project as prefabs and cannot exist in any specific scene.  You can then directly reference those prefabs by dragging them into the Installers property of the global installers asset.
 
-Then, when you start any scene, the CompositionRoot for the scene will call the global composition root to install the global bindings, before installing any scene specific bindings.  If you load another scene from the first scene, the global composition root will not be called again and the bindings that it added previously will persist into the new scene.  You can declare ITickable / IInitializable / IDisposable objects in your global installers in the same way you do for your scene installers with the result being IInitializable.Initialize is called only once across each play session and IDisposable.Dispose is only called once the application is fully stopped.
+Note that you can add multiple Global Installers asset's in different resource folders and they will all be installed.
+
+When you start any scene that contains a Scene Composition Root, this will cause every Global Installers Asset in your project to be installed.  This will always occur before any scene specific installers are called.  Note also that this only occurs once.  If you load another scene from the first scene, your global installers will not be called again and the bindings that it added previously will persist into the new scene.  You can declare ITickable / IInitializable / IDisposable objects in your global installers in the same way you do for your scene installers with the result being IInitializable.Initialize is called only once across each play session and IDisposable.Dispose is only called once the application is fully stopped.
+
+This works because the container defined for each scene is nested inside the global container that your global installers bind into.  For more information on nested containers see <a href="#sub-containers-and-facades">here</a>.
 
 ## <a id="update--initialization-order"></a>Update / Initialization Order
 
