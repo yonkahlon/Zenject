@@ -659,7 +659,7 @@ Container.BindIFactory<IFoo>().ToFactory<Foo>();
 
 This bind method is used to create abstract factories.
 
-The above line result in all dependencies of type `IFactory<IFoo>` being bound to an object that returns type `Foo` when its Create() method is called.
+The above line results in all dependencies of type `IFactory<IFoo>` being bound to an object that returns type `Foo` when its Create() method is called.
 
 See the <a href="#abstract-factories">abstract factories section</a> for more information on abstract factories.
 
