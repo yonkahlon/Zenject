@@ -19,7 +19,7 @@ namespace Zenject
         public static Action<DiContainer> BeforeInstallHooks;
         public static Action<DiContainer> AfterInstallHooks;
 
-        public bool OnlyInjectWhenActive = true;
+        public bool OnlyInjectWhenActive = false;
 
         [SerializeField]
         public MonoInstaller[] Installers = new MonoInstaller[0];
