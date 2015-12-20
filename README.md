@@ -3,6 +3,22 @@
 
 # Dependency Injection Framework for Unity3D
 
+## NOTE
+
+The following documentation is written to be packaged with Zenject as it appears in the Asset store (which you can find [here](http://u3d.as/content/modest-tree-media/zenject-dependency-injection/7ER))
+
+## <a id="introduction"></a>Introduction
+
+Zenject is a lightweight dependency injection framework built specifically to target Unity 3D.  It can be used to turn your Unity 3D application into a collection of loosely-coupled parts with highly segmented responsibilities.  Zenject can then glue the parts together in many different configurations to allow you to easily write, re-use, refactor and test your code in a scalable and extremely flexible way.
+
+Tested in Unity 3D on the following platforms: PC/Mac/Linux, iOS, Android, WP8, Webplayer and WebGL (See <a href="#aot-support">here</a> for details on WebGL).
+
+This project is open source.  You can find the official repository [here](https://github.com/modesttree/Zenject).
+
+For general troubleshooting / support, please use the [zenject subreddit](http://www.reddit.com/r/zenject) or the [zenject google group](https://groups.google.com/forum/#!forum/zenject/).  If you have found a bug, you are also welcome to create an issue on the [github page](https://github.com/modesttree/Zenject), or a pull request if you have a fix / extension.  You can also follow [@Zenject](https://twitter.com/Zenject) on twitter for updates.  Finally, you can also email me directly at sfvermeulen@gmail.com
+
+__Quick Start__:  If you are already familiar with dependency injection and are more interested in the syntax than anything else, you might want to start by looking over the <a href="#cheatsheet">cheatsheet</a> at the bottom of this page, which shows a bunch of typical example cases of usage.
+
 ## Table Of Contents
 
 * <a href="#introduction">Introduction</a>
@@ -42,30 +58,14 @@
         * <a href="#sub-containers-and-facades">Sub-Containers and Facades</a>
         * <a href="#commands-and-signals">Commands And Signals</a>
         * <a href="#auto-mocking-using-moq">Auto-Mocking Using Moq</a>
-    * <a href="#questions">Frequently Asked Questions</a>
-        * <a href="#aot-support">Does this work on AOT platforms such as iOS and WebGL?</a>
-        * <a href="#faq-performance">How is Performance?</a>
-        * <a href="#net-framework">Can I use .NET framework 4.0 and above?</a>
-    * <a href="#cheatsheet">Cheat Sheet</a>
-    * <a href="#further-help">Further Help</a>
-    * <a href="#release-notes">Release Notes</a>
-    * <a href="#license">License</a>
-
-## NOTE
-
-The following documentation is written to be packaged with Zenject as it appears in the Asset store (which you can find [here](http://u3d.as/content/modest-tree-media/zenject-dependency-injection/7ER))
-
-## <a id="introduction"></a>Introduction
-
-Zenject is a lightweight dependency injection framework built specifically to target Unity 3D.  It can be used to turn your Unity 3D application into a collection of loosely-coupled parts with highly segmented responsibilities.  Zenject can then glue the parts together in many different configurations to allow you to easily write, re-use, refactor and test your code in a scalable and extremely flexible way.
-
-Tested in Unity 3D on the following platforms: PC/Mac/Linux, iOS, Android, WP8, Webplayer and WebGL (See <a href="#aot-support">here</a> for details on WebGL).
-
-This project is open source.  You can find the official repository [here](https://github.com/modesttree/Zenject).
-
-For general troubleshooting / support, please use the [zenject subreddit](http://www.reddit.com/r/zenject) or the [zenject google group](https://groups.google.com/forum/#!forum/zenject/).  If you have found a bug, you are also welcome to create an issue on the [github page](https://github.com/modesttree/Zenject), or a pull request if you have a fix / extension.  You can also follow [@Zenject](https://twitter.com/Zenject) on twitter for updates.  Finally, you can also email me directly at sfvermeulen@gmail.com
-
-__Quick Start__:  If you are already familiar with dependency injection and are more interested in the syntax than anything else, you might want to start by looking over the <a href="#cheatsheet">cheatsheet</a> at the bottom of this page, which shows a bunch of typical example cases of usage.
+* <a href="#questions">Frequently Asked Questions</a>
+    * <a href="#aot-support">Does this work on AOT platforms such as iOS and WebGL?</a>
+    * <a href="#faq-performance">How is Performance?</a>
+    * <a href="#net-framework">Can I use .NET framework 4.0 and above?</a>
+* <a href="#cheatsheet">Cheat Sheet</a>
+* <a href="#further-help">Further Help</a>
+* <a href="#release-notes">Release Notes</a>
+* <a href="#license">License</a>
 
 ## <a id="features"></a>Features
 
