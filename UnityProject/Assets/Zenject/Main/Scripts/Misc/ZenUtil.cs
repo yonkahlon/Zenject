@@ -122,6 +122,39 @@ namespace Zenject
                 parentContainer.InjectGameObject(newObject);
             }
         }
+
+#if UNITY_5_3
+        // This method can be used to load the given scene and perform injection on its contents
+        // Note that the scene we're loading can have [Inject] flags however it should not have
+        // its own composition root.
+        // This Method uses LoadSceneAsync and works in unity from 5.3 and upward.
+        // After the loading finishes and the callback parameter is set the callback gets called.
+        public static IEnumerator LoadSceneAdditiveWithContainerAsync(string levelName, DiContainer parentContainer,
+            Action<Scene> callback)
+        {
+            var asyncOp = SceneManager.LoadSceneAsync(levelName, LoadSceneMode.Additive);
+
+            yield return asyncOp;
+
+            var scene = SceneManager.GetSceneByName(levelName);
+
+            if (scene.IsValid())
+            {
+                foreach (var go in UnityUtil.GetRootGameObjects())
+                {
+                    if (go.scene == scene)
+                    {
+                        parentContainer.InjectGameObject(go);
+                    }
+                }
+
+                if (callback != null)
+                {
+                    callback(scene);
+                }
+            }
+        }
+#endif
 #endif
     }
 }
