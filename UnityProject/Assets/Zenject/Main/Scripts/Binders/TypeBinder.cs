@@ -31,7 +31,7 @@ namespace Zenject
             }
 #endif
 
-            return ToProvider(new TransientProvider(Container, ContractType));
+            return ToProvider(new TransientProvider(ContractType));
         }
 
         public BindingConditionSetter ToTransient(Type concreteType)
@@ -45,7 +45,7 @@ namespace Zenject
             }
 #endif
 
-            return ToProvider(new TransientProvider(Container, concreteType));
+            return ToProvider(new TransientProvider(concreteType));
         }
 
         public BindingConditionSetter ToSingle()
@@ -140,7 +140,7 @@ namespace Zenject
                 throw new ZenjectBindException("Received null prefab while binding type '{0}'".Fmt(concreteType.Name()));
             }
 
-            return ToProvider(new GameObjectTransientProviderFromPrefab(concreteType, Container, prefab));
+            return ToProvider(new GameObjectTransientProviderFromPrefab(concreteType, prefab));
         }
 
         public BindingConditionSetter ToSingleGameObject()
@@ -157,7 +157,7 @@ namespace Zenject
                 throw new ZenjectBindException("Expected UnityEngine.Component derived type when binding type '{0}'".Fmt(ContractType.Name()));
             }
 
-            return ToProvider(new GameObjectSingletonProvider(ContractType, Container, name));
+            return ToProvider(new GameObjectSingletonProvider(ContractType, name));
         }
 
         // Creates a new game object and adds the given type as a new component on it
@@ -170,7 +170,7 @@ namespace Zenject
                     "Invalid type given during bind command.  Expected type '{0}' to derive from type '{1}'".Fmt(concreteType.Name(), ContractType.Name()));
             }
 
-            return ToProvider(new GameObjectSingletonProvider(concreteType, Container, name));
+            return ToProvider(new GameObjectSingletonProvider(concreteType, name));
         }
 
         public BindingConditionSetter ToTransientPrefabResource(string resourcePath)
@@ -181,7 +181,7 @@ namespace Zenject
         public BindingConditionSetter ToTransientPrefabResource(Type concreteType, string resourcePath)
         {
             Assert.IsNotNull(resourcePath);
-            return ToProvider(new GameObjectTransientProviderFromPrefabResource(concreteType, Container, resourcePath));
+            return ToProvider(new GameObjectTransientProviderFromPrefabResource(concreteType, resourcePath));
         }
 
         public BindingConditionSetter ToSinglePrefabResource(Type concreteType, string concreteIdentifier, string resourcePath)
@@ -318,7 +318,7 @@ namespace Zenject
 
         protected BindingConditionSetter ToSingleMonoBehaviourBase<TConcrete>(GameObject gameObject)
         {
-            return ToProvider(new MonoBehaviourSingletonProvider(typeof(TConcrete), Container, gameObject));
+            return ToProvider(new MonoBehaviourSingletonProvider(typeof(TConcrete), gameObject));
         }
 
         public BindingConditionSetter ToResource(string resourcePath)

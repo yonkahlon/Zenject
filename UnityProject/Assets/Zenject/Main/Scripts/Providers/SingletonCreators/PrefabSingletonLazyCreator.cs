@@ -10,7 +10,6 @@ namespace Zenject
 {
     public class PrefabSingletonLazyCreator
     {
-        readonly DiContainer _container;
         readonly PrefabSingletonProviderMap _owner;
         readonly PrefabSingletonId _id;
 
@@ -18,9 +17,8 @@ namespace Zenject
         GameObject _rootObj;
 
         public PrefabSingletonLazyCreator(
-            DiContainer container, PrefabSingletonProviderMap owner, PrefabSingletonId id)
+            PrefabSingletonProviderMap owner, PrefabSingletonId id)
         {
-            _container = container;
             _owner = owner;
             _id = id;
 
@@ -97,10 +95,10 @@ namespace Zenject
                 _rootObj = (GameObject)GameObject.Instantiate(prefab);
 
                 // Default parent to comp root
-                _rootObj.transform.SetParent(_container.Resolve<CompositionRoot>().transform, false);
+                _rootObj.transform.SetParent(context.Container.Resolve<CompositionRoot>().transform, false);
                 _rootObj.SetActive(true);
 
-                _container.InjectGameObject(_rootObj, true, false, new object[0], context);
+                context.Container.InjectGameObject(_rootObj, true, false, new object[0], context);
             }
 
             var component = _rootObj.GetComponentInChildren(componentType);

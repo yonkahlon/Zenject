@@ -13,8 +13,8 @@ namespace Zenject.Commands
         where TCommand : Command
         where THandler : ICommandHandler
     {
-        public CommandProviderHandlerSingle(DiContainer container, ProviderBase singletonProvider)
-            : base(container, singletonProvider)
+        public CommandProviderHandlerSingle(ProviderBase singletonProvider)
+            : base(singletonProvider)
         {
         }
 
@@ -33,8 +33,8 @@ namespace Zenject.Commands
         where TCommand : Command<TParam1>
         where THandler : ICommandHandler<TParam1>
     {
-        public CommandProviderHandlerSingle(DiContainer container, ProviderBase singletonProvider)
-            : base(container, singletonProvider)
+        public CommandProviderHandlerSingle(ProviderBase singletonProvider)
+            : base(singletonProvider)
         {
         }
 
@@ -53,8 +53,8 @@ namespace Zenject.Commands
         where TCommand : Command<TParam1, TParam2>
         where THandler : ICommandHandler<TParam1, TParam2>
     {
-        public CommandProviderHandlerSingle(DiContainer container, ProviderBase singletonProvider)
-            : base(container, singletonProvider)
+        public CommandProviderHandlerSingle(ProviderBase singletonProvider)
+            : base(singletonProvider)
         {
         }
 
@@ -73,8 +73,8 @@ namespace Zenject.Commands
         where TCommand : Command<TParam1, TParam2, TParam3>
         where THandler : ICommandHandler<TParam1, TParam2, TParam3>
     {
-        public CommandProviderHandlerSingle(DiContainer container, ProviderBase singletonProvider)
-            : base(container, singletonProvider)
+        public CommandProviderHandlerSingle(ProviderBase singletonProvider)
+            : base(singletonProvider)
         {
         }
 
@@ -93,8 +93,8 @@ namespace Zenject.Commands
         where TCommand : Command<TParam1, TParam2, TParam3, TParam4>
         where THandler : ICommandHandler<TParam1, TParam2, TParam3, TParam4>
     {
-        public CommandProviderHandlerSingle(DiContainer container, ProviderBase singletonProvider)
-            : base(container, singletonProvider)
+        public CommandProviderHandlerSingle(ProviderBase singletonProvider)
+            : base(singletonProvider)
         {
         }
 
@@ -113,8 +113,8 @@ namespace Zenject.Commands
         where TCommand : Command<TParam1, TParam2, TParam3, TParam4, TParam5>
         where THandler : ICommandHandler<TParam1, TParam2, TParam3, TParam4, TParam5>
     {
-        public CommandProviderHandlerSingle(DiContainer container, ProviderBase singletonProvider)
-            : base(container, singletonProvider)
+        public CommandProviderHandlerSingle(ProviderBase singletonProvider)
+            : base(singletonProvider)
         {
         }
 
@@ -133,8 +133,8 @@ namespace Zenject.Commands
         where TCommand : Command<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6>
         where THandler : ICommandHandler<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6>
     {
-        public CommandProviderHandlerSingle(DiContainer container, ProviderBase singletonProvider)
-            : base(container, singletonProvider)
+        public CommandProviderHandlerSingle(ProviderBase singletonProvider)
+            : base(singletonProvider)
         {
         }
 

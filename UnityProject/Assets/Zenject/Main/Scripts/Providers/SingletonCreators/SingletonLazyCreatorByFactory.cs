@@ -8,15 +8,12 @@ namespace Zenject
     internal class SingletonLazyCreatorByFactory<TContract, TFactory> : SingletonLazyCreatorBase
         where TFactory : IFactory<TContract>
     {
-        readonly DiContainer _container;
-
         object _instance;
 
         public SingletonLazyCreatorByFactory(
-            SingletonId id, SingletonProviderMap owner, DiContainer container)
+            SingletonId id, SingletonProviderMap owner)
             : base(id, owner)
         {
-            _container = container;
         }
 
         public override object GetInstance(InjectContext context)
@@ -26,7 +23,7 @@ namespace Zenject
                 return _instance;
             }
 
-            _instance = _container.Instantiate<TFactory>().Create();
+            _instance = context.Container.Instantiate<TFactory>().Create();
 
             if (_instance == null)
             {
@@ -41,7 +38,7 @@ namespace Zenject
         {
             if (typeof(TFactory).DerivesFrom<IValidatable>())
             {
-                var factory = _container.Instantiate<TFactory>(context);
+                var factory = context.Container.Instantiate<TFactory>(context);
                 return ((IValidatable)factory).Validate();
             }
 

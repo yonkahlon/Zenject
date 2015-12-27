@@ -8,11 +8,9 @@ namespace Zenject
     public class TransientProvider : ProviderBase
     {
         readonly Type _concreteType;
-        readonly DiContainer _container;
 
-        public TransientProvider(DiContainer container, Type concreteType)
+        public TransientProvider(Type concreteType)
         {
-            _container = container;
             _concreteType = concreteType;
         }
 
@@ -23,7 +21,7 @@ namespace Zenject
 
         public override object GetInstance(InjectContext context)
         {
-            var obj = _container.InstantiateExplicit(
+            var obj = context.Container.InstantiateExplicit(
                 GetTypeToInstantiate(context.MemberType), new List<TypeValuePair>(), context, null, true);
             Assert.That(obj != null);
             return obj;
@@ -44,7 +42,7 @@ namespace Zenject
 
         public override IEnumerable<ZenjectResolveException> ValidateBinding(InjectContext context)
         {
-            return _container.ValidateObjectGraph(_concreteType, context);
+            return context.Container.ValidateObjectGraph(_concreteType, context);
         }
     }
 }

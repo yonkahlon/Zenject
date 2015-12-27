@@ -13,14 +13,12 @@ namespace Zenject
     internal class PrefabSingletonProvider : ProviderBase
     {
         PrefabSingletonLazyCreator _creator;
-        DiContainer _container;
         Type _concreteType;
 
         public PrefabSingletonProvider(
-            DiContainer container, Type concreteType, PrefabSingletonLazyCreator creator)
+            Type concreteType, PrefabSingletonLazyCreator creator)
         {
             _creator = creator;
-            _container = container;
             _concreteType = concreteType;
         }
 
@@ -49,7 +47,7 @@ namespace Zenject
                 yield break;
             }
 
-            foreach (var err in _container.ValidateObjectGraph(_concreteType, context))
+            foreach (var err in context.Container.ValidateObjectGraph(_concreteType, context))
             {
                 yield return err;
             }

@@ -11,11 +11,6 @@ namespace Zenject.Commands
         where TCommand : Command
         where THandler : ICommandHandler
     {
-        public CommandProviderHandlerTransient(DiContainer container)
-            : base(container)
-        {
-        }
-
         protected override Action GetCommandAction(InjectContext context)
         {
             return () =>
