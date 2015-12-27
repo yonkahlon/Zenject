@@ -124,6 +124,11 @@ namespace Zenject
         }
 
 #if UNITY_5_3
+        public static IEnumerator LoadSceneAdditiveWithContainerAsync(string levelName, DiContainer parentContainer)
+        {
+            return LoadSceneAdditiveWithContainerAsync(levelName, parentContainer, null);
+        }
+
         // This method can be used to load the given scene and perform injection on its contents
         // Note that the scene we're loading can have [Inject] flags however it should not have
         // its own composition root.
