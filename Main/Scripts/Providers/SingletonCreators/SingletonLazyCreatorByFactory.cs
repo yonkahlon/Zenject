@@ -8,12 +8,15 @@ namespace Zenject
     internal class SingletonLazyCreatorByFactory<TContract, TFactory> : SingletonLazyCreatorBase
         where TFactory : IFactory<TContract>
     {
+        readonly DiContainer _container;
+
         object _instance;
 
         public SingletonLazyCreatorByFactory(
-            SingletonId id, SingletonProviderMap owner)
+            SingletonId id, SingletonProviderMap owner, DiContainer container)
             : base(id, owner)
         {
+            _container = container;
         }
 
         public override object GetInstance(InjectContext context)
@@ -23,7 +26,11 @@ namespace Zenject
                 return _instance;
             }
 
-            _instance = context.Container.Instantiate<TFactory>().Create();
+            // Note that we always want to cache _container instead of using context.Container 
+            // since for singletons, the container they are accessed from should not determine
+            // the container they are instantiated with
+            // Transients can do that but not singletons
+            _instance = _container.Instantiate<TFactory>().Create();
 
             if (_instance == null)
             {
@@ -38,7 +45,7 @@ namespace Zenject
         {
             if (typeof(TFactory).DerivesFrom<IValidatable>())
             {
-                var factory = context.Container.Instantiate<TFactory>(context);
+                var factory = _container.Instantiate<TFactory>(context);
                 return ((IValidatable)factory).Validate();
             }
 

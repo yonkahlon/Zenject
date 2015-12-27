@@ -11,16 +11,18 @@ namespace Zenject
     public class MonoBehaviourSingletonProvider : ProviderBase
     {
         Component _instance;
+        DiContainer _container;
         Type _componentType;
         GameObject _gameObject;
 
         public MonoBehaviourSingletonProvider(
-            Type componentType, GameObject gameObject)
+            Type componentType, DiContainer container, GameObject gameObject)
         {
             Assert.That(componentType.DerivesFrom<Component>());
 
             _gameObject = gameObject;
             _componentType = componentType;
+            _container = container;
         }
 
         public override Type GetInstanceType()
@@ -34,13 +36,18 @@ namespace Zenject
 
             if (_instance == null)
             {
-                Assert.That(!context.Container.IsValidating,
+                Assert.That(!_container.IsValidating,
                     "Tried to instantiate a MonoBehaviour with type '{0}' during validation. Object graph: {1}", _componentType, context.GetObjectGraphString());
+
+                // Note that we always want to cache _container instead of using context.Container 
+                // since for singletons, the container they are accessed from should not determine
+                // the container they are instantiated with
+                // Transients can do that but not singletons
 
                 _instance = _gameObject.AddComponent(_componentType);
                 Assert.That(_instance != null);
 
-                context.Container.Inject(_instance);
+                _container.Inject(_instance);
             }
 
             return _instance;
@@ -48,7 +55,7 @@ namespace Zenject
 
         public override IEnumerable<ZenjectResolveException> ValidateBinding(InjectContext context)
         {
-            return context.Container.ValidateObjectGraph(_componentType, context);
+            return _container.ValidateObjectGraph(_componentType, context);
         }
     }
 }

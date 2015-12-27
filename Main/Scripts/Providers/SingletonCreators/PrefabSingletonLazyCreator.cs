@@ -10,6 +10,7 @@ namespace Zenject
 {
     public class PrefabSingletonLazyCreator
     {
+        readonly DiContainer _container;
         readonly PrefabSingletonProviderMap _owner;
         readonly PrefabSingletonId _id;
 
@@ -17,8 +18,9 @@ namespace Zenject
         GameObject _rootObj;
 
         public PrefabSingletonLazyCreator(
-            PrefabSingletonProviderMap owner, PrefabSingletonId id)
+            DiContainer container, PrefabSingletonProviderMap owner, PrefabSingletonId id)
         {
+            _container = container;
             _owner = owner;
             _id = id;
 
@@ -94,11 +96,16 @@ namespace Zenject
 
                 _rootObj = (GameObject)GameObject.Instantiate(prefab);
 
+                // Note that we always want to cache _container instead of using context.Container 
+                // since for singletons, the container they are accessed from should not determine
+                // the container they are instantiated with
+                // Transients can do that but not singletons
+
                 // Default parent to comp root
-                _rootObj.transform.SetParent(context.Container.Resolve<CompositionRoot>().transform, false);
+                _rootObj.transform.SetParent(_container.Resolve<CompositionRoot>().transform, false);
                 _rootObj.SetActive(true);
 
-                context.Container.InjectGameObject(_rootObj, true, false, new object[0], context);
+                _container.InjectGameObject(_rootObj, true, false, new object[0], context);
             }
 
             var component = _rootObj.GetComponentInChildren(componentType);
