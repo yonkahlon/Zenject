@@ -12,9 +12,7 @@ namespace Zenject.Commands
     {
         readonly ProviderBase _singletonProvider;
 
-        public CommandProviderSingle(
-            DiContainer container, ProviderBase singletonProvider)
-            : base(container)
+        public CommandProviderSingle(ProviderBase singletonProvider)
         {
             _singletonProvider = singletonProvider;
         }

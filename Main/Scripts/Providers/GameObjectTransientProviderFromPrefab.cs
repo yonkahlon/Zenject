@@ -11,16 +11,14 @@ namespace Zenject
     public class GameObjectTransientProviderFromPrefab : ProviderBase
     {
         readonly Type _concreteType;
-        readonly DiContainer _container;
         readonly GameObject _template;
 
-        public GameObjectTransientProviderFromPrefab(Type concreteType, DiContainer container, GameObject template)
+        public GameObjectTransientProviderFromPrefab(Type concreteType, GameObject template)
         {
             // Don't do this because it might be an interface
             //Assert.That(typeof(T).DerivesFrom<Component>());
 
             _concreteType = concreteType;
-            _container = container;
             _template = template;
         }
 
@@ -32,12 +30,12 @@ namespace Zenject
         public override object GetInstance(InjectContext context)
         {
             Assert.That(_concreteType.DerivesFromOrEqual(context.MemberType));
-            return _container.InstantiatePrefabForComponent(_concreteType, _template);
+            return context.Container.InstantiatePrefabForComponent(_concreteType, _template);
         }
 
         public override IEnumerable<ZenjectResolveException> ValidateBinding(InjectContext context)
         {
-            return _container.ValidateObjectGraph(_concreteType, context);
+            return context.Container.ValidateObjectGraph(_concreteType, context);
         }
     }
 }

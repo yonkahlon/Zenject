@@ -10,11 +10,6 @@ namespace Zenject.Commands
         : CommandProviderBase<TCommand, TAction>
         where TCommand : ICommand
     {
-        public CommandProviderTransient(DiContainer container)
-            : base(container)
-        {
-        }
-
         protected THandler CreateHandler(InjectContext c)
         {
             var newContext = new InjectContext(
@@ -22,13 +17,13 @@ namespace Zenject.Commands
                 c.ObjectInstance, c.MemberName, c.ParentContext, c.ConcreteIdentifier,
                 null, c.LocalOnly);
 
-            return Container.InstantiateExplicit<THandler>(new List<TypeValuePair>(), newContext);
+            return c.Container.InstantiateExplicit<THandler>(new List<TypeValuePair>(), newContext);
         }
 
         public override IEnumerable<ZenjectResolveException> ValidateBinding(InjectContext context)
         {
             return base.ValidateBinding(context)
-                .Concat(Container.ValidateObjectGraph<THandler>(context));
+                .Concat(context.Container.ValidateObjectGraph<THandler>(context));
         }
     }
 }

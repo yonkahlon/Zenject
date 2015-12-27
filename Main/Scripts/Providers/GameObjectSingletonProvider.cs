@@ -11,18 +11,16 @@ namespace Zenject
     public class GameObjectSingletonProvider : ProviderBase
     {
         readonly string _name;
-        readonly DiContainer _container;
         readonly Type _componentType;
 
         object _instance;
 
         public GameObjectSingletonProvider(
-            Type componentType, DiContainer container, string name)
+            Type componentType, string name)
         {
             Assert.That(componentType.DerivesFrom<Component>());
             _componentType = componentType;
             _name = name;
-            _container = container;
         }
 
         public override Type GetInstanceType()
@@ -37,11 +35,11 @@ namespace Zenject
             if (_instance == null)
             {
                 // This is valid sometimes
-                //Assert.That(!_container.IsValidating,
+                //Assert.That(!context.Container.IsValidating,
                     //"Tried to instantiate a MonoBehaviour with type '{0}' during validation. Object graph: {1}", _componentType, DiContainer.GetCurrentObjectGraph());
 
                 // We don't use the generic version here to avoid duplicate generic arguments to binder
-                _instance = _container.InstantiateComponentOnNewGameObjectExplicit(
+                _instance = context.Container.InstantiateComponentOnNewGameObjectExplicit(
                     _componentType, _name, new List<TypeValuePair>(), context);
                 Assert.IsNotNull(_instance);
             }
@@ -51,7 +49,7 @@ namespace Zenject
 
         public override IEnumerable<ZenjectResolveException> ValidateBinding(InjectContext context)
         {
-            return _container.ValidateObjectGraph(_componentType, context);
+            return context.Container.ValidateObjectGraph(_componentType, context);
         }
     }
 }

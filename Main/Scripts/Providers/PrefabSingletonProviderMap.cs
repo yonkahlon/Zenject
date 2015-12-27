@@ -12,12 +12,6 @@ namespace Zenject
     public class PrefabSingletonProviderMap
     {
         Dictionary<PrefabSingletonId, PrefabSingletonLazyCreator> _creators = new Dictionary<PrefabSingletonId, PrefabSingletonLazyCreator>();
-        DiContainer _container;
-
-        public PrefabSingletonProviderMap(DiContainer container)
-        {
-            _container = container;
-        }
 
         public IEnumerable<PrefabSingletonLazyCreator> Creators
         {
@@ -39,7 +33,7 @@ namespace Zenject
 
             if (!_creators.TryGetValue(id, out creator))
             {
-                creator = new PrefabSingletonLazyCreator(_container, this, id);
+                creator = new PrefabSingletonLazyCreator(this, id);
                 _creators.Add(id, creator);
             }
 
@@ -51,7 +45,7 @@ namespace Zenject
             string identifier, Type concreteType, GameObject prefab, string resourcePath)
         {
             return new PrefabSingletonProvider(
-                _container, concreteType, AddCreator(new PrefabSingletonId(identifier, prefab, resourcePath)));
+                concreteType, AddCreator(new PrefabSingletonId(identifier, prefab, resourcePath)));
         }
     }
 }
