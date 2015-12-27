@@ -13,12 +13,14 @@ namespace Zenject
     internal class PrefabSingletonProvider : ProviderBase
     {
         PrefabSingletonLazyCreator _creator;
+        DiContainer _container;
         Type _concreteType;
 
         public PrefabSingletonProvider(
-            Type concreteType, PrefabSingletonLazyCreator creator)
+            DiContainer container, Type concreteType, PrefabSingletonLazyCreator creator)
         {
             _creator = creator;
+            _container = container;
             _concreteType = concreteType;
         }
 
@@ -47,7 +49,11 @@ namespace Zenject
                 yield break;
             }
 
-            foreach (var err in context.Container.ValidateObjectGraph(_concreteType, context))
+            // Note that we always want to cache _container instead of using context.Container 
+            // since for singletons, the container they are accessed from should not determine
+            // the container they are instantiated with
+            // Transients can do that but not singletons
+            foreach (var err in _container.ValidateObjectGraph(_concreteType, context))
             {
                 yield return err;
             }

@@ -157,7 +157,7 @@ namespace Zenject
                 throw new ZenjectBindException("Expected UnityEngine.Component derived type when binding type '{0}'".Fmt(ContractType.Name()));
             }
 
-            return ToProvider(new GameObjectSingletonProvider(ContractType, name));
+            return ToProvider(new GameObjectSingletonProvider(ContractType, Container, name));
         }
 
         // Creates a new game object and adds the given type as a new component on it
@@ -170,7 +170,7 @@ namespace Zenject
                     "Invalid type given during bind command.  Expected type '{0}' to derive from type '{1}'".Fmt(concreteType.Name(), ContractType.Name()));
             }
 
-            return ToProvider(new GameObjectSingletonProvider(concreteType, name));
+            return ToProvider(new GameObjectSingletonProvider(concreteType, Container, name));
         }
 
         public BindingConditionSetter ToTransientPrefabResource(string resourcePath)
@@ -318,7 +318,7 @@ namespace Zenject
 
         protected BindingConditionSetter ToSingleMonoBehaviourBase<TConcrete>(GameObject gameObject)
         {
-            return ToProvider(new MonoBehaviourSingletonProvider(typeof(TConcrete), gameObject));
+            return ToProvider(new MonoBehaviourSingletonProvider(typeof(TConcrete), Container, gameObject));
         }
 
         public BindingConditionSetter ToResource(string resourcePath)

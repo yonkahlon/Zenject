@@ -11,16 +11,18 @@ namespace Zenject
     public class GameObjectSingletonProvider : ProviderBase
     {
         readonly string _name;
+        readonly DiContainer _container;
         readonly Type _componentType;
 
         object _instance;
 
         public GameObjectSingletonProvider(
-            Type componentType, string name)
+            Type componentType, DiContainer container, string name)
         {
             Assert.That(componentType.DerivesFrom<Component>());
             _componentType = componentType;
             _name = name;
+            _container = container;
         }
 
         public override Type GetInstanceType()
@@ -35,11 +37,16 @@ namespace Zenject
             if (_instance == null)
             {
                 // This is valid sometimes
-                //Assert.That(!context.Container.IsValidating,
+                //Assert.That(!_container.IsValidating,
                     //"Tried to instantiate a MonoBehaviour with type '{0}' during validation. Object graph: {1}", _componentType, DiContainer.GetCurrentObjectGraph());
 
+                // Note that we always want to cache _container instead of using context.Container 
+                // since for singletons, the container they are accessed from should not determine
+                // the container they are instantiated with
+                // Transients can do that but not singletons
+
                 // We don't use the generic version here to avoid duplicate generic arguments to binder
-                _instance = context.Container.InstantiateComponentOnNewGameObjectExplicit(
+                _instance = _container.InstantiateComponentOnNewGameObjectExplicit(
                     _componentType, _name, new List<TypeValuePair>(), context);
                 Assert.IsNotNull(_instance);
             }
@@ -49,7 +56,7 @@ namespace Zenject
 
         public override IEnumerable<ZenjectResolveException> ValidateBinding(InjectContext context)
         {
-            return context.Container.ValidateObjectGraph(_componentType, context);
+            return _container.ValidateObjectGraph(_componentType, context);
         }
     }
 }

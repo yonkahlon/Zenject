@@ -41,7 +41,7 @@ namespace Zenject
 
             if (creator == null)
             {
-                creator = new SingletonLazyCreatorByType(singleId, this);
+                creator = new SingletonLazyCreatorByType(singleId, this, _container);
                 _creators.Add(singleId, creator);
             }
 
@@ -56,7 +56,7 @@ namespace Zenject
 
             if (creator == null)
             {
-                creator = new SingletonLazyCreatorByFactory<TContract, TFactory>(singleId, this);
+                creator = new SingletonLazyCreatorByFactory<TContract, TFactory>(singleId, this, _container);
                 _creators.Add(singleId, creator);
             }
 
