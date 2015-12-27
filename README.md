@@ -81,7 +81,6 @@ __Quick Start__:  If you are already familiar with dependency injection and are 
 * Support for global, project-wide bindings to apply to all scenes
 * "Scene Decorators" which allow adding functionality to a different scene without changing it directly
 * Ability to validate object graphs at editor time including dynamic object graphs created via factories
-* Ability to print entire object graph as a UML image automatically
 * Nested Containers / Sub-Containers
 * Support for Commands and Signals
 * Ability to easily define discrete 'islands' of dependencies using 'Facade' classes
@@ -2686,7 +2685,7 @@ For general troubleshooting / support, please use the [zenject subreddit](http:/
 
 ## <a id="release-notes"></a>Release Notes
 
-3.2
+3.2 (December 20, 2015)
 - Added the concept of "Commands" and "Signals".  See documentation for details.
 - Fixed validation for decorator scenes that open decorator scenes.
 - Changed to be more strict when using a combination of differents kinds of ToSingle<>, since there should only be one way to create the singleton.
