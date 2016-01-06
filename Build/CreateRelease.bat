@@ -1,5 +1,5 @@
 @echo off
 
 set PYTHONPATH=%~dp0/python;%PYTHONPATH%
-python -m mtm.zen.IncrementVersion %*
+python -m mtm.zen.CreateRelease %*
 
