@@ -45,19 +45,12 @@ class Runner:
 
         self._log.info("Found version {0}", versionStr)
 
-        groups = re.match('^(\d+)\.(\d+)$', versionStr).groups()
-
-        majorNumber = int(groups[0])
-        minorNumber = int(groups[1])
-
-        minorNumber += 1
-
         self._populateDistDir(versionStr)
 
-        self._sys.executeAndReturnOutput("git tag -a v{0}.{1} -m 'Version {0}.{1}'".format(majorNumber, minorNumber))
-        self._sys.writeFileAsText('[BuildDir]/Version.txt', '{0}.{1}'.format(majorNumber, minorNumber))
+        self._sys.executeAndReturnOutput("git tag -a v{0} -m 'Version {0}'".format(versionStr))
+        self._sys.writeFileAsText('[BuildDir]/Version.txt', '{0}'.format(versionStr))
 
-        self._log.info("Incremented version to {0}.{1}! \n\nNow commit, run 'git push --tags', then update the Releases with the contents of the Dist directory\n\n", majorNumber, minorNumber)
+        self._log.info("Incremented version to {0}! \n\nNow commit, run 'git push --tags', then update the Releases with the contents of the Dist directory\n\n", versionStr)
 
     def _populateDistDir(self, versionStr):
 
