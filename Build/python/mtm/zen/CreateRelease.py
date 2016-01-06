@@ -54,10 +54,10 @@ class Runner:
 
         self._populateDistDir(versionStr)
 
-        #self._sys.executeAndReturnOutput("git tag -a v{0}.{1} -m 'Version {0}.{1}'".format(majorNumber, minorNumber))
-        #self._sys.writeFileAsText('[BuildDir]/Version.txt', '{0}.{1}'.format(majorNumber, minorNumber))
+        self._sys.executeAndReturnOutput("git tag -a v{0}.{1} -m 'Version {0}.{1}'".format(majorNumber, minorNumber))
+        self._sys.writeFileAsText('[BuildDir]/Version.txt', '{0}.{1}'.format(majorNumber, minorNumber))
 
-        self._log.info("Incremented version to {0}.{1}. Now commit and then run 'git push --tags'\n\n", majorNumber, minorNumber)
+        self._log.info("Incremented version to {0}.{1}! \n\nNow commit, run 'git push --tags', then update the Releases with the contents of the Dist directory\n\n", majorNumber, minorNumber)
 
     def _populateDistDir(self, versionStr):
 
@@ -79,6 +79,7 @@ class Runner:
         self._sys.clearDirectoryContents(tempDir)
 
         binDir = '[BinDir]/Not Unity Release'
+        self._sys.createDirectory(binDir)
         self._sys.clearDirectoryContents(binDir)
         self._vsSolutionHelper.buildVisualStudioProject('[RootDir]/AssemblyBuild/Zenject.sln', 'Not Unity Release')
 

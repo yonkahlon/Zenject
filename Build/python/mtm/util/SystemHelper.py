@@ -158,6 +158,10 @@ class SystemHelper:
 
     def clearDirectoryContents(self, dirPath):
         dirPath = self._varManager.expand(dirPath)
+
+        if not os.path.exists(dirPath):
+            return
+
         for fileName in os.listdir(dirPath):
             filePath = os.path.join(dirPath, fileName)
             if os.path.isfile(filePath):
