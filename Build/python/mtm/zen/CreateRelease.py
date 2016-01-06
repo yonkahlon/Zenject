@@ -35,9 +35,8 @@ class Runner:
         self._varMgr.add('TempDir', '[BuildDir]/Temp')
         self._varMgr.add('AssetsDir', '[RootDir]/UnityProject/Assets')
         self._varMgr.add('ZenjectDir', '[AssetsDir]/Zenject')
-        self._varMgr.add('ReleaseDir', '[TempDir]/Zenject')
 
-        versionStr = self._sys.readFileAsText('[BuildDir]/Version.txt')
+        versionStr = self._sys.readFileAsText('[BuildDir]/Version.txt').strip()
 
         self._log.info("Found version {0}", versionStr)
 
@@ -48,36 +47,56 @@ class Runner:
 
         minorNumber += 1
 
-        self._createReleaseZip()
+        self._createReleaseZip(versionStr)
 
-        #self._sys.executeAndReturnOutput("git tag -a v{0}.{1} -m 'Version {0}.{1}'".format(majorNumber, minorNumber))
-        #self._sys.writeFileAsText('[BuildDir]/Version.txt', '{0}.{1}'.format(majorNumber, minorNumber))
+        self._sys.executeAndReturnOutput("git tag -a v{0}.{1} -m 'Version {0}.{1}'".format(majorNumber, minorNumber))
+        self._sys.writeFileAsText('[BuildDir]/Version.txt', '{0}.{1}'.format(majorNumber, minorNumber))
 
         self._log.info("Incremented version to {0}.{1}. Now commit and then run 'git push --tags'\n\n", majorNumber, minorNumber)
 
-    def _createReleaseZip(self):
+    def _createReleaseZip(self, versionStr):
         self._log.heading('Creating release zip file')
 
+        self._sys.createDirectory('[TempDir]')
         self._sys.clearDirectoryContents('[TempDir]')
 
-        self._sys.copyDirectory('[ZenjectDir]', '[ReleaseDir]')
+        self._varMgr.add('ZenTempDir', '[TempDir]/Packager/Assets/Zenject')
 
-        self._zipHelper.createZipFile('[ReleaseDir]/Extras/ZenjectUnitTests', '[ReleaseDir]/Extras/ZenjectUnitTests.zip')
-        self._sys.deleteDirectory('[ReleaseDir]/Extras/ZenjectUnitTests')
-        self._sys.removeFile('[ReleaseDir]/Extras/ZenjectUnitTests.meta')
+        self._log.info('Copying Zenject to temporary directory')
+        self._sys.copyDirectory('[ZenjectDir]', '[ZenTempDir]')
 
-        self._zipHelper.createZipFile('[ReleaseDir]/Extras/ZenjectAutoMocking', '[ReleaseDir]/Extras/ZenjectAutoMocking.zip')
-        self._sys.deleteDirectory('[ReleaseDir]/Extras/ZenjectAutoMocking')
-        self._sys.removeFile('[ReleaseDir]/Extras/ZenjectAutoMocking.meta')
+        self._log.info('Cleaning up Zenject directory')
+        self._zipHelper.createZipFile('[ZenTempDir]/Extras/ZenjectUnitTests', '[ZenTempDir]/Extras/ZenjectUnitTests.zip')
+        self._sys.deleteDirectory('[ZenTempDir]/Extras/ZenjectUnitTests')
 
-        #self._log.info('Zipping up demo project')
-        #self._zipHelper.createZipFile('[ReleaseDir]', '[DistDir]/Zenject-Source-{0}.zip'.format(versionStr))
+        self._zipHelper.createZipFile('[ZenTempDir]/Extras/ZenjectAutoMocking', '[ZenTempDir]/Extras/ZenjectAutoMocking.zip')
+        self._sys.deleteDirectory('[ZenTempDir]/Extras/ZenjectAutoMocking')
+
+        self._sys.createDirectory('[TempDir]/Packager/ProjectSettings')
+
+        self._sys.copyFile('[BuildDir]/UnityPackager/UnityPackageUtil.cs', '[TempDir]/Packager/Assets/Editor/UnityPackageUtil.cs')
+
+        self._log.info('Creating unity package')
+        self._sys.executeAndWait('"[UnityExePath]" -batchmode -nographics -quit -projectPath "[TempDir]/Packager" -executeMethod Zenject.UnityPackageUtil.CreateUnityPackage')
+
+        self._varMgr.add('DistDir', '[BuildDir]/Dist')
+
+        self._sys.createDirectory('[DistDir]')
+        self._sys.clearDirectoryContents('[DistDir]')
+
+        self._sys.copyFile('[TempDir]/Packager/Zenject.unitypackage', '[DistDir]/Zenject-{0}.unitypackage'.format(versionStr))
 
 def installBindings():
 
+    config = {
+        'PathVars': {
+            'UnityExePath': 'C:/Program Files/Unity/Editor/Unity.exe',
+        }
+    }
+    Container.bind('Config').toSingle(Config, [config])
+
     Container.bind('LogStream').toSingle(LogStreamFile)
-    Container.bind('LogStream').toSingle(LogStreamConsole, True, True)
-    Container.bind('Config').toSingle(Config, [])
+    Container.bind('LogStream').toSingle(LogStreamConsole, True, False)
 
     Container.bind('VarManager').toSingle(VarManager)
     Container.bind('SystemHelper').toSingle(SystemHelper)
