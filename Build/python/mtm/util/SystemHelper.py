@@ -146,6 +146,13 @@ class SystemHelper:
         self.makeMissingDirectoriesInPath(toPath)
         shutil.copy2(fromPath, toPath)
 
+    def move(self, fromPath, toPath):
+        toPath = self._varManager.expand(toPath)
+        fromPath = self._varManager.expand(fromPath)
+
+        self.makeMissingDirectoriesInPath(toPath)
+        shutil.move(fromPath, toPath)
+
     def IsDir(self, path):
         return os.path.isdir(self._varManager.expand(path))
 
