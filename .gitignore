@@ -10,3 +10,5 @@
 .ackrc
 .vimrc_l
 project_root_marker
+
+*.pyc
