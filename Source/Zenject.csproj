@@ -64,19 +64,19 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
     <Reference Include="UnityEngine">
-      <HintPath>..\..\..\..\..\AssemblyBuild\Libraries\Unity\UnityEngine.dll</HintPath>
+      <HintPath>..\..\..\..\AssemblyBuild\Libraries\Unity\UnityEngine.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\..\Internal\Assert.cs" />
-    <Compile Include="..\..\Internal\LinqExtensions.cs" />
-    <Compile Include="..\..\Internal\Log.cs" />
-    <Compile Include="..\..\Internal\MiscExtensions.cs" />
-    <Compile Include="..\..\Internal\ProfileBlock.cs" />
-    <Compile Include="..\..\Internal\ReflectionUtil.cs" />
-    <Compile Include="..\..\Internal\Tuple.cs" />
-    <Compile Include="..\..\Internal\TypeExtensions.cs" />
-    <Compile Include="..\..\Internal\Func.cs" />
+    <Compile Include="Internal\Assert.cs" />
+    <Compile Include="Internal\LinqExtensions.cs" />
+    <Compile Include="Internal\Log.cs" />
+    <Compile Include="Internal\MiscExtensions.cs" />
+    <Compile Include="Internal\ProfileBlock.cs" />
+    <Compile Include="Internal\ReflectionUtil.cs" />
+    <Compile Include="Internal\Tuple.cs" />
+    <Compile Include="Internal\TypeExtensions.cs" />
+    <Compile Include="Internal\Func.cs" />
     <Compile Include="Binders\BinderBase.cs" />
     <Compile Include="Binders\BindingConditionSetter.cs" />
     <Compile Include="Binders\GenericBinder.cs" />
