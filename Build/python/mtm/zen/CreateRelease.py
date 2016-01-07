@@ -139,14 +139,14 @@ class Runner:
             self._sys.copyDirectory('[ZenjectDir]', '[ZenTempDir]')
 
             self._log.info('Cleaning up Zenject directory')
-            self._zipHelper.createZipFile('[ZenTempDir]/Extras/ZenjectUnitTests', '[ZenTempDir]/Extras/ZenjectUnitTests.zip')
-            self._sys.deleteDirectory('[ZenTempDir]/Extras/ZenjectUnitTests')
+            self._zipHelper.createZipFile('[ZenTempDir]/OptionalExtras/UnitTests', '[ZenTempDir]/OptionalExtras/UnitTests.zip')
+            self._sys.deleteDirectory('[ZenTempDir]/OptionalExtras/UnitTests')
 
-            self._zipHelper.createZipFile('[ZenTempDir]/Extras/ZenjectAutoMocking', '[ZenTempDir]/Extras/ZenjectAutoMocking.zip')
-            self._sys.deleteDirectory('[ZenTempDir]/Extras/ZenjectAutoMocking')
+            self._zipHelper.createZipFile('[ZenTempDir]/OptionalExtras/AutoMocking', '[ZenTempDir]/OptionalExtras/AutoMocking.zip')
+            self._sys.deleteDirectory('[ZenTempDir]/OptionalExtras/AutoMocking')
 
             if not includeSample:
-                self._sys.deleteDirectory('[ZenTempDir]/Extras/SampleGame')
+                self._sys.deleteDirectory('[ZenTempDir]/OptionalExtras/SampleGame')
 
         self._sys.copyFile('[BuildDir]/UnityPackager/UnityPackageUtil.cs', '[PackageTempDir]/Assets/Editor/UnityPackageUtil.cs')
 
