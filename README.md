@@ -1071,7 +1071,7 @@ As mentioned in the above code, Zenject will search for a prefab named QuxInstal
 A Zenject driven application is executed by the following steps:
 
 1. Unity Awake() phase begins
-1. CompositionRoot.Awake() method is called.  NOTE: This should always be the first thing executed in your scene.  By default this should work this way out of the box, because the executionOrder property is set to -9999 (which you can find by opening SceneCompositionRoot.cs.meta).  You can also verify that this is the case by selecting Edit -> Project Settings -> Script Execution Order and making sure that SceneCompositionRoot is at the top.
+1. CompositionRoot.Awake() method is called.  NOTE: This should always be the first thing executed in your scene.  By default this should work this way out of the box, because the executionOrder property is set to -9999 for the CompositionRoot classes.  You can also verify that this is the case by selecting `Edit -> Project Settings -> Script Execution Order` and making sure that GlobalCompositionRoot and SceneCompositionRoot are at the top.  (GlobalCompositionRoot goes first because global bindings should alway get updated before scene bindings)
 1. Composition Root creates a new DiContainer object to be used to contain all instances used in the scene
 1. Composition Root iterates through all the Installers that have been added to it via the Unity Inspector, and updates them to point to the new DiContainer.  It then calls InstallBindings() on each installer.
 1. Each Installer then registers different sets of dependencies directly on to the given DiContainer by calling one of the Bind<> methods.  Note that the order that this binding occurs should not generally matter. Each installer may also include other installers by calling Container.Install<>. Each installer can also add bindings to configure other installers, however note that in this case order might actually matter, since you will have to make sure that code configuring other installers is executed before the installers that you are configuring! You can control the order by simply re-ordering the Installers property of the CompositionRoot
@@ -1092,12 +1092,13 @@ A Zenject driven application is executed by the following steps:
 
 ## <a id="di-rules--guidelines--recommendations"></a>DI Guidelines / Recommendations / Gotchas / Tips and Tricks
 
+* **Do not use GameObject.Instantiate if you want your objects to have their dependencies injected**
+    * If you want to create a prefab yourself, you can use either IInstantiator interface (which is automatically included in every container) or the DiContainer directly, which will automatically fill in any fields that are marked with the [Inject] attribute.  The IInstantiator interface and DiContainer contain various methods to create from prefabs or create from empty game objects, etc.  
+    **In other words:  If you want your dynamically created game object to have its fields injected, do not use GameObject.Instantiate and use DiContainer.InstantiatePrefab or GameObjectFactory instead**
+    * For more information on GameObjectFactory see <a href="#game-object-factories">this section</a>
+
 * **The container should *only* be referenced in the composition root "layer"**.
     * Note that factories are part of this layer and the container can be referenced there (which is necessary to create objects at runtime).  For example, see ShipStateFactory in the sample project.  See <a href="#creating-objects-dynamically">here</a> for more details on this.
-
-* **Do not use GameObject.Instantiate if you want your objects to have their dependencies injected**
-    * If you want to create a prefab yourself, you can use either IInstantiator interface (which is automatically included in every container) or the DiContainer directly, which will automatically fill in any fields that are marked with the [Inject] attribute.  The IInstantiator interface contains various methods to create from prefabs or create from empty game objects, etc.
-    * You can also use GameObjectFactory as suggested <a href="#game-object-factories">in this section</a>
 
 * **Do not use IInitializable, ITickable and IDisposable for dynamically created objects**
     * Objects that are of type IInitializable are only initialized once, at startup.  If you create an object through a factory, and it derives from IInitializable, the Initialize() method will not be called.  You should use [PostInject] in this case.
@@ -1117,7 +1118,7 @@ A Zenject driven application is executed by the following steps:
     * Zenject will only instantiate any objects that are referenced in the object graph that is generated based on the bindings that you've invoked in your installer.  Internally, how it works is that Zenject has one single class that represents the root of the entire object graph (aka IDependencyRoot).  For unity projects this is typically the 'UnityDependencyRoot' class.  This class has a dependency on all ITickable, IInitializable, and IDisposable objects.  This is important to understand because it means that any class that you bind to ITickable, IInitializable, or IDisposable will always be created as part of the initial object graph of your application.  And only otherwise will your class be lazily instantiated when referenced by another class.
 
 * **The order that things occur in is wrong, like injection is occurring too late, or Initialize() event is not called at the right time, etc.**
-    * It may be because the execution order of the Zenject class 'SceneCompositionRoot' is incorrect.  This should always have the earliest or near earliest execution order.  This should already be set by default (since this settings is in the SceneCompositionRoot.cs.meta file). However, if you are compiling Zenject as a DLL or have a unique configuration you may want to make sure, which you can do by going to Edit -> Project Settings -> Script Execution Order and confirming that SceneCompositionRoot is at the top, before the default time.
+    * It may be because the execution order of the Zenject classes 'SceneCompositionRoot' and 'GlobalCompositionRoot' may be incorrect.  These classes should always have the earliest or near earliest execution order.  This should already be set by default (since this settings is in the SceneCompositionRoot.cs.meta and GlobalCompositionRoot.cs.meta files). However, if you are compiling Zenject yourself or have a unique configuration you may want to make sure, which you can do by going to "Edit -> Project Settings -> Script Execution Order" and confirming that GlobalCompositionRoot and SceneCompositionRoot are at the top, before the default time.
 
 Please feel free to submit any other sources of confusion to sfvermeulen@gmail.com and I will add it here.
 
