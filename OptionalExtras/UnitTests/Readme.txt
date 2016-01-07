@@ -1,0 +1,1 @@
+Note: You will need Unity Test Tools package installed from asset store in order to execute these tests.
