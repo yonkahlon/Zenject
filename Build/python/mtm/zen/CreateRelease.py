@@ -76,11 +76,12 @@ class Runner:
         self._sys.createDirectory('[TempDir]')
 
         try:
-            self._createPackage(False, True, '[DistDir]/Zenject-{0}-WithAsteroidsDemo.unitypackage'.format(versionStr))
-            self._createPackage(False, False, '[DistDir]/Zenject-{0}.unitypackage'.format(versionStr))
-            self._createPackage(True, False, '[DistDir]/Zenject-{0}-BinariesOnly.unitypackage'.format(versionStr))
+            self._createCSharpPackage(True, '[DistDir]/Zenject-WithAsteroidsDemo@v{0}.unitypackage'.format(versionStr))
+            self._createCSharpPackage(False, '[DistDir]/Zenject@v{0}.unitypackage'.format(versionStr))
 
-            self._createNonUnityZip('[DistDir]/Zenject-{0}-NonUnity.zip'.format(versionStr))
+            self._createDllPackage('[DistDir]/Zenject-BinariesOnly@v{0}.unitypackage'.format(versionStr))
+
+            self._createNonUnityZip('[DistDir]/Zenject-NonUnity@v{0}.zip'.format(versionStr))
         finally:
             self._sys.deleteDirectory('[TempDir]')
 
@@ -103,7 +104,7 @@ class Runner:
 
         self._zipHelper.createZipFile(tempDir, zipPath)
 
-    def _createPackage(self, useDll, includeSample, outputPath):
+    def _createDllPackage(self, outputPath):
 
         self._log.heading('Creating {0}'.format(os.path.basename(outputPath)))
 
@@ -113,7 +114,7 @@ class Runner:
         self._sys.createDirectory('[PackageTempDir]')
         self._sys.createDirectory('[PackageTempDir]/ProjectSettings')
 
-        if useDll:
+        try:
             self._log.info('Building zenject dlls')
 
             self._varMgr.set('ZenDllDir', '[BinDir]/Release')
@@ -134,29 +135,55 @@ class Runner:
 
             self._sys.copyFile('[ZenDllDir]/Zenject.Commands.dll', '[ZenTempDir]/Zenject.Commands.dll')
             self._sys.copyFile('[ZenDllMetaDir]/Zenject.Commands.dll.meta', '[ZenTempDir]/Zenject.Commands.dll.meta')
-        else:
+
+            self._createUnityPackage('[PackageTempDir]', outputPath)
+        finally:
+            self._sys.deleteDirectory('[PackageTempDir]')
+
+        self._log.heading('Creating {0}'.format(os.path.basename(outputPath)))
+
+    def _createCSharpPackage(self, includeSample, outputPath):
+
+        self._log.heading('Creating {0}'.format(os.path.basename(outputPath)))
+
+        self._varMgr.set('PackageTempDir', '[TempDir]/Packager')
+        self._varMgr.set('ZenTempDir', '[PackageTempDir]/Assets/Zenject')
+
+        self._sys.createDirectory('[PackageTempDir]')
+        self._sys.createDirectory('[PackageTempDir]/ProjectSettings')
+
+        try:
             self._log.info('Copying Zenject to temporary directory')
             self._sys.copyDirectory('[ZenjectDir]', '[ZenTempDir]')
 
             self._log.info('Cleaning up Zenject directory')
             self._zipHelper.createZipFile('[ZenTempDir]/OptionalExtras/UnitTests', '[ZenTempDir]/OptionalExtras/UnitTests.zip')
             self._sys.deleteDirectory('[ZenTempDir]/OptionalExtras/UnitTests')
+            self._sys.removeFile('[ZenTempDir]/OptionalExtras/UnitTests.meta')
 
             self._zipHelper.createZipFile('[ZenTempDir]/OptionalExtras/AutoMocking', '[ZenTempDir]/OptionalExtras/AutoMocking.zip')
             self._sys.deleteDirectory('[ZenTempDir]/OptionalExtras/AutoMocking')
+            self._sys.removeFile('[ZenTempDir]/OptionalExtras/AutoMocking.meta')
+
+            self._sys.removeFile('[ZenTempDir]/Source/Zenject.csproj')
+            self._sys.removeFile('[ZenTempDir]/Source/Zenject.csproj.user')
+            self._sys.removeFile('[ZenTempDir]/OptionalExtras/CommandsAndSignals/Zenject.Commands.csproj')
+            self._sys.removeFile('[ZenTempDir]/OptionalExtras/CommandsAndSignals/Zenject.Commands.csproj.user')
 
             if not includeSample:
                 self._sys.deleteDirectory('[ZenTempDir]/OptionalExtras/SampleGame')
 
-        self._sys.copyFile('[BuildDir]/UnityPackager/UnityPackageUtil.cs', '[PackageTempDir]/Assets/Editor/UnityPackageUtil.cs')
+            self._createUnityPackage('[PackageTempDir]', outputPath)
+        finally:
+            self._sys.deleteDirectory('[PackageTempDir]')
+
+    def _createUnityPackage(self, projectPath, outputPath):
+        self._sys.copyFile('[BuildDir]/UnityPackager/UnityPackageUtil.cs', '{0}/Assets/Editor/UnityPackageUtil.cs'.format(projectPath))
 
         self._log.info('Running unity to create unity package')
 
         self._unityHelper.runEditorFunction('[PackageTempDir]', 'Zenject.UnityPackageUtil.CreateUnityPackage')
-
-        self._sys.move('[PackageTempDir]/Zenject.unitypackage', outputPath)
-
-        self._sys.deleteDirectory('[PackageTempDir]')
+        self._sys.move('{0}/Zenject.unitypackage'.format(projectPath), outputPath)
 
 def installBindings():
 

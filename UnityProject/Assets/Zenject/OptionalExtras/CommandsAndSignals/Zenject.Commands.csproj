@@ -85,7 +85,7 @@
     <Compile Include="Signal\SignalExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Main\Scripts\Zenject.csproj">
+    <ProjectReference Include="..\..\Source\Zenject.csproj">
       <Project>{46f25a62-2e29-48cb-95f3-bdbcb0976ddc}</Project>
       <Name>Zenject</Name>
     </ProjectReference>
