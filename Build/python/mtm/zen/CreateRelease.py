@@ -94,7 +94,7 @@ class Runner:
 
         binDir = '[BinDir]/Not Unity Release'
         self._sys.deleteDirectoryIfExists(binDir)
-        self._sys.clearDirectory(binDir)
+        self._sys.clearDirectoryContents(binDir)
         self._vsSolutionHelper.buildVisualStudioProject('[RootDir]/AssemblyBuild/Zenject.sln', 'Not Unity Release')
 
         self._log.info('Copying Zenject dlls')
