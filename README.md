@@ -2687,6 +2687,11 @@ For general troubleshooting / support, please use the [zenject subreddit](http:/
 
 ## <a id="release-notes"></a>Release Notes
 
+3.4 (Jan 7, 2015)
+- Cleaned up directory structure
+- Fixed bug with Global bindings not getting their Tick() called in the correct order
+- Fixes to the releases automation scripts
+
 3.2 (December 20, 2015)
 - Added the concept of "Commands" and "Signals".  See documentation for details.
 - Fixed validation for decorator scenes that open decorator scenes.
