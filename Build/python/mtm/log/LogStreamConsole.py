@@ -82,10 +82,6 @@ class LogStreamConsole:
         logType, message = self.classifyMessage(logType, message)
 
         if logType is not None:
-
-            if logType == LogType.HeadingFailed:
-                message += '...'
-
             if logType == LogType.HeadingFailed or logType == LogType.Error:
                 self._output(logType, message, sys.stderr, self._useColors)
             else:

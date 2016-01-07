@@ -127,10 +127,8 @@ class SystemHelper:
 
     def createDirectory(self, dirPath):
         dirPath = self._varManager.expand(dirPath)
-        try:
-            os.makedirs(dirPath)
-        except:
-            pass
+        assertThat(not self.directoryExists(dirPath), 'Tried to create a directory that already exists')
+        os.makedirs(dirPath)
 
     def makeMissingDirectoriesInPath(self, dirPath):
         dirPath = self._varManager.expand(dirPath)

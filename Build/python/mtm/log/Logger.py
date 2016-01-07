@@ -106,6 +106,9 @@ class Logger:
         if len(args) > 0:
             msg = msg.format(*args)
 
+        if logType == LogType.Heading:
+            msg += '...'
+
         for stream in self._streams:
             stream.log(logType, msg)
 

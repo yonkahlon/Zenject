@@ -43,9 +43,6 @@ class VarManager:
 
         return self._config.tryGetString(None, 'PathVars', key)
 
-    def add(self, key, value):
-        self._params[key] = value
-
     def set(self, key, value):
         self._params[key] = value
 
