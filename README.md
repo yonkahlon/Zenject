@@ -1345,10 +1345,11 @@ public class EnemySpawner
 }
 ```
 
-Then in your installer, you would include:
+Then in your installer, you would include something like:
 
 ```csharp
 Container.Bind<Enemy.Factory>().ToSingle();
+Container.Bind<EnemySpawner>().ToSingle();
 ```
 
 By using Enemy.Factory above, all the dependencies for the Enemy class (such as the Player) will be automatically filled in.
