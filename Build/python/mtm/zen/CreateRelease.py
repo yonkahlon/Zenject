@@ -94,7 +94,7 @@ class Runner:
 
         binDir = '[BinDir]/Not Unity Release'
         self._sys.deleteDirectoryIfExists(binDir)
-        self._sys.clearDirectoryContents(binDir)
+        self._sys.createDirectory(binDir)
         self._vsSolutionHelper.buildVisualStudioProject('[RootDir]/AssemblyBuild/Zenject.sln', 'Not Unity Release')
 
         self._log.info('Copying Zenject dlls')
@@ -115,13 +115,25 @@ class Runner:
 
         if useDll:
             self._log.info('Building zenject dlls')
-            self._sys.clearDirectoryContents('[BinDir]/Release')
+
+            self._varMgr.set('ZenDllDir', '[BinDir]/Release')
+            self._varMgr.set('ZenDllMetaDir', '[BuildDir]/BinaryMetas')
+
+            self._sys.deleteDirectoryIfExists('[ZenDllDir]')
+            self._sys.createDirectory('[ZenDllDir]')
+
             self._vsSolutionHelper.buildVisualStudioProject('[RootDir]/AssemblyBuild/Zenject.sln', 'Release')
 
             self._log.info('Copying Zenject dlls')
-            self._sys.copyFile('[BinDir]/Release/Zenject.dll', '[ZenTempDir]/Zenject.dll')
-            self._sys.copyFile('[BinDir]/Release/Zenject-editor.dll', '[ZenTempDir]/Editor/Zenject-editor.dll')
-            self._sys.copyFile('[BinDir]/Release/Zenject.Commands.dll', '[ZenTempDir]/Zenject.Commands.dll')
+
+            self._sys.copyFile('[ZenDllDir]/Zenject.dll', '[ZenTempDir]/Zenject.dll')
+            self._sys.copyFile('[ZenDllMetaDir]/Zenject.dll.meta', '[ZenTempDir]/Zenject.dll.meta')
+
+            self._sys.copyFile('[ZenDllDir]/Zenject-editor.dll', '[ZenTempDir]/Editor/Zenject-editor.dll')
+            self._sys.copyFile('[ZenDllMetaDir]/Zenject-editor.dll.meta', '[ZenTempDir]/Editor/Zenject-editor.dll.meta')
+
+            self._sys.copyFile('[ZenDllDir]/Zenject.Commands.dll', '[ZenTempDir]/Zenject.Commands.dll')
+            self._sys.copyFile('[ZenDllMetaDir]/Zenject.Commands.dll.meta', '[ZenTempDir]/Zenject.Commands.dll.meta')
         else:
             self._log.info('Copying Zenject to temporary directory')
             self._sys.copyDirectory('[ZenjectDir]', '[ZenTempDir]')
