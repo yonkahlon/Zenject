@@ -1,5 +1,5 @@
 
-<img src="UnityProject/Assets/Zenject/Main/ZenjectLogo.png?raw=true" alt="Zenject" width="600px" height="134px"/>
+<img src="Build/ZenjectLogo.png?raw=true" alt="Zenject" width="600px" height="134px"/>
 
 # Dependency Injection Framework for Unity3D
 
