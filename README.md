@@ -35,14 +35,14 @@ __Quick Start__:  If you are already familiar with dependency injection and are 
         * <a href="#bind-methods">Bind Methods</a>
         * <a href="#list-bindings">List Bindings</a>
         * <a href="#optional-binding">Optional Binding</a>
-        * <a href="#conditional-bindings">Conditional Bindings</a>
         * <a href="#identifiers">Identifiers</a>
+        * <a href="#conditional-bindings">Conditional Bindings</a>
         * <a href="#itickable">ITickable</a>
         * <a href="#iinitializable-and-postinject">IInitializable and PostInject</a>
         * <a href="#implementing-idisposable">Implementing IDisposable</a>
         * <a href="#installers">Installers</a>
     * <a href="#zenject-order-of-operations">Zenject Order Of Operations</a>
-    * <a href="#di-rules--guidelines--recommendations">Rules / Guidelines / Recommendations / Gotchas / Miscellaneous Tips and Tricks</a>
+    * <a href="#di-guidelines--recommendations">Guidelines / Recommendations / Gotchas / Miscellaneous Tips and Tricks</a>
     * Advanced Features
         * <a href="#global-bindings">Global Bindings</a>
         * <a href="#update--initialization-order">Update Order And Initialization Order</a>
@@ -640,7 +640,7 @@ class MyCustomFactory : IFactory<IFoo>
 }
 ```
 
-The `ToSingleFactory` binding can be useful when you want to define a singleton, but it has complex construction logic that you want to define yourself.  You could use `ToSingleMethod`, but this can get ugly if your construction logic itself has its own dependencies that it needs.  Using `ToSingleFactory` for this case is nice because any dependencies that you require for construction can be simply added to the factory constructor
+The `ToSingleFactory` binding can be useful when you want to define a singleton, but it has complex construction logic that you want to define yourself.  You could use `ToSingleMethod`, but this can get ugly if your construction logic itself has its own dependencies that it needs.  Using `ToSingleFactory` for this case it is nice because any dependencies that you require for construction can be simply added to the factory constructor
 
 18 - **Untyped Bindings**
 
@@ -691,7 +691,7 @@ public class Bar
 }
 ```
 
-Also worth noting is that if you try and declare a single dependency of IFoo (like Bar below) and there are multiple bindings for it, then Zenject will throw an exception, since Zenject doesn't know which instance of IFoo to use.  Also, if the empty list is valid, then you should mark your List constructor parameter (or [Inject] field) as optional (see <a href="#optional-binding">here</a> for details).
+Also worth noting is that if you try and declare a single dependency of IFoo (like Bar below) and there are multiple bindings for it, then Zenject will throw an exception, since Zenject doesn't know which instance of IFoo to use.
 
 ```csharp
 public class Bar
@@ -701,6 +701,8 @@ public class Bar
     }
 }
 ```
+
+Also, if the empty list is valid, then you should mark your List constructor parameter (or [Inject] field) as optional (see <a href="#optional-binding">here</a> for details).
 
 ## <a id="optional-binding"></a>Optional Binding
 
@@ -796,7 +798,7 @@ public class Bar2
 
 In this example, the Bar1 class will be given an instance of Foo1, and the Bar2 class will use the default version of IFoo which is bound to Foo2.
 
-Note also that you can add a name constructor arguments as well, for example:
+Note also that you can add a name to constructor arguments as well, for example:
 
 ```csharp
 public class Bar
@@ -993,7 +995,7 @@ Note that this example may or may not be a good idea (for example, the file will
 
 ## <a id="installers"></a>Installers
 
-Often, there is some collection of related bindings for each sub-system and so it makes sense to group those bindings into a re-usable object.  In Zenject this re-usable object is called an Installer.  You can define a new installer as follows:
+Often, there is some collections of related bindings for each sub-system and so it makes sense to group those bindings into a re-usable object.  In Zenject this re-usable object is called an Installer.  You can define a new installer as follows:
 
 ```csharp
 public class FooInstaller : MonoInstaller
@@ -1090,20 +1092,20 @@ A Zenject driven application is executed by the following steps:
 1. App is exited
 1. Dispose() is called on all objects mapped to IDisposable (see <a href="#implementing-idisposable">here</a> for details)
 
-## <a id="di-rules--guidelines--recommendations"></a>DI Guidelines / Recommendations / Gotchas / Tips and Tricks
+## <a id="di-guidelines--recommendations"></a>DI Guidelines / Recommendations / Gotchas / Tips and Tricks
 
 * **Do not use GameObject.Instantiate if you want your objects to have their dependencies injected**
     * If you want to create a prefab yourself, you can use either IInstantiator interface (which is automatically included in every container) or the DiContainer directly, which will automatically fill in any fields that are marked with the [Inject] attribute.  The IInstantiator interface and DiContainer contain various methods to create from prefabs or create from empty game objects, etc.  
     **In other words:  If you want your dynamically created game object to have its fields injected, do not use GameObject.Instantiate and use DiContainer.InstantiatePrefab or GameObjectFactory instead**
     * For more information on GameObjectFactory see <a href="#game-object-factories">this section</a>
 
-* **The container should *only* be referenced in the composition root "layer"**.
+* **The container should *only* be referenced in the composition root "layer"**
     * Note that factories are part of this layer and the container can be referenced there (which is necessary to create objects at runtime).  For example, see ShipStateFactory in the sample project.  See <a href="#creating-objects-dynamically">here</a> for more details on this.
 
 * **Do not use IInitializable, ITickable and IDisposable for dynamically created objects**
     * Objects that are of type IInitializable are only initialized once, at startup.  If you create an object through a factory, and it derives from IInitializable, the Initialize() method will not be called.  You should use [PostInject] in this case.
-    * The same applies to ITickable and IDisposable.  Deriving from these will do nothing unless they are part of the original object graph created at startup
-    * If you have dynamically created objects that have an Update() method, it is usually best to call Update() on those manually, and often there is a higher level manager-like class in which it makes to do this from.  If however you prefer to use ITickable for dynamically objects you can declare a dependency to TickableManager and add/remove it explicitly as well.
+    * The same applies to ITickable and IDisposable.  Deriving from these will do nothing unless they are part of the original object graph created at startup.
+    * If you have dynamically created objects that have an Update() method, it is usually best to call Update() on those manually, and often there is a higher level manager-like class in which it makes sense to do this from.  If however you prefer to use ITickable for dynamically objects you can declare a dependency to TickableManager and add/remove it explicitly as well.
 
 * **Using multiple constructors**
     * Zenject does not support injecting into multiple constructors currently.  You can have multiple constructors however you must mark one of them with the [Inject] attribute so Zenject knows which one to use.
@@ -1497,7 +1499,7 @@ public class GameInstaller : Installer
 
 ```
 
-Because of the fact that there are a number of different ways to define what is returned by a given `IFactory<>`, it has it's own bind method called `BindIFactory<>`.  This method takes one generic parameter that defines the generic parameter that you want to use for `IFactory<>`, and then provides a number of different methods that you can choose from to define what is returned by the `IFactory<>` that you're creating.
+Because of the fact that there are a number of different ways to define what is returned by a given `IFactory<>`, it has its own bind method called `BindIFactory<>`.  This method takes one generic parameter that defines the generic parameter that you want to use for `IFactory<>`, and then provides a number of different methods that you can choose from to define what is returned by the `IFactory<>` that you're creating.
 
 In the example installer above, our bind command maps our abstract factory `IFactory<IPathFindingStrategy>` to a concrete factory that returns a new instance of type `AStarPathFindingStrategy`.
 
@@ -1526,7 +1528,7 @@ Container.BindIFactory<IFoo>().ToMethod(c => new Foo());
 Container.BindIFactory<string, IFoo>().ToMethod((text, c) => new Foo(text));
 ```
 
-2 - **ToInstance<TContract>** - Create dynamic dependency from an existing instance
+2 - **ToInstance&lt;TContract&gt;** - Create dynamic dependency from an existing instance
 
 Results in a dependency of type `IFactory<TContract>` that just returns the given instance
 
@@ -1563,7 +1565,7 @@ Container.BindIFactory<string, int, IFoo>().ToFactory<Foo>();
 
 5 - **ToIFactory&lt;TConcrete&gt;** - Create dynamic dependency via lookup on another factory
 
-Results in a dependency of type IFactory<TContract> that will return an instance of type TConcrete.  It does this by looking up IFactory<TConcrete> and calling Create() to create an instance of type TConcrete.  TConcrete must derive from TContract for this binding.  Also, it is assumed that IFactory<TConcrete> is declared in a separate binding.
+Results in a dependency of type `IFactory<TContract>` that will return an instance of type `TConcrete`.  It does this by looking up `IFactory<TConcrete>` and calling `Create()` to create an instance of type `TConcrete`.  `TConcrete` must derive from `TContract` for this binding.  Also, it is assumed that `IFactory<TConcrete>` is declared in a separate binding.
 
 ```csharp
 // First create a simple binding for IFactory<Foo>
@@ -1573,9 +1575,9 @@ Container.BindIFactory<Foo>().ToFactory();
 Container.BindIFactory<IFoo>().ToIFactory<Foo>();
 ```
 
-6 - **ToCustomFactory<TContract, TConcrete, TFactory>** - Create dynamic dependency using user created factory class
+6 - **ToCustomFactory&lt;TConcrete, TFactory&gt;** - Create dynamic dependency using user created factory class
 
-Results in a dependency of type IFactory<TContract> that will return an instance of type TConcrete using the given factory of type TFactory.  It is assumed that TFactory is declared in another binding.  TFactory must also derive from IFactory<TConcrete> for this to work
+Results in a dependency of type `IFactory<TContract>` that will return an instance of type `TConcrete` using the given factory of type `TFactory`.  It is assumed that `TFactory` is declared in another binding.  `TFactory` must also derive from `IFactory<TConcrete>` for this to work.
 
 ```csharp
 // Map IFoo to our custom factory Foo.Factory
@@ -1587,11 +1589,11 @@ public class MyCustomFooFactory : IFactory<IFoo>
 }
 ```
 
-7 - **ToPrefab<TMonoBehaviour>(prefab)** - Create dynamic MonoBehaviour using given prefab
+7 - **ToPrefab&lt;TMonoBehaviour&gt;(prefab)** - Create dynamic MonoBehaviour using given prefab
 
 TMonoBehaviour = Derives from MonoBehaviour
 
-Results in a dependency of type IFactory<TMonoBehaviour> that can be used to create instances of the given prefab.  After instantiating the given prefab, the factory will search it for a component of type 'TMonoBehaviour' and then return that from the Create() method
+Results in a dependency of type `IFactory<TMonoBehaviour>` that can be used to create instances of the given prefab.  After instantiating the given prefab, the factory will search it for a component of type `TMonoBehaviour` and then will return that from the `Create()` method.
 
 ```csharp
 Container.BindIFactory<IFoo>().ToPrefab<FooMonoBehaviour>(prefab);
@@ -1746,7 +1748,7 @@ public class LevelHandler : IInitializable
 }
 ```
 
-You can load the scene containing `LessonStandaloneStart` and specify a particular level by using the following syntax:
+You can load the scene containing `LevelHandler` and specify a particular level by using the following syntax:
 
 ```csharp
 ZenUtil.LoadScene("NameOfSceneToLoad",
@@ -1756,9 +1758,9 @@ ZenUtil.LoadScene("NameOfSceneToLoad",
     });
 ```
 
-Note that you can still run the scene directly, in which case it will default to using "level01".  This is possible because we are using the InjectOptional flag.
+Note that you can still run the scene directly, in which case it will default to using "default_level".  This is possible because we are using the `InjectOptional` flag.
 
-An alternative and arguably cleaner way to do this would be to customize the installer itself rather than the LevelHandler class.  In this case we can write our LevelHandler class like this (without the [InjectOptional] flag)
+An alternative and arguably cleaner way to do this would be to customize the installer itself rather than the `LevelHandler` class.  In this case we can write our `LevelHandler` class like this (without the `[InjectOptional]` flag).
 
 ```csharp
 public class LevelHandler : IInitializable
@@ -1798,17 +1800,17 @@ public class GameInstaller : Installer
 }
 ```
 
-Then, instead of injecting directly into the LevelHandler we can inject into the installer instead.
+Then, instead of injecting directly into the `LevelHandler` we can inject into the installer instead.
 
 ```csharp
 ZenUtil.LoadScene("NameOfSceneToLoad",
     delegate (DiContainer container)
     {
-        container.Bind<string>().ToInstance("level02").WhenInjectedInto<GameInstaller>();
+        container.Bind<string>().ToInstance("custom_level").WhenInjectedInto<GameInstaller>();
     });
 ```
 
-Note that in this case I didn't need to use the "LevelName" identifier since there is only one string injected into the GameInstaller class.
+Note that in this case I didn't need to use the "LevelName" identifier since there is only one string injected into the `GameInstaller` class.
 
 Some people have also found it useful to separate out content into different scenes and then load each scene additively using the Unity method `Application.LoadLevelAdditive`.  In some cases it's useful to have the dependencies in the new scene resolved using the container of the original scene.  To achieve this, you can call `ZenUtil.LoadSceneAdditiveWithContainer` and pass in your scene's container.  Note however that it is assumed in this case that the new scene does not have its own container + Composition Root.
 
@@ -1822,7 +1824,7 @@ For example, let's say we want to add some special keyboard shortcuts to our mai
 * Add an empty GameObject and name it 'CompositionRoot'
 * Add a 'SceneDecoratorCompositionRoot' MonoBehaviour to it
 * Type in the scene you want to 'decorate' in the 'Scene Name' field of SceneDecoratorCompositionRoot
-* Create a new C# script with the following contents, then add your the MonoBehaviour to your scene and drag it to the Installers property of SceneDecoratorCompositionRoot
+* Create a new C# script with the following contents, then add this MonoBehaviour to your scene as a gameObject, then drag it to the Installers property of SceneDecoratorCompositionRoot
 
 ```csharp
 public class ExampleDecoratorInstaller : DecoratorInstaller
@@ -1862,7 +1864,7 @@ Note also that Zenject validate (using CTRL+SHIFT+V or the menu item via Edit->Z
 
 In the real world there can sometimes be complex construction that needs to occur in your custom factory classes.  One way to deal with this is to use a temporary sub-container.
 
-For example, suppose one day we decide to add further runtime constructor arguments to the Enemy class:
+For example, suppose one day we decide to add further runtime constructor arguments to the `Enemy` class:
 
 ```csharp
 public class Enemy
@@ -1882,7 +1884,7 @@ public class EnemyWeapon
 }
 ```
 
-And let's say we want the damage of the EnemyWeapon class to be specified by the EnemySpawner class.  How do we pass that argument down to EnemyWeapon?  In this case it might be easiest to create the EnemyWeapon class first and then pass it to the factory.  However, for the sake of this example let's pretend we want to create the EnemyClass in one call to Instantiate
+And let's say we want the damage of the `EnemyWeapon` class to be specified by the `EnemySpawner` class.  How do we pass that argument down to `EnemyWeapon`?  In this case it might be easiest to create the `EnemyWeapon` class first and then pass it to the factory.  However, for the sake of this example let's pretend we want to create the `Enemy` class in one call to `Instantiate()`.
 
 ```csharp
 public class EnemyFactory
@@ -1903,21 +1905,21 @@ public class EnemyFactory
 }
 ```
 
-We can use Sub-Containers here to achieve this.  Sub-containers can be used in factories to add complex bindings to the object graph that you are instantiating.  The Container.Instantiate method does allow passing in a list of constructor arguments, but it is limited to just that.  Using Sub-Containers in this way can be thought of a more powerful version of that.  Though of course, SubContainers have a lot more uses than simply factory construction, as explained in the <a href="#sub-containers-and-facades">next section</a>
+We can use Sub-Containers here to achieve this.  Sub-containers can be used in factories to add complex bindings to the object graph that you are instantiating.  The `Container.Instantiate` method does allow passing in a list of constructor arguments, but it is limited to just that.  Using Sub-Containers in this way can be thought of a more powerful version of that.  Though of course, Sub-Containers have a lot more uses than simply factory construction, as explained in the <a href="#sub-containers-and-facades">next section</a>
 
 ## <a id="sub-containers-and-facades"></a>Sub-Containers And Facades
 
-In some cases is can be very useful to use multiple containers in the same application.  For example, if you are creating a word processor it may be useful to have a sub-container for each tab that represents a separate document.  This way, you could bind a bunch of classes `ToSingle()` within the sub-container and they could all easily reference each other as if they were all singletons.  Then you could instantiate multiple sub-containers to be used for each document, with each sub-container having unique instances of all the classes that handle each specific document.
+In some cases it can be very useful to use multiple containers in the same application.  For example, if you are creating a word processor it may be useful to have a sub-container for each tab that represents a separate document.  This way, you could bind a bunch of classes `ToSingle()` within the sub-container and they could all easily reference each other as if they were all singletons.  Then you could instantiate multiple sub-containers to be used for each document, with each sub-container having unique instances of all the classes that handle each specific document.
 
 Another example might be if you are designing an open-world space ship game, you might want each space ship to have it's own container that contains all the class instances responsible for running that specific spaceship.
 
-This is actually how global bindings work.  There is one global container for the entire application, and when a unity scene starts up, it creates a new sub-container "underneath" the global container.  All the bindings that you add in your scene MonoInstaller are bound to your subcontainer.  This allows the dependencies in your scene to automatically get injected with global bindings, because sub-containers automatically inherit all the bindings in its parent (and grandparent, etc.).
+This is actually how global bindings work.  There is one global container for the entire application, and when a unity scene starts up, it creates a new sub-container "underneath" the global container.  All the bindings that you add in your scene MonoInstaller are bound to your sub-container.  This allows the dependencies in your scene to automatically get injected with global bindings, because sub-containers automatically inherit all the bindings in its parent (and grandparent, etc.).
 
-A common design pattern that we like to use in relation to sub-containers is the <a href="https://en.wikipedia.org/wiki/Facade_pattern">Facade pattern</a>.  This pattern is used to abstract away a related group of dependencies so that it can be used at a more higher-level when used by other modules in the code base.  This is relevant here because often when you are defining sub-containers in your application it is very useful to also define a Facade class that is used to interact with this sub-container as a whole.  So, to apply it to the spaceship example above, you might have a SpaceshipFacade class that represents very high-level operations on a spaceship such as "Start Engine", "Take Damage", "Fly to destination", etc.  And then internally, the SpaceshipFacade class can delegate the specific handling of all the parts of these requests to the relevant single-responsibility dependencies that exist within the sub-container.  Let's see what the code would look like in this example (read the comments for an explanation)
+A common design pattern that we like to use in relation to sub-containers is the <a href="https://en.wikipedia.org/wiki/Facade_pattern">Facade pattern</a>.  This pattern is used to abstract away a related group of dependencies so that it can be used at a higher level when used by other modules in the code base.  This is relevant here because often when you are defining sub-containers in your application it is very useful to also define a Facade class that is used to interact with this sub-container as a whole.  So, to apply it to the spaceship example above, you might have a SpaceshipFacade class that represents very high-level operations on a spaceship such as "Start Engine", "Take Damage", "Fly to destination", etc.  And then internally, the SpaceshipFacade class can delegate the specific handling of all the parts of these requests to the relevant single-responsibility dependencies that exist within the sub-container.  Let's see what the code would look like in this example (read the comments for an explanation)
 
 ```csharp
 // First we define our facade class to represent all the classes associated with a ship
-// Facade is a class that is built into zenject
+// Facade is a class that is built into Zenject
 public class ShipFacade : Facade
 {
     public class Factory : FacadeFactory<ShipFacade>
@@ -1954,7 +1956,7 @@ public class ShipMoveHandler : ITickable
     }
 }
 
-// We define an empty monobehaviour that will allow use to manipulate the game object
+// We define an empty monobehaviour that will allow us to manipulate the game object
 // that contains the ship mesh, animations, etc.
 // This would normally contain references to all the different parts of the model that we're
 // interested in
