@@ -1,10 +1,11 @@
 
 <img src="Build/ZenjectLogo.png?raw=true" alt="Zenject" width="600px" height="134px"/>
 
-# Dependency Injection Framework for Unity3D
+## Dependency Injection Framework for Unity3D
 
-## NOTE
+#### ---- NEW ---- If you're interested in Zenject, you may also be interested in [Projeny](https://github.com/modesttree/projeny) - our other open source project
 
+### NOTE
 The following documentation is written to be packaged with Zenject as it appears in the Asset store (which you can find [here](http://u3d.as/content/modest-tree-media/zenject-dependency-injection/7ER))
 
 ## <a id="introduction"></a>Introduction
