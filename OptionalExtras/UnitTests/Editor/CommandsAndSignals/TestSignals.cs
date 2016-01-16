@@ -26,7 +26,8 @@ namespace Zenject.Tests
             _container.Bind<Foo>().ToSingle();
             _container.Bind<Bar>().ToSingle();
 
-            _container.BindSignalTrigger<SomethingHappenedSignal.Trigger, SomethingHappenedSignal>()
+            _container.BindSignal<SomethingHappenedSignal>();
+            _container.BindTrigger<SomethingHappenedSignal.Trigger>()
                 .WhenInjectedInto<Foo>();
 
             var foo = _container.Resolve<Foo>();
