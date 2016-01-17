@@ -2161,7 +2161,9 @@ public class GameLoadedSignalWithParameter : Signal<string>
 }
 ```
 
-The trigger class is used to invoke the signal event.  Note that the Signal base class is defined within the Zenject.Commands namespace.
+The trigger class is used to invoke the signal event.  We make the trigger a separate class so that we can control which classes can trigger the signal and which classes can listen on the signal separately.
+
+Note that the Signal base class is defined within the Zenject.Commands namespace.
 
 Signals are declared in an installer like this:
 
@@ -2177,7 +2179,7 @@ public override void InstallBindings()
 
 ```
 
-This statement will do the following:
+These statements will do the following:
 * Bind the class `GameLoadedSignal` as `ToSingle<>` without a condition.  This means that any class can declare `GameLoadedSignal` as a dependency.
 * Bind the class `GameLoadedSignalWithParameter` as `ToSingle<>` as well, except it will limit its usage strictly to class `Foo`.
 
@@ -2222,7 +2224,7 @@ Triggers are declared in an installer like this:
 public override void InstallBindings()
 {
     ...
-    Container.BindTrigger<GameLoadedSignal.Trigger>().WhenInjectedInto<Foo>();
+    Container.BindTrigger<GameLoadedSignal.Trigger>();
     ...
     Container.BindTrigger<GameLoadedSignalWithParameter.Trigger, string>().WhenInjectedInto<Foo>();
 }
