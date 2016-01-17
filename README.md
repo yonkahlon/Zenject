@@ -3,7 +3,7 @@
 
 ## Dependency Injection Framework for Unity3D
 
-#### ---- NEW ---- If you're interested in Zenject, you may also be interested in [Projeny](https://github.com/modesttree/projeny) - our other open source project
+#### ----[ NEW ]---- If you like Zenject, you may also be interested in [Projeny](https://github.com/modesttree/projeny) (our other open source project)
 
 ### NOTE
 The following documentation is written to be packaged with Zenject as it appears in the Asset store (which you can find [here](http://u3d.as/content/modest-tree-media/zenject-dependency-injection/7ER))
@@ -2170,16 +2170,83 @@ Signals are declared in an installer like this:
 public override void InstallBindings()
 {
     ...
-    Container.BindSignalTrigger<GameLoadedSignal.Trigger, GameLoadedSignal>().WhenInjectedInto<Foo>();
+    Container.BindSignal<GameLoadedSignal>();
     ...
-    Container.BindSignalTrigger<GameLoadedSignalWithParameter.Trigger, GameLoadedSignalWithParameter, string>().WhenInjectedInto<Foo>();
+    Container.BindSignal<GameLoadedSignalWithParameter, string>().WhenInjectedInto<Foo>();
 }
 
 ```
 
 This statement will do the following:
 * Bind the class `GameLoadedSignal` as `ToSingle<>` without a condition.  This means that any class can declare `GameLoadedSignal` as a dependency.
-* Bind the class `GameLoadedSignal.Trigger` as `ToSingle<>` as well, except it will limit its usage strictly to class `Foo`.
+* Bind the class `GameLoadedSignalWithParameter` as `ToSingle<>` as well, except it will limit its usage strictly to class `Foo`.
+
+Once you have added the signal to your container by binding it within an installer, you can use it like this:
+
+```csharp
+
+public class Foo : IInitializable, IDisposable
+{
+    readonly GameLoadedSignal _signal;
+
+    public Foo(GameLoadedSignal signal)
+    {
+        _signal = signal;
+    }
+
+    public void Initialize()
+    {
+        _signal.Event += OnGameLoaded;
+    }
+
+    public void Dispose()
+    {
+        _signal.Event -= OnGameLoaded;
+    }
+
+    void OnGameLoaded()
+    {
+        ...
+    }
+}
+```
+
+Here we use the convention of prefixing event handlers with On, but of course you don't have to follow this convention.
+
+After binding the signal, you will almost always want to also bind a trigger, so that you can actually invoke the signal.  Signals and Triggers are bound as separate statements so that you can optionally add conditional binding on both the trigger and the signal separately.
+
+Triggers are declared in an installer like this:
+
+```csharp
+
+public override void InstallBindings()
+{
+    ...
+    Container.BindTrigger<GameLoadedSignal.Trigger>().WhenInjectedInto<Foo>();
+    ...
+    Container.BindTrigger<GameLoadedSignalWithParameter.Trigger, string>().WhenInjectedInto<Foo>();
+}
+
+```
+
+Once you have added the trigger to your container by binding it within an installer, you can use it like this:
+
+```csharp
+public class Foo
+{
+    readonly GameLoadedSignal.Trigger _trigger;
+
+    public Foo(GameLoadedSignal.Trigger trigger)
+    {
+        _trigger = trigger;
+    }
+
+    public void DoSomething()
+    {
+        _trigger.Fire();
+    }
+}
+```
 
 Commands are defined like this
 
