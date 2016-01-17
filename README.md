@@ -2758,6 +2758,9 @@ For general troubleshooting / support, please use the [zenject subreddit](http:/
 
 ## <a id="release-notes"></a>Release Notes
 
+3.5 (Jan 17, 2015)
+- Made breaking change to require separate bind commands for signals and triggers, to allow adding different conditionals on each.
+
 3.4 (Jan 7, 2015)
 - Cleaned up directory structure
 - Fixed bug with Global bindings not getting their Tick() called in the correct order
