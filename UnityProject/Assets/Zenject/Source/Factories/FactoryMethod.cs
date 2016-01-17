@@ -108,7 +108,7 @@ namespace Zenject
         }
     }
 
-    // Three parameters
+    // Four parameters
     [System.Diagnostics.DebuggerStepThrough]
     public sealed class FactoryMethod<TParam1, TParam2, TParam3, TParam4, TValue> : IValidatableFactory, IFactory<TParam1, TParam2, TParam3, TParam4, TValue>
     {
