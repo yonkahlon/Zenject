@@ -41,11 +41,8 @@ namespace Zenject.Tests
             bar.Dispose();
         }
 
-        public class SomethingHappenedSignal : Signal<string>
+        public class SomethingHappenedSignal : Signal<SomethingHappenedSignal, string>
         {
-            public class Trigger : TriggerBase
-            {
-            }
         }
 
         public class Foo

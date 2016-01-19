@@ -41,15 +41,15 @@ namespace Zenject.Tests
             bar.Dispose();
         }
 
-        public class SomethingHappenedSignal : Signal
+        public class SomethingHappenedSignal : Signal<SomethingHappenedSignal>
         {
         }
 
         public class Foo
         {
-            readonly Trigger<SomethingHappenedSignal> _trigger;
+            readonly SomethingHappenedSignal.Trigger _trigger;
 
-            public Foo(Trigger<SomethingHappenedSignal> trigger)
+            public Foo(SomethingHappenedSignal.Trigger trigger)
             {
                 _trigger = trigger;
             }
