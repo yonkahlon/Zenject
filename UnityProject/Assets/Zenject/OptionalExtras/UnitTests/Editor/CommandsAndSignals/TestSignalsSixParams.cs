@@ -27,8 +27,7 @@ namespace Zenject.Tests
             _container.Bind<Bar>().ToSingle();
 
             _container.BindSignal<SomethingHappenedSignal, string, int, float, string, int, float>();
-
-            _container.BindTrigger<SomethingHappenedSignal.Trigger, string, int, float, string, int, float>()
+            _container.BindTrigger<SomethingHappenedSignal, string, int, float, string, int, float>()
                 .WhenInjectedInto<Foo>();
 
             var foo = _container.Resolve<Foo>();
@@ -44,16 +43,13 @@ namespace Zenject.Tests
 
         public class SomethingHappenedSignal : Signal<string, int, float, string, int, float>
         {
-            public class Trigger : TriggerBase
-            {
-            }
         }
 
         public class Foo
         {
-            readonly SomethingHappenedSignal.Trigger _trigger;
+            readonly Trigger<SomethingHappenedSignal, string, int, float, string, int, float> _trigger;
 
-            public Foo(SomethingHappenedSignal.Trigger trigger)
+            public Foo(Trigger<SomethingHappenedSignal, string, int, float, string, int, float> trigger)
             {
                 _trigger = trigger;
             }
