@@ -3,6 +3,10 @@ using ModestTree.Util;
 
 namespace Zenject.Commands
 {
+    public interface ITrigger
+    {
+    }
+
     public interface ISignal
     {
     }
@@ -12,7 +16,7 @@ namespace Zenject.Commands
     {
         public event Action Event = delegate {};
 
-        public abstract class TriggerBase
+        public abstract class TriggerBase : ITrigger
         {
             [Inject]
             Signal _signal = null;
@@ -37,7 +41,7 @@ namespace Zenject.Commands
     {
         public event Action<TParam1> Event = delegate {};
 
-        public abstract class TriggerBase
+        public abstract class TriggerBase : ITrigger
         {
             [Inject]
             Signal<TParam1> _signal = null;
@@ -62,7 +66,7 @@ namespace Zenject.Commands
     {
         public event Action<TParam1, TParam2> Event = delegate {};
 
-        public abstract class TriggerBase
+        public abstract class TriggerBase : ITrigger
         {
             [Inject]
             Signal<TParam1, TParam2> _signal = null;
@@ -87,7 +91,7 @@ namespace Zenject.Commands
     {
         public event Action<TParam1, TParam2, TParam3> Event = delegate {};
 
-        public abstract class TriggerBase
+        public abstract class TriggerBase : ITrigger
         {
             [Inject]
             Signal<TParam1, TParam2, TParam3> _signal = null;
@@ -112,7 +116,7 @@ namespace Zenject.Commands
     {
         public event Action<TParam1, TParam2, TParam3, TParam4> Event = delegate {};
 
-        public abstract class TriggerBase
+        public abstract class TriggerBase : ITrigger
         {
             [Inject]
             Signal<TParam1, TParam2, TParam3, TParam4> _signal = null;
@@ -137,7 +141,7 @@ namespace Zenject.Commands
     {
         public event ModestTree.Util.Action<TParam1, TParam2, TParam3, TParam4, TParam5> Event = delegate {};
 
-        public abstract class TriggerBase
+        public abstract class TriggerBase : ITrigger
         {
             [Inject]
             Signal<TParam1, TParam2, TParam3, TParam4, TParam5> _signal = null;
@@ -162,7 +166,7 @@ namespace Zenject.Commands
     {
         public event ModestTree.Util.Action<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6> Event = delegate {};
 
-        public abstract class TriggerBase
+        public abstract class TriggerBase : ITrigger
         {
             [Inject]
             Signal<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6> _signal = null;
