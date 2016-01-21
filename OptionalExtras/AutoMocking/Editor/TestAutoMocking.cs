@@ -43,12 +43,7 @@ namespace Zenject.Tests
 
                 var result = _foo.GetTest();
 
-                if (result == null)
-                {
-                    Log.Trace("Result is null");
-                }
-
-                Log.Trace("Finished Running Bar");
+                Assert.IsNull(result);
             }
         }
 
