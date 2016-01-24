@@ -1,11 +1,11 @@
 using System;
 using System.Collections.Generic;
+
 namespace Zenject
 {
     [System.Diagnostics.DebuggerStepThrough]
     public abstract class ProviderBase : IDisposable
     {
-        string _identifier;
         BindingCondition _condition = null;
 
         public BindingCondition Condition
@@ -20,21 +20,8 @@ namespace Zenject
             }
         }
 
-        public string Identifier
+        public virtual bool Matches(InjectContext context)
         {
-            get
-            {
-                return _identifier;
-            }
-            set
-            {
-                _identifier = value;
-            }
-        }
-
-        public bool Matches(InjectContext context)
-        {
-            // Note that identifiers are matches in DiContainer
             return _condition == null || _condition(context);
         }
 
