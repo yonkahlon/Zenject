@@ -38,7 +38,7 @@ namespace Zenject
             }
         }
 
-        protected virtual BindingConditionSetter ToProvider(ProviderBase provider)
+        public BindingConditionSetter ToProvider(ProviderBase provider)
         {
             _container.RegisterProvider(
                 provider, new BindingId(_contractType, _bindIdentifier));
