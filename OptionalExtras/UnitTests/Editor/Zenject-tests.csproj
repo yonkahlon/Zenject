@@ -94,10 +94,7 @@
     <Compile Include="CommandsAndSignals\TestSignals.cs" />
     <Compile Include="CommandsAndSignals\TestSignalsOneParam.cs" />
     <Compile Include="CommandsAndSignals\TestSignalsSixParams.cs" />
-    <Compile Include="Factories\TestFactory.cs" />
-    <Compile Include="Factories\TestFactoryNullArgs.cs" />
-    <Compile Include="Factories\TestIFactory.cs" />
-    <Compile Include="Factories\TestIFactoryUntyped.cs" />
+    <Compile Include="CommandsAndSignals\TestSignalsWithIdentifiers.cs" />
     <Compile Include="TestAllInjectionTypes.cs" />
     <Compile Include="TestBaseClassPropertyInjection.cs" />
     <Compile Include="TestBothInterfaceAndConcreteBoundToSameSingleton.cs" />
@@ -114,8 +111,12 @@
     <Compile Include="TestDiContainer.cs" />
     <Compile Include="TestDuplicateInjection.cs" />
     <Compile Include="TestFacades.cs" />
+    <Compile Include="TestFactory.cs" />
+    <Compile Include="TestFactoryNullArgs.cs" />
     <Compile Include="TestGenericContract.cs" />
     <Compile Include="TestIdentifiers.cs" />
+    <Compile Include="TestIFactory.cs" />
+    <Compile Include="TestIFactoryUntyped.cs" />
     <Compile Include="TestListComparer.cs" />
     <Compile Include="TestListInjection.cs" />
     <Compile Include="TestMoq.cs" />
@@ -136,6 +137,7 @@
     <Compile Include="TestStructInjection.cs" />
     <Compile Include="TestSubContainer2.cs" />
     <Compile Include="TestSubContainers.cs" />
+    <Compile Include="TestSubContainers4.cs" />
     <Compile Include="TestTaskUpdater.cs" />
     <Compile Include="TestTestOptional.cs" />
     <Compile Include="TestTestUtil.cs" />
