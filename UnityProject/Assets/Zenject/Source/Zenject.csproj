@@ -72,6 +72,7 @@
     <Compile Include="Internal\LinqExtensions.cs" />
     <Compile Include="Internal\Log.cs" />
     <Compile Include="Internal\MiscExtensions.cs" />
+    <Compile Include="Internal\PreserveAttribute.cs" />
     <Compile Include="Internal\ProfileBlock.cs" />
     <Compile Include="Internal\ReflectionUtil.cs" />
     <Compile Include="Internal\Tuple.cs" />
@@ -162,7 +163,6 @@
     <Compile Include="Usage\InjectLocalAttribute.cs" />
     <Compile Include="Usage\InjectOptionalAttribute.cs" />
     <Compile Include="Usage\PostInjectAttribute.cs" />
-    <Compile Include="Usage\PreserveAttribute.cs" />
     <Compile Include="Util\AutoBindInstaller.cs" />
     <Compile Include="Util\DecoratorInstaller.cs" />
     <Compile Include="Util\SceneDecoratorCompositionRoot.cs" />
