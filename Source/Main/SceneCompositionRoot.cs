@@ -117,7 +117,7 @@ namespace Zenject
         public DiContainer CreateContainer(
             bool isValidating, DiContainer parentContainer, List<IInstaller> extraInstallers)
         {
-            var container = new DiContainer(this.transform, parentContainer);
+            var container = new DiContainer(parentContainer);
 
             container.IsValidating = isValidating;
 
