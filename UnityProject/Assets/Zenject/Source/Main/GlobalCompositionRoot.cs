@@ -72,7 +72,7 @@ namespace Zenject
         {
             Assert.That(isValidating || root != null);
 
-            var container = new DiContainer(root == null ? null : root.transform);
+            var container = new DiContainer();
 
             container.IsValidating = isValidating;
 

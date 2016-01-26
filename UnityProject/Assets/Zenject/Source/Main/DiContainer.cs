@@ -23,10 +23,6 @@ namespace Zenject
         readonly DiContainer _parentContainer;
         readonly Stack<LookupId> _resolvesInProgress = new Stack<LookupId>();
 
-#if !ZEN_NOT_UNITY3D
-        readonly Transform _rootTransform;
-#endif
-
         bool _isValidating;
 
         public DiContainer()
@@ -48,21 +44,6 @@ namespace Zenject
         {
             _parentContainer = parentContainer;
         }
-
-#if !ZEN_NOT_UNITY3D
-        public DiContainer(Transform rootTransform, DiContainer parentContainer)
-            : this()
-        {
-            _parentContainer = parentContainer;
-            _rootTransform = rootTransform;
-        }
-
-        public DiContainer(Transform rootTransform)
-            : this()
-        {
-            _rootTransform = rootTransform;
-        }
-#endif
 
         public SingletonProviderMap SingletonProviderMap
         {
@@ -102,16 +83,6 @@ namespace Zenject
             }
         }
 
-#if !ZEN_NOT_UNITY3D
-        public Transform RootTransform
-        {
-            get
-            {
-                return _rootTransform;
-            }
-        }
-#endif
-
         // True if this container was created for the purposes of validation
         // Useful to avoid instantiating things that we shouldn't during this step
         public bool IsValidating
@@ -145,11 +116,7 @@ namespace Zenject
 
         public DiContainer CreateSubContainer()
         {
-#if ZEN_NOT_UNITY3D
             return new DiContainer(this);
-#else
-            return new DiContainer(_rootTransform, this);
-#endif
         }
 
         public void RegisterProvider(
@@ -798,31 +765,9 @@ namespace Zenject
         {
             var gameObj = (GameObject)GameObject.Instantiate(prefab);
 
-            if (_rootTransform != null)
-            {
-                // By default parent to comp root
-                // This is good so that the entire object graph is
-                // contained underneath it, which is useful for cases
-                // where you need to delete the entire object graph
-                gameObj.transform.SetParent(_rootTransform, false);
-            }
-
             gameObj.SetActive(true);
 
             this.InjectGameObject(gameObj, true, includeInactive, extraArgMap, context);
-
-            return gameObj;
-        }
-
-        // Create a new empty game object under the composition root
-        public GameObject InstantiateGameObject(string name)
-        {
-            var gameObj = new GameObject(name);
-
-            if (_rootTransform != null)
-            {
-                gameObj.transform.SetParent(_rootTransform, false);
-            }
 
             return gameObj;
         }
@@ -833,11 +778,6 @@ namespace Zenject
             Assert.That(componentType.DerivesFrom<Component>(), "Expected type '{0}' to derive from UnityEngine.Component", componentType.Name());
 
             var gameObj = new GameObject(name);
-
-            if (_rootTransform != null)
-            {
-                gameObj.transform.SetParent(_rootTransform, false);
-            }
 
             if (componentType == typeof(Transform))
             {
@@ -877,15 +817,6 @@ namespace Zenject
             Assert.That(componentType.DerivesFrom<Component>(), "Expected type '{0}' to derive from UnityEngine.Component", componentType.Name());
 
             var gameObj = (GameObject)GameObject.Instantiate(prefab);
-
-            if (_rootTransform != null)
-            {
-                // By default parent to comp root
-                // This is good so that the entire object graph is
-                // contained underneath it, which is useful for cases
-                // where you need to delete the entire object graph
-                gameObj.transform.SetParent(_rootTransform, false);
-            }
 
             gameObj.SetActive(true);
 

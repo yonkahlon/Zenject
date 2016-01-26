@@ -48,9 +48,6 @@ namespace Zenject
             GameObject gameObject, params object[] args)
             where TContract : Component;
 
-        // Create a new empty game object under the root transform
-        GameObject InstantiateGameObject(string name);
-
         // Create a new game object from a prefab and fill in dependencies for all children
         GameObject InstantiatePrefab(
             GameObject prefab, params object[] args);
