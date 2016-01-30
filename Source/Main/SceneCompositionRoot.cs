@@ -14,7 +14,7 @@ using UnityEngine.SceneManagement;
 
 namespace Zenject
 {
-    public sealed class SceneCompositionRoot : CompositionRoot
+    public class SceneCompositionRoot : CompositionRoot
     {
         public static Action<DiContainer> BeforeInstallHooks;
         public static Action<DiContainer> AfterInstallHooks;
@@ -45,17 +45,11 @@ namespace Zenject
             }
         }
 
-        string GetCurrentSceneName()
+        public void Awake()
         {
-#if UNITY_5_3
-            return SceneManager.GetActiveScene().name;
-#else
-            return Application.loadedLevelName;
-#endif
-        }
+            Assert.IsNull(Container);
+            Assert.IsNull(RootFacade);
 
-        protected override void Initialize()
-        {
             Log.Debug("Initializing SceneCompositionRoot in scene '{0}'", GetCurrentSceneName());
             InitContainer();
             Log.Debug("SceneCompositionRoot: Finished install phase.  Injecting into scene...");
@@ -63,6 +57,9 @@ namespace Zenject
 
             Log.Debug("SceneCompositionRoot: Resolving root IFacade...");
             _rootFacade = _container.Resolve<IFacade>();
+
+            Assert.IsNotNull(Container);
+            Assert.IsNotNull(RootFacade);
         }
 
         public void Start()
@@ -76,6 +73,46 @@ namespace Zenject
             // so this is consistent with that convention as well
             GlobalCompositionRoot.Instance.InitializeRootIfNecessary();
             _rootFacade.Initialize();
+        }
+
+        public DiContainer CreateContainer(
+            bool isValidating, DiContainer parentContainer, List<IInstaller> extraInstallers)
+        {
+            var container = new DiContainer(parentContainer);
+
+            container.IsValidating = isValidating;
+
+            container.Bind<CompositionRoot>().ToInstance(this);
+            container.Bind<SceneCompositionRoot>().ToInstance(this);
+
+            if (BeforeInstallHooks != null)
+            {
+                BeforeInstallHooks(container);
+                // Reset extra bindings for next time we change scenes
+                BeforeInstallHooks = null;
+            }
+
+            container.Install<StandardInstaller>();
+
+            var allInstallers = extraInstallers.Concat(Installers).ToList();
+
+            if (allInstallers.Where(x => x != null).IsEmpty())
+            {
+                Log.Warn("No installers found while initializing SceneCompositionRoot");
+            }
+            else
+            {
+                container.Install(allInstallers);
+            }
+
+            if (AfterInstallHooks != null)
+            {
+                AfterInstallHooks(container);
+                // Reset extra bindings for next time we change scenes
+                AfterInstallHooks = null;
+            }
+
+            return container;
         }
 
         // This method is used for cases where you need to create the SceneCompositionRoot entirely in code
@@ -114,44 +151,13 @@ namespace Zenject
             }
         }
 
-        public DiContainer CreateContainer(
-            bool isValidating, DiContainer parentContainer, List<IInstaller> extraInstallers)
+        string GetCurrentSceneName()
         {
-            var container = new DiContainer(parentContainer);
-
-            container.IsValidating = isValidating;
-
-            container.Bind<SceneCompositionRoot>().ToInstance(this);
-            container.Bind<CompositionRoot>().ToInstance(this);
-
-            if (BeforeInstallHooks != null)
-            {
-                BeforeInstallHooks(container);
-                // Reset extra bindings for next time we change scenes
-                BeforeInstallHooks = null;
-            }
-
-            container.Install<StandardInstaller>();
-
-            var allInstallers = extraInstallers.Concat(Installers).ToList();
-
-            if (allInstallers.Where(x => x != null).IsEmpty())
-            {
-                Log.Warn("No installers found while initializing SceneCompositionRoot");
-            }
-            else
-            {
-                container.Install(allInstallers);
-            }
-
-            if (AfterInstallHooks != null)
-            {
-                AfterInstallHooks(container);
-                // Reset extra bindings for next time we change scenes
-                AfterInstallHooks = null;
-            }
-
-            return container;
+#if UNITY_5_3
+            return SceneManager.GetActiveScene().name;
+#else
+            return Application.loadedLevelName;
+#endif
         }
     }
 }

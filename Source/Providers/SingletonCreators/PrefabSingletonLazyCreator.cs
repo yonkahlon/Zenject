@@ -96,13 +96,11 @@ namespace Zenject
 
                 _rootObj = (GameObject)GameObject.Instantiate(prefab);
 
-                // Note that we always want to cache _container instead of using context.Container 
+                // Note that we always want to cache _container instead of using context.Container
                 // since for singletons, the container they are accessed from should not determine
                 // the container they are instantiated with
                 // Transients can do that but not singletons
 
-                // Default parent to comp root
-                _rootObj.transform.SetParent(_container.Resolve<CompositionRoot>().transform, false);
                 _rootObj.SetActive(true);
 
                 _container.InjectGameObject(_rootObj, true, false, new object[0], context);
