@@ -64,17 +64,17 @@ namespace Zenject
 
         public BindingConditionSetter ToInstance<TConcrete>(TConcrete instance)
         {
-            return ToInstance(instance != null ? instance.GetType() : typeof(TConcrete), instance);
+            return ToInstance(instance == null ? typeof(TConcrete) : instance.GetType(), instance);
         }
 
         public BindingConditionSetter ToSingleInstance<TConcrete>(TConcrete instance)
         {
-            return ToSingleInstance(instance != null ? instance.GetType() : typeof(TConcrete), null, instance);
+            return ToSingleInstance(instance == null ? typeof(TConcrete) : instance.GetType(), null, instance);
         }
 
         public BindingConditionSetter ToSingleInstance<TConcrete>(string concreteIdentifier, TConcrete instance)
         {
-            return ToSingleInstance(instance != null ? instance.GetType() : typeof(TConcrete), concreteIdentifier, instance);
+            return ToSingleInstance(instance == null ? typeof(TConcrete) : instance.GetType(), concreteIdentifier, instance);
         }
 
         public BindingConditionSetter ToSingleMethod<TConcrete>(string concreteIdentifier, Func<InjectContext, TConcrete> method)
