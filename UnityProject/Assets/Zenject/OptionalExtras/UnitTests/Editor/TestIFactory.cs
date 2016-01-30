@@ -145,5 +145,42 @@ namespace Zenject.Tests
 
             Assert.IsNotNull(Container.Resolve<IFactory<string, ITest>>().Create("sdfsd") is Test5);
         }
+
+        [Test]
+        public void TestToFacadeFactory1()
+        {
+            bool wasCalled = false;
+
+            Container.BindIFactory<FooFacade>().ToFacadeFactory<FooFacade.Factory>((c) =>
+                {
+                    wasCalled = true;
+                });
+
+            Assert.That(!wasCalled);
+            Assert.IsNotNull(Container.Resolve<IFactory<FooFacade>>().Create() is FooFacade);
+            Assert.That(wasCalled);
+        }
+
+        [Test]
+        public void TestToFacadeFactory2()
+        {
+            bool wasCalled = false;
+
+            Container.BindIFactory<Facade>().ToFacadeFactory<FooFacade, FooFacade.Factory>((c) =>
+                {
+                    wasCalled = true;
+                });
+
+            Assert.That(!wasCalled);
+            Assert.IsNotNull(Container.Resolve<IFactory<Facade>>().Create() is FooFacade);
+            Assert.That(wasCalled);
+        }
+
+        public class FooFacade : Facade
+        {
+            public class Factory : FacadeFactory<FooFacade>
+            {
+            }
+        }
     }
 }
