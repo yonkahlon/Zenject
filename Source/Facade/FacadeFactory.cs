@@ -5,7 +5,11 @@ using ModestTree.Util;
 
 namespace Zenject
 {
-    public abstract class FacadeFactory<TFacade> : IFactory<TFacade>, IValidatable
+    public interface IFacadeFactory : IValidatable
+    {
+    }
+
+    public abstract class FacadeFactory<TFacade> : IFactory<TFacade>, IFacadeFactory
         where TFacade : IFacade
     {
         [Inject]
@@ -56,7 +60,7 @@ namespace Zenject
         }
     }
 
-    public abstract class FacadeFactory<TParam1, TFacade> : IFactory<TFacade>, IValidatable
+    public abstract class FacadeFactory<TParam1, TFacade> : IFactory<TParam1, TFacade>, IFacadeFactory
         where TFacade : IFacade
     {
         [Inject]
@@ -98,7 +102,7 @@ namespace Zenject
         }
     }
 
-    public abstract class FacadeFactory<TParam1, TParam2, TFacade> : IFactory<TFacade>, IValidatable
+    public abstract class FacadeFactory<TParam1, TParam2, TFacade> : IFactory<TParam1, TParam2, TFacade>, IFacadeFactory
         where TFacade : IFacade
     {
         [Inject]
@@ -140,7 +144,7 @@ namespace Zenject
         }
     }
 
-    public abstract class FacadeFactory<TParam1, TParam2, TParam3, TFacade> : IFactory<TFacade>, IValidatable
+    public abstract class FacadeFactory<TParam1, TParam2, TParam3, TFacade> : IFactory<TParam1, TParam2, TParam3, TFacade>, IFacadeFactory
         where TFacade : IFacade
     {
         [Inject]
@@ -182,7 +186,7 @@ namespace Zenject
         }
     }
 
-    public abstract class FacadeFactory<TParam1, TParam2, TParam3, TParam4, TFacade> : IFactory<TFacade>, IValidatable
+    public abstract class FacadeFactory<TParam1, TParam2, TParam3, TParam4, TFacade> : IFactory<TParam1, TParam2, TParam3, TParam4, TFacade>, IFacadeFactory
         where TFacade : IFacade
     {
         [Inject]
@@ -224,7 +228,7 @@ namespace Zenject
         }
     }
 
-    public abstract class FacadeFactory<TParam1, TParam2, TParam3, TParam4, TParam5, TFacade> : IFactory<TFacade>, IValidatable
+    public abstract class FacadeFactory<TParam1, TParam2, TParam3, TParam4, TParam5, TFacade> : IFactory<TParam1, TParam2, TParam3, TParam4, TParam5, TFacade>, IFacadeFactory
         where TFacade : IFacade
     {
         [Inject]
@@ -266,7 +270,7 @@ namespace Zenject
         }
     }
 
-    public abstract class FacadeFactory<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6, TFacade> : IFactory<TFacade>, IValidatable
+    public abstract class FacadeFactory<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6, TFacade> : IFactory<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6, TFacade>, IFacadeFactory
         where TFacade : IFacade
     {
         [Inject]
@@ -308,7 +312,7 @@ namespace Zenject
         }
     }
 
-    public abstract class FacadeFactory<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6, TParam7, TFacade> : IFactory<TFacade>, IValidatable
+    public abstract class FacadeFactory<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6, TParam7, TFacade> : IFactory<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6, TParam7, TFacade>, IFacadeFactory
         where TFacade : IFacade
     {
         [Inject]
