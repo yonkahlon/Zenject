@@ -10,14 +10,15 @@ using UnityEngine;
 
 namespace Zenject
 {
-    public sealed class GlobalCompositionRoot : CompositionRoot
+    public class GlobalCompositionRoot : CompositionRoot
     {
+        public const string GlobalInstallersResourceName = "ZenjectGlobalInstallers";
+
         static GlobalCompositionRoot _instance;
+
         DiContainer _container;
         IFacade _rootFacade;
         bool _hasInitialized;
-
-        public const string GlobalInstallersResourceName = "ZenjectGlobalInstallers";
 
         public override DiContainer Container
         {
@@ -39,24 +40,33 @@ namespace Zenject
         {
             get
             {
-                if (_instance == null)
-                {
-                    _instance = new GameObject("Global Composition Root")
-                        .AddComponent<GlobalCompositionRoot>();
-                }
+                Assert.IsNotNull(_instance);
                 return _instance;
             }
         }
 
-        protected override void Initialize()
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+        static void GlobalMainEntryPoint()
         {
-            DontDestroyOnLoad(gameObject);
+            _instance = new GameObject("Global Composition Root")
+                .AddComponent<GlobalCompositionRoot>();
+            _instance.Initialize();
+        }
 
-            // Is this a good idea?
-            //go.hideFlags = HideFlags.HideInHierarchy;
+        void Initialize()
+        {
+            Log.Debug("Initializing GlobalCompositionRoot");
+
+            Assert.IsNull(Container);
+            Assert.IsNull(RootFacade);
+
+            DontDestroyOnLoad(gameObject);
 
             _container = CreateContainer(false, this);
             _rootFacade = _container.Resolve<IFacade>();
+
+            Assert.IsNotNull(Container);
+            Assert.IsNotNull(RootFacade);
         }
 
         public void InitializeRootIfNecessary()
@@ -76,11 +86,10 @@ namespace Zenject
 
             container.IsValidating = isValidating;
 
-            container.Bind<GlobalCompositionRoot>().ToInstance(root);
             container.Bind<CompositionRoot>().ToInstance(root);
+            container.Bind<GlobalCompositionRoot>().ToInstance(root);
 
             container.Install<StandardInstaller>();
-
             container.Install(GetGlobalInstallers());
 
             return container;

@@ -6,7 +6,6 @@ namespace Zenject
     public class StandardInstaller<TRoot> : Installer
         where TRoot : IFacade
     {
-        // Install basic functionality for most unity apps
         public override void InstallBindings()
         {
             Container.Bind<IFacade>().ToSingle<TRoot>();

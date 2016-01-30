@@ -9,6 +9,10 @@ namespace ModestTree.Util
 {
     public static class UnityEditorUtil
     {
+        const string ArgPrefix = "-CustomArg:";
+
+        static Dictionary<string, string> _customArgs;
+
         // Returns the best guess directory in projects pane
         // Useful when adding to Assets -> Create context menu
         // Returns null if it can't find one
@@ -61,6 +65,50 @@ namespace ModestTree.Util
         {
             return UnityEditor.EditorBuildSettings.scenes.Where(x => x.enabled)
                 .Select(x => x.path).ToList();
+        }
+
+        static void LazyInitArgs()
+        {
+            if (_customArgs != null)
+            {
+                return;
+            }
+
+            _customArgs = new Dictionary<string, string>();
+
+            string[] args = Environment.GetCommandLineArgs();
+
+            foreach (var arg in args)
+            {
+                if (!arg.StartsWith(ArgPrefix))
+                {
+                    continue;
+                }
+
+                var assignStr = arg.Substring(ArgPrefix.Length);
+
+                var equalsPos = assignStr.IndexOf("=");
+
+                if (equalsPos == -1)
+                {
+                    continue;
+                }
+
+                var name = assignStr.Substring(0, equalsPos).Trim();
+                var value = assignStr.Substring(equalsPos + 1).Trim();
+
+                if (name.Length > 0 && value.Length > 0)
+                {
+                    _customArgs[name] = value;
+                }
+            }
+        }
+
+        public static string GetArgument(string name)
+        {
+            LazyInitArgs();
+            Assert.That(_customArgs.ContainsKey(name), "Could not find custom command line argument '{0}'", name);
+            return _customArgs[name];
         }
     }
 }

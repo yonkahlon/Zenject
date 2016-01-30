@@ -154,6 +154,16 @@ namespace Zenject
             Debug.Log("Created new asset at '{0}'".Fmt(assetPath));
         }
 
+        public static void ValidateScenesFromScript()
+        {
+            var sceneNames = UnityEditorUtil.GetArgument("scenes").Split(',');
+
+            Assert.That(sceneNames.Length > 0);
+
+            ValidateScenes(
+                sceneNames.Select(x => UnityEditorUtil.GetScenePath(x)).ToList(), true);
+        }
+
         // This can be called by build scripts using batch mode unity for continuous integration testing
         // This will exit with an error code for whether validation passed or not
         public static void ValidateAllScenesFromScript()
@@ -220,7 +230,10 @@ namespace Zenject
                 }
             }
 
-            OpenScene(startScene);
+            if (!exitAfter && !string.IsNullOrEmpty(startScene))
+            {
+                OpenScene(startScene);
+            }
 
             if (failedScenes.IsEmpty())
             {
