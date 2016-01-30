@@ -76,12 +76,12 @@ namespace Zenject
             return _container.Bind<IFactory<TContract>>(_identifier).ToTransient<TFactory>();
         }
 
-        public BindingConditionSetter ToCustomFactory<TConcrete, TFactory>(params object[] args)
+        public BindingConditionSetter ToCustomFactory<TConcrete, TFactory>()
             where TFactory : IFactory<TConcrete>
             where TConcrete : TContract
         {
             return _container.Bind<IFactory<TContract>>(_identifier)
-                .ToMethod(c => new FactoryNested<TContract, TConcrete>(c.Container.Instantiate<TFactory>(args)));
+                .ToMethod(c => new FactoryNested<TContract, TConcrete>(c.Container.Instantiate<TFactory>()));
         }
 
 #if !ZEN_NOT_UNITY3D
