@@ -40,14 +40,16 @@ namespace Zenject
                 //Assert.That(!_container.IsValidating,
                     //"Tried to instantiate a MonoBehaviour with type '{0}' during validation. Object graph: {1}", _componentType, DiContainer.GetCurrentObjectGraph());
 
-                // Note that we always want to cache _container instead of using context.Container 
+                // Note that we always want to cache _container instead of using context.Container
                 // since for singletons, the container they are accessed from should not determine
                 // the container they are instantiated with
                 // Transients can do that but not singletons
 
+                var name = string.IsNullOrEmpty(_name) ? _componentType.Name() : _name;
+
                 // We don't use the generic version here to avoid duplicate generic arguments to binder
                 _instance = _container.InstantiateComponentOnNewGameObjectExplicit(
-                    _componentType, _name, new List<TypeValuePair>(), context);
+                    _componentType, name, new List<TypeValuePair>(), context);
                 Assert.IsNotNull(_instance);
             }
 
