@@ -101,6 +101,8 @@ namespace Zenject
                 // the container they are instantiated with
                 // Transients can do that but not singletons
 
+                _rootObj.transform.SetParent(_container.DefaultParent, false);
+
                 _rootObj.SetActive(true);
 
                 _container.InjectGameObject(_rootObj, true, false, new object[0], context);

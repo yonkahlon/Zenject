@@ -24,6 +24,8 @@ namespace Zenject
         readonly Stack<LookupId> _resolvesInProgress = new Stack<LookupId>();
 
         bool _isValidating;
+        bool _hasLookedUpParent;
+        Transform _defaultParent;
 
         public DiContainer()
         {
@@ -43,6 +45,29 @@ namespace Zenject
             : this()
         {
             _parentContainer = parentContainer;
+        }
+
+        public Transform DefaultParent
+        {
+            get
+            {
+                // We should be able to cache this since we should be able to assume that
+                // this property isn't called until after the install phase
+                if (!_hasLookedUpParent)
+                {
+                    _hasLookedUpParent = true;
+
+                    // Use an InjectContext so we can specify local = true
+                    // and optional = true
+                    var ctx = new InjectContext(
+                        this, typeof(Transform), ZenConstants.DefaultParentId,
+                        true, null, null, "", null, null, null, true);
+
+                    _defaultParent = this.Resolve<Transform>(ctx);
+                }
+
+                return _defaultParent;
+            }
         }
 
         public SingletonProviderMap SingletonProviderMap
@@ -765,10 +790,20 @@ namespace Zenject
         {
             var gameObj = (GameObject)GameObject.Instantiate(prefab);
 
+            gameObj.transform.SetParent(DefaultParent, false);
+
             gameObj.SetActive(true);
 
             this.InjectGameObject(gameObj, true, includeInactive, extraArgMap, context);
 
+            return gameObj;
+        }
+
+        // Create a new empty game object under the default parent
+        public GameObject InstantiateGameObject(string name)
+        {
+            var gameObj = new GameObject(name);
+            gameObj.transform.SetParent(DefaultParent, false);
             return gameObj;
         }
 
@@ -777,7 +812,7 @@ namespace Zenject
         {
             Assert.That(componentType.DerivesFrom<Component>(), "Expected type '{0}' to derive from UnityEngine.Component", componentType.Name());
 
-            var gameObj = new GameObject(name);
+            var gameObj = InstantiateGameObject(name);
 
             if (componentType == typeof(Transform))
             {
