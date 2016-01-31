@@ -87,12 +87,14 @@ namespace Zenject
         public InjectContext(
             DiContainer container, Type memberType, string identifier, bool optional,
             Type objectType, object objectInstance, string memberName, InjectContext parentContext)
-            : this(container, memberType, identifier, optional, objectType, objectInstance, memberName, parentContext, null, null, false)
+            : this(container, memberType, identifier, optional, objectType,
+                objectInstance, memberName, parentContext, null, null, false)
         {
         }
 
         public InjectContext(
-            DiContainer container, Type memberType, string identifier, bool optional, Type objectType, object objectInstance)
+            DiContainer container, Type memberType, string identifier,
+            bool optional, Type objectType, object objectInstance)
             : this(container, memberType, identifier, optional, objectType, objectInstance, "", null)
         {
         }

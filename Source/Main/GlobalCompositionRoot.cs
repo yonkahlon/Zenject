@@ -86,6 +86,12 @@ namespace Zenject
 
             container.IsValidating = isValidating;
 
+            if (root != null)
+            {
+                container.Bind<Transform>(ZenConstants.DefaultParentId)
+                    .ToInstance<Transform>(root.gameObject.transform);
+            }
+
             container.Bind<CompositionRoot>().ToInstance(root);
             container.Bind<GlobalCompositionRoot>().ToInstance(root);
 

@@ -171,6 +171,12 @@ namespace Zenject
             ValidateAllActiveScenes(true);
         }
 
+        [MenuItem("Edit/Zenject/Help...")]
+        public static void OpenDocumentation()
+        {
+            Application.OpenURL("https://github.com/modesttree/zenject");
+        }
+
         [MenuItem("Edit/Zenject/Validate All Active Scenes")]
         public static bool ValidateAllActiveScenes()
         {

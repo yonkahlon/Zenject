@@ -20,6 +20,7 @@ namespace Zenject
         public static Action<DiContainer> AfterInstallHooks;
 
         public bool OnlyInjectWhenActive = false;
+        public bool ParentDynamicObjectsUnderRoot = true;
 
         [SerializeField]
         public MonoInstaller[] Installers = new MonoInstaller[0];
@@ -85,6 +86,12 @@ namespace Zenject
             container.Bind<CompositionRoot>().ToInstance(this);
             container.Bind<SceneCompositionRoot>().ToInstance(this);
 
+            if (ParentDynamicObjectsUnderRoot)
+            {
+                container.Bind<Transform>(ZenConstants.DefaultParentId)
+                    .ToInstance<Transform>(this.transform);
+            }
+
             if (BeforeInstallHooks != null)
             {
                 BeforeInstallHooks(container);
@@ -141,14 +148,21 @@ namespace Zenject
 
         void InitialInject()
         {
-            foreach (var rootObj in SceneManager.GetActiveScene().GetRootGameObjects())
-            {
-                if (rootObj.GetComponent<GlobalCompositionRoot>() != null)
-                {
-                    continue;
-                }
+            var activeScene = SceneManager.GetActiveScene();
+            Log.Debug("Injecting all objects in scene '{0}'", activeScene.name);
 
-                Log.Trace("Injecting into {0}", rootObj.name);
+            // Note: We can't use activeScene.GetRootObjects() here because that fails with an exception
+            // about the scene not being loaded yet
+            // It's important here that we only inject into root objects that are part of our scene
+            // Otherwise, if there is an object that is marked with DontDestroyOnLoad, then it will
+            // be injected multiple times when another scene is loaded
+            // Also make sure not to inject into the global root objects which are handled in GlobalCompositionRoot
+            var rootGameObjects = GameObject.FindObjectsOfType<Transform>()
+                .Where(x => x.parent == null && x.GetComponent<GlobalCompositionRoot>() == null && x.gameObject.scene == activeScene)
+                .Select(x => x.gameObject).ToList();
+
+            foreach (var rootObj in rootGameObjects)
+            {
                 _container.InjectGameObject(rootObj, true, !OnlyInjectWhenActive);
             }
         }
