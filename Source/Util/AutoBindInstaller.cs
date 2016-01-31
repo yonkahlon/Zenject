@@ -17,15 +17,19 @@ namespace Zenject
     // Then also call Container.Install<AutoBindInstaller> from another installer
     public class AutoBindInstaller : Installer
     {
+        readonly CompositionRoot _compRoot;
+
         public AutoBindInstaller(CompositionRoot compRoot)
         {
             Assert.That(!(compRoot is GlobalCompositionRoot),
                 "You cannot use AutoBindInstaller from within a global installer");
+
+            _compRoot = compRoot;
         }
 
         public override void InstallBindings()
         {
-            foreach (var monoBehaviour in SceneCompositionRoot.GetSceneRootObjects()
+            foreach (var monoBehaviour in SceneCompositionRoot.GetSceneRootObjects(_compRoot.gameObject.scene)
                 .SelectMany(x => x.GetComponentsInChildren<MonoBehaviour>()))
             {
                 if (monoBehaviour != null && monoBehaviour.GetType().HasAttribute<AutoBindAttribute>())
