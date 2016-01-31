@@ -143,9 +143,27 @@ namespace Zenject
             return ToProvider(new GameObjectTransientProviderFromPrefab(concreteType, prefab));
         }
 
+        public BindingConditionSetter ToTransientGameObject()
+        {
+            return ToTransientGameObject(null);
+        }
+
+        // Creates a new game object and adds the given type as a new component on it
+        // NOTE! The string given here is just a name and not a singleton identifier
+        public BindingConditionSetter ToTransientGameObject(string name)
+        {
+            if (!ContractType.IsSubclassOf(typeof(Component)))
+            {
+                throw new ZenjectBindException(
+                    "Expected UnityEngine.Component derived type when binding type '{0}'".Fmt(ContractType.Name()));
+            }
+
+            return ToProvider(new GameObjectTransientProvider(ContractType, name));
+        }
+
         public BindingConditionSetter ToSingleGameObject()
         {
-            return ToSingleGameObject(ContractType.Name());
+            return ToSingleGameObject(null);
         }
 
         // Creates a new game object and adds the given type as a new component on it
@@ -158,6 +176,19 @@ namespace Zenject
             }
 
             return ToProvider(new GameObjectSingletonProvider(ContractType, Container, name));
+        }
+
+        // Creates a new game object and adds the given type as a new component on it
+        // NOTE! The string given here is just a name and not a singleton identifier
+        public BindingConditionSetter ToTransientGameObject(Type concreteType, string name)
+        {
+            if (!concreteType.DerivesFromOrEqual(ContractType))
+            {
+                throw new ZenjectBindException(
+                    "Invalid type given during bind command.  Expected type '{0}' to derive from type '{1}'".Fmt(concreteType.Name(), ContractType.Name()));
+            }
+
+            return ToProvider(new GameObjectTransientProvider(concreteType, name));
         }
 
         // Creates a new game object and adds the given type as a new component on it
