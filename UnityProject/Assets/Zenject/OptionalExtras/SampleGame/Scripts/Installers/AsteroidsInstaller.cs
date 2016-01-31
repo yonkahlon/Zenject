@@ -30,11 +30,13 @@ namespace Asteroids
         // In this example there is only one 'installer' but in larger projects you
         // will likely end up with many different re-usable installers
         // that you'll want to use in several different scenes
-        // To re-use an existing installer you can simply bind it to IInstaller like below
+        // To re-use an existing installer you can simply call Container.Install<> like below
         // Note that this will only work if your installer is just a normal C# class
         // If it's a monobehaviour (that is, derived from MonoInstaller) then you would be
         // better off making it a prefab and then just including it in your scene (and adding
         // it to the list of installers in the inspector of CompositionRoot) to re-use it
+        // Another option is to store your MonoInstallers as a prefab in a resource folder,
+        // in which case you can call Container.Install<> with a MonoInstaller (see documentation)
         void InstallIncludes()
         {
             //Container.Install<MyCustomInstaller>();
@@ -43,16 +45,16 @@ namespace Asteroids
         void InstallAsteroids()
         {
             Container.Bind<LevelHelper>().ToSingle();
-         
+
             // ITickable, IFixedTickable, IInitializable and IDisposable are special Zenject interfaces.
             // Binding a class to any of these interfaces creates an instance of the class at startup.
             // Binding to any of these interfaces is also necessary to have the method defined in that interface be
             // called on the implementing class as follows:
-			// Binding to ITickable or IFixedTickable will result in Tick() or FixedTick() being called like Update() or FixedUpdate().
-			// Binding to IInitializable means that Initialize() will be called on startup.
-			// Binding to IDisposable means that Dispose() will be called when the app closes, the scene changes,
-			// or the composition root object is destroyed.
-			
+            // Binding to ITickable or IFixedTickable will result in Tick() or FixedTick() being called like Update() or FixedUpdate().
+            // Binding to IInitializable means that Initialize() will be called on startup.
+            // Binding to IDisposable means that Dispose() will be called when the app closes, the scene changes,
+            // or the composition root object is destroyed.
+
             // Any time you use ToSingle<>, what that means is that the DiContainer will only ever instantiate
             // one instance of the type given inside the ToSingle<>. So in this case, any classes that take ITickable,
             // IFixedTickable, or AsteroidManager as inputs will receive the same instance of AsteroidManager.

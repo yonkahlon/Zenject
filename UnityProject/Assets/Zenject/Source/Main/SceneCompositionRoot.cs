@@ -50,7 +50,7 @@ namespace Zenject
             Assert.IsNull(Container);
             Assert.IsNull(RootFacade);
 
-            Log.Debug("Initializing SceneCompositionRoot in scene '{0}'", GetCurrentSceneName());
+            Log.Debug("Initializing SceneCompositionRoot in scene '{0}'", SceneManager.GetActiveScene().name);
             InitContainer();
             Log.Debug("SceneCompositionRoot: Finished install phase.  Injecting into scene...");
             InitialInject();
@@ -141,23 +141,16 @@ namespace Zenject
 
         void InitialInject()
         {
-            var rootGameObjects = GameObject.FindObjectsOfType<Transform>()
-                .Where(x => x.parent == null && x.GetComponent<GlobalCompositionRoot>() == null && (x.GetComponent<SceneCompositionRoot>() == null || x == this.transform))
-                .Select(x => x.gameObject).ToList();
-
-            foreach (var rootObj in rootGameObjects)
+            foreach (var rootObj in SceneManager.GetActiveScene().GetRootGameObjects())
             {
+                if (rootObj.GetComponent<GlobalCompositionRoot>() != null)
+                {
+                    continue;
+                }
+
+                Log.Trace("Injecting into {0}", rootObj.name);
                 _container.InjectGameObject(rootObj, true, !OnlyInjectWhenActive);
             }
-        }
-
-        string GetCurrentSceneName()
-        {
-#if UNITY_5_3
-            return SceneManager.GetActiveScene().name;
-#else
-            return Application.loadedLevelName;
-#endif
         }
     }
 }
