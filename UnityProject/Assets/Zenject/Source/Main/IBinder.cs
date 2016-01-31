@@ -83,8 +83,10 @@ namespace Zenject
 #if !ZEN_NOT_UNITY3D
         BindingConditionSetter BindGameObjectFactory<T>(
             GameObject prefab)
-            // This would be useful but fails with VerificationException's in webplayer builds for some reason
-            //where T : GameObjectFactory
+            where T : class;
+
+        BindingConditionSetter BindGameObjectFactory<T>(
+            GameObject prefab, string groupName)
             where T : class;
 #endif
     }

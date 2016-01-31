@@ -19,8 +19,11 @@ namespace Zenject
         public static Action<DiContainer> BeforeInstallHooks;
         public static Action<DiContainer> AfterInstallHooks;
 
+        [Tooltip("When true, inactive objects will not have their members injected")]
         public bool OnlyInjectWhenActive = false;
-        public bool ParentDynamicObjectsUnderRoot = true;
+
+        [Tooltip("When true, objects that are created at runtime will be parented to the SceneCompositionRoot")]
+        public bool ParentNewObjectsUnderRoot = true;
 
         [SerializeField]
         public MonoInstaller[] Installers = new MonoInstaller[0];
@@ -87,7 +90,7 @@ namespace Zenject
             container.Bind<CompositionRoot>().ToInstance(this);
             container.Bind<SceneCompositionRoot>().ToInstance(this);
 
-            if (ParentDynamicObjectsUnderRoot)
+            if (ParentNewObjectsUnderRoot)
             {
                 container.Bind<Transform>(ZenConstants.DefaultParentId)
                     .ToInstance<Transform>(this.transform);
