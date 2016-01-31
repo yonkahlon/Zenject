@@ -14,14 +14,14 @@ namespace Zenject
     {
         PrefabSingletonLazyCreator _creator;
         DiContainer _container;
-        Type _concreteType;
+        Type _instanceType;
 
         public PrefabSingletonProvider(
-            DiContainer container, Type concreteType, PrefabSingletonLazyCreator creator)
+            DiContainer container, Type instanceType, PrefabSingletonLazyCreator creator)
         {
             _creator = creator;
             _container = container;
-            _concreteType = concreteType;
+            _instanceType = instanceType;
         }
 
         public override void Dispose()
@@ -31,31 +31,36 @@ namespace Zenject
 
         public override Type GetInstanceType()
         {
-            return _concreteType;
+            return _instanceType;
         }
 
         public override object GetInstance(InjectContext context)
         {
-            return _creator.GetComponent(_concreteType, context);
+            return _creator.GetComponent(_instanceType, context);
         }
 
         public override IEnumerable<ZenjectResolveException> ValidateBinding(InjectContext context)
         {
-            if (!_creator.ContainsComponent(_concreteType))
+            if (!_creator.ContainsComponent(_instanceType))
             {
                 yield return new ZenjectResolveException(
                     "Could not find component of type '{0}' in prefab with name '{1}' \nObject graph:\n{2}"
-                    .Fmt(_concreteType.Name(), _creator.Prefab.name, context.GetObjectGraphString()));
+                    .Fmt(_instanceType.Name(), _creator.Prefab.name, context.GetObjectGraphString()));
                 yield break;
             }
 
-            // Note that we always want to cache _container instead of using context.Container 
-            // since for singletons, the container they are accessed from should not determine
-            // the container they are instantiated with
-            // Transients can do that but not singletons
-            foreach (var err in _container.ValidateObjectGraph(_concreteType, context))
+            // In most cases _instanceType will be a MonoBehaviour but we also want to allow interfaces
+            // And in that case we can't validate it
+            if (!_instanceType.IsAbstract)
             {
-                yield return err;
+                // Note that we always want to cache _container instead of using context.Container
+                // since for singletons, the container they are accessed from should not determine
+                // the container they are instantiated with
+                // Transients can do that but not singletons
+                foreach (var err in _container.ValidateObjectGraph(_instanceType, context))
+                {
+                    yield return err;
+                }
             }
         }
     }

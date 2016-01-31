@@ -88,12 +88,13 @@ namespace Zenject
 
         public BindingConditionSetter ToPrefab(GameObject prefab)
         {
-            Assert.That(typeof(TContract).DerivesFrom<Component>());
+            var contractType = typeof(TContract);
+            Assert.That(contractType.IsInterface || contractType.DerivesFrom<Component>());
 
             if (prefab == null)
             {
                 throw new ZenjectBindException(
-                    "Null prefab provided to BindIFactory<{0}>().ToPrefab".Fmt(typeof(TContract).Name()));
+                    "Null prefab provided to BindIFactory<{0}>().ToPrefab".Fmt(contractType.Name()));
             }
 
             return _container.Bind<IFactory<TContract>>(_identifier)
