@@ -13,9 +13,9 @@ namespace Zenject
         bool _disposed;
 
         public DisposableManager(
-            [InjectLocalOptional]
+            [InjectOptional(InjectSources.Local)]
             List<IDisposable> disposables,
-            [InjectLocalOptional]
+            [InjectOptional(InjectSources.Local)]
             List<ModestTree.Util.Tuple<Type, int>> priorities,
             SingletonInstanceHelper singletonInstanceHelper)
         {

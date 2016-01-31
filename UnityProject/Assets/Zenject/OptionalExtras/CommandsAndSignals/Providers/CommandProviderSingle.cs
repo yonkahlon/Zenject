@@ -27,7 +27,7 @@ namespace Zenject.Commands
             var newContext = new InjectContext(
                 c.Container, typeof(THandler), null, false, c.ObjectType,
                 c.ObjectInstance, c.MemberName, c.ParentContext, c.ConcreteIdentifier,
-                null, c.LocalOnly);
+                null, c.SourceType);
 
             return (THandler)_singletonProvider.GetInstance(newContext);
         }
