@@ -68,7 +68,9 @@ namespace Asteroids
             // only one of them
             // So any classes that want to create new asteroid objects can simply include a injected field
             // or constructor parameter of type Asteroid.Factory, then call create on that
-            Container.BindGameObjectFactory<Asteroid.Factory>(_settings.Asteroid.Prefab);
+            // The extra string parameter here is optional, but if provided will group the dynamically created
+            // game objects underneath a new game object named Asteroids
+            Container.BindGameObjectFactory<Asteroid.Factory>(_settings.Asteroid.Prefab, "Asteroids");
 
             Container.Bind<IInitializable>().ToSingle<GameController>();
             Container.Bind<ITickable>().ToSingle<GameController>();

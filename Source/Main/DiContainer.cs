@@ -788,9 +788,15 @@ namespace Zenject
         public GameObject InstantiatePrefabExplicit(
             GameObject prefab, IEnumerable<object> extraArgMap, InjectContext context, bool includeInactive)
         {
+            return InstantiatePrefabExplicit(prefab, extraArgMap, context, includeInactive, null);
+        }
+
+        public GameObject InstantiatePrefabExplicit(
+            GameObject prefab, IEnumerable<object> extraArgMap, InjectContext context, bool includeInactive, string groupName)
+        {
             var gameObj = (GameObject)GameObject.Instantiate(prefab);
 
-            gameObj.transform.SetParent(DefaultParent, false);
+            gameObj.transform.SetParent(GetTransformGroup(groupName), false);
 
             gameObj.SetActive(true);
 
@@ -837,13 +843,24 @@ namespace Zenject
         }
 
         public object InstantiatePrefabForComponentExplicit(
-            Type componentType, GameObject prefab, List<TypeValuePair> extraArgs, InjectContext currentContext)
+            Type componentType, GameObject prefab, List<TypeValuePair> extraArgs,
+            InjectContext currentContext)
         {
-            return InstantiatePrefabForComponentExplicit(componentType, prefab, extraArgs, currentContext, false);
+            return InstantiatePrefabForComponentExplicit(
+                componentType, prefab, extraArgs, currentContext, false);
         }
 
         public object InstantiatePrefabForComponentExplicit(
-            Type componentType, GameObject prefab, List<TypeValuePair> extraArgs, InjectContext currentContext, bool includeInactive)
+            Type componentType, GameObject prefab, List<TypeValuePair> extraArgs,
+            InjectContext currentContext, bool includeInactive)
+        {
+            return InstantiatePrefabForComponentExplicit(
+                componentType, prefab, extraArgs, currentContext, includeInactive, null);
+        }
+
+        public object InstantiatePrefabForComponentExplicit(
+            Type componentType, GameObject prefab, List<TypeValuePair> extraArgs,
+            InjectContext currentContext, bool includeInactive, string groupName)
         {
             Assert.That(prefab != null, "Null prefab found when instantiating game object");
 
@@ -852,6 +869,8 @@ namespace Zenject
             Assert.That(componentType.DerivesFrom<Component>(), "Expected type '{0}' to derive from UnityEngine.Component", componentType.Name());
 
             var gameObj = (GameObject)GameObject.Instantiate(prefab);
+
+            gameObj.transform.SetParent(GetTransformGroup(groupName), false);
 
             gameObj.SetActive(true);
 
@@ -892,6 +911,36 @@ namespace Zenject
 #endif
 
         ////////////// Convenience methods for IInstantiator ////////////////
+
+        Transform GetTransformGroup(string groupName)
+        {
+            if (DefaultParent == null)
+            {
+                if (groupName == null)
+                {
+                    return null;
+                }
+
+                return (GameObject.Find("/" + groupName) ?? new GameObject(groupName)).transform;
+            }
+
+            if (groupName == null)
+            {
+                return DefaultParent;
+            }
+
+            foreach (Transform child in DefaultParent)
+            {
+                if (child.name == groupName)
+                {
+                    return child;
+                }
+            }
+
+            var group = new GameObject(groupName).transform;
+            group.SetParent(DefaultParent, false);
+            return group;
+        }
 
         public T Instantiate<T>(
             params object[] extraArgs)
@@ -1494,8 +1543,14 @@ namespace Zenject
         }
 
 #if !ZEN_NOT_UNITY3D
+        public BindingConditionSetter BindGameObjectFactory<T>(GameObject prefab)
+            where T : class
+        {
+            return BindGameObjectFactory<T>(prefab, null);
+        }
+
         public BindingConditionSetter BindGameObjectFactory<T>(
-            GameObject prefab)
+            GameObject prefab, string groupName)
             // This would be useful but fails with VerificationException's in webplayer builds for some reason
             //where T : GameObjectFactory
             where T : class
@@ -1509,7 +1564,8 @@ namespace Zenject
             // We could bind the factory ToSingle but doing it this way is better
             // since it allows us to have multiple game object factories that
             // use different prefabs and have them injected into different places
-            return Bind<T>().ToMethod((ctx) => ctx.Container.Instantiate<T>(prefab));
+            return Bind<T>().ToMethod((ctx) => ctx.Container.InstantiateExplicit<T>(
+                new List<TypeValuePair>() { InstantiateUtil.CreateTypePair(prefab), InstantiateUtil.CreateTypePair(groupName) }));
         }
 #endif
 

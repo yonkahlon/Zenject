@@ -15,7 +15,17 @@ namespace Zenject
         [Inject]
         protected readonly GameObject _prefab;
 
+        [InjectOptional]
+        string _groupName = null;
+
         public abstract IEnumerable<ZenjectResolveException> Validate();
+
+        protected TValue CreateInternal<TValue>(List<TypeValuePair> argList)
+        {
+            return (TValue)_container.InstantiatePrefabForComponentExplicit(
+                typeof(TValue), _prefab, argList,
+                new InjectContext(_container, typeof(TValue), null), false, _groupName);
+        }
     }
 
     public class GameObjectFactory<TValue> : GameObjectFactory, IFactory<TValue>
@@ -29,7 +39,7 @@ namespace Zenject
 
         public virtual TValue Create()
         {
-            return (TValue)_container.InstantiatePrefabForComponent(typeof(TValue), _prefab);
+            return CreateInternal<TValue>(new List<TypeValuePair>());
         }
 
         public override IEnumerable<ZenjectResolveException> Validate()
@@ -50,7 +60,11 @@ namespace Zenject
 
         public virtual TValue Create(TParam1 param)
         {
-            return (TValue)_container.InstantiatePrefabForComponent(typeof(TValue), _prefab, param);
+            return CreateInternal<TValue>(
+                new List<TypeValuePair>()
+                {
+                    InstantiateUtil.CreateTypePair(param),
+                });
         }
 
         public override IEnumerable<ZenjectResolveException> Validate()
@@ -71,7 +85,12 @@ namespace Zenject
 
         public virtual TValue Create(TParam1 param1, TParam2 param2)
         {
-            return (TValue)_container.InstantiatePrefabForComponent(typeof(TValue), _prefab, param1, param2);
+            return CreateInternal<TValue>(
+                new List<TypeValuePair>()
+                {
+                    InstantiateUtil.CreateTypePair(param1),
+                    InstantiateUtil.CreateTypePair(param2),
+                });
         }
 
         public override IEnumerable<ZenjectResolveException> Validate()
@@ -92,7 +111,13 @@ namespace Zenject
 
         public virtual TValue Create(TParam1 param1, TParam2 param2, TParam3 param3)
         {
-            return (TValue)_container.InstantiatePrefabForComponent(typeof(TValue), _prefab, param1, param2, param3);
+            return CreateInternal<TValue>(
+                new List<TypeValuePair>()
+                {
+                    InstantiateUtil.CreateTypePair(param1),
+                    InstantiateUtil.CreateTypePair(param2),
+                    InstantiateUtil.CreateTypePair(param3),
+                });
         }
 
         public override IEnumerable<ZenjectResolveException> Validate()
@@ -113,7 +138,14 @@ namespace Zenject
 
         public virtual TValue Create(TParam1 param1, TParam2 param2, TParam3 param3, TParam4 param4)
         {
-            return (TValue)_container.InstantiatePrefabForComponent(typeof(TValue), _prefab, param1, param2, param3, param4);
+            return CreateInternal<TValue>(
+                new List<TypeValuePair>()
+                {
+                    InstantiateUtil.CreateTypePair(param1),
+                    InstantiateUtil.CreateTypePair(param2),
+                    InstantiateUtil.CreateTypePair(param3),
+                    InstantiateUtil.CreateTypePair(param4),
+                });
         }
 
         public override IEnumerable<ZenjectResolveException> Validate()
