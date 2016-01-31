@@ -20,7 +20,7 @@
     <IntermediateOutputPath>..\..\..\..\..\AssemblyBuild\Temp\Debug\</IntermediateOutputPath>
     <BaseIntermediateOutputPath>..\..\..\..\..\AssemblyBuild\Temp\Debug\</BaseIntermediateOutputPath>
     <OutputPath>..\..\..\..\..\AssemblyBuild\Bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;UNITY_5_3</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -30,7 +30,7 @@
     <IntermediateOutputPath>..\..\..\..\..\AssemblyBuild\Temp\Release\</IntermediateOutputPath>
     <BaseIntermediateOutputPath>..\..\..\..\..\AssemblyBuild\Temp\Release\</BaseIntermediateOutputPath>
     <OutputPath>..\..\..\..\..\AssemblyBuild\Bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
+    <DefineConstants>TRACE;UNITY_5_3</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -121,6 +121,7 @@
     <Compile Include="Main\IResolver.cs" />
     <Compile Include="Main\MonoInstaller.cs" />
     <Compile Include="Main\SceneCompositionRoot.cs" />
+    <Compile Include="Main\ZenConstants.cs" />
     <Compile Include="Misc\DisposableManager.cs" />
     <Compile Include="Misc\ExecutionOrderInstaller.cs" />
     <Compile Include="Misc\FixedTickablePrioritiesInstaller.cs" />

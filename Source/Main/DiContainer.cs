@@ -24,8 +24,11 @@ namespace Zenject
         readonly Stack<LookupId> _resolvesInProgress = new Stack<LookupId>();
 
         bool _isValidating;
+
+#if !ZEN_NOT_UNITY3D
         bool _hasLookedUpParent;
         Transform _defaultParent;
+#endif
 
         public DiContainer()
         {
@@ -47,6 +50,7 @@ namespace Zenject
             _parentContainer = parentContainer;
         }
 
+#if !ZEN_NOT_UNITY3D
         public Transform DefaultParent
         {
             get
@@ -69,6 +73,7 @@ namespace Zenject
                 return _defaultParent;
             }
         }
+#endif
 
         public SingletonProviderMap SingletonProviderMap
         {
@@ -908,9 +913,6 @@ namespace Zenject
 
             return requestedScript;
         }
-#endif
-
-        ////////////// Convenience methods for IInstantiator ////////////////
 
         Transform GetTransformGroup(string groupName)
         {
@@ -941,6 +943,9 @@ namespace Zenject
             group.SetParent(DefaultParent, false);
             return group;
         }
+#endif
+
+        ////////////// Convenience methods for IInstantiator ////////////////
 
         public T Instantiate<T>(
             params object[] extraArgs)
