@@ -53,8 +53,9 @@ namespace Zenject
 
             Log.Debug("Initializing SceneCompositionRoot in scene '{0}'", SceneManager.GetActiveScene().name);
             InitContainer();
+
             Log.Debug("SceneCompositionRoot: Finished install phase.  Injecting into scene...");
-            InitialInject();
+            InjectObjectsInScene();
 
             Log.Debug("SceneCompositionRoot: Resolving root IFacade...");
             _rootFacade = _container.Resolve<IFacade>();
@@ -146,22 +147,26 @@ namespace Zenject
             _staticInstallers.Clear();
         }
 
-        void InitialInject()
+        public static IEnumerable<GameObject> GetSceneRootObjects()
         {
             var activeScene = SceneManager.GetActiveScene();
-            Log.Debug("Injecting all objects in scene '{0}'", activeScene.name);
 
-            // Note: We can't use activeScene.GetRootObjects() here because that fails with an exception
-            // about the scene not being loaded yet
+            // Note: We can't use activeScene.GetRootObjects() here because that apparently fails with an exception
+            // about the scene not being loaded yet when executed in Awake
             // It's important here that we only inject into root objects that are part of our scene
             // Otherwise, if there is an object that is marked with DontDestroyOnLoad, then it will
             // be injected multiple times when another scene is loaded
             // Also make sure not to inject into the global root objects which are handled in GlobalCompositionRoot
-            var rootGameObjects = GameObject.FindObjectsOfType<Transform>()
+            return GameObject.FindObjectsOfType<Transform>()
                 .Where(x => x.parent == null && x.GetComponent<GlobalCompositionRoot>() == null && x.gameObject.scene == activeScene)
-                .Select(x => x.gameObject).ToList();
+                .Select(x => x.gameObject);
+        }
 
-            foreach (var rootObj in rootGameObjects)
+        void InjectObjectsInScene()
+        {
+            Log.Debug("Injecting all objects in scene '{0}'", SceneManager.GetActiveScene().name);
+
+            foreach (var rootObj in GetSceneRootObjects())
             {
                 _container.InjectGameObject(rootObj, true, !OnlyInjectWhenActive);
             }
