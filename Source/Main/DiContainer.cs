@@ -65,7 +65,7 @@ namespace Zenject
                     // and optional = true
                     var ctx = new InjectContext(
                         this, typeof(Transform), ZenConstants.DefaultParentId,
-                        true, null, null, "", null, null, null, true);
+                        true, null, null, "", null, null, null, InjectSources.Local);
 
                     _defaultParent = this.Resolve<Transform>(ctx);
                 }
@@ -283,20 +283,51 @@ namespace Zenject
         // Be careful with this method since it is a coroutine
         IEnumerable<ProviderPair> GetProviderMatchesInternal(InjectContext context)
         {
-            return GetProvidersForContract(context.BindingId, context.LocalOnly).Where(x => x.Provider.Matches(context));
+            return GetProvidersForContract(context.BindingId, context.SourceType).Where(x => x.Provider.Matches(context));
         }
 
-        IEnumerable<ProviderPair> GetProvidersForContract(BindingId bindingId, bool localOnly)
+        IEnumerable<ProviderPair> GetProvidersForContract(BindingId bindingId, InjectSources sourceType)
         {
-            var localPairs = GetLocalProviders(bindingId).Select(x => new ProviderPair(x, this));
-
-            if (localOnly || _parentContainer == null)
+            switch (sourceType)
             {
-                return localPairs;
+                case InjectSources.Local:
+                {
+                    return GetLocalProviders(bindingId).Select(x => new ProviderPair(x, this));
+                }
+                case InjectSources.Any:
+                {
+                    var localPairs = GetLocalProviders(bindingId).Select(x => new ProviderPair(x, this));
+
+                    if (_parentContainer == null)
+                    {
+                        return localPairs;
+                    }
+
+                    return localPairs.Concat(
+                        _parentContainer.GetProvidersForContract(bindingId, InjectSources.Any));
+                }
+                case InjectSources.AnyParent:
+                {
+                    if (_parentContainer == null)
+                    {
+                        return Enumerable.Empty<ProviderPair>();
+                    }
+
+                    return _parentContainer.GetProvidersForContract(bindingId, InjectSources.Any);
+                }
+                case InjectSources.Parent:
+                {
+                    if (_parentContainer == null)
+                    {
+                        return Enumerable.Empty<ProviderPair>();
+                    }
+
+                    return _parentContainer.GetProvidersForContract(bindingId, InjectSources.Local);
+                }
             }
 
-            return localPairs.Concat(
-                _parentContainer.GetProvidersForContract(bindingId, false));
+            Assert.Throw("Invalid source type");
+            return null;
         }
 
         List<ProviderBase> GetLocalProviders(BindingId bindingId)
@@ -471,7 +502,7 @@ namespace Zenject
 
                 // First try picking the most 'local' dependencies
                 // This will bias towards bindings for the lower level specific containers rather than the global high level container
-                // This will, for example, allow you to just ask for a DiContainer dependency without needing to specify [InjectLocal]
+                // This will, for example, allow you to just ask for a DiContainer dependency without needing to specify [Inject(InjectSources.Local)]
                 // (otherwise it would always match for a list of DiContainer's for all parent containers)
                 var sortedProviders = providers.Select(x => new { Pair = x, Distance = GetContainerHeirarchyDistance(x.Container) }).OrderBy(x => x.Distance).ToList();
 

@@ -68,13 +68,13 @@ namespace Zenject
 
             string identifier = null;
             bool isOptional = false;
-            bool localOnly = false;
+            InjectSources sourceType = InjectSources.Any;
 
             if (injectAttr != null)
             {
                 identifier = injectAttr.Identifier;
                 isOptional = injectAttr.IsOptional;
-                localOnly = injectAttr.LocalOnly;
+                sourceType = injectAttr.SourceType;
             }
 
             bool isOptionalWithADefaultValue = (paramInfo.Attributes & ParameterAttributes.HasDefault) == ParameterAttributes.HasDefault;
@@ -87,7 +87,7 @@ namespace Zenject
                 parentType,
                 null,
                 isOptionalWithADefaultValue ? paramInfo.DefaultValue : null,
-                localOnly);
+                sourceType);
         }
 
         static List<PostInjectableInfo> GetPostInjectMethods(Type type)
@@ -157,13 +157,13 @@ namespace Zenject
 
             string identifier = null;
             bool isOptional = false;
-            bool localOnly = false;
+            InjectSources sourceType = InjectSources.Any;
 
             if (injectAttr != null)
             {
                 identifier = injectAttr.Identifier;
                 isOptional = injectAttr.IsOptional;
-                localOnly = injectAttr.LocalOnly;
+                sourceType = injectAttr.SourceType;
             }
 
             Type memberType;
@@ -191,7 +191,7 @@ namespace Zenject
                 parentType,
                 setter,
                 null,
-                localOnly);
+                sourceType);
         }
 
         static ConstructorInfo GetInjectConstructor(Type parentType)

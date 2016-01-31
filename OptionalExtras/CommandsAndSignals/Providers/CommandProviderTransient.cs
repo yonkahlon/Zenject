@@ -15,7 +15,7 @@ namespace Zenject.Commands
             var newContext = new InjectContext(
                 c.Container, typeof(THandler), null, false, c.ObjectType,
                 c.ObjectInstance, c.MemberName, c.ParentContext, c.ConcreteIdentifier,
-                null, c.LocalOnly);
+                null, c.SourceType);
 
             return c.Container.InstantiateExplicit<THandler>(new List<TypeValuePair>(), newContext);
         }

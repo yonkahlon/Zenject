@@ -15,9 +15,9 @@ namespace Zenject
         List<InitializableInfo> _initializables = new List<InitializableInfo>();
 
         public InitializableManager(
-            [InjectLocalOptional]
+            [InjectOptional(InjectSources.Local)]
             List<IInitializable> initializables,
-            [InjectLocalOptional]
+            [InjectOptional(InjectSources.Local)]
             List<ModestTree.Util.Tuple<Type, int>> priorities,
             DiContainer container,
             SingletonInstanceHelper singletonInstanceHelper)

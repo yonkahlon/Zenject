@@ -8,22 +8,22 @@ namespace Zenject
 {
     public class TickableManager
     {
-        [InjectLocalOptional]
+        [InjectOptional(InjectSources.Local)]
         readonly List<ITickable> _tickables = null;
 
-        [InjectLocalOptional]
+        [InjectOptional(InjectSources.Local)]
         readonly List<IFixedTickable> _fixedTickables = null;
 
-        [InjectLocalOptional]
+        [InjectOptional(InjectSources.Local)]
         readonly List<ILateTickable> _lateTickables = null;
 
-        [InjectLocalOptional]
+        [InjectOptional(InjectSources.Local)]
         readonly List<ModestTree.Util.Tuple<Type, int>> _priorities = null;
 
-        [InjectLocalOptional("Fixed")]
+        [InjectOptional("Fixed", InjectSources.Local)]
         readonly List<ModestTree.Util.Tuple<Type, int>> _fixedPriorities = null;
 
-        [InjectLocalOptional("Late")]
+        [InjectOptional("Late", InjectSources.Local)]
         readonly List<ModestTree.Util.Tuple<Type, int>> _latePriorities = null;
 
         [Inject]
