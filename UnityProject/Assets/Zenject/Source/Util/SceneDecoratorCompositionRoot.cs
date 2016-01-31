@@ -34,6 +34,8 @@ namespace Zenject
             _afterInstallHooks = SceneCompositionRoot.AfterInstallHooks;
             SceneCompositionRoot.AfterInstallHooks = null;
 
+            SceneCompositionRoot.DecoratedScenes.Add(this.gameObject.scene);
+
             ZenUtil.LoadSceneAdditive(
                 SceneName, AddPreBindings, AddPostBindings);
         }

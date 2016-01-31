@@ -16,6 +16,7 @@ namespace Zenject
 {
     public class SceneCompositionRoot : CompositionRoot
     {
+        public static readonly List<Scene> DecoratedScenes = new List<Scene>();
         public static Action<DiContainer> BeforeInstallHooks;
         public static Action<DiContainer> AfterInstallHooks;
 
@@ -54,7 +55,7 @@ namespace Zenject
             Assert.IsNull(Container);
             Assert.IsNull(RootFacade);
 
-            Log.Debug("Initializing SceneCompositionRoot in scene '{0}'", SceneManager.GetActiveScene().name);
+            Log.Debug("Initializing SceneCompositionRoot in scene '{0}'", this.gameObject.scene.name);
             InitContainer();
 
             Log.Debug("SceneCompositionRoot: Finished install phase.  Injecting into scene...");
@@ -62,6 +63,8 @@ namespace Zenject
 
             Log.Debug("SceneCompositionRoot: Resolving root IFacade...");
             _rootFacade = _container.Resolve<IFacade>();
+
+            DecoratedScenes.Clear();
 
             Assert.IsNotNull(Container);
             Assert.IsNotNull(RootFacade);
@@ -150,10 +153,8 @@ namespace Zenject
             _staticInstallers.Clear();
         }
 
-        public static IEnumerable<GameObject> GetSceneRootObjects()
+        public static IEnumerable<GameObject> GetSceneRootObjects(Scene scene)
         {
-            var activeScene = SceneManager.GetActiveScene();
-
             // Note: We can't use activeScene.GetRootObjects() here because that apparently fails with an exception
             // about the scene not being loaded yet when executed in Awake
             // It's important here that we only inject into root objects that are part of our scene
@@ -161,15 +162,15 @@ namespace Zenject
             // be injected multiple times when another scene is loaded
             // Also make sure not to inject into the global root objects which are handled in GlobalCompositionRoot
             return GameObject.FindObjectsOfType<Transform>()
-                .Where(x => x.parent == null && x.GetComponent<GlobalCompositionRoot>() == null && x.gameObject.scene == activeScene)
+                .Where(x => x.parent == null && x.GetComponent<GlobalCompositionRoot>() == null && (x.gameObject.scene == scene || DecoratedScenes.Contains(x.gameObject.scene)))
                 .Select(x => x.gameObject);
         }
 
         void InjectObjectsInScene()
         {
-            Log.Debug("Injecting all objects in scene '{0}'", SceneManager.GetActiveScene().name);
+            Log.Debug("Injecting all objects in scene '{0}'", this.gameObject.scene.name);
 
-            foreach (var rootObj in GetSceneRootObjects())
+            foreach (var rootObj in GetSceneRootObjects(this.gameObject.scene))
             {
                 _container.InjectGameObject(rootObj, true, !OnlyInjectWhenActive);
             }
