@@ -29,12 +29,12 @@ namespace Zenject
     }
 
     public class GameObjectFactory<TValue> : GameObjectFactory, IFactory<TValue>
-        // We can't do this because of the way IFactoryBinder works
+        // We don't want to do this to allow interfaces
         //where TValue : Component
     {
         public GameObjectFactory()
         {
-            Assert.That(typeof(TValue).DerivesFrom<Component>());
+            Assert.That(typeof(TValue).IsInterface || typeof(TValue).DerivesFrom<Component>());
         }
 
         public virtual TValue Create()
@@ -50,12 +50,12 @@ namespace Zenject
 
     // One parameter
     public class GameObjectFactory<TParam1, TValue> : GameObjectFactory, IFactory<TParam1, TValue>
-        // We can't do this because of the way IFactoryBinder works
+        // We don't want to do this to allow interfaces
         //where TValue : Component
     {
         public GameObjectFactory()
         {
-            Assert.That(typeof(TValue).DerivesFrom<Component>());
+            Assert.That(typeof(TValue).IsInterface || typeof(TValue).DerivesFrom<Component>());
         }
 
         public virtual TValue Create(TParam1 param)
@@ -75,12 +75,12 @@ namespace Zenject
 
     // Two parameters
     public class GameObjectFactory<TParam1, TParam2, TValue> : GameObjectFactory, IFactory<TParam1, TParam2, TValue>
-        // We can't do this because of the way IFactoryBinder works
+        // We don't want to do this to allow interfaces
         //where TValue : Component
     {
         public GameObjectFactory()
         {
-            Assert.That(typeof(TValue).DerivesFrom<Component>());
+            Assert.That(typeof(TValue).IsInterface || typeof(TValue).DerivesFrom<Component>());
         }
 
         public virtual TValue Create(TParam1 param1, TParam2 param2)
@@ -101,12 +101,12 @@ namespace Zenject
 
     // Three parameters
     public class GameObjectFactory<TParam1, TParam2, TParam3, TValue> : GameObjectFactory, IFactory<TParam1, TParam2, TParam3, TValue>
-        // We can't do this because of the way IFactoryBinder works
+        // We don't want to do this to allow interfaces
         //where TValue : Component
     {
         public GameObjectFactory()
         {
-            Assert.That(typeof(TValue).DerivesFrom<Component>());
+            Assert.That(typeof(TValue).IsInterface || typeof(TValue).DerivesFrom<Component>());
         }
 
         public virtual TValue Create(TParam1 param1, TParam2 param2, TParam3 param3)
@@ -128,12 +128,12 @@ namespace Zenject
 
     // Four parameters
     public class GameObjectFactory<TParam1, TParam2, TParam3, TParam4, TValue> : GameObjectFactory, IFactory<TParam1, TParam2, TParam3, TParam4, TValue>
-        // We can't do this because of the way IFactoryBinder works
+        // We don't want to do this to allow interfaces
         //where TValue : Component
     {
         public GameObjectFactory()
         {
-            Assert.That(typeof(TValue).DerivesFrom<Component>());
+            Assert.That(typeof(TValue).IsInterface || typeof(TValue).DerivesFrom<Component>());
         }
 
         public virtual TValue Create(TParam1 param1, TParam2 param2, TParam3 param3, TParam4 param4)

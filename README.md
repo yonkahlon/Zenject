@@ -851,15 +851,15 @@ In this case, two instances will be created.
 Something else worth noting is that the behaviour of ToSinglePrefab works similarly.  Given the following:
 
 ```csharp
-Container.Bind<IFoo>().ToSingleFromPrefab<Foo>(MyPrefab);
-Container.Bind<IBar>().ToSingleFromPrefab<Bar>(MyPrefab);
+Container.Bind<IFoo>().ToSinglePrefab<Foo>(MyPrefab);
+Container.Bind<IBar>().ToSinglePrefab<Bar>(MyPrefab);
 ```
 
-It will only instantiate the prefab MyPrefab once.  The generic parameter given to ToSingleFromPrefab can be interpreted as "Search the instantiated prefab for this component".  If instead, you want Zenject to instantiate a new instance of the prefab for each ToSingleFromPrefab binding, then you can do that as well by supplying an identifier to the ToSingleFromPrefab function like so:
+It will only instantiate the prefab MyPrefab once.  The generic parameter given to ToSinglePrefab can be interpreted as "Search the instantiated prefab for this component".  If instead, you want Zenject to instantiate a new instance of the prefab for each ToSinglePrefab binding, then you can do that as well by supplying an identifier to the ToSinglePrefab function like so:
 
 ```csharp
-Container.Bind<IFoo>().ToSingleFromPrefab<Foo>("foo", MyPrefab);
-Container.Bind<IBar>().ToSingleFromPrefab<Bar>("bar", MyPrefab);
+Container.Bind<IFoo>().ToSinglePrefab<Foo>("foo", MyPrefab);
+Container.Bind<IBar>().ToSinglePrefab<Bar>("bar", MyPrefab);
 ```
 
 Now two instances of the prefab will be created.
@@ -1589,14 +1589,12 @@ public class MyCustomFooFactory : IFactory<IFoo>
 }
 ```
 
-7 - **ToPrefab&lt;TMonoBehaviour&gt;(prefab)** - Create dynamic MonoBehaviour using given prefab
+7 - **ToPrefab(prefab)** - Create dynamic MonoBehaviour using given prefab
 
-TMonoBehaviour = Derives from MonoBehaviour
-
-Results in a dependency of type `IFactory<TMonoBehaviour>` that can be used to create instances of the given prefab.  After instantiating the given prefab, the factory will search it for a component of type `TMonoBehaviour` and then will return that from the `Create()` method.
+Results in a dependency of type `IFactory<TContract>` that can be used to create instances of the given prefab.  After instantiating the given prefab, the factory will search it for a component of type `TContract` and then will return that from the `Create()` method.  In this case, the `TContract` class must either be an interface or derive from `Component` / `MonoBehaviour`.
 
 ```csharp
-Container.BindIFactory<IFoo>().ToPrefab<FooMonoBehaviour>(prefab);
+Container.BindIFactory<IFoo>().ToPrefab(prefab);
 ```
 
 ## <a id="custom-factories"></a>Custom Factories
