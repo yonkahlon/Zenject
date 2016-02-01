@@ -136,6 +136,15 @@ class Runner:
             self._sys.copyFile('[ZenDllDir]/Zenject.Commands.dll', '[ZenTempDir]/Zenject.Commands.dll')
             self._sys.copyFile('[ZenDllMetaDir]/Zenject.Commands.dll.meta', '[ZenTempDir]/Zenject.Commands.dll.meta')
 
+            self._sys.copyFile('[ZenjectDir]/Version.txt', '[ZenTempDir]/Version.txt')
+            self._sys.copyFile('[ZenjectDir]/Version.txt.meta', '[ZenTempDir]/Version.txt.meta')
+
+            self._sys.copyFile('[ZenjectDir]/LICENSE.txt', '[ZenTempDir]/LICENSE.txt')
+            self._sys.copyFile('[ZenjectDir]/LICENSE.txt.meta', '[ZenTempDir]/LICENSE.txt.meta')
+
+            self._sys.copyDirectory('[ZenjectDir]/Documentation', '[ZenTempDir]/Documentation')
+            self._sys.copyFile('[ZenjectDir]/Documentation.meta', '[ZenTempDir]/Documentation.meta')
+
             self._createUnityPackage('[PackageTempDir]', outputPath)
         finally:
             self._sys.deleteDirectory('[PackageTempDir]')
