@@ -59,9 +59,9 @@ namespace Zenject
 
         public enum BindTypes
         {
-            Instance,
-            Interfaces,
-            All,
+            ToInstance,
+            ToInterfaces,
+            ToInstanceAndInterfaces,
         }
     }
 }
