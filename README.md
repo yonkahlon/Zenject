@@ -1,5 +1,5 @@
 
-<img src="Build/ZenjectLogo.png?raw=true" alt="Zenject" width="600px" height="134px"/>
+<img src="Documentation/ZenjectLogo.png?raw=true" alt="Zenject" width="600px" height="134px"/>
 
 ## Dependency Injection Framework for Unity3D
 
@@ -58,7 +58,7 @@ __Quick Start__:  If you are already familiar with dependency injection and are 
         * <a href="#advanced-factory-construction-using-subcontainers">Advanced Factory Construction Using SubContainers</a>
         * <a href="#sub-containers-and-facades">Sub-Containers and Facades</a>
         * <a href="#commands-and-signals">Commands And Signals</a>
-        * <a href="#autobind">AutoBind Attribute</a>
+        * <a href="#autobind">Automatic Bindings</a>
         * <a href="#auto-mocking-using-moq">Auto-Mocking Using Moq</a>
 * <a href="#questions">Frequently Asked Questions</a>
     * <a href="#aot-support">Does this work on AOT platforms such as iOS and WebGL?</a>
@@ -2345,13 +2345,12 @@ This approach does not require that you derive from `ICommandHandler` at all.  T
 Container.BindCommand<ResetSceneCommand>().HandleWithTransient<MyOtherHandler>(x => x.ResetScene);
 ```
 
-## <a id="autobind"></a>AutoBind Attribute
+## <a id="autobind"></a>Automatic Bindings
 
 In many cases, you have a number of MonoBehaviour's that have been added to the scene within the Unity editor (ie. at editor time not runtime) and you want to also have these MonoBehaviour's added to the Zenject Container so that they can be injected into other classes.
 
 The usual way this is done is to add public references to these objects within your installer like this:
 
-    // Here we assume that a game object is added to the scene with a component of type Foo
     public class Foo : MonoBehaviour
     {
     }
@@ -2383,59 +2382,17 @@ The usual way this is done is to add public references to these objects within y
         }
     }
 
-Note that you could also just make `Foo` public here - my personal convention is to just always use `SerializeField` instead to avoid breaking encapsulation.
+(Note that you could also just make `Foo` public here - my personal convention is to just always use `SerializeField` instead to avoid breaking encapsulation)
 
 This works fine however in some cases this can get cumbersome.  For example, if you want to allow an artist to add any number of `Enemy` objects to the scene, and you also want all those `Enemy` objects added to the Zenject Container.  In this case, you would have to manually drag each one to the inspector of one of your installers.  This is very error prone since its easy to forget one, or to delete the `Enemy` game object but forget to delete the null reference in the inspector for your installer, etc.
 
-So another way to do this is to use the `AutoBindInstaller`.  You can do this by adding an `[AutoBind]` attribute to the MonoBehaviour class you wish to automatically get added to the Zenject Container.
+So another way to do this is to use the `AutoBindInstaller`.  You can do this by adding a `ZenjectAutoBinding` monobehaviour to the same game object that you want to be automatically added to the Zenject container.
 
-    [AutoBind]
-    public class Foo : MonoBehaviour
-    {
-    }
+For example, if I have a MonoBehaviour of type `Foo` in my scene, I can just add `ZenjectAutoBinding` alongside it:
 
-    public class GameInstaller : MonoInstaller
-    {
-        public override void InstallBindings()
-        {
-            Container.Install<AutoBindInstaller>();
-            Container.Bind<IInitializable>().ToSingle<GameRunner>();
-        }
-    }
+<img src="Documentation/AutoBind1.png?raw=true" alt="ZenjectAutoBinding"/>
 
-    public class GameRunner : IInitializable
-    {
-        readonly Foo _foo;
-
-        public GameRunner(Foo foo)
-        {
-            _foo = foo;
-        }
-
-        public void Initialize()
-        {
-            ...
-        }
-    }
-
-In this case, you'll notice that we do not have to explicitly bind `Foo` using a public reference in `GameInstaller`.  Note also that in order for this to work you have to execute `Container.Install<AutoBindInstaller>()` in one of your installers.
-
-When using `AutoBind`, it will bind `Foo` using the `ToInstance` method, so it is equivalent to the first example where we did this:
-
-    Container.BindInstance(_foo);
-
-Also note that if we add multiple game objects with `Foo` attached to them in our scene, they will all be bound to the Container this way.  So after doing this, we would have to change `GameRunner` above to take a `List<Foo>` otherwise we would get Zenject exceptions.
-
-There's also a few variations of `[AutoBind]` that will result in different bindings.  For example, if we wanted to only bind the interfaces that are used by Foo, then we could do that as well using `[AutoBindInterfaces]`:
-
-    public interface IFoo
-    {
-    }
-
-    [AutoBindInterfaces]
-    public class Foo : MonoBehaviour, IFoo
-    {
-    }
+Then our installer becomes:
 
     public class GameInstaller : MonoInstaller
     {
@@ -2446,31 +2403,30 @@ There's also a few variations of `[AutoBind]` that will result in different bind
         }
     }
 
-    public class GameRunner : IInitializable
-    {
-        readonly IFoo _foo;
+Note that when using the `ZenjectAutoBinding` MonoBehaviour you always need to add `Container.Install<AutoBindInstaller>()` to one of the installers in your scene.
 
-        public GameRunner(IFoo foo)
-        {
-            _foo = foo;
-        }
+When using `ZenjectAutoBinding` this way, it will bind `Foo` using the `ToInstance` method, so it is equivalent to the first example where we did this:
 
-        public void Initialize()
-        {
-            ...
-        }
-    }
+    Container.BindInstance(_foo);
 
-In this case, objects marked with the `[AutoBindInterfaces]` attribute will be equivalent to doing this for each one:
+Also note that if we duplicate this game object to have multiple game objects with `Foo` on them (and its `ZenjectAutoBinding`), they will all be bound to the Container this way.  So after doing this, we would have to change `GameRunner` above to take a `List<Foo>` otherwise we would get Zenject exceptions.
+
+Also note that the `ZenjectAutoBinding` component contains a `Bind Type` property in its inspector.  By default this simply binds the instance as shown above but it can also be set to the following:
+
+1 - `Interfaces`
+
+This bind type is equivalent to the following:
 
     Container.BindAllInterfacesToInstance(_foo);
 
-Note however, in this case, that `GameRunner` must ask for type `IFoo` in its constructor.  If we left `GameRunner` asking for type `Foo` then Zenject would throw exceptions, since the `BindAllInterfacesToInstance` method only binds the interfaces, not the concrete type.  However, if you want both interfaces and the actual type to all be bound, you can use the `[AutoBindAll]` attribute, which will be equivalent to executing both bindings:
+Note however, in this case, that `GameRunner` must ask for type `IFoo` in its constructor.  If we left `GameRunner` asking for type `Foo` then Zenject would throw exceptions, since the `BindAllInterfacesToInstance` method only binds the interfaces, not the concrete type.  If you want the concrete type as well then you can use:
+
+2 - `All`
+
+This bind type is equivalent to the following:
 
     Container.BindAllInterfacesToInstance(_foo);
     Container.BindInstance(_foo);
-
-Finally, I want to note here that many DI purists would consider this bad practice.  This is because we are moving installer logic into the classes themselves.  There is admittedly some logic to this, so you may or may not want to use this feature depending on how you feel about this.
 
 ## <a id="auto-mocking-using-moq"></a>Auto-Mocking using Moq
 
