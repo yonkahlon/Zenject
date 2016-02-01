@@ -138,6 +138,7 @@
     <Compile Include="Misc\ZenUtil.cs" />
     <Compile Include="Providers\DiContainerProvider.cs" />
     <Compile Include="Providers\GameObjectSingletonProvider.cs" />
+    <Compile Include="Providers\GameObjectTransientProvider.cs" />
     <Compile Include="Providers\GameObjectTransientProviderFromPrefab.cs" />
     <Compile Include="Providers\GameObjectTransientProviderFromPrefabResource.cs" />
     <Compile Include="Providers\InstanceProvider.cs" />
@@ -159,15 +160,13 @@
     <Compile Include="Providers\SingletonProvider.cs" />
     <Compile Include="Providers\SingletonProviderMap.cs" />
     <Compile Include="Providers\TransientProvider.cs" />
-    <Compile Include="Usage\InjectAttribute.cs" />
     <Compile Include="Usage\InjectAttributeBase.cs" />
-    <Compile Include="Usage\InjectLocalAttribute.cs" />
-    <Compile Include="Usage\InjectOptionalAttribute.cs" />
     <Compile Include="Usage\PostInjectAttribute.cs" />
     <Compile Include="Util\AutoBindInstaller.cs" />
     <Compile Include="Util\DecoratorInstaller.cs" />
     <Compile Include="Util\SceneDecoratorCompositionRoot.cs" />
     <Compile Include="Util\UnityUtil.cs" />
+    <Compile Include="Util\ZenjectAutoBinding.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
