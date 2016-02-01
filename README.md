@@ -18,7 +18,7 @@ This project is open source.  You can find the official repository [here](https:
 
 For general troubleshooting / support, please use the [zenject subreddit](http://www.reddit.com/r/zenject) or the [zenject google group](https://groups.google.com/forum/#!forum/zenject/).  If you have found a bug, you are also welcome to create an issue on the [github page](https://github.com/modesttree/Zenject), or a pull request if you have a fix / extension.  You can also follow [@Zenject](https://twitter.com/Zenject) on twitter for updates.  Finally, you can also email me directly at sfvermeulen@gmail.com
 
-__Quick Start__:  If you are already familiar with dependency injection and are more interested in the syntax than anything else, you might want to start by looking over the <a href="#cheatsheet">cheatsheet</a> at the bottom of this page, which shows a bunch of typical example cases of usage.
+__Quick Start__:  If you are already familiar with dependency injection and are more interested in the syntax than anything else, you might want to start by looking over the <a href="#cheatsheet">cheatsheet</a> at the bottom of this page, which shows a bunch of typical example cases of usage.  You may also be interested in reading some of the Unit tests (see `Zenject/OptionalExtras/UnitTests` directory)
 
 ## Table Of Contents
 
@@ -76,16 +76,17 @@ __Quick Start__:  If you are already familiar with dependency injection and are 
 * Field injection
 * Property injection
 * Injection via [PostInject] method parameters
-* Conditional binding (eg. by name, by parent type, etc.)
+* Conditional binding (eg. by type, by name, etc.)
 * Optional dependencies
 * Support for building dynamic object graphs at runtime using factories
 * Injection across different Unity scenes
-* Support for global, project-wide bindings to apply to all scenes
+* Support for global, project-wide bindings to add dependencies for all scenes
 * "Scene Decorators" which allow adding functionality to a different scene without changing it directly
 * Ability to validate object graphs at editor time including dynamic object graphs created via factories
-* Nested Containers / Sub-Containers
+* Nested Containers aka Sub-Containers
 * Support for Commands and Signals
 * Ability to easily define discrete 'islands' of dependencies using 'Facade' classes
+* Ability to automatically add bindings by dropping `ZenjectAutoBinding` on a game object in your scene
 * Auto-Mocking using the Moq library
 
 ## <a id="history"></a>History
@@ -201,11 +202,11 @@ Other benefits include:
 
 ## <a id="overview-of-the-zenject-api"></a>Overview Of The Zenject API
 
-What follows is a general overview of how DI patterns are applied using Zenject.  For further documentation I highly recommend the sample project itself (a kind of asteroids clone, which you can find by opening "Extras/SampleGame/Asteroids.unity").  I would recommend using that for reference after reading over these concepts.
+What follows is a general overview of how DI patterns are applied using Zenject.  For further documentation I highly recommend the sample project itself (a kind of asteroids clone, which you can find by opening "Zenject/OptionalExtras/SampleGame/Asteroids.unity").  I would recommend using that for reference after reading over these concepts.
 
 You may also find the <a href="#cheatsheet">cheatsheet</a> at the bottom of this page helpful in understanding some typical usage scenarios.
 
-The unit tests may also be helpful to show usage for each specific feature (which you can find by extracting Extras/ZenjectUnitTests.zip)
+The unit tests may also be helpful to show usage for each specific feature (which you can find at `Zenject/OptionalExtras/UnitTests`)
 
 ## <a id="hello-world-example"></a>Hello World Example
 
@@ -1213,7 +1214,13 @@ This works ok for small projects, but as the complexity of your project grows it
 
 You can do this in Zenject out-of-the-box by executing the menu item `Edit -> Zenject -> Validate Current Scene` or simply hitting CTRL+SHIFT+V with the scene open that you want to validate.  This will execute all installers for the current scene and construct a fully bound container (with null values for all instances).   It will then iterate through the object graphs and verify that all bindings can be found (without actually instantiating any of them).
 
-Also, if you happen to be a fan of automated testing (as I am) then you can include calls to this menu item in unity batch mode as part of your testing suite.
+Note that if you want to use this feature (which I recommend as its very useful) then you should avoid instantiating new objects in your installers and executing other code that has similar side effects.
+
+Also, if you happen to be a fan of automated testing (as I am) then you can include calls to this menu item in unity batch mode as part of your testing suite.  For example, to validate the scenes in the sample project from the command line, you can just execute this:
+
+    "[PATH TO UNITY]" -projectPath "[PATH TO SAMPLE PROJECT]" -executeMethod Zenject.ZenEditorUtil.ValidateScenesFromScript -batchmode -nographics "-CustomArg:scenes=Asteroids,AsteroidsDecoratorExample"
+
+This will return an error code if validation fails.  If it succeeded, it will return 0 and the log for the unity editor will contain the line "Successfully validated all 2 scenes".
 
 ## <a id="using-the-unity-inspector-to-configure-settings"></a>Using the Unity Inspector To Configure Settings
 
@@ -2541,6 +2548,8 @@ However, this approach will not allow you to take advantage of the advanced feat
 ## <a id="cheatsheet"></a>Installers Cheat-Sheet
 
 Below are a bunch of randomly assorted examples of bindings that you might include in one of your installers.
+
+For more examples, you may also be interested in reading some of the Unit tests (see `Zenject/OptionalExtras/UnitTests` directory)
 
 ```csharp
 
