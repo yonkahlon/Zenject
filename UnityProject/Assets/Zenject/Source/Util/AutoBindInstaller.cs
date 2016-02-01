@@ -8,11 +8,6 @@ using ModestTree;
 
 namespace Zenject
 {
-    [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
-    public class AutoBindAttribute : Attribute
-    {
-    }
-
     // To use this, just add [AutoBind] above the monobehaviours that you want to be automatically added to the container
     // Then also call Container.Install<AutoBindInstaller> from another installer
     public class AutoBindInstaller : Installer
@@ -32,9 +27,28 @@ namespace Zenject
             foreach (var monoBehaviour in SceneCompositionRoot.GetSceneRootObjects(_compRoot.gameObject.scene)
                 .SelectMany(x => x.GetComponentsInChildren<MonoBehaviour>()))
             {
-                if (monoBehaviour != null && monoBehaviour.GetType().HasAttribute<AutoBindAttribute>())
+                if (monoBehaviour == null)
                 {
-                    Container.Bind(monoBehaviour.GetType()).ToInstance(monoBehaviour);
+                    continue;
+                }
+
+                var autoBindAttribute = monoBehaviour.GetType().AllAttributes<AutoBindAttributeBase>().SingleOrDefault();
+
+                if (autoBindAttribute != null)
+                {
+                    var bindType = autoBindAttribute.BindType;
+
+                    if (bindType == AutoBindTypes.Self
+                        || bindType == AutoBindTypes.All)
+                    {
+                        Container.Bind(monoBehaviour.GetType()).ToInstance(monoBehaviour);
+                    }
+
+                    if (bindType == AutoBindTypes.Interfaces
+                        || bindType == AutoBindTypes.All)
+                    {
+                        Container.BindAllInterfacesToInstance(monoBehaviour);
+                    }
                 }
             }
         }
