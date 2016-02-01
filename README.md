@@ -2881,14 +2881,14 @@ For general troubleshooting / support, please use the [zenject subreddit](http:/
 ## <a id="release-notes"></a>Release Notes
 
 3.7 (Jan 31, 2015)
-- Changed to not both parenting transforms to the CompositionRoot object by default (This is still optional with a checkbox however)
+- Changed to not bother parenting transforms to the CompositionRoot object by default (This is still optional with a checkbox however)
 - Added string parameter to BindGameObjectFactory method to allow specifying the name of an empty GameObject to use for organization
 - Changed FacadeFactory to inherit from IFactory
 - Changed GlobalCompositionRoot to initialize using Unity's new [RuntimeInitializeOnLoadMethod] attribute
 - Added easier ability to validate specific scenes from the command line outside of Unity
 - Added AutoBindInstaller class and ZenjectAutoBinding attribute to make it easier to add MonoBehaviours that start in the scene to the container
 - Added optional parameter to the [Inject] attribute to specify which container to retrieve from in the case of nested containers
-- Fixed some unity-specific bind commands to place more nicely with interfaces
+- Fixed some unity-specific bind commands to play more nicely with interfaces
 
 3.6 (Jan 24, 2015)
 - Another change to signals to not require parameter types to the bind methods
