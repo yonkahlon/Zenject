@@ -484,7 +484,15 @@ Container.Bind<FooMonoBehaviour>().ToSingleGameObject();
 
 This binding will create a new game object and attach the given FooMonoBehaviour.  Also note that since it is ToSingle that it will use the same instance everywhere that has FooMonoBehaviour as a dependency
 
-9 - **ToMethod** - Inject using a custom method
+9 - **ToTransientGameObject** - Inject by instantiating a new game object
+
+```csharp
+Container.Bind<FooMonoBehaviour>().ToTransientGameObject();
+```
+
+This binding will create a new game object and attach the given FooMonoBehaviour.  Note that since this is transient, a unique game object will be created every time it is injected.
+
+10 - **ToMethod** - Inject using a custom method
 
 This binding allows you to customize creation logic yourself by defining a method:
 
@@ -500,7 +508,7 @@ public IFoo SomeMethod(InjectContext context)
 }
 ```
 
-10 - **ToSingleMethod** - Inject using a custom method but only call that method once
+11 - **ToSingleMethod** - Inject using a custom method but only call that method once
 
 This binding works similar to `ToMethod` except that the given method will only be called once.  The value returned from the method will then be used for every subsequent request for the given dependency.
 
@@ -516,7 +524,7 @@ public IFoo SomeMethod(InjectContext context)
 }
 ```
 
-11 - **ToGetter** - Inject by getter.
+12 - **ToGetter** - Inject by getter.
 
 This method can be useful if you want to bind to a property of another object.
 
@@ -525,7 +533,7 @@ Container.Bind<IFoo>().ToSingle<Foo>()
 Container.Bind<Bar>().ToGetter<IFoo>(x => x.GetBar())
 ```
 
-12 - **ToLookup** - Inject by recursive resolve.
+13 - **ToLookup** - Inject by recursive resolve.
 
 ```csharp
 Container.Bind<IFoo>().ToLookup<IBar>()
@@ -538,7 +546,7 @@ In the example code above we assume that Foo inherits from IBar, which inherits 
 
 You can also supply an identifier to the ToLookup() method.  See <a href="#identifiers">here</a> section for details on identifiers.
 
-13 - **Rebind** - Override existing binding
+14 - **Rebind** - Override existing binding
 
 ```csharp
 Container.Rebind<IFoo>().To<Foo>();
@@ -546,7 +554,7 @@ Container.Rebind<IFoo>().To<Foo>();
 
 The Rebind function can be used to override any existing bindings that were added previously.  It will first clear all previous bindings and then add the new binding.  This method is especially useful for tests, where you often want to use almost all the same bindings used in production, except override a few specific bindings.
 
-14 - **BindAllInterfacesToSingle**
+15 - **BindAllInterfacesToSingle**
 
 This function can be used to automatically bind any interfaces that it finds on the given type.
 
@@ -570,7 +578,7 @@ Container.Bind<ITickable>().ToSingle<Foo>();
 Container.Bind<IInitializable>().ToSingle<Foo>();
 ```
 
-15 - **BindAllInterfacesToInstance**
+16 - **BindAllInterfacesToInstance**
 
 This function works very similar to BindAllInterfacesToSingle.
 
@@ -593,7 +601,7 @@ Container.Bind<ITickable>().ToInstance(foo);
 Container.Bind<IInitializable>().ToInstance(foo);
 ```
 
-16 - **ToSingleInstance** - Use the given instance as a singleton.
+17 - **ToSingleInstance** - Use the given instance as a singleton.
 
 This is the same as `ToInstance` except it will ensure that there is only ever one instance for the given type.
 
@@ -620,7 +628,7 @@ And then have a class that takes all of them as a list like this:
 
 Whereas, if you use ToSingleInstance this would trigger an error.
 
-17 - **ToSingleFactory** - Define a custom factory for a singleton
+18 - **ToSingleFactory** - Define a custom factory for a singleton
 
 ```csharp
 Container.Bind<IFoo>().ToSingleFactory<MyCustomFactory>();
@@ -643,7 +651,7 @@ class MyCustomFactory : IFactory<IFoo>
 
 The `ToSingleFactory` binding can be useful when you want to define a singleton, but it has complex construction logic that you want to define yourself.  You could use `ToSingleMethod`, but this can get ugly if your construction logic itself has its own dependencies that it needs.  Using `ToSingleFactory` for this case it is nice because any dependencies that you require for construction can be simply added to the factory constructor
 
-18 - **Untyped Bindings**
+19 - **Untyped Bindings**
 
 ```csharp
 Container.Bind(typeof(IFoo)).ToSingle(typeof(Foo));
@@ -651,7 +659,7 @@ Container.Bind(typeof(IFoo)).ToSingle(typeof(Foo));
 
 In some cases it is not possible to use the generic versions of the Bind<> functions.  In these cases a non-generic version is provided, which works by taking in a Type value as a parameter.
 
-19 - **BindIFactory** - Bind type `IFactory<>` to a construction method
+20 - **BindIFactory** - Bind type `IFactory<>` to a construction method
 
 ```csharp
 Container.BindIFactory<IFoo>().ToFactory<Foo>();
@@ -663,11 +671,11 @@ The above line results in all dependencies of type `IFactory<IFoo>` being bound 
 
 See the <a href="#abstract-factories">abstract factories section</a> for more information on abstract factories.
 
-20 - **BindFacadeFactory** - Declare a nested container facade factory.
+21 - **BindFacadeFactory** - Declare a nested container facade factory.
 
 See <a href="#sub-containers-and-facades">this section</a> for more details on this binding.
 
-21 - **BindFacade** - Declare a nested container facade.
+22 - **BindFacade** - Declare a nested container facade.
 
 See <a href="#sub-containers-and-facades">this section</a> for more details on this binding.
 
@@ -1435,6 +1443,8 @@ public override void InstallBindings()
 
 Now classes can simply declare a constructor parameter of type FooMonoBehaviour.Factory and by calling the Create() method, construct new instances of a given prefab.
 
+Also note that there is an optional string parameter on the `BindGameObjectFactory` method.  This can be used to automatically group dynamically created objects underneath an empty transform with this name.  For example, in the sample game we pass "Asteroids" here since otherwise every time a new asteroid spawns it will clutter our scene heirarchy.
+
 ## <a id="abstract-factories"></a>Abstract Factories
 
 The above description of factories is great for most cases, however, there are times you do not want to depend directly on a concrete class and instead want your factory to return an interface instead.  This kind of factory is called an Abstract Factory, and it works a bit differently in Zenject from the standard factory as described above.
@@ -2132,6 +2142,27 @@ public class GameInstaller : MonoInstaller
     }
 }
 ```
+
+If you find yourself using a lot of sub-containers / facades, you may find yourself in a situation where you want to inject a dependency from the parent container, or you want to explicitly not inject from the parent container.  For these cases you can pass an extra parameter to the `[Inject]` attribute to specify this.  For example, the following will guarantee that the `Bar` dependencies always comes from the same container that `Foo` is created in.
+
+    class Foo
+    {
+        public Bar val;
+
+        public Foo(
+            [Inject(InjectSources.Local)]
+            Bar val)
+        {
+            this.val = val;
+        }
+    }
+
+`InjectSources` can be any of the following.  Note that `Any` is the default when unspecified.
+
+* `Any` - Current Container or any parent
+* `Local` - Inject strictly from the current container and ignore any parent dependencies
+* `Parent` - Inject strictly from the immediate parent container and ignore any dependency matches in the current container or grant-parent container
+* `AnyParent` - Inject from any parent, but ignore the current container.
 
 ## <a id="commands-and-signals"></a>Commands And Signals
 
