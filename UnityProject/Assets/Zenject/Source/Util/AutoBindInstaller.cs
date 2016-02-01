@@ -41,14 +41,14 @@ namespace Zenject
                     continue;
                 }
 
-                if (bindType == ZenjectAutoBinding.BindTypes.Instance
-                    || bindType == ZenjectAutoBinding.BindTypes.All)
+                if (bindType == ZenjectAutoBinding.BindTypes.ToInstance
+                    || bindType == ZenjectAutoBinding.BindTypes.ToInstanceAndInterfaces)
                 {
                     Container.Bind(component.GetType()).ToInstance(component);
                 }
 
-                if (bindType == ZenjectAutoBinding.BindTypes.Interfaces
-                    || bindType == ZenjectAutoBinding.BindTypes.All)
+                if (bindType == ZenjectAutoBinding.BindTypes.ToInterfaces
+                    || bindType == ZenjectAutoBinding.BindTypes.ToInstanceAndInterfaces)
                 {
                     Container.BindAllInterfacesToInstance(component);
                 }

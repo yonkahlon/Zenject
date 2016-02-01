@@ -2405,7 +2405,7 @@ Then our installer becomes:
 
 Note that when using the `ZenjectAutoBinding` MonoBehaviour you always need to add `Container.Install<AutoBindInstaller>()` to one of the installers in your scene.
 
-When using `ZenjectAutoBinding` this way, it will bind `Foo` using the `ToInstance` method, so it is equivalent to the first example where we did this:
+When using `ZenjectAutoBinding` this way, by default it will bind `Foo` using the `ToInstance` method, so it is equivalent to the first example where we did this:
 
     Container.BindInstance(_foo);
 
@@ -2413,7 +2413,7 @@ Also note that if we duplicate this game object to have multiple game objects wi
 
 Also note that the `ZenjectAutoBinding` component contains a `Bind Type` property in its inspector.  By default this simply binds the instance as shown above but it can also be set to the following:
 
-1 - `Interfaces`
+1 - `ToInterfaces`
 
 This bind type is equivalent to the following:
 
@@ -2421,7 +2421,7 @@ This bind type is equivalent to the following:
 
 Note however, in this case, that `GameRunner` must ask for type `IFoo` in its constructor.  If we left `GameRunner` asking for type `Foo` then Zenject would throw exceptions, since the `BindAllInterfacesToInstance` method only binds the interfaces, not the concrete type.  If you want the concrete type as well then you can use:
 
-2 - `All`
+2 - `ToInstanceAndInterfaces`
 
 This bind type is equivalent to the following:
 
