@@ -8,7 +8,8 @@ using ModestTree;
 
 namespace Zenject
 {
-    // To use this, just add [AutoBind] above the monobehaviours that you want to be automatically added to the container
+    // To use this, just add the ZenjectAutoBinding on to the monobehaviours in your scene
+    // that you want to be automatically added to the container
     // Then also call Container.Install<AutoBindInstaller> from another installer
     public class AutoBindInstaller : Installer
     {
@@ -24,31 +25,32 @@ namespace Zenject
 
         public override void InstallBindings()
         {
-            foreach (var monoBehaviour in SceneCompositionRoot.GetSceneRootObjects(_compRoot.gameObject.scene)
-                .SelectMany(x => x.GetComponentsInChildren<MonoBehaviour>()))
+            foreach (var autoBinding in SceneCompositionRoot.GetSceneRootObjects(_compRoot.gameObject.scene)
+                .SelectMany(x => x.GetComponentsInChildren<ZenjectAutoBinding>()))
             {
-                if (monoBehaviour == null)
+                if (autoBinding == null)
                 {
                     continue;
                 }
 
-                var autoBindAttribute = monoBehaviour.GetType().AllAttributes<AutoBindAttributeBase>().SingleOrDefault();
+                var component = autoBinding.Component;
+                var bindType = autoBinding.BindType;
 
-                if (autoBindAttribute != null)
+                if (component == null)
                 {
-                    var bindType = autoBindAttribute.BindType;
+                    continue;
+                }
 
-                    if (bindType == AutoBindTypes.Self
-                        || bindType == AutoBindTypes.All)
-                    {
-                        Container.Bind(monoBehaviour.GetType()).ToInstance(monoBehaviour);
-                    }
+                if (bindType == ZenjectAutoBinding.BindTypes.Instance
+                    || bindType == ZenjectAutoBinding.BindTypes.All)
+                {
+                    Container.Bind(component.GetType()).ToInstance(component);
+                }
 
-                    if (bindType == AutoBindTypes.Interfaces
-                        || bindType == AutoBindTypes.All)
-                    {
-                        Container.BindAllInterfacesToInstance(monoBehaviour);
-                    }
+                if (bindType == ZenjectAutoBinding.BindTypes.Interfaces
+                    || bindType == ZenjectAutoBinding.BindTypes.All)
+                {
+                    Container.BindAllInterfacesToInstance(component);
                 }
             }
         }
