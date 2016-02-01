@@ -1,5 +1,5 @@
 
-<img src="Documentation/ZenjectLogo.png?raw=true" alt="Zenject" width="600px" height="134px"/>
+<img src="UnityProject/Assets/Zenject/Documentation/ReadMe_files/ZenjectLogo.png?raw=true" alt="Zenject" width="600px" height="134px"/>
 
 ## Dependency Injection Framework for Unity3D
 
@@ -2428,7 +2428,7 @@ So another way to do this is to use the `AutoBindInstaller`.  You can do this by
 
 For example, if I have a MonoBehaviour of type `Foo` in my scene, I can just add `ZenjectAutoBinding` alongside it:
 
-<img src="Documentation/AutoBind1.png?raw=true" alt="ZenjectAutoBinding"/>
+<img src="UnityProject/Assets/Zenject/Documentation/ReadMe_files/AutoBind1.png?raw=true" alt="ZenjectAutoBinding"/>
 
 Then our installer becomes:
 
@@ -2879,6 +2879,19 @@ Foo foo = Container.InstantiateComponent<Foo>(gameObject);
 For general troubleshooting / support, please use the [zenject subreddit](http://www.reddit.com/r/zenject) or the [zenject google group](https://groups.google.com/forum/#!forum/zenject/).  If you have found a bug, you are also welcome to create an issue on the [github page](https://github.com/modesttree/Zenject), or a pull request if you have a fix / extension.  You can also follow [@Zenject](https://twitter.com/Zenject) on twitter for updates.  Finally, you can also email me directly at sfvermeulen@gmail.com
 
 ## <a id="release-notes"></a>Release Notes
+
+3.7 (Jan 31, 2015)
+- Changed to not both parenting transforms to the CompositionRoot object by default (This is still optional with a checkbox however)
+- Added string parameter to BindGameObjectFactory method to allow specifying the name of an empty GameObject to use for organization
+- Changed FacadeFactory to inherit from IFactory
+- Changed GlobalCompositionRoot to initialize using Unity's new [RuntimeInitializeOnLoadMethod] attribute
+- Added easier ability to validate specific scenes from the command line outside of Unity
+- Added AutoBindInstaller class and ZenjectAutoBinding attribute to make it easier to add MonoBehaviours that start in the scene to the container
+- Added optional parameter to the [Inject] attribute to specify which container to retrieve from in the case of nested containers
+- Fixed some unity-specific bind commands to place more nicely with interfaces
+
+3.6 (Jan 24, 2015)
+- Another change to signals to not require parameter types to the bind methods
 
 3.5 (Jan 17, 2015)
 - Made breaking change to require separate bind commands for signals and triggers, to allow adding different conditionals on each.
