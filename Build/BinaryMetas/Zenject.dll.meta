@@ -1,6 +1,6 @@
 fileFormatVersion: 2
 guid: 39de377ce3657274f872ae938966268e
-timeCreated: 1452187614
+timeCreated: 1454555684
 licenseType: Pro
 PluginImporter:
   serializedVersion: 1
@@ -8,7 +8,8 @@ PluginImporter:
   executionOrder:
     Zenject.GlobalCompositionRoot: -9999
     Zenject.SceneCompositionRoot: -9998
-    Zenject.UnityEventManager: -9997
+    Zenject.SceneDecoratorCompositionRoot: -9997
+    Zenject.UnityEventManager: -9996
   isPreloaded: 0
   platformData:
     Any:
