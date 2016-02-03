@@ -52,6 +52,9 @@ namespace Zenject
 
         public void Awake()
         {
+            // We always want to initialize GlobalCompositionRoot as early as possible
+            GlobalCompositionRoot.Instance.EnsureIsInitialized();
+
             Assert.IsNull(Container);
             Assert.IsNull(RootFacade);
 

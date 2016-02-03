@@ -40,17 +40,20 @@ namespace Zenject
         {
             get
             {
-                Assert.IsNotNull(_instance);
+                if (_instance == null)
+                {
+                    _instance = new GameObject("Global Composition Root")
+                        .AddComponent<GlobalCompositionRoot>();
+                    _instance.Initialize();
+                }
+
                 return _instance;
             }
         }
 
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
-        static void GlobalMainEntryPoint()
+        public void EnsureIsInitialized()
         {
-            _instance = new GameObject("Global Composition Root")
-                .AddComponent<GlobalCompositionRoot>();
-            _instance.Initialize();
+            // Do nothing - Initialize occurs in Instance property
         }
 
         void Initialize()
