@@ -100,7 +100,7 @@ You can install Zenject using any of the following methods
 
 1. From the [Asset Store Page](http://u3d.as/content/modest-tree-media/zenject-dependency-injection/7ER)
 
-    * Normally this should be the same as what you find in the [Releases secion](https://github.com/modesttree/Zenject/releases), but may also be slightly out of date since Asset Store can take a week or so to review submissions sometimes.
+    * Normally this should be the same as what you find in the [Releases section](https://github.com/modesttree/Zenject/releases), but may also be slightly out of date since Asset Store can take a week or so to review submissions sometimes.
 
 1. From Source
 
