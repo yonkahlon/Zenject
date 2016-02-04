@@ -11,27 +11,6 @@ namespace Zenject.Tests
     [TestFixture]
     public class TestSingleton : TestWithContainer
     {
-        private interface IFoo
-        {
-            int ReturnValue();
-        }
-
-        private class Foo : IFoo, ITickable, IInitializable
-        {
-            public int ReturnValue()
-            {
-                return 5;
-            }
-
-            public void Initialize()
-            {
-            }
-
-            public void Tick()
-            {
-            }
-        }
-
         [Test]
         public void TestClassRegistration()
         {
@@ -226,44 +205,6 @@ namespace Zenject.Tests
         }
 
         [Test]
-        [ExpectedException(typeof(ZenjectBindException))]
-        public void TestToSingleMethod1()
-        {
-            var foo = new Foo();
-
-            Container.Bind(typeof(Foo)).ToSingleMethod((container) => foo);
-            Container.Bind(typeof(IFoo)).ToSingle<Foo>();
-
-            Assert.That(ReferenceEquals(Container.Resolve<Foo>(), foo));
-            Assert.That(ReferenceEquals(Container.Resolve<Foo>(), Container.Resolve<IFoo>()));
-        }
-
-        [Test]
-        [ExpectedException(typeof(ZenjectBindException))]
-        public void TestToSingleMethod3()
-        {
-            Container.Bind<Foo>().ToSingle();
-            Container.Bind(typeof(IFoo)).ToSingleMethod((container) => new Foo());
-        }
-
-        [Test]
-        [ExpectedException(typeof(ZenjectBindException))]
-        public void TestToSingleMethod4()
-        {
-            // Cannot bind different singleton providers
-            Container.Bind<Foo>().ToSingleMethod((container) => new Foo());
-            Container.Bind<Foo>().ToSingle();
-        }
-
-        [Test]
-        [ExpectedException(typeof(ZenjectBindException))]
-        public void TestToSingleMethod5()
-        {
-            Container.Bind<Foo>().ToSingleMethod((container) => new Foo());
-            Container.Bind<Foo>().ToSingleMethod((container) => new Foo());
-        }
-
-        [Test]
         public void TestToSingleMethod6()
         {
             Func<InjectContext, Foo> method = (ctx) => new Foo();
@@ -299,15 +240,6 @@ namespace Zenject.Tests
             Assert.IsEqual(ifoo, foo2);
         }
 
-        [Test]
-        [ExpectedException(typeof(ZenjectBindException))]
-        public void TestToSingleFactory2()
-        {
-            // Cannot bind different singleton providers
-            Container.Bind<Foo>().ToSingleFactory<FooFactory>();
-            Container.Bind<Foo>().ToSingle();
-        }
-
         class FooFactory : IFactory<Foo>
         {
             public static bool WasCalled;
@@ -316,6 +248,27 @@ namespace Zenject.Tests
             {
                 WasCalled = true;
                 return new Foo();
+            }
+        }
+
+        interface IFoo
+        {
+            int ReturnValue();
+        }
+
+        class Foo : IFoo, ITickable, IInitializable
+        {
+            public int ReturnValue()
+            {
+                return 5;
+            }
+
+            public void Initialize()
+            {
+            }
+
+            public void Tick()
+            {
             }
         }
     }
