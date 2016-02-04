@@ -5,9 +5,6 @@
 
 #### ----[ NEW ]---- If you like Zenject, you may also be interested in [Projeny](https://github.com/modesttree/projeny) (our other open source project)
 
-### NOTE
-The following documentation is written to be packaged with Zenject as it appears in the Asset store (which you can find [here](http://u3d.as/content/modest-tree-media/zenject-dependency-injection/7ER))
-
 ## <a id="introduction"></a>Introduction
 
 Zenject is a lightweight dependency injection framework built specifically to target Unity 3D.  It can be used to turn your Unity 3D application into a collection of loosely-coupled parts with highly segmented responsibilities.  Zenject can then glue the parts together in many different configurations to allow you to easily write, re-use, refactor and test your code in a scalable and extremely flexible way.
@@ -24,6 +21,7 @@ __Quick Start__:  If you are already familiar with dependency injection and are 
 
 * <a href="#introduction">Introduction</a>
 * <a href="#features">Features</a>
+* <a href="#installation">Installation</a>
 * <a href="#history">History</a>
 * Dependency Injection
     * <a href="#theory">Theory</a>
@@ -88,6 +86,25 @@ __Quick Start__:  If you are already familiar with dependency injection and are 
 * Ability to easily define discrete 'islands' of dependencies using 'Facade' classes
 * Ability to automatically add bindings by dropping `ZenjectAutoBinding` on a game object in your scene
 * Auto-Mocking using the Moq library
+
+## <a id="installation"></a>Installation
+
+You can install Zenject using any of the following methods
+
+1. From [Releases Page](https://github.com/modesttree/Zenject/releases). Here you can choose between the following:
+
+    * **Zenject-WithAsteroidsDemo.vX.X.unitypackage** - This is equivalent to what you find in the Asset Store and contains the sample game "Asteroids" as part of the package.  All the source code for Zenject is included here.
+    * **Zenject.vX.X.unitypackage** - Same as above except without the Sample project.
+    * **Zenject-BinariesOnly.vX.X.unitypackage** - If you don't care about the source you can install Zenject from this package, which just contains a few DLL files.
+    * **Zenject-NonUnity.vX.X.zip** - Use this if you want to use Zenject outside of Unity (eg. just as a normal C# project)
+
+1. From the [Asset Store Page](http://u3d.as/content/modest-tree-media/zenject-dependency-injection/7ER)
+
+    * Normally this should be the same as what you find in the [Releases secion](https://github.com/modesttree/Zenject/releases), but may also be slightly out of date since Asset Store can take a week or so to review submissions sometimes.
+
+1. From Source
+
+    * You can also just clone this repo and copy the `UnityProject/Assets/Zenject` directory to your own Unity3D project
 
 ## <a id="history"></a>History
 
@@ -2884,7 +2901,10 @@ For general troubleshooting / support, please use the [zenject subreddit](http:/
 
 ## <a id="release-notes"></a>Release Notes
 
-3.7 (Jan 31, 2015)
+3.8 (Feb 4, 2016)
+- Changed back to only initializing the GlobalCompositionRoot when starting a scene with a SceneCompositionRoot rather than always starting it in every scene
+
+3.7 (Jan 31, 2016)
 - Changed to not bother parenting transforms to the CompositionRoot object by default (This is still optional with a checkbox however)
 - Added string parameter to BindGameObjectFactory method to allow specifying the name of an empty GameObject to use for organization
 - Changed FacadeFactory to inherit from IFactory
@@ -2894,13 +2914,13 @@ For general troubleshooting / support, please use the [zenject subreddit](http:/
 - Added optional parameter to the [Inject] attribute to specify which container to retrieve from in the case of nested containers
 - Fixed some unity-specific bind commands to play more nicely with interfaces
 
-3.6 (Jan 24, 2015)
+3.6 (Jan 24, 2016)
 - Another change to signals to not require parameter types to the bind methods
 
-3.5 (Jan 17, 2015)
+3.5 (Jan 17, 2016)
 - Made breaking change to require separate bind commands for signals and triggers, to allow adding different conditionals on each.
 
-3.4 (Jan 7, 2015)
+3.4 (Jan 7, 2016)
 - Cleaned up directory structure
 - Fixed bug with Global bindings not getting their Tick() called in the correct order
 - Fixes to the releases automation scripts
