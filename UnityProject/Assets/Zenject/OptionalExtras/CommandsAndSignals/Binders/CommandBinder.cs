@@ -11,13 +11,13 @@ namespace Zenject.Commands
     public class CommandBinderBase<TCommand, TAction> : BinderBase
         where TCommand : ICommand
     {
-        readonly SingletonProviderMap _singletonMap;
+        readonly SingletonProviderCreator _singletonProviderFactory;
 
         public CommandBinderBase(
-            DiContainer container, string identifier, SingletonProviderMap singletonMap)
+            DiContainer container, string identifier, SingletonProviderCreator singletonProviderFactory)
             : base(container, typeof(TCommand), identifier)
         {
-            _singletonMap = singletonMap;
+            _singletonProviderFactory = singletonProviderFactory;
         }
 
         public BindingConditionSetter HandleWithStaticMethod(Func<TAction> methodGetter)
@@ -27,7 +27,7 @@ namespace Zenject.Commands
 
         protected ProviderBase CreateSingletonProvider<THandler>(string concreteIdentifier)
         {
-            return _singletonMap.CreateProviderFromType(concreteIdentifier, typeof(THandler));
+            return _singletonProviderFactory.CreateProviderFromType(concreteIdentifier, typeof(THandler));
         }
     }
 
@@ -37,8 +37,8 @@ namespace Zenject.Commands
         where TCommand : Command
     {
         public CommandBinder(
-            DiContainer container, string identifier, SingletonProviderMap singletonMap)
-            : base(container, identifier, singletonMap)
+            DiContainer container, string identifier, SingletonProviderCreator singletonProviderFactory)
+            : base(container, identifier, singletonProviderFactory)
         {
         }
 
@@ -90,8 +90,8 @@ namespace Zenject.Commands
         where TCommand : Command<TParam1>
     {
         public CommandBinder(
-            DiContainer container, string identifier, SingletonProviderMap singletonMap)
-            : base(container, identifier, singletonMap)
+            DiContainer container, string identifier, SingletonProviderCreator singletonProviderFactory)
+            : base(container, identifier, singletonProviderFactory)
         {
         }
 
@@ -141,8 +141,8 @@ namespace Zenject.Commands
         where TCommand : Command<TParam1, TParam2>
     {
         public CommandBinder(
-            DiContainer container, string identifier, SingletonProviderMap singletonMap)
-            : base(container, identifier, singletonMap)
+            DiContainer container, string identifier, SingletonProviderCreator singletonProviderFactory)
+            : base(container, identifier, singletonProviderFactory)
         {
         }
 
@@ -192,8 +192,8 @@ namespace Zenject.Commands
         where TCommand : Command<TParam1, TParam2, TParam3>
     {
         public CommandBinder(
-            DiContainer container, string identifier, SingletonProviderMap singletonMap)
-            : base(container, identifier, singletonMap)
+            DiContainer container, string identifier, SingletonProviderCreator singletonProviderFactory)
+            : base(container, identifier, singletonProviderFactory)
         {
         }
 
@@ -243,8 +243,8 @@ namespace Zenject.Commands
         where TCommand : Command<TParam1, TParam2, TParam3, TParam4>
     {
         public CommandBinder(
-            DiContainer container, string identifier, SingletonProviderMap singletonMap)
-            : base(container, identifier, singletonMap)
+            DiContainer container, string identifier, SingletonProviderCreator singletonProviderFactory)
+            : base(container, identifier, singletonProviderFactory)
         {
         }
 
@@ -294,8 +294,8 @@ namespace Zenject.Commands
         where TCommand : Command<TParam1, TParam2, TParam3, TParam4, TParam5>
     {
         public CommandBinder(
-            DiContainer container, string identifier, SingletonProviderMap singletonMap)
-            : base(container, identifier, singletonMap)
+            DiContainer container, string identifier, SingletonProviderCreator singletonProviderFactory)
+            : base(container, identifier, singletonProviderFactory)
         {
         }
 
@@ -345,8 +345,8 @@ namespace Zenject.Commands
         where TCommand : Command<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6>
     {
         public CommandBinder(
-            DiContainer container, string identifier, SingletonProviderMap singletonMap)
-            : base(container, identifier, singletonMap)
+            DiContainer container, string identifier, SingletonProviderCreator singletonProviderFactory)
+            : base(container, identifier, singletonProviderFactory)
         {
         }
 

@@ -14,7 +14,7 @@ namespace Zenject.Commands
             where TCommand : Command
         {
             var container = (DiContainer)binder;
-            return new CommandBinder<TCommand>(container, identifier, container.SingletonProviderMap);
+            return new CommandBinder<TCommand>(container, identifier, container.SingletonProviderCreator);
         }
 
         public static CommandBinder<TCommand> BindCommand<TCommand>(this IBinder container)
@@ -28,7 +28,7 @@ namespace Zenject.Commands
             where TCommand : Command<TParam1>
         {
             var container = (DiContainer)binder;
-            return new CommandBinder<TCommand, TParam1>(container, identifier, container.SingletonProviderMap);
+            return new CommandBinder<TCommand, TParam1>(container, identifier, container.SingletonProviderCreator);
         }
 
         public static CommandBinder<TCommand, TParam1> BindCommand<TCommand, TParam1>(this IBinder container)
@@ -42,7 +42,7 @@ namespace Zenject.Commands
             where TCommand : Command<TParam1, TParam2>
         {
             var container = (DiContainer)binder;
-            return new CommandBinder<TCommand, TParam1, TParam2>(container, identifier, container.SingletonProviderMap);
+            return new CommandBinder<TCommand, TParam1, TParam2>(container, identifier, container.SingletonProviderCreator);
         }
 
         public static CommandBinder<TCommand, TParam1, TParam2> BindCommand<TCommand, TParam1, TParam2>(this IBinder container)
@@ -56,7 +56,7 @@ namespace Zenject.Commands
             where TCommand : Command<TParam1, TParam2, TParam3>
         {
             var container = (DiContainer)binder;
-            return new CommandBinder<TCommand, TParam1, TParam2, TParam3>(container, identifier, container.SingletonProviderMap);
+            return new CommandBinder<TCommand, TParam1, TParam2, TParam3>(container, identifier, container.SingletonProviderCreator);
         }
 
         public static CommandBinder<TCommand, TParam1, TParam2, TParam3> BindCommand<TCommand, TParam1, TParam2, TParam3>(this IBinder container)
@@ -70,7 +70,7 @@ namespace Zenject.Commands
             where TCommand : Command<TParam1, TParam2, TParam3, TParam4>
         {
             var container = (DiContainer)binder;
-            return new CommandBinder<TCommand, TParam1, TParam2, TParam3, TParam4>(container, identifier, container.SingletonProviderMap);
+            return new CommandBinder<TCommand, TParam1, TParam2, TParam3, TParam4>(container, identifier, container.SingletonProviderCreator);
         }
 
         public static CommandBinder<TCommand, TParam1, TParam2, TParam3, TParam4> BindCommand<TCommand, TParam1, TParam2, TParam3, TParam4>(this IBinder container)
@@ -84,7 +84,7 @@ namespace Zenject.Commands
             where TCommand : Command<TParam1, TParam2, TParam3, TParam4, TParam5>
         {
             var container = (DiContainer)binder;
-            return new CommandBinder<TCommand, TParam1, TParam2, TParam3, TParam4, TParam5>(container, identifier, container.SingletonProviderMap);
+            return new CommandBinder<TCommand, TParam1, TParam2, TParam3, TParam4, TParam5>(container, identifier, container.SingletonProviderCreator);
         }
 
         public static CommandBinder<TCommand, TParam1, TParam2, TParam3, TParam4, TParam5> BindCommand<TCommand, TParam1, TParam2, TParam3, TParam4, TParam5>(this IBinder container)
@@ -98,7 +98,7 @@ namespace Zenject.Commands
             where TCommand : Command<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6>
         {
             var container = (DiContainer)binder;
-            return new CommandBinder<TCommand, TParam1, TParam2, TParam3, TParam4, TParam5, TParam6>(container, identifier, container.SingletonProviderMap);
+            return new CommandBinder<TCommand, TParam1, TParam2, TParam3, TParam4, TParam5, TParam6>(container, identifier, container.SingletonProviderCreator);
         }
 
         public static CommandBinder<TCommand, TParam1, TParam2, TParam3, TParam4, TParam5, TParam6> BindCommand<TCommand, TParam1, TParam2, TParam3, TParam4, TParam5, TParam6>(this IBinder container)
