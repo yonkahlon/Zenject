@@ -945,7 +945,9 @@ Note that the order that Tick() is called on all ITickables is also configurable
 
 If you have some initialization that needs to occur on a given object, you can include this code in the constructor.  However, this means that the initialization logic would occur in the middle of the object graph being constructed, so it may not be ideal.
 
-One alternative is to implement IInitializable, and then perform initialization logic in an Initialize() method.  This method would be called immediately after the entire object graph is constructed.  This is also nice because the initialization order is customizable in a similar way to ITickable, as explained <a href="#update--initialization-order">here</a>.
+One alternative is to implement IInitializable, and then perform initialization logic in an Initialize() method.  This Initailzie method would then be called after the entire object graph is constructed.  Note that the object graph is constructed during Unity's Awake event, and that the IInitializable.Initialize methods are called immediately on Unity's Start event.  Using IInitializable as opposed to a constructor is therefore more in line with Unity's own recommendations, which suggest that the Awake phase be used to set up object references, and the Start phase should be used for more involved initialization logic.
+
+This is also nice because the initialization order is customizable in a similar way to ITickable, as explained <a href="#update--initialization-order">here</a>.
 
 ```csharp
 public class Ship : IInitializable
