@@ -27,7 +27,7 @@ namespace Zenject
             DiContainer container, SingletonRegistry singletonRegistry)
         {
             _typeSingletonProviderCreator = new TypeSingletonProviderCreator(container, singletonRegistry);
-            _methodSingletonProviderCreator = new MethodSingletonProviderCreator(container, singletonRegistry);
+            _methodSingletonProviderCreator = new MethodSingletonProviderCreator(singletonRegistry);
             _instanceSingletonProviderCreator = new InstanceSingletonProviderCreator(container, singletonRegistry);
             _factorySingletonProviderCreator = new FactorySingletonProviderCreator(container, singletonRegistry);
 
