@@ -9,13 +9,11 @@ namespace Zenject
     public class MethodSingletonProviderCreator
     {
         readonly Dictionary<SingletonId, IMethodSingletonLazyCreator> _creators = new Dictionary<SingletonId, IMethodSingletonLazyCreator>();
-        readonly DiContainer _container;
         readonly SingletonRegistry _singletonRegistry;
 
         public MethodSingletonProviderCreator(
-            DiContainer container, SingletonRegistry singletonRegistry)
+            SingletonRegistry singletonRegistry)
         {
-            _container = container;
             _singletonRegistry = singletonRegistry;
         }
 
