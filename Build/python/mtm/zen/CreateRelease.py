@@ -170,6 +170,10 @@ class Runner:
             self._sys.deleteDirectory('[ZenTempDir]/OptionalExtras/UnitTests')
             self._sys.removeFile('[ZenTempDir]/OptionalExtras/UnitTests.meta')
 
+            self._zipHelper.createZipFile('[ZenTempDir]/OptionalExtras/IntegrationTests', '[ZenTempDir]/OptionalExtras/IntegrationTests.zip')
+            self._sys.deleteDirectory('[ZenTempDir]/OptionalExtras/IntegrationTests')
+            self._sys.removeFile('[ZenTempDir]/OptionalExtras/IntegrationTests.meta')
+
             self._zipHelper.createZipFile('[ZenTempDir]/OptionalExtras/AutoMocking', '[ZenTempDir]/OptionalExtras/AutoMocking.zip')
             self._sys.deleteDirectory('[ZenTempDir]/OptionalExtras/AutoMocking')
             self._sys.removeFile('[ZenTempDir]/OptionalExtras/AutoMocking.meta')
