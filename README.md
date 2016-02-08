@@ -59,9 +59,11 @@ __Quick Start__:  If you are already familiar with dependency injection and are 
         * <a href="#autobind">Automatic Bindings</a>
         * <a href="#auto-mocking-using-moq">Auto-Mocking Using Moq</a>
 * <a href="#questions">Frequently Asked Questions</a>
+    * <a href="#isthisoverkill">Isn't this overkill?  I mean, is using statically accessible singletons really that bad?</a>
     * <a href="#aot-support">Does this work on AOT platforms such as iOS and WebGL?</a>
     * <a href="#faq-performance">How is Performance?</a>
     * <a href="#net-framework">Can I use .NET framework 4.0 and above?</a>
+    * <a href="#howtousecoroutines">How do I use Unity style Coroutines in normal C# classes?</a>
 * <a href="#cheatsheet">Cheat Sheet</a>
 * <a href="#further-help">Further Help</a>
 * <a href="#release-notes">Release Notes</a>
@@ -209,7 +211,7 @@ As shown in the above example, DI can be used to easily swap different implement
 
 More important than that is the fact that using a dependency injection framework like Zenject allows you to more easily follow the '[Single Responsibility Principle](http://en.wikipedia.org/wiki/Single_responsibility_principle)'.  By letting Zenject worry about wiring up the classes, the classes themselves can just focus on fulfilling their specific responsibilities.
 
-Another common mistake that people new to DI make is that they extract interfaces from every class, and use those interfaces everywhere instead of using the class directly.  The goal is to make code more loosely coupled, so it's reasonable to think that being bound to an interface is better than being bound to a concrete class.  However, in most cases the various responsibilities of an application have single, specific classes implementing them, so using an interfaces in these cases just adds unnecessary maintenance overhead.  Also, concrete classes already have an interface defined by their public members.  A good rule of thumb instead is to only create interfaces when the class has more than one implementation.  This is known, by the way, as the [Reused Abstraction Principle](http://codemanship.co.uk/parlezuml/blog/?postid=934))
+<a id="overusinginterfaces"></a>Another common mistake that people new to DI make is that they extract interfaces from every class, and use those interfaces everywhere instead of using the class directly.  The goal is to make code more loosely coupled, so it's reasonable to think that being bound to an interface is better than being bound to a concrete class.  However, in most cases the various responsibilities of an application have single, specific classes implementing them, so using an interfaces in these cases just adds unnecessary maintenance overhead.  Also, concrete classes already have an interface defined by their public members.  A good rule of thumb instead is to only create interfaces when the class has more than one implementation.  This is known, by the way, as the [Reused Abstraction Principle](http://codemanship.co.uk/parlezuml/blog/?postid=934))
 
 Other benefits include:
 
@@ -1037,7 +1039,7 @@ public class FooInstaller : MonoInstaller
 }
 ```
 
-You add bindings by overriding the InstallBindings method, which is called by the CompositionRoot when your scene starts up.  MonoInstaller is a MonoBehaviour so you can add FooInstaller by attaching it to a GameObject.  Since it is a GameObject you can also add public members to it to configure your installer from the Unity inspector, to add references within the scene, references to assets, or simply tuning data.
+You add bindings by overriding the InstallBindings method, which is called by the CompositionRoot when your scene starts up.  MonoInstaller is a MonoBehaviour so you can add FooInstaller by attaching it to a GameObject.  Since it is a GameObject you can also add public members to it to configure your installer from the Unity inspector.  This allows you to add references within the scene, references to assets, or simply tuning data (see [here](https://github.com/modesttree/Zenject#using-the-unity-inspector-to-configure-settings) for more information on tuning data).
 
 Note that in order for your installer to be triggered it must be attached to the Installers property of the CompositionRoot object.  This is necessary to be able to control the order that installers are called in (which you can do by dragging rows around in the Installers property).  The order should not usually matter (since nothing is instantiated during the install process) however it can matter in some cases, such as when you configure an Installer from an existing installer (eg: `Container.BindInstance("mysetting").WhenInjectedInto<MyOtherInstaller>()`).
 
@@ -1063,15 +1065,15 @@ public class FooInstaller : MonoInstaller
 }
 ```
 
-Note that in this case BarInstaller is of type Installer and not MonoInstaller, which is why we can simply call `Container.Install<BarInstaller>`.  By using Installer for BarInstaller instead of MonoInstaller, we don't need an instance of BarInstaller in our scene to use it.  Any calls to Container.Install will immediately instantiate the given installer type and then call InstallBindings on it.  This will repeat for any installers that this installer installs.
+Note that in this case BarInstaller is of type Installer and not MonoInstaller, which is why we can simply call `Container.Install<BarInstaller>`.  By using Installer for BarInstaller instead of MonoInstaller, we don't need an instance of BarInstaller in our scene to use it.  Any calls to Container.Install will immediately create the given installer type and then call InstallBindings on it.  This will repeat for any installers that this installer installs.
 
 One of the main reasons we use installers as opposed to just having all our bindings declared all at once for each scene, is to make them re-usable.  This is not a problem for installers of type `Installer` because you can simply call `Container.Install` as described above for every scene you wish to use it in, but then how would we re-use a MonoInstaller in multiple scenes?
 
 There are two ways to do this.
 
-1. Prefabs.  After attaching your MonoInstaller to a gameobject in your scene, you can then create a prefab out of it.  This is nice because it allows you to share any configuration that you've done in the inspector on the MonoInstaller across scenes (and also have per-scene overrides if you want).
+1. **Prefabs within the scene**.  After attaching your MonoInstaller to a gameobject in your scene, you can then create a prefab out of it.  This is nice because it allows you to share any configuration that you've done in the inspector on the MonoInstaller across scenes (and also have per-scene overrides if you want).  After adding it in your scene you can then drag and drop it on to the SceneCompositionRoot propeerty in the Unity inspector
 
-2. `Container.Install<>`.  You can also call Container.Install just as we did with BarInstaller above for MonoInstallers.  However, unlike with installers of type `Installer`, Zenject cannot simply create a new instance and then install that, because the MonoInstaller could have inspector settings on it.  To address this, when Container.Install is called with a MonoInstaller, Zenject will follow a naming convention to find the prefab for the MonoInstaller.  For example:
+2. **Prefabs within Resources folder**.  You can also call `Container.Install` just as we did with `BarInstaller` above for `MonoInstallers`.  However, unlike with installers of type `Installer`, Zenject cannot simply create a new instance and then install that, because the `MonoInstaller` could have inspector settings on it.  To address this, when `Container.Install` is called with a `MonoInstaller`, Zenject will follow a naming convention to find the prefab for the `MonoInstaller` using Unity's `Resources` folder.  For example:
 
 ```csharp
 // Note that this is a MonoInstaller and has inspector settings
@@ -1089,13 +1091,13 @@ public class FooInstaller : MonoInstaller
 {
     public override void InstallBindings()
     {
-        // When this is called, Zenject will look for a prefab at Resources/Installers/QuxInstaller.prefab and load that
+        // When this is called, Zenject will look for a prefab at `Resources/Installers/QuxInstaller.prefab` and load that
         Container.Install<QuxInstaller>();
     }
 }
 ```
 
-As mentioned in the above code, Zenject will search for a prefab named QuxInstaller.prefab in all the Resources/Installer directories in your project.  This is sometimes a useful alternative to adding installer prefabs to every scene because it allows you to keep the objects in your scenes extremely light.
+As mentioned in the above code, Zenject will search for a prefab named `QuxInstaller.prefab` in all the `Resources/Installers` directories in your project.  This is sometimes a useful alternative to adding installer prefabs to every scene because it allows you to keep the objects in your scenes extremely light.
 
 ## <a id="zenject-order-of-operations"></a>Zenject Order Of Operations
 
@@ -2550,6 +2552,18 @@ However, this approach will not allow you to take advantage of the advanced feat
 
 ## <a id="questions"></a>Frequently Asked Questions
 
+* **<a id="isthisoverkill"></a>Isn't this overkill?  I mean, is using statically accessible singletons really that bad?**
+
+    For small enough projects, I would agree with you that using a global singleton might be easier and less complicated.  But as your project grows in size, using global singletons will make your code unwieldy.  Good code is basically synonymous with loosely coupled code, and to write loosely coupled code you need to (A) actually be aware of the dependencies between classes and (B) code to interfaces (however I don't literally mean to use interfaces everywhere as explained [here](overusinginterfaces))
+
+    In terms of (A), using global singletons, it's not obvious at all what depends on what, and over time your code will become really convoluted, as everything will tend towards depending on everything.  There could always be some method somewhere deep in a call stack that does some hail mary request to some other class anywhere in your code base.  In terms of (B), you can't really code to interfaces since with global singletons you're always referring to a concrete class
+
+    With a DI framework, in terms of (A), it's a bit more work to declare the dependencies you need up-front in your constructor, but this can be a good thing too because it forces you to be aware of the dependencies between classes.
+
+    And in terms of (B), it also forces you to code to interfaces.  By declaring all your dependencies as constructor parameters, you are basically saying "in order for me to do X, I need these contracts fulfilled".  These constructor parameters might not actually be interfaces or abstract classes, but it doesn't matter - in an abstract sense, they are still contracts, which isn't the case when you are creating them within the class or using global singletons.
+
+    Then the result will be more loosely coupled code, which will make it 100x easier to refactor, maintain, test, understand, re-use, etc.
+
 * **<a id="aot-support"></a>Does this work on AOT platforms such as iOS and WebGL?**
 
     Yes.  However, there are a few things that you should be aware.  One of the things that Unity's IL2CPP compiler does is strip out any code that is not used.  It calculates what code is used by statically analyzing the code to find usage.  This is great, except that this will miss any methods/types that are not used explicitly.  In particular, any classes that are created solely through Zenject will have their constructors ignored by the IL2CPP compiler.  In order to address this, the [Inject] attribute that is sometimes applied to constructors also serves to automatically mark the constructor to IL2CPP to not strip out.   In other words, to fix this issue all you have to do is mark every constructor that you create through Zenject with an [Inject] attribute when compiling for WebGL / iOS.
@@ -2567,6 +2581,50 @@ However, this approach will not allow you to take advantage of the advanced feat
 * **<a id="net-framework"></a>Can I use .NET framework 4.0 and above?**
 
     By default Unity uses .NET framework 3.5 and so Zenject assumes that this is what you want.  If you are compiling Zenject with a version greater than this, this is fine, but you'll have to either delete or comment out the contents of Func.cs.
+
+* **<a id="howtousecoroutines"></a>How do I use Unity style Coroutines in normal C# classes?**
+
+    With Zenject, there is less of a need to make every class a `MonoBehaviour`.  But it is often still desirable to be able to call `StartCoroutine` to add asynchronous methods.
+
+    One solution here is to use a dedicated class and just call `StartCoroutine` on that instead.  For example:
+
+        public class AsyncProcessor : MonoBehaviour
+        {
+            // Purposely left empty
+        }
+
+        public class Foo : IInitializable
+        {
+            AsyncProcessor _asyncProcessor;
+
+            public Foo(AsyncProcessor asyncProcessor)
+            {
+                _asyncProcessor = asyncProcessor;
+            }
+
+            public void Initialize()
+            {
+                _asyncProcessor.StartCoroutine(RunAsync());
+            }
+
+            public IEnumerator RunAsync()
+            {
+                Debug.Log("Foo started");
+                yield return new WaitForSeconds(2.0f);
+                Debug.Log("Foo finished");
+            }
+        }
+
+        public class TestInstaller : MonoInstaller
+        {
+            public override void InstallBindings()
+            {
+                Binder.Bind<IInitializable>().ToSingle<Foo>();
+                Binder.Bind<AsyncProcessor>().ToSingleGameObject();
+            }
+        }
+
+    If you need more control than this, another option is to use a coroutine library that implements similar functionality to what Unity provides.  This is what we do.  See [here](https://github.com/svermeulen/UnityCoroutinesWithoutMonoBehaviours) for the library that we use for this.
 
 ## <a id="cheatsheet"></a>Installers Cheat-Sheet
 
@@ -2902,6 +2960,15 @@ Foo foo = Container.InstantiateComponent<Foo>(gameObject);
 For general troubleshooting / support, please use the [zenject subreddit](http://www.reddit.com/r/zenject) or the [zenject google group](https://groups.google.com/forum/#!forum/zenject/).  If you have found a bug, you are also welcome to create an issue on the [github page](https://github.com/modesttree/Zenject), or a pull request if you have a fix / extension.  You can also follow [@Zenject](https://twitter.com/Zenject) on twitter for updates.  Finally, you can also email me directly at sfvermeulen@gmail.com
 
 ## <a id="release-notes"></a>Release Notes
+
+3.9 (Feb 7, 2016)
+- Added a lot more error checking when using the ToSingle bindings. It will no longer allow mixing different ToSingle types
+- Fixed ToSingleGameObject and ToSingleMonoBehaviour to allow multiple bindings to the same result
+- Made it easier to construct SceneCompositionRoot objects dynamically
+- Added untyped versions of BindIFactory.ToFactory method
+- Removed the ability warn on missing ITickable/IInitializbale bindings
+- Added a bunch of integration tests
+- Reorganized folder structure
 
 3.8 (Feb 4, 2016)
 - Changed back to only initializing the GlobalCompositionRoot when starting a scene with a SceneCompositionRoot rather than always starting it in every scene
