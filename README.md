@@ -2619,8 +2619,8 @@ However, this approach will not allow you to take advantage of the advanced feat
         {
             public override void InstallBindings()
             {
-                Binder.Bind<IInitializable>().ToSingle<Foo>();
-                Binder.Bind<AsyncProcessor>().ToSingleGameObject();
+                Container.Bind<IInitializable>().ToSingle<Foo>();
+                Container.Bind<AsyncProcessor>().ToSingleGameObject();
             }
         }
 
