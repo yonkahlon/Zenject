@@ -30,17 +30,29 @@ namespace Zenject
 
         public void Update()
         {
-            RootFacade.Tick();
+            // Avoid spamming the log if RootFacade failed to initialize
+            if (RootFacade != null)
+            {
+                RootFacade.Tick();
+            }
         }
 
         public void FixedUpdate()
         {
-            RootFacade.FixedTick();
+            // Avoid spamming the log if RootFacade failed to initialize
+            if (RootFacade != null)
+            {
+                RootFacade.FixedTick();
+            }
         }
 
         public void LateUpdate()
         {
-            RootFacade.LateTick();
+            // Avoid spamming the log if RootFacade failed to initialize
+            if (RootFacade != null)
+            {
+                RootFacade.LateTick();
+            }
         }
 
         public void OnApplicationQuit()
