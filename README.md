@@ -943,6 +943,8 @@ Container.Bind<ITickable>().ToSingle<Ship>();
 
 Note that the order that Tick() is called on all ITickables is also configurable, as outlined <a href="#update--initialization-order">here</a>.
 
+Also note that there is also interfaces `ILateTickable` and `IFixedTickable` which work similarly for the other unity update methods.
+
 ## <a id="iinitializable-and-postinject"></a>IInitializable and PostInject
 
 If you have some initialization that needs to occur on a given object, you can include this code in the constructor.  However, this means that the initialization logic would occur in the middle of the object graph being constructed, so it may not be ideal.
