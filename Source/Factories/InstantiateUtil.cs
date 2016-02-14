@@ -19,7 +19,7 @@ namespace Zenject
     }
 
     [System.Diagnostics.DebuggerStepThrough]
-    internal static class InstantiateUtil
+    public static class InstantiateUtil
     {
         public static List<TypeValuePair> CreateTypeValueList(IEnumerable<object> args)
         {

@@ -66,7 +66,7 @@ namespace Zenject
             DontDestroyOnLoad(gameObject);
 
             _container = CreateContainer(false, this);
-            _rootFacade = _container.Resolve<IFacade>();
+            _rootFacade = _container.Resolver.Resolve<IFacade>();
 
             Assert.IsNotNull(Container);
             Assert.IsNotNull(RootFacade);
@@ -91,15 +91,15 @@ namespace Zenject
 
             if (root != null)
             {
-                container.Bind<Transform>(ZenConstants.DefaultParentId)
+                container.Binder.Bind<Transform>(ZenConstants.DefaultParentId)
                     .ToInstance<Transform>(root.gameObject.transform);
             }
 
-            container.Bind<CompositionRoot>().ToInstance(root);
-            container.Bind<GlobalCompositionRoot>().ToInstance(root);
+            container.Binder.Bind<CompositionRoot>().ToInstance(root);
+            container.Binder.Bind<GlobalCompositionRoot>().ToInstance(root);
 
-            container.Install<StandardInstaller>();
-            container.Install(GetGlobalInstallers());
+            container.Binder.Install<StandardInstaller>();
+            container.Binder.Install(GetGlobalInstallers());
 
             return container;
         }

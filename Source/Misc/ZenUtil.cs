@@ -36,13 +36,13 @@ namespace Zenject
             LoadSceneInternal(levelName, false, null, null);
         }
 
-        public static void LoadScene(string levelName, Action<DiContainer> preBindings)
+        public static void LoadScene(string levelName, Action<IBinder> preBindings)
         {
             LoadSceneInternal(levelName, false, preBindings, null);
         }
 
         public static void LoadScene(
-            string levelName, Action<DiContainer> preBindings, Action<DiContainer> postBindings)
+            string levelName, Action<IBinder> preBindings, Action<IBinder> postBindings)
         {
             LoadSceneInternal(levelName, false, preBindings, postBindings);
         }
@@ -52,13 +52,13 @@ namespace Zenject
             LoadSceneInternal(levelName, true, null, null);
         }
 
-        public static void LoadSceneAdditive(string levelName, Action<DiContainer> preBindings)
+        public static void LoadSceneAdditive(string levelName, Action<IBinder> preBindings)
         {
             LoadSceneInternal(levelName, true, preBindings, null);
         }
 
         public static void LoadSceneAdditive(
-            string levelName, Action<DiContainer> preBindings, Action<DiContainer> postBindings)
+            string levelName, Action<IBinder> preBindings, Action<IBinder> postBindings)
         {
             LoadSceneInternal(levelName, true, preBindings, postBindings);
         }
@@ -80,7 +80,7 @@ namespace Zenject
         }
 
         static void LoadSceneInternal(
-            string levelName, bool isAdditive, Action<DiContainer> preBindings, Action<DiContainer> postBindings)
+            string levelName, bool isAdditive, Action<IBinder> preBindings, Action<IBinder> postBindings)
         {
             if (preBindings != null)
             {
@@ -119,7 +119,7 @@ namespace Zenject
                 Assert.That(newObject.GetComponent<SceneCompositionRoot>() == null,
                     "LoadSceneAdditiveWithContainer does not expect a container to exist in the loaded scene");
 
-                parentContainer.InjectGameObject(newObject);
+                parentContainer.Resolver.InjectGameObject(newObject);
             }
         }
 
@@ -147,7 +147,7 @@ namespace Zenject
             {
                 foreach (var go in scene.GetRootGameObjects())
                 {
-                    parentContainer.InjectGameObject(go);
+                    parentContainer.Resolver.InjectGameObject(go);
                 }
 
                 if (callback != null)

@@ -95,11 +95,11 @@ namespace Zenject
                     Assert.IsEqual(subTypes.Length, 1);
 
                     var subType = subTypes[0];
-                    dependTypes = container.ResolveTypeAll(subType);
+                    dependTypes = container.Resolver.ResolveTypeAll(subType);
                 }
                 else
                 {
-                    dependTypes = container.ResolveTypeAll(contractType);
+                    dependTypes = container.Resolver.ResolveTypeAll(contractType);
                     Assert.That(dependTypes.Count <= 1);
                 }
 

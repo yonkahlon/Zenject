@@ -37,23 +37,23 @@ namespace Zenject.Tests
         {
             var container1 = new DiContainer();
 
-            Assert.Throws<ZenjectResolveException>(() => container1.Resolve<IFoo>());
-            Assert.Throws<ZenjectResolveException>(() => Container.Resolve<IFoo>());
+            Assert.Throws<ZenjectResolveException>(() => container1.Resolver.Resolve<IFoo>());
+            Assert.Throws<ZenjectResolveException>(() => Resolver.Resolve<IFoo>());
 
-            Container.Bind<IFoo>().ToSingle<Foo>();
+            Binder.Bind<IFoo>().ToSingle<Foo>();
 
-            Assert.Throws<ZenjectResolveException>(() => container1.Resolve<IFoo>());
-            Assert.IsEqual(Container.Resolve<IFoo>().GetBar(), 0);
+            Assert.Throws<ZenjectResolveException>(() => container1.Resolver.Resolve<IFoo>());
+            Assert.IsEqual(Resolver.Resolve<IFoo>().GetBar(), 0);
 
             var container2 = new DiContainer(Container);
 
-            Assert.IsEqual(container2.Resolve<IFoo>().GetBar(), 0);
-            Assert.IsEqual(Container.Resolve<IFoo>().GetBar(), 0);
+            Assert.IsEqual(container2.Resolver.Resolve<IFoo>().GetBar(), 0);
+            Assert.IsEqual(Resolver.Resolve<IFoo>().GetBar(), 0);
 
-            container2.Bind<IFoo>().ToSingle<Foo2>();
+            container2.Binder.Bind<IFoo>().ToSingle<Foo2>();
 
-            Assert.IsEqual(container2.Resolve<IFoo>().GetBar(), 1);
-            Assert.IsEqual(Container.Resolve<IFoo>().GetBar(), 0);
+            Assert.IsEqual(container2.Resolver.Resolve<IFoo>().GetBar(), 1);
+            Assert.IsEqual(Resolver.Resolve<IFoo>().GetBar(), 0);
         }
     }
 }

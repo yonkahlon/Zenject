@@ -11,12 +11,12 @@ namespace Zenject
     [System.Diagnostics.DebuggerStepThrough]
     public class IFactoryUntypedBinder<TContract>
     {
-        readonly DiContainer _container;
+        readonly IBinder _binder;
         readonly string _identifier;
 
-        public IFactoryUntypedBinder(DiContainer container, string identifier)
+        public IFactoryUntypedBinder(IBinder binder, string identifier)
         {
-            _container = container;
+            _binder = binder;
             _identifier = identifier;
         }
 
@@ -26,29 +26,29 @@ namespace Zenject
         }
 
         public BindingConditionSetter ToMethod(
-            Func<DiContainer, object[], TContract> method)
+            Func<IInstantiator, object[], TContract> method)
         {
-            return _container.Bind<IFactoryUntyped<TContract>>()
+            return _binder.Bind<IFactoryUntyped<TContract>>()
                 .ToMethod(c => new FactoryMethodUntyped<TContract>(c.Container, method));
         }
 
         public BindingConditionSetter ToCustomFactory<TFactory>()
             where TFactory : IFactoryUntyped<TContract>
         {
-            return _container.Bind<IFactoryUntyped<TContract>>(_identifier)
+            return _binder.Bind<IFactoryUntyped<TContract>>(_identifier)
                 .ToTransient<TFactory>();
         }
 
         public BindingConditionSetter ToFactory()
         {
-            return _container.Bind<IFactoryUntyped<TContract>>()
+            return _binder.Bind<IFactoryUntyped<TContract>>()
                 .ToSingle<FactoryUntyped<TContract>>();
         }
 
         public BindingConditionSetter ToFactory<TConcrete>()
             where TConcrete : TContract
         {
-            return _container.Bind<IFactoryUntyped<TContract>>()
+            return _binder.Bind<IFactoryUntyped<TContract>>()
                 .ToSingle<FactoryUntyped<TContract, TConcrete>>();
         }
     }

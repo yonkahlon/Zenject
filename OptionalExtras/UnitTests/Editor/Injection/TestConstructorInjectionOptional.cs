@@ -37,10 +37,10 @@ namespace Zenject.Tests
         [Test]
         public void TestCase1()
         {
-            Container.Bind<Test2>().ToSingle();
+            Binder.Bind<Test2>().ToSingle();
 
-            Assert.That(Container.ValidateResolve<Test2>().IsEmpty());
-            var test1 = Container.Resolve<Test2>();
+            Assert.That(Resolver.ValidateResolve<Test2>().IsEmpty());
+            var test1 = Resolver.Resolve<Test2>();
 
             Assert.That(test1.val == null);
         }
@@ -49,9 +49,9 @@ namespace Zenject.Tests
         [ExpectedException(typeof(ZenjectResolveException))]
         public void TestCase2()
         {
-            Container.Bind<Test3>().ToSingle();
+            Binder.Bind<Test3>().ToSingle();
 
-            var test1 = Container.Instantiate<Test3>();
+            var test1 = Container.Instantiator.Instantiate<Test3>();
 
             Assert.That(test1.val == null);
         }
@@ -59,9 +59,9 @@ namespace Zenject.Tests
         [Test]
         public void TestConstructByFactory()
         {
-            Container.Bind<Test2>().ToSingle();
+            Binder.Bind<Test2>().ToSingle();
 
-            var test1 = Container.Instantiate<Test2>();
+            var test1 = Container.Instantiator.Instantiate<Test2>();
 
             Assert.That(test1.val == null);
         }

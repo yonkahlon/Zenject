@@ -8,13 +8,13 @@ using System.Linq;
 namespace Zenject.Commands
 {
     // Zero params
-    public class CommandProviderMethodSingle<TCommand, THandler>
-        : CommandProviderSingle<TCommand, THandler, Action>
+    public class CommandProviderSingleMethod<TCommand, THandler>
+        : CommandProviderSingleBase<TCommand, THandler, Action>
         where TCommand : Command
     {
         readonly Func<THandler, Action> _methodGetter;
 
-        public CommandProviderMethodSingle(
+        public CommandProviderSingleMethod(
             Func<THandler, Action> methodGetter, ProviderBase singletonProvider)
             : base(singletonProvider)
         {
@@ -33,13 +33,13 @@ namespace Zenject.Commands
     }
 
     // One param
-    public class CommandProviderMethodSingle<TCommand, THandler, TParam1>
-        : CommandProviderSingle<TCommand, THandler, Action<TParam1>>
+    public class CommandProviderSingleMethod<TCommand, THandler, TParam1>
+        : CommandProviderSingleBase<TCommand, THandler, Action<TParam1>>
         where TCommand : Command<TParam1>
     {
         readonly Func<THandler, Action<TParam1>> _methodGetter;
 
-        public CommandProviderMethodSingle(
+        public CommandProviderSingleMethod(
             Func<THandler, Action<TParam1>> methodGetter, ProviderBase singletonProvider)
             : base(singletonProvider)
         {
@@ -58,13 +58,13 @@ namespace Zenject.Commands
     }
 
     // Two params
-    public class CommandProviderMethodSingle<TCommand, THandler, TParam1, TParam2>
-        : CommandProviderSingle<TCommand, THandler, Action<TParam1, TParam2>>
+    public class CommandProviderSingleMethod<TCommand, THandler, TParam1, TParam2>
+        : CommandProviderSingleBase<TCommand, THandler, Action<TParam1, TParam2>>
         where TCommand : Command<TParam1, TParam2>
     {
         readonly Func<THandler, Action<TParam1, TParam2>> _methodGetter;
 
-        public CommandProviderMethodSingle(
+        public CommandProviderSingleMethod(
             Func<THandler, Action<TParam1, TParam2>> methodGetter,
             ProviderBase singletonProvider)
             : base(singletonProvider)
@@ -84,13 +84,13 @@ namespace Zenject.Commands
     }
 
     // Three params
-    public class CommandProviderMethodSingle<TCommand, THandler, TParam1, TParam2, TParam3>
-        : CommandProviderSingle<TCommand, THandler, Action<TParam1, TParam2, TParam3>>
+    public class CommandProviderSingleMethod<TCommand, THandler, TParam1, TParam2, TParam3>
+        : CommandProviderSingleBase<TCommand, THandler, Action<TParam1, TParam2, TParam3>>
         where TCommand : Command<TParam1, TParam2, TParam3>
     {
         readonly Func<THandler, Action<TParam1, TParam2, TParam3>> _methodGetter;
 
-        public CommandProviderMethodSingle(
+        public CommandProviderSingleMethod(
             Func<THandler, Action<TParam1, TParam2, TParam3>> methodGetter,
             ProviderBase singletonProvider)
             : base(singletonProvider)
@@ -110,13 +110,13 @@ namespace Zenject.Commands
     }
 
     // Four params
-    public class CommandProviderMethodSingle<TCommand, THandler, TParam1, TParam2, TParam3, TParam4>
-        : CommandProviderSingle<TCommand, THandler, Action<TParam1, TParam2, TParam3, TParam4>>
+    public class CommandProviderSingleMethod<TCommand, THandler, TParam1, TParam2, TParam3, TParam4>
+        : CommandProviderSingleBase<TCommand, THandler, Action<TParam1, TParam2, TParam3, TParam4>>
         where TCommand : Command<TParam1, TParam2, TParam3, TParam4>
     {
         readonly Func<THandler, Action<TParam1, TParam2, TParam3, TParam4>> _methodGetter;
 
-        public CommandProviderMethodSingle(
+        public CommandProviderSingleMethod(
             Func<THandler, Action<TParam1, TParam2, TParam3, TParam4>> methodGetter,
             ProviderBase singletonProvider)
             : base(singletonProvider)
@@ -136,13 +136,13 @@ namespace Zenject.Commands
     }
 
     // Five params
-    public class CommandProviderMethodSingle<TCommand, THandler, TParam1, TParam2, TParam3, TParam4, TParam5>
-        : CommandProviderSingle<TCommand, THandler, ModestTree.Util.Action<TParam1, TParam2, TParam3, TParam4, TParam5>>
+    public class CommandProviderSingleMethod<TCommand, THandler, TParam1, TParam2, TParam3, TParam4, TParam5>
+        : CommandProviderSingleBase<TCommand, THandler, ModestTree.Util.Action<TParam1, TParam2, TParam3, TParam4, TParam5>>
         where TCommand : Command<TParam1, TParam2, TParam3, TParam4, TParam5>
     {
         readonly Func<THandler, ModestTree.Util.Action<TParam1, TParam2, TParam3, TParam4, TParam5>> _methodGetter;
 
-        public CommandProviderMethodSingle(
+        public CommandProviderSingleMethod(
             Func<THandler, ModestTree.Util.Action<TParam1, TParam2, TParam3, TParam4, TParam5>> methodGetter,
             ProviderBase singletonProvider)
             : base(singletonProvider)
@@ -162,13 +162,13 @@ namespace Zenject.Commands
     }
 
     // Six params
-    public class CommandProviderMethodSingle<TCommand, THandler, TParam1, TParam2, TParam3, TParam4, TParam5, TParam6>
-        : CommandProviderSingle<TCommand, THandler, ModestTree.Util.Action<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6>>
+    public class CommandProviderSingleMethod<TCommand, THandler, TParam1, TParam2, TParam3, TParam4, TParam5, TParam6>
+        : CommandProviderSingleBase<TCommand, THandler, ModestTree.Util.Action<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6>>
         where TCommand : Command<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6>
     {
         readonly Func<THandler, ModestTree.Util.Action<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6>> _methodGetter;
 
-        public CommandProviderMethodSingle(
+        public CommandProviderSingleMethod(
             Func<THandler, ModestTree.Util.Action<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6>> methodGetter,
             ProviderBase singletonProvider)
             : base(singletonProvider)

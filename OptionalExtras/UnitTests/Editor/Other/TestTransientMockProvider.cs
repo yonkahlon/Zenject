@@ -23,7 +23,7 @@ namespace Zenject.Tests
 
             //Container.FallbackProvider = new TransientMockProvider(Container);
 
-            //var foo = Container.Resolve<IFoo>();
+            //var foo = Resolver.Resolve<IFoo>();
 
             //Assert.IsEqual(foo.GetBar(), 0);
         }

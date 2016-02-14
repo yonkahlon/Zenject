@@ -6,14 +6,14 @@ using System.Linq;
 
 namespace Zenject.Commands
 {
-    public class CommandProviderStatic<TCommand, TAction> : ProviderBase
+    public class CommandProviderMethod<TCommand, TAction> : ProviderBase
         where TCommand : ICommand
     {
-        readonly Func<TAction> _methodGetter;
+        readonly TAction _method;
 
-        public CommandProviderStatic(Func<TAction> methodGetter)
+        public CommandProviderMethod(TAction method)
         {
-            _methodGetter = methodGetter;
+            _method = method;
         }
 
         public override Type GetInstanceType()
@@ -23,14 +23,18 @@ namespace Zenject.Commands
 
         public override object GetInstance(InjectContext context)
         {
-            var obj = context.Container.Instantiate<TCommand>(_methodGetter());
+            var obj = context.Instantiator.InstantiateExplicit<TCommand>(
+                new List<TypeValuePair>()
+                {
+                    InstantiateUtil.CreateTypePair(_method),
+                });
             Assert.That(obj != null);
             return obj;
         }
 
         public override IEnumerable<ZenjectResolveException> ValidateBinding(InjectContext context)
         {
-            return context.Container.ValidateObjectGraph<TCommand>(context, typeof(TAction));
+            return context.Resolver.ValidateObjectGraph<TCommand>(context, typeof(TAction));
         }
     }
 }

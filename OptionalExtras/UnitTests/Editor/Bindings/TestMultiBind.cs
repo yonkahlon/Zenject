@@ -42,12 +42,12 @@ namespace Zenject.Tests
         [Test]
         public void TestMultiBind1()
         {
-            Container.Bind<Test1>().ToSingle<Test2>();
-            Container.Bind<Test1>().ToSingle<Test3>();
-            Container.Bind<TestImpl1>().ToSingle();
+            Binder.Bind<Test1>().ToSingle<Test2>();
+            Binder.Bind<Test1>().ToSingle<Test3>();
+            Binder.Bind<TestImpl1>().ToSingle();
 
-            Assert.That(Container.ValidateResolve<TestImpl1>().IsEmpty());
-            var test1 = Container.Resolve<TestImpl1>();
+            Assert.That(Resolver.ValidateResolve<TestImpl1>().IsEmpty());
+            var test1 = Resolver.Resolve<TestImpl1>();
 
             Assert.That(test1.tests.Count == 2);
         }
@@ -55,35 +55,35 @@ namespace Zenject.Tests
         [Test]
         public void TestMultiBind2()
         {
-            Container.Bind<TestImpl1>().ToSingle();
+            Binder.Bind<TestImpl1>().ToSingle();
 
             // optional list dependencies should be declared as optional
             Assert.Throws<ZenjectResolveException>(
-                delegate { Container.Resolve<TestImpl1>(); });
+                delegate { Resolver.Resolve<TestImpl1>(); });
 
-            Assert.That(Container.ValidateResolve<TestImpl1>().Any());
+            Assert.That(Resolver.ValidateResolve<TestImpl1>().Any());
         }
 
         [Test]
         public void TestMultiBind2Validate()
         {
-            Container.Bind<TestImpl1>().ToSingle();
+            Binder.Bind<TestImpl1>().ToSingle();
 
             Assert.Throws<ZenjectResolveException>(
-                delegate { Container.Resolve<TestImpl1>(); });
+                delegate { Resolver.Resolve<TestImpl1>(); });
 
-            Assert.That(Container.ValidateResolve<Test2>().Any());
+            Assert.That(Resolver.ValidateResolve<Test2>().Any());
         }
 
         [Test]
         public void TestMultiBindListInjection()
         {
-            Container.Bind<Test1>().ToSingle<Test2>();
-            Container.Bind<Test1>().ToSingle<Test3>();
-            Container.Bind<TestImpl2>().ToSingle();
+            Binder.Bind<Test1>().ToSingle<Test2>();
+            Binder.Bind<Test1>().ToSingle<Test3>();
+            Binder.Bind<TestImpl2>().ToSingle();
 
-            Assert.That(Container.ValidateResolve<TestImpl2>().IsEmpty());
-            var test = Container.Resolve<TestImpl2>();
+            Assert.That(Resolver.ValidateResolve<TestImpl2>().IsEmpty());
+            var test = Resolver.Resolve<TestImpl2>();
             Assert.That(test.tests.Count == 2);
         }
     }

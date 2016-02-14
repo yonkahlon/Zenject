@@ -10,26 +10,18 @@ using Zenject.Commands;
 namespace Zenject.Tests
 {
     [TestFixture]
-    public class TestCommandsOneParam
+    public class TestCommandsOneParam : TestWithContainer
     {
-        DiContainer _container;
-
-        [SetUp]
-        public void Setup()
-        {
-            _container = new DiContainer();
-        }
-
         [Test]
         public void TestSingle()
         {
-            _container.Bind<Bar>().ToSingle();
-            _container.Bind<Foo>().ToSingle();
-            _container.BindCommand<DoSomethingCommand, string>()
-                .HandleWithSingle<Bar>(x => x.Execute).WhenInjectedInto<Foo>();
+            Binder.Bind<Bar>().ToSingle();
+            Binder.Bind<Foo>().ToSingle();
+            Binder.BindCommand<DoSomethingCommand, string>()
+                .ToSingle<Bar>(x => x.Execute).WhenInjectedInto<Foo>();
 
-            var bar = _container.Resolve<Bar>();
-            var foo = _container.Resolve<Foo>();
+            var bar = Resolver.Resolve<Bar>();
+            var foo = Resolver.Resolve<Foo>();
 
             Assert.IsNull(bar.ReceivedValue);
             foo.Trigger("asdf");
@@ -37,14 +29,54 @@ namespace Zenject.Tests
         }
 
         [Test]
+        public void TestResolve()
+        {
+            Binder.Bind<Bar>().ToSingle();
+            Binder.Bind<Foo>().ToSingle();
+            Binder.BindCommand<DoSomethingCommand, string>()
+                .ToResolve<Bar>(x => x.Execute).WhenInjectedInto<Foo>();
+
+            var bar = Resolver.Resolve<Bar>();
+            var foo = Resolver.Resolve<Foo>();
+
+            Assert.IsNull(bar.ReceivedValue);
+            foo.Trigger("asdf");
+            Assert.IsEqual(bar.ReceivedValue, "asdf");
+        }
+
+        [Test]
+        public void TestOptionalResolve1()
+        {
+            Binder.Bind<Foo>().ToSingle();
+            Binder.BindCommand<DoSomethingCommand, string>()
+                .ToOptionalResolve<Bar>(x => x.Execute).WhenInjectedInto<Foo>();
+
+            var foo = Resolver.Resolve<Foo>();
+            foo.Trigger("asdf");
+        }
+
+        [Test]
+        public void TestOptionalResolve2()
+        {
+            Binder.Bind<Bar>().ToSingle();
+            Binder.Bind<Foo>().ToSingle();
+            Binder.BindCommand<DoSomethingCommand, string>()
+                .ToOptionalResolve<Bar>(x => x.Execute).WhenInjectedInto<Foo>();
+
+            var foo = Resolver.Resolve<Foo>();
+            foo.Trigger("asdf");
+            Assert.IsEqual(Resolver.Resolve<Bar>().ReceivedValue, "asdf");
+        }
+
+        [Test]
         public void TestTransient()
         {
-            _container.Bind<Foo>().ToSingle();
-            _container.BindCommand<DoSomethingCommand, string>().HandleWithTransient<Bar>(x => x.Execute).WhenInjectedInto<Foo>();
+            Binder.Bind<Foo>().ToSingle();
+            Binder.BindCommand<DoSomethingCommand, string>().ToTransient<Bar>(x => x.Execute).WhenInjectedInto<Foo>();
 
             Bar.Instances.Clear();
 
-            var foo = _container.Resolve<Foo>();
+            var foo = Resolver.Resolve<Foo>();
 
             Assert.IsEqual(Bar.Instances.Count, 0);
             foo.Trigger("asdf");
@@ -59,6 +91,32 @@ namespace Zenject.Tests
             Assert.IsEqual(Bar.Instances.Count, 2);
             Assert.IsEqual(Bar.Instances.Last().ReceivedValue, "zcxv");
             Assert.IsNull(bar1.ReceivedValue);
+        }
+
+        [Test]
+        public void TestNothing()
+        {
+            Binder.Bind<Foo>().ToSingle();
+
+            Binder.BindCommand<DoSomethingCommand, string>().ToNothing();
+
+            var foo = Resolver.Resolve<Foo>();
+            foo.Trigger("asdf");
+        }
+
+        [Test]
+        public void TestMethod()
+        {
+            Binder.Bind<Foo>().ToSingle();
+
+            string receivedValue = null;
+            Binder.BindCommand<DoSomethingCommand, string>().ToMethod((v) => receivedValue = v);
+
+            var foo = Resolver.Resolve<Foo>();
+
+            Assert.IsNull(receivedValue);
+            foo.Trigger("asdf");
+            Assert.IsEqual(receivedValue, "asdf");
         }
 
         public class DoSomethingCommand : Command<string>

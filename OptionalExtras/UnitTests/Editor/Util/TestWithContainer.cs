@@ -22,6 +22,30 @@ namespace Zenject.Tests
             }
         }
 
+        protected IBinder Binder
+        {
+            get
+            {
+                return _container.Binder;
+            }
+        }
+
+        protected IResolver Resolver
+        {
+            get
+            {
+                return _container.Resolver;
+            }
+        }
+
+        protected IInstantiator Instantiator
+        {
+            get
+            {
+                return _container.Instantiator;
+            }
+        }
+
         [SetUp]
         public virtual void Setup()
         {
@@ -29,12 +53,12 @@ namespace Zenject.Tests
             InstallBindings();
 
             Validate();
-            _container.Inject(this);
+            _container.Resolver.Inject(this);
         }
 
         void Validate()
         {
-            var errors = _container.ValidateValidatables().Take(5).ToList();
+            var errors = Resolver.ValidateValidatables().Take(5).ToList();
 
             if (!errors.IsEmpty())
             {

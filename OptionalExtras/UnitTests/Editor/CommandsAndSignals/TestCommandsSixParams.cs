@@ -10,26 +10,34 @@ using Zenject.Commands;
 namespace Zenject.Tests
 {
     [TestFixture]
-    public class TestCommandsSixParam
+    public class TestCommandsSixParams : TestWithContainer
     {
-        DiContainer _container;
-
-        [SetUp]
-        public void Setup()
-        {
-            _container = new DiContainer();
-        }
-
         [Test]
         public void TestSingle()
         {
-            _container.Bind<Bar>().ToSingle();
-            _container.Bind<Foo>().ToSingle();
-            _container.BindCommand<DoSomethingCommand, string, int, float, string, int, float>()
-                .HandleWithSingle<Bar>(x => x.Execute).WhenInjectedInto<Foo>();
+            Binder.Bind<Bar>().ToSingle();
+            Binder.Bind<Foo>().ToSingle();
+            Binder.BindCommand<DoSomethingCommand, string, int, float, string, int, float>()
+                .ToSingle<Bar>(x => x.Execute).WhenInjectedInto<Foo>();
 
-            var bar = _container.Resolve<Bar>();
-            var foo = _container.Resolve<Foo>();
+            var bar = Resolver.Resolve<Bar>();
+            var foo = Resolver.Resolve<Foo>();
+
+            Assert.IsNull(bar.ReceivedValue);
+            foo.Trigger("asdf", 5, 1.2f, "zxcv", 5, 123.0f);
+            Assert.IsEqual(bar.ReceivedValue, "zxcv");
+        }
+
+        [Test]
+        public void TestResolve()
+        {
+            Binder.Bind<Bar>().ToSingle();
+            Binder.Bind<Foo>().ToSingle();
+            Binder.BindCommand<DoSomethingCommand, string, int, float, string, int, float>()
+                .ToResolve<Bar>(x => x.Execute).WhenInjectedInto<Foo>();
+
+            var bar = Resolver.Resolve<Bar>();
+            var foo = Resolver.Resolve<Foo>();
 
             Assert.IsNull(bar.ReceivedValue);
             foo.Trigger("asdf", 5, 1.2f, "zxcv", 5, 123.0f);
@@ -39,12 +47,12 @@ namespace Zenject.Tests
         [Test]
         public void TestTransient()
         {
-            _container.Bind<Foo>().ToSingle();
-            _container.BindCommand<DoSomethingCommand, string, int, float, string, int, float>().HandleWithTransient<Bar>(x => x.Execute).WhenInjectedInto<Foo>();
+            Binder.Bind<Foo>().ToSingle();
+            Binder.BindCommand<DoSomethingCommand, string, int, float, string, int, float>().ToTransient<Bar>(x => x.Execute).WhenInjectedInto<Foo>();
 
             Bar.Instances.Clear();
 
-            var foo = _container.Resolve<Foo>();
+            var foo = Resolver.Resolve<Foo>();
 
             Assert.IsEqual(Bar.Instances.Count, 0);
             foo.Trigger("zxcv", 5, 1.2f, "asdf", 5, 123.0f);
@@ -59,6 +67,32 @@ namespace Zenject.Tests
             Assert.IsEqual(Bar.Instances.Count, 2);
             Assert.IsEqual(Bar.Instances.Last().ReceivedValue, "zxcv");
             Assert.IsNull(bar1.ReceivedValue);
+        }
+
+        [Test]
+        public void TestNothing()
+        {
+            Binder.Bind<Foo>().ToSingle();
+
+            Binder.BindCommand<DoSomethingCommand, string, int, float, string, int, float>().ToNothing();
+
+            var foo = Resolver.Resolve<Foo>();
+            foo.Trigger("asdf", 5, 1.2f, "zxcv", 5, 123.0f);
+        }
+
+        [Test]
+        public void TestMethod()
+        {
+            Binder.Bind<Foo>().ToSingle();
+
+            string receivedValue = null;
+            Binder.BindCommand<DoSomethingCommand, string, int, float, string, int, float>().ToMethod((p1, p2, p3, p4, p5, p6) => receivedValue = p1);
+
+            var foo = Resolver.Resolve<Foo>();
+
+            Assert.IsNull(receivedValue);
+            foo.Trigger("asdf", 5, 1.2f, "zxcv", 5, 123.0f);
+            Assert.IsEqual(receivedValue, "asdf");
         }
 
         public class DoSomethingCommand : Command<string, int, float, string, int, float>

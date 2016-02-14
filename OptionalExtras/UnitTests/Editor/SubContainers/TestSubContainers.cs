@@ -21,15 +21,15 @@ namespace Zenject.Tests
             var subContainer = Container.CreateSubContainer();
             var test1 = new Test0();
 
-            subContainer.Bind<Test0>().ToInstance(test1);
+            subContainer.Binder.Bind<Test0>().ToInstance(test1);
 
-            Assert.That(subContainer.ValidateResolve<Test0>().IsEmpty());
-            Assert.That(ReferenceEquals(test1, subContainer.Resolve<Test0>()));
+            Assert.That(subContainer.Resolver.ValidateResolve<Test0>().IsEmpty());
+            Assert.That(ReferenceEquals(test1, subContainer.Resolver.Resolve<Test0>()));
 
-            Assert.That(Container.ValidateResolve<Test0>().Any());
+            Assert.That(Resolver.ValidateResolve<Test0>().Any());
 
             Assert.Throws<ZenjectResolveException>(
-                delegate { Container.Resolve<Test0>(); });
+                delegate { Resolver.Resolve<Test0>(); });
         }
 
         class Test1
@@ -47,34 +47,34 @@ namespace Zenject.Tests
             var subContainer = Container.CreateSubContainer();
             var test0Local = new Test0();
 
-            subContainer.Bind<Test0>().ToInstance(test0Local);
-            subContainer.Bind<Test1>().ToSingle();
+            subContainer.Binder.Bind<Test0>().ToInstance(test0Local);
+            subContainer.Binder.Bind<Test1>().ToSingle();
 
-            Assert.That(subContainer.ValidateResolve<Test0>().IsEmpty());
-            test0 = subContainer.Resolve<Test0>();
+            Assert.That(subContainer.Resolver.ValidateResolve<Test0>().IsEmpty());
+            test0 = subContainer.Resolver.Resolve<Test0>();
             Assert.IsEqual(test0Local, test0);
 
-            Assert.That(subContainer.ValidateResolve<Test1>().IsEmpty());
-            test1 = subContainer.Resolve<Test1>();
+            Assert.That(subContainer.Resolver.ValidateResolve<Test1>().IsEmpty());
+            test1 = subContainer.Resolver.Resolve<Test1>();
 
-            Assert.That(Container.ValidateResolve<Test0>().Any());
-
-            Assert.Throws<ZenjectResolveException>(
-                delegate { Container.Resolve<Test0>(); });
-
-            Assert.That(Container.ValidateResolve<Test1>().Any());
+            Assert.That(Resolver.ValidateResolve<Test0>().Any());
 
             Assert.Throws<ZenjectResolveException>(
-                delegate { Container.Resolve<Test1>(); });
+                delegate { Resolver.Resolve<Test0>(); });
 
-            Container.Bind<Test0>().ToSingle();
-            Container.Bind<Test1>().ToSingle();
+            Assert.That(Resolver.ValidateResolve<Test1>().Any());
 
-            Assert.That(Container.ValidateResolve<Test0>().IsEmpty());
-            Assert.That(Container.Resolve<Test0>() != test0);
+            Assert.Throws<ZenjectResolveException>(
+                delegate { Resolver.Resolve<Test1>(); });
 
-            Assert.That(Container.ValidateResolve<Test1>().IsEmpty());
-            Assert.That(Container.Resolve<Test1>() != test1);
+            Binder.Bind<Test0>().ToSingle();
+            Binder.Bind<Test1>().ToSingle();
+
+            Assert.That(Resolver.ValidateResolve<Test0>().IsEmpty());
+            Assert.That(Resolver.Resolve<Test0>() != test0);
+
+            Assert.That(Resolver.ValidateResolve<Test1>().IsEmpty());
+            Assert.That(Resolver.Resolve<Test1>() != test1);
         }
 
         interface IFoo
@@ -95,14 +95,14 @@ namespace Zenject.Tests
             IFoo foo1;
 
             var subContainer1 = Container.CreateSubContainer();
-            subContainer1.Bind<IFoo>().ToSingle<Foo>();
-            foo1 = subContainer1.Resolve<IFoo>();
+            subContainer1.Binder.Bind<IFoo>().ToSingle<Foo>();
+            foo1 = subContainer1.Resolver.Resolve<IFoo>();
 
-            Assert.That(!Container.ValidateResolve<IFoo>().IsEmpty());
+            Assert.That(!Resolver.ValidateResolve<IFoo>().IsEmpty());
 
             var subContainer2 = Container.CreateSubContainer();
-            subContainer2.Bind<IFoo>().ToSingle<Foo>();
-            var foo2 = subContainer2.Resolve<IFoo>();
+            subContainer2.Binder.Bind<IFoo>().ToSingle<Foo>();
+            var foo2 = subContainer2.Resolver.Resolve<IFoo>();
 
             Assert.That(foo2 != foo1);
         }

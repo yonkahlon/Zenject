@@ -26,15 +26,15 @@ namespace Zenject.Tests
         [Test]
         public void Run()
         {
-            Container.Bind<Test1>().ToSingle<Test2>();
+            Binder.Bind<Test1>().ToSingle<Test2>();
 
-            Assert.That(Container.ValidateResolve<Test1>().IsEmpty());
-            Assert.That(Container.Resolve<Test1>() is Test2);
+            Assert.That(Resolver.ValidateResolve<Test1>().IsEmpty());
+            Assert.That(Resolver.Resolve<Test1>() is Test2);
 
-            Container.Rebind<Test1>().ToSingle<Test3>();
+            Binder.Rebind<Test1>().ToSingle<Test3>();
 
-            Assert.That(Container.ValidateResolve<Test1>().IsEmpty());
-            Assert.That(Container.Resolve<Test1>() is Test3);
+            Assert.That(Resolver.ValidateResolve<Test1>().IsEmpty());
+            Assert.That(Resolver.Resolve<Test1>() is Test3);
         }
     }
 }

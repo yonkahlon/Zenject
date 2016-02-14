@@ -28,6 +28,22 @@ namespace Zenject
             }
         }
 
+        protected IResolver Resolver
+        {
+            get
+            {
+                return _container;
+            }
+        }
+
+        protected IInstantiator Instantiator
+        {
+            get
+            {
+                return _container;
+            }
+        }
+
         protected abstract Type[] ProvidedTypes
         {
             get;
@@ -82,17 +98,17 @@ namespace Zenject
         {
             foreach (var constructType in _typeMap.Values)
             {
-                foreach (var error in _container.ValidateObjectGraph(constructType, ProvidedTypes))
+                foreach (var error in Resolver.ValidateObjectGraph(constructType, ProvidedTypes))
                 {
                     yield return error;
                 }
             }
         }
 
-        protected static BindingConditionSetter AddBindingInternal<TDerived>(DiContainer container, TKey key)
+        protected static BindingConditionSetter AddBindingInternal<TDerived>(IBinder binder, TKey key)
             where TDerived : TBase
         {
-            return container.Bind<ModestTree.Util.Tuple<TKey, Type>>().ToInstance(ModestTree.Util.Tuple.New(key, typeof(TDerived)));
+            return binder.Bind<ModestTree.Util.Tuple<TKey, Type>>().ToInstance(ModestTree.Util.Tuple.New(key, typeof(TDerived)));
         }
     }
 
@@ -110,7 +126,7 @@ namespace Zenject
         public virtual TBase Create(TKey key)
         {
             var type = GetTypeForKey(key);
-            return (TBase)Container.Instantiate(type);
+            return (TBase)Instantiator.Instantiate(type);
         }
     }
 
@@ -127,7 +143,7 @@ namespace Zenject
 
         public virtual TBase Create(TKey key, TParam1 param1)
         {
-            return (TBase)Container.InstantiateExplicit(
+            return (TBase)Instantiator.InstantiateExplicit(
                 GetTypeForKey(key),
                 new List<TypeValuePair>()
                 {
@@ -149,7 +165,7 @@ namespace Zenject
 
         public virtual TBase Create(TKey key, TParam1 param1, TParam2 param2)
         {
-            return (TBase)Container.InstantiateExplicit(
+            return (TBase)Instantiator.InstantiateExplicit(
                 GetTypeForKey(key),
                 new List<TypeValuePair>()
                 {
@@ -172,7 +188,7 @@ namespace Zenject
 
         public virtual TBase Create(TKey key, TParam1 param1, TParam2 param2, TParam3 param3)
         {
-            return (TBase)Container.InstantiateExplicit(
+            return (TBase)Instantiator.InstantiateExplicit(
                 GetTypeForKey(key),
                 new List<TypeValuePair>()
                 {
@@ -196,7 +212,7 @@ namespace Zenject
 
         public virtual TBase Create(TKey key, TParam1 param1, TParam2 param2, TParam3 param3, TParam4 param4)
         {
-            return (TBase)Container.InstantiateExplicit(
+            return (TBase)Instantiator.InstantiateExplicit(
                 GetTypeForKey(key),
                 new List<TypeValuePair>()
                 {

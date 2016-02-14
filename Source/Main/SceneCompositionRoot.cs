@@ -17,8 +17,8 @@ namespace Zenject
     public class SceneCompositionRoot : CompositionRoot
     {
         public static readonly List<Scene> DecoratedScenes = new List<Scene>();
-        public static Action<DiContainer> BeforeInstallHooks;
-        public static Action<DiContainer> AfterInstallHooks;
+        public static Action<IBinder> BeforeInstallHooks;
+        public static Action<IBinder> AfterInstallHooks;
 
         [Tooltip("When true, inactive objects will not have their members injected")]
         public bool OnlyInjectWhenActive = false;
@@ -77,7 +77,7 @@ namespace Zenject
             InjectObjectsInScene();
 
             Log.Debug("SceneCompositionRoot: Resolving root IFacade...");
-            _rootFacade = _container.Resolve<IFacade>();
+            _rootFacade = _container.Resolver.Resolve<IFacade>();
 
             DecoratedScenes.Clear();
 
@@ -103,14 +103,16 @@ namespace Zenject
         {
             var container = new DiContainer(parentContainer);
 
+            var binder = container.Binder;
+
             container.IsValidating = isValidating;
 
-            container.Bind<CompositionRoot>().ToInstance(this);
-            container.Bind<SceneCompositionRoot>().ToInstance(this);
+            binder.Bind<CompositionRoot>().ToInstance(this);
+            binder.Bind<SceneCompositionRoot>().ToInstance(this);
 
             if (ParentNewObjectsUnderRoot)
             {
-                container.Bind<Transform>(ZenConstants.DefaultParentId)
+                binder.Bind<Transform>(ZenConstants.DefaultParentId)
                     .ToInstance<Transform>(this.transform);
             }
 
@@ -121,7 +123,7 @@ namespace Zenject
                 BeforeInstallHooks = null;
             }
 
-            container.Install<StandardInstaller>();
+            binder.Install<StandardInstaller>();
 
             var allInstallers = extraInstallers.Concat(Installers).ToList();
 
@@ -131,7 +133,7 @@ namespace Zenject
             }
             else
             {
-                container.Install(allInstallers);
+                binder.Install(allInstallers);
             }
 
             if (AfterInstallHooks != null)
@@ -163,7 +165,7 @@ namespace Zenject
 
             foreach (var rootObj in GetSceneRootObjects(this.gameObject.scene))
             {
-                _container.InjectGameObject(rootObj, true, !OnlyInjectWhenActive);
+                _container.Resolver.InjectGameObject(rootObj, true, !OnlyInjectWhenActive);
             }
         }
 

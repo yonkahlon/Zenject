@@ -44,13 +44,13 @@ namespace Zenject
                 if (bindType == ZenjectAutoBinding.BindTypes.ToInstance
                     || bindType == ZenjectAutoBinding.BindTypes.ToInstanceAndInterfaces)
                 {
-                    Container.Bind(component.GetType()).ToInstance(component);
+                    Binder.Bind(component.GetType()).ToInstance(component);
                 }
 
                 if (bindType == ZenjectAutoBinding.BindTypes.ToInterfaces
                     || bindType == ZenjectAutoBinding.BindTypes.ToInstanceAndInterfaces)
                 {
-                    Container.BindAllInterfacesToInstance(component);
+                    Binder.BindAllInterfacesToInstance(component);
                 }
             }
         }

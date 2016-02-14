@@ -9,11 +9,11 @@ namespace ModestTree
         [InstallerTest]
         public void Test1()
         {
-            Container.Bind<Foo>().ToTransientGameObject();
-            Container.Bind<Foo>().ToTransientGameObject();
-            Container.Bind<Bar>().ToTransientGameObject();
+            Binder.Bind<Foo>().ToTransientGameObject();
+            Binder.Bind<Foo>().ToTransientGameObject();
+            Binder.Bind<Bar>().ToTransientGameObject();
 
-            Container.BindAllInterfacesToSingle<Runner>();
+            Binder.BindAllInterfacesToSingle<Runner>();
         }
 
         public class Runner : IInitializable

@@ -11,29 +11,29 @@ namespace Zenject
     public class FactoryUntyped<TContract, TConcrete> : IFactoryUntyped<TContract> where TConcrete : TContract
     {
         [Inject]
-        DiContainer _container;
+        IInstantiator _instantiator;
 
-        // So it can be created without using container
-        public DiContainer Container
+        // So it can be created without using instantiator
+        public IInstantiator Instantiator
         {
             get
             {
-                return _container;
+                return _instantiator;
             }
             set
             {
-                _container = value;
+                _instantiator = value;
             }
         }
 
         public virtual TContract Create(params object[] constructorArgs)
         {
-            return _container.Instantiate<TConcrete>(constructorArgs);
+            return _instantiator.Instantiate<TConcrete>(constructorArgs);
         }
 
         public IEnumerable<ZenjectResolveException> Validate(params Type[] extras)
         {
-            return _container.ValidateObjectGraph<TConcrete>(extras);
+            return _instantiator.Resolver.ValidateObjectGraph<TConcrete>(extras);
         }
     }
 
@@ -42,21 +42,21 @@ namespace Zenject
     public class FactoryUntyped<TContract> : IFactoryUntyped<TContract>
     {
         [Inject]
-        DiContainer _container;
+        IInstantiator _instantiator;
 
         [InjectOptional]
         Type _concreteType;
 
         // So it can be created without using container
-        public DiContainer Container
+        public IInstantiator Instantiator
         {
             get
             {
-                return _container;
+                return _instantiator;
             }
             set
             {
-                _container = value;
+                _instantiator = value;
             }
         }
 
@@ -89,12 +89,12 @@ namespace Zenject
 
         public virtual TContract Create(params object[] constructorArgs)
         {
-            return (TContract)_container.Instantiate(_concreteType, constructorArgs);
+            return (TContract)_instantiator.Instantiate(_concreteType, constructorArgs);
         }
 
         public IEnumerable<ZenjectResolveException> Validate(params Type[] extras)
         {
-            return _container.ValidateObjectGraph(_concreteType, extras);
+            return _instantiator.Resolver.ValidateObjectGraph(_concreteType, extras);
         }
     }
 }

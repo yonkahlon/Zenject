@@ -76,7 +76,7 @@ namespace Zenject
                 _instance = GameObject.AddComponent(ComponentType);
                 Assert.That(_instance != null);
 
-                _container.Inject(_instance, new object[0], true, context);
+                _container.Resolver.Inject(_instance, new object[0], true, context);
             }
 
             return _instance;
@@ -84,7 +84,7 @@ namespace Zenject
 
         public IEnumerable<ZenjectResolveException> ValidateBinding(InjectContext context)
         {
-            return _container.ValidateObjectGraph(ComponentType, context);
+            return _container.Resolver.ValidateObjectGraph(ComponentType, context);
         }
     }
 }

@@ -15,7 +15,7 @@ namespace ModestTree
 
     public abstract class MonoInstallerTestFixture : MonoBehaviour
     {
-        protected DiContainer Container
+        protected IBinder Binder
         {
             get;
             private set;
@@ -39,7 +39,7 @@ namespace ModestTree
                 var wrapper = new InstallerWrapper();
                 wrapper.InstallCallback = () =>
                 {
-                    Container = wrapper.GetContainer();
+                    Binder = wrapper.GetBinder();
                     method.Invoke(this, new object[0]);
                 };
 
@@ -85,9 +85,9 @@ namespace ModestTree
         {
             public Action InstallCallback;
 
-            public DiContainer GetContainer()
+            public IBinder GetBinder()
             {
-                return Container;
+                return Binder;
             }
 
             public override void InstallBindings()

@@ -21,7 +21,7 @@ namespace Zenject
             Assert.That(prefab != null,
                "Null prefab given to factory create method when instantiating object with type '{0}'.", typeof(T));
 
-            return _container.InstantiatePrefabForComponent<T>(prefab);
+            return _container.Instantiator.InstantiatePrefabForComponent<T>(prefab);
         }
 
         public virtual T Create(string prefabResourceName)
@@ -34,7 +34,7 @@ namespace Zenject
 
         public System.Collections.Generic.IEnumerable<ZenjectResolveException> Validate()
         {
-            return _container.ValidateObjectGraph<T>();
+            return _container.Resolver.ValidateObjectGraph<T>();
         }
     }
 
@@ -50,7 +50,7 @@ namespace Zenject
             Assert.That(prefab != null,
                "Null prefab given to factory create method when instantiating object with type '{0}'.", typeof(T));
 
-            return _container.InstantiatePrefabForComponent<T>(prefab, param);
+            return _container.Instantiator.InstantiatePrefabForComponent<T>(prefab, param);
         }
 
         public virtual T Create(string prefabResourceName, P1 param)
@@ -63,7 +63,7 @@ namespace Zenject
 
         public System.Collections.Generic.IEnumerable<ZenjectResolveException> Validate()
         {
-            return _container.ValidateObjectGraph<T>(typeof(P1));
+            return _container.Resolver.ValidateObjectGraph<T>(typeof(P1));
         }
     }
 
@@ -79,7 +79,7 @@ namespace Zenject
             Assert.That(prefab != null,
                "Null prefab given to factory create method when instantiating object with type '{0}'.", typeof(T));
 
-            return _container.InstantiatePrefabForComponent<T>(prefab, param, param2);
+            return _container.Instantiator.InstantiatePrefabForComponent<T>(prefab, param, param2);
         }
 
         public virtual T Create(string prefabResourceName, P1 param, P2 param2)
@@ -92,7 +92,7 @@ namespace Zenject
 
         public System.Collections.Generic.IEnumerable<ZenjectResolveException> Validate()
         {
-            return _container.ValidateObjectGraph<T>(typeof(P1), typeof(P2));
+            return _container.Resolver.ValidateObjectGraph<T>(typeof(P1), typeof(P2));
         }
     }
 
@@ -108,7 +108,7 @@ namespace Zenject
             Assert.That(prefab != null,
                "Null prefab given to factory create method when instantiating object with type '{0}'.", typeof(T));
 
-            return _container.InstantiatePrefabForComponent<T>(prefab, param, param2, param3);
+            return _container.Instantiator.InstantiatePrefabForComponent<T>(prefab, param, param2, param3);
         }
 
         public virtual T Create(string prefabResourceName, P1 param, P2 param2, P3 param3)
@@ -121,7 +121,7 @@ namespace Zenject
 
         public System.Collections.Generic.IEnumerable<ZenjectResolveException> Validate()
         {
-            return _container.ValidateObjectGraph<T>(typeof(P1), typeof(P2), typeof(P3));
+            return _container.Resolver.ValidateObjectGraph<T>(typeof(P1), typeof(P2), typeof(P3));
         }
     }
 
@@ -137,7 +137,7 @@ namespace Zenject
             Assert.That(prefab != null,
                "Null prefab given to factory create method when instantiating object with type '{0}'.", typeof(T));
 
-            return _container.InstantiatePrefabForComponent<T>(prefab, param, param2, param3, param4);
+            return _container.Instantiator.InstantiatePrefabForComponent<T>(prefab, param, param2, param3, param4);
         }
 
         public virtual T Create(string prefabResourceName, P1 param, P2 param2, P3 param3, P4 param4)
@@ -150,7 +150,7 @@ namespace Zenject
 
         public System.Collections.Generic.IEnumerable<ZenjectResolveException> Validate()
         {
-            return _container.ValidateObjectGraph<T>(typeof(P1), typeof(P2), typeof(P3), typeof(P4));
+            return _container.Resolver.ValidateObjectGraph<T>(typeof(P1), typeof(P2), typeof(P3), typeof(P4));
         }
     }
 }

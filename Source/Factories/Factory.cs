@@ -30,9 +30,17 @@ namespace Zenject
             }
         }
 
+        protected IInstantiator Instantiator
+        {
+            get
+            {
+                return _container;
+            }
+        }
+
         public virtual T Create()
         {
-            return _container.Instantiate<T>();
+            return Instantiator.Instantiate<T>();
         }
     }
 
@@ -61,9 +69,17 @@ namespace Zenject
             }
         }
 
+        protected IInstantiator Instantiator
+        {
+            get
+            {
+                return _container;
+            }
+        }
+
         public virtual TValue Create(TParam1 param)
         {
-            return _container.InstantiateExplicit<TValue>(
+            return Instantiator.InstantiateExplicit<TValue>(
                 new List<TypeValuePair>()
                 {
                     InstantiateUtil.CreateTypePair(param),
@@ -96,9 +112,17 @@ namespace Zenject
             }
         }
 
+        protected IInstantiator Instantiator
+        {
+            get
+            {
+                return _container;
+            }
+        }
+
         public virtual TValue Create(TParam1 param1, TParam2 param2)
         {
-            return _container.InstantiateExplicit<TValue>(
+            return Instantiator.InstantiateExplicit<TValue>(
                 new List<TypeValuePair>()
                 {
                     InstantiateUtil.CreateTypePair(param1),
@@ -132,9 +156,17 @@ namespace Zenject
             }
         }
 
+        protected IInstantiator Instantiator
+        {
+            get
+            {
+                return _container;
+            }
+        }
+
         public virtual TValue Create(TParam1 param1, TParam2 param2, TParam3 param3)
         {
-            return _container.InstantiateExplicit<TValue>(
+            return Instantiator.InstantiateExplicit<TValue>(
                 new List<TypeValuePair>()
                 {
                     InstantiateUtil.CreateTypePair(param1),
@@ -170,10 +202,18 @@ namespace Zenject
             }
         }
 
+        protected IInstantiator Instantiator
+        {
+            get
+            {
+                return _container;
+            }
+        }
+
         public virtual TValue Create(
             TParam1 param1, TParam2 param2, TParam3 param3, TParam4 param4)
         {
-            return _container.InstantiateExplicit<TValue>(
+            return Instantiator.InstantiateExplicit<TValue>(
                 new List<TypeValuePair>()
                 {
                     InstantiateUtil.CreateTypePair(param1),
@@ -210,10 +250,18 @@ namespace Zenject
             }
         }
 
+        protected IInstantiator Instantiator
+        {
+            get
+            {
+                return _container;
+            }
+        }
+
         public virtual TValue Create(
             TParam1 param1, TParam2 param2, TParam3 param3, TParam4 param4, TParam5 param5)
         {
-            return _container.InstantiateExplicit<TValue>(
+            return Instantiator.InstantiateExplicit<TValue>(
                 new List<TypeValuePair>()
                 {
                     InstantiateUtil.CreateTypePair(param1),
@@ -251,10 +299,18 @@ namespace Zenject
             }
         }
 
+        protected IInstantiator Instantiator
+        {
+            get
+            {
+                return _container;
+            }
+        }
+
         public virtual TValue Create(
             TParam1 param1, TParam2 param2, TParam3 param3, TParam4 param4, TParam5 param5, TParam6 param6)
         {
-            return _container.InstantiateExplicit<TValue>(
+            return Instantiator.InstantiateExplicit<TValue>(
                 new List<TypeValuePair>()
                 {
                     InstantiateUtil.CreateTypePair(param1),
@@ -293,10 +349,18 @@ namespace Zenject
             }
         }
 
+        protected IInstantiator Instantiator
+        {
+            get
+            {
+                return _container;
+            }
+        }
+
         public virtual TValue Create(
             TParam1 param1, TParam2 param2, TParam3 param3, TParam4 param4, TParam5 param5, TParam6 param6, TParam7 param7)
         {
-            return _container.InstantiateExplicit<TValue>(
+            return Instantiator.InstantiateExplicit<TValue>(
                 new List<TypeValuePair>()
                 {
                     InstantiateUtil.CreateTypePair(param1),
@@ -336,10 +400,18 @@ namespace Zenject
             }
         }
 
+        protected IInstantiator Instantiator
+        {
+            get
+            {
+                return _container;
+            }
+        }
+
         public virtual TValue Create(
             TParam1 param1, TParam2 param2, TParam3 param3, TParam4 param4, TParam5 param5, TParam6 param6, TParam7 param7, TParam8 param8)
         {
-            return _container.InstantiateExplicit<TValue>(
+            return Instantiator.InstantiateExplicit<TValue>(
                 new List<TypeValuePair>()
                 {
                     InstantiateUtil.CreateTypePair(param1),
@@ -380,10 +452,18 @@ namespace Zenject
             }
         }
 
+        protected IInstantiator Instantiator
+        {
+            get
+            {
+                return _container;
+            }
+        }
+
         public virtual TValue Create(
             TParam1 param1, TParam2 param2, TParam3 param3, TParam4 param4, TParam5 param5, TParam6 param6, TParam7 param7, TParam8 param8, TParam9 param9)
         {
-            return _container.InstantiateExplicit<TValue>(
+            return Instantiator.InstantiateExplicit<TValue>(
                 new List<TypeValuePair>()
                 {
                     InstantiateUtil.CreateTypePair(param1),
@@ -425,10 +505,18 @@ namespace Zenject
             }
         }
 
+        protected IInstantiator Instantiator
+        {
+            get
+            {
+                return _container;
+            }
+        }
+
         public virtual TValue Create(
             TParam1 param1, TParam2 param2, TParam3 param3, TParam4 param4, TParam5 param5, TParam6 param6, TParam7 param7, TParam8 param8, TParam9 param9, TParam10 param10)
         {
-            return _container.InstantiateExplicit<TValue>(
+            return Instantiator.InstantiateExplicit<TValue>(
                 new List<TypeValuePair>()
                 {
                     InstantiateUtil.CreateTypePair(param1),

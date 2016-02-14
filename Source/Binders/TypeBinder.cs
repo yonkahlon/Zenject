@@ -22,7 +22,7 @@ namespace Zenject
             if (ContractType.DerivesFrom(typeof(Component)))
             {
                 throw new ZenjectBindException(
-                    "Should not use ToTransient for Monobehaviours (when binding type '{0}'), you probably want either ToLookup or ToTransientFromPrefab"
+                    "Should not use ToTransient for Monobehaviours (when binding type '{0}'), you probably want either ToResolve or ToTransientFromPrefab"
                     .Fmt(ContractType.Name()));
             }
 #endif
@@ -36,7 +36,7 @@ namespace Zenject
             if (concreteType.DerivesFrom(typeof(Component)))
             {
                 throw new ZenjectBindException(
-                    "Should not use ToTransient for Monobehaviours (when binding type '{0}'), you probably want either ToLookup or ToTransientFromPrefab"
+                    "Should not use ToTransient for Monobehaviours (when binding type '{0}'), you probably want either ToResolve or ToTransientFromPrefab"
                     .Fmt(concreteType.Name()));
             }
 #endif
@@ -55,7 +55,7 @@ namespace Zenject
             if (ContractType.DerivesFrom(typeof(Component)))
             {
                 throw new ZenjectBindException(
-                    "Should not use ToSingle for Monobehaviours (when binding type '{0}'), you probably want either ToLookup or ToSinglePrefab or ToSingleGameObject"
+                    "Should not use ToSingle for Monobehaviours (when binding type '{0}'), you probably want either ToResolve or ToSinglePrefab or ToSingleGameObject"
                     .Fmt(ContractType.Name()));
             }
 #endif
@@ -91,7 +91,7 @@ namespace Zenject
             if (concreteType.DerivesFrom(typeof(Component)))
             {
                 throw new ZenjectBindException(
-                    "Should not use ToSingle for Monobehaviours (when binding type '{0}' to '{1}'), you probably want either ToLookup or ToSinglePrefab or ToSinglePrefabResource or ToSingleGameObject"
+                    "Should not use ToSingle for Monobehaviours (when binding type '{0}' to '{1}'), you probably want either ToResolve or ToSinglePrefab or ToSinglePrefabResource or ToSingleGameObject"
                     .Fmt(ContractType.Name(), concreteType.Name()));
             }
 #endif
@@ -288,9 +288,9 @@ namespace Zenject
             return ToProvider(new MethodProvider<T>(method, Container));
         }
 
-        protected BindingConditionSetter ToLookupBase<TConcrete>(string identifier)
+        protected BindingConditionSetter ToResolveBase<TConcrete>(string identifier)
         {
-            return ToMethodBase<TConcrete>((ctx) => ctx.Container.Resolve<TConcrete>(
+            return ToMethodBase<TConcrete>((ctx) => ctx.Resolver.Resolve<TConcrete>(
                 new InjectContext(
                     ctx.Container, typeof(TConcrete), identifier,
                     false, ctx.ObjectType, ctx.ObjectInstance, ctx.MemberName, ctx, null, ctx.FallBackValue, ctx.SourceType)));
@@ -298,7 +298,7 @@ namespace Zenject
 
         protected BindingConditionSetter ToGetterBase<TObj, TResult>(string identifier, Func<TObj, TResult> method)
         {
-            return ToMethodBase((ctx) => method(ctx.Container.Resolve<TObj>(
+            return ToMethodBase((ctx) => method(ctx.Resolver.Resolve<TObj>(
                 new InjectContext(
                     ctx.Container, typeof(TObj), identifier,
                     false, ctx.ObjectType, ctx.ObjectInstance, ctx.MemberName, ctx, null, ctx.FallBackValue, ctx.SourceType))));

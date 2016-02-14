@@ -24,28 +24,28 @@ namespace Zenject.Tests
         {
             var foo = new Foo();
 
-            Container.Bind<Foo>().ToSingleInstance(foo);
-            Container.Bind<IFoo>().ToSingleInstance(foo);
+            Binder.Bind<Foo>().ToSingleInstance(foo);
+            Binder.Bind<IFoo>().ToSingleInstance(foo);
 
-            Assert.ReferenceEquals(Container.Resolve<IFoo>(), foo);
-            Assert.ReferenceEquals(Container.Resolve<Foo>(), foo);
-            Assert.ReferenceEquals(Container.Resolve<IFoo>(), Container.Resolve<Foo>());
+            Assert.ReferenceEquals(Resolver.Resolve<IFoo>(), foo);
+            Assert.ReferenceEquals(Resolver.Resolve<Foo>(), foo);
+            Assert.ReferenceEquals(Resolver.Resolve<IFoo>(), Container.Resolver.Resolve<Foo>());
         }
 
         [Test]
         [ExpectedException(typeof(ZenjectBindException))]
         public void TestCaseDuplicates()
         {
-            Container.Bind<Foo>().ToSingleInstance(new Foo());
-            Container.Bind<Foo>().ToSingleInstance(new Foo());
+            Binder.Bind<Foo>().ToSingleInstance(new Foo());
+            Binder.Bind<Foo>().ToSingleInstance(new Foo());
         }
 
         [Test]
         [ExpectedException(typeof(ZenjectBindException))]
         public void TestCaseDuplicatesUntyped()
         {
-            Container.Bind(typeof(Foo)).ToSingleInstance(new Foo());
-            Container.Bind(typeof(Foo)).ToSingleInstance(new Foo());
+            Binder.Bind(typeof(Foo)).ToSingleInstance(new Foo());
+            Binder.Bind(typeof(Foo)).ToSingleInstance(new Foo());
         }
     }
 }

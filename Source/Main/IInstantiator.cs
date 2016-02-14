@@ -18,11 +18,32 @@ namespace Zenject
         // This is used instead of Instantiate to support specifying null values
         T InstantiateExplicit<T>(List<TypeValuePair> extraArgMap);
 
+        T InstantiateExplicit<T>(
+            List<TypeValuePair> extraArgMap, InjectContext context);
+
+        object InstantiateExplicit(
+            Type concreteType, List<TypeValuePair> extraArgMap, InjectContext context);
+
         object InstantiateExplicit(Type concreteType, List<TypeValuePair> extraArgMap);
 
         // For most cases you can pass in currentContext and concreteIdentifier as null
         object InstantiateExplicit(
             Type concreteType, List<TypeValuePair> extraArgMap, InjectContext currentContext, string concreteIdentifier, bool autoInject);
+
+        DiContainer Container
+        {
+            get;
+        }
+
+        IBinder Binder
+        {
+            get;
+        }
+
+        IResolver Resolver
+        {
+            get;
+        }
 
 #if !ZEN_NOT_UNITY3D
 
@@ -122,6 +143,9 @@ namespace Zenject
 
         object InstantiatePrefabResourceForComponentExplicit(
             Type concreteType, string resourcePath, List<TypeValuePair> extraArgMap);
+
+        object InstantiatePrefabResourceForComponentExplicit(
+            Type componentType, string resourcePath, List<TypeValuePair> extraArgs, InjectContext currentContext);
 
         /////////////// InstantiateComponentOnNewGameObject
         // Create a new game object, and add the given component to it, and fill in dependencies

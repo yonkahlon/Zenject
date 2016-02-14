@@ -24,17 +24,17 @@ namespace Zenject.Tests
         {
             var foo = new Foo();
 
-            Container.Bind(typeof(Foo)).ToSingleMethod((container) => foo);
+            Binder.Bind(typeof(Foo)).ToSingleMethod((container) => foo);
 
-            Assert.That(ReferenceEquals(Container.Resolve<Foo>(), foo));
+            Assert.That(ReferenceEquals(Resolver.Resolve<Foo>(), foo));
         }
 
         [Test]
         [ExpectedException(typeof(ZenjectBindException))]
         public void TestDuplicates()
         {
-            Container.Bind<Foo>().ToSingleMethod((container) => new Foo());
-            Container.Bind<IFoo>().ToSingleMethod<Foo>((container) => new Foo());
+            Binder.Bind<Foo>().ToSingleMethod((container) => new Foo());
+            Binder.Bind<IFoo>().ToSingleMethod<Foo>((container) => new Foo());
         }
 
         [Test]
@@ -42,19 +42,19 @@ namespace Zenject.Tests
         {
             Func<InjectContext, Foo> method = (ctx) => new Foo();
 
-            Container.Bind<Foo>().ToSingleMethod(method);
-            Container.Bind<IFoo>().ToSingleMethod(method);
+            Binder.Bind<Foo>().ToSingleMethod(method);
+            Binder.Bind<IFoo>().ToSingleMethod(method);
 
-            Assert.ReferenceEquals(Container.Resolve<Foo>(), Container.Resolve<IFoo>());
+            Assert.ReferenceEquals(Resolver.Resolve<Foo>(), Container.Resolver.Resolve<IFoo>());
         }
 
         [Test]
         public void TestDuplicates3()
         {
-            Container.Bind<Foo>().ToSingleMethod<Foo>(CreateFoo);
-            Container.Bind<IFoo>().ToSingleMethod<Foo>(CreateFoo);
+            Binder.Bind<Foo>().ToSingleMethod<Foo>(CreateFoo);
+            Binder.Bind<IFoo>().ToSingleMethod<Foo>(CreateFoo);
 
-            Assert.ReferenceEquals(Container.Resolve<Foo>(), Container.Resolve<IFoo>());
+            Assert.ReferenceEquals(Resolver.Resolve<Foo>(), Container.Resolver.Resolve<IFoo>());
         }
 
         Foo CreateFoo(InjectContext ctx)

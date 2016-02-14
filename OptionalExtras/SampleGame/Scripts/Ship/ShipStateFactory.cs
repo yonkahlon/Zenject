@@ -9,11 +9,11 @@ namespace Asteroids
 {
     public class ShipStateFactory
     {
-        DiContainer _container;
+        IInstantiator _instantiator;
 
-        public ShipStateFactory(DiContainer container)
+        public ShipStateFactory(IInstantiator container)
         {
-            _container = container;
+            _instantiator = container;
         }
 
         public ShipState Create(ShipStates state, params object[] constructorArgs)
@@ -21,13 +21,13 @@ namespace Asteroids
             switch (state)
             {
                 case ShipStates.Dead:
-                    return _container.Instantiate<ShipStateDead>(constructorArgs);
+                    return _instantiator.Instantiate<ShipStateDead>(constructorArgs);
 
                 case ShipStates.Moving:
-                    return _container.Instantiate<ShipStateMoving>(constructorArgs);
+                    return _instantiator.Instantiate<ShipStateMoving>(constructorArgs);
 
                 case ShipStates.WaitingToStart:
-                    return _container.Instantiate<ShipStateWaitingToStart>(constructorArgs);
+                    return _instantiator.Instantiate<ShipStateWaitingToStart>(constructorArgs);
             }
 
             Assert.That(false);

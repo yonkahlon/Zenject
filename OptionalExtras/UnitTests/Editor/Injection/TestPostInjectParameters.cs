@@ -49,16 +49,16 @@ namespace Zenject.Tests
         [Test]
         public void Test()
         {
-            Container.Bind<Test1>().ToSingle();
-            Container.Bind<Test3>().ToSingle();
+            Binder.Bind<Test1>().ToSingle();
+            Binder.Bind<Test3>().ToSingle();
 
-            Assert.That(!Container.ValidateResolve<Test3>().IsEmpty());
+            Assert.That(!Resolver.ValidateResolve<Test3>().IsEmpty());
 
-            Container.Bind<Test0>().ToSingle();
+            Binder.Bind<Test0>().ToSingle();
 
-            Assert.That(Container.ValidateResolve<Test3>().IsEmpty());
+            Assert.That(Resolver.ValidateResolve<Test3>().IsEmpty());
 
-            var test3 = Container.Resolve<Test3>();
+            var test3 = Resolver.Resolve<Test3>();
 
             Assert.That(test3.HasInitialized);
             Assert.IsNotNull(test3.test0);

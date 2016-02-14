@@ -26,41 +26,41 @@ namespace Zenject.Tests
         [Test]
         public void TestSameIdsSameInstance()
         {
-            Container.Bind<IBar>().ToSingle<Foo0>("foo");
-            Container.Bind<IFoo>().ToSingle<Foo0>("foo");
-            Container.Bind<Foo0>().ToSingle("foo");
+            Binder.Bind<IBar>().ToSingle<Foo0>("foo");
+            Binder.Bind<IFoo>().ToSingle<Foo0>("foo");
+            Binder.Bind<Foo0>().ToSingle("foo");
 
-            Assert.IsEqual(Container.Resolve<Foo0>(), Container.Resolve<IFoo>());
-            Assert.IsEqual(Container.Resolve<Foo0>(), Container.Resolve<IBar>());
+            Assert.IsEqual(Resolver.Resolve<Foo0>(), Container.Resolver.Resolve<IFoo>());
+            Assert.IsEqual(Resolver.Resolve<Foo0>(), Container.Resolver.Resolve<IBar>());
         }
 
         [Test]
         public void TestDifferentIdsDifferentInstances()
         {
-            Container.Bind<IFoo>().ToSingle<Foo0>("foo");
-            Container.Bind<Foo0>().ToSingle("bar");
+            Binder.Bind<IFoo>().ToSingle<Foo0>("foo");
+            Binder.Bind<Foo0>().ToSingle("bar");
 
-            Assert.IsNotEqual(Container.Resolve<Foo0>(), Container.Resolve<IFoo>());
+            Assert.IsNotEqual(Resolver.Resolve<Foo0>(), Container.Resolver.Resolve<IFoo>());
         }
 
         [Test]
         public void TestNoIdDifferentInstances()
         {
-            Container.Bind<IFoo>().ToSingle<Foo0>();
-            Container.Bind<Foo0>().ToSingle("bar");
+            Binder.Bind<IFoo>().ToSingle<Foo0>();
+            Binder.Bind<Foo0>().ToSingle("bar");
 
-            Assert.IsNotEqual(Container.Resolve<Foo0>(), Container.Resolve<IFoo>());
+            Assert.IsNotEqual(Resolver.Resolve<Foo0>(), Container.Resolver.Resolve<IFoo>());
         }
 
         [Test]
         public void TestManyInstances()
         {
-            Container.Bind<IFoo>().ToSingle<Foo0>("foo1");
-            Container.Bind<IFoo>().ToSingle<Foo0>("foo2");
-            Container.Bind<IFoo>().ToSingle<Foo0>("foo3");
-            Container.Bind<IFoo>().ToSingle<Foo0>("foo4");
+            Binder.Bind<IFoo>().ToSingle<Foo0>("foo1");
+            Binder.Bind<IFoo>().ToSingle<Foo0>("foo2");
+            Binder.Bind<IFoo>().ToSingle<Foo0>("foo3");
+            Binder.Bind<IFoo>().ToSingle<Foo0>("foo4");
 
-            Assert.IsEqual(Container.ResolveAll<IFoo>().Count, 4);
+            Assert.IsEqual(Resolver.ResolveAll<IFoo>().Count, 4);
         }
     }
 }

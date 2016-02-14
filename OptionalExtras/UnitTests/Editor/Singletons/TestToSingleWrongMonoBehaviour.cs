@@ -12,13 +12,13 @@ namespace Zenject.Tests
         [ExpectedException]
         public void TestCase1()
         {
-            Container.Bind<Foo>().ToSingle();
+            Binder.Bind<Foo>().ToSingle();
         }
 
         [ExpectedException]
         public void TestCase2()
         {
-            Container.Bind<Bar>().ToSingleGameObject();
+            Binder.Bind<Bar>().ToSingleGameObject();
         }
 
         public class Foo : MonoBehaviour

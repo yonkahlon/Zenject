@@ -29,14 +29,14 @@ namespace Zenject.Tests
             var foo1 = new Foo();
             var foo2 = new Foo();
 
-            Container.Bind<Bar>("Bar1").ToTransient();
-            Container.Bind<Bar>("Bar2").ToTransient();
+            Binder.Bind<Bar>("Bar1").ToTransient();
+            Binder.Bind<Bar>("Bar2").ToTransient();
 
-            Container.BindInstance(foo1).When(c => c.ParentContexts.Where(x => x.MemberType == typeof(Bar) && x.Identifier == "Bar1").Any());
-            Container.BindInstance(foo2).When(c => c.ParentContexts.Where(x => x.MemberType == typeof(Bar) && x.Identifier == "Bar2").Any());
+            Binder.BindInstance(foo1).When(c => c.ParentContexts.Where(x => x.MemberType == typeof(Bar) && x.Identifier == "Bar1").Any());
+            Binder.BindInstance(foo2).When(c => c.ParentContexts.Where(x => x.MemberType == typeof(Bar) && x.Identifier == "Bar2").Any());
 
-            Assert.IsEqual(Container.Resolve<Bar>("Bar1").Foo, foo1);
-            Assert.IsEqual(Container.Resolve<Bar>("Bar2").Foo, foo2);
+            Assert.IsEqual(Resolver.Resolve<Bar>("Bar1").Foo, foo1);
+            Assert.IsEqual(Resolver.Resolve<Bar>("Bar2").Foo, foo2);
         }
     }
 }

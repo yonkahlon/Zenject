@@ -9,21 +9,13 @@ using Assert=ModestTree.Assert;
 namespace Zenject.Tests
 {
     [TestFixture]
-    public class TestDiContainer
+    public class TestDiContainer : TestWithContainer
     {
-        DiContainer _container;
-
-        [SetUp]
-        public void Setup()
-        {
-            _container = new DiContainer();
-        }
-
         [Test]
         public void TestSimple()
         {
-            _container.Bind<IFoo>().ToSingle<Foo>();
-            _container.Bind<Bar>().ToSingle();
+            Binder.Bind<IFoo>().ToSingle<Foo>();
+            Binder.Bind<Bar>().ToSingle();
 
             AssertHasContracts(
                 new List<Type>() { typeof(Bar), typeof(IFoo) });
@@ -34,7 +26,7 @@ namespace Zenject.Tests
 
         void AssertHasConcreteTypes(IEnumerable<Type> expectedValues)
         {
-            var concreteList = _container.AllConcreteTypes.ToList();
+            var concreteList = Container.AllConcreteTypes.ToList();
             var expectedList = GetStandardConcreteTypeInclusions().Concat(expectedValues).ToList();
 
             Assert.That(
@@ -45,7 +37,7 @@ namespace Zenject.Tests
 
         void AssertHasContracts(IEnumerable<Type> expectedValues)
         {
-            var contractList = _container.AllContracts.Select(x => x.Type).ToList();
+            var contractList = Container.AllContracts.Select(x => x.Type).ToList();
             var expectedList = GetStandardContractTypeInclusions().Concat(expectedValues).ToList();
 
             Assert.That(
@@ -58,7 +50,7 @@ namespace Zenject.Tests
         {
             return new List<Type>()
             {
-                typeof(IInstantiator), typeof(DiContainer), 
+                typeof(IInstantiator), typeof(DiContainer), typeof(IBinder), typeof(IResolver),
             };
         }
 
@@ -66,18 +58,18 @@ namespace Zenject.Tests
         {
             return new List<Type>()
             {
-                typeof(DiContainer), 
+                typeof(DiContainer),
             };
         }
 
         [Test]
         public void TestComplex()
         {
-            _container.Bind<IFoo>().ToSingle<Foo>();
-            _container.Bind<IFoo>().ToSingle<Foo2>();
+            Binder.Bind<IFoo>().ToSingle<Foo>();
+            Binder.Bind<IFoo>().ToSingle<Foo2>();
 
-            _container.Bind<Bar>().ToInstance(new Bar());
-            _container.Bind<Bar>().ToInstance(new Bar());
+            Binder.Bind<Bar>().ToInstance(new Bar());
+            Binder.Bind<Bar>().ToInstance(new Bar());
 
             AssertHasContracts(
                 new List<Type>() { typeof(Bar), typeof(IFoo) });

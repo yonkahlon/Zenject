@@ -5,7 +5,7 @@ using Assert=ModestTree.Assert;
 namespace Zenject.Tests
 {
     [TestFixture]
-    public class TestFacades
+    public class TestFacades : TestWithContainer
     {
         public class FooFacade : Facade
         {
@@ -51,10 +51,9 @@ namespace Zenject.Tests
             MyInit.HasInitialized = false;
             MyDispose.HasDisposed = false;
 
-            var container = new DiContainer();
-            container.BindFacadeFactory<FooFacade, FooFacade.Factory>(FacadeInstaller);
+            Binder.BindFacadeFactory<FooFacade, FooFacade.Factory>(FacadeInstaller);
 
-            var facadeFactory = container.Resolve<FooFacade.Factory>();
+            var facadeFactory = Resolver.Resolve<FooFacade.Factory>();
 
             Assert.That(!MyInit.HasInitialized);
             var facade = facadeFactory.Create();
@@ -69,11 +68,11 @@ namespace Zenject.Tests
             Assert.That(MyDispose.HasDisposed);
         }
 
-        void FacadeInstaller(DiContainer subContainer)
+        void FacadeInstaller(IBinder binder)
         {
-            subContainer.Bind<IDisposable>().ToSingle<MyDispose>();
-            subContainer.Bind<IInitializable>().ToSingle<MyInit>();
-            subContainer.Bind<ITickable>().ToSingle<MyTickable>();
+            binder.Bind<IDisposable>().ToSingle<MyDispose>();
+            binder.Bind<IInitializable>().ToSingle<MyInit>();
+            binder.Bind<ITickable>().ToSingle<MyTickable>();
         }
     }
 }

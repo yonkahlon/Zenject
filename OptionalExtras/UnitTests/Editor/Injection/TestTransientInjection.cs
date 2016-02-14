@@ -17,12 +17,12 @@ namespace Zenject.Tests
         [Test]
         public void TestTransientType()
         {
-            Container.Bind<Test1>().ToTransient();
+            Binder.Bind<Test1>().ToTransient();
 
-            Assert.That(Container.ValidateResolve<Test1>().IsEmpty());
+            Assert.That(Resolver.ValidateResolve<Test1>().IsEmpty());
 
-            var test1 = Container.Resolve<Test1>();
-            var test2 = Container.Resolve<Test1>();
+            var test1 = Resolver.Resolve<Test1>();
+            var test2 = Resolver.Resolve<Test1>();
 
             Assert.That(test1 != null && test2 != null);
             Assert.That(!ReferenceEquals(test1, test2));
@@ -31,12 +31,12 @@ namespace Zenject.Tests
         [Test]
         public void TestTransientTypeUntyped()
         {
-            Container.Bind(typeof(Test1)).ToTransient();
+            Binder.Bind(typeof(Test1)).ToTransient();
 
-            Assert.That(Container.ValidateResolve<Test1>().IsEmpty());
+            Assert.That(Resolver.ValidateResolve<Test1>().IsEmpty());
 
-            var test1 = Container.Resolve<Test1>();
-            var test2 = Container.Resolve<Test1>();
+            var test1 = Resolver.Resolve<Test1>();
+            var test2 = Resolver.Resolve<Test1>();
 
             Assert.That(test1 != null && test2 != null);
             Assert.That(!ReferenceEquals(test1, test2));

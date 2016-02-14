@@ -8,13 +8,13 @@ namespace Zenject
     {
         public static void BindTickable<TTickable>(DiContainer container, int priority) where TTickable : ITickable
         {
-            container.Bind<ITickable>().ToSingle<TTickable>();
+            container.Binder.Bind<ITickable>().ToSingle<TTickable>();
             BindTickablePriority<TTickable>(container, priority);
         }
 
         public static void BindTickablePriority<TTickable>(DiContainer container, int priority)
         {
-            container.Bind<ModestTree.Util.Tuple<Type, int>>().ToInstance(ModestTree.Util.Tuple.New(typeof(TTickable), priority));
+            container.Binder.Bind<ModestTree.Util.Tuple<Type, int>>().ToInstance(ModestTree.Util.Tuple.New(typeof(TTickable), priority));
         }
     }
 }

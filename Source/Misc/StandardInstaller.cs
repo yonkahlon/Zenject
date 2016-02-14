@@ -8,12 +8,12 @@ namespace Zenject
     {
         public override void InstallBindings()
         {
-            Container.Bind<IFacade>().ToSingle<TRoot>();
-            Container.Bind<TRoot>().ToSingle();
+            Binder.Bind<IFacade>().ToSingle<TRoot>();
+            Binder.Bind<TRoot>().ToSingle();
 
-            Container.Bind<TickableManager>().ToSingle();
-            Container.Bind<InitializableManager>().ToSingle();
-            Container.Bind<DisposableManager>().ToSingle();
+            Binder.Bind<TickableManager>().ToSingle();
+            Binder.Bind<InitializableManager>().ToSingle();
+            Binder.Bind<DisposableManager>().ToSingle();
         }
     }
 

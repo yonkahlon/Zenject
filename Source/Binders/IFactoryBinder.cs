@@ -12,12 +12,12 @@ namespace Zenject
     [System.Diagnostics.DebuggerStepThrough]
     public class IFactoryBinder<TContract>
     {
-        readonly DiContainer _container;
+        readonly IBinder _binder;
         readonly string _identifier;
 
-        public IFactoryBinder(DiContainer container, string identifier)
+        public IFactoryBinder(IBinder binder, string identifier)
         {
-            _container = container;
+            _binder = binder;
             _identifier = identifier;
         }
 
@@ -27,17 +27,17 @@ namespace Zenject
         }
 
         public BindingConditionSetter ToMethod(
-            Func<DiContainer, TContract> method)
+            Func<IInstantiator, TContract> method)
         {
-            return _container.Bind<IFactory<TContract>>(_identifier)
-                .ToMethod((ctx) => ctx.Container.Instantiate<FactoryMethod<TContract>>(method));
+            return _binder.Bind<IFactory<TContract>>(_identifier)
+                .ToMethod((ctx) => ctx.Instantiator.Instantiate<FactoryMethod<TContract>>(method));
         }
 
         public BindingConditionSetter ToFactory()
         {
             Assert.That(!typeof(TContract).IsAbstract,
                 "Unable to create abstract type '{0}' in Factory", typeof(TContract).Name());
-            return _container.Bind<IFactory<TContract>>(_identifier)
+            return _binder.Bind<IFactory<TContract>>(_identifier)
                 .ToTransient<Factory<TContract>>();
         }
 
@@ -59,23 +59,23 @@ namespace Zenject
         public BindingConditionSetter ToIFactory<TConcrete>()
             where TConcrete : TContract
         {
-            return _container.Bind<IFactory<TContract>>(_identifier)
-                .ToMethod(c => new FactoryNested<TContract, TConcrete>(c.Container.Resolve<IFactory<TConcrete>>()));
+            return _binder.Bind<IFactory<TContract>>(_identifier)
+                .ToMethod(c => new FactoryNested<TContract, TConcrete>(c.Resolver.Resolve<IFactory<TConcrete>>()));
         }
 
-        public BindingConditionSetter ToFacadeFactory<TFactory>(Action<DiContainer> facadeInstaller)
+        public BindingConditionSetter ToFacadeFactory<TFactory>(Action<IBinder> facadeInstaller)
             where TFactory : IFactory<TContract>, IFacadeFactory
         {
-            return _container.Bind<IFactory<TContract>>(_identifier)
-                .ToMethod(c => c.Container.Instantiate<TFactory>(facadeInstaller));
+            return _binder.Bind<IFactory<TContract>>(_identifier)
+                .ToMethod(c => c.Instantiator.Instantiate<TFactory>(facadeInstaller));
         }
 
-        public BindingConditionSetter ToFacadeFactory<TConcrete, TFactory>(Action<DiContainer> facadeInstaller)
+        public BindingConditionSetter ToFacadeFactory<TConcrete, TFactory>(Action<IBinder> facadeInstaller)
             where TFactory : IFactory<TConcrete>, IFacadeFactory
             where TConcrete : TContract
         {
-            return _container.Bind<IFactory<TContract>>(_identifier)
-                .ToMethod(c => new FactoryNested<TContract, TConcrete>(c.Container.Instantiate<TFactory>(facadeInstaller)));
+            return _binder.Bind<IFactory<TContract>>(_identifier)
+                .ToMethod(c => new FactoryNested<TContract, TConcrete>(c.Instantiator.Instantiate<TFactory>(facadeInstaller)));
         }
 
         public BindingConditionSetter ToCustomFactory<TFactory>()
@@ -87,15 +87,15 @@ namespace Zenject
         public BindingConditionSetter ToCustomFactory(Type factoryType)
         {
             Assert.DerivesFrom<IFactory<TContract>>(factoryType);
-            return _container.Bind<IFactory<TContract>>(_identifier).ToTransient(factoryType);
+            return _binder.Bind<IFactory<TContract>>(_identifier).ToTransient(factoryType);
         }
 
         public BindingConditionSetter ToCustomFactory<TConcrete, TFactory>()
             where TFactory : IFactory<TConcrete>
             where TConcrete : TContract
         {
-            return _container.Bind<IFactory<TContract>>(_identifier)
-                .ToMethod(c => new FactoryNested<TContract, TConcrete>(c.Container.Instantiate<TFactory>()));
+            return _binder.Bind<IFactory<TContract>>(_identifier)
+                .ToMethod(c => new FactoryNested<TContract, TConcrete>(c.Instantiator.Instantiate<TFactory>()));
         }
 
         public BindingConditionSetter ToCustomFactory(Type concreteType, Type factoryType)
@@ -107,8 +107,8 @@ namespace Zenject
 
             var genericFactoryNestedType = typeof(FactoryNested<,>).MakeGenericType(typeof(TContract), concreteType);
 
-            return _container.Bind<IFactory<TContract>>(_identifier)
-                .ToMethod(c => (IFactory<TContract>)c.Container.Instantiate(genericFactoryNestedType, c.Container.Instantiate(factoryType)));
+            return _binder.Bind<IFactory<TContract>>(_identifier)
+                .ToMethod(c => (IFactory<TContract>)c.Instantiator.Instantiate(genericFactoryNestedType, c.Instantiator.Instantiate(factoryType)));
         }
 
 #if !ZEN_NOT_UNITY3D
@@ -124,8 +124,8 @@ namespace Zenject
                     "Null prefab provided to BindIFactory< {0} >().ToPrefab".Fmt(contractType.Name()));
             }
 
-            return _container.Bind<IFactory<TContract>>(_identifier)
-                .ToMethod((ctx) => ctx.Container.Instantiate<GameObjectFactory<TContract>>(prefab));
+            return _binder.Bind<IFactory<TContract>>(_identifier)
+                .ToMethod((ctx) => ctx.Instantiator.Instantiate<GameObjectFactory<TContract>>(prefab));
         }
 #endif
     }
@@ -134,26 +134,26 @@ namespace Zenject
     [System.Diagnostics.DebuggerStepThrough]
     public class IFactoryBinder<TParam1, TContract>
     {
-        readonly DiContainer _container;
+        readonly IBinder _binder;
         readonly string _identifier;
 
-        public IFactoryBinder(DiContainer container, string identifier)
+        public IFactoryBinder(IBinder container, string identifier)
         {
-            _container = container;
+            _binder = container;
             _identifier = identifier;
         }
 
         public BindingConditionSetter ToMethod(
-            Func<DiContainer, TParam1, TContract> method)
+            Func<IInstantiator, TParam1, TContract> method)
         {
-            return _container.Bind<IFactory<TParam1, TContract>>(_identifier)
-                .ToMethod((ctx) => ctx.Container.Instantiate<FactoryMethod<TParam1, TContract>>(method));
+            return _binder.Bind<IFactory<TParam1, TContract>>(_identifier)
+                .ToMethod((ctx) => ctx.Instantiator.Instantiate<FactoryMethod<TParam1, TContract>>(method));
         }
 
         public BindingConditionSetter ToFactory()
         {
             Assert.That(!typeof(TContract).IsAbstract);
-            return _container.Bind<IFactory<TParam1, TContract>>(_identifier)
+            return _binder.Bind<IFactory<TParam1, TContract>>(_identifier)
                 .ToTransient<Factory<TParam1, TContract>>();
         }
 
@@ -167,26 +167,26 @@ namespace Zenject
         public BindingConditionSetter ToIFactory<TConcrete>()
             where TConcrete : TContract
         {
-            return _container.Bind<IFactory<TParam1, TContract>>(_identifier)
+            return _binder.Bind<IFactory<TParam1, TContract>>(_identifier)
                 .ToMethod(c =>
                     new FactoryNested<TParam1, TContract, TConcrete>(
-                        c.Container.Resolve<IFactory<TParam1, TConcrete>>()));
+                        c.Resolver.Resolve<IFactory<TParam1, TConcrete>>()));
         }
 
         public BindingConditionSetter ToCustomFactory<TFactory>()
             where TFactory : IFactory<TParam1, TContract>
         {
-            return _container.Bind<IFactory<TParam1, TContract>>(_identifier).ToTransient<TFactory>();
+            return _binder.Bind<IFactory<TParam1, TContract>>(_identifier).ToTransient<TFactory>();
         }
 
         public BindingConditionSetter ToCustomFactory<TConcrete, TFactory>()
             where TFactory : IFactory<TParam1, TConcrete>
             where TConcrete : TContract
         {
-            return _container.Bind<IFactory<TParam1, TContract>>(_identifier)
+            return _binder.Bind<IFactory<TParam1, TContract>>(_identifier)
                 .ToMethod(c =>
                     new FactoryNested<TParam1, TContract, TConcrete>(
-                        c.Container.Instantiate<TFactory>()));
+                        c.Instantiator.Instantiate<TFactory>()));
         }
 
 #if !ZEN_NOT_UNITY3D
@@ -201,8 +201,8 @@ namespace Zenject
                     "Null prefab provided to BindIFactory< {0} >().ToPrefab".Fmt(typeof(TContract).Name()));
             }
 
-            return _container.Bind<IFactory<TParam1, TContract>>(_identifier)
-                .ToMethod((ctx) => ctx.Container.Instantiate<GameObjectFactory<TParam1, TContract>>(prefab));
+            return _binder.Bind<IFactory<TParam1, TContract>>(_identifier)
+                .ToMethod((ctx) => ctx.Instantiator.Instantiate<GameObjectFactory<TParam1, TContract>>(prefab));
         }
 #endif
     }
@@ -211,26 +211,26 @@ namespace Zenject
     [System.Diagnostics.DebuggerStepThrough]
     public class IFactoryBinder<TParam1, TParam2, TContract>
     {
-        readonly DiContainer _container;
+        readonly IBinder _binder;
         readonly string _identifier;
 
-        public IFactoryBinder(DiContainer container, string identifier)
+        public IFactoryBinder(IBinder container, string identifier)
         {
-            _container = container;
+            _binder = container;
             _identifier = identifier;
         }
 
         public BindingConditionSetter ToMethod(
-            Func<DiContainer, TParam1, TParam2, TContract> method)
+            Func<IInstantiator, TParam1, TParam2, TContract> method)
         {
-            return _container.Bind<IFactory<TParam1, TParam2, TContract>>(_identifier)
-                .ToMethod((ctx) => ctx.Container.Instantiate<FactoryMethod<TParam1, TParam2, TContract>>(method));
+            return _binder.Bind<IFactory<TParam1, TParam2, TContract>>(_identifier)
+                .ToMethod((ctx) => ctx.Instantiator.Instantiate<FactoryMethod<TParam1, TParam2, TContract>>(method));
         }
 
         public BindingConditionSetter ToFactory()
         {
             Assert.That(!typeof(TContract).IsAbstract);
-            return _container.Bind<IFactory<TParam1, TParam2, TContract>>(_identifier)
+            return _binder.Bind<IFactory<TParam1, TParam2, TContract>>(_identifier)
                 .ToTransient<Factory<TParam1, TParam2, TContract>>();
         }
 
@@ -244,26 +244,26 @@ namespace Zenject
         public BindingConditionSetter ToIFactory<TConcrete>()
             where TConcrete : TContract
         {
-            return _container.Bind<IFactory<TParam1, TParam2, TContract>>(_identifier)
+            return _binder.Bind<IFactory<TParam1, TParam2, TContract>>(_identifier)
                 .ToMethod(c =>
                     new FactoryNested<TParam1, TParam2, TContract, TConcrete>(
-                        c.Container.Resolve<IFactory<TParam1, TParam2, TConcrete>>()));
+                        c.Resolver.Resolve<IFactory<TParam1, TParam2, TConcrete>>()));
         }
 
         public BindingConditionSetter ToCustomFactory<TFactory>()
             where TFactory : IFactory<TParam1, TParam2, TContract>
         {
-            return _container.Bind<IFactory<TParam1, TParam2, TContract>>(_identifier).ToTransient<TFactory>();
+            return _binder.Bind<IFactory<TParam1, TParam2, TContract>>(_identifier).ToTransient<TFactory>();
         }
 
         public BindingConditionSetter ToCustomFactory<TConcrete, TFactory>()
             where TFactory : IFactory<TParam1, TParam2, TConcrete>
             where TConcrete : TContract
         {
-            return _container.Bind<IFactory<TParam1, TParam2, TContract>>(_identifier)
+            return _binder.Bind<IFactory<TParam1, TParam2, TContract>>(_identifier)
                 .ToMethod(c =>
                     new FactoryNested<TParam1, TParam2, TContract, TConcrete>(
-                        c.Container.Instantiate<TFactory>()));
+                        c.Instantiator.Instantiate<TFactory>()));
         }
 
 #if !ZEN_NOT_UNITY3D
@@ -278,8 +278,8 @@ namespace Zenject
                     "Null prefab provided to BindIFactory< {0} >().ToPrefab".Fmt(typeof(TContract).Name()));
             }
 
-            return _container.Bind<IFactory<TParam1, TParam2, TContract>>(_identifier)
-                .ToMethod((ctx) => ctx.Container.Instantiate<GameObjectFactory<TParam1, TParam2, TContract>>(prefab));
+            return _binder.Bind<IFactory<TParam1, TParam2, TContract>>(_identifier)
+                .ToMethod((ctx) => ctx.Instantiator.Instantiate<GameObjectFactory<TParam1, TParam2, TContract>>(prefab));
         }
 #endif
     }
@@ -288,26 +288,26 @@ namespace Zenject
     [System.Diagnostics.DebuggerStepThrough]
     public class IFactoryBinder<TParam1, TParam2, TParam3, TContract>
     {
-        readonly DiContainer _container;
+        readonly IBinder _binder;
         readonly string _identifier;
 
-        public IFactoryBinder(DiContainer container, string identifier)
+        public IFactoryBinder(IBinder container, string identifier)
         {
-            _container = container;
+            _binder = container;
             _identifier = identifier;
         }
 
         public BindingConditionSetter ToMethod(
-            Func<DiContainer, TParam1, TParam2, TParam3, TContract> method)
+            Func<IInstantiator, TParam1, TParam2, TParam3, TContract> method)
         {
-            return _container.Bind<IFactory<TParam1, TParam2, TParam3, TContract>>(_identifier)
-                .ToMethod((ctx) => ctx.Container.Instantiate<FactoryMethod<TParam1, TParam2, TParam3, TContract>>(method));
+            return _binder.Bind<IFactory<TParam1, TParam2, TParam3, TContract>>(_identifier)
+                .ToMethod((ctx) => ctx.Instantiator.Instantiate<FactoryMethod<TParam1, TParam2, TParam3, TContract>>(method));
         }
 
         public BindingConditionSetter ToFactory()
         {
             Assert.That(!typeof(TContract).IsAbstract);
-            return _container.Bind<IFactory<TParam1, TParam2, TParam3, TContract>>(_identifier)
+            return _binder.Bind<IFactory<TParam1, TParam2, TParam3, TContract>>(_identifier)
                 .ToTransient<Factory<TParam1, TParam2, TParam3, TContract>>();
         }
 
@@ -321,26 +321,26 @@ namespace Zenject
         public BindingConditionSetter ToIFactory<TConcrete>()
             where TConcrete : TContract
         {
-            return _container.Bind<IFactory<TParam1, TParam2, TParam3, TContract>>(_identifier)
+            return _binder.Bind<IFactory<TParam1, TParam2, TParam3, TContract>>(_identifier)
                 .ToMethod(c =>
                     new FactoryNested<TParam1, TParam2, TParam3, TContract, TConcrete>(
-                        c.Container.Resolve<IFactory<TParam1, TParam2, TParam3, TConcrete>>()));
+                        c.Resolver.Resolve<IFactory<TParam1, TParam2, TParam3, TConcrete>>()));
         }
 
         public BindingConditionSetter ToCustomFactory<TFactory>()
             where TFactory : IFactory<TParam1, TParam2, TParam3, TContract>
         {
-            return _container.Bind<IFactory<TParam1, TParam2, TParam3, TContract>>(_identifier).ToTransient<TFactory>();
+            return _binder.Bind<IFactory<TParam1, TParam2, TParam3, TContract>>(_identifier).ToTransient<TFactory>();
         }
 
         public BindingConditionSetter ToCustomFactory<TConcrete, TFactory>()
             where TFactory : IFactory<TParam1, TParam2, TParam3, TConcrete>
             where TConcrete : TContract
         {
-            return _container.Bind<IFactory<TParam1, TParam2, TParam3, TContract>>(_identifier)
+            return _binder.Bind<IFactory<TParam1, TParam2, TParam3, TContract>>(_identifier)
                 .ToMethod(c =>
                     new FactoryNested<TParam1, TParam2, TParam3, TContract, TConcrete>(
-                        c.Container.Instantiate<TFactory>()));
+                        c.Instantiator.Instantiate<TFactory>()));
         }
 
 #if !ZEN_NOT_UNITY3D
@@ -355,8 +355,8 @@ namespace Zenject
                     "Null prefab provided to BindIFactory< {0} >().ToPrefab".Fmt(typeof(TContract).Name()));
             }
 
-            return _container.Bind<IFactory<TParam1, TParam2, TParam3, TContract>>(_identifier)
-                .ToMethod((ctx) => ctx.Container.Instantiate<GameObjectFactory<TParam1, TParam2, TParam3, TContract>>(prefab));
+            return _binder.Bind<IFactory<TParam1, TParam2, TParam3, TContract>>(_identifier)
+                .ToMethod((ctx) => ctx.Instantiator.Instantiate<GameObjectFactory<TParam1, TParam2, TParam3, TContract>>(prefab));
         }
 #endif
     }
@@ -366,26 +366,26 @@ namespace Zenject
     [System.Diagnostics.DebuggerStepThrough]
     public class IFactoryBinder<TParam1, TParam2, TParam3, TParam4, TContract>
     {
-        readonly DiContainer _container;
+        readonly IBinder _binder;
         readonly string _identifier;
 
-        public IFactoryBinder(DiContainer container, string identifier)
+        public IFactoryBinder(IBinder container, string identifier)
         {
-            _container = container;
+            _binder = container;
             _identifier = identifier;
         }
 
         public BindingConditionSetter ToMethod(
-            ModestTree.Util.Func<DiContainer, TParam1, TParam2, TParam3, TParam4, TContract> method)
+            ModestTree.Util.Func<IInstantiator, TParam1, TParam2, TParam3, TParam4, TContract> method)
         {
-            return _container.Bind<IFactory<TParam1, TParam2, TParam3, TParam4, TContract>>(_identifier)
-                .ToMethod((ctx) => ctx.Container.Instantiate<FactoryMethod<TParam1, TParam2, TParam3, TParam4, TContract>>(method));
+            return _binder.Bind<IFactory<TParam1, TParam2, TParam3, TParam4, TContract>>(_identifier)
+                .ToMethod((ctx) => ctx.Instantiator.Instantiate<FactoryMethod<TParam1, TParam2, TParam3, TParam4, TContract>>(method));
         }
 
         public BindingConditionSetter ToFactory()
         {
             Assert.That(!typeof(TContract).IsAbstract);
-            return _container.Bind<IFactory<TParam1, TParam2, TParam3, TParam4, TContract>>(_identifier)
+            return _binder.Bind<IFactory<TParam1, TParam2, TParam3, TParam4, TContract>>(_identifier)
                 .ToTransient<Factory<TParam1, TParam2, TParam3, TParam4, TContract>>();
         }
 
@@ -399,26 +399,26 @@ namespace Zenject
         public BindingConditionSetter ToIFactory<TConcrete>()
             where TConcrete : TContract
         {
-            return _container.Bind<IFactory<TParam1, TParam2, TParam3, TParam4, TContract>>(_identifier)
+            return _binder.Bind<IFactory<TParam1, TParam2, TParam3, TParam4, TContract>>(_identifier)
                 .ToMethod(c =>
                     new FactoryNested<TParam1, TParam2, TParam3, TParam4, TContract, TConcrete>(
-                        c.Container.Resolve<IFactory<TParam1, TParam2, TParam3, TParam4, TConcrete>>()));
+                        c.Resolver.Resolve<IFactory<TParam1, TParam2, TParam3, TParam4, TConcrete>>()));
         }
 
         public BindingConditionSetter ToCustomFactory<TFactory>()
             where TFactory : IFactory<TParam1, TParam2, TParam3, TParam4, TContract>
         {
-            return _container.Bind<IFactory<TParam1, TParam2, TParam3, TParam4, TContract>>(_identifier).ToTransient<TFactory>();
+            return _binder.Bind<IFactory<TParam1, TParam2, TParam3, TParam4, TContract>>(_identifier).ToTransient<TFactory>();
         }
 
         public BindingConditionSetter ToCustomFactory<TConcrete, TFactory>()
             where TFactory : IFactory<TParam1, TParam2, TParam3, TParam4, TConcrete>
             where TConcrete : TContract
         {
-            return _container.Bind<IFactory<TParam1, TParam2, TParam3, TParam4, TContract>>(_identifier)
+            return _binder.Bind<IFactory<TParam1, TParam2, TParam3, TParam4, TContract>>(_identifier)
                 .ToMethod(c =>
                     new FactoryNested<TParam1, TParam2, TParam3, TParam4, TContract, TConcrete>(
-                        c.Container.Instantiate<TFactory>()));
+                        c.Instantiator.Instantiate<TFactory>()));
         }
 
 #if !ZEN_NOT_UNITY3D
@@ -433,8 +433,8 @@ namespace Zenject
                     "Null prefab provided to BindIFactory< {0} >().ToPrefab".Fmt(typeof(TContract).Name()));
             }
 
-            return _container.Bind<IFactory<TParam1, TParam2, TParam3, TParam4, TContract>>(_identifier)
-                .ToMethod((ctx) => ctx.Container.Instantiate<GameObjectFactory<TParam1, TParam2, TParam3, TParam4, TContract>>(prefab));
+            return _binder.Bind<IFactory<TParam1, TParam2, TParam3, TParam4, TContract>>(_identifier)
+                .ToMethod((ctx) => ctx.Instantiator.Instantiate<GameObjectFactory<TParam1, TParam2, TParam3, TParam4, TContract>>(prefab));
         }
 #endif
     }

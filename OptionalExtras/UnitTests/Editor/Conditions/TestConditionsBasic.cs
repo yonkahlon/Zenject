@@ -46,13 +46,13 @@ namespace Zenject.Tests
         [Test]
         public void Test1()
         {
-            Container.Bind<Bar1>().ToSingle();
-            Container.Bind<Bar2>().ToSingle();
-            Container.Bind<IFoo>().ToSingle<Foo1>();
-            Container.Bind<IFoo>().ToSingle<Foo2>().WhenInjectedInto<Bar2>();
+            Binder.Bind<Bar1>().ToSingle();
+            Binder.Bind<Bar2>().ToSingle();
+            Binder.Bind<IFoo>().ToSingle<Foo1>();
+            Binder.Bind<IFoo>().ToSingle<Foo2>().WhenInjectedInto<Bar2>();
 
             Assert.IsNotEqual(
-                Container.Resolve<Bar1>().Foo, Container.Resolve<Bar2>().Foo);
+                Resolver.Resolve<Bar1>().Foo, Container.Resolver.Resolve<Bar2>().Foo);
         }
     }
 }

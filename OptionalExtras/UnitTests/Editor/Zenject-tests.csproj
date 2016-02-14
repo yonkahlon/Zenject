@@ -92,7 +92,7 @@
     <Compile Include="Bindings\TestMultiBindAgain.cs" />
     <Compile Include="Bindings\TestRebind.cs" />
     <Compile Include="Bindings\TestToGetter.cs" />
-    <Compile Include="Bindings\TestToLookup.cs" />
+    <Compile Include="Bindings\TestToResolve.cs" />
     <Compile Include="Bindings\TestUnbind.cs" />
     <Compile Include="CommandsAndSignals\TestCommands.cs" />
     <Compile Include="CommandsAndSignals\TestCommandsOneParam.cs" />

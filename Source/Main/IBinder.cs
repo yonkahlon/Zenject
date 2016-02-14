@@ -61,22 +61,22 @@ namespace Zenject
         void BindAllInterfacesToInstance(Type concreteType, object value);
 
         BindingConditionSetter BindFacadeFactory<TFacade, TFacadeFactory>(
-            Action<DiContainer> facadeInstaller)
+            Action<IBinder> facadeInstaller)
             where TFacade : IFacade
             where TFacadeFactory : FacadeFactory<TFacade>;
 
         BindingConditionSetter BindFacadeFactory<TParam1, TFacade, TFacadeFactory>(
-            Action<DiContainer, TParam1> facadeInstaller)
+            Action<IBinder, TParam1> facadeInstaller)
             where TFacade : IFacade
             where TFacadeFactory : FacadeFactory<TParam1, TFacade>;
 
         BindingConditionSetter BindFacadeFactory<TParam1, TParam2, TFacade, TFacadeFactory>(
-            Action<DiContainer, TParam1, TParam2> facadeInstaller)
+            Action<IBinder, TParam1, TParam2> facadeInstaller)
             where TFacade : IFacade
             where TFacadeFactory : FacadeFactory<TParam1, TParam2, TFacade> ;
 
         BindingConditionSetter BindFacadeFactory<TParam1, TParam2, TParam3, TFacade, TFacadeFactory>(
-            Action<DiContainer, TParam1, TParam2, TParam3> facadeInstaller)
+            Action<IBinder, TParam1, TParam2, TParam3> facadeInstaller)
             where TFacade : IFacade
             where TFacadeFactory : FacadeFactory<TParam1, TParam2, TParam3, TFacade>;
 
@@ -102,6 +102,28 @@ namespace Zenject
 
         bool HasInstalled<T>()
             where T : IInstaller;
+
+        FacadeBinder<TFacade> BindFacade<TFacade>(Action<IBinder> installerFunc)
+            where TFacade : IFacade;
+
+        FacadeBinder<TFacade> BindFacade<TFacade>(
+            Action<IBinder> installerFunc, string identifier)
+            where TFacade : IFacade;
+
+        DiContainer Container
+        {
+            get;
+        }
+
+        IInstantiator Instantiator
+        {
+            get;
+        }
+
+        IResolver Resolver
+        {
+            get;
+        }
     }
 }
 
