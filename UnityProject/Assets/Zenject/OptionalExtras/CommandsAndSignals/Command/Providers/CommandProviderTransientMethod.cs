@@ -8,13 +8,13 @@ using System.Linq;
 namespace Zenject.Commands
 {
     // Common
-    public abstract class CommandProviderMethodTransientBase<TCommand, THandler, TAction>
-        : CommandProviderTransient<TCommand, THandler, TAction>
+    public abstract class CommandProviderTransientMethodBase<TCommand, THandler, TAction>
+        : CommandProviderTransientBase<TCommand, THandler, TAction>
         where TCommand : ICommand
     {
         readonly Func<THandler, TAction> _methodGetter;
 
-        public CommandProviderMethodTransientBase(Func<THandler, TAction> methodGetter)
+        public CommandProviderTransientMethodBase(Func<THandler, TAction> methodGetter)
         {
             _methodGetter = methodGetter;
         }
@@ -26,11 +26,11 @@ namespace Zenject.Commands
     }
 
     // Zero Parameters
-    public class CommandProviderMethodTransient<TCommand, THandler>
-        : CommandProviderMethodTransientBase<TCommand, THandler, Action>
+    public class CommandProviderTransientMethod<TCommand, THandler>
+        : CommandProviderTransientMethodBase<TCommand, THandler, Action>
         where TCommand : Command
     {
-        public CommandProviderMethodTransient(Func<THandler, Action> methodGetter)
+        public CommandProviderTransientMethod(Func<THandler, Action> methodGetter)
             : base(methodGetter)
         {
         }
@@ -45,11 +45,11 @@ namespace Zenject.Commands
     }
 
     // One Parameter
-    public class CommandProviderMethodTransient<TCommand, THandler, TParam1>
-        : CommandProviderMethodTransientBase<TCommand, THandler, Action<TParam1>>
+    public class CommandProviderTransientMethod<TCommand, THandler, TParam1>
+        : CommandProviderTransientMethodBase<TCommand, THandler, Action<TParam1>>
         where TCommand : Command<TParam1>
     {
-        public CommandProviderMethodTransient(
+        public CommandProviderTransientMethod(
             Func<THandler, Action<TParam1>> methodGetter)
             : base(methodGetter)
         {
@@ -65,11 +65,11 @@ namespace Zenject.Commands
     }
 
     // Two Parameters
-    public class CommandProviderMethodTransient<TCommand, THandler, TParam1, TParam2>
-        : CommandProviderMethodTransientBase<TCommand, THandler, Action<TParam1, TParam2>>
+    public class CommandProviderTransientMethod<TCommand, THandler, TParam1, TParam2>
+        : CommandProviderTransientMethodBase<TCommand, THandler, Action<TParam1, TParam2>>
         where TCommand : Command<TParam1, TParam2>
     {
-        public CommandProviderMethodTransient(
+        public CommandProviderTransientMethod(
             Func<THandler, Action<TParam1, TParam2>> methodGetter)
             : base(methodGetter)
         {
@@ -85,11 +85,11 @@ namespace Zenject.Commands
     }
 
     // Three Parameters
-    public class CommandProviderMethodTransient<TCommand, THandler, TParam1, TParam2, TParam3>
-        : CommandProviderMethodTransientBase<TCommand, THandler, Action<TParam1, TParam2, TParam3>>
+    public class CommandProviderTransientMethod<TCommand, THandler, TParam1, TParam2, TParam3>
+        : CommandProviderTransientMethodBase<TCommand, THandler, Action<TParam1, TParam2, TParam3>>
         where TCommand : Command<TParam1, TParam2, TParam3>
     {
-        public CommandProviderMethodTransient(
+        public CommandProviderTransientMethod(
             Func<THandler, Action<TParam1, TParam2, TParam3>> methodGetter)
             : base(methodGetter)
         {
@@ -105,11 +105,11 @@ namespace Zenject.Commands
     }
 
     // Four Parameters
-    public class CommandProviderMethodTransient<TCommand, THandler, TParam1, TParam2, TParam3, TParam4>
-        : CommandProviderMethodTransientBase<TCommand, THandler, Action<TParam1, TParam2, TParam3, TParam4>>
+    public class CommandProviderTransientMethod<TCommand, THandler, TParam1, TParam2, TParam3, TParam4>
+        : CommandProviderTransientMethodBase<TCommand, THandler, Action<TParam1, TParam2, TParam3, TParam4>>
         where TCommand : Command<TParam1, TParam2, TParam3, TParam4>
     {
-        public CommandProviderMethodTransient(
+        public CommandProviderTransientMethod(
             Func<THandler, Action<TParam1, TParam2, TParam3, TParam4>> methodGetter)
             : base(methodGetter)
         {
@@ -125,11 +125,11 @@ namespace Zenject.Commands
     }
 
     // Five Parameters
-    public class CommandProviderMethodTransient<TCommand, THandler, TParam1, TParam2, TParam3, TParam4, TParam5>
-        : CommandProviderMethodTransientBase<TCommand, THandler, ModestTree.Util.Action<TParam1, TParam2, TParam3, TParam4, TParam5>>
+    public class CommandProviderTransientMethod<TCommand, THandler, TParam1, TParam2, TParam3, TParam4, TParam5>
+        : CommandProviderTransientMethodBase<TCommand, THandler, ModestTree.Util.Action<TParam1, TParam2, TParam3, TParam4, TParam5>>
         where TCommand : Command<TParam1, TParam2, TParam3, TParam4, TParam5>
     {
-        public CommandProviderMethodTransient(
+        public CommandProviderTransientMethod(
             Func<THandler, ModestTree.Util.Action<TParam1, TParam2, TParam3, TParam4, TParam5>> methodGetter)
             : base(methodGetter)
         {
@@ -145,11 +145,11 @@ namespace Zenject.Commands
     }
 
     // Six Parameters
-    public class CommandProviderMethodTransient<TCommand, THandler, TParam1, TParam2, TParam3, TParam4, TParam5, TParam6>
-        : CommandProviderMethodTransientBase<TCommand, THandler, ModestTree.Util.Action<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6>>
+    public class CommandProviderTransientMethod<TCommand, THandler, TParam1, TParam2, TParam3, TParam4, TParam5, TParam6>
+        : CommandProviderTransientMethodBase<TCommand, THandler, ModestTree.Util.Action<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6>>
         where TCommand : Command<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6>
     {
-        public CommandProviderMethodTransient(
+        public CommandProviderTransientMethod(
             Func<THandler, ModestTree.Util.Action<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6>> methodGetter)
             : base(methodGetter)
         {

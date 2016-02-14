@@ -60,13 +60,13 @@ namespace Zenject.Tests
         [Test]
         public void Test()
         {
-            Container.Bind<Test0>().ToSingle();
-            Container.Bind<Test1>().ToSingle();
-            Container.Bind<Test2>().ToSingle();
-            Container.Bind<Test3>().ToSingle();
+            Binder.Bind<Test0>().ToSingle();
+            Binder.Bind<Test1>().ToSingle();
+            Binder.Bind<Test2>().ToSingle();
+            Binder.Bind<Test3>().ToSingle();
 
-            Assert.That(Container.ValidateResolve<Test3>().IsEmpty());
-            var test3 = Container.Resolve<Test3>();
+            Assert.That(Resolver.ValidateResolve<Test3>().IsEmpty());
+            var test3 = Resolver.Resolve<Test3>();
             Assert.That(test3.HasInitialized);
             Assert.That(test3.HasInitialized2);
         }
@@ -89,9 +89,9 @@ namespace Zenject.Tests
         [Test]
         public void TestPrivateBaseClassPostInject()
         {
-            Container.Bind<SimpleBase>().ToSingle<SimpleDerived>();
+            Binder.Bind<SimpleBase>().ToSingle<SimpleDerived>();
 
-            var simple = Container.Resolve<SimpleBase>();
+            var simple = Resolver.Resolve<SimpleBase>();
 
             Assert.That(simple.WasCalled);
         }
@@ -99,10 +99,10 @@ namespace Zenject.Tests
         [Test]
         public void TestInheritance()
         {
-            Container.Bind<IFoo>().ToSingle<FooDerived>();
+            Binder.Bind<IFoo>().ToSingle<FooDerived>();
 
-            Assert.That(Container.ValidateResolve<IFoo>().IsEmpty());
-            var foo = Container.Resolve<IFoo>();
+            Assert.That(Resolver.ValidateResolve<IFoo>().IsEmpty());
+            var foo = Resolver.Resolve<IFoo>();
 
             Assert.That(((FooDerived)foo).WasDerivedCalled);
             Assert.That(((FooBase)foo).WasBaseCalled);
@@ -113,7 +113,7 @@ namespace Zenject.Tests
         [Test]
         public void TestInheritanceOrder()
         {
-            Container.Bind<IFoo>().ToSingle<FooDerived2>();
+            Binder.Bind<IFoo>().ToSingle<FooDerived2>();
 
             // base post inject methods should be called first
             _initOrder = 0;
@@ -121,7 +121,7 @@ namespace Zenject.Tests
             FooDerived.DerivedCallOrder = 0;
             FooDerived2.Derived2CallOrder = 0;
 
-            Container.Resolve<IFoo>();
+            Resolver.Resolve<IFoo>();
 
             //Log.Info("FooBase.BaseCallOrder = {0}".Fmt(FooBase.BaseCallOrder));
             //Log.Info("FooDerived.DerivedCallOrder = {0}".Fmt(FooDerived.DerivedCallOrder));

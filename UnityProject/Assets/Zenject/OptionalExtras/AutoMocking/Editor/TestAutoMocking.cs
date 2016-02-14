@@ -22,10 +22,10 @@ namespace Zenject.Tests
         [Test]
         public void Test1()
         {
-            _container.Bind<IFoo>().ToMock();
-            _container.Bind<Bar>().ToSingle();
+            _container.Binder.Bind<IFoo>().ToMock();
+            _container.Binder.Bind<Bar>().ToSingle();
 
-            _container.Resolve<Bar>().Run();
+            _container.Resolver.Resolve<Bar>().Run();
         }
 
         public class Bar

@@ -8,7 +8,7 @@ using Assert=ModestTree.Assert;
 namespace Zenject.Tests
 {
     [TestFixture]
-    public class TestToLookup : TestWithContainer
+    public class TestToResolve : TestWithContainer
     {
         interface IFoo
         {
@@ -23,10 +23,10 @@ namespace Zenject.Tests
         {
             var foo = new Foo();
 
-            Container.Bind<Foo>().ToInstance(foo);
-            Container.Bind<IFoo>().ToLookup<Foo>();
+            Binder.Bind<Foo>().ToInstance(foo);
+            Binder.Bind<IFoo>().ToResolve<Foo>();
 
-            Assert.IsEqual(Container.Resolve<IFoo>(), Container.Resolve<Foo>());
+            Assert.IsEqual(Resolver.Resolve<IFoo>(), Resolver.Resolve<Foo>());
         }
 
         [Test]
@@ -34,12 +34,12 @@ namespace Zenject.Tests
         {
             var foo = new Foo();
 
-            Container.Bind<Foo>("foo").ToInstance(foo);
-            Container.Bind<IFoo>().ToLookup<Foo>("foo");
+            Binder.Bind<Foo>("foo").ToInstance(foo);
+            Binder.Bind<IFoo>().ToResolve<Foo>("foo");
 
-            Container.Resolve<IFoo>();
+            Resolver.Resolve<IFoo>();
 
-            Assert.IsEqual(Container.Resolve<IFoo>(), Container.Resolve<Foo>("foo"));
+            Assert.IsEqual(Resolver.Resolve<IFoo>(), Resolver.Resolve<Foo>("foo"));
         }
 
         [Test]
@@ -47,11 +47,11 @@ namespace Zenject.Tests
         {
             var foo = new Foo();
 
-            Container.Bind<Foo>("foo").ToInstance(foo);
-            Container.Bind<IFoo>().ToLookup<Foo>();
+            Binder.Bind<Foo>("foo").ToInstance(foo);
+            Binder.Bind<IFoo>().ToResolve<Foo>();
 
             Assert.Throws<ZenjectResolveException>(
-                delegate { Container.Resolve<IFoo>(); });
+                delegate { Resolver.Resolve<IFoo>(); });
         }
     }
 }

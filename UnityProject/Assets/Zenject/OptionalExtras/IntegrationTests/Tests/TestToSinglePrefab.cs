@@ -12,10 +12,10 @@ namespace ModestTree
         [InstallerTest]
         public void TestSamePrefabMultipleTypes()
         {
-            Container.Bind<FooMono1>().ToSinglePrefab(FooMono1Prefab);
-            Container.Bind<IInitializable>().ToSinglePrefab<FooMono1>(FooMono1Prefab);
+            Binder.Bind<FooMono1>().ToSinglePrefab(FooMono1Prefab);
+            Binder.Bind<IInitializable>().ToSinglePrefab<FooMono1>(FooMono1Prefab);
 
-            Container.BindAllInterfacesToSingle<Runner1>();
+            Binder.BindAllInterfacesToSingle<Runner1>();
         }
 
         public class Runner1 : IInitializable
@@ -37,13 +37,13 @@ namespace ModestTree
         [InstallerTest]
         public void TestToSinglePrefabSamePrefabMultipleTypes()
         {
-            Container.Bind<FooMono1>().ToSinglePrefab(FooMono1AndBarMono1Prefab);
-            Container.Bind<IInitializable>().ToSinglePrefab<FooMono1>(FooMono1AndBarMono1Prefab);
+            Binder.Bind<FooMono1>().ToSinglePrefab(FooMono1AndBarMono1Prefab);
+            Binder.Bind<IInitializable>().ToSinglePrefab<FooMono1>(FooMono1AndBarMono1Prefab);
 
-            Container.Bind<BarMono1>().ToSinglePrefab(FooMono1AndBarMono1Prefab);
-            Container.Bind<IInitializable>().ToSinglePrefab<BarMono1>(FooMono1AndBarMono1Prefab);
+            Binder.Bind<BarMono1>().ToSinglePrefab(FooMono1AndBarMono1Prefab);
+            Binder.Bind<IInitializable>().ToSinglePrefab<BarMono1>(FooMono1AndBarMono1Prefab);
 
-            Container.BindAllInterfacesToSingle<Runner2>();
+            Binder.BindAllInterfacesToSingle<Runner2>();
         }
 
         public class Runner2 : IInitializable
@@ -66,8 +66,8 @@ namespace ModestTree
         [InstallerTest]
         public void TestToSinglePrefabSameTypeDifferentPrefab()
         {
-            Container.Bind<FooMono1>().ToSinglePrefab(FooMono1AndBarMono1Prefab);
-            Assert.Throws(() => Container.Bind<IInitializable>().ToSinglePrefab<FooMono1>(FooMono1Prefab));
+            Binder.Bind<FooMono1>().ToSinglePrefab(FooMono1AndBarMono1Prefab);
+            Assert.Throws(() => Binder.Bind<IInitializable>().ToSinglePrefab<FooMono1>(FooMono1Prefab));
         }
     }
 }

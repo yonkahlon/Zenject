@@ -14,7 +14,7 @@ namespace Zenject
         {
             _method = method;
 
-            // We can't do this because this is used by ToLookup which is valid in this case
+            // We can't do this because this is used by ToResolve which is valid in this case
             //var singletonMark = container.SingletonRegistry.TryGetSingletonType<T>();
 
             //if (singletonMark.HasValue)

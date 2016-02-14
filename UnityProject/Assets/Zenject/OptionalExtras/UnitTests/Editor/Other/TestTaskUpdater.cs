@@ -20,43 +20,43 @@ namespace Zenject.Tests
         {
             _container = new DiContainer();
 
-            _container.Bind<TaskUpdater<ITickable>>().ToSingleInstance(new TickablesTaskUpdater());
+            _container.Binder.Bind<TaskUpdater<ITickable>>().ToSingleInstance(new TickablesTaskUpdater());
         }
 
         public void BindTickable<TTickable>(int priority) where TTickable : ITickable
         {
-            _container.Bind<ITickable>().ToSingle<TTickable>();
-            _container.Bind<ModestTree.Util.Tuple<Type, int>>().ToInstance(ModestTree.Util.Tuple.New(typeof(TTickable), priority));
+            _container.Binder.Bind<ITickable>().ToSingle<TTickable>();
+            _container.Binder.Bind<ModestTree.Util.Tuple<Type, int>>().ToInstance(ModestTree.Util.Tuple.New(typeof(TTickable), priority));
         }
 
         [Test]
         public void TestTickablesAreOptional()
         {
-            Assert.That(_container.ValidateResolve<TaskUpdater<ITickable>>().IsEmpty());
-            Assert.IsNotNull(_container.Resolve<TaskUpdater<ITickable>>());
+            Assert.That(_container.Resolver.ValidateResolve<TaskUpdater<ITickable>>().IsEmpty());
+            Assert.IsNotNull(_container.Resolver.Resolve<TaskUpdater<ITickable>>());
         }
 
         [Test]
         // Test that tickables get called in the correct order
         public void TestOrder()
         {
-            _container.Bind<Tickable1>().ToSingle();
-            _container.Bind<Tickable2>().ToSingle();
-            _container.Bind<Tickable3>().ToSingle();
+            _container.Binder.Bind<Tickable1>().ToSingle();
+            _container.Binder.Bind<Tickable2>().ToSingle();
+            _container.Binder.Bind<Tickable3>().ToSingle();
 
             BindTickable<Tickable3>(2);
             BindTickable<Tickable1>(0);
             BindTickable<Tickable2>(1);
 
-            Assert.That(_container.ValidateResolve<TaskUpdater<ITickable>>().IsEmpty());
-            var kernel = _container.Resolve<TaskUpdater<ITickable>>();
+            Assert.That(_container.Resolver.ValidateResolve<TaskUpdater<ITickable>>().IsEmpty());
+            var kernel = _container.Resolver.Resolve<TaskUpdater<ITickable>>();
 
-            Assert.That(_container.ValidateResolve<Tickable1>().IsEmpty());
-            var tick1 = _container.Resolve<Tickable1>();
-            Assert.That(_container.ValidateResolve<Tickable2>().IsEmpty());
-            var tick2 = _container.Resolve<Tickable2>();
-            Assert.That(_container.ValidateResolve<Tickable3>().IsEmpty());
-            var tick3 = _container.Resolve<Tickable3>();
+            Assert.That(_container.Resolver.ValidateResolve<Tickable1>().IsEmpty());
+            var tick1 = _container.Resolver.Resolve<Tickable1>();
+            Assert.That(_container.Resolver.ValidateResolve<Tickable2>().IsEmpty());
+            var tick2 = _container.Resolver.Resolve<Tickable2>();
+            Assert.That(_container.Resolver.ValidateResolve<Tickable3>().IsEmpty());
+            var tick3 = _container.Resolver.Resolve<Tickable3>();
 
             int tickCount = 0;
 

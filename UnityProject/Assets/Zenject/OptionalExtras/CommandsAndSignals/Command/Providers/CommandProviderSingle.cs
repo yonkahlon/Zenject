@@ -8,12 +8,12 @@ using System.Linq;
 namespace Zenject.Commands
 {
     // Zero params
-    public class CommandProviderHandlerSingle<TCommand, THandler>
-        : CommandProviderSingle<TCommand, THandler, Action>
+    public class CommandProviderSingle<TCommand, THandler>
+        : CommandProviderSingleBase<TCommand, THandler, Action>
         where TCommand : Command
         where THandler : ICommandHandler
     {
-        public CommandProviderHandlerSingle(ProviderBase singletonProvider)
+        public CommandProviderSingle(ProviderBase singletonProvider)
             : base(singletonProvider)
         {
         }
@@ -28,12 +28,12 @@ namespace Zenject.Commands
     }
 
     // One param
-    public class CommandProviderHandlerSingle<TCommand, THandler, TParam1>
-        : CommandProviderSingle<TCommand, THandler, Action<TParam1>>
+    public class CommandProviderSingle<TCommand, THandler, TParam1>
+        : CommandProviderSingleBase<TCommand, THandler, Action<TParam1>>
         where TCommand : Command<TParam1>
         where THandler : ICommandHandler<TParam1>
     {
-        public CommandProviderHandlerSingle(ProviderBase singletonProvider)
+        public CommandProviderSingle(ProviderBase singletonProvider)
             : base(singletonProvider)
         {
         }
@@ -48,12 +48,12 @@ namespace Zenject.Commands
     }
 
     // Two params
-    public class CommandProviderHandlerSingle<TCommand, THandler, TParam1, TParam2>
-        : CommandProviderSingle<TCommand, THandler, Action<TParam1, TParam2>>
+    public class CommandProviderSingle<TCommand, THandler, TParam1, TParam2>
+        : CommandProviderSingleBase<TCommand, THandler, Action<TParam1, TParam2>>
         where TCommand : Command<TParam1, TParam2>
         where THandler : ICommandHandler<TParam1, TParam2>
     {
-        public CommandProviderHandlerSingle(ProviderBase singletonProvider)
+        public CommandProviderSingle(ProviderBase singletonProvider)
             : base(singletonProvider)
         {
         }
@@ -68,12 +68,12 @@ namespace Zenject.Commands
     }
 
     // Three params
-    public class CommandProviderHandlerSingle<TCommand, THandler, TParam1, TParam2, TParam3>
-        : CommandProviderSingle<TCommand, THandler, Action<TParam1, TParam2, TParam3>>
+    public class CommandProviderSingle<TCommand, THandler, TParam1, TParam2, TParam3>
+        : CommandProviderSingleBase<TCommand, THandler, Action<TParam1, TParam2, TParam3>>
         where TCommand : Command<TParam1, TParam2, TParam3>
         where THandler : ICommandHandler<TParam1, TParam2, TParam3>
     {
-        public CommandProviderHandlerSingle(ProviderBase singletonProvider)
+        public CommandProviderSingle(ProviderBase singletonProvider)
             : base(singletonProvider)
         {
         }
@@ -88,12 +88,12 @@ namespace Zenject.Commands
     }
 
     // Four params
-    public class CommandProviderHandlerSingle<TCommand, THandler, TParam1, TParam2, TParam3, TParam4>
-        : CommandProviderSingle<TCommand, THandler, Action<TParam1, TParam2, TParam3, TParam4>>
+    public class CommandProviderSingle<TCommand, THandler, TParam1, TParam2, TParam3, TParam4>
+        : CommandProviderSingleBase<TCommand, THandler, Action<TParam1, TParam2, TParam3, TParam4>>
         where TCommand : Command<TParam1, TParam2, TParam3, TParam4>
         where THandler : ICommandHandler<TParam1, TParam2, TParam3, TParam4>
     {
-        public CommandProviderHandlerSingle(ProviderBase singletonProvider)
+        public CommandProviderSingle(ProviderBase singletonProvider)
             : base(singletonProvider)
         {
         }
@@ -108,12 +108,12 @@ namespace Zenject.Commands
     }
 
     // Five params
-    public class CommandProviderHandlerSingle<TCommand, THandler, TParam1, TParam2, TParam3, TParam4, TParam5>
-        : CommandProviderSingle<TCommand, THandler, ModestTree.Util.Action<TParam1, TParam2, TParam3, TParam4, TParam5>>
+    public class CommandProviderSingle<TCommand, THandler, TParam1, TParam2, TParam3, TParam4, TParam5>
+        : CommandProviderSingleBase<TCommand, THandler, ModestTree.Util.Action<TParam1, TParam2, TParam3, TParam4, TParam5>>
         where TCommand : Command<TParam1, TParam2, TParam3, TParam4, TParam5>
         where THandler : ICommandHandler<TParam1, TParam2, TParam3, TParam4, TParam5>
     {
-        public CommandProviderHandlerSingle(ProviderBase singletonProvider)
+        public CommandProviderSingle(ProviderBase singletonProvider)
             : base(singletonProvider)
         {
         }
@@ -128,12 +128,12 @@ namespace Zenject.Commands
     }
 
     // Six params
-    public class CommandProviderHandlerSingle<TCommand, THandler, TParam1, TParam2, TParam3, TParam4, TParam5, TParam6>
-        : CommandProviderSingle<TCommand, THandler, ModestTree.Util.Action<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6>>
+    public class CommandProviderSingle<TCommand, THandler, TParam1, TParam2, TParam3, TParam4, TParam5, TParam6>
+        : CommandProviderSingleBase<TCommand, THandler, ModestTree.Util.Action<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6>>
         where TCommand : Command<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6>
         where THandler : ICommandHandler<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6>
     {
-        public CommandProviderHandlerSingle(ProviderBase singletonProvider)
+        public CommandProviderSingle(ProviderBase singletonProvider)
             : base(singletonProvider)
         {
         }

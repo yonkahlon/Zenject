@@ -9,13 +9,13 @@ namespace Zenject
     public abstract class DecoratorInstaller : MonoBehaviour
     {
         [Inject]
-        DiContainer _container = null;
+        IBinder _binder = null;
 
-        protected DiContainer Container
+        protected IBinder Binder
         {
             get
             {
-                return _container;
+                return _binder;
             }
         }
 

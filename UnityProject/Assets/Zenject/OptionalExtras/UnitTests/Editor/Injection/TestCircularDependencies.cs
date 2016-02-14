@@ -43,11 +43,11 @@ namespace Zenject.Tests
             Test2.CreateCount = 0;
             Test1.CreateCount = 0;
 
-            Container.Bind<Test1>().ToSingle();
-            Container.Bind<Test2>().ToSingle();
+            Binder.Bind<Test1>().ToSingle();
+            Binder.Bind<Test2>().ToSingle();
 
-            var test1 = Container.Resolve<Test1>();
-            var test2 = Container.Resolve<Test2>();
+            var test1 = Resolver.Resolve<Test1>();
+            var test2 = Resolver.Resolve<Test2>();
 
             Assert.IsEqual(Test2.CreateCount, 1);
             Assert.IsEqual(Test1.CreateCount, 1);
@@ -97,11 +97,11 @@ namespace Zenject.Tests
             Test4.CreateCount = 0;
             Test3.CreateCount = 0;
 
-            Container.Bind<Test3>().ToSingle();
-            Container.Bind<Test4>().ToSingle();
+            Binder.Bind<Test3>().ToSingle();
+            Binder.Bind<Test4>().ToSingle();
 
-            var test1 = Container.Resolve<Test3>();
-            var test2 = Container.Resolve<Test4>();
+            var test1 = Resolver.Resolve<Test3>();
+            var test2 = Resolver.Resolve<Test4>();
 
             Assert.IsEqual(Test4.CreateCount, 1);
             Assert.IsEqual(Test3.CreateCount, 1);
@@ -130,13 +130,13 @@ namespace Zenject.Tests
         {
             if (Container.ChecksForCircularDependencies)
             {
-                Container.Bind<Test5>().ToSingle();
-                Container.Bind<Test6>().ToSingle();
+                Binder.Bind<Test5>().ToSingle();
+                Binder.Bind<Test6>().ToSingle();
 
-                Assert.Throws(() => Container.Resolve<Test5>());
-                Assert.Throws(() => Container.Resolve<Test6>());
+                Assert.Throws(() => Resolver.Resolve<Test5>());
+                Assert.Throws(() => Resolver.Resolve<Test6>());
 
-                Assert.That(!Container.ValidateResolve<Test6>().IsEmpty());
+                Assert.That(!Resolver.ValidateResolve<Test6>().IsEmpty());
             }
         }
 
@@ -152,8 +152,8 @@ namespace Zenject.Tests
         {
             if (Container.ChecksForCircularDependencies)
             {
-                Container.Bind<Test7>().ToSingle();
-                Assert.Throws(() => Container.Instantiate<Test7>());
+                Binder.Bind<Test7>().ToSingle();
+                Assert.Throws(() => Container.Instantiator.Instantiate<Test7>());
             }
         }
     }

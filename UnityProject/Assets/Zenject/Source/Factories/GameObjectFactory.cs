@@ -20,9 +20,25 @@ namespace Zenject
 
         public abstract IEnumerable<ZenjectResolveException> Validate();
 
+        protected IInstantiator Instantiator
+        {
+            get
+            {
+                return _container;
+            }
+        }
+
+        protected IResolver Resolver
+        {
+            get
+            {
+                return _container;
+            }
+        }
+
         protected TValue CreateInternal<TValue>(List<TypeValuePair> argList)
         {
-            return (TValue)_container.InstantiatePrefabForComponentExplicit(
+            return (TValue)Instantiator.InstantiatePrefabForComponentExplicit(
                 typeof(TValue), _prefab, argList,
                 new InjectContext(_container, typeof(TValue), null), false, _groupName);
         }
@@ -44,7 +60,7 @@ namespace Zenject
 
         public override IEnumerable<ZenjectResolveException> Validate()
         {
-            return _container.ValidateObjectGraph<TValue>();
+            return Resolver.ValidateObjectGraph<TValue>();
         }
     }
 
@@ -69,7 +85,7 @@ namespace Zenject
 
         public override IEnumerable<ZenjectResolveException> Validate()
         {
-            return _container.ValidateObjectGraph<TValue>(typeof(TParam1));
+            return Resolver.ValidateObjectGraph<TValue>(typeof(TParam1));
         }
     }
 
@@ -95,7 +111,7 @@ namespace Zenject
 
         public override IEnumerable<ZenjectResolveException> Validate()
         {
-            return _container.ValidateObjectGraph<TValue>(typeof(TParam1), typeof(TParam2));
+            return Resolver.ValidateObjectGraph<TValue>(typeof(TParam1), typeof(TParam2));
         }
     }
 
@@ -122,7 +138,7 @@ namespace Zenject
 
         public override IEnumerable<ZenjectResolveException> Validate()
         {
-            return _container.ValidateObjectGraph<TValue>(typeof(TParam1), typeof(TParam2), typeof(TParam3));
+            return Resolver.ValidateObjectGraph<TValue>(typeof(TParam1), typeof(TParam2), typeof(TParam3));
         }
     }
 
@@ -150,7 +166,7 @@ namespace Zenject
 
         public override IEnumerable<ZenjectResolveException> Validate()
         {
-            return _container.ValidateObjectGraph<TValue>(typeof(TParam1), typeof(TParam2), typeof(TParam3), typeof(TParam4));
+            return Resolver.ValidateObjectGraph<TValue>(typeof(TParam1), typeof(TParam2), typeof(TParam3), typeof(TParam4));
         }
     }
 }

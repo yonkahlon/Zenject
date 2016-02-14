@@ -69,18 +69,21 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Binders\CommandBinder.cs" />
+    <Compile Include="Command\Binders\CommandBinder.cs" />
+    <Compile Include="Command\Binders\CommandExtensions.cs" />
     <Compile Include="Command\Command.cs" />
-    <Compile Include="Command\CommandExtensions.cs" />
     <Compile Include="Command\ICommandHandler.cs" />
-    <Compile Include="Providers\CommandProviderBase.cs" />
-    <Compile Include="Providers\CommandProviderHandlerSingle.cs" />
-    <Compile Include="Providers\CommandProviderHandlerTransient.cs" />
-    <Compile Include="Providers\CommandProviderMethodSingle.cs" />
-    <Compile Include="Providers\CommandProviderMethodTransient.cs" />
-    <Compile Include="Providers\CommandProviderSingle.cs" />
-    <Compile Include="Providers\CommandProviderStatic.cs" />
-    <Compile Include="Providers\CommandProviderTransient.cs" />
+    <Compile Include="Command\Providers\CommandProviderLookup.cs" />
+    <Compile Include="Command\Providers\CommandProviderLookupMethod.cs" />
+    <Compile Include="Command\Providers\CommandProviderMethod.cs" />
+    <Compile Include="Command\Providers\CommandProviderSingle.cs" />
+    <Compile Include="Command\Providers\CommandProviderSingleMethod.cs" />
+    <Compile Include="Command\Providers\CommandProviderTransient.cs" />
+    <Compile Include="Command\Providers\CommandProviderTransientMethod.cs" />
+    <Compile Include="Command\Providers\Common\CommandProviderBase.cs" />
+    <Compile Include="Command\Providers\Common\CommandProviderLookupBase.cs" />
+    <Compile Include="Command\Providers\Common\CommandProviderSingleBase.cs" />
+    <Compile Include="Command\Providers\Common\CommandProviderTransientBase.cs" />
     <Compile Include="Signal\Signal.cs" />
     <Compile Include="Signal\SignalExtensions.cs" />
   </ItemGroup>

@@ -27,14 +27,14 @@ namespace Zenject.Tests
             base.Setup();
 
             _test1 = new Test1();
-            Container.Bind<Test0>().ToSingle().When(r => r.ObjectInstance == _test1);
-            Container.Bind<Test1>().ToInstance(_test1);
+            Binder.Bind<Test0>().ToSingle().When(r => r.ObjectInstance == _test1);
+            Binder.Bind<Test1>().ToInstance(_test1);
         }
 
         [Test]
         public void TestTargetConditionError()
         {
-            Container.Inject(_test1);
+            Resolver.Inject(_test1);
 
             Assert.That(_test1.test0 != null);
         }

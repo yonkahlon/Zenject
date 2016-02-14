@@ -23,11 +23,11 @@ namespace Zenject.Tests
         [Test]
         public void RunTest1()
         {
-            Container.Bind<Test2>().ToSingle();
-            Container.Bind<int>().ToInstance(1);
+            Binder.Bind<Test2>().ToSingle();
+            Binder.Bind<int>().ToInstance(1);
 
-            Assert.That(Container.ValidateResolve<Test2>().IsEmpty());
-            var test1 = Container.Resolve<Test2>();
+            Assert.That(Resolver.ValidateResolve<Test2>().IsEmpty());
+            var test1 = Resolver.Resolve<Test2>();
             Assert.IsEqual(test1.val, 1);
         }
     }

@@ -22,21 +22,21 @@ namespace Zenject.Tests
         [Test]
         public void TestClassRegistration()
         {
-            Container.Bind<Foo>().ToSingle();
+            Binder.Bind<Foo>().ToSingle();
 
-            Assert.That(Container.ValidateResolve<Foo>().IsEmpty());
-            Assert.IsNotNull(Container.Resolve<Foo>());
+            Assert.That(Resolver.ValidateResolve<Foo>().IsEmpty());
+            Assert.IsNotNull(Resolver.Resolve<Foo>());
         }
 
         [Test]
         public void TestSingletonOneInstance()
         {
-            Container.Bind<Foo>().ToSingle();
+            Binder.Bind<Foo>().ToSingle();
 
-            Assert.That(Container.ValidateResolve<Foo>().IsEmpty());
-            var test1 = Container.Resolve<Foo>();
-            Assert.That(Container.ValidateResolve<Foo>().IsEmpty());
-            var test2 = Container.Resolve<Foo>();
+            Assert.That(Resolver.ValidateResolve<Foo>().IsEmpty());
+            var test1 = Resolver.Resolve<Foo>();
+            Assert.That(Resolver.ValidateResolve<Foo>().IsEmpty());
+            var test2 = Resolver.Resolve<Foo>();
 
             Assert.That(test1 != null && test2 != null);
             Assert.That(ReferenceEquals(test1, test2));
@@ -45,12 +45,12 @@ namespace Zenject.Tests
         [Test]
         public void TestSingletonOneInstanceUntyped()
         {
-            Container.Bind(typeof(Foo)).ToSingle();
+            Binder.Bind(typeof(Foo)).ToSingle();
 
-            Assert.That(Container.ValidateResolve<Foo>().IsEmpty());
-            var test1 = Container.Resolve<Foo>();
-            Assert.That(Container.ValidateResolve<Foo>().IsEmpty());
-            var test2 = Container.Resolve<Foo>();
+            Assert.That(Resolver.ValidateResolve<Foo>().IsEmpty());
+            var test1 = Resolver.Resolve<Foo>();
+            Assert.That(Resolver.ValidateResolve<Foo>().IsEmpty());
+            var test2 = Resolver.Resolve<Foo>();
 
             Assert.That(test1 != null && test2 != null);
             Assert.That(ReferenceEquals(test1, test2));
@@ -59,51 +59,51 @@ namespace Zenject.Tests
         [Test]
         public void TestInterfaceBoundToImplementationRegistration()
         {
-            Container.Bind<IFoo>().ToSingle<Foo>();
+            Binder.Bind<IFoo>().ToSingle<Foo>();
 
-            Assert.That(Container.ValidateResolve<IFoo>().IsEmpty());
-            Assert.IsNotNull(Container.Resolve<IFoo>());
+            Assert.That(Resolver.ValidateResolve<IFoo>().IsEmpty());
+            Assert.IsNotNull(Resolver.Resolve<IFoo>());
         }
 
         [Test]
         public void TestInterfaceBoundToImplementationRegistrationUntyped()
         {
-            Container.Bind(typeof(IFoo)).ToSingle(typeof(Foo));
+            Binder.Bind(typeof(IFoo)).ToSingle(typeof(Foo));
 
-            Assert.That(Container.ValidateResolve<IFoo>().IsEmpty());
-            Assert.IsNotNull(Container.Resolve<IFoo>());
+            Assert.That(Resolver.ValidateResolve<IFoo>().IsEmpty());
+            Assert.IsNotNull(Resolver.Resolve<IFoo>());
         }
 
         [Test]
         public void TestDuplicateBindings()
         {
             // Note: does not error out until a request for Foo is made
-            Container.Bind<Foo>().ToSingle();
-            Container.Bind<Foo>().ToSingle();
+            Binder.Bind<Foo>().ToSingle();
+            Binder.Bind<Foo>().ToSingle();
         }
 
         [Test]
         public void TestDuplicateBindingsFail()
         {
-            Container.Bind<Foo>().ToSingle();
-            Container.Bind<Foo>().ToSingle();
+            Binder.Bind<Foo>().ToSingle();
+            Binder.Bind<Foo>().ToSingle();
 
             Assert.Throws<ZenjectResolveException>(
-                delegate { Container.Resolve<Foo>(); });
+                delegate { Resolver.Resolve<Foo>(); });
 
-            Assert.That(Container.ValidateResolve<Foo>().Any());
+            Assert.That(Resolver.ValidateResolve<Foo>().Any());
         }
 
         [Test]
         public void TestDuplicateBindingsFailUntyped()
         {
-            Container.Bind(typeof(Foo)).ToSingle();
-            Container.Bind(typeof(Foo)).ToSingle();
+            Binder.Bind(typeof(Foo)).ToSingle();
+            Binder.Bind(typeof(Foo)).ToSingle();
 
             Assert.Throws<ZenjectResolveException>(
-                delegate { Container.Resolve<Foo>(); });
+                delegate { Resolver.Resolve<Foo>(); });
 
-            Assert.That(Container.ValidateResolve<Foo>().Any());
+            Assert.That(Resolver.ValidateResolve<Foo>().Any());
         }
     }
 }

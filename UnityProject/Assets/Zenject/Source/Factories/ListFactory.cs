@@ -34,7 +34,7 @@ namespace Zenject
 
             foreach (var type in _implTypes)
             {
-                list.Add(_container.Instantiate<T>(type, constructorArgs));
+                list.Add(_container.Instantiator.Instantiate<T>(type, constructorArgs));
             }
 
             return list;

@@ -69,7 +69,7 @@ namespace Zenject
 
                 _rootObj.SetActive(true);
 
-                _container.InjectGameObject(_rootObj, true, false, new object[0], context);
+                _container.Resolver.InjectGameObject(_rootObj, true, false, new object[0], context);
             }
 
             var component = _rootObj.GetComponentInChildren(componentType);
@@ -102,7 +102,7 @@ namespace Zenject
                 // since for singletons, the container they are accessed from should not determine
                 // the container they are instantiated with
                 // Transients can do that but not singletons
-                foreach (var err in _container.ValidateObjectGraph(componentType, context))
+                foreach (var err in _container.Resolver.ValidateObjectGraph(componentType, context))
                 {
                     yield return err;
                 }

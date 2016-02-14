@@ -25,7 +25,7 @@ namespace Zenject
         // Identifier - most of the time this is null
         // It will match 'foo' in this example:
         //      ... In an installer somewhere:
-        //          Container.Bind<Foo>("foo").ToSingle();
+        //          Binder.Bind<Foo>("foo").ToSingle();
         //      ...
         //      ... In a constructor:
         //          public Foo([Inject("foo") Foo foo)
@@ -34,8 +34,8 @@ namespace Zenject
         // ConcreteIdentifier - most of the time this is null
         // It will match 'foo' in this example:
         //      ... In an installer somewhere:
-        //          Container.Bind<Foo>().ToSingle("foo");
-        //          Container.Bind<ITickable>().ToSingle<Foo>("foo");
+        //          Binder.Bind<Foo>().ToSingle("foo");
+        //          Binder.Bind<ITickable>().ToSingle<Foo>("foo");
         //      ...
         // This allows you to create When() conditionals like this:
         //      ...
@@ -115,6 +115,22 @@ namespace Zenject
             DiContainer container, Type memberType)
             : this(container, memberType, null, false)
         {
+        }
+
+        public IInstantiator Instantiator
+        {
+            get
+            {
+                return Container.Instantiator;
+            }
+        }
+
+        public IResolver Resolver
+        {
+            get
+            {
+                return Container.Resolver;
+            }
         }
 
         public IEnumerable<InjectContext> ParentContexts

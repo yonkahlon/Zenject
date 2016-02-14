@@ -34,10 +34,10 @@ namespace Zenject.Tests
             var t1 = new Test2();
             var t2 = new Test2();
 
-            Container.Bind<FactoryUntyped<Test1>>().ToSingle();
+            Binder.Bind<FactoryUntyped<Test1>>().ToSingle();
 
-            Assert.That(Container.ValidateResolve<FactoryUntyped<Test1>>().IsEmpty());
-            var factory = Container.Resolve<FactoryUntyped<Test1>>();
+            Assert.That(Resolver.ValidateResolve<FactoryUntyped<Test1>>().IsEmpty());
+            var factory = Resolver.Resolve<FactoryUntyped<Test1>>();
 
             var test = factory.Create(t1, 5.0f, t2);
 

@@ -30,21 +30,21 @@ namespace Asteroids
         // In this example there is only one 'installer' but in larger projects you
         // will likely end up with many different re-usable installers
         // that you'll want to use in several different scenes
-        // To re-use an existing installer you can simply call Container.Install<> like below
+        // To re-use an existing installer you can simply call Binder.Install<> like below
         // Note that this will only work if your installer is just a normal C# class
         // If it's a monobehaviour (that is, derived from MonoInstaller) then you would be
         // better off making it a prefab and then just including it in your scene (and adding
         // it to the list of installers in the inspector of CompositionRoot) to re-use it
         // Another option is to store your MonoInstallers as a prefab in a resource folder,
-        // in which case you can call Container.Install<> with a MonoInstaller (see documentation)
+        // in which case you can call Binder.Install<> with a MonoInstaller (see documentation)
         void InstallIncludes()
         {
-            //Container.Install<MyCustomInstaller>();
+            //Binder.Install<MyCustomInstaller>();
         }
 
         void InstallAsteroids()
         {
-            Container.Bind<LevelHelper>().ToSingle();
+            Binder.Bind<LevelHelper>().ToSingle();
 
             // ITickable, IFixedTickable, IInitializable and IDisposable are special Zenject interfaces.
             // Binding a class to any of these interfaces creates an instance of the class at startup.
@@ -59,9 +59,9 @@ namespace Asteroids
             // one instance of the type given inside the ToSingle<>. So in this case, any classes that take ITickable,
             // IFixedTickable, or AsteroidManager as inputs will receive the same instance of AsteroidManager.
             // We create multiple bindings for ITickable, so any dependencies that reference this type must be lists of ITickable.
-            Container.Bind<ITickable>().ToSingle<AsteroidManager>();
-            Container.Bind<IFixedTickable>().ToSingle<AsteroidManager>();
-            Container.Bind<AsteroidManager>().ToSingle();
+            Binder.Bind<ITickable>().ToSingle<AsteroidManager>();
+            Binder.Bind<IFixedTickable>().ToSingle<AsteroidManager>();
+            Binder.Bind<AsteroidManager>().ToSingle();
 
             // Here, we're defining a generic factory to create asteroid objects using the given prefab
             // There's several different ways of instantiating new game objects in zenject, this is
@@ -70,43 +70,43 @@ namespace Asteroids
             // or constructor parameter of type Asteroid.Factory, then call create on that
             // The extra string parameter here is optional, but if provided will group the dynamically created
             // game objects underneath a new game object named Asteroids
-            Container.BindGameObjectFactory<Asteroid.Factory>(_settings.Asteroid.Prefab, "Asteroids");
+            Binder.BindGameObjectFactory<Asteroid.Factory>(_settings.Asteroid.Prefab, "Asteroids");
 
-            Container.Bind<IInitializable>().ToSingle<GameController>();
-            Container.Bind<ITickable>().ToSingle<GameController>();
-            Container.Bind<GameController>().ToSingle();
+            Binder.Bind<IInitializable>().ToSingle<GameController>();
+            Binder.Bind<ITickable>().ToSingle<GameController>();
+            Binder.Bind<GameController>().ToSingle();
 
-            Container.Bind<ShipStateFactory>().ToSingle();
+            Binder.Bind<ShipStateFactory>().ToSingle();
 
             // Here's another way to create game objects dynamically, by using ToTransientPrefab
             // We prefer to use ITickable / IInitializable in favour of the Monobehaviour methods
             // so we just use a monobehaviour wrapper class here to pass in asset data
-            Container.Bind<ShipHooks>().ToTransientPrefab<ShipHooks>(_settings.Ship.Prefab).WhenInjectedInto<Ship>();
+            Binder.Bind<ShipHooks>().ToTransientPrefab<ShipHooks>(_settings.Ship.Prefab).WhenInjectedInto<Ship>();
 
             // In this game there is only one camera so an enum isn't necessary
             // but used here to show how it would work if there were multiple
-            Container.Bind<Camera>("Main").ToSingleInstance(_settings.MainCamera);
+            Binder.Bind<Camera>("Main").ToSingleInstance(_settings.MainCamera);
 
-            Container.Bind<Ship>().ToSingle();
-            Container.Bind<ITickable>().ToSingle<Ship>();
-            Container.Bind<IInitializable>().ToSingle<Ship>();
+            Binder.Bind<Ship>().ToSingle();
+            Binder.Bind<ITickable>().ToSingle<Ship>();
+            Binder.Bind<IInitializable>().ToSingle<Ship>();
         }
 
         void InstallSettings()
         {
-            Container.Bind<ShipStateMoving.Settings>().ToSingleInstance(_settings.Ship.StateMoving);
-            Container.Bind<ShipStateDead.Settings>().ToSingleInstance(_settings.Ship.StateDead);
-            Container.Bind<ShipStateWaitingToStart.Settings>().ToSingleInstance(_settings.Ship.StateStarting);
+            Binder.Bind<ShipStateMoving.Settings>().ToSingleInstance(_settings.Ship.StateMoving);
+            Binder.Bind<ShipStateDead.Settings>().ToSingleInstance(_settings.Ship.StateDead);
+            Binder.Bind<ShipStateWaitingToStart.Settings>().ToSingleInstance(_settings.Ship.StateStarting);
 
-            Container.Bind<AsteroidManager.Settings>().ToSingleInstance(_settings.Asteroid.Spawner);
-            Container.Bind<Asteroid.Settings>().ToSingleInstance(_settings.Asteroid.General);
+            Binder.Bind<AsteroidManager.Settings>().ToSingleInstance(_settings.Asteroid.Spawner);
+            Binder.Bind<Asteroid.Settings>().ToSingleInstance(_settings.Asteroid.General);
         }
 
         // We don't need to include these bindings but often its nice to have
         // control over initialization-order and update-order
         void InitExecutionOrder()
         {
-            Container.Install<ExecutionOrderInstaller>(
+            Binder.Install<ExecutionOrderInstaller>(
                 new List<Type>()
                 {
                     // Re-arrange this list to control update order

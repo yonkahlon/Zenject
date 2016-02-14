@@ -10,29 +10,21 @@ using Zenject.Commands;
 namespace Zenject.Tests
 {
     [TestFixture]
-    public class TestSignalsSixParams
+    public class TestSignalsSixParams : TestWithContainer
     {
-        DiContainer _container;
-
-        [SetUp]
-        public void Setup()
-        {
-            _container = new DiContainer();
-        }
-
         [Test]
         public void RunTest()
         {
-            _container.Bind<Foo>().ToSingle();
-            _container.Bind<Bar>().ToSingle();
+            Binder.Bind<Foo>().ToSingle();
+            Binder.Bind<Bar>().ToSingle();
 
-            _container.BindSignal<SomethingHappenedSignal>();
+            Binder.BindSignal<SomethingHappenedSignal>();
 
-            _container.BindTrigger<SomethingHappenedSignal.Trigger>()
+            Binder.BindTrigger<SomethingHappenedSignal.Trigger>()
                 .WhenInjectedInto<Foo>();
 
-            var foo = _container.Resolve<Foo>();
-            var bar = _container.Resolve<Bar>();
+            var foo = Resolver.Resolve<Foo>();
+            var bar = Resolver.Resolve<Bar>();
             bar.Initialize();
 
             Assert.IsNull(bar.ReceivedValue);

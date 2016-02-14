@@ -32,12 +32,12 @@ namespace Zenject
         {
             Assert.That(_concreteType.DerivesFromOrEqual(context.MemberType));
 
-            return context.Container.InstantiatePrefabResourceForComponent(_concreteType, _resourcePath);
+            return context.Container.Instantiator.InstantiatePrefabResourceForComponent(_concreteType, _resourcePath);
         }
 
         public override IEnumerable<ZenjectResolveException> ValidateBinding(InjectContext context)
         {
-            return context.Container.ValidateObjectGraph(_concreteType, context);
+            return context.Container.Resolver.ValidateObjectGraph(_concreteType, context);
         }
     }
 }

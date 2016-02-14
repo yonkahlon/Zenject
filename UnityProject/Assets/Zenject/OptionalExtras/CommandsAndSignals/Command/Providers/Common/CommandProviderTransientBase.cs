@@ -6,37 +6,26 @@ using System.Linq;
 
 namespace Zenject.Commands
 {
-    public abstract class CommandProviderSingle<TCommand, THandler, TAction>
+    public abstract class CommandProviderTransientBase<TCommand, THandler, TAction>
         : CommandProviderBase<TCommand, TAction>
         where TCommand : ICommand
     {
-        readonly ProviderBase _singletonProvider;
-
-        public CommandProviderSingle(ProviderBase singletonProvider)
-        {
-            _singletonProvider = singletonProvider;
-        }
-
-        public override void Dispose()
-        {
-            _singletonProvider.Dispose();
-        }
-
-        protected THandler GetSingleton(InjectContext c)
+        protected THandler CreateHandler(InjectContext c)
         {
             var newContext = new InjectContext(
                 c.Container, typeof(THandler), null, false, c.ObjectType,
                 c.ObjectInstance, c.MemberName, c.ParentContext, c.ConcreteIdentifier,
                 null, c.SourceType);
 
-            return (THandler)_singletonProvider.GetInstance(newContext);
+            return c.Instantiator.InstantiateExplicit<THandler>(new List<TypeValuePair>(), newContext);
         }
 
         public override IEnumerable<ZenjectResolveException> ValidateBinding(InjectContext context)
         {
             return base.ValidateBinding(context)
-                .Concat(_singletonProvider.ValidateBinding(context));
+                .Concat(context.Resolver.ValidateObjectGraph<THandler>(context));
         }
     }
 }
+
 

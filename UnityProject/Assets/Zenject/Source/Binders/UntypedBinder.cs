@@ -16,14 +16,14 @@ namespace Zenject
         {
         }
 
-        public BindingConditionSetter ToLookup<TConcrete>()
+        public BindingConditionSetter ToResolve<TConcrete>()
         {
-            return ToLookupBase<TConcrete>(null);
+            return ToResolveBase<TConcrete>(null);
         }
 
-        public BindingConditionSetter ToLookup<TConcrete>(string identifier)
+        public BindingConditionSetter ToResolve<TConcrete>(string identifier)
         {
-            return ToLookupBase<TConcrete>(identifier);
+            return ToResolveBase<TConcrete>(identifier);
         }
 
         public BindingConditionSetter ToMethod(Type returnType, Func<InjectContext, object> method)

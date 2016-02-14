@@ -8,13 +8,13 @@ namespace Zenject
     public abstract class Installer : IInstaller
     {
         [Inject]
-        DiContainer _container = null;
+        IBinder _binder = null;
 
-        protected DiContainer Container
+        protected IBinder Binder
         {
             get
             {
-                return _container;
+                return _binder;
             }
         }
 

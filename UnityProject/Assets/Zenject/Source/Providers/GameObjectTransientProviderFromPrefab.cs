@@ -39,12 +39,12 @@ namespace Zenject
         public override object GetInstance(InjectContext context)
         {
             Assert.That(_concreteType.DerivesFromOrEqual(context.MemberType));
-            return context.Container.InstantiatePrefabForComponent(_concreteType, _template);
+            return context.Container.Instantiator.InstantiatePrefabForComponent(_concreteType, _template);
         }
 
         public override IEnumerable<ZenjectResolveException> ValidateBinding(InjectContext context)
         {
-            return context.Container.ValidateObjectGraph(_concreteType, context);
+            return context.Container.Resolver.ValidateObjectGraph(_concreteType, context);
         }
     }
 }

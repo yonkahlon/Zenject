@@ -27,13 +27,13 @@ namespace Zenject
         {
             Assert.That(_componentType.DerivesFromOrEqual(context.MemberType));
 
-            return context.Container.InstantiateComponentOnNewGameObjectExplicit(
+            return context.Container.Instantiator.InstantiateComponentOnNewGameObjectExplicit(
                 _componentType, _componentType.Name(), new List<TypeValuePair>(), context);
         }
 
         public override IEnumerable<ZenjectResolveException> ValidateBinding(InjectContext context)
         {
-            return context.Container.ValidateObjectGraph(_componentType, context);
+            return context.Container.Resolver.ValidateObjectGraph(_componentType, context);
         }
     }
 }

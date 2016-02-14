@@ -10,36 +10,28 @@ using Zenject.Commands;
 namespace Zenject.Tests
 {
     [TestFixture]
-    public class TestSignalsWithIdentifiers
+    public class TestSignalsWithIdentifiers : TestWithContainer
     {
-        DiContainer _container;
-
-        [SetUp]
-        public void Setup()
-        {
-            _container = new DiContainer();
-        }
-
         [Test]
         public void RunTest()
         {
-            _container.BindSignal<SomethingHappenedSignal>();
-            _container.BindTrigger<SomethingHappenedSignal.Trigger>();
+            Binder.BindSignal<SomethingHappenedSignal>();
+            Binder.BindTrigger<SomethingHappenedSignal.Trigger>();
 
-            _container.Bind<Foo>().ToSingle();
-            _container.Bind<Bar>().ToSingle();
+            Binder.Bind<Foo>().ToSingle();
+            Binder.Bind<Bar>().ToSingle();
 
-            _container.BindSignal<SomethingHappenedSignal>("special");
-            _container.BindTrigger<SomethingHappenedSignal.Trigger>("special");
+            Binder.BindSignal<SomethingHappenedSignal>("special");
+            Binder.BindTrigger<SomethingHappenedSignal.Trigger>("special");
 
-            _container.Bind<FooSpecial>().ToSingle();
-            _container.Bind<BarSpecial>().ToSingle();
+            Binder.Bind<FooSpecial>().ToSingle();
+            Binder.Bind<BarSpecial>().ToSingle();
 
-            var foo = _container.Resolve<Foo>();
-            var bar = _container.Resolve<Bar>();
+            var foo = Resolver.Resolve<Foo>();
+            var bar = Resolver.Resolve<Bar>();
 
-            var fooSpecial = _container.Resolve<FooSpecial>();
-            var barSpecial = _container.Resolve<BarSpecial>();
+            var fooSpecial = Resolver.Resolve<FooSpecial>();
+            var barSpecial = Resolver.Resolve<BarSpecial>();
 
             bar.Initialize();
             barSpecial.Initialize();

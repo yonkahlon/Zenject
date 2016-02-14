@@ -8,10 +8,10 @@ namespace ModestTree
         [InstallerTest]
         public void TestBindingsOnSameGameObject()
         {
-            Container.Bind<Foo>().ToSingleGameObject();
-            Container.Bind<IInitializable>().ToSingleGameObject<Foo>();
+            Binder.Bind<Foo>().ToSingleGameObject();
+            Binder.Bind<IInitializable>().ToSingleGameObject<Foo>();
 
-            Container.BindAllInterfacesToSingle<Runner>();
+            Binder.BindAllInterfacesToSingle<Runner>();
         }
 
         public class Runner : IInitializable

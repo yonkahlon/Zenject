@@ -6,8 +6,8 @@ using System.Linq;
 
 namespace Zenject.Commands
 {
-    public class CommandProviderHandlerTransient<TCommand, THandler>
-        : CommandProviderTransient<TCommand, THandler, Action>
+    public class CommandProviderTransient<TCommand, THandler>
+        : CommandProviderTransientBase<TCommand, THandler, Action>
         where TCommand : Command
         where THandler : ICommandHandler
     {

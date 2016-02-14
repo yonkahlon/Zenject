@@ -19,13 +19,13 @@ namespace Zenject.Tests
         [Test]
         public void TestCase1()
         {
-            Container.Bind<IFoo>().ToSingle<Foo>();
+            Binder.Bind<IFoo>().ToSingle<Foo>();
 
-            Assert.That(Container.ValidateResolve<IFoo>().IsEmpty());
+            Assert.That(Resolver.ValidateResolve<IFoo>().IsEmpty());
 
-            Container.Unbind<IFoo>();
+            Binder.Unbind<IFoo>();
 
-            Assert.That(!Container.ValidateResolve<IFoo>().IsEmpty());
+            Assert.That(!Resolver.ValidateResolve<IFoo>().IsEmpty());
         }
     }
 }

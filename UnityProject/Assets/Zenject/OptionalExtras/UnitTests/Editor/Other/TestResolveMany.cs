@@ -25,10 +25,10 @@ namespace Zenject.Tests
         [Test]
         public void TestCase1()
         {
-            Container.Bind<Test0>().ToSingle<Test1>();
-            Container.Bind<Test0>().ToSingle<Test2>();
+            Binder.Bind<Test0>().ToSingle<Test1>();
+            Binder.Bind<Test0>().ToSingle<Test2>();
 
-            List<Test0> many = Container.ResolveAll<Test0>();
+            List<Test0> many = Resolver.ResolveAll<Test0>();
 
             Assert.That(many.Count == 2);
         }
@@ -36,7 +36,7 @@ namespace Zenject.Tests
         [Test]
         public void TestOptional()
         {
-            List<Test0> many = Container.ResolveAll<Test0>(true);
+            List<Test0> many = Resolver.ResolveAll<Test0>(true);
             Assert.That(many.Count == 0);
         }
     }

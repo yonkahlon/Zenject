@@ -10,10 +10,10 @@ namespace Zenject
     // Input.GetMouseButtonDown() and similar methods
     public enum MouseButtons
     {
+        None,
         Left,
         Right,
         Middle,
-        None,
     }
 
     [System.Diagnostics.DebuggerStepThrough]

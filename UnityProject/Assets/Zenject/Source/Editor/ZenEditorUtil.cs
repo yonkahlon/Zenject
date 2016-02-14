@@ -27,7 +27,7 @@ namespace Zenject
             var globalContainer = GlobalCompositionRoot.CreateContainer(true, null);
             var container = compRoot.CreateContainer(true, globalContainer, new List<IInstaller>());
 
-            foreach (var error in container.ValidateResolve(
+            foreach (var error in container.Resolver.ValidateResolve(
                 new InjectContext(container, typeof(IFacade), null)))
             {
                 yield return error;
@@ -52,7 +52,7 @@ namespace Zenject
                         continue;
                     }
 
-                    foreach (var error in container.ValidateObjectGraph(monoBehaviour.GetType()))
+                    foreach (var error in container.Resolver.ValidateObjectGraph(monoBehaviour.GetType()))
                     {
                         yield return error;
                     }
@@ -67,7 +67,7 @@ namespace Zenject
                 }
             }
 
-            foreach (var error in container.ValidateValidatables())
+            foreach (var error in container.Resolver.ValidateValidatables())
             {
                 yield return error;
             }

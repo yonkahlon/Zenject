@@ -42,8 +42,8 @@ namespace Zenject.Tests
 
             public void Rebind()
             {
-                _container.Rebind<IHaveMessage>().ToSingle<Bye>();
-                _container.Inject(this);
+                _container.Binder.Rebind<IHaveMessage>().ToSingle<Bye>();
+                _container.Resolver.Inject(this);
             }
         }
 
@@ -51,35 +51,35 @@ namespace Zenject.Tests
         public void RebindingInSubContainer()
         {
             DiContainer parentContainer = new DiContainer();
-            parentContainer.Bind<IHaveMessage>().ToSingle<Welcome>();
+            parentContainer.Binder.Bind<IHaveMessage>().ToSingle<Welcome>();
 
-            Assert.AreEqual("Welcome", parentContainer.Resolve<IHaveMessage>().GetMessage());
+            Assert.AreEqual("Welcome", parentContainer.Resolver.Resolve<IHaveMessage>().GetMessage());
 
             DiContainer childContainer = parentContainer.CreateSubContainer();
-            childContainer.Rebind<IHaveMessage>().ToSingle<Bye>();
+            childContainer.Binder.Rebind<IHaveMessage>().ToSingle<Bye>();
 
-            Assert.AreEqual("Bye", childContainer.Resolve<IHaveMessage>().GetMessage());
+            Assert.AreEqual("Bye", childContainer.Resolver.Resolve<IHaveMessage>().GetMessage());
 
-            Assert.AreEqual("Welcome", parentContainer.Resolve<IHaveMessage>().GetMessage());
+            Assert.AreEqual("Welcome", parentContainer.Resolver.Resolve<IHaveMessage>().GetMessage());
         }
 
         [Test]
         public void RebindingInSubContainer2()
         {
             DiContainer parentContainer = new DiContainer();
-            parentContainer.Bind<IHaveMessage>().ToSingle<Welcome>();
+            parentContainer.Binder.Bind<IHaveMessage>().ToSingle<Welcome>();
 
-            Assert.AreEqual("Welcome", parentContainer.Resolve<IHaveMessage>().GetMessage());
+            Assert.AreEqual("Welcome", parentContainer.Resolver.Resolve<IHaveMessage>().GetMessage());
 
             DiContainer childContainer = parentContainer.CreateSubContainer();
             User user = new User();
-            childContainer.Inject(user);
+            childContainer.Resolver.Inject(user);
 
             Assert.AreEqual("Welcome", user.SayIt());
             user.Rebind();
             Assert.AreEqual("Bye", user.SayIt());
 
-            parentContainer.Inject(user);
+            parentContainer.Resolver.Inject(user);
             Assert.AreEqual("Welcome", user.SayIt());
         }
     }
