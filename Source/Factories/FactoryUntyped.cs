@@ -11,7 +11,7 @@ namespace Zenject
     public class FactoryUntyped<TContract, TConcrete> : IFactoryUntyped<TContract> where TConcrete : TContract
     {
         [Inject]
-        IInstantiator _instantiator;
+        IInstantiator _instantiator = null;
 
         // So it can be created without using instantiator
         public IInstantiator Instantiator
@@ -19,10 +19,6 @@ namespace Zenject
             get
             {
                 return _instantiator;
-            }
-            set
-            {
-                _instantiator = value;
             }
         }
 
@@ -42,10 +38,10 @@ namespace Zenject
     public class FactoryUntyped<TContract> : IFactoryUntyped<TContract>
     {
         [Inject]
-        IInstantiator _instantiator;
+        IInstantiator _instantiator = null;
 
         [InjectOptional]
-        Type _concreteType;
+        Type _concreteType = null;
 
         // So it can be created without using container
         public IInstantiator Instantiator
@@ -54,10 +50,6 @@ namespace Zenject
             {
                 return _instantiator;
             }
-            set
-            {
-                _instantiator = value;
-            }
         }
 
         public Type ConcreteType
@@ -65,10 +57,6 @@ namespace Zenject
             get
             {
                 return _concreteType;
-            }
-            set
-            {
-                _concreteType = value;
             }
         }
 
