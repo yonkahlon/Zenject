@@ -70,7 +70,7 @@ namespace Zenject
 
             if (prefab == null)
             {
-                instance = new GameObject().AddComponent<GlobalCompositionRoot>();
+                instance = new GameObject("GlobalCompositionRoot").AddComponent<GlobalCompositionRoot>();
             }
             else
             {
