@@ -56,6 +56,11 @@ namespace Zenject
             _container = new DiContainer(
                 GlobalCompositionRoot.Instance.Container);
 
+            if (Installers.IsEmpty() && InstallerPrefabs.IsEmpty())
+            {
+                Log.Warn("No installers found while initializing CompositionRoot '{0}'", this.name);
+            }
+
             InstallBindings(_container.Binder);
 
             InjectComponents(_container.Resolver);

@@ -7,6 +7,10 @@ using UnityEngine.Serialization;
 using System.Linq;
 using Zenject.Internal;
 
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
+
 namespace Zenject
 {
     public abstract class CompositionRoot : MonoBehaviour
@@ -54,44 +58,50 @@ namespace Zenject
         {
             binder.Install<StandardInstaller>();
 
-            if (_installers.IsEmpty() && _installerPrefabs.IsEmpty())
-            {
-                Log.Warn("No installers found while initializing CompositionRoot '{0}'", this.name);
-            }
-            else
-            {
-                var newGameObjects = new List<GameObject>();
-                var allInstallers = _installers.Cast<IInstaller>().ToList();
+            var newGameObjects = new List<GameObject>();
+            var allInstallers = _installers.Cast<IInstaller>().ToList();
 
-                try
+            try
+            {
+#if UNITY_EDITOR
+                foreach (var installer in _installers)
                 {
-                    foreach (var prefab in _installerPrefabs)
-                    {
-                        Assert.IsNotNull(prefab, "Found null prefab in CompositionRoot");
-
-                        var installerGameObject = GameObject.Instantiate(prefab.gameObject);
-
-                        newGameObjects.Add(installerGameObject);
-
-                        installerGameObject.transform.SetParent(this.transform, false);
-                        var installer = installerGameObject.GetComponent<MonoInstaller>();
-
-                        Assert.IsNotNull(installer,
-                            "Expected to find component with type 'MonoInstaller' on given installer prefab '{0}'", prefab.name);
-
-                        allInstallers.Add(installer);
-                    }
-
-                    binder.Install(allInstallers);
+                    Assert.That(PrefabUtility.GetPrefabType(installer.gameObject) != PrefabType.Prefab,
+                        "Found prefab with name '{0}' in the Installer property of CompositionRoot '{1}'.  You should use the property 'InstallerPrefabs' for this instead.", installer.name, this.name);
                 }
-                finally
+#endif
+
+                foreach (var installerPrefab in _installerPrefabs)
                 {
-                    if (binder.IsValidating)
+                    Assert.IsNotNull(installerPrefab, "Found null prefab in CompositionRoot");
+
+#if UNITY_EDITOR
+                    Assert.That(PrefabUtility.GetPrefabType(installerPrefab.gameObject) == PrefabType.Prefab,
+                        "Found non-prefab with name '{0}' in the InstallerPrefabs property of CompositionRoot '{1}'.  You should use the property 'Installer' for this instead",
+                        installerPrefab.name, this.name);
+#endif
+                    var installerGameObject = GameObject.Instantiate(installerPrefab.gameObject);
+
+                    newGameObjects.Add(installerGameObject);
+
+                    installerGameObject.transform.SetParent(this.transform, false);
+                    var installer = installerGameObject.GetComponent<MonoInstaller>();
+
+                    Assert.IsNotNull(installer,
+                        "Expected to find component with type 'MonoInstaller' on given installer prefab '{0}'", installerPrefab.name);
+
+                    allInstallers.Add(installer);
+                }
+
+                binder.Install(allInstallers);
+            }
+            finally
+            {
+                if (binder.IsValidating)
+                {
+                    foreach (var gameObject in newGameObjects)
                     {
-                        foreach (var gameObject in newGameObjects)
-                        {
-                            GameObject.DestroyImmediate(gameObject);
-                        }
+                        GameObject.DestroyImmediate(gameObject);
                     }
                 }
             }
