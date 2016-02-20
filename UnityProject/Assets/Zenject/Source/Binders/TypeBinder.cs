@@ -1,5 +1,6 @@
 using System;
 using ModestTree;
+using Zenject.Internal;
 #if !ZEN_NOT_UNITY3D
 using UnityEngine;
 #endif
@@ -139,7 +140,7 @@ namespace Zenject
                     "Invalid type given during bind command.  Expected type '{0}' to derive from type '{1}'".Fmt(concreteType.Name(), ContractType.Name()));
             }
 
-            if (ZenUtil.IsNull(prefab))
+            if (ZenUtilInternal.IsNull(prefab))
             {
                 throw new ZenjectBindException(
                     "Received null prefab while binding type '{0}'".Fmt(concreteType.Name()));
@@ -158,7 +159,7 @@ namespace Zenject
             }
 
             // We have to cast to object otherwise we get SecurityExceptions when this function is run outside of unity
-            if (ZenUtil.IsNull(prefab))
+            if (ZenUtilInternal.IsNull(prefab))
             {
                 throw new ZenjectBindException("Received null prefab while binding type '{0}'".Fmt(concreteType.Name()));
             }
@@ -306,7 +307,7 @@ namespace Zenject
 
         public BindingConditionSetter ToInstance(Type concreteType, object instance)
         {
-            if (ZenUtil.IsNull(instance) && !Container.IsValidating)
+            if (ZenUtilInternal.IsNull(instance) && !Container.IsValidating)
             {
                 string message;
 
@@ -323,7 +324,7 @@ namespace Zenject
                 throw new ZenjectBindException(message);
             }
 
-            if (!ZenUtil.IsNull(instance) && !instance.GetType().DerivesFromOrEqual(ContractType))
+            if (!ZenUtilInternal.IsNull(instance) && !instance.GetType().DerivesFromOrEqual(ContractType))
             {
                 throw new ZenjectBindException(
                     "Invalid type given during bind command.  Expected type '{0}' to derive from type '{1}'".Fmt(concreteType.Name(), ContractType.Name()));
@@ -340,7 +341,7 @@ namespace Zenject
                     "Invalid type given during bind command.  Expected type '{0}' to derive from type '{1}'".Fmt(concreteType.Name(), ContractType.Name()));
             }
 
-            if (ZenUtil.IsNull(instance) && !Container.IsValidating)
+            if (ZenUtilInternal.IsNull(instance) && !Container.IsValidating)
             {
                 string message;
 
@@ -380,4 +381,3 @@ namespace Zenject
 #endif
     }
 }
-

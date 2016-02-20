@@ -117,11 +117,19 @@ namespace Zenject
         {
         }
 
+        public IBinder Binder
+        {
+            get
+            {
+                return Container;
+            }
+        }
+
         public IInstantiator Instantiator
         {
             get
             {
-                return Container.Instantiator;
+                return Container;
             }
         }
 
@@ -129,7 +137,7 @@ namespace Zenject
         {
             get
             {
-                return Container.Resolver;
+                return Container;
             }
         }
 

@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using ModestTree;
 using UnityEngine;
+using Zenject.Internal;
 
 namespace Zenject
 {
@@ -28,7 +29,7 @@ namespace Zenject
             {
                 int hash = 17;
                 hash = hash * 29 + (this.ConcreteIdentifier == null ? 0 : this.ConcreteIdentifier.GetHashCode());
-                hash = hash * 29 + (ZenUtil.IsNull(this.Prefab) ? 0 : this.Prefab.GetHashCode());
+                hash = hash * 29 + (ZenUtilInternal.IsNull(this.Prefab) ? 0 : this.Prefab.GetHashCode());
                 return hash;
             }
         }

@@ -10,7 +10,7 @@ namespace Zenject
     }
 
     public abstract class FacadeFactory<TFacade> : IFactory<TFacade>, IFacadeFactory
-        where TFacade : IFacade
+        where TFacade : Facade
     {
         [Inject]
         DiContainer _container = null;
@@ -20,7 +20,8 @@ namespace Zenject
 
         public TFacade Create()
         {
-            var facade = CreateSubContainer(_container, _containerInitializer).Resolver.Resolve<TFacade>();
+            var facade = CreateSubContainer(
+                _container, _containerInitializer).Resolver.Resolve<TFacade>();
             facade.Initialize();
             return facade;
         }
@@ -32,8 +33,9 @@ namespace Zenject
             Assert.IsNotNull(containerInitializer);
             var subContainer = parentContainer.CreateSubContainer();
             subContainer.IsValidating = parentContainer.IsValidating;
+            subContainer.Binder.Install<StandardInstaller>();
+            subContainer.Binder.Bind<TFacade>().ToSingle();
             containerInitializer(subContainer);
-            subContainer.Binder.Install<StandardInstaller<TFacade>>();
             return subContainer;
         }
 
@@ -61,7 +63,7 @@ namespace Zenject
     }
 
     public abstract class FacadeFactory<TParam1, TFacade> : IFactory<TParam1, TFacade>, IFacadeFactory
-        where TFacade : IFacade
+        where TFacade : Facade
     {
         [Inject]
         DiContainer _container = null;
@@ -81,8 +83,9 @@ namespace Zenject
             Assert.IsNotNull(_containerInitializer);
             var subContainer = _container.CreateSubContainer();
             subContainer.IsValidating = _container.IsValidating;
+            subContainer.Binder.Install<StandardInstaller>();
+            subContainer.Binder.Bind<TFacade>().ToSingle();
             _containerInitializer(subContainer, param1);
-            subContainer.Binder.Install<StandardInstaller<TFacade>>();
             return subContainer;
         }
 
@@ -103,7 +106,7 @@ namespace Zenject
     }
 
     public abstract class FacadeFactory<TParam1, TParam2, TFacade> : IFactory<TParam1, TParam2, TFacade>, IFacadeFactory
-        where TFacade : IFacade
+        where TFacade : Facade
     {
         [Inject]
         DiContainer _container = null;
@@ -123,8 +126,9 @@ namespace Zenject
             Assert.IsNotNull(_containerInitializer);
             var subContainer = _container.CreateSubContainer();
             subContainer.IsValidating = _container.IsValidating;
+            subContainer.Binder.Install<StandardInstaller>();
+            subContainer.Binder.Bind<TFacade>().ToSingle();
             _containerInitializer(subContainer, param1, param2);
-            subContainer.Binder.Install<StandardInstaller<TFacade>>();
             return subContainer;
         }
 
@@ -145,7 +149,7 @@ namespace Zenject
     }
 
     public abstract class FacadeFactory<TParam1, TParam2, TParam3, TFacade> : IFactory<TParam1, TParam2, TParam3, TFacade>, IFacadeFactory
-        where TFacade : IFacade
+        where TFacade : Facade
     {
         [Inject]
         DiContainer _container = null;
@@ -165,8 +169,9 @@ namespace Zenject
             Assert.IsNotNull(_containerInitializer);
             var subContainer = _container.CreateSubContainer();
             subContainer.IsValidating = _container.IsValidating;
+            subContainer.Binder.Install<StandardInstaller>();
+            subContainer.Binder.Bind<TFacade>().ToSingle();
             _containerInitializer(subContainer, param1, param2, param3);
-            subContainer.Binder.Install<StandardInstaller<TFacade>>();
             return subContainer;
         }
 
@@ -187,7 +192,7 @@ namespace Zenject
     }
 
     public abstract class FacadeFactory<TParam1, TParam2, TParam3, TParam4, TFacade> : IFactory<TParam1, TParam2, TParam3, TParam4, TFacade>, IFacadeFactory
-        where TFacade : IFacade
+        where TFacade : Facade
     {
         [Inject]
         DiContainer _container = null;
@@ -207,8 +212,9 @@ namespace Zenject
             Assert.IsNotNull(_containerInitializer);
             var subContainer = _container.CreateSubContainer();
             subContainer.IsValidating = _container.IsValidating;
+            subContainer.Binder.Install<StandardInstaller>();
+            subContainer.Binder.Bind<TFacade>().ToSingle();
             _containerInitializer(subContainer, param1, param2, param3, param4);
-            subContainer.Binder.Install<StandardInstaller<TFacade>>();
             return subContainer;
         }
 
@@ -229,7 +235,7 @@ namespace Zenject
     }
 
     public abstract class FacadeFactory<TParam1, TParam2, TParam3, TParam4, TParam5, TFacade> : IFactory<TParam1, TParam2, TParam3, TParam4, TParam5, TFacade>, IFacadeFactory
-        where TFacade : IFacade
+        where TFacade : Facade
     {
         [Inject]
         DiContainer _container = null;
@@ -249,8 +255,9 @@ namespace Zenject
             Assert.IsNotNull(_containerInitializer);
             var subContainer = _container.CreateSubContainer();
             subContainer.IsValidating = _container.IsValidating;
+            subContainer.Binder.Install<StandardInstaller>();
+            subContainer.Binder.Bind<TFacade>().ToSingle();
             _containerInitializer(subContainer, param1, param2, param3, param4, param5);
-            subContainer.Binder.Install<StandardInstaller<TFacade>>();
             return subContainer;
         }
 
@@ -271,7 +278,7 @@ namespace Zenject
     }
 
     public abstract class FacadeFactory<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6, TFacade> : IFactory<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6, TFacade>, IFacadeFactory
-        where TFacade : IFacade
+        where TFacade : Facade
     {
         [Inject]
         DiContainer _container = null;
@@ -291,8 +298,9 @@ namespace Zenject
             Assert.IsNotNull(_containerInitializer);
             var subContainer = _container.CreateSubContainer();
             subContainer.IsValidating = _container.IsValidating;
+            subContainer.Binder.Install<StandardInstaller>();
+            subContainer.Binder.Bind<TFacade>().ToSingle();
             _containerInitializer(subContainer, param1, param2, param3, param4, param5, param6);
-            subContainer.Binder.Install<StandardInstaller<TFacade>>();
             return subContainer;
         }
 
@@ -313,7 +321,7 @@ namespace Zenject
     }
 
     public abstract class FacadeFactory<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6, TParam7, TFacade> : IFactory<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6, TParam7, TFacade>, IFacadeFactory
-        where TFacade : IFacade
+        where TFacade : Facade
     {
         [Inject]
         DiContainer _container = null;
@@ -333,8 +341,9 @@ namespace Zenject
             Assert.IsNotNull(_containerInitializer);
             var subContainer = _container.CreateSubContainer();
             subContainer.IsValidating = _container.IsValidating;
+            subContainer.Binder.Install<StandardInstaller>();
+            subContainer.Binder.Bind<TFacade>().ToSingle();
             _containerInitializer(subContainer, param1, param2, param3, param4, param5, param6, param7);
-            subContainer.Binder.Install<StandardInstaller<TFacade>>();
             return subContainer;
         }
 

@@ -3,21 +3,15 @@ using System.Linq;
 
 namespace Zenject
 {
-    public class StandardInstaller<TRoot> : Installer
-        where TRoot : IFacade
+    // This is automatically installed on the scene composition root,
+    // global composition root, facades, and monofacades
+    public class StandardInstaller : Installer
     {
         public override void InstallBindings()
         {
-            Binder.Bind<IFacade>().ToSingle<TRoot>();
-            Binder.Bind<TRoot>().ToSingle();
-
             Binder.Bind<TickableManager>().ToSingle();
             Binder.Bind<InitializableManager>().ToSingle();
             Binder.Bind<DisposableManager>().ToSingle();
         }
-    }
-
-    public class StandardInstaller : StandardInstaller<Facade>
-    {
     }
 }

@@ -68,6 +68,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Facade\MonoFacade.cs" />
     <Compile Include="Internal\Assert.cs" />
     <Compile Include="Internal\LinqExtensions.cs" />
     <Compile Include="Internal\Log.cs" />
@@ -90,7 +91,6 @@
     <Compile Include="Facade\Facade.cs" />
     <Compile Include="Facade\FacadeBinder.cs" />
     <Compile Include="Facade\FacadeFactory.cs" />
-    <Compile Include="Facade\IFacade.cs" />
     <Compile Include="Factories\Factory.cs" />
     <Compile Include="Factories\FactoryMethod.cs" />
     <Compile Include="Factories\FactoryMethodUntyped.cs" />
@@ -112,15 +112,18 @@
     <Compile Include="Main\BindingId.cs" />
     <Compile Include="Main\CompositionRoot.cs" />
     <Compile Include="Main\DiContainer.cs" />
+    <Compile Include="Main\FacadeCompositionRoot.cs" />
     <Compile Include="Main\GlobalCompositionRoot.cs" />
-    <Compile Include="Main\GlobalInstallerConfig.cs" />
+    <Compile Include="Main\GlobalFacade.cs" />
     <Compile Include="Main\IBinder.cs" />
+    <Compile Include="Main\IDependencyRoot.cs" />
     <Compile Include="Main\IInstaller.cs" />
     <Compile Include="Main\IInstantiator.cs" />
     <Compile Include="Main\Installer.cs" />
     <Compile Include="Main\IResolver.cs" />
     <Compile Include="Main\MonoInstaller.cs" />
     <Compile Include="Main\SceneCompositionRoot.cs" />
+    <Compile Include="Main\SceneFacade.cs" />
     <Compile Include="Main\SingletonId.cs" />
     <Compile Include="Main\SingletonRegistry.cs" />
     <Compile Include="Main\ZenConstants.cs" />
@@ -137,6 +140,7 @@
     <Compile Include="Misc\TickableManager.cs" />
     <Compile Include="Misc\UnityEventManager.cs" />
     <Compile Include="Misc\ZenUtil.cs" />
+    <Compile Include="Misc\ZenUtilInternal.cs" />
     <Compile Include="Providers\DiContainerProvider.cs" />
     <Compile Include="Providers\GameObjectTransientProvider.cs" />
     <Compile Include="Providers\GameObjectTransientProviderFromPrefab.cs" />
@@ -179,11 +183,10 @@
     <Compile Include="Providers\TransientProvider.cs" />
     <Compile Include="Usage\InjectAttributeBase.cs" />
     <Compile Include="Usage\PostInjectAttribute.cs" />
-    <Compile Include="Util\AutoBindInstaller.cs" />
     <Compile Include="Util\DecoratorInstaller.cs" />
     <Compile Include="Util\SceneDecoratorCompositionRoot.cs" />
     <Compile Include="Util\UnityUtil.cs" />
-    <Compile Include="Util\ZenjectAutoBinding.cs" />
+    <Compile Include="Util\ZenjectBinding.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.

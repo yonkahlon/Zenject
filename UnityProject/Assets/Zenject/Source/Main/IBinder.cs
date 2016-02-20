@@ -13,6 +13,11 @@ namespace Zenject
 {
     public interface IBinder
     {
+        bool IsValidating
+        {
+            get;
+        }
+
         bool HasBinding(InjectContext context);
 
         UntypedBinder Bind(Type contractType, string identifier);
@@ -62,22 +67,22 @@ namespace Zenject
 
         BindingConditionSetter BindFacadeFactory<TFacade, TFacadeFactory>(
             Action<IBinder> facadeInstaller)
-            where TFacade : IFacade
+            where TFacade : Facade
             where TFacadeFactory : FacadeFactory<TFacade>;
 
         BindingConditionSetter BindFacadeFactory<TParam1, TFacade, TFacadeFactory>(
             Action<IBinder, TParam1> facadeInstaller)
-            where TFacade : IFacade
+            where TFacade : Facade
             where TFacadeFactory : FacadeFactory<TParam1, TFacade>;
 
         BindingConditionSetter BindFacadeFactory<TParam1, TParam2, TFacade, TFacadeFactory>(
             Action<IBinder, TParam1, TParam2> facadeInstaller)
-            where TFacade : IFacade
+            where TFacade : Facade
             where TFacadeFactory : FacadeFactory<TParam1, TParam2, TFacade> ;
 
         BindingConditionSetter BindFacadeFactory<TParam1, TParam2, TParam3, TFacade, TFacadeFactory>(
             Action<IBinder, TParam1, TParam2, TParam3> facadeInstaller)
-            where TFacade : IFacade
+            where TFacade : Facade
             where TFacadeFactory : FacadeFactory<TParam1, TParam2, TParam3, TFacade>;
 
 #if !ZEN_NOT_UNITY3D
@@ -104,11 +109,11 @@ namespace Zenject
             where T : IInstaller;
 
         FacadeBinder<TFacade> BindFacade<TFacade>(Action<IBinder> installerFunc)
-            where TFacade : IFacade;
+            where TFacade : Facade;
 
         FacadeBinder<TFacade> BindFacade<TFacade>(
             Action<IBinder> installerFunc, string identifier)
-            where TFacade : IFacade;
+            where TFacade : Facade;
 
         DiContainer Container
         {

@@ -1,11 +1,13 @@
+using System;
 using System.Collections.Generic;
-using ModestTree;
-using ModestTree.Util;
+
+// Ignore the fact that _initialObjects is not used
+#pragma warning disable 414
 
 namespace Zenject
 {
     [System.Diagnostics.DebuggerStepThrough]
-    public class Facade : IFacade
+    public class Facade : IInitializable, IDisposable, ITickable, ILateTickable, IFixedTickable, IDependencyRoot
     {
         [Inject(InjectSources.Local)]
         TickableManager _tickableManager = null;
@@ -19,31 +21,7 @@ namespace Zenject
         // For cases where you have objects that aren't referenced anywhere but still want them to be
         // created on startup
         [InjectOptional(InjectSources.Local)]
-        public List<object> _initialObjects = null;
-
-        public TickableManager TickableManager
-        {
-            get
-            {
-                return _tickableManager;
-            }
-        }
-
-        public InitializableManager InitializableManager
-        {
-            get
-            {
-                return _initializableManager;
-            }
-        }
-
-        public DisposableManager DisposableManager
-        {
-            get
-            {
-                return _disposablesManager;
-            }
-        }
+        List<object> _initialObjects = null;
 
         public virtual void Initialize()
         {

@@ -20,16 +20,6 @@ namespace Zenject
     [System.Diagnostics.DebuggerStepThrough]
     public class ZenUtil
     {
-        // Due to the way that Unity overrides the Equals operator,
-        // normal null checks such as (x == null) do not always work as
-        // expected
-        // In those cases you can use this function which will also
-        // work with non-unity objects
-        public static bool IsNull(System.Object obj)
-        {
-            return obj == null || obj.Equals(null);
-        }
-
 #if !ZEN_NOT_UNITY3D
         public static void LoadScene(string levelName)
         {

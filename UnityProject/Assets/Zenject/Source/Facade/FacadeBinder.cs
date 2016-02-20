@@ -8,7 +8,7 @@ using UnityEngine;
 namespace Zenject
 {
     public class FacadeBinder<TFacade>
-        where TFacade : IFacade
+        where TFacade : Facade
     {
         readonly Action<IBinder> _installerFunc;
         readonly DiContainer _container;
