@@ -18,7 +18,7 @@ namespace Zenject
             {
                 return new string[]
                 {
-                    "Installers"
+                    "_installers"
                 };
             }
         }

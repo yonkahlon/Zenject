@@ -19,23 +19,23 @@ namespace Zenject
             string concreteIdentifier);
 
 #if !ZEN_NOT_UNITY3D
+        void InjectGameObject(
+            GameObject gameObject);
+
+        void InjectGameObject(
+            GameObject gameObject, bool recursive);
+
         // Inject dependencies into child game objects
         void InjectGameObject(
             GameObject gameObject, bool recursive, bool includeInactive);
 
         void InjectGameObject(
-            GameObject gameObject, bool recursive);
+            GameObject gameObject, bool recursive, bool includeInactive,
+            IEnumerable<object> extraArgs);
 
         void InjectGameObject(
-            GameObject gameObject);
-
-        void InjectGameObject(
-            GameObject gameObject,
-            bool recursive, bool includeInactive, IEnumerable<object> extraArgs);
-
-        void InjectGameObject(
-            GameObject gameObject,
-            bool recursive, bool includeInactive, IEnumerable<object> extraArgs, InjectContext context);
+            GameObject gameObject, bool recursive, bool includeInactive,
+            IEnumerable<object> extraArgs, InjectContext context);
 #endif
 
         void Inject(object injectable);

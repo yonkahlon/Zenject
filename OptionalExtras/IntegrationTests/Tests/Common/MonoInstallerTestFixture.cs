@@ -34,9 +34,10 @@ namespace ModestTree
                 BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
                 .Where(x => x.GetCustomAttributes(typeof(InstallerTestAttribute), false).Any()).ToList();
 
+            var wrapper = this.gameObject.AddComponent<InstallerWrapper>();
+
             foreach (var method in testMethods)
             {
-                var wrapper = new InstallerWrapper();
                 wrapper.InstallCallback = () =>
                 {
                     Binder = wrapper.GetBinder();
@@ -45,7 +46,7 @@ namespace ModestTree
 
                 var settings = new SceneCompositionRoot.StaticSettings()
                 {
-                    Installers = new List<IInstaller>() { wrapper },
+                    Installers = new MonoInstaller[] { wrapper },
                     ParentNewObjectsUnderRoot = true,
                     OnlyInjectWhenActive = true,
                 };
@@ -81,7 +82,7 @@ namespace ModestTree
             IntegrationTest.Pass();
         }
 
-        class InstallerWrapper : Installer
+        class InstallerWrapper : MonoInstaller
         {
             public Action InstallCallback;
 

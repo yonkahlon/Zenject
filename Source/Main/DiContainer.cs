@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using ModestTree;
 using ModestTree.Util;
+using Zenject.Internal;
 
 #if !ZEN_NOT_UNITY3D
 using UnityEngine;
@@ -770,7 +771,8 @@ namespace Zenject
         // Iterate over fields/properties on the given object and inject any with the [Inject] attribute
         void IResolver.InjectExplicit(
             object injectable, IEnumerable<TypeValuePair> extraArgs,
-            bool shouldUseAll, ZenjectTypeInfo typeInfo, InjectContext context, string concreteIdentifier)
+            bool shouldUseAll, ZenjectTypeInfo typeInfo, InjectContext context,
+            string concreteIdentifier)
         {
             Assert.IsEqual(typeInfo.TypeAnalyzed, injectable.GetType());
             Assert.That(injectable != null);
@@ -794,7 +796,8 @@ namespace Zenject
                 else
                 {
                     value = Resolver.Resolve(
-                        injectInfo.CreateInjectContext(this, context, injectable, concreteIdentifier));
+                        injectInfo.CreateInjectContext(
+                            this, context, injectable, concreteIdentifier));
 
                     if (injectInfo.Optional && value == null)
                     {
@@ -952,27 +955,32 @@ namespace Zenject
         {
             Assert.That(prefab != null, "Null prefab found when instantiating game object");
 
-            // It could be an interface so this may fail in valid cases so you may want to comment out
-            // Leaving it in for now to catch the more likely scenario of it being a mistake
-            Assert.That(componentType.IsInterface || componentType.DerivesFrom<Component>(), "Expected type '{0}' to derive from UnityEngine.Component", componentType.Name());
+            Assert.That(componentType.IsInterface || componentType.DerivesFrom<Component>(),
+                "Expected type '{0}' to derive from UnityEngine.Component", componentType.Name());
 
             var gameObj = (GameObject)GameObject.Instantiate(prefab);
 
-            gameObj.transform.SetParent(GetTransformGroup(groupName), false);
-
-            gameObj.SetActive(true);
-
-            Component requestedScript = null;
-
-            // Inject on the children first since the parent objects are more likely to use them in their post inject methods
-            foreach (var component in UnityUtil.GetComponentsInChildrenBottomUp(gameObj, includeInactive))
+            try
             {
-                if (component != null)
+                gameObj.transform.SetParent(GetTransformGroup(groupName), false);
+
+                gameObj.SetActive(true);
+
+                Component requestedScript = null;
+
+                // Inject on the children first since the parent objects are more likely to use them in their post inject methods
+                foreach (var component in ZenUtilInternal.GetInjectableComponentsBottomUp(gameObj, true, includeInactive).ToList())
                 {
+                    if (component == null)
+                    {
+                        Log.Warn("Found null component while instantiating prefab '{0}'.  Possible missing script.", prefab.name);
+                        continue;
+                    }
+
                     if (component.GetType().DerivesFromOrEqual(componentType))
                     {
                         Assert.IsNull(requestedScript,
-                            "Found multiple matches with type '{0}' when instantiating new game object from prefab '{1}'", componentType, prefab.name);
+                        "Found multiple matches with type '{0}' when instantiating new game object from prefab '{1}'", componentType, prefab.name);
                         requestedScript = component;
 
                         Resolver.InjectExplicit(component, extraArgs);
@@ -982,19 +990,23 @@ namespace Zenject
                         Resolver.Inject(component);
                     }
                 }
-                else
+
+                if (requestedScript == null)
                 {
-                    Log.Warn("Found null component while instantiating prefab '{0}'.  Possible missing script.", prefab.name);
+                    throw new ZenjectResolveException(
+                        "Could not find component with type '{0}' when instantiating new game object".Fmt(componentType));
                 }
-            }
 
-            if (requestedScript == null)
+                return requestedScript;
+            }
+            catch (Exception e)
             {
-                throw new ZenjectResolveException(
-                    "Could not find component with type '{0}' when instantiating new game object".Fmt(componentType));
-            }
+                // If we do get exceptions don't leave half-initialized objects around
+                GameObject.DestroyImmediate(gameObj);
 
-            return requestedScript;
+                throw new Exception(
+                    "Error while instantiating prefab '{0}'".Fmt(prefab.name), e);
+            }
         }
 
         Transform GetTransformGroup(string groupName)
@@ -1026,6 +1038,7 @@ namespace Zenject
             group.SetParent(DefaultParent, false);
             return group;
         }
+
 #endif
 
         ////////////// Convenience methods for IInstantiator ////////////////
@@ -1252,33 +1265,25 @@ namespace Zenject
         }
 
         void IResolver.InjectGameObject(
-            GameObject gameObject,
-            bool recursive, bool includeInactive, IEnumerable<object> extraArgs, InjectContext context)
+            GameObject gameObject, bool recursive, bool includeInactive,
+            IEnumerable<object> extraArgs, InjectContext context)
         {
-            IEnumerable<Component> components;
-
-            if (recursive)
+            // Inject on the children first since the parent objects are more likely to use them in their post inject methods
+            foreach (var component in ZenUtilInternal.GetInjectableComponentsBottomUp(gameObject, recursive, includeInactive).ToList())
             {
-                components = UnityUtil.GetComponentsInChildrenBottomUp(gameObject, includeInactive);
-            }
-            else
-            {
-                if (!includeInactive && !gameObject.activeSelf)
+                if (component == null)
                 {
-                    return;
+                    Log.Warn("Found null component while injecting game object '{0}'.  Possible missing script.", gameObject.name);
+                    continue;
                 }
 
-                components = gameObject.GetComponents<Component>();
-            }
-
-            foreach (var component in components)
-            {
-                // null if monobehaviour link is broken
-                // Do not inject on installers since these are always injected before they are installed
-                if (component != null && !component.GetType().DerivesFrom<MonoInstaller>())
+                if (component.GetType().DerivesFrom<MonoInstaller>())
                 {
-                    Resolver.Inject(component, extraArgs, false, context);
+                    // Do not inject on installers since these are always injected before they are installed
+                    continue;
                 }
+
+                Resolver.Inject(component, extraArgs, false, context);
             }
         }
 #endif
@@ -1307,14 +1312,15 @@ namespace Zenject
         }
 
         void IResolver.Inject(
-            object injectable,
-            IEnumerable<object> additional, bool shouldUseAll, InjectContext context, ZenjectTypeInfo typeInfo)
+            object injectable, IEnumerable<object> additional, bool shouldUseAll,
+            InjectContext context, ZenjectTypeInfo typeInfo)
         {
             Assert.That(!additional.ContainsItem(null),
                 "Null value given to injection argument list. In order to use null you must provide a List<TypeValuePair> and not just a list of objects");
 
             Resolver.InjectExplicit(
-                injectable, InstantiateUtil.CreateTypeValueList(additional), shouldUseAll, typeInfo, context, null);
+                injectable, InstantiateUtil.CreateTypeValueList(additional),
+                shouldUseAll, typeInfo, context, null);
         }
 
         void IResolver.InjectExplicit(object injectable, List<TypeValuePair> additional)

@@ -6,33 +6,34 @@ using ModestTree;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using ModestTree.Util;
 using UnityEngine;
+using Zenject.Internal;
 
 namespace Zenject
 {
     public class GlobalCompositionRoot : CompositionRoot
     {
-        public const string GlobalInstallersResourceName = "ZenjectGlobalInstallers";
+        public const string GlobalCompRootResourcePath = "GlobalCompositionRoot";
 
         static GlobalCompositionRoot _instance;
 
         DiContainer _container;
-        IFacade _rootFacade;
-        bool _hasInitialized;
+        IDependencyRoot _dependencyRoot;
 
-        public override DiContainer Container
+        public override IDependencyRoot DependencyRoot
+        {
+            get
+            {
+                return _dependencyRoot;
+            }
+        }
+
+        public DiContainer Container
         {
             get
             {
                 return _container;
-            }
-        }
-
-        public override IFacade RootFacade
-        {
-            get
-            {
-                return _rootFacade;
             }
         }
 
@@ -42,13 +43,44 @@ namespace Zenject
             {
                 if (_instance == null)
                 {
-                    _instance = new GameObject("Global Composition Root")
-                        .AddComponent<GlobalCompositionRoot>();
+                    _instance = InstantiateNewRoot();
+
+                    // Note: We use Initialize instead of awake here in case someone calls
+                    // GlobalCompositionRoot.Instance while GlobalCompositionRoot is initializing
                     _instance.Initialize();
                 }
 
                 return _instance;
             }
+        }
+
+        public static GameObject TryGetPrefab()
+        {
+            return (GameObject)Resources.Load(GlobalCompRootResourcePath);
+        }
+
+        public static GlobalCompositionRoot InstantiateNewRoot()
+        {
+            Assert.That(GameObject.FindObjectsOfType<GlobalCompositionRoot>().IsEmpty(),
+                "Tried to create multiple instances of GlobalCompositionRoot!");
+
+            GlobalCompositionRoot instance;
+
+            var prefab = TryGetPrefab();
+
+            if (prefab == null)
+            {
+                instance = new GameObject().AddComponent<GlobalCompositionRoot>();
+            }
+            else
+            {
+                instance = GameObject.Instantiate(prefab).GetComponent<GlobalCompositionRoot>();
+
+                Assert.IsNotNull(instance,
+                    "Could not find GlobalCompositionRoot component on prefab 'Resources/{0}.prefab'", GlobalCompRootResourcePath);
+            }
+
+            return instance;
         }
 
         public void EnsureIsInitialized()
@@ -60,58 +92,40 @@ namespace Zenject
         {
             Log.Debug("Initializing GlobalCompositionRoot");
 
-            Assert.IsNull(Container);
-            Assert.IsNull(RootFacade);
+            Assert.IsNull(_container);
 
             DontDestroyOnLoad(gameObject);
 
-            _container = CreateContainer(false, this);
-            _rootFacade = _container.Resolver.Resolve<IFacade>();
+            _container = new DiContainer();
 
-            Assert.IsNotNull(Container);
-            Assert.IsNotNull(RootFacade);
+            InstallBindings(_container.Binder);
+            InjectComponents(_container.Resolver);
+
+            _dependencyRoot = _container.Resolver.Resolve<IDependencyRoot>();
         }
 
-        public void InitializeRootIfNecessary()
+        public override IEnumerable<Component> GetInjectableComponents()
         {
-            if (!_hasInitialized)
-            {
-                _hasInitialized = true;
-                _rootFacade.Initialize();
-            }
+            return GetRootObjectsInjectableComponents();
         }
 
-        public static DiContainer CreateContainer(bool isValidating, GlobalCompositionRoot root)
+        public override IEnumerable<GameObject> GetRootGameObjects()
         {
-            Assert.That(isValidating || root != null);
-
-            var container = new DiContainer();
-
-            container.IsValidating = isValidating;
-
-            if (root != null)
-            {
-                container.Binder.Bind<Transform>(ZenConstants.DefaultParentId)
-                    .ToInstance<Transform>(root.gameObject.transform);
-            }
-
-            container.Binder.Bind<CompositionRoot>().ToInstance(root);
-            container.Binder.Bind<GlobalCompositionRoot>().ToInstance(root);
-
-            container.Binder.Install<StandardInstaller>();
-            container.Binder.Install(GetGlobalInstallers());
-
-            return container;
+            return UnityUtil.GetDirectChildrenAndSelf(this.gameObject);
         }
 
-        static IEnumerable<IInstaller> GetGlobalInstallers()
+        // We pass in the binder here instead of using our own for validation to work
+        public override void InstallBindings(IBinder binder)
         {
-            // For backwards compatibility include the old name
-            var installerConfigs1 = Resources.LoadAll("ZenjectGlobalCompositionRoot", typeof(GlobalInstallerConfig));
+            binder.Bind<CompositionRoot>().ToInstance(this);
+            binder.Bind<IDependencyRoot>().ToSingleMonoBehaviour<GlobalFacade>(this.gameObject);
 
-            var installerConfigs2 = Resources.LoadAll(GlobalInstallersResourceName, typeof(GlobalInstallerConfig));
+            binder.Bind<Transform>(ZenConstants.DefaultParentId)
+                .ToInstance<Transform>(this.gameObject.transform);
 
-            return installerConfigs1.Concat(installerConfigs2).Cast<GlobalInstallerConfig>().SelectMany(x => x.Installers).Cast<IInstaller>();
+            InstallSceneBindings(binder);
+
+            InstallInstallers(binder);
         }
     }
 }
