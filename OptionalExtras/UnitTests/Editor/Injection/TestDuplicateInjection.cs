@@ -30,6 +30,8 @@ namespace Zenject.Tests
 
             Binder.Bind<Test1>().ToSingle();
 
+            AssertValidationFails();
+
             Assert.Throws<ZenjectResolveException>(
                 delegate { Resolver.Resolve<Test1>(); });
 

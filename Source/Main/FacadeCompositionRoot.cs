@@ -34,9 +34,17 @@ namespace Zenject
         }
 
         [PostInject]
-        public void Construct(DiContainer parentContainer)
+        public void Construct(
+            DiContainer parentContainer,
+            [InjectOptional]
+            List<TypeValuePair> facadeExtraArgs)
         {
             Assert.IsNull(_container);
+
+            if (facadeExtraArgs == null)
+            {
+                facadeExtraArgs = new List<TypeValuePair>();
+            }
 
             if (_facade == null)
             {
@@ -44,43 +52,53 @@ namespace Zenject
                     "Facade property is not set in FacadeCompositionRoot '{0}'".Fmt(this.gameObject.name));
             }
 
-            if (!UnityUtil.GetParents(_facade.transform).Contains(this.transform))
+            if (!UnityUtil.GetParentsAndSelf(_facade.transform).Contains(this.transform))
             {
                 throw new ZenjectBindException(
                     "The given Facade must exist on the same game object as the FacadeCompositionRoot '{0}' or a descendant!".Fmt(this.name));
             }
 
-            _container = new DiContainer(parentContainer);
+            _container = parentContainer.CreateSubContainer();
 
             InstallBindings(_container.Binder);
 
-            InjectComponents(_container.Resolver);
+            InjectComponents(_container.Resolver, facadeExtraArgs);
         }
 
-        public override IEnumerable<Component> GetInjectableComponents()
+        void InjectComponents(IResolver resolver, List<TypeValuePair> facadeExtraArgs)
         {
-            // Note: We intentionally do not inject into the components on our own game object
-            // This is nice so you can add zenject bindings on it
-            // Installers are also fine to add since these are only injected when they are installed
+            bool foundFacade = false;
 
-            foreach (var component in GetRootObjectsInjectableComponents())
+            // Use ToList in case they do something weird in post inject
+            foreach (var component in GetInjectableComponents().ToList())
             {
-                yield return component;
+                Assert.That(!component.GetType().DerivesFrom<MonoInstaller>());
+
+                if (component == _facade)
+                {
+                    Assert.That(!foundFacade);
+                    foundFacade = true;
+                    resolver.InjectExplicit(component, facadeExtraArgs);
+                }
+                else
+                {
+                    resolver.Inject(component);
+                }
             }
 
-            yield return _facade;
+            Assert.That(foundFacade);
         }
 
         public override IEnumerable<GameObject> GetRootGameObjects()
         {
-            return UnityUtil.GetDirectChildrenAndSelf(this.gameObject);
+            return UnityUtil.GetDirectChildren(this.gameObject);
         }
 
         // We pass in the binder here instead of using our own for validation to work
         public override void InstallBindings(IBinder binder)
         {
             binder.Bind<CompositionRoot>().ToInstance(this);
-            binder.Bind<Transform>(ZenConstants.DefaultParentId)
+            binder.Bind<Transform>(DiContainer.DefaultParentId)
                 .ToInstance<Transform>(this.transform);
 
             binder.Bind<IDependencyRoot>().ToInstance(_facade);

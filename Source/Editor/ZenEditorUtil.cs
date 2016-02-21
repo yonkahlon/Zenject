@@ -97,7 +97,7 @@ namespace Zenject
 
             try
             {
-                var globalRoot = gameObject.AddComponent<GlobalCompositionRoot>();
+                gameObject.AddComponent<GlobalCompositionRoot>();
                 PrefabUtility.ReplacePrefab(gameObject, emptyPrefab);
             }
             finally

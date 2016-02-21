@@ -20,6 +20,8 @@ namespace Zenject.Tests
         {
             Binder.Bind<Test0>("foo").ToTransient();
 
+            AssertValidates();
+
             Assert.Throws<ZenjectResolveException>(
                 delegate { Resolver.Resolve<Test0>(); });
 
@@ -32,6 +34,8 @@ namespace Zenject.Tests
         {
             Binder.Bind<Test0>("foo").ToSingle();
 
+            AssertValidates();
+
             Assert.Throws<ZenjectResolveException>(
                 delegate { Resolver.Resolve<Test0>(); });
 
@@ -43,6 +47,8 @@ namespace Zenject.Tests
         public void TestBasic3()
         {
             Binder.Bind<Test0>("foo").ToMethod((ctx) => new Test0());
+
+            AssertValidates();
 
             Assert.Throws<ZenjectResolveException>(
                 delegate { Resolver.Resolve<Test0>(); });
@@ -57,6 +63,8 @@ namespace Zenject.Tests
             Binder.Bind<Test0>("foo").ToTransient();
             Binder.Bind<Test0>("foo").ToTransient();
 
+            AssertValidates();
+
             Assert.Throws<ZenjectResolveException>(
                 delegate { Resolver.Resolve<Test0>(); });
 
@@ -70,6 +78,8 @@ namespace Zenject.Tests
         public void TestToMethodUntyped()
         {
             Binder.Bind(typeof(Test0)).ToMethod((ctx) => new Test0());
+
+            AssertValidates();
 
             Resolver.Resolve<Test0>();
 

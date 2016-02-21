@@ -35,6 +35,8 @@ namespace Zenject.Tests
             Binder.BindInstance(foo1).When(c => c.ParentContexts.Where(x => x.MemberType == typeof(Bar) && x.Identifier == "Bar1").Any());
             Binder.BindInstance(foo2).When(c => c.ParentContexts.Where(x => x.MemberType == typeof(Bar) && x.Identifier == "Bar2").Any());
 
+            AssertValidates();
+
             Assert.IsEqual(Resolver.Resolve<Bar>("Bar1").Foo, foo1);
             Assert.IsEqual(Resolver.Resolve<Bar>("Bar2").Foo, foo2);
         }

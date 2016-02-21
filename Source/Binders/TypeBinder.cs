@@ -66,27 +66,12 @@ namespace Zenject
 
         public BindingConditionSetter ToSingle(Type concreteType)
         {
-            return ToSingle(null, concreteType);
-        }
-
-        public BindingConditionSetter ToSingle(string concreteIdentifier, Type concreteType)
-        {
-            if (!concreteType.DerivesFromOrEqual(ContractType))
-            {
-                throw new ZenjectBindException(
-                    "Invalid type given during bind command.  Expected type '{0}' to derive from type '{1}'".Fmt(concreteType.Name(), ContractType.Name()));
-            }
-
-            return ToProvider(Container.SingletonProviderCreator.CreateProviderFromType(concreteIdentifier, concreteType));
+            return ToSingle(concreteType, null);
         }
 
         public BindingConditionSetter ToSingle(Type concreteType, string concreteIdentifier)
         {
-            if (!concreteType.DerivesFromOrEqual(ContractType))
-            {
-                throw new ZenjectBindException(
-                    "Invalid type given during bind command.  Expected type '{0}' to derive from type '{1}'".Fmt(concreteType.Name(), ContractType.Name()));
-            }
+            AssertIsDerivedType(concreteType);
 
 #if !ZEN_NOT_UNITY3D
             if (concreteType.DerivesFrom(typeof(Component)))
@@ -115,11 +100,7 @@ namespace Zenject
         public BindingConditionSetter ToSingleMonoBehaviour(
             string concreteIdentifier, Type concreteType, GameObject gameObject)
         {
-            if (!concreteType.DerivesFromOrEqual(ContractType))
-            {
-                throw new ZenjectBindException(
-                    "Invalid type given during bind command.  Expected type '{0}' to derive from type '{1}'".Fmt(concreteType.Name(), ContractType.Name()));
-            }
+            AssertIsDerivedType(concreteType);
 
             if (!concreteType.DerivesFrom(typeof(Component)))
             {
@@ -134,11 +115,7 @@ namespace Zenject
         public BindingConditionSetter ToSinglePrefab(
             Type concreteType, string concreteIdentifier, GameObject prefab)
         {
-            if (!concreteType.DerivesFromOrEqual(ContractType))
-            {
-                throw new ZenjectBindException(
-                    "Invalid type given during bind command.  Expected type '{0}' to derive from type '{1}'".Fmt(concreteType.Name(), ContractType.Name()));
-            }
+            AssertIsDerivedType(concreteType);
 
             if (ZenUtilInternal.IsNull(prefab))
             {
@@ -152,11 +129,7 @@ namespace Zenject
 
         public BindingConditionSetter ToTransientPrefab(Type concreteType, GameObject prefab)
         {
-            if (!concreteType.DerivesFromOrEqual(ContractType))
-            {
-                throw new ZenjectBindException(
-                    "Invalid type given during bind command.  Expected type '{0}' to derive from type '{1}'".Fmt(concreteType.Name(), ContractType.Name()));
-            }
+            AssertIsDerivedType(concreteType);
 
             // We have to cast to object otherwise we get SecurityExceptions when this function is run outside of unity
             if (ZenUtilInternal.IsNull(prefab))
@@ -182,18 +155,14 @@ namespace Zenject
         // Creates a new game object and adds the given type as a new component on it
         public BindingConditionSetter ToTransientGameObject(Type concreteType)
         {
-            if (!concreteType.DerivesFromOrEqual(ContractType))
-            {
-                throw new ZenjectBindException(
-                    "Invalid type given during bind command.  Expected type '{0}' to derive from type '{1}'".Fmt(concreteType.Name(), ContractType.Name()));
-            }
+            AssertIsDerivedType(concreteType);
 
             return ToProvider(new GameObjectTransientProvider(concreteType));
         }
 
         public BindingConditionSetter ToSingleGameObject()
         {
-            return ToSingleGameObject(null);
+            return ToSingleGameObject((string)null);
         }
 
         // Creates a new game object and adds the given type as a new component on it
@@ -202,14 +171,15 @@ namespace Zenject
             return ToSingleGameObject(ContractType, concreteIdentifier);
         }
 
+        public BindingConditionSetter ToSingleGameObject(Type concreteType)
+        {
+            return ToSingleGameObject(concreteType, null);
+        }
+
         // Creates a new game object and adds the given type as a new component on it
         public BindingConditionSetter ToSingleGameObject(Type concreteType, string concreteIdentifier)
         {
-            if (!concreteType.DerivesFromOrEqual(ContractType))
-            {
-                throw new ZenjectBindException(
-                    "Invalid type given during bind command.  Expected type '{0}' to derive from type '{1}'".Fmt(concreteType.Name(), ContractType.Name()));
-            }
+            AssertIsDerivedType(concreteType);
 
             if (!concreteType.DerivesFrom<Component>())
             {
@@ -307,7 +277,7 @@ namespace Zenject
 
         public BindingConditionSetter ToInstance(Type concreteType, object instance)
         {
-            if (ZenUtilInternal.IsNull(instance) && !Container.IsValidating)
+            if (ZenUtilInternal.IsNull(instance) && !Container.Binder.IsValidating)
             {
                 string message;
 
@@ -335,13 +305,9 @@ namespace Zenject
 
         protected BindingConditionSetter ToSingleInstance(Type concreteType, string concreteIdentifier, object instance)
         {
-            if (!concreteType.DerivesFromOrEqual(ContractType))
-            {
-                throw new ZenjectBindException(
-                    "Invalid type given during bind command.  Expected type '{0}' to derive from type '{1}'".Fmt(concreteType.Name(), ContractType.Name()));
-            }
+            AssertIsDerivedType(concreteType);
 
-            if (ZenUtilInternal.IsNull(instance) && !Container.IsValidating)
+            if (ZenUtilInternal.IsNull(instance) && !Container.Binder.IsValidating)
             {
                 string message;
 
@@ -361,6 +327,80 @@ namespace Zenject
             return ToProvider(Container.SingletonProviderCreator.CreateProviderFromInstance(concreteIdentifier, concreteType, instance));
         }
 
+        public BindingConditionSetter ToSingleFacadeMethod(Action<IBinder> installerFunc)
+        {
+            return ToSingleFacadeMethod(ContractType, null, installerFunc);
+        }
+
+        public BindingConditionSetter ToSingleFacadeMethod(
+            string concreteIdentifier, Action<IBinder> installerFunc)
+        {
+            return ToSingleFacadeMethod(ContractType, concreteIdentifier, installerFunc);
+        }
+
+        public BindingConditionSetter ToSingleFacadeMethod(
+            Type concreteType, string concreteIdentifier, Action<IBinder> installerFunc)
+        {
+            return ToProvider(
+                Container.SingletonProviderCreator.CreateProviderFromFacadeMethod(concreteType, concreteIdentifier, installerFunc));
+        }
+
+        public BindingConditionSetter ToSingleFacadeInstaller<TInstaller>()
+            where TInstaller : Installer
+        {
+            return ToSingleFacadeInstaller(typeof(TInstaller));
+        }
+
+        public BindingConditionSetter ToSingleFacadeInstaller<TInstaller>(
+            string concreteIdentifier)
+            where TInstaller : Installer
+        {
+            return ToSingleFacadeInstaller(concreteIdentifier, typeof(TInstaller));
+        }
+
+        public BindingConditionSetter ToSingleFacadeInstaller<TInstaller>(
+            Type concreteType, string concreteIdentifier)
+            where TInstaller : Installer
+        {
+            return ToSingleFacadeInstaller(concreteType, concreteIdentifier, typeof(TInstaller));
+        }
+
+        public BindingConditionSetter ToSingleFacadeInstaller(Type installerType)
+        {
+            return ToSingleFacadeInstaller(null, installerType);
+        }
+
+        public BindingConditionSetter ToSingleFacadeInstaller(
+            string concreteIdentifier, Type installerType)
+        {
+            return ToSingleFacadeInstaller(ContractType, null, installerType);
+        }
+
+        public BindingConditionSetter ToSingleFacadeInstaller(
+            Type concreteType, string concreteIdentifier, Type installerType)
+        {
+            AssertIsDerivedType(concreteType);
+
+            if (!installerType.DerivesFrom<Installer>())
+            {
+                throw new ZenjectBindException(
+                    "Invalid installer type given during bind command.  Expected type '{0}' to derive from 'Installer'".Fmt(installerType.Name()));
+            }
+
+            return ToProvider(
+                Container.SingletonProviderCreator.CreateProviderFromFacadeInstaller(
+                    concreteType, concreteIdentifier, installerType));
+        }
+
+        void AssertIsDerivedType(Type concreteType)
+        {
+            if (!concreteType.DerivesFromOrEqual(ContractType))
+            {
+                throw new ZenjectBindException(
+                    "Invalid type given during bind command.  Expected type '{0}' to derive from type '{1}'".Fmt(concreteType.Name(), ContractType.Name()));
+            }
+        }
+
 #if !ZEN_NOT_UNITY3D
 
         public BindingConditionSetter ToResource(string resourcePath)
@@ -370,11 +410,7 @@ namespace Zenject
 
         public BindingConditionSetter ToResource(Type concreteType, string resourcePath)
         {
-            if (!concreteType.DerivesFromOrEqual(ContractType))
-            {
-                throw new ZenjectBindException(
-                    "Invalid type given during bind command.  Expected type '{0}' to derive from type '{1}'".Fmt(concreteType.Name(), ContractType.Name()));
-            }
+            AssertIsDerivedType(concreteType);
 
             return ToProvider(new ResourceProvider(concreteType, resourcePath));
         }

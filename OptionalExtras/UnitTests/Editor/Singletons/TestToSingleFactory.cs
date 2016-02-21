@@ -27,6 +27,8 @@ namespace Zenject.Tests
 
             FooFactory.WasCalled = false;
 
+            AssertValidates();
+
             var foo = Resolver.Resolve<Foo>();
             Assert.That(FooFactory.WasCalled);
 

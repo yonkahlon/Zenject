@@ -68,7 +68,21 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Binders\IFactoryBinderFour.cs" />
+    <Compile Include="Binders\IFactoryBinderOne.cs" />
+    <Compile Include="Binders\IFactoryBinderThree.cs" />
+    <Compile Include="Binders\IFactoryBinderTwo.cs" />
+    <Compile Include="Binders\IFactoryBinderZero.cs" />
+    <Compile Include="Facade\FacadeUtil.cs" />
     <Compile Include="Facade\MonoFacade.cs" />
+    <Compile Include="Factories\MonoFacadeFactory.cs" />
+    <Compile Include="Interfaces\IBinder.cs" />
+    <Compile Include="Interfaces\IGenericBinder.cs" />
+    <Compile Include="Interfaces\IIFactoryBinder.cs" />
+    <Compile Include="Interfaces\IInstantiator.cs" />
+    <Compile Include="Interfaces\IResolver.cs" />
+    <Compile Include="Interfaces\ITypeBinder.cs" />
+    <Compile Include="Interfaces\IUntypedBinder.cs" />
     <Compile Include="Internal\Assert.cs" />
     <Compile Include="Internal\LinqExtensions.cs" />
     <Compile Include="Internal\Log.cs" />
@@ -82,14 +96,12 @@
     <Compile Include="Binders\BinderBase.cs" />
     <Compile Include="Binders\BindingConditionSetter.cs" />
     <Compile Include="Binders\GenericBinder.cs" />
-    <Compile Include="Binders\IFactoryBinder.cs" />
     <Compile Include="Binders\IFactoryUntypedBinder.cs" />
     <Compile Include="Binders\InjectContext.cs" />
     <Compile Include="Binders\TypeBinder.cs" />
     <Compile Include="Binders\UntypedBinder.cs" />
     <Compile Include="Exceptions\ZenjectException.cs" />
     <Compile Include="Facade\Facade.cs" />
-    <Compile Include="Facade\FacadeBinder.cs" />
     <Compile Include="Facade\FacadeFactory.cs" />
     <Compile Include="Factories\Factory.cs" />
     <Compile Include="Factories\FactoryMethod.cs" />
@@ -115,27 +127,23 @@
     <Compile Include="Main\FacadeCompositionRoot.cs" />
     <Compile Include="Main\GlobalCompositionRoot.cs" />
     <Compile Include="Main\GlobalFacade.cs" />
-    <Compile Include="Main\IBinder.cs" />
     <Compile Include="Main\IDependencyRoot.cs" />
     <Compile Include="Main\IInstaller.cs" />
-    <Compile Include="Main\IInstantiator.cs" />
     <Compile Include="Main\Installer.cs" />
-    <Compile Include="Main\IResolver.cs" />
     <Compile Include="Main\MonoInstaller.cs" />
     <Compile Include="Main\SceneCompositionRoot.cs" />
     <Compile Include="Main\SceneFacade.cs" />
     <Compile Include="Main\SingletonId.cs" />
     <Compile Include="Main\SingletonRegistry.cs" />
-    <Compile Include="Main\ZenConstants.cs" />
     <Compile Include="Misc\DisposableManager.cs" />
     <Compile Include="Misc\ExecutionOrderInstaller.cs" />
+    <Compile Include="Misc\FacadeCommonInstaller.cs" />
     <Compile Include="Misc\FixedTickablePrioritiesInstaller.cs" />
     <Compile Include="Misc\IInitializable.cs" />
     <Compile Include="Misc\InitializableManager.cs" />
     <Compile Include="Misc\ITickable.cs" />
     <Compile Include="Misc\KernelUtil.cs" />
     <Compile Include="Misc\LateTickablePrioritiesInstaller.cs" />
-    <Compile Include="Misc\StandardInstaller.cs" />
     <Compile Include="Misc\TaskUpdater.cs" />
     <Compile Include="Misc\TickableManager.cs" />
     <Compile Include="Misc\UnityEventManager.cs" />
@@ -150,6 +158,12 @@
     <Compile Include="Providers\MethodProviderUntyped.cs" />
     <Compile Include="Providers\ProviderBase.cs" />
     <Compile Include="Providers\ResourceProvider.cs" />
+    <Compile Include="Providers\Singleton\FacadeInstaller\FacadeInstallerSingletonLazyCreator.cs" />
+    <Compile Include="Providers\Singleton\FacadeInstaller\FacadeInstallerSingletonProvider.cs" />
+    <Compile Include="Providers\Singleton\FacadeInstaller\FacadeInstallerSingletonProviderCreator.cs" />
+    <Compile Include="Providers\Singleton\FacadeMethod\FacadeMethodSingletonLazyCreator.cs" />
+    <Compile Include="Providers\Singleton\FacadeMethod\FacadeMethodSingletonProvider.cs" />
+    <Compile Include="Providers\Singleton\FacadeMethod\FacadeMethodSingletonProviderCreator.cs" />
     <Compile Include="Providers\Singleton\Factory\FactorySingletonLazyCreator.cs" />
     <Compile Include="Providers\Singleton\Factory\FactorySingletonProvider.cs" />
     <Compile Include="Providers\Singleton\Factory\FactorySingletonProviderCreator.cs" />
@@ -187,6 +201,7 @@
     <Compile Include="Util\SceneDecoratorCompositionRoot.cs" />
     <Compile Include="Util\UnityUtil.cs" />
     <Compile Include="Util\ZenjectBinding.cs" />
+    <Compile Include="Util\ZenValidator.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.

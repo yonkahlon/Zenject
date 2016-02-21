@@ -17,6 +17,8 @@ namespace Zenject.Tests
             Binder.Bind<Test0>().ToInstance(new Test0());
             Binder.Bind<IFoo>().ToSingle<FooDerived>();
 
+            AssertValidates();
+
             Assert.That(Resolver.ValidateResolve<IFoo>().IsEmpty());
             var foo = Resolver.Resolve<IFoo>();
 

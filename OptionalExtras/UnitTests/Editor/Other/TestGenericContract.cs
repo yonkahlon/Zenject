@@ -24,6 +24,8 @@ namespace Zenject.Tests
         {
             Binder.Bind(typeof(Test1<>)).ToSingle();
 
+            AssertValidates();
+
             var test1 = Resolver.Resolve<Test1<int>>();
             Assert.That(test1.Data == 0);
             test1.Data = 5;
@@ -38,6 +40,8 @@ namespace Zenject.Tests
         public void TestToTransient()
         {
             Binder.Bind(typeof(Test1<>)).ToTransient();
+
+            AssertValidates();
 
             var test1 = Resolver.Resolve<Test1<int>>();
             Assert.That(test1.Data == 0);

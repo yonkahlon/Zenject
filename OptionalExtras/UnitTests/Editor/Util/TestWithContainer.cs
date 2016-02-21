@@ -49,28 +49,26 @@ namespace Zenject.Tests
         [SetUp]
         public virtual void Setup()
         {
-            _container = new DiContainer();
+            _container = new DiContainer(false);
             InstallBindings();
 
-            Validate();
+            AssertValidates();
             _container.Resolver.Inject(this);
         }
 
-        void Validate()
+        protected void AssertValidationFails()
         {
-            var errors = Resolver.ValidateValidatables().Take(5).ToList();
+            Assert.That(Resolver.ValidateAll().HasMoreThan(0),
+                "Expected validation to fail but it succeeded");
+        }
 
-            if (!errors.IsEmpty())
+        protected void AssertValidates()
+        {
+            var error = Resolver.ValidateAll().FirstOrDefault();
+
+            if (error != null)
             {
-                throw errors.First();
-
-                // Print out 5 so you don't have to recompile and execute one by one
-                //foreach (var err in errors)
-                //{
-                    //Log.ErrorException(err);
-                //}
-
-                //throw new Exception("Zenject Validation failed");
+                throw error;
             }
         }
 

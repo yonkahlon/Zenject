@@ -46,6 +46,9 @@ namespace Zenject.Tests
             Binder.Bind<Test1>().ToSingle();
             Binder.Bind<Test2>().ToSingle();
 
+            // TODO: Validation does not support circular dependencies
+            //AssertValidates();
+
             var test1 = Resolver.Resolve<Test1>();
             var test2 = Resolver.Resolve<Test2>();
 
@@ -100,6 +103,10 @@ namespace Zenject.Tests
             Binder.Bind<Test3>().ToSingle();
             Binder.Bind<Test4>().ToSingle();
 
+            // TODO - validation does not support circular dependencies
+            // which is valid for properties
+            //AssertValidates();
+
             var test1 = Resolver.Resolve<Test3>();
             var test2 = Resolver.Resolve<Test4>();
 
@@ -132,6 +139,8 @@ namespace Zenject.Tests
             {
                 Binder.Bind<Test5>().ToSingle();
                 Binder.Bind<Test6>().ToSingle();
+
+                AssertValidationFails();
 
                 Assert.Throws(() => Resolver.Resolve<Test5>());
                 Assert.Throws(() => Resolver.Resolve<Test6>());

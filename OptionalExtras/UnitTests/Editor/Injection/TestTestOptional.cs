@@ -40,6 +40,8 @@ namespace Zenject.Tests
 
             Assert.That(Resolver.ValidateResolve<Test2>().Any());
 
+            AssertValidationFails();
+
             Assert.Throws<ZenjectResolveException>(
                 delegate { Resolver.Resolve<Test2>(); });
         }
@@ -48,6 +50,8 @@ namespace Zenject.Tests
         public void TestFieldOptional()
         {
             Binder.Bind<Test3>().ToSingle();
+
+            AssertValidates();
 
             Assert.That(Resolver.ValidateResolve<Test3>().IsEmpty());
             var test = Resolver.Resolve<Test3>();
@@ -62,6 +66,8 @@ namespace Zenject.Tests
             var test1 = new Test1();
             Binder.Bind<Test1>().ToInstance(test1);
 
+            AssertValidates();
+
             Assert.That(Resolver.ValidateResolve<Test3>().IsEmpty());
             Assert.IsEqual(Resolver.Resolve<Test3>().val1, test1);
         }
@@ -71,10 +77,14 @@ namespace Zenject.Tests
         {
             Binder.Bind<Test0>().ToTransient();
 
+            AssertValidates();
+
             // Should not redefine the hard coded value in this case
             Assert.IsEqual(Resolver.Resolve<Test0>().Val1, 5);
 
             Binder.Bind<int>().ToInstance(3);
+
+            AssertValidates();
 
             Assert.IsEqual(Resolver.Resolve<Test0>().Val1, 3);
         }
@@ -103,6 +113,8 @@ namespace Zenject.Tests
         {
             Binder.Bind<Test4>().ToSingle();
 
+            AssertValidationFails();
+
             Assert.Throws<ZenjectResolveException>(
                 delegate { Resolver.Resolve<Test4>(); });
 
@@ -113,6 +125,8 @@ namespace Zenject.Tests
         public void TestParameterOptional()
         {
             Binder.Bind<Test5>().ToSingle();
+
+            AssertValidates();
 
             Assert.That(Resolver.ValidateResolve<Test5>().IsEmpty());
             var test = Resolver.Resolve<Test5>();
@@ -133,6 +147,8 @@ namespace Zenject.Tests
             Binder.Bind<Test2>().ToSingle();
 
             Assert.That(Resolver.ValidateResolve<Test6>().Any());
+
+            AssertValidationFails();
 
             Assert.Throws<ZenjectResolveException>(
                 delegate { Resolver.Resolve<Test6>(); });
@@ -157,6 +173,8 @@ namespace Zenject.Tests
 
             Assert.That(Resolver.ValidateResolve<Test7>().IsEmpty());
 
+            AssertValidates();
+
             Assert.IsEqual(Resolver.Resolve<Test7>().Val1, 0);
         }
 
@@ -176,6 +194,9 @@ namespace Zenject.Tests
         public void TestPrimitiveParamOptionalUsesExplicitDefault()
         {
             Binder.Bind<Test8>().ToSingle();
+
+            AssertValidates();
+
             Assert.That(Resolver.ValidateResolve<Test8>().IsEmpty());
             Assert.IsEqual(Resolver.Resolve<Test8>().Val1, 5);
         }
@@ -194,6 +215,9 @@ namespace Zenject.Tests
         public void TestPrimitiveParamOptionalUsesExplicitDefault2()
         {
             Binder.Bind<Test8_2>().ToSingle();
+
+            AssertValidates();
+
             Assert.That(Resolver.ValidateResolve<Test8_2>().IsEmpty());
             Assert.IsEqual(Resolver.Resolve<Test8_2>().Val1, 5);
         }
@@ -214,6 +238,8 @@ namespace Zenject.Tests
         public void TestPrimitiveParamOptionalNullable()
         {
             Binder.Bind<Test9>().ToSingle();
+
+            AssertValidates();
 
             Assert.That(Resolver.ValidateResolve<Test9>().IsEmpty());
 

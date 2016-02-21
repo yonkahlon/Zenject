@@ -44,6 +44,8 @@ namespace Zenject.Tests
             Assert.Throws<ZenjectResolveException>(
                 delegate { Resolver.Resolve<Test2>(); });
 
+            AssertValidationFails();
+
             Assert.That(Resolver.ValidateResolve<Test2>().Any());
         }
 
@@ -51,6 +53,8 @@ namespace Zenject.Tests
         public void TestNameConditionSuccess()
         {
             Binder.Bind<Test1>().ToSingle();
+
+            AssertValidates();
 
             Assert.That(Resolver.ValidateResolve<Test1>().IsEmpty());
             var test1 = Resolver.Resolve<Test1>();

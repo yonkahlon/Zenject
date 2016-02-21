@@ -26,6 +26,8 @@ namespace Zenject.Tests
 
             Binder.Bind<IFoo>().ToInstance(instance);
 
+            AssertValidates();
+
             Assert.That(Resolver.ValidateResolve<IFoo>().IsEmpty());
             var builtInstance = Resolver.Resolve<IFoo>();
 
@@ -38,6 +40,8 @@ namespace Zenject.Tests
             IFoo instance = new Foo();
 
             Binder.Bind(typeof(IFoo)).ToInstance(instance);
+
+            AssertValidates();
 
             Assert.That(Resolver.ValidateResolve<IFoo>().IsEmpty());
             var builtInstance = Resolver.Resolve<IFoo>();
@@ -53,6 +57,8 @@ namespace Zenject.Tests
             Binder.Bind<Foo>().ToInstance(instance);
             Binder.Bind<Foo>().ToInstance(instance);
 
+            AssertValidates();
+
             Assert.That(Resolver.ValidateResolve<Foo>().Any());
 
             Assert.Throws<ZenjectResolveException>(
@@ -66,6 +72,8 @@ namespace Zenject.Tests
 
             Binder.Bind(typeof(Foo)).ToInstance(instance);
             Binder.Bind(typeof(Foo)).ToInstance(instance);
+
+            AssertValidates();
 
             Assert.That(Resolver.ValidateResolve<Foo>().Any());
 

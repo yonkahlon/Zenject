@@ -21,6 +21,8 @@ namespace Zenject.Tests
 
             Assert.That(Resolver.ValidateResolve<Test1>().IsEmpty());
 
+            AssertValidates();
+
             var test1 = Resolver.Resolve<Test1>();
             var test2 = Resolver.Resolve<Test1>();
 
@@ -32,6 +34,8 @@ namespace Zenject.Tests
         public void TestTransientTypeUntyped()
         {
             Binder.Bind(typeof(Test1)).ToTransient();
+
+            AssertValidates();
 
             Assert.That(Resolver.ValidateResolve<Test1>().IsEmpty());
 

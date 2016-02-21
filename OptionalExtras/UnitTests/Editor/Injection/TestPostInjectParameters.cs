@@ -58,6 +58,8 @@ namespace Zenject.Tests
 
             Assert.That(Resolver.ValidateResolve<Test3>().IsEmpty());
 
+            AssertValidates();
+
             var test3 = Resolver.Resolve<Test3>();
 
             Assert.That(test3.HasInitialized);

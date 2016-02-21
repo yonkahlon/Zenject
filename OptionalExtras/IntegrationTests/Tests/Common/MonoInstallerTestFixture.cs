@@ -26,6 +26,14 @@ namespace ModestTree
             StartCoroutine(Run());
         }
 
+        protected virtual float Delay
+        {
+            get
+            {
+                return 0.1f;
+            }
+        }
+
         IEnumerator Run()
         {
             GlobalCompositionRoot.Instance.EnsureIsInitialized();
@@ -56,10 +64,7 @@ namespace ModestTree
                 var root = SceneCompositionRoot.Instantiate(gameObject, settings);
 
                 // Wait a few frames to have it start up
-                yield return null;
-                yield return null;
-                yield return null;
-                yield return null;
+                yield return new WaitForSeconds(Delay);
 
                 GameObject.Destroy(root.gameObject);
 
@@ -98,3 +103,4 @@ namespace ModestTree
         }
     }
 }
+

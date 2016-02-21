@@ -93,6 +93,8 @@ namespace Zenject.Tests
 
             Binder.Bind<Bar>().ToSingle();
 
+            AssertValidates();
+
             Assert.That(Resolver.ValidateResolve<List<IFoo>>().IsEmpty());
 
             // Should not throw

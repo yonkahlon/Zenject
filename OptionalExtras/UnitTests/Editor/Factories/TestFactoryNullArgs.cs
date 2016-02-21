@@ -42,6 +42,8 @@ namespace Zenject.Tests
             Binder.Bind<Foo>().ToSingle();
             Binder.Bind<Test2.Factory>().ToSingle();
 
+            AssertValidates();
+
             var factory = Resolver.Resolve<Test2.Factory>();
             var test2 = factory.Create(new Bar());
 
@@ -53,6 +55,8 @@ namespace Zenject.Tests
         {
             Binder.Bind<Foo>().ToSingle();
             Binder.Bind<Test2.Factory>().ToSingle();
+
+            AssertValidates();
 
             var factory = Resolver.Resolve<Test2.Factory>();
             var test2 = factory.Create(null);
@@ -81,6 +85,8 @@ namespace Zenject.Tests
         public void Run3()
         {
             Binder.Bind<Test3.Factory>().ToSingle();
+
+            AssertValidates();
 
             var factory = Resolver.Resolve<Test3.Factory>();
             var test = factory.Create(null, null, new Foo());
