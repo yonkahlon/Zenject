@@ -29,6 +29,11 @@ namespace Zenject.Internal
             return obj == null || obj.Equals(null);
         }
 
+        public static bool AreFunctionsEqual(Delegate left, Delegate right)
+        {
+            return left.Target == right.Target && left.Method == right.Method;
+        }
+
 #if !ZEN_NOT_UNITY3D
         // NOTE: This method will not return components that are within a FacadeCompositionRoot
         public static IEnumerable<Component> GetInjectableComponentsBottomUp(
@@ -39,27 +44,8 @@ namespace Zenject.Internal
                 yield break;
             }
 
-            var compRoot = gameObject.GetComponent<FacadeCompositionRoot>();
-
-            if (compRoot != null)
-            {
-                foreach (var component in gameObject.GetComponents<Component>())
-                {
-                    if (compRoot.Facade == component)
-                    {
-                        // Allow an exception for the facade class to exist alongside the facade composition root
-                        // on the same game object
-                        // And inject all other components from the parent root
-                        continue;
-                    }
-
-                    yield return component;
-                }
-
-                yield break;
-            }
-
-            if (recursive)
+            // Do not recurse down into Facades
+            if (recursive && gameObject.GetComponent<FacadeCompositionRoot>() == null)
             {
                 foreach (Transform child in gameObject.transform)
                 {

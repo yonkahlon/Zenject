@@ -148,7 +148,9 @@
     <Compile Include="Singletons\TestToSingleInstance.cs" />
     <Compile Include="Singletons\TestToSingleMethod.cs" />
     <Compile Include="Singletons\TestToSingleWrongMonoBehaviour.cs" />
-    <Compile Include="SubContainers\TestFacades.cs" />
+    <Compile Include="SubContainers\TestFacade.cs" />
+    <Compile Include="SubContainers\TestFacade2.cs" />
+    <Compile Include="SubContainers\TestFacadeFactory.cs" />
     <Compile Include="SubContainers\TestNestedContainer.cs" />
     <Compile Include="SubContainers\TestSubContainer2.cs" />
     <Compile Include="SubContainers\TestSubContainer3.cs" />

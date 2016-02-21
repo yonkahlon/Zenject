@@ -8,7 +8,7 @@ using UnityEngine;
 namespace Zenject
 {
     // All this class does is provide generic constraints on all the inherited bind methods
-    public class GenericBinder<TContract> : TypeBinder
+    public class GenericBinder<TContract> : TypeBinder, IGenericBinder<TContract>
     {
         public GenericBinder(
             DiContainer container, string identifier)
@@ -196,6 +196,36 @@ namespace Zenject
             return ToSinglePrefabResource(typeof(TConcrete), concreteIdentifier, resourcePath);
         }
 #endif
+
+        public BindingConditionSetter ToSingleFacadeMethod<TConcrete>(Action<IBinder> installerFunc)
+            where TConcrete : TContract
+        {
+            return ToSingleFacadeMethod<TConcrete>(null, installerFunc);
+        }
+
+        public BindingConditionSetter ToSingleFacadeMethod<TConcrete>(
+            string concreteIdentifier, Action<IBinder> installerFunc)
+            where TConcrete : TContract
+        {
+            return ToSingleFacadeMethod(typeof(TConcrete), concreteIdentifier, installerFunc);
+        }
+
+        public BindingConditionSetter ToSingleFacadeInstaller<TConcrete, TInstaller>()
+            where TConcrete : TContract
+            where TInstaller : Installer
+        {
+            return ToSingleFacadeInstaller(
+                typeof(TConcrete), null, typeof(TInstaller));
+        }
+
+        public BindingConditionSetter ToSingleFacadeInstaller<TConcrete, TInstaller>(
+            string concreteIdentifier)
+            where TConcrete : TContract
+            where TInstaller : Installer
+        {
+            return ToSingleFacadeInstaller(
+                typeof(TConcrete), concreteIdentifier, typeof(TInstaller));
+        }
     }
 }
 

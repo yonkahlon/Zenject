@@ -28,10 +28,14 @@ namespace Zenject.Tests
         {
             Binder.Bind<Test1>().ToSingle<Test2>();
 
+            AssertValidates();
+
             Assert.That(Resolver.ValidateResolve<Test1>().IsEmpty());
             Assert.That(Resolver.Resolve<Test1>() is Test2);
 
             Binder.Rebind<Test1>().ToSingle<Test3>();
+
+            AssertValidates();
 
             Assert.That(Resolver.ValidateResolve<Test1>().IsEmpty());
             Assert.That(Resolver.Resolve<Test1>() is Test3);

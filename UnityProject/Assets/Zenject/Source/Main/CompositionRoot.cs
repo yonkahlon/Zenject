@@ -15,8 +15,10 @@ namespace Zenject
 {
     public abstract class CompositionRoot : MonoBehaviour
     {
+        [FormerlySerializedAs("OnlyInjectWhenActive")]
         [Tooltip("When true, inactive objects will not have their members injected")]
-        public bool OnlyInjectWhenActive = false;
+        [SerializeField]
+        bool _onlyInjectWhenActive = false;
 
         [FormerlySerializedAs("Installers")]
         [SerializeField]
@@ -28,6 +30,18 @@ namespace Zenject
         public abstract IDependencyRoot DependencyRoot
         {
             get;
+        }
+
+        public bool OnlyInjectWhenActive
+        {
+            get
+            {
+                return _onlyInjectWhenActive;
+            }
+            protected set
+            {
+                _onlyInjectWhenActive = value;
+            }
         }
 
         public IEnumerable<MonoInstaller> Installers
@@ -56,7 +70,7 @@ namespace Zenject
         // We pass in the binder here instead of using our own for validation to work
         protected void InstallInstallers(IBinder binder)
         {
-            binder.Install<StandardInstaller>();
+            binder.Install<FacadeCommonInstaller>();
 
             var newGameObjects = new List<GameObject>();
             var allInstallers = _installers.Cast<IInstaller>().ToList();
@@ -107,35 +121,6 @@ namespace Zenject
             }
         }
 
-        protected IEnumerable<Component> GetRootObjectsInjectableComponents()
-        {
-            foreach (var gameObject in GetRootGameObjects())
-            {
-                foreach (var component in ZenUtilInternal.GetInjectableComponentsBottomUp(
-                    gameObject, true, !OnlyInjectWhenActive))
-                {
-                    if (component == null)
-                    {
-                        // This warning about fiBackupSceneStorage appears in normal cases so just ignore
-                        // Not sure what it is
-                        if (gameObject.name != "fiBackupSceneStorage")
-                        {
-                            Log.Warn("Zenject: Found null component on game object '{0}'.  Possible missing script.", gameObject.name);
-                        }
-                        continue;
-                    }
-
-                    if (component.GetType().DerivesFrom<MonoInstaller>())
-                    {
-                        // Do not inject on installers since these are always injected before they are installed
-                        continue;
-                    }
-
-                    yield return component;
-                }
-            }
-        }
-
         protected void InstallSceneBindings(IBinder binder)
         {
             foreach (var autoBinding in GetRootGameObjects().SelectMany(x => x.GetComponentsInChildren<ZenjectBinding>()))
@@ -167,6 +152,35 @@ namespace Zenject
             }
         }
 
+        public IEnumerable<Component> GetInjectableComponents()
+        {
+            foreach (var gameObject in GetRootGameObjects())
+            {
+                foreach (var component in ZenUtilInternal.GetInjectableComponentsBottomUp(
+                    gameObject, true, !OnlyInjectWhenActive))
+                {
+                    if (component == null)
+                    {
+                        // This warning about fiBackupSceneStorage appears in normal cases so just ignore
+                        // Not sure what it is
+                        if (gameObject.name != "fiBackupSceneStorage")
+                        {
+                            Log.Warn("Zenject: Found null component on game object '{0}'.  Possible missing script.", gameObject.name);
+                        }
+                        continue;
+                    }
+
+                    if (component.GetType().DerivesFrom<MonoInstaller>())
+                    {
+                        // Do not inject on installers since these are always injected before they are installed
+                        continue;
+                    }
+
+                    yield return component;
+                }
+            }
+        }
+
         protected void InjectComponents(IResolver resolver)
         {
             // Use ToList in case they do something weird in post inject
@@ -179,8 +193,8 @@ namespace Zenject
         }
 
         public abstract IEnumerable<GameObject> GetRootGameObjects();
-        public abstract IEnumerable<Component> GetInjectableComponents();
     }
 }
 
 #endif
+

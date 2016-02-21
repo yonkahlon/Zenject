@@ -51,6 +51,8 @@ namespace Zenject.Tests
             Binder.Bind<IFoo>().ToSingle<Foo1>();
             Binder.Bind<IFoo>().ToSingle<Foo2>().WhenInjectedInto<Bar2>();
 
+            AssertValidates();
+
             Assert.IsNotEqual(
                 Resolver.Resolve<Bar1>().Foo, Container.Resolver.Resolve<Bar2>().Foo);
         }

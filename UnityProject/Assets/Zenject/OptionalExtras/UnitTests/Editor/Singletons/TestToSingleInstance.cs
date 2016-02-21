@@ -27,6 +27,8 @@ namespace Zenject.Tests
             Binder.Bind<Foo>().ToSingleInstance(foo);
             Binder.Bind<IFoo>().ToSingleInstance(foo);
 
+            AssertValidates();
+
             Assert.ReferenceEquals(Resolver.Resolve<IFoo>(), foo);
             Assert.ReferenceEquals(Resolver.Resolve<Foo>(), foo);
             Assert.ReferenceEquals(Resolver.Resolve<IFoo>(), Container.Resolver.Resolve<Foo>());

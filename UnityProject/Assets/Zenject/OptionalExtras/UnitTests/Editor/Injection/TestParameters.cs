@@ -42,6 +42,8 @@ namespace Zenject.Tests
         {
             Binder.Bind<Test1>().ToTransient();
 
+            AssertValidationFails();
+
             Assert.Throws<ZenjectResolveException>(
                 delegate { Resolver.Resolve<Test1>(); });
 

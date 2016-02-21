@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using ModestTree;
+using Zenject.Internal;
 
 namespace Zenject
 {
@@ -32,7 +33,7 @@ namespace Zenject
 
             if (_creators.TryGetValue(id, out creator))
             {
-                if (!AreFunctionsEqual(creator.CreateMethod, method))
+                if (!ZenUtilInternal.AreFunctionsEqual(creator.CreateMethod, method))
                 {
                     throw new ZenjectBindException(
                         "Cannot use 'ToSingleMethod' with multiple different methods!");
@@ -45,11 +46,6 @@ namespace Zenject
             }
 
             return creator;
-        }
-
-        bool AreFunctionsEqual(Delegate left, Delegate right)
-        {
-            return left.Target == right.Target && left.Method == right.Method;
         }
 
         public MethodSingletonProvider CreateProvider<TConcrete>(

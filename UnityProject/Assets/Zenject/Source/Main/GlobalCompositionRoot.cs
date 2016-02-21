@@ -96,17 +96,12 @@ namespace Zenject
 
             DontDestroyOnLoad(gameObject);
 
-            _container = new DiContainer();
+            _container = new DiContainer(false);
 
             InstallBindings(_container.Binder);
             InjectComponents(_container.Resolver);
 
             _dependencyRoot = _container.Resolver.Resolve<IDependencyRoot>();
-        }
-
-        public override IEnumerable<Component> GetInjectableComponents()
-        {
-            return GetRootObjectsInjectableComponents();
         }
 
         public override IEnumerable<GameObject> GetRootGameObjects()
@@ -120,7 +115,7 @@ namespace Zenject
             binder.Bind<CompositionRoot>().ToInstance(this);
             binder.Bind<IDependencyRoot>().ToSingleMonoBehaviour<GlobalFacade>(this.gameObject);
 
-            binder.Bind<Transform>(ZenConstants.DefaultParentId)
+            binder.Bind<Transform>(DiContainer.DefaultParentId)
                 .ToInstance<Transform>(this.gameObject.transform);
 
             InstallSceneBindings(binder);
@@ -131,3 +126,4 @@ namespace Zenject
 }
 
 #endif
+

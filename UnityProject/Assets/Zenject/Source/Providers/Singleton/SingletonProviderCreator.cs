@@ -12,6 +12,8 @@ namespace Zenject
     public class SingletonProviderCreator
     {
         readonly MethodSingletonProviderCreator _methodSingletonProviderCreator;
+        readonly FacadeMethodSingletonProviderCreator _facadeMethodSingletonProviderCreator;
+        readonly FacadeInstallerSingletonProviderCreator _facadeInstallerSingletonProviderCreator;
         readonly TypeSingletonProviderCreator _typeSingletonProviderCreator;
         readonly InstanceSingletonProviderCreator _instanceSingletonProviderCreator;
         readonly FactorySingletonProviderCreator _factorySingletonProviderCreator;
@@ -28,6 +30,8 @@ namespace Zenject
         {
             _typeSingletonProviderCreator = new TypeSingletonProviderCreator(container, singletonRegistry);
             _methodSingletonProviderCreator = new MethodSingletonProviderCreator(singletonRegistry);
+            _facadeMethodSingletonProviderCreator = new FacadeMethodSingletonProviderCreator(container, singletonRegistry);
+            _facadeInstallerSingletonProviderCreator = new FacadeInstallerSingletonProviderCreator(container, singletonRegistry);
             _instanceSingletonProviderCreator = new InstanceSingletonProviderCreator(container, singletonRegistry);
             _factorySingletonProviderCreator = new FactorySingletonProviderCreator(container, singletonRegistry);
 
@@ -74,6 +78,19 @@ namespace Zenject
         {
             return CreateProviderFromType(
                 new SingletonId(concreteType, concreteIdentifier));
+        }
+
+        public ProviderBase CreateProviderFromFacadeMethod(
+            Type concreteType, string concreteIdentifier, Action<IBinder> installerFunc)
+        {
+            return _facadeMethodSingletonProviderCreator.CreateProvider(concreteType, concreteIdentifier, installerFunc);
+        }
+
+        public ProviderBase CreateProviderFromFacadeInstaller(
+            Type concreteType, string concreteIdentifier, Type installerType)
+        {
+            return _facadeInstallerSingletonProviderCreator.CreateProvider(
+                concreteType, concreteIdentifier, installerType);
         }
 
 #if !ZEN_NOT_UNITY3D

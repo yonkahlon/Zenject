@@ -36,6 +36,8 @@ namespace Zenject.Tests
 
             Binder.Bind<FactoryUntyped<Test1>>().ToSingle();
 
+            AssertValidates();
+
             Assert.That(Resolver.ValidateResolve<FactoryUntyped<Test1>>().IsEmpty());
             var factory = Resolver.Resolve<FactoryUntyped<Test1>>();
 

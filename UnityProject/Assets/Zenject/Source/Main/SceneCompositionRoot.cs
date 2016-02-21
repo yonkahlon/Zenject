@@ -18,11 +18,14 @@ namespace Zenject
     public class SceneCompositionRoot : CompositionRoot
     {
         public static readonly List<Scene> DecoratedScenes = new List<Scene>();
+
         public static Action<IBinder> BeforeInstallHooks;
         public static Action<IBinder> AfterInstallHooks;
 
+        [FormerlySerializedAs("ParentNewObjectsUnderRoot")]
         [Tooltip("When true, objects that are created at runtime will be parented to the SceneCompositionRoot")]
-        public bool ParentNewObjectsUnderRoot = true;
+        [SerializeField]
+        bool _parentNewObjectsUnderRoot = true;
 
         DiContainer _container;
         IDependencyRoot _dependencyRoot;
@@ -44,7 +47,7 @@ namespace Zenject
             {
                 this.SetInstallers(_staticSettings.Installers);
                 OnlyInjectWhenActive = _staticSettings.OnlyInjectWhenActive;
-                ParentNewObjectsUnderRoot = _staticSettings.ParentNewObjectsUnderRoot;
+                _parentNewObjectsUnderRoot = _staticSettings.ParentNewObjectsUnderRoot;
                 _staticSettings = null;
             }
 
@@ -54,7 +57,7 @@ namespace Zenject
             Assert.IsNull(_container);
 
             _container = new DiContainer(
-                GlobalCompositionRoot.Instance.Container);
+                GlobalCompositionRoot.Instance.Container, false);
 
             if (Installers.IsEmpty() && InstallerPrefabs.IsEmpty())
             {
@@ -73,9 +76,9 @@ namespace Zenject
         // We pass in the binder here instead of using our own for validation to work
         public override void InstallBindings(IBinder binder)
         {
-            if (ParentNewObjectsUnderRoot)
+            if (_parentNewObjectsUnderRoot)
             {
-                binder.Bind<Transform>(ZenConstants.DefaultParentId)
+                binder.Bind<Transform>(DiContainer.DefaultParentId)
                     .ToInstance<Transform>(this.transform);
             }
 
@@ -100,11 +103,6 @@ namespace Zenject
                 // Reset extra bindings for next time we change scenes
                 AfterInstallHooks = null;
             }
-        }
-
-        public override IEnumerable<Component> GetInjectableComponents()
-        {
-            return GetRootObjectsInjectableComponents();
         }
 
         public override IEnumerable<GameObject> GetRootGameObjects()
@@ -158,3 +156,4 @@ namespace Zenject
 }
 
 #endif
+

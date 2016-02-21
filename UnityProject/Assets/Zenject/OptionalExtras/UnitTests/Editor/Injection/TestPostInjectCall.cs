@@ -65,6 +65,8 @@ namespace Zenject.Tests
             Binder.Bind<Test2>().ToSingle();
             Binder.Bind<Test3>().ToSingle();
 
+            AssertValidates();
+
             Assert.That(Resolver.ValidateResolve<Test3>().IsEmpty());
             var test3 = Resolver.Resolve<Test3>();
             Assert.That(test3.HasInitialized);
@@ -91,6 +93,8 @@ namespace Zenject.Tests
         {
             Binder.Bind<SimpleBase>().ToSingle<SimpleDerived>();
 
+            AssertValidates();
+
             var simple = Resolver.Resolve<SimpleBase>();
 
             Assert.That(simple.WasCalled);
@@ -100,6 +104,8 @@ namespace Zenject.Tests
         public void TestInheritance()
         {
             Binder.Bind<IFoo>().ToSingle<FooDerived>();
+
+            AssertValidates();
 
             Assert.That(Resolver.ValidateResolve<IFoo>().IsEmpty());
             var foo = Resolver.Resolve<IFoo>();
@@ -120,6 +126,8 @@ namespace Zenject.Tests
             FooBase.BaseCallOrder = 0;
             FooDerived.DerivedCallOrder = 0;
             FooDerived2.Derived2CallOrder = 0;
+
+            AssertValidates();
 
             Resolver.Resolve<IFoo>();
 

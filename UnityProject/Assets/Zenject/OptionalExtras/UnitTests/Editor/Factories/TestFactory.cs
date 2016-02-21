@@ -42,6 +42,8 @@ namespace Zenject.Tests
             Binder.Bind<Test0>().ToSingle();
             Binder.Bind<Test2.Factory>().ToSingle();
 
+            AssertValidates();
+
             var factory = Resolver.Resolve<Test2.Factory>();
             var test = factory.Create(5, new Test1());
 

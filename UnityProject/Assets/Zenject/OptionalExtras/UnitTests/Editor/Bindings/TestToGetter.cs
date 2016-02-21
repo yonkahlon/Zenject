@@ -34,6 +34,8 @@ namespace Zenject.Tests
             Binder.Bind<Foo>().ToSingle();
             Binder.Bind<Bar>().ToGetter<Foo>(x => x.GetBar());
 
+            AssertValidates();
+
             var foo = Resolver.Resolve<Foo>();
             var bar = Resolver.Resolve<Bar>();
 

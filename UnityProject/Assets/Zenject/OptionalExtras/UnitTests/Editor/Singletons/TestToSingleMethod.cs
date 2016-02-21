@@ -26,6 +26,8 @@ namespace Zenject.Tests
 
             Binder.Bind(typeof(Foo)).ToSingleMethod((container) => foo);
 
+            AssertValidates();
+
             Assert.That(ReferenceEquals(Resolver.Resolve<Foo>(), foo));
         }
 
@@ -45,6 +47,8 @@ namespace Zenject.Tests
             Binder.Bind<Foo>().ToSingleMethod(method);
             Binder.Bind<IFoo>().ToSingleMethod(method);
 
+            AssertValidates();
+
             Assert.ReferenceEquals(Resolver.Resolve<Foo>(), Container.Resolver.Resolve<IFoo>());
         }
 
@@ -53,6 +57,8 @@ namespace Zenject.Tests
         {
             Binder.Bind<Foo>().ToSingleMethod<Foo>(CreateFoo);
             Binder.Bind<IFoo>().ToSingleMethod<Foo>(CreateFoo);
+
+            AssertValidates();
 
             Assert.ReferenceEquals(Resolver.Resolve<Foo>(), Container.Resolver.Resolve<IFoo>());
         }

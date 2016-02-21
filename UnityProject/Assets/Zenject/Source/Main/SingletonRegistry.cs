@@ -15,6 +15,8 @@ namespace Zenject
     {
         ToSingle,
         ToSingleMethod,
+        ToSingleFacadeMethod,
+        ToSingleFacadeInstaller,
         ToSingleInstance,
         ToSinglePrefab,
         ToSinglePrefabResource,

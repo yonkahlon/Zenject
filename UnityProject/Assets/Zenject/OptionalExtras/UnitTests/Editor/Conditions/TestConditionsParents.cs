@@ -65,6 +65,8 @@ namespace Zenject.Tests
             Binder.Bind<Test1>().ToSingle();
             Binder.Bind<Test0>().ToSingle().When(c => c.AllObjectTypes.Contains(typeof(Test2)));
 
+            AssertValidationFails();
+
             Assert.Throws<ZenjectResolveException>(
                 delegate { Resolver.Resolve<Test1>(); });
 
@@ -76,6 +78,8 @@ namespace Zenject.Tests
         {
             Binder.Bind<Test1>().ToSingle();
             Binder.Bind<Test0>().ToSingle().When(c => c.AllObjectTypes.Contains(typeof(Test1)));
+
+            AssertValidates();
 
             var test1 = Resolver.Resolve<Test1>();
             Assert.That(Resolver.ValidateResolve<Test1>().IsEmpty());
@@ -112,6 +116,8 @@ namespace Zenject.Tests
             Binder.Bind<ITest1>().ToSingle<Test2>();
             Binder.Bind<Test0>().ToSingle().When(c => c.AllObjectTypes.Contains(typeof(ITest1)));
 
+            AssertValidationFails();
+
             Assert.Throws<ZenjectResolveException>(
                 delegate { Resolver.Resolve<ITest1>(); });
 
@@ -124,6 +130,8 @@ namespace Zenject.Tests
             Binder.Bind<ITest1>().ToSingle<Test2>();
             Binder.Bind<Test0>().ToSingle().When(c => c.AllObjectTypes.Contains(typeof(Test2)));
 
+            AssertValidates();
+
             Assert.That(Resolver.ValidateResolve<ITest1>().IsEmpty());
             var test1 = Resolver.Resolve<ITest1>();
             Assert.That(test1 != null);
@@ -134,6 +142,8 @@ namespace Zenject.Tests
         {
             Binder.Bind<ITest1>().ToSingle<Test2>();
             Binder.Bind<Test0>().ToSingle().When(c => c.AllObjectTypes.Where(x => typeof(ITest1).IsAssignableFrom(x)).Any());
+
+            AssertValidates();
 
             Assert.That(Resolver.ValidateResolve<ITest1>().IsEmpty());
             var test1 = Resolver.Resolve<ITest1>();

@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace Zenject
 {
-    public class UntypedBinder : TypeBinder
+    public class UntypedBinder : TypeBinder, IUntypedBinder
     {
         public UntypedBinder(
             DiContainer container, Type contractType,
@@ -87,6 +87,16 @@ namespace Zenject
             return ToSingleMethodBase<TConcrete>(null, method);
         }
 
+        public BindingConditionSetter ToSingleFacadeMethod<TConcrete>(string concreteIdentifier, Action<IBinder> installerFunc)
+        {
+            return ToSingleFacadeMethod(typeof(TConcrete), concreteIdentifier, installerFunc);
+        }
+
+        public BindingConditionSetter ToSingleFacadeMethod<TConcrete>(Action<IBinder> installerFunc)
+        {
+            return ToSingleFacadeMethod(typeof(TConcrete), null, installerFunc);
+        }
+
         public BindingConditionSetter ToSingle<TConcrete>()
         {
             return ToSingle(typeof(TConcrete), null);
@@ -121,12 +131,24 @@ namespace Zenject
             return ToTransientPrefab(typeof(TConcrete), prefab);
         }
 
+        public BindingConditionSetter ToSingleGameObject<TConcrete>()
+            where TConcrete : Component
+        {
+            return ToSingleGameObject(typeof(TConcrete));
+        }
+
         // Creates a new game object and adds the given type as a new component on it
-        // NOTE! The string given here is just a name and not a singleton identifier
         public BindingConditionSetter ToSingleGameObject<TConcrete>(string name)
             where TConcrete : Component
         {
             return ToSingleGameObject(typeof(TConcrete), name);
+        }
+
+        // Creates a new game object and adds the given type as a new component on it
+        public BindingConditionSetter ToTransientGameObject<TConcrete>()
+            where TConcrete : Component
+        {
+            return ToTransientGameObject(typeof(TConcrete));
         }
 
         public BindingConditionSetter ToSinglePrefab<TConcrete>(GameObject prefab)

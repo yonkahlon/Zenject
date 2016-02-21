@@ -24,6 +24,8 @@ namespace Zenject.Tests
             Binder.Bind<Test0>().ToSingle<Test1>();
             Binder.Bind<Test1>().ToSingle();
 
+            AssertValidates();
+
             Assert.That(Resolver.ValidateResolve<Test0>().IsEmpty());
             var test1 = Resolver.Resolve<Test0>();
 

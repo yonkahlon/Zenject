@@ -24,6 +24,8 @@ namespace Zenject.Tests
         {
             Binder.Bind<Foo>().ToSingle();
 
+            AssertValidates();
+
             Assert.That(Resolver.ValidateResolve<Foo>().IsEmpty());
             Assert.IsNotNull(Resolver.Resolve<Foo>());
         }
@@ -32,6 +34,8 @@ namespace Zenject.Tests
         public void TestSingletonOneInstance()
         {
             Binder.Bind<Foo>().ToSingle();
+
+            AssertValidates();
 
             Assert.That(Resolver.ValidateResolve<Foo>().IsEmpty());
             var test1 = Resolver.Resolve<Foo>();
@@ -47,6 +51,8 @@ namespace Zenject.Tests
         {
             Binder.Bind(typeof(Foo)).ToSingle();
 
+            AssertValidates();
+
             Assert.That(Resolver.ValidateResolve<Foo>().IsEmpty());
             var test1 = Resolver.Resolve<Foo>();
             Assert.That(Resolver.ValidateResolve<Foo>().IsEmpty());
@@ -61,6 +67,8 @@ namespace Zenject.Tests
         {
             Binder.Bind<IFoo>().ToSingle<Foo>();
 
+            AssertValidates();
+
             Assert.That(Resolver.ValidateResolve<IFoo>().IsEmpty());
             Assert.IsNotNull(Resolver.Resolve<IFoo>());
         }
@@ -69,6 +77,8 @@ namespace Zenject.Tests
         public void TestInterfaceBoundToImplementationRegistrationUntyped()
         {
             Binder.Bind(typeof(IFoo)).ToSingle(typeof(Foo));
+
+            AssertValidates();
 
             Assert.That(Resolver.ValidateResolve<IFoo>().IsEmpty());
             Assert.IsNotNull(Resolver.Resolve<IFoo>());
@@ -88,6 +98,8 @@ namespace Zenject.Tests
             Binder.Bind<Foo>().ToSingle();
             Binder.Bind<Foo>().ToSingle();
 
+            AssertValidates();
+
             Assert.Throws<ZenjectResolveException>(
                 delegate { Resolver.Resolve<Foo>(); });
 
@@ -99,6 +111,8 @@ namespace Zenject.Tests
         {
             Binder.Bind(typeof(Foo)).ToSingle();
             Binder.Bind(typeof(Foo)).ToSingle();
+
+            AssertValidates();
 
             Assert.Throws<ZenjectResolveException>(
                 delegate { Resolver.Resolve<Foo>(); });

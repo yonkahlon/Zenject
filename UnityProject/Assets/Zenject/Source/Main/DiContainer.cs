@@ -17,6 +17,10 @@ namespace Zenject
     // - Build object graphs via Resolve() method
     public class DiContainer : IInstantiator, IResolver, IBinder
     {
+#if !ZEN_NOT_UNITY3D
+        public const string DefaultParentId = "InstantiateDefaultParent";
+#endif
+
         readonly Dictionary<BindingId, List<ProviderBase>> _providers = new Dictionary<BindingId, List<ProviderBase>>();
         readonly HashSet<Type> _installedInstallers = new HashSet<Type>();
         readonly Stack<Type> _installsInProgress = new Stack<Type>();
@@ -24,16 +28,17 @@ namespace Zenject
         readonly Stack<LookupId> _resolvesInProgress = new Stack<LookupId>();
         readonly SingletonProviderCreator _singletonProviderFactory;
         readonly SingletonRegistry _singletonRegistry;
-
-        bool _isValidating;
+        readonly bool _isValidating;
 
 #if !ZEN_NOT_UNITY3D
         bool _hasLookedUpParent;
         Transform _defaultParent;
 #endif
 
-        public DiContainer()
+        public DiContainer(bool isValidating)
         {
+            _isValidating = isValidating;
+
             _singletonRegistry = new SingletonRegistry();
             _singletonProviderFactory = new SingletonProviderCreator(this, _singletonRegistry);
 
@@ -43,10 +48,20 @@ namespace Zenject
             Binder.Bind<IInstantiator>().ToInstance(this);
         }
 
-        public DiContainer(DiContainer parentContainer)
-            : this()
+        public DiContainer()
+            : this(false)
+        {
+        }
+
+        public DiContainer(DiContainer parentContainer, bool isValidating)
+            : this(isValidating)
         {
             _parentContainer = parentContainer;
+        }
+
+        public DiContainer(DiContainer parentContainer)
+            : this(parentContainer, false)
+        {
         }
 
         public IResolver Resolver
@@ -66,30 +81,6 @@ namespace Zenject
         }
 
         public IInstantiator Instantiator
-        {
-            get
-            {
-                return this;
-            }
-        }
-
-        DiContainer IInstantiator.Container
-        {
-            get
-            {
-                return this;
-            }
-        }
-
-        DiContainer IResolver.Container
-        {
-            get
-            {
-                return this;
-            }
-        }
-
-        DiContainer IBinder.Container
         {
             get
             {
@@ -127,7 +118,7 @@ namespace Zenject
                     // Use an InjectContext so we can specify local = true
                     // and optional = true
                     var ctx = new InjectContext(
-                        this, typeof(Transform), ZenConstants.DefaultParentId,
+                        this, typeof(Transform), DefaultParentId,
                         true, null, null, "", null, null, null, InjectSources.Local);
 
                     _defaultParent = Resolver.Resolve<Transform>(ctx);
@@ -170,15 +161,11 @@ namespace Zenject
 
         // True if this container was created for the purposes of validation
         // Useful to avoid instantiating things that we shouldn't during this step
-        public bool IsValidating
+        bool IBinder.IsValidating
         {
             get
             {
                 return _isValidating;
-            }
-            set
-            {
-                _isValidating = value;
             }
         }
 
@@ -201,7 +188,7 @@ namespace Zenject
 
         public DiContainer CreateSubContainer()
         {
-            return new DiContainer(this);
+            return new DiContainer(this, _isValidating);
         }
 
         public void RegisterProvider(
@@ -253,7 +240,47 @@ namespace Zenject
 
         IEnumerable<ZenjectResolveException> IResolver.ValidateResolve<TContract>(string identifier)
         {
-            return Resolver.ValidateResolve(new InjectContext(this, typeof(TContract), identifier));
+            return Resolver.ValidateResolve(typeof(TContract), identifier);
+        }
+
+        IEnumerable<ZenjectResolveException> IResolver.ValidateResolve(Type contractType)
+        {
+            return Resolver.ValidateResolve(contractType, (string)null);
+        }
+
+        IEnumerable<ZenjectResolveException> IResolver.ValidateResolve(Type contractType, string identifier)
+        {
+            return Resolver.ValidateResolve(new InjectContext(this, contractType, identifier));
+        }
+
+        IEnumerable<ZenjectResolveException> IResolver.ValidateAll(params Type[] ignoreTypes)
+        {
+            foreach (var error in Resolver.ValidateValidatables(ignoreTypes))
+            {
+                yield return error;
+            }
+
+            // Use ToList() in case it changes somehow during iteration
+            foreach (var pair in _providers.ToList())
+            {
+                var bindingId = pair.Key;
+
+                if (ignoreTypes.Where(i => bindingId.Type.DerivesFromOrEqual(i)).Any())
+                {
+                    continue;
+                }
+
+                foreach (var provider in pair.Value)
+                {
+                    var injectCtx = new InjectContext(
+                        this, bindingId.Type, bindingId.Identifier);
+
+                    foreach (var error in provider.ValidateBinding(injectCtx))
+                    {
+                        yield return error;
+                    }
+                }
+            }
         }
 
         IEnumerable<ZenjectResolveException> IResolver.ValidateValidatables(params Type[] ignoreTypes)
@@ -980,7 +1007,7 @@ namespace Zenject
                     if (component.GetType().DerivesFromOrEqual(componentType))
                     {
                         Assert.IsNull(requestedScript,
-                        "Found multiple matches with type '{0}' when instantiating new game object from prefab '{1}'", componentType, prefab.name);
+                            "Found multiple matches with type '{0}' when instantiating new game object from prefab '{1}'", componentType, prefab.name);
                         requestedScript = component;
 
                         Resolver.InjectExplicit(component, extraArgs);
@@ -1486,12 +1513,12 @@ namespace Zenject
             return Binder.Bind<TContract>().ToInstance(obj);
         }
 
-        GenericBinder<TContract> IBinder.Bind<TContract>()
+        IGenericBinder<TContract> IBinder.Bind<TContract>()
         {
             return Binder.Bind<TContract>(null);
         }
 
-        UntypedBinder IBinder.Bind(Type contractType)
+        IUntypedBinder IBinder.Bind(Type contractType)
         {
             return Binder.Bind(contractType, null);
         }
@@ -1519,6 +1546,27 @@ namespace Zenject
                 new InjectContext(this, typeof(TContract), identifier));
         }
 
+        void IBinder.BindAllInterfacesToSingleFacadeMethod<TConcrete>(Action<IBinder> installerMethod)
+        {
+            Binder.BindAllInterfacesToSingleFacadeMethod(typeof(TConcrete), installerMethod);
+        }
+
+        void IBinder.BindAllInterfacesToSingleFacadeMethod(Type concreteType, Action<IBinder> installerMethod)
+        {
+            Binder.BindAllInterfacesToSingleFacadeMethod(concreteType, null, installerMethod);
+        }
+
+        void IBinder.BindAllInterfacesToSingleFacadeMethod(
+            Type concreteType, string concreteIdentifier, Action<IBinder> installerMethod)
+        {
+            foreach (var interfaceType in concreteType.GetInterfaces())
+            {
+                Assert.That(concreteType.DerivesFrom(interfaceType));
+
+                Binder.Bind(interfaceType).ToSingleFacadeMethod(concreteType, concreteIdentifier, installerMethod);
+            }
+        }
+
         void IBinder.BindAllInterfacesToSingle<TConcrete>()
         {
             Binder.BindAllInterfacesToSingle(typeof(TConcrete));
@@ -1526,10 +1574,15 @@ namespace Zenject
 
         void IBinder.BindAllInterfacesToSingle(Type concreteType)
         {
+            Binder.BindAllInterfacesToSingle(concreteType, null);
+        }
+
+        void IBinder.BindAllInterfacesToSingle(Type concreteType, string concreteIdentifier)
+        {
             foreach (var interfaceType in concreteType.GetInterfaces())
             {
                 Assert.That(concreteType.DerivesFrom(interfaceType));
-                Binder.Bind(interfaceType).ToSingle(concreteType);
+                Binder.Bind(interfaceType).ToSingle(concreteType, concreteIdentifier);
             }
         }
 
@@ -1540,7 +1593,7 @@ namespace Zenject
 
         void IBinder.BindAllInterfacesToInstance(Type concreteType, object value)
         {
-            Assert.That((value == null && IsValidating) || value.GetType().DerivesFromOrEqual(concreteType));
+            Assert.That((value == null && _isValidating) || value.GetType().DerivesFromOrEqual(concreteType));
 
             foreach (var interfaceType in concreteType.GetInterfaces())
             {
@@ -1559,82 +1612,71 @@ namespace Zenject
             return Binder.BindIFactoryUntyped<TContract>(null);
         }
 
-        IFactoryBinder<TContract> IBinder.BindIFactory<TContract>(string identifier)
+        IIFactoryBinder<TContract> IBinder.BindIFactory<TContract>(string identifier)
         {
             return new IFactoryBinder<TContract>(this, identifier);
         }
 
-        IFactoryBinder<TContract> IBinder.BindIFactory<TContract>()
+        IIFactoryBinder<TContract> IBinder.BindIFactory<TContract>()
         {
             return Binder.BindIFactory<TContract>(null);
         }
 
-        IFactoryBinder<TParam1, TContract> IBinder.BindIFactory<TParam1, TContract>(string identifier)
+        IIFactoryBinder<TParam1, TContract> IBinder.BindIFactory<TParam1, TContract>(string identifier)
         {
             return new IFactoryBinder<TParam1, TContract>(this, identifier);
         }
 
-        IFactoryBinder<TParam1, TContract> IBinder.BindIFactory<TParam1, TContract>()
+        IIFactoryBinder<TParam1, TContract> IBinder.BindIFactory<TParam1, TContract>()
         {
             return Binder.BindIFactory<TParam1, TContract>(null);
         }
 
-        IFactoryBinder<TParam1, TParam2, TContract> IBinder.BindIFactory<TParam1, TParam2, TContract>(string identifier)
+        IIFactoryBinder<TParam1, TParam2, TContract> IBinder.BindIFactory<TParam1, TParam2, TContract>(string identifier)
         {
             return new IFactoryBinder<TParam1, TParam2, TContract>(this, identifier);
         }
 
-        IFactoryBinder<TParam1, TParam2, TContract> IBinder.BindIFactory<TParam1, TParam2, TContract>()
+        IIFactoryBinder<TParam1, TParam2, TContract> IBinder.BindIFactory<TParam1, TParam2, TContract>()
         {
             return Binder.BindIFactory<TParam1, TParam2, TContract>(null);
         }
 
-        IFactoryBinder<TParam1, TParam2, TParam3, TContract> IBinder.BindIFactory<TParam1, TParam2, TParam3, TContract>(string identifier)
+        IIFactoryBinder<TParam1, TParam2, TParam3, TContract> IBinder.BindIFactory<TParam1, TParam2, TParam3, TContract>(string identifier)
         {
             return new IFactoryBinder<TParam1, TParam2, TParam3, TContract>(this, identifier);
         }
 
-        IFactoryBinder<TParam1, TParam2, TParam3, TContract> IBinder.BindIFactory<TParam1, TParam2, TParam3, TContract>()
+        IIFactoryBinder<TParam1, TParam2, TParam3, TContract> IBinder.BindIFactory<TParam1, TParam2, TParam3, TContract>()
         {
             return Binder.BindIFactory<TParam1, TParam2, TParam3, TContract>(null);
         }
 
-        IFactoryBinder<TParam1, TParam2, TParam3, TParam4, TContract> IBinder.BindIFactory<TParam1, TParam2, TParam3, TParam4, TContract>(string identifier)
+        IIFactoryBinder<TParam1, TParam2, TParam3, TParam4, TContract> IBinder.BindIFactory<TParam1, TParam2, TParam3, TParam4, TContract>(string identifier)
         {
             return new IFactoryBinder<TParam1, TParam2, TParam3, TParam4, TContract>(this, identifier);
         }
 
-        IFactoryBinder<TParam1, TParam2, TParam3, TParam4, TContract> IBinder.BindIFactory<TParam1, TParam2, TParam3, TParam4, TContract>()
+        IIFactoryBinder<TParam1, TParam2, TParam3, TParam4, TContract> IBinder.BindIFactory<TParam1, TParam2, TParam3, TParam4, TContract>()
         {
             return Binder.BindIFactory<TParam1, TParam2, TParam3, TParam4, TContract>(null);
         }
 
-        GenericBinder<TContract> IBinder.Rebind<TContract>()
+        IGenericBinder<TContract> IBinder.Rebind<TContract>()
         {
             Binder.Unbind<TContract>();
             return Binder.Bind<TContract>();
         }
 
-        GenericBinder<TContract> IBinder.Bind<TContract>(string identifier)
+        IGenericBinder<TContract> IBinder.Bind<TContract>(string identifier)
         {
             Assert.That(!typeof(TContract).DerivesFromOrEqual<IInstaller>(),
                 "Deprecated usage of Bind<IInstaller>, use Install<IInstaller> instead");
             return new GenericBinder<TContract>(this, identifier);
         }
 
-        FacadeBinder<TFacade> IBinder.BindFacade<TFacade>(Action<IBinder> installerFunc)
-        {
-            return Binder.BindFacade<TFacade>(installerFunc, null);
-        }
-
-        FacadeBinder<TFacade> IBinder.BindFacade<TFacade>(
-            Action<IBinder> installerFunc, string identifier)
-        {
-            return new FacadeBinder<TFacade>(this, identifier, installerFunc);
-        }
-
         // Note that this can include open generic types as well such as List<>
-        UntypedBinder IBinder.Bind(Type contractType, string identifier)
+        IUntypedBinder IBinder.Bind(Type contractType, string identifier)
         {
             Assert.That(!contractType.DerivesFromOrEqual<IInstaller>(),
                 "Deprecated usage of Bind<IInstaller>, use Install<IInstaller> instead");
@@ -1642,54 +1684,121 @@ namespace Zenject
         }
 
 #if !ZEN_NOT_UNITY3D
-        BindingConditionSetter IBinder.BindGameObjectFactory<T>(GameObject prefab)
+
+        BindingConditionSetter IBinder.BindMonoFacadeFactory<TFactory>(
+            GameObject prefab)
         {
-            return Binder.BindGameObjectFactory<T>(prefab, null);
+            return Binder.BindMonoFacadeFactory<TFactory>(prefab, null);
         }
 
-        BindingConditionSetter IBinder.BindGameObjectFactory<T>(
+        BindingConditionSetter IBinder.BindMonoFacadeFactory<TFactory>(
             GameObject prefab, string groupName)
         {
             if (prefab == null)
             {
                 throw new ZenjectBindException(
-                    "Null prefab provided to BindGameObjectFactory for type '{0}'".Fmt(typeof(T).Name()));
+                    "Null prefab provided to BindMonoFacadeFactory for type '{0}'".Fmt(typeof(TFactory).Name()));
             }
 
             // We could bind the factory ToSingle but doing it this way is better
             // since it allows us to have multiple game object factories that
             // use different prefabs and have them injected into different places
-            return Binder.Bind<T>().ToMethod((ctx) => ctx.Instantiator.InstantiateExplicit<T>(
+            return Binder.Bind<TFactory>().ToMethod((ctx) => ctx.Instantiator.InstantiateExplicit<TFactory>(
+                new List<TypeValuePair>() { InstantiateUtil.CreateTypePair(prefab), InstantiateUtil.CreateTypePair(groupName) }));
+        }
+
+        BindingConditionSetter IBinder.BindGameObjectFactory<TFactory>(GameObject prefab)
+        {
+            return Binder.BindGameObjectFactory<TFactory>(prefab, null);
+        }
+
+        BindingConditionSetter IBinder.BindGameObjectFactory<TFactory>(
+            GameObject prefab, string groupName)
+        {
+            if (prefab == null)
+            {
+                throw new ZenjectBindException(
+                    "Null prefab provided to BindGameObjectFactory for type '{0}'".Fmt(typeof(TFactory).Name()));
+            }
+
+            // We could bind the factory ToSingle but doing it this way is better
+            // since it allows us to have multiple game object factories that
+            // use different prefabs and have them injected into different places
+            return Binder.Bind<TFactory>().ToMethod((ctx) => ctx.Instantiator.InstantiateExplicit<TFactory>(
                 new List<TypeValuePair>() { InstantiateUtil.CreateTypePair(prefab), InstantiateUtil.CreateTypePair(groupName) }));
         }
 #endif
 
-        BindingConditionSetter IBinder.BindFacadeFactory<TFacade, TFacadeFactory>(
+        BindingConditionSetter IBinder.BindFacadeFactoryMethod<TFacade, TFacadeFactory>(
             Action<IBinder> facadeInstaller)
         {
             return Binder.Bind<TFacadeFactory>().ToMethod(
                 x => x.Instantiator.Instantiate<TFacadeFactory>(facadeInstaller));
         }
 
-        BindingConditionSetter IBinder.BindFacadeFactory<TParam1, TFacade, TFacadeFactory>(
+        BindingConditionSetter IBinder.BindFacadeFactoryMethod<TParam1, TFacade, TFacadeFactory>(
             Action<IBinder, TParam1> facadeInstaller)
         {
             return Binder.Bind<TFacadeFactory>().ToMethod(
                 x => x.Instantiator.Instantiate<TFacadeFactory>(facadeInstaller));
         }
 
-        BindingConditionSetter IBinder.BindFacadeFactory<TParam1, TParam2, TFacade, TFacadeFactory>(
+        BindingConditionSetter IBinder.BindFacadeFactoryMethod<TParam1, TParam2, TFacade, TFacadeFactory>(
             Action<IBinder, TParam1, TParam2> facadeInstaller)
         {
             return Binder.Bind<TFacadeFactory>().ToMethod(
                 x => x.Instantiator.Instantiate<TFacadeFactory>(facadeInstaller));
         }
 
-        BindingConditionSetter IBinder.BindFacadeFactory<TParam1, TParam2, TParam3, TFacade, TFacadeFactory>(
+        BindingConditionSetter IBinder.BindFacadeFactoryMethod<TParam1, TParam2, TParam3, TFacade, TFacadeFactory>(
             Action<IBinder, TParam1, TParam2, TParam3> facadeInstaller)
         {
             return Binder.Bind<TFacadeFactory>().ToMethod(
                 x => x.Instantiator.Instantiate<TFacadeFactory>(facadeInstaller));
+        }
+
+        BindingConditionSetter IBinder.BindFacadeFactoryInstaller<TFacade, TFacadeFactory, TInstaller>()
+        {
+            return Binder.BindFacadeFactoryInstaller<TFacade, TFacadeFactory>(typeof(TInstaller));
+        }
+
+        BindingConditionSetter IBinder.BindFacadeFactoryInstaller<TParam1, TFacade, TFacadeFactory, TInstaller>()
+        {
+            return Binder.BindFacadeFactoryInstaller<TParam1, TFacade, TFacadeFactory>(typeof(TInstaller));
+        }
+
+        BindingConditionSetter IBinder.BindFacadeFactoryInstaller<TParam1, TParam2, TFacade, TFacadeFactory, TInstaller>()
+        {
+            return Binder.BindFacadeFactoryInstaller<TParam1, TParam2, TFacade, TFacadeFactory>(typeof(TInstaller));
+        }
+
+        BindingConditionSetter IBinder.BindFacadeFactoryInstaller<TParam1, TParam2, TParam3, TFacade, TFacadeFactory, TInstaller>()
+        {
+            return Binder.BindFacadeFactoryInstaller<TParam1, TParam2, TParam3, TFacade, TFacadeFactory>(typeof(TInstaller));
+        }
+
+        BindingConditionSetter IBinder.BindFacadeFactoryInstaller<TFacade, TFacadeFactory>(Type installerType)
+        {
+            return Binder.Bind<TFacadeFactory>().ToMethod(
+                x => x.Instantiator.Instantiate<TFacadeFactory>(installerType));
+        }
+
+        BindingConditionSetter IBinder.BindFacadeFactoryInstaller<TParam1, TFacade, TFacadeFactory>(Type installerType)
+        {
+            return Binder.Bind<TFacadeFactory>().ToMethod(
+                x => x.Instantiator.Instantiate<TFacadeFactory>(installerType));
+        }
+
+        BindingConditionSetter IBinder.BindFacadeFactoryInstaller<TParam1, TParam2, TFacade, TFacadeFactory>(Type installerType)
+        {
+            return Binder.Bind<TFacadeFactory>().ToMethod(
+                x => x.Instantiator.Instantiate<TFacadeFactory>(installerType));
+        }
+
+        BindingConditionSetter IBinder.BindFacadeFactoryInstaller<TParam1, TParam2, TParam3, TFacade, TFacadeFactory>(Type installerType)
+        {
+            return Binder.Bind<TFacadeFactory>().ToMethod(
+                x => x.Instantiator.Instantiate<TFacadeFactory>(installerType));
         }
 
         ////////////// Other ////////////////

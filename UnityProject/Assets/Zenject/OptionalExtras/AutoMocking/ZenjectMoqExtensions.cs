@@ -11,7 +11,7 @@ namespace Zenject
 {
     public static class ZenjectMoqExtensions
     {
-        public static BindingConditionSetter ToMock<TContract>(this GenericBinder<TContract> binder)
+        public static BindingConditionSetter ToMock<TContract>(this IGenericBinder<TContract> binder)
             where TContract : class
         {
 #if UNITY_EDITOR && !UNITY_WEBPLAYER

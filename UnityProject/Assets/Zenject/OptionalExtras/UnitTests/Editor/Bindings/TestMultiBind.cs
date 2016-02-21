@@ -46,6 +46,8 @@ namespace Zenject.Tests
             Binder.Bind<Test1>().ToSingle<Test3>();
             Binder.Bind<TestImpl1>().ToSingle();
 
+            AssertValidates();
+
             Assert.That(Resolver.ValidateResolve<TestImpl1>().IsEmpty());
             var test1 = Resolver.Resolve<TestImpl1>();
 
@@ -56,6 +58,8 @@ namespace Zenject.Tests
         public void TestMultiBind2()
         {
             Binder.Bind<TestImpl1>().ToSingle();
+
+            AssertValidationFails();
 
             // optional list dependencies should be declared as optional
             Assert.Throws<ZenjectResolveException>(
@@ -69,6 +73,8 @@ namespace Zenject.Tests
         {
             Binder.Bind<TestImpl1>().ToSingle();
 
+            AssertValidationFails();
+
             Assert.Throws<ZenjectResolveException>(
                 delegate { Resolver.Resolve<TestImpl1>(); });
 
@@ -81,6 +87,8 @@ namespace Zenject.Tests
             Binder.Bind<Test1>().ToSingle<Test2>();
             Binder.Bind<Test1>().ToSingle<Test3>();
             Binder.Bind<TestImpl2>().ToSingle();
+
+            AssertValidates();
 
             Assert.That(Resolver.ValidateResolve<TestImpl2>().IsEmpty());
             var test = Resolver.Resolve<TestImpl2>();

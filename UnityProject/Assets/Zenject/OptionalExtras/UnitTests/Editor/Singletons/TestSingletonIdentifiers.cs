@@ -30,6 +30,8 @@ namespace Zenject.Tests
             Binder.Bind<IFoo>().ToSingle<Foo0>("foo");
             Binder.Bind<Foo0>().ToSingle("foo");
 
+            AssertValidates();
+
             Assert.IsEqual(Resolver.Resolve<Foo0>(), Container.Resolver.Resolve<IFoo>());
             Assert.IsEqual(Resolver.Resolve<Foo0>(), Container.Resolver.Resolve<IBar>());
         }
@@ -40,6 +42,8 @@ namespace Zenject.Tests
             Binder.Bind<IFoo>().ToSingle<Foo0>("foo");
             Binder.Bind<Foo0>().ToSingle("bar");
 
+            AssertValidates();
+
             Assert.IsNotEqual(Resolver.Resolve<Foo0>(), Container.Resolver.Resolve<IFoo>());
         }
 
@@ -48,6 +52,8 @@ namespace Zenject.Tests
         {
             Binder.Bind<IFoo>().ToSingle<Foo0>();
             Binder.Bind<Foo0>().ToSingle("bar");
+
+            AssertValidates();
 
             Assert.IsNotEqual(Resolver.Resolve<Foo0>(), Container.Resolver.Resolve<IFoo>());
         }

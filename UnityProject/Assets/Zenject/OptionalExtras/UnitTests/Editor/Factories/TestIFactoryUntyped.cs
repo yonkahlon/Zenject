@@ -47,6 +47,8 @@ namespace Zenject.Tests
             var test4 = new Test4();
             Binder.BindIFactoryUntyped<Test4>().ToInstance(test4);
 
+            AssertValidates();
+
             Assert.IsNotNull(ReferenceEquals(test4, Resolver.Resolve<IFactoryUntyped<Test4>>().Create()));
         }
 
@@ -57,6 +59,8 @@ namespace Zenject.Tests
 
             Binder.BindIFactoryUntyped<ITest>().ToMethod((c, args) => test3);
 
+            AssertValidates();
+
             Assert.That(ReferenceEquals(test3, Resolver.Resolve<IFactoryUntyped<ITest>>().Create()));
         }
 
@@ -64,6 +68,8 @@ namespace Zenject.Tests
         public void TestToFactory()
         {
             Binder.BindIFactoryUntyped<Test4>().ToFactory();
+
+            AssertValidates();
 
             Assert.IsNotNull(Resolver.Resolve<IFactoryUntyped<Test4>>().Create());
         }
@@ -73,6 +79,8 @@ namespace Zenject.Tests
         {
             Binder.BindIFactoryUntyped<ITest>().ToFactory<Test2>();
 
+            AssertValidates();
+
             Assert.IsNotNull(Resolver.Resolve<IFactoryUntyped<ITest>>().Create() is Test2);
         }
 
@@ -80,6 +88,8 @@ namespace Zenject.Tests
         public void TestToCustomFactory()
         {
             Binder.BindIFactoryUntyped<ITest>().ToCustomFactory<Test2.Factory>();
+
+            AssertValidates();
 
             Assert.IsNotNull(Resolver.Resolve<IFactoryUntyped<ITest>>().Create() is Test2);
         }

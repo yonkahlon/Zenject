@@ -65,7 +65,7 @@ namespace Zenject
 
             if (_instance == null)
             {
-                Assert.That(!_container.IsValidating,
+                Assert.That(!_container.Binder.IsValidating,
                     "Tried to instantiate a MonoBehaviour with type '{0}' during validation. Object graph: {1}", ComponentType, context.GetObjectGraphString());
 
                 // Note that we always want to cache _container instead of using context.Container

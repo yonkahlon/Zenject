@@ -6,6 +6,7 @@ using System.Collections.Generic;
 
 namespace Zenject
 {
+    // NOTE: If you inherit from this class you need to also install FacadeCommonInstaller
     [System.Diagnostics.DebuggerStepThrough]
     public class Facade : IInitializable, IDisposable, ITickable, ILateTickable, IFixedTickable, IDependencyRoot
     {
@@ -23,6 +24,7 @@ namespace Zenject
         [InjectOptional(InjectSources.Local)]
         List<object> _initialObjects = null;
 
+        // NOTE!  This method must be called explicitly when creating facades through factories
         public virtual void Initialize()
         {
             _initializableManager.Initialize();
