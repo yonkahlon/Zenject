@@ -24,8 +24,8 @@ GameObject:
   serializedVersion: 4
   m_Component:
   - 4: {fileID: 484544}
-  - 114: {fileID: 11461772}
   - 114: {fileID: 11434476}
+  - 114: {fileID: 11465794}
   m_Layer: 0
   m_Name: FooMonoFacade
   m_TagString: Untagged
@@ -80,7 +80,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: faaac91ffd32067459dc749020b5256a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &11461772
+--- !u!114 &11465794
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
@@ -88,7 +88,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 141484}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: -81101194, guid: e03d0b00807cd2a449e87e14b6053120, type: 3}
+  m_Script: {fileID: 11500000, guid: 08eca9f7688a0a24685b89133b020c8e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _onlyInjectWhenActive: 0
@@ -102,7 +102,15 @@ Prefab:
   serializedVersion: 2
   m_Modification:
     m_TransformParent: {fileID: 0}
-    m_Modifications: []
+    m_Modifications:
+    - target: {fileID: 0}
+      propertyPath: _installers.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: _installers.Array.data[0]
+      value: 
+      objectReference: {fileID: 11434476}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}
   m_RootGameObject: {fileID: 141484}
