@@ -27,13 +27,13 @@ namespace Zenject.Tests
         [Test]
         public void TestCase1()
         {
-            Binder.Bind<Test2>().ToSingle();
-            Binder.Bind<Test1>().ToSingle();
+            Container.Bind<Test2>().ToSingle();
+            Container.Bind<Test1>().ToSingle();
 
             AssertValidates();
 
-            Assert.That(Resolver.ValidateResolve<Test2>().IsEmpty());
-            var test1 = Resolver.Resolve<Test2>();
+            Assert.That(Container.ValidateResolve<Test2>().IsEmpty());
+            var test1 = Container.Resolve<Test2>();
 
             Assert.That(test1.val != null);
         }
@@ -41,10 +41,10 @@ namespace Zenject.Tests
         [Test]
         public void TestConstructByFactory()
         {
-            Binder.Bind<Test2>().ToSingle();
+            Container.Bind<Test2>().ToSingle();
 
             var val = new Test1();
-            var test1 = Container.Instantiator.Instantiate<Test2>(val);
+            var test1 = Container.Instantiate<Test2>(val);
 
             Assert.That(test1.val == val);
         }

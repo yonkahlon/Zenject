@@ -81,7 +81,7 @@ namespace Zenject
         }
 
         public ProviderBase CreateProviderFromFacadeMethod(
-            Type concreteType, string concreteIdentifier, Action<IBinder> installerFunc)
+            Type concreteType, string concreteIdentifier, Action<DiContainer> installerFunc)
         {
             return _facadeMethodSingletonProviderCreator.CreateProvider(concreteType, concreteIdentifier, installerFunc);
         }

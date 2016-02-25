@@ -11,16 +11,16 @@ namespace Zenject
     public class GameObjectTransientProviderFromPrefab : ProviderBase
     {
         readonly Type _concreteType;
-        readonly GameObject _template;
+        readonly GameObject _prefab;
 
         public GameObjectTransientProviderFromPrefab(
-            Type concreteType, GameObject template, DiContainer container)
+            Type concreteType, GameObject prefab, DiContainer container)
         {
             // Don't do this because it might be an interface
             //Assert.That(typeof(T).DerivesFrom<Component>());
 
             _concreteType = concreteType;
-            _template = template;
+            _prefab = prefab;
 
             var singletonMark = container.SingletonRegistry.TryGetSingletonType(concreteType);
 
@@ -39,12 +39,24 @@ namespace Zenject
         public override object GetInstance(InjectContext context)
         {
             Assert.That(_concreteType.DerivesFromOrEqual(context.MemberType));
-            return context.Instantiator.InstantiatePrefabForComponent(_concreteType, _template);
+
+            var rootGameObject = context.Container.InstantiatePrefab(_prefab);
+
+            var component = rootGameObject.GetComponentInChildren(_concreteType);
+
+            if (component == null)
+            {
+                throw new ZenjectResolveException(
+                    "Could not find component with type '{0}' in given transient prefab".Fmt(_concreteType));
+            }
+
+            return component;
         }
 
         public override IEnumerable<ZenjectResolveException> ValidateBinding(InjectContext context)
         {
-            return context.Resolver.ValidateObjectGraph(_concreteType, context);
+            return ZenValidator.ValidatePrefab(
+                context.Container, _prefab, _concreteType, context);
         }
     }
 }

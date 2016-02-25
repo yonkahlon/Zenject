@@ -14,8 +14,8 @@ namespace Zenject.Tests
         [Test]
         public void TestSimple()
         {
-            Binder.Bind<IFoo>().ToSingle<Foo>();
-            Binder.Bind<Bar>().ToSingle();
+            Container.Bind<IFoo>().ToSingle<Foo>();
+            Container.Bind<Bar>().ToSingle();
 
             AssertHasContracts(
                 new List<Type>() { typeof(Bar), typeof(IFoo) });
@@ -65,11 +65,11 @@ namespace Zenject.Tests
         [Test]
         public void TestComplex()
         {
-            Binder.Bind<IFoo>().ToSingle<Foo>();
-            Binder.Bind<IFoo>().ToSingle<Foo2>();
+            Container.Bind<IFoo>().ToSingle<Foo>();
+            Container.Bind<IFoo>().ToSingle<Foo2>();
 
-            Binder.Bind<Bar>().ToInstance(new Bar());
-            Binder.Bind<Bar>().ToInstance(new Bar());
+            Container.Bind<Bar>().ToInstance(new Bar());
+            Container.Bind<Bar>().ToInstance(new Bar());
 
             AssertHasContracts(
                 new List<Type>() { typeof(Bar), typeof(IFoo) });

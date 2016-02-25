@@ -50,7 +50,7 @@ namespace Zenject
             // since for singletons, the container they are accessed from should not determine
             // the container they are instantiated with
             // Transients can do that but not singletons
-            _instance = _container.Instantiator.Instantiate<TFactory>().Create();
+            _instance = _container.Instantiate<TFactory>().Create();
 
             if (_instance == null)
             {
@@ -65,7 +65,7 @@ namespace Zenject
         {
             if (typeof(TFactory).DerivesFrom<IValidatable>())
             {
-                var factory = _container.Instantiator.Instantiate<TFactory>(context);
+                var factory = _container.Instantiate<TFactory>(context);
                 return ((IValidatable)factory).Validate();
             }
 

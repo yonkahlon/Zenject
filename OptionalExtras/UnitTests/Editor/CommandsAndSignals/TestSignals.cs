@@ -15,15 +15,15 @@ namespace Zenject.Tests
         [Test]
         public void RunTest()
         {
-            Binder.Bind<Foo>().ToSingle();
-            Binder.Bind<Bar>().ToSingle();
+            Container.Bind<Foo>().ToSingle();
+            Container.Bind<Bar>().ToSingle();
 
-            Binder.BindSignal<SomethingHappenedSignal>();
-            Binder.BindTrigger<SomethingHappenedSignal.Trigger>()
+            Container.BindSignal<SomethingHappenedSignal>();
+            Container.BindTrigger<SomethingHappenedSignal.Trigger>()
                 .WhenInjectedInto<Foo>();
 
-            var foo = Resolver.Resolve<Foo>();
-            var bar = Resolver.Resolve<Bar>();
+            var foo = Container.Resolve<Foo>();
+            var bar = Container.Resolve<Bar>();
             bar.Initialize();
 
             Assert.That(!bar.ReceivedSignal);

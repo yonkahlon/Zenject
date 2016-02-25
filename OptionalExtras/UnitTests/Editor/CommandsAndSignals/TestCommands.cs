@@ -17,10 +17,10 @@ namespace Zenject.Tests
         {
             Bar.StaticWasTriggered = false;
 
-            Binder.Bind<Foo>().ToSingle();
-            Binder.BindCommand<DoSomethingCommand>().ToSingle<Bar>(x => x.Execute).WhenInjectedInto<Foo>();
+            Container.Bind<Foo>().ToSingle();
+            Container.BindCommand<DoSomethingCommand>().ToSingle<Bar>(x => x.Execute).WhenInjectedInto<Foo>();
 
-            var foo = Resolver.Resolve<Foo>();
+            var foo = Container.Resolve<Foo>();
 
             Assert.That(!Bar.StaticWasTriggered);
             foo.Trigger();
@@ -30,12 +30,12 @@ namespace Zenject.Tests
         [Test]
         public void TestResolveMethod()
         {
-            Binder.Bind<Bar>().ToSingle();
-            Binder.Bind<Foo>().ToSingle();
-            Binder.BindCommand<DoSomethingCommand>().ToResolve<Bar>(x => x.Execute).WhenInjectedInto<Foo>();
+            Container.Bind<Bar>().ToSingle();
+            Container.Bind<Foo>().ToSingle();
+            Container.BindCommand<DoSomethingCommand>().ToResolve<Bar>(x => x.Execute).WhenInjectedInto<Foo>();
 
-            var bar = Resolver.Resolve<Bar>();
-            var foo = Resolver.Resolve<Foo>();
+            var bar = Container.Resolve<Bar>();
+            var foo = Container.Resolve<Foo>();
 
             Assert.That(!bar.WasTriggered);
             foo.Trigger();
@@ -47,10 +47,10 @@ namespace Zenject.Tests
         {
             Bar.StaticWasTriggered = false;
 
-            Binder.Bind<Foo>().ToSingle();
-            Binder.BindCommand<DoSomethingCommand>().ToOptionalResolve<Bar>(x => x.Execute);
+            Container.Bind<Foo>().ToSingle();
+            Container.BindCommand<DoSomethingCommand>().ToOptionalResolve<Bar>(x => x.Execute);
 
-            var foo = Resolver.Resolve<Foo>();
+            var foo = Container.Resolve<Foo>();
             foo.Trigger();
 
             Assert.That(!Bar.StaticWasTriggered);
@@ -61,11 +61,11 @@ namespace Zenject.Tests
         {
             Bar.StaticWasTriggered = false;
 
-            Binder.Bind<Bar>().ToSingle();
-            Binder.Bind<Foo>().ToSingle();
-            Binder.BindCommand<DoSomethingCommand>().ToOptionalResolve<Bar>(x => x.Execute);
+            Container.Bind<Bar>().ToSingle();
+            Container.Bind<Foo>().ToSingle();
+            Container.BindCommand<DoSomethingCommand>().ToOptionalResolve<Bar>(x => x.Execute);
 
-            var foo = Resolver.Resolve<Foo>();
+            var foo = Container.Resolve<Foo>();
 
             Assert.That(!Bar.StaticWasTriggered);
             foo.Trigger();
@@ -75,12 +75,12 @@ namespace Zenject.Tests
         [Test]
         public void TestTransientMethod()
         {
-            Binder.Bind<Foo>().ToSingle();
-            Binder.BindCommand<DoSomethingCommand>().ToTransient<Bar>(x => x.Execute).WhenInjectedInto<Foo>();
+            Container.Bind<Foo>().ToSingle();
+            Container.BindCommand<DoSomethingCommand>().ToTransient<Bar>(x => x.Execute).WhenInjectedInto<Foo>();
 
             Bar.Instances.Clear();
 
-            var foo = Resolver.Resolve<Foo>();
+            var foo = Container.Resolve<Foo>();
 
             Assert.IsEqual(Bar.Instances.Count, 0);
             foo.Trigger();
@@ -100,12 +100,12 @@ namespace Zenject.Tests
         [Test]
         public void TestSingleHandler()
         {
-            Binder.Bind<BarHandler>().ToSingle();
-            Binder.Bind<Foo>().ToSingle();
-            Binder.BindCommand<DoSomethingCommand>().ToSingle<BarHandler>().WhenInjectedInto<Foo>();
+            Container.Bind<BarHandler>().ToSingle();
+            Container.Bind<Foo>().ToSingle();
+            Container.BindCommand<DoSomethingCommand>().ToSingle<BarHandler>().WhenInjectedInto<Foo>();
 
-            var foo = Resolver.Resolve<Foo>();
-            var handler = Resolver.Resolve<BarHandler>();
+            var foo = Container.Resolve<Foo>();
+            var handler = Container.Resolve<BarHandler>();
 
             Assert.That(!handler.WasTriggered);
             foo.Trigger();
@@ -115,12 +115,12 @@ namespace Zenject.Tests
         [Test]
         public void TestResolveHandler()
         {
-            Binder.Bind<BarHandler>().ToSingle();
-            Binder.Bind<Foo>().ToSingle();
-            Binder.BindCommand<DoSomethingCommand>().ToResolve<BarHandler>();
+            Container.Bind<BarHandler>().ToSingle();
+            Container.Bind<Foo>().ToSingle();
+            Container.BindCommand<DoSomethingCommand>().ToResolve<BarHandler>();
 
-            var foo = Resolver.Resolve<Foo>();
-            var handler = Resolver.Resolve<BarHandler>();
+            var foo = Container.Resolve<Foo>();
+            var handler = Container.Resolve<BarHandler>();
 
             Assert.That(!handler.WasTriggered);
             foo.Trigger();
@@ -130,12 +130,12 @@ namespace Zenject.Tests
         [Test]
         public void TestResolveOptionalHandler1()
         {
-            Binder.Bind<BarHandler>().ToSingle();
-            Binder.Bind<Foo>().ToSingle();
-            Binder.BindCommand<DoSomethingCommand>().ToOptionalResolve<BarHandler>();
+            Container.Bind<BarHandler>().ToSingle();
+            Container.Bind<Foo>().ToSingle();
+            Container.BindCommand<DoSomethingCommand>().ToOptionalResolve<BarHandler>();
 
-            var foo = Resolver.Resolve<Foo>();
-            var handler = Resolver.Resolve<BarHandler>();
+            var foo = Container.Resolve<Foo>();
+            var handler = Container.Resolve<BarHandler>();
 
             Assert.That(!handler.WasTriggered);
             foo.Trigger();
@@ -145,22 +145,22 @@ namespace Zenject.Tests
         [Test]
         public void TestResolveOptionalHandler2()
         {
-            Binder.Bind<Foo>().ToSingle();
-            Binder.BindCommand<DoSomethingCommand>().ToOptionalResolve<BarHandler>();
+            Container.Bind<Foo>().ToSingle();
+            Container.BindCommand<DoSomethingCommand>().ToOptionalResolve<BarHandler>();
 
-            var foo = Resolver.Resolve<Foo>();
+            var foo = Container.Resolve<Foo>();
             foo.Trigger();
         }
 
         [Test]
         public void TestTransientHandler()
         {
-            Binder.Bind<Foo>().ToSingle();
-            Binder.BindCommand<DoSomethingCommand>().ToTransient<BarHandler>().WhenInjectedInto<Foo>();
+            Container.Bind<Foo>().ToSingle();
+            Container.BindCommand<DoSomethingCommand>().ToTransient<BarHandler>().WhenInjectedInto<Foo>();
 
             BarHandler.Instances.Clear();
 
-            var foo = Resolver.Resolve<Foo>();
+            var foo = Container.Resolve<Foo>();
 
             Assert.IsEqual(BarHandler.Instances.Count, 0);
             foo.Trigger();
@@ -180,24 +180,24 @@ namespace Zenject.Tests
         [Test]
         public void TestNothingHandler()
         {
-            Binder.Bind<Foo>().ToSingle();
+            Container.Bind<Foo>().ToSingle();
 
-            Binder.BindCommand<DoSomethingCommand>().ToNothing();
+            Container.BindCommand<DoSomethingCommand>().ToNothing();
 
-            var foo = Resolver.Resolve<Foo>();
+            var foo = Container.Resolve<Foo>();
             foo.Trigger();
         }
 
         [Test]
         public void TestWithMethodHandler()
         {
-            Binder.Bind<Foo>().ToSingle();
+            Container.Bind<Foo>().ToSingle();
 
             bool wasCalled = false;
 
-            Binder.BindCommand<DoSomethingCommand>().ToMethod(() => wasCalled = true);
+            Container.BindCommand<DoSomethingCommand>().ToMethod(() => wasCalled = true);
 
-            var foo = Resolver.Resolve<Foo>();
+            var foo = Container.Resolve<Foo>();
 
             Assert.That(!wasCalled);
             foo.Trigger();

@@ -16,7 +16,7 @@ namespace Zenject.Commands
 
         public override object GetInstance(InjectContext context)
         {
-            var obj = context.Instantiator.Instantiate<TCommand>(GetCommandAction(context));
+            var obj = context.Container.Instantiate<TCommand>(GetCommandAction(context));
             Assert.That(obj != null);
             return obj;
         }
@@ -25,7 +25,7 @@ namespace Zenject.Commands
 
         public override IEnumerable<ZenjectResolveException> ValidateBinding(InjectContext context)
         {
-            return context.Resolver.ValidateObjectGraph<TCommand>(context, typeof(TAction));
+            return context.Container.ValidateObjectGraph<TCommand>(context, typeof(TAction));
         }
     }
 }

@@ -7,7 +7,7 @@ namespace Zenject
 {
     public class FacadeMethodSingletonLazyCreator
     {
-        readonly Action<IBinder> _installMethod;
+        readonly Action<DiContainer> _installMethod;
         readonly SingletonId _id;
         readonly FacadeMethodSingletonProviderCreator _owner;
         readonly DiContainer _container;
@@ -17,7 +17,7 @@ namespace Zenject
 
         public FacadeMethodSingletonLazyCreator(
             SingletonId id, FacadeMethodSingletonProviderCreator owner,
-            Action<IBinder> installMethod, DiContainer container)
+            Action<DiContainer> installMethod, DiContainer container)
         {
             _owner = owner;
             _installMethod = installMethod;

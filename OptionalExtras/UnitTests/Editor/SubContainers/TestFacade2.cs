@@ -32,13 +32,13 @@ namespace Zenject.Tests
         [Test]
         public void TestMethod()
         {
-            Binder.Bind<FooFacade>().ToSingleFacadeMethod(FacadeInstaller);
+            Container.Bind<FooFacade>().ToSingleFacadeMethod(FacadeInstaller);
 
             AssertValidates();
 
-            var foo = Resolver.Resolve<FooFacade>();
+            var foo = Container.Resolve<FooFacade>();
 
-            Assert.That(Resolver.TryResolve<Bar>() == null);
+            Assert.That(Container.TryResolve<Bar>() == null);
 
             Assert.IsNotNull(foo.Bar);
         }
@@ -46,29 +46,29 @@ namespace Zenject.Tests
         [Test]
         public void TestInstaller()
         {
-            Binder.Bind<FooFacade>().ToSingleFacadeInstaller<FooInstaller>();
+            Container.Bind<FooFacade>().ToSingleFacadeInstaller<FooInstaller>();
 
             AssertValidates();
 
-            var foo = Resolver.Resolve<FooFacade>();
+            var foo = Container.Resolve<FooFacade>();
 
-            Assert.That(Resolver.TryResolve<Bar>() == null);
+            Assert.That(Container.TryResolve<Bar>() == null);
 
             Assert.IsNotNull(foo.Bar);
         }
 
-        void FacadeInstaller(IBinder binder)
+        void FacadeInstaller(DiContainer container)
         {
-            binder.Bind<FooFacade>().ToSingle();
-            binder.Bind<Bar>().ToSingle();
+            container.Bind<FooFacade>().ToSingle();
+            container.Bind<Bar>().ToSingle();
         }
 
         class FooInstaller : Installer
         {
             public override void InstallBindings()
             {
-                Binder.Bind<FooFacade>().ToSingle();
-                Binder.Bind<Bar>().ToSingle();
+                Container.Bind<FooFacade>().ToSingle();
+                Container.Bind<Bar>().ToSingle();
             }
         }
     }

@@ -30,16 +30,6 @@ namespace Zenject
         object InstantiateExplicit(
             Type concreteType, List<TypeValuePair> extraArgMap, InjectContext currentContext, string concreteIdentifier, bool autoInject);
 
-        IBinder Binder
-        {
-            get;
-        }
-
-        IResolver Resolver
-        {
-            get;
-        }
-
 #if !ZEN_NOT_UNITY3D
 
         // Create a new game object from a given prefab

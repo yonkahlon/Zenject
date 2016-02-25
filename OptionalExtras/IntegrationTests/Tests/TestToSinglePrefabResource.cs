@@ -8,10 +8,10 @@ namespace ModestTree
         [InstallerTest]
         public void TestMultipleBindingsOnSamePrefab()
         {
-            Binder.Bind<FooMono1>().ToSinglePrefabResource("FooMono1");
-            Binder.Bind<IInitializable>().ToSinglePrefabResource<FooMono1>("FooMono1");
+            Container.Bind<FooMono1>().ToSinglePrefabResource("FooMono1");
+            Container.Bind<IInitializable>().ToSinglePrefabResource<FooMono1>("FooMono1");
 
-            Binder.BindAllInterfacesToSingle<Runner1>();
+            Container.BindAllInterfaces<Runner1>().ToSingle<Runner1>();
         }
 
         public class Runner1 : IInitializable
@@ -33,10 +33,10 @@ namespace ModestTree
         [InstallerTest]
         public void Test2()
         {
-            Binder.Bind<FooMono1>().ToSinglePrefabResource("FooMono1");
-            Binder.Bind<BarMono1>().ToSinglePrefabResource("BarMono1");
+            Container.Bind<FooMono1>().ToSinglePrefabResource("FooMono1");
+            Container.Bind<BarMono1>().ToSinglePrefabResource("BarMono1");
 
-            Binder.BindAllInterfacesToSingle<Runner2>();
+            Container.BindAllInterfaces<Runner2>().ToSingle<Runner2>();
         }
 
         public class Runner2 : IInitializable

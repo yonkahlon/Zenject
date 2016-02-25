@@ -135,6 +135,11 @@ namespace ModestTree
             return enumerable.Take(amount + 1).Count() == amount;
         }
 
+        public static IEnumerable<T> Except<T>(this IEnumerable<T> list, T item)
+        {
+            return list.Except(item.Yield());
+        }
+
         public static T GetSingle<T>(this object[] objectArray, bool required)
         {
             if (required)
@@ -231,6 +236,37 @@ namespace ModestTree
         {
             // Use object.Equals to support null values
             return list.Where(x => object.Equals(x, value)).Any();
+        }
+
+        // We call it Zipper instead of Zip to avoid naming conflicts with .NET 4
+        public static IEnumerable<T> Zipper<A, B, T>(
+            this IEnumerable<A> seqA, IEnumerable<B> seqB, Func<A, B, T> func)
+        {
+            using (var iteratorA = seqA.GetEnumerator())
+            using (var iteratorB = seqB.GetEnumerator())
+            {
+                while (true)
+                {
+                    bool isDoneA = !iteratorA.MoveNext();
+                    bool isDoneB = !iteratorB.MoveNext();
+
+                    Assert.That(isDoneA == isDoneB,
+                        "Given collections have different length in Zip operator");
+
+                    if (isDoneA || isDoneB)
+                    {
+                        break;
+                    }
+
+                    yield return func(iteratorA.Current, iteratorB.Current);
+                }
+            }
+        }
+
+        public static IEnumerable<ModestTree.Util.Tuple<A, B>> Zipper<A, B>(
+            this IEnumerable<A> seqA, IEnumerable<B> seqB)
+        {
+            return seqA.Zipper<A, B, ModestTree.Util.Tuple<A, B>>(seqB, ModestTree.Util.Tuple.New);
         }
     }
 }

@@ -31,13 +31,13 @@ namespace Zenject.Tests
         [Test]
         public void Test1()
         {
-            Binder.Bind<Foo>().ToSingle();
-            Binder.Bind<Bar>().ToGetter<Foo>(x => x.GetBar());
+            Container.Bind<Foo>().ToSingle();
+            Container.Bind<Bar>().ToGetter<Foo>(x => x.GetBar());
 
             AssertValidates();
 
-            var foo = Resolver.Resolve<Foo>();
-            var bar = Resolver.Resolve<Bar>();
+            var foo = Container.Resolve<Foo>();
+            var bar = Container.Resolve<Bar>();
 
             Assert.IsEqual(bar, foo.GetBar());
         }

@@ -243,55 +243,13 @@ namespace Zenject
             try
             {
                 globalCompRoot = GlobalCompositionRoot.InstantiateNewRoot();
-                return ValidateScene(compRoot, globalCompRoot).Take(maxErrors).ToList();
+                return ZenValidator.ValidateScene(compRoot, globalCompRoot).Take(maxErrors).ToList();
             }
             finally
             {
                 if (globalCompRoot != null)
                 {
                     GameObject.DestroyImmediate(globalCompRoot.gameObject);
-                }
-            }
-        }
-
-        static IEnumerable<ZenjectResolveException> ValidateScene(
-            SceneCompositionRoot sceneRoot, GlobalCompositionRoot globalRoot)
-        {
-            var globalContainer = new DiContainer(true);
-            globalRoot.InstallBindings(globalContainer.Binder);
-
-            var sceneContainer = new DiContainer(globalContainer, true);
-            sceneRoot.InstallBindings(sceneContainer.Binder);
-
-            return ZenValidator.ValidateCompositionRoot(globalRoot, globalContainer)
-                .Concat(ZenValidator.ValidateCompositionRoot(sceneRoot, sceneContainer))
-                .Concat(ValidateFacadeRoots(sceneContainer));
-        }
-
-        static IEnumerable<ZenjectResolveException> ValidateFacadeRoots(DiContainer sceneContainer)
-        {
-            foreach (var facadeRoot in GameObject.FindObjectsOfType<FacadeCompositionRoot>())
-            {
-                if (facadeRoot.Facade == null)
-                {
-                    yield return new ZenjectResolveException(
-                        "Facade property is not set in FacadeCompositionRoot '{0}'".Fmt(facadeRoot.name));
-                    continue;
-                }
-
-                if (!UnityUtil.GetParentsAndSelf(facadeRoot.Facade.transform).Contains(facadeRoot.transform))
-                {
-                    yield return new ZenjectResolveException(
-                        "The given Facade must exist on the same game object as the FacadeCompositionRoot '{0}' or a descendant!".Fmt(facadeRoot.name));
-                    continue;
-                }
-
-                var facadeContainer = new DiContainer(sceneContainer, true);
-                facadeRoot.InstallBindings(facadeContainer.Binder);
-
-                foreach (var err in ZenValidator.ValidateCompositionRoot(facadeRoot, facadeContainer))
-                {
-                    yield return err;
                 }
             }
         }

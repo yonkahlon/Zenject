@@ -24,13 +24,13 @@ namespace Zenject.Tests
         [Test]
         public void TestCase1()
         {
-            Binder.Bind<Test1>().ToInstance(new Test1());
-            Binder.Bind<Test2>().ToSingle();
+            Container.Bind<Test1>().ToInstance(new Test1());
+            Container.Bind<Test2>().ToSingle();
 
             AssertValidates();
 
-            Assert.That(Resolver.ValidateResolve<Test2>().IsEmpty());
-            var t2 = Resolver.Resolve<Test2>();
+            Assert.That(Container.ValidateResolve<Test2>().IsEmpty());
+            var t2 = Container.Resolve<Test2>();
 
             Assert.That(t2 != null);
         }

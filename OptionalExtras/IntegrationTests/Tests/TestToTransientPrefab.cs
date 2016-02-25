@@ -11,10 +11,10 @@ namespace ModestTree
         [InstallerTest]
         public void TestSamePrefabMultipleTypes()
         {
-            Binder.Bind<FooMono1>().ToTransientPrefab(FooMono1Prefab);
-            Binder.Bind<FooMono1>().ToTransientPrefab(FooMono1Prefab);
+            Container.Bind<FooMono1>().ToTransientPrefab(FooMono1Prefab);
+            Container.Bind<FooMono1>().ToTransientPrefab(FooMono1Prefab);
 
-            Binder.BindAllInterfacesToSingle<Runner1>();
+            Container.BindAllInterfaces<Runner1>().ToSingle<Runner1>();
         }
 
         public class Runner1 : IInitializable

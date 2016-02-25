@@ -12,7 +12,7 @@ namespace Zenject
         DiContainer _container = null;
 
         [Inject]
-        readonly Func<IInstantiator, TValue> _method = null;
+        readonly Func<DiContainer, TValue> _method = null;
 
         public Type ConstructedType
         {
@@ -38,7 +38,7 @@ namespace Zenject
         DiContainer _container = null;
 
         [Inject]
-        readonly Func<IInstantiator, TParam1, TValue> _method = null;
+        readonly Func<DiContainer, TParam1, TValue> _method = null;
 
         public Type ConstructedType
         {
@@ -64,7 +64,7 @@ namespace Zenject
         DiContainer _container = null;
 
         [Inject]
-        readonly Func<IInstantiator, TParam1, TParam2, TValue> _method = null;
+        readonly Func<DiContainer, TParam1, TParam2, TValue> _method = null;
 
         public Type ConstructedType
         {
@@ -90,7 +90,7 @@ namespace Zenject
         DiContainer _container = null;
 
         [Inject]
-        readonly Func<IInstantiator, TParam1, TParam2, TParam3, TValue> _method = null;
+        readonly Func<DiContainer, TParam1, TParam2, TParam3, TValue> _method = null;
 
         public Type ConstructedType
         {
@@ -116,7 +116,7 @@ namespace Zenject
         DiContainer _container = null;
 
         [Inject]
-        readonly ModestTree.Util.Func<IInstantiator, TParam1, TParam2, TParam3, TParam4, TValue> _method = null;
+        readonly ModestTree.Util.Func<DiContainer, TParam1, TParam2, TParam3, TParam4, TValue> _method = null;
 
         public Type ConstructedType
         {

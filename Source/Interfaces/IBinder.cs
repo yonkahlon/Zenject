@@ -24,27 +24,23 @@ namespace Zenject
         IUntypedBinder Bind(Type contractType, string identifier);
         IUntypedBinder Bind(Type contractType);
 
+        IUntypedBinder Bind(List<Type> contractTypes);
+        IUntypedBinder Bind(List<Type> contractTypes, string identifier);
+
+        // _____ BindAllInterfaces _____
+        //
+        IUntypedBinder BindAllInterfaces<T>();
+        IUntypedBinder BindAllInterfaces(Type type);
+
+        // _____ BindAllInterfaces _____
+        //
+        IUntypedBinder BindAllInterfacesAndSelf<T>();
+        IUntypedBinder BindAllInterfacesAndSelf(Type type);
+
         // _____ BindIFactory _____
         //
         BindingConditionSetter BindInstance<TContract>(string identifier, TContract obj);
         BindingConditionSetter BindInstance<TContract>(TContract obj);
-
-        // _____ BindAllInterfacesToSingle _____
-        //
-        void BindAllInterfacesToSingle<TConcrete>();
-        void BindAllInterfacesToSingle(Type concreteType);
-        void BindAllInterfacesToSingle(Type concreteType, string concreteIdentifier);
-
-        // _____ BindAllInterfacesToSingleFacadeMethod _____
-        //
-        void BindAllInterfacesToSingleFacadeMethod<TConcrete>(Action<IBinder> installerMethod);
-        void BindAllInterfacesToSingleFacadeMethod(Type concreteType, Action<IBinder> installerMethod);
-        void BindAllInterfacesToSingleFacadeMethod(Type concreteType, string concreteIdentifier, Action<IBinder> installerMethod);
-
-        // _____ BindAllInterfacesToInstance _____
-        //
-        void BindAllInterfacesToInstance(object value);
-        void BindAllInterfacesToInstance(Type concreteType, object value);
 
         // _____ HasBinding _____
         //
@@ -55,12 +51,15 @@ namespace Zenject
         // _____ Install _____
         //
         void Install(IEnumerable<IInstaller> installers);
-        void Install(IInstaller installer);
+        void Install(IInstaller installer, params object[] extraArgs);
 
         void Install<T>(params object[] extraArgs)
             where T : IInstaller;
 
         void Install(Type installerType, params object[] extraArgs);
+
+        void InstallExplicit(IInstaller installer, List<TypeValuePair> extraArgs);
+        void InstallExplicit(Type installerType, List<TypeValuePair> extraArgs);
 
         bool HasInstalled(Type installerType);
 
@@ -104,87 +103,77 @@ namespace Zenject
         // NOTE: If you inherit from the Facade you need to install FacadeCommonInstaller
         // in your custom install method
         BindingConditionSetter BindFacadeFactoryMethod<TFacade, TFacadeFactory>(
-            Action<IBinder> facadeInstaller)
+            Action<DiContainer> facadeInstaller)
             where TFacadeFactory : FacadeFactory<TFacade>;
 
         BindingConditionSetter BindFacadeFactoryMethod<TParam1, TFacade, TFacadeFactory>(
-            Action<IBinder, TParam1> facadeInstaller)
+            Action<DiContainer, TParam1> facadeInstaller)
             where TFacadeFactory : FacadeFactory<TParam1, TFacade>;
 
         BindingConditionSetter BindFacadeFactoryMethod<TParam1, TParam2, TFacade, TFacadeFactory>(
-            Action<IBinder, TParam1, TParam2> facadeInstaller)
+            Action<DiContainer, TParam1, TParam2> facadeInstaller)
             where TFacadeFactory : FacadeFactory<TParam1, TParam2, TFacade> ;
 
         BindingConditionSetter BindFacadeFactoryMethod<TParam1, TParam2, TParam3, TFacade, TFacadeFactory>(
-            Action<IBinder, TParam1, TParam2, TParam3> facadeInstaller)
+            Action<DiContainer, TParam1, TParam2, TParam3> facadeInstaller)
             where TFacadeFactory : FacadeFactory<TParam1, TParam2, TParam3, TFacade>;
+
+        BindingConditionSetter BindFacadeFactoryMethod<TParam1, TParam2, TParam3, TParam4, TFacade, TFacadeFactory>(
+            ModestTree.Util.Action<DiContainer, TParam1, TParam2, TParam3, TParam4> facadeInstaller)
+            where TFacadeFactory : FacadeFactory<TParam1, TParam2, TParam3, TParam4, TFacade>;
+
+        BindingConditionSetter BindFacadeFactoryMethod<TParam1, TParam2, TParam3, TParam4, TParam5, TFacade, TFacadeFactory>(
+            ModestTree.Util.Action<DiContainer, TParam1, TParam2, TParam3, TParam4, TParam5> facadeInstaller)
+            where TFacadeFactory : FacadeFactory<TParam1, TParam2, TParam3, TParam4, TParam5, TFacade>;
+
+        BindingConditionSetter BindFacadeFactoryMethod<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6, TFacade, TFacadeFactory>(
+            ModestTree.Util.Action<DiContainer, TParam1, TParam2, TParam3, TParam4, TParam5, TParam6> facadeInstaller)
+            where TFacadeFactory : FacadeFactory<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6, TFacade>;
 
         // _____ BindFacadeFactoryInstaller _____
         //
         // NOTE: If you inherit from the Facade you need to install FacadeCommonInstaller
         // in your custom install method
         BindingConditionSetter BindFacadeFactoryInstaller<TFacade, TFacadeFactory, TInstaller>()
-            where TFacadeFactory : FacadeFactory<TFacade>
-            where TInstaller : Installer;
-
-        BindingConditionSetter BindFacadeFactoryInstaller<TParam1, TFacade, TFacadeFactory, TInstaller>()
-            where TFacadeFactory : FacadeFactory<TParam1, TFacade>
-            where TInstaller : Installer;
-
-        BindingConditionSetter BindFacadeFactoryInstaller<TParam1, TParam2, TFacade, TFacadeFactory, TInstaller>()
-            where TFacadeFactory : FacadeFactory<TParam1, TParam2, TFacade>
-            where TInstaller : Installer;
-
-        BindingConditionSetter BindFacadeFactoryInstaller<TParam1, TParam2, TParam3, TFacade, TFacadeFactory, TInstaller>()
-            where TFacadeFactory : FacadeFactory<TParam1, TParam2, TParam3, TFacade>
+            where TFacadeFactory : FacadeFactoryBase<TFacade>
             where TInstaller : Installer;
 
         // Non-generic versions
         BindingConditionSetter BindFacadeFactoryInstaller<TFacade, TFacadeFactory>(Type installerType)
-            where TFacadeFactory : FacadeFactory<TFacade>;
-
-        BindingConditionSetter BindFacadeFactoryInstaller<TParam1, TFacade, TFacadeFactory>(Type installerType)
-            where TFacadeFactory : FacadeFactory<TParam1, TFacade>;
-
-        BindingConditionSetter BindFacadeFactoryInstaller<TParam1, TParam2, TFacade, TFacadeFactory>(Type installerType)
-            where TFacadeFactory : FacadeFactory<TParam1, TParam2, TFacade> ;
-
-        BindingConditionSetter BindFacadeFactoryInstaller<TParam1, TParam2, TParam3, TFacade, TFacadeFactory>(Type installerType)
-            where TFacadeFactory : FacadeFactory<TParam1, TParam2, TParam3, TFacade>;
-
+            where TFacadeFactory : FacadeFactoryBase<TFacade>;
 
 #if !ZEN_NOT_UNITY3D
 
         // _____ BindMonoFacadeFactory _____
         //
-        BindingConditionSetter BindMonoFacadeFactory<T>(
+        BindingConditionSetter BindMonoFacadeFactory<TFactory>(
             GameObject prefab)
-            where T : MonoFacadeFactory;
+            where TFactory : IMonoFacadeFactoryZeroParams;
 
-        BindingConditionSetter BindMonoFacadeFactory<T>(
+        BindingConditionSetter BindMonoFacadeFactory<TFactory>(
             GameObject prefab, string groupName)
-            where T : MonoFacadeFactory;
+            where TFactory : IMonoFacadeFactoryZeroParams;
 
-        // _____ BindGameObjectFactory _____
+        BindingConditionSetter BindMonoFacadeFactory<TInstaller, TFactory>(
+            GameObject prefab)
+            where TInstaller : MonoInstaller
+            where TFactory : IMonoFacadeFactoryMultipleParams;
+
+        BindingConditionSetter BindMonoFacadeFactory<TInstaller, TFactory>(
+            GameObject prefab, string groupName)
+            where TInstaller : MonoInstaller
+            where TFactory : IMonoFacadeFactoryMultipleParams;
+
+        // _____ BindMonoBehaviourFactory _____
         //
-        BindingConditionSetter BindGameObjectFactory<T>(
+        BindingConditionSetter BindMonoBehaviourFactory<TFactory>(
             GameObject prefab)
-            where T : GameObjectFactory;
+            where TFactory : IMonoBehaviourFactory;
 
-        BindingConditionSetter BindGameObjectFactory<T>(
+        BindingConditionSetter BindMonoBehaviourFactory<TFactory>(
             GameObject prefab, string groupName)
-            where T : GameObjectFactory;
+            where TFactory : IMonoBehaviourFactory;
 #endif
-
-        IInstantiator Instantiator
-        {
-            get;
-        }
-
-        IResolver Resolver
-        {
-            get;
-        }
 
         // Returns true if the DiContainer waas made for validation purposes only
         // This is run at edit time.  This is one of the reasons you should never instantiate
@@ -192,6 +181,7 @@ namespace Zenject
         bool IsValidating
         {
             get;
+            set;
         }
     }
 }

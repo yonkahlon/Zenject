@@ -16,7 +16,7 @@ namespace Zenject.Commands
 
         public CommandBinderBase(
             DiContainer container, string identifier, SingletonProviderCreator singletonProviderFactory)
-            : base(container, typeof(TCommand), identifier)
+            : base(container, new List<Type>() { typeof(TCommand) }, identifier)
         {
             _singletonProviderFactory = singletonProviderFactory;
         }
@@ -28,7 +28,7 @@ namespace Zenject.Commands
 
         public BindingConditionSetter ToMethod(TAction action)
         {
-            return ToProvider(new CommandProviderMethod<TCommand, TAction>(action));
+            return RegisterSingleProvider(new CommandProviderMethod<TCommand, TAction>(action));
         }
 
         protected ProviderBase CreateSingletonProvider<THandler>(string concreteIdentifier)
@@ -51,7 +51,7 @@ namespace Zenject.Commands
         public BindingConditionSetter ToTransient<THandler>(
             Func<THandler, Action> methodGetter)
         {
-            return ToProvider(
+            return RegisterSingleProvider(
                 new CommandProviderTransientMethod<TCommand, THandler>(
                     methodGetter));
         }
@@ -59,7 +59,7 @@ namespace Zenject.Commands
         public BindingConditionSetter ToTransient<THandler>()
             where THandler : ICommandHandler
         {
-            return ToProvider(
+            return RegisterSingleProvider(
                 new CommandProviderTransient<TCommand, THandler>());
         }
 
@@ -72,7 +72,7 @@ namespace Zenject.Commands
         public BindingConditionSetter ToSingle<THandler>(string concreteIdentifier)
             where THandler : ICommandHandler
         {
-            return ToProvider(
+            return RegisterSingleProvider(
                 new CommandProviderSingle<TCommand, THandler>(
                     CreateSingletonProvider<THandler>(concreteIdentifier)));
         }
@@ -80,7 +80,7 @@ namespace Zenject.Commands
         public BindingConditionSetter ToSingle<THandler>(
             string concreteIdentifier, Func<THandler, Action> methodGetter)
         {
-            return ToProvider(new CommandProviderSingleMethod<TCommand, THandler>(
+            return RegisterSingleProvider(new CommandProviderSingleMethod<TCommand, THandler>(
                 methodGetter, CreateSingletonProvider<THandler>(concreteIdentifier)));
         }
 
@@ -98,7 +98,7 @@ namespace Zenject.Commands
         public BindingConditionSetter ToResolve<THandler>(string identifier)
             where THandler : ICommandHandler
         {
-            return ToProvider(
+            return RegisterSingleProvider(
                 new CommandProviderResolve<TCommand, THandler>(identifier, false));
         }
 
@@ -110,7 +110,7 @@ namespace Zenject.Commands
         public BindingConditionSetter ToResolve<THandler>(
             string identifier, Func<THandler, Action> methodGetter)
         {
-            return ToProvider(new CommandProviderResolveMethod<TCommand, THandler>(methodGetter, identifier, false));
+            return RegisterSingleProvider(new CommandProviderResolveMethod<TCommand, THandler>(methodGetter, identifier, false));
         }
 
         public BindingConditionSetter ToOptionalResolve<THandler>()
@@ -122,7 +122,7 @@ namespace Zenject.Commands
         public BindingConditionSetter ToOptionalResolve<THandler>(string identifier)
             where THandler : ICommandHandler
         {
-            return ToProvider(
+            return RegisterSingleProvider(
                 new CommandProviderResolve<TCommand, THandler>(identifier, true));
         }
 
@@ -134,7 +134,7 @@ namespace Zenject.Commands
         public BindingConditionSetter ToOptionalResolve<THandler>(
             string identifier, Func<THandler, Action> methodGetter)
         {
-            return ToProvider(new CommandProviderResolveMethod<TCommand, THandler>(methodGetter, identifier, true));
+            return RegisterSingleProvider(new CommandProviderResolveMethod<TCommand, THandler>(methodGetter, identifier, true));
         }
     }
 
@@ -152,7 +152,7 @@ namespace Zenject.Commands
         public BindingConditionSetter ToTransient<THandler>(
             string concreteIdentifier, Func<THandler, Action<TParam1>> methodGetter)
         {
-            return ToProvider(
+            return RegisterSingleProvider(
                 new CommandProviderTransientMethod<TCommand, THandler, TParam1>(
                     methodGetter));
         }
@@ -171,7 +171,7 @@ namespace Zenject.Commands
         public BindingConditionSetter ToSingle<THandler>(string concreteIdentifier)
             where THandler : ICommandHandler<TParam1>
         {
-            return ToProvider(
+            return RegisterSingleProvider(
                 new CommandProviderSingle<TCommand, THandler, TParam1>(
                     CreateSingletonProvider<THandler>(concreteIdentifier)));
         }
@@ -179,7 +179,7 @@ namespace Zenject.Commands
         public BindingConditionSetter ToSingle<THandler>(
             string concreteIdentifier, Func<THandler, Action<TParam1>> methodGetter)
         {
-            return ToProvider(new CommandProviderSingleMethod<TCommand, THandler, TParam1>(
+            return RegisterSingleProvider(new CommandProviderSingleMethod<TCommand, THandler, TParam1>(
                 methodGetter, CreateSingletonProvider<THandler>(concreteIdentifier)));
         }
 
@@ -197,7 +197,7 @@ namespace Zenject.Commands
         public BindingConditionSetter ToResolve<THandler>(string identifier)
             where THandler : ICommandHandler<TParam1>
         {
-            return ToProvider(
+            return RegisterSingleProvider(
                 new CommandProviderResolve<TCommand, THandler, TParam1>(identifier, false));
         }
 
@@ -209,7 +209,7 @@ namespace Zenject.Commands
         public BindingConditionSetter ToResolve<THandler>(
             string identifier, Func<THandler, Action<TParam1>> methodGetter)
         {
-            return ToProvider(new CommandProviderResolveMethod<TCommand, THandler, TParam1>(methodGetter, identifier, false));
+            return RegisterSingleProvider(new CommandProviderResolveMethod<TCommand, THandler, TParam1>(methodGetter, identifier, false));
         }
 
         public BindingConditionSetter ToOptionalResolve<THandler>()
@@ -221,7 +221,7 @@ namespace Zenject.Commands
         public BindingConditionSetter ToOptionalResolve<THandler>(string identifier)
             where THandler : ICommandHandler<TParam1>
         {
-            return ToProvider(
+            return RegisterSingleProvider(
                 new CommandProviderResolve<TCommand, THandler, TParam1>(identifier, true));
         }
 
@@ -233,7 +233,7 @@ namespace Zenject.Commands
         public BindingConditionSetter ToOptionalResolve<THandler>(
             string identifier, Func<THandler, Action<TParam1>> methodGetter)
         {
-            return ToProvider(new CommandProviderResolveMethod<TCommand, THandler, TParam1>(methodGetter, identifier, true));
+            return RegisterSingleProvider(new CommandProviderResolveMethod<TCommand, THandler, TParam1>(methodGetter, identifier, true));
         }
     }
 
@@ -251,7 +251,7 @@ namespace Zenject.Commands
         public BindingConditionSetter ToTransient<THandler>(
             string concreteIdentifier, Func<THandler, Action<TParam1, TParam2>> methodGetter)
         {
-            return ToProvider(
+            return RegisterSingleProvider(
                 new CommandProviderTransientMethod<TCommand, THandler, TParam1, TParam2>(
                     methodGetter));
         }
@@ -270,7 +270,7 @@ namespace Zenject.Commands
         public BindingConditionSetter ToSingle<THandler>(string concreteIdentifier)
             where THandler : ICommandHandler<TParam1, TParam2>
         {
-            return ToProvider(
+            return RegisterSingleProvider(
                 new CommandProviderSingle<TCommand, THandler, TParam1, TParam2>(
                     CreateSingletonProvider<THandler>(concreteIdentifier)));
         }
@@ -278,7 +278,7 @@ namespace Zenject.Commands
         public BindingConditionSetter ToSingle<THandler>(
             string concreteIdentifier, Func<THandler, Action<TParam1, TParam2>> methodGetter)
         {
-            return ToProvider(new CommandProviderSingleMethod<TCommand, THandler, TParam1, TParam2>(
+            return RegisterSingleProvider(new CommandProviderSingleMethod<TCommand, THandler, TParam1, TParam2>(
                 methodGetter, CreateSingletonProvider<THandler>(concreteIdentifier)));
         }
 
@@ -296,7 +296,7 @@ namespace Zenject.Commands
         public BindingConditionSetter ToResolve<THandler>(string identifier)
             where THandler : ICommandHandler<TParam1, TParam2>
         {
-            return ToProvider(
+            return RegisterSingleProvider(
                 new CommandProviderResolve<TCommand, THandler, TParam1, TParam2>(identifier, false));
         }
 
@@ -308,7 +308,7 @@ namespace Zenject.Commands
         public BindingConditionSetter ToResolve<THandler>(
             string identifier, Func<THandler, Action<TParam1, TParam2>> methodGetter)
         {
-            return ToProvider(new CommandProviderResolveMethod<TCommand, THandler, TParam1, TParam2>(methodGetter, identifier, false));
+            return RegisterSingleProvider(new CommandProviderResolveMethod<TCommand, THandler, TParam1, TParam2>(methodGetter, identifier, false));
         }
 
         public BindingConditionSetter ToOptionalResolve<THandler>()
@@ -320,7 +320,7 @@ namespace Zenject.Commands
         public BindingConditionSetter ToOptionalResolve<THandler>(string identifier)
             where THandler : ICommandHandler<TParam1, TParam2>
         {
-            return ToProvider(
+            return RegisterSingleProvider(
                 new CommandProviderResolve<TCommand, THandler, TParam1, TParam2>(identifier, true));
         }
 
@@ -332,7 +332,7 @@ namespace Zenject.Commands
         public BindingConditionSetter ToOptionalResolve<THandler>(
             string identifier, Func<THandler, Action<TParam1, TParam2>> methodGetter)
         {
-            return ToProvider(new CommandProviderResolveMethod<TCommand, THandler, TParam1, TParam2>(methodGetter, identifier, true));
+            return RegisterSingleProvider(new CommandProviderResolveMethod<TCommand, THandler, TParam1, TParam2>(methodGetter, identifier, true));
         }
     }
 
@@ -350,7 +350,7 @@ namespace Zenject.Commands
         public BindingConditionSetter ToTransient<THandler>(
             string concreteIdentifier, Func<THandler, Action<TParam1, TParam2, TParam3>> methodGetter)
         {
-            return ToProvider(
+            return RegisterSingleProvider(
                 new CommandProviderTransientMethod<TCommand, THandler, TParam1, TParam2, TParam3>(
                     methodGetter));
         }
@@ -369,7 +369,7 @@ namespace Zenject.Commands
         public BindingConditionSetter ToSingle<THandler>(string concreteIdentifier)
             where THandler : ICommandHandler<TParam1, TParam2, TParam3>
         {
-            return ToProvider(
+            return RegisterSingleProvider(
                 new CommandProviderSingle<TCommand, THandler, TParam1, TParam2, TParam3>(
                     CreateSingletonProvider<THandler>(concreteIdentifier)));
         }
@@ -377,7 +377,7 @@ namespace Zenject.Commands
         public BindingConditionSetter ToSingle<THandler>(
             string concreteIdentifier, Func<THandler, Action<TParam1, TParam2, TParam3>> methodGetter)
         {
-            return ToProvider(new CommandProviderSingleMethod<TCommand, THandler, TParam1, TParam2, TParam3>(
+            return RegisterSingleProvider(new CommandProviderSingleMethod<TCommand, THandler, TParam1, TParam2, TParam3>(
                 methodGetter, CreateSingletonProvider<THandler>(concreteIdentifier)));
         }
 
@@ -395,7 +395,7 @@ namespace Zenject.Commands
         public BindingConditionSetter ToResolve<THandler>(string identifier)
             where THandler : ICommandHandler<TParam1, TParam2, TParam3>
         {
-            return ToProvider(
+            return RegisterSingleProvider(
                 new CommandProviderResolve<TCommand, THandler, TParam1, TParam2, TParam3>(identifier, false));
         }
 
@@ -407,7 +407,7 @@ namespace Zenject.Commands
         public BindingConditionSetter ToResolve<THandler>(
             string identifier, Func<THandler, Action<TParam1, TParam2, TParam3>> methodGetter)
         {
-            return ToProvider(new CommandProviderResolveMethod<TCommand, THandler, TParam1, TParam2, TParam3>(methodGetter, identifier, false));
+            return RegisterSingleProvider(new CommandProviderResolveMethod<TCommand, THandler, TParam1, TParam2, TParam3>(methodGetter, identifier, false));
         }
 
         public BindingConditionSetter ToOptionalResolve<THandler>()
@@ -419,7 +419,7 @@ namespace Zenject.Commands
         public BindingConditionSetter ToOptionalResolve<THandler>(string identifier)
             where THandler : ICommandHandler<TParam1, TParam2, TParam3>
         {
-            return ToProvider(
+            return RegisterSingleProvider(
                 new CommandProviderResolve<TCommand, THandler, TParam1, TParam2, TParam3>(identifier, true));
         }
 
@@ -431,7 +431,7 @@ namespace Zenject.Commands
         public BindingConditionSetter ToOptionalResolve<THandler>(
             string identifier, Func<THandler, Action<TParam1, TParam2, TParam3>> methodGetter)
         {
-            return ToProvider(new CommandProviderResolveMethod<TCommand, THandler, TParam1, TParam2, TParam3>(methodGetter, identifier, true));
+            return RegisterSingleProvider(new CommandProviderResolveMethod<TCommand, THandler, TParam1, TParam2, TParam3>(methodGetter, identifier, true));
         }
     }
 
@@ -449,7 +449,7 @@ namespace Zenject.Commands
         public BindingConditionSetter ToTransient<THandler>(
             string concreteIdentifier, Func<THandler, Action<TParam1, TParam2, TParam3, TParam4>> methodGetter)
         {
-            return ToProvider(
+            return RegisterSingleProvider(
                 new CommandProviderTransientMethod<TCommand, THandler, TParam1, TParam2, TParam3, TParam4>(
                     methodGetter));
         }
@@ -468,7 +468,7 @@ namespace Zenject.Commands
         public BindingConditionSetter ToSingle<THandler>(string concreteIdentifier)
             where THandler : ICommandHandler<TParam1, TParam2, TParam3, TParam4>
         {
-            return ToProvider(
+            return RegisterSingleProvider(
                 new CommandProviderSingle<TCommand, THandler, TParam1, TParam2, TParam3, TParam4>(
                     CreateSingletonProvider<THandler>(concreteIdentifier)));
         }
@@ -476,7 +476,7 @@ namespace Zenject.Commands
         public BindingConditionSetter ToSingle<THandler>(
             string concreteIdentifier, Func<THandler, Action<TParam1, TParam2, TParam3, TParam4>> methodGetter)
         {
-            return ToProvider(new CommandProviderSingleMethod<TCommand, THandler, TParam1, TParam2, TParam3, TParam4>(
+            return RegisterSingleProvider(new CommandProviderSingleMethod<TCommand, THandler, TParam1, TParam2, TParam3, TParam4>(
                 methodGetter, CreateSingletonProvider<THandler>(concreteIdentifier)));
         }
 
@@ -494,7 +494,7 @@ namespace Zenject.Commands
         public BindingConditionSetter ToResolve<THandler>(string identifier)
             where THandler : ICommandHandler<TParam1, TParam2, TParam3, TParam4>
         {
-            return ToProvider(
+            return RegisterSingleProvider(
                 new CommandProviderResolve<TCommand, THandler, TParam1, TParam2, TParam3, TParam4>(identifier, false));
         }
 
@@ -506,7 +506,7 @@ namespace Zenject.Commands
         public BindingConditionSetter ToResolve<THandler>(
             string identifier, Func<THandler, Action<TParam1, TParam2, TParam3, TParam4>> methodGetter)
         {
-            return ToProvider(new CommandProviderResolveMethod<TCommand, THandler, TParam1, TParam2, TParam3, TParam4>(methodGetter, identifier, false));
+            return RegisterSingleProvider(new CommandProviderResolveMethod<TCommand, THandler, TParam1, TParam2, TParam3, TParam4>(methodGetter, identifier, false));
         }
 
         public BindingConditionSetter ToOptionalResolve<THandler>()
@@ -518,7 +518,7 @@ namespace Zenject.Commands
         public BindingConditionSetter ToOptionalResolve<THandler>(string identifier)
             where THandler : ICommandHandler<TParam1, TParam2, TParam3, TParam4>
         {
-            return ToProvider(
+            return RegisterSingleProvider(
                 new CommandProviderResolve<TCommand, THandler, TParam1, TParam2, TParam3, TParam4>(identifier, true));
         }
 
@@ -530,7 +530,7 @@ namespace Zenject.Commands
         public BindingConditionSetter ToOptionalResolve<THandler>(
             string identifier, Func<THandler, Action<TParam1, TParam2, TParam3, TParam4>> methodGetter)
         {
-            return ToProvider(new CommandProviderResolveMethod<TCommand, THandler, TParam1, TParam2, TParam3, TParam4>(methodGetter, identifier, true));
+            return RegisterSingleProvider(new CommandProviderResolveMethod<TCommand, THandler, TParam1, TParam2, TParam3, TParam4>(methodGetter, identifier, true));
         }
     }
 
@@ -548,7 +548,7 @@ namespace Zenject.Commands
         public BindingConditionSetter ToTransient<THandler>(
             string concreteIdentifier, Func<THandler, ModestTree.Util.Action<TParam1, TParam2, TParam3, TParam4, TParam5>> methodGetter)
         {
-            return ToProvider(
+            return RegisterSingleProvider(
                 new CommandProviderTransientMethod<TCommand, THandler, TParam1, TParam2, TParam3, TParam4, TParam5>(
                     methodGetter));
         }
@@ -567,7 +567,7 @@ namespace Zenject.Commands
         public BindingConditionSetter ToSingle<THandler>(string concreteIdentifier)
             where THandler : ICommandHandler<TParam1, TParam2, TParam3, TParam4, TParam5>
         {
-            return ToProvider(
+            return RegisterSingleProvider(
                 new CommandProviderSingle<TCommand, THandler, TParam1, TParam2, TParam3, TParam4, TParam5>(
                     CreateSingletonProvider<THandler>(concreteIdentifier)));
         }
@@ -575,7 +575,7 @@ namespace Zenject.Commands
         public BindingConditionSetter ToSingle<THandler>(
             string concreteIdentifier, Func<THandler, ModestTree.Util.Action<TParam1, TParam2, TParam3, TParam4, TParam5>> methodGetter)
         {
-            return ToProvider(new CommandProviderSingleMethod<TCommand, THandler, TParam1, TParam2, TParam3, TParam4, TParam5>(
+            return RegisterSingleProvider(new CommandProviderSingleMethod<TCommand, THandler, TParam1, TParam2, TParam3, TParam4, TParam5>(
                 methodGetter, CreateSingletonProvider<THandler>(concreteIdentifier)));
         }
 
@@ -593,7 +593,7 @@ namespace Zenject.Commands
         public BindingConditionSetter ToResolve<THandler>(string identifier)
             where THandler : ICommandHandler<TParam1, TParam2, TParam3, TParam4, TParam5>
         {
-            return ToProvider(
+            return RegisterSingleProvider(
                 new CommandProviderResolve<TCommand, THandler, TParam1, TParam2, TParam3, TParam4, TParam5>(identifier, false));
         }
 
@@ -605,7 +605,7 @@ namespace Zenject.Commands
         public BindingConditionSetter ToResolve<THandler>(
             string identifier, Func<THandler, ModestTree.Util.Action<TParam1, TParam2, TParam3, TParam4, TParam5>> methodGetter)
         {
-            return ToProvider(new CommandProviderResolveMethod<TCommand, THandler, TParam1, TParam2, TParam3, TParam4, TParam5>(methodGetter, identifier, false));
+            return RegisterSingleProvider(new CommandProviderResolveMethod<TCommand, THandler, TParam1, TParam2, TParam3, TParam4, TParam5>(methodGetter, identifier, false));
         }
 
         public BindingConditionSetter ToOptionalResolve<THandler>()
@@ -617,7 +617,7 @@ namespace Zenject.Commands
         public BindingConditionSetter ToOptionalResolve<THandler>(string identifier)
             where THandler : ICommandHandler<TParam1, TParam2, TParam3, TParam4, TParam5>
         {
-            return ToProvider(
+            return RegisterSingleProvider(
                 new CommandProviderResolve<TCommand, THandler, TParam1, TParam2, TParam3, TParam4, TParam5>(identifier, true));
         }
 
@@ -629,7 +629,7 @@ namespace Zenject.Commands
         public BindingConditionSetter ToOptionalResolve<THandler>(
             string identifier, Func<THandler, ModestTree.Util.Action<TParam1, TParam2, TParam3, TParam4, TParam5>> methodGetter)
         {
-            return ToProvider(new CommandProviderResolveMethod<TCommand, THandler, TParam1, TParam2, TParam3, TParam4, TParam5>(methodGetter, identifier, true));
+            return RegisterSingleProvider(new CommandProviderResolveMethod<TCommand, THandler, TParam1, TParam2, TParam3, TParam4, TParam5>(methodGetter, identifier, true));
         }
     }
 
@@ -647,7 +647,7 @@ namespace Zenject.Commands
         public BindingConditionSetter ToTransient<THandler>(
             string concreteIdentifier, Func<THandler, ModestTree.Util.Action<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6>> methodGetter)
         {
-            return ToProvider(
+            return RegisterSingleProvider(
                 new CommandProviderTransientMethod<TCommand, THandler, TParam1, TParam2, TParam3, TParam4, TParam5, TParam6>(
                     methodGetter));
         }
@@ -666,7 +666,7 @@ namespace Zenject.Commands
         public BindingConditionSetter ToSingle<THandler>(string concreteIdentifier)
             where THandler : ICommandHandler<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6>
         {
-            return ToProvider(
+            return RegisterSingleProvider(
                 new CommandProviderSingle<TCommand, THandler, TParam1, TParam2, TParam3, TParam4, TParam5, TParam6>(
                     CreateSingletonProvider<THandler>(concreteIdentifier)));
         }
@@ -674,7 +674,7 @@ namespace Zenject.Commands
         public BindingConditionSetter ToSingle<THandler>(
             string concreteIdentifier, Func<THandler, ModestTree.Util.Action<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6>> methodGetter)
         {
-            return ToProvider(new CommandProviderSingleMethod<TCommand, THandler, TParam1, TParam2, TParam3, TParam4, TParam5, TParam6>(
+            return RegisterSingleProvider(new CommandProviderSingleMethod<TCommand, THandler, TParam1, TParam2, TParam3, TParam4, TParam5, TParam6>(
                 methodGetter, CreateSingletonProvider<THandler>(concreteIdentifier)));
         }
 
@@ -692,7 +692,7 @@ namespace Zenject.Commands
         public BindingConditionSetter ToResolve<THandler>(string identifier)
             where THandler : ICommandHandler<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6>
         {
-            return ToProvider(
+            return RegisterSingleProvider(
                 new CommandProviderResolve<TCommand, THandler, TParam1, TParam2, TParam3, TParam4, TParam5, TParam6>(identifier, false));
         }
 
@@ -704,7 +704,8 @@ namespace Zenject.Commands
         public BindingConditionSetter ToResolve<THandler>(
             string identifier, Func<THandler, ModestTree.Util.Action<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6>> methodGetter)
         {
-            return ToProvider(new CommandProviderResolveMethod<TCommand, THandler, TParam1, TParam2, TParam3, TParam4, TParam5, TParam6>(methodGetter, identifier, false));
+            return RegisterSingleProvider(
+                new CommandProviderResolveMethod<TCommand, THandler, TParam1, TParam2, TParam3, TParam4, TParam5, TParam6>(methodGetter, identifier, false));
         }
 
         public BindingConditionSetter ToOptionalResolve<THandler>()
@@ -716,7 +717,7 @@ namespace Zenject.Commands
         public BindingConditionSetter ToOptionalResolve<THandler>(string identifier)
             where THandler : ICommandHandler<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6>
         {
-            return ToProvider(
+            return RegisterSingleProvider(
                 new CommandProviderResolve<TCommand, THandler, TParam1, TParam2, TParam3, TParam4, TParam5, TParam6>(identifier, true));
         }
 
@@ -728,7 +729,8 @@ namespace Zenject.Commands
         public BindingConditionSetter ToOptionalResolve<THandler>(
             string identifier, Func<THandler, ModestTree.Util.Action<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6>> methodGetter)
         {
-            return ToProvider(new CommandProviderResolveMethod<TCommand, THandler, TParam1, TParam2, TParam3, TParam4, TParam5, TParam6>(methodGetter, identifier, true));
+            return RegisterSingleProvider(
+                new CommandProviderResolveMethod<TCommand, THandler, TParam1, TParam2, TParam3, TParam4, TParam5, TParam6>(methodGetter, identifier, true));
         }
     }
 }

@@ -29,7 +29,7 @@ namespace Zenject
 
         public override object GetInstance(InjectContext context)
         {
-            var obj = context.Container.Instantiator.InstantiateExplicit(
+            var obj = context.Container.InstantiateExplicit(
                 GetTypeToInstantiate(context.MemberType), new List<TypeValuePair>(), context, null, true);
             Assert.That(obj != null);
             return obj;
@@ -50,7 +50,7 @@ namespace Zenject
 
         public override IEnumerable<ZenjectResolveException> ValidateBinding(InjectContext context)
         {
-            return context.Container.Resolver.ValidateObjectGraph(_concreteType, context);
+            return context.Container.ValidateObjectGraph(_concreteType, context);
         }
     }
 }

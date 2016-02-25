@@ -41,18 +41,18 @@ namespace Zenject.Tests
         [ExpectedException]
         public void TestCase1()
         {
-            Binder.Bind<Test1>().ToSingle();
+            Container.Bind<Test1>().ToSingle();
 
-            Resolver.ResolveAll<Test1>();
+            Container.ResolveAll<Test1>();
         }
 
         [Test]
         public void TestCase2()
         {
-            Binder.Bind<Test2>().ToSingle();
+            Container.Bind<Test2>().ToSingle();
 
-            Assert.That(Resolver.ValidateResolve<Test2>().IsEmpty());
-            var result = Resolver.ResolveAll<Test2>();
+            Assert.That(Container.ValidateResolve<Test2>().IsEmpty());
+            var result = Container.ResolveAll<Test2>();
 
             Assert.That(result != null);
         }
@@ -61,17 +61,17 @@ namespace Zenject.Tests
         [ExpectedException(typeof(ZenjectResolveException))]
         public void TestCase3()
         {
-            Binder.Bind<Test3>().ToSingle();
+            Container.Bind<Test3>().ToSingle();
 
-            Resolver.ResolveAll<Test3>();
+            Container.ResolveAll<Test3>();
         }
 
         [Test]
         public void TestCase4()
         {
-            Binder.Bind<Test4>().ToSingle();
+            Container.Bind<Test4>().ToSingle();
 
-            var result = Resolver.ResolveAll<Test4>();
+            var result = Container.ResolveAll<Test4>();
 
             Assert.That(result != null);
         }

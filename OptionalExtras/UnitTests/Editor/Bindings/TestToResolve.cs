@@ -23,12 +23,12 @@ namespace Zenject.Tests
         {
             var foo = new Foo();
 
-            Binder.Bind<Foo>().ToInstance(foo);
-            Binder.Bind<IFoo>().ToResolve<Foo>();
+            Container.Bind<Foo>().ToInstance(foo);
+            Container.Bind<IFoo>().ToResolve<Foo>();
 
             AssertValidates();
 
-            Assert.IsEqual(Resolver.Resolve<IFoo>(), Resolver.Resolve<Foo>());
+            Assert.IsEqual(Container.Resolve<IFoo>(), Container.Resolve<Foo>());
         }
 
         [Test]
@@ -36,14 +36,14 @@ namespace Zenject.Tests
         {
             var foo = new Foo();
 
-            Binder.Bind<Foo>("foo").ToInstance(foo);
-            Binder.Bind<IFoo>().ToResolve<Foo>("foo");
+            Container.Bind<Foo>("foo").ToInstance(foo);
+            Container.Bind<IFoo>().ToResolve<Foo>("foo");
 
             AssertValidates();
 
-            Resolver.Resolve<IFoo>();
+            Container.Resolve<IFoo>();
 
-            Assert.IsEqual(Resolver.Resolve<IFoo>(), Resolver.Resolve<Foo>("foo"));
+            Assert.IsEqual(Container.Resolve<IFoo>(), Container.Resolve<Foo>("foo"));
         }
 
         [Test]
@@ -51,15 +51,15 @@ namespace Zenject.Tests
         {
             var foo = new Foo();
 
-            Binder.Bind<Foo>("foo").ToInstance(foo);
-            Binder.Bind<IFoo>().ToResolve<Foo>();
+            Container.Bind<Foo>("foo").ToInstance(foo);
+            Container.Bind<IFoo>().ToResolve<Foo>();
 
             // TODO: Validation should fail but doesn't
             // ToResolve needs to stop using ToMethod and instead have its own provider
             //AssertValidationFails();
 
             Assert.Throws<ZenjectResolveException>(
-                delegate { Resolver.Resolve<IFoo>(); });
+                delegate { Container.Resolve<IFoo>(); });
         }
     }
 }

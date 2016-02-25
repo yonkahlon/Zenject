@@ -18,72 +18,72 @@ namespace Zenject.Tests
         [Test]
         public void TestBasic()
         {
-            Binder.Bind<Test0>("foo").ToTransient();
+            Container.Bind<Test0>("foo").ToTransient();
 
             AssertValidates();
 
             Assert.Throws<ZenjectResolveException>(
-                delegate { Resolver.Resolve<Test0>(); });
+                delegate { Container.Resolve<Test0>(); });
 
-            Resolver.Resolve<Test0>("foo");
-            Assert.That(Resolver.ValidateResolve<Test0>("foo").IsEmpty());
+            Container.Resolve<Test0>("foo");
+            Assert.That(Container.ValidateResolve<Test0>("foo").IsEmpty());
         }
 
         [Test]
         public void TestBasic2()
         {
-            Binder.Bind<Test0>("foo").ToSingle();
+            Container.Bind<Test0>("foo").ToSingle();
 
             AssertValidates();
 
             Assert.Throws<ZenjectResolveException>(
-                delegate { Resolver.Resolve<Test0>(); });
+                delegate { Container.Resolve<Test0>(); });
 
-            Resolver.Resolve<Test0>("foo");
-            Assert.That(Resolver.ValidateResolve<Test0>("foo").IsEmpty());
+            Container.Resolve<Test0>("foo");
+            Assert.That(Container.ValidateResolve<Test0>("foo").IsEmpty());
         }
 
         [Test]
         public void TestBasic3()
         {
-            Binder.Bind<Test0>("foo").ToMethod((ctx) => new Test0());
+            Container.Bind<Test0>("foo").ToMethod((ctx) => new Test0());
 
             AssertValidates();
 
             Assert.Throws<ZenjectResolveException>(
-                delegate { Resolver.Resolve<Test0>(); });
+                delegate { Container.Resolve<Test0>(); });
 
-            Resolver.Resolve<Test0>("foo");
-            Assert.That(Resolver.ValidateResolve<Test0>("foo").IsEmpty());
+            Container.Resolve<Test0>("foo");
+            Assert.That(Container.ValidateResolve<Test0>("foo").IsEmpty());
         }
 
         [Test]
         public void TestBasic4()
         {
-            Binder.Bind<Test0>("foo").ToTransient();
-            Binder.Bind<Test0>("foo").ToTransient();
+            Container.Bind<Test0>("foo").ToTransient();
+            Container.Bind<Test0>("foo").ToTransient();
 
             AssertValidates();
 
             Assert.Throws<ZenjectResolveException>(
-                delegate { Resolver.Resolve<Test0>(); });
+                delegate { Container.Resolve<Test0>(); });
 
             Assert.Throws<ZenjectResolveException>(
-                delegate { Resolver.Resolve<Test0>("foo"); });
+                delegate { Container.Resolve<Test0>("foo"); });
 
-            Assert.IsEqual(Resolver.ResolveAll<Test0>("foo").Count, 2);
+            Assert.IsEqual(Container.ResolveAll<Test0>("foo").Count, 2);
         }
 
         [Test]
         public void TestToMethodUntyped()
         {
-            Binder.Bind(typeof(Test0)).ToMethod((ctx) => new Test0());
+            Container.Bind(typeof(Test0)).ToMethod((ctx) => new Test0());
 
             AssertValidates();
 
-            Resolver.Resolve<Test0>();
+            Container.Resolve<Test0>();
 
-            Assert.That(Resolver.ValidateResolve<Test0>().IsEmpty());
+            Assert.That(Container.ValidateResolve<Test0>().IsEmpty());
         }
     }
 }

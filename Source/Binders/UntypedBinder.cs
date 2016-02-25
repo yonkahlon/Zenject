@@ -1,6 +1,7 @@
 using System;
+using System.Collections.Generic;
 using ModestTree;
-using ModestTree.Util;
+
 #if !ZEN_NOT_UNITY3D
 using UnityEngine;
 #endif
@@ -10,9 +11,8 @@ namespace Zenject
     public class UntypedBinder : TypeBinder, IUntypedBinder
     {
         public UntypedBinder(
-            DiContainer container, Type contractType,
-            string identifier)
-            : base(container, contractType, identifier)
+            DiContainer container, List<Type> contractTypes, string identifier)
+            : base(container, contractTypes, identifier)
         {
         }
 
@@ -26,15 +26,11 @@ namespace Zenject
             return ToResolveBase<TConcrete>(identifier);
         }
 
-        public BindingConditionSetter ToMethod(Type returnType, Func<InjectContext, object> method)
+        public BindingConditionSetter ToMethod(Type concreteType, Func<InjectContext, object> method)
         {
-            if (!returnType.DerivesFromOrEqual(ContractType))
-            {
-                throw new ZenjectBindException(
-                    "Invalid type given during bind command.  Expected type '{0}' to derive from type '{1}'".Fmt(returnType, ContractType.Name()));
-            }
+            AssertIsDerivedFromContracts(concreteType);
 
-            return ToProvider(new MethodProviderUntyped(returnType, method));
+            return RegisterSingleProvider(new MethodProviderUntyped(concreteType, method));
         }
 
         public BindingConditionSetter ToMethod<TContract>(Func<InjectContext, TContract> method)
@@ -87,12 +83,12 @@ namespace Zenject
             return ToSingleMethodBase<TConcrete>(null, method);
         }
 
-        public BindingConditionSetter ToSingleFacadeMethod<TConcrete>(string concreteIdentifier, Action<IBinder> installerFunc)
+        public BindingConditionSetter ToSingleFacadeMethod<TConcrete>(string concreteIdentifier, Action<DiContainer> installerFunc)
         {
             return ToSingleFacadeMethod(typeof(TConcrete), concreteIdentifier, installerFunc);
         }
 
-        public BindingConditionSetter ToSingleFacadeMethod<TConcrete>(Action<IBinder> installerFunc)
+        public BindingConditionSetter ToSingleFacadeMethod<TConcrete>(Action<DiContainer> installerFunc)
         {
             return ToSingleFacadeMethod(typeof(TConcrete), null, installerFunc);
         }

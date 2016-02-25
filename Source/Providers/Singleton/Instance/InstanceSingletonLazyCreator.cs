@@ -17,7 +17,7 @@ namespace Zenject
             SingletonId id, InstanceSingletonProviderCreator owner,
             DiContainer container, object instance)
         {
-            Assert.That(instance != null || container.Binder.IsValidating);
+            Assert.That(instance != null || container.IsValidating);
 
             _owner = owner;
             _id = id;

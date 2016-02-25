@@ -109,7 +109,7 @@ namespace Zenject
         //  This binding allows you to customize creation logic yourself by defining a method.
         //  For example:
         //
-        //  Binder.Bind<IFoo>().ToMethod(SomeMethod);
+        //  Container.Bind<IFoo>().ToMethod(SomeMethod);
         //
         //  public IFoo SomeMethod(InjectContext context)
         //  {
@@ -261,11 +261,11 @@ namespace Zenject
         //
         //  See description in ITypeBinder
         //
-        BindingConditionSetter ToSingleFacadeMethod<TConcrete>(Action<IBinder> installerFunc)
+        BindingConditionSetter ToSingleFacadeMethod<TConcrete>(Action<DiContainer> installerFunc)
             where TConcrete : TContract;
 
         BindingConditionSetter ToSingleFacadeMethod<TConcrete>(
-            string concreteIdentifier, Action<IBinder> installerFunc)
+            string concreteIdentifier, Action<DiContainer> installerFunc)
             where TConcrete : TContract;
 
         // _____ ToSingleFacadeInstaller _____

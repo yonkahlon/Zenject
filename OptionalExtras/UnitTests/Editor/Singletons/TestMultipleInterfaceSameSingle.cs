@@ -25,15 +25,15 @@ namespace Zenject.Tests
         [Test]
         public void TestCase1()
         {
-            Binder.Bind<ITest1>().ToSingle<Test1>();
-            Binder.Bind<ITest2>().ToSingle<Test1>();
+            Container.Bind<ITest1>().ToSingle<Test1>();
+            Container.Bind<ITest2>().ToSingle<Test1>();
 
             AssertValidates();
 
-            Assert.That(Resolver.ValidateResolve<ITest1>().IsEmpty());
-            var test1 = Resolver.Resolve<ITest1>();
-            Assert.That(Resolver.ValidateResolve<ITest2>().IsEmpty());
-            var test2 = Resolver.Resolve<ITest2>();
+            Assert.That(Container.ValidateResolve<ITest1>().IsEmpty());
+            var test1 = Container.Resolve<ITest1>();
+            Assert.That(Container.ValidateResolve<ITest2>().IsEmpty());
+            var test2 = Container.Resolve<ITest2>();
 
             Assert.That(ReferenceEquals(test1, test2));
         }

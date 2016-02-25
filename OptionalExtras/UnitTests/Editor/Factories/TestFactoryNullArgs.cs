@@ -39,12 +39,12 @@ namespace Zenject.Tests
         [Test]
         public void Run1()
         {
-            Binder.Bind<Foo>().ToSingle();
-            Binder.Bind<Test2.Factory>().ToSingle();
+            Container.Bind<Foo>().ToSingle();
+            Container.Bind<Test2.Factory>().ToSingle();
 
             AssertValidates();
 
-            var factory = Resolver.Resolve<Test2.Factory>();
+            var factory = Container.Resolve<Test2.Factory>();
             var test2 = factory.Create(new Bar());
 
             Assert.IsNotNull(test2);
@@ -53,12 +53,12 @@ namespace Zenject.Tests
         [Test]
         public void Run2()
         {
-            Binder.Bind<Foo>().ToSingle();
-            Binder.Bind<Test2.Factory>().ToSingle();
+            Container.Bind<Foo>().ToSingle();
+            Container.Bind<Test2.Factory>().ToSingle();
 
             AssertValidates();
 
-            var factory = Resolver.Resolve<Test2.Factory>();
+            var factory = Container.Resolve<Test2.Factory>();
             var test2 = factory.Create(null);
 
             Assert.IsNotNull(test2);
@@ -84,11 +84,11 @@ namespace Zenject.Tests
         [Test]
         public void Run3()
         {
-            Binder.Bind<Test3.Factory>().ToSingle();
+            Container.Bind<Test3.Factory>().ToSingle();
 
             AssertValidates();
 
-            var factory = Resolver.Resolve<Test3.Factory>();
+            var factory = Container.Resolve<Test3.Factory>();
             var test = factory.Create(null, null, new Foo());
 
             Assert.IsNull(test.Foo1);

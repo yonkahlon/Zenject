@@ -15,13 +15,13 @@ namespace Zenject.Tests
         [Test]
         public void TestSingle()
         {
-            Binder.Bind<Bar>().ToSingle();
-            Binder.Bind<Foo>().ToSingle();
-            Binder.BindCommand<DoSomethingCommand, string>()
+            Container.Bind<Bar>().ToSingle();
+            Container.Bind<Foo>().ToSingle();
+            Container.BindCommand<DoSomethingCommand, string>()
                 .ToSingle<Bar>(x => x.Execute).WhenInjectedInto<Foo>();
 
-            var bar = Resolver.Resolve<Bar>();
-            var foo = Resolver.Resolve<Foo>();
+            var bar = Container.Resolve<Bar>();
+            var foo = Container.Resolve<Foo>();
 
             Assert.IsNull(bar.ReceivedValue);
             foo.Trigger("asdf");
@@ -31,13 +31,13 @@ namespace Zenject.Tests
         [Test]
         public void TestResolve()
         {
-            Binder.Bind<Bar>().ToSingle();
-            Binder.Bind<Foo>().ToSingle();
-            Binder.BindCommand<DoSomethingCommand, string>()
+            Container.Bind<Bar>().ToSingle();
+            Container.Bind<Foo>().ToSingle();
+            Container.BindCommand<DoSomethingCommand, string>()
                 .ToResolve<Bar>(x => x.Execute).WhenInjectedInto<Foo>();
 
-            var bar = Resolver.Resolve<Bar>();
-            var foo = Resolver.Resolve<Foo>();
+            var bar = Container.Resolve<Bar>();
+            var foo = Container.Resolve<Foo>();
 
             Assert.IsNull(bar.ReceivedValue);
             foo.Trigger("asdf");
@@ -47,36 +47,36 @@ namespace Zenject.Tests
         [Test]
         public void TestOptionalResolve1()
         {
-            Binder.Bind<Foo>().ToSingle();
-            Binder.BindCommand<DoSomethingCommand, string>()
+            Container.Bind<Foo>().ToSingle();
+            Container.BindCommand<DoSomethingCommand, string>()
                 .ToOptionalResolve<Bar>(x => x.Execute).WhenInjectedInto<Foo>();
 
-            var foo = Resolver.Resolve<Foo>();
+            var foo = Container.Resolve<Foo>();
             foo.Trigger("asdf");
         }
 
         [Test]
         public void TestOptionalResolve2()
         {
-            Binder.Bind<Bar>().ToSingle();
-            Binder.Bind<Foo>().ToSingle();
-            Binder.BindCommand<DoSomethingCommand, string>()
+            Container.Bind<Bar>().ToSingle();
+            Container.Bind<Foo>().ToSingle();
+            Container.BindCommand<DoSomethingCommand, string>()
                 .ToOptionalResolve<Bar>(x => x.Execute).WhenInjectedInto<Foo>();
 
-            var foo = Resolver.Resolve<Foo>();
+            var foo = Container.Resolve<Foo>();
             foo.Trigger("asdf");
-            Assert.IsEqual(Resolver.Resolve<Bar>().ReceivedValue, "asdf");
+            Assert.IsEqual(Container.Resolve<Bar>().ReceivedValue, "asdf");
         }
 
         [Test]
         public void TestTransient()
         {
-            Binder.Bind<Foo>().ToSingle();
-            Binder.BindCommand<DoSomethingCommand, string>().ToTransient<Bar>(x => x.Execute).WhenInjectedInto<Foo>();
+            Container.Bind<Foo>().ToSingle();
+            Container.BindCommand<DoSomethingCommand, string>().ToTransient<Bar>(x => x.Execute).WhenInjectedInto<Foo>();
 
             Bar.Instances.Clear();
 
-            var foo = Resolver.Resolve<Foo>();
+            var foo = Container.Resolve<Foo>();
 
             Assert.IsEqual(Bar.Instances.Count, 0);
             foo.Trigger("asdf");
@@ -96,23 +96,23 @@ namespace Zenject.Tests
         [Test]
         public void TestNothing()
         {
-            Binder.Bind<Foo>().ToSingle();
+            Container.Bind<Foo>().ToSingle();
 
-            Binder.BindCommand<DoSomethingCommand, string>().ToNothing();
+            Container.BindCommand<DoSomethingCommand, string>().ToNothing();
 
-            var foo = Resolver.Resolve<Foo>();
+            var foo = Container.Resolve<Foo>();
             foo.Trigger("asdf");
         }
 
         [Test]
         public void TestMethod()
         {
-            Binder.Bind<Foo>().ToSingle();
+            Container.Bind<Foo>().ToSingle();
 
             string receivedValue = null;
-            Binder.BindCommand<DoSomethingCommand, string>().ToMethod((v) => receivedValue = v);
+            Container.BindCommand<DoSomethingCommand, string>().ToMethod((v) => receivedValue = v);
 
-            var foo = Resolver.Resolve<Foo>();
+            var foo = Container.Resolve<Foo>();
 
             Assert.IsNull(receivedValue);
             foo.Trigger("asdf");

@@ -23,25 +23,25 @@ namespace Zenject
 
             foreach (var tickableType in _tickables)
             {
-                BindPriority(Binder, tickableType, priorityCount);
+                BindPriority(Container, tickableType, priorityCount);
                 priorityCount++;
             }
         }
 
         public static void BindPriority<T>(
-            IBinder binder, int priorityCount)
+            DiContainer container, int priorityCount)
             where T : ILateTickable
         {
-            BindPriority(binder, typeof(T), priorityCount);
+            BindPriority(container, typeof(T), priorityCount);
         }
 
         public static void BindPriority(
-            IBinder binder, Type tickableType, int priorityCount)
+            DiContainer container, Type tickableType, int priorityCount)
         {
             Assert.That(tickableType.DerivesFrom<ILateTickable>(),
                 "Expected type '{0}' to derive from ILateTickable", tickableType.Name());
 
-            binder.Bind<ModestTree.Util.Tuple<Type, int>>("Late").ToInstance(
+            container.Bind<ModestTree.Util.Tuple<Type, int>>("Late").ToInstance(
                 ModestTree.Util.Tuple.New(tickableType, priorityCount)).WhenInjectedInto<TickableManager>();
         }
     }

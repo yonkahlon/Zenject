@@ -19,13 +19,13 @@ namespace Zenject
     {
         public static readonly List<Scene> DecoratedScenes = new List<Scene>();
 
-        public static Action<IBinder> BeforeInstallHooks;
-        public static Action<IBinder> AfterInstallHooks;
+        public static Action<DiContainer> BeforeInstallHooks;
+        public static Action<DiContainer> AfterInstallHooks;
 
         [FormerlySerializedAs("ParentNewObjectsUnderRoot")]
         [Tooltip("When true, objects that are created at runtime will be parented to the SceneCompositionRoot")]
         [SerializeField]
-        bool _parentNewObjectsUnderRoot = true;
+        bool _parentNewObjectsUnderRoot = false;
 
         DiContainer _container;
         IDependencyRoot _dependencyRoot;
@@ -64,17 +64,25 @@ namespace Zenject
                 Log.Warn("No installers found while initializing CompositionRoot '{0}'", this.name);
             }
 
-            InstallBindings(_container.Binder);
+            Log.Debug("SceneCompositionRoot: Running installers...");
 
-            InjectComponents(_container.Resolver);
+            InstallBindings(_container);
 
-            _dependencyRoot = _container.Resolver.Resolve<IDependencyRoot>();
+            Log.Debug("SceneCompositionRoot: Injecting components in the scene...");
+
+            InjectComponents(_container);
+
+            Log.Debug("SceneCompositionRoot: Resolving dependency root...");
+
+            _dependencyRoot = _container.Resolve<IDependencyRoot>();
 
             DecoratedScenes.Clear();
+
+            Log.Debug("SceneCompositionRoot: Initialized successfully");
         }
 
         // We pass in the binder here instead of using our own for validation to work
-        public override void InstallBindings(IBinder binder)
+        public void InstallBindings(DiContainer binder)
         {
             if (_parentNewObjectsUnderRoot)
             {

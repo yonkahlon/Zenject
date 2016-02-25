@@ -47,14 +47,14 @@ namespace Zenject.Tests
         public void TestMultiBind2()
         {
             // Multi-binds should not map to single-binds
-            Binder.Bind<Test0>().ToSingle<Test3>();
-            Binder.Bind<Test0>().ToSingle<Test4>();
-            Binder.Bind<Test2>().ToSingle();
+            Container.Bind<Test0>().ToSingle<Test3>();
+            Container.Bind<Test0>().ToSingle<Test4>();
+            Container.Bind<Test2>().ToSingle();
 
             AssertValidates();
 
-            Assert.That(Resolver.ValidateResolve<Test2>().IsEmpty());
-            Resolver.Resolve<Test2>();
+            Assert.That(Container.ValidateResolve<Test2>().IsEmpty());
+            Container.Resolve<Test2>();
         }
     }
 }

@@ -22,7 +22,7 @@ namespace Zenject.Commands
 
         protected THandler TryGetResolve(InjectContext ctx)
         {
-            return ctx.Resolver.Resolve<THandler>(GetNewInjectContext(ctx));
+            return ctx.Container.Resolve<THandler>(GetNewInjectContext(ctx));
         }
 
         InjectContext GetNewInjectContext(InjectContext ctx)
@@ -36,7 +36,7 @@ namespace Zenject.Commands
         public override IEnumerable<ZenjectResolveException> ValidateBinding(InjectContext ctx)
         {
             return base.ValidateBinding(ctx)
-                .Concat(ctx.Resolver.ValidateResolve(GetNewInjectContext(ctx)));
+                .Concat(ctx.Container.ValidateResolve(GetNewInjectContext(ctx)));
         }
     }
 }

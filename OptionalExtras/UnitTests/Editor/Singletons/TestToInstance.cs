@@ -24,12 +24,12 @@ namespace Zenject.Tests
         {
             IFoo instance = new Foo();
 
-            Binder.Bind<IFoo>().ToInstance(instance);
+            Container.Bind<IFoo>().ToInstance(instance);
 
             AssertValidates();
 
-            Assert.That(Resolver.ValidateResolve<IFoo>().IsEmpty());
-            var builtInstance = Resolver.Resolve<IFoo>();
+            Assert.That(Container.ValidateResolve<IFoo>().IsEmpty());
+            var builtInstance = Container.Resolve<IFoo>();
 
             Assert.That(ReferenceEquals(builtInstance, instance));
         }
@@ -39,12 +39,12 @@ namespace Zenject.Tests
         {
             IFoo instance = new Foo();
 
-            Binder.Bind(typeof(IFoo)).ToInstance(instance);
+            Container.Bind(typeof(IFoo)).ToInstance(instance);
 
             AssertValidates();
 
-            Assert.That(Resolver.ValidateResolve<IFoo>().IsEmpty());
-            var builtInstance = Resolver.Resolve<IFoo>();
+            Assert.That(Container.ValidateResolve<IFoo>().IsEmpty());
+            var builtInstance = Container.Resolve<IFoo>();
 
             Assert.That(ReferenceEquals(builtInstance, instance));
         }
@@ -54,15 +54,15 @@ namespace Zenject.Tests
         {
             var instance = new Foo();
 
-            Binder.Bind<Foo>().ToInstance(instance);
-            Binder.Bind<Foo>().ToInstance(instance);
+            Container.Bind<Foo>().ToInstance(instance);
+            Container.Bind<Foo>().ToInstance(instance);
 
             AssertValidates();
 
-            Assert.That(Resolver.ValidateResolve<Foo>().Any());
+            Assert.That(Container.ValidateResolve<Foo>().Any());
 
             Assert.Throws<ZenjectResolveException>(
-                delegate { Resolver.Resolve<Foo>(); });
+                delegate { Container.Resolve<Foo>(); });
         }
 
         [Test]
@@ -70,15 +70,15 @@ namespace Zenject.Tests
         {
             var instance = new Foo();
 
-            Binder.Bind(typeof(Foo)).ToInstance(instance);
-            Binder.Bind(typeof(Foo)).ToInstance(instance);
+            Container.Bind(typeof(Foo)).ToInstance(instance);
+            Container.Bind(typeof(Foo)).ToInstance(instance);
 
             AssertValidates();
 
-            Assert.That(Resolver.ValidateResolve<Foo>().Any());
+            Assert.That(Container.ValidateResolve<Foo>().Any());
 
             Assert.Throws<ZenjectResolveException>(
-                delegate { Resolver.Resolve<Foo>(); });
+                delegate { Container.Resolve<Foo>(); });
         }
     }
 }

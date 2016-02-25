@@ -55,24 +55,24 @@ namespace Zenject.Tests
             MyDispose.HasDisposed = false;
             FooFacade.CreateCount = 0;
 
-            Binder.Install<FacadeCommonInstaller>();
+            Container.Install<FacadeCommonInstaller>();
 
-            Binder.Bind<ITickable>().ToSingleFacadeMethod<FooFacade>(FacadeInstaller);
-            Binder.Bind<IInitializable>().ToSingleFacadeMethod<FooFacade>(FacadeInstaller);
-            Binder.Bind<IDisposable>().ToSingleFacadeMethod<FooFacade>(FacadeInstaller);
+            Container.Bind<ITickable>().ToSingleFacadeMethod<FooFacade>(FacadeInstaller);
+            Container.Bind<IInitializable>().ToSingleFacadeMethod<FooFacade>(FacadeInstaller);
+            Container.Bind<IDisposable>().ToSingleFacadeMethod<FooFacade>(FacadeInstaller);
 
             AssertValidates();
 
             Assert.That(!MyInit.HasInitialized);
-            Resolver.Resolve<InitializableManager>().Initialize();
+            Container.Resolve<InitializableManager>().Initialize();
             Assert.That(MyInit.HasInitialized);
 
             Assert.That(!MyTickable.HasTicked);
-            Resolver.Resolve<TickableManager>().Update();
+            Container.Resolve<TickableManager>().Update();
             Assert.That(MyTickable.HasTicked);
 
             Assert.That(!MyDispose.HasDisposed);
-            Resolver.Resolve<DisposableManager>().Dispose();
+            Container.Resolve<DisposableManager>().Dispose();
             Assert.That(MyDispose.HasDisposed);
 
             Assert.IsEqual(FooFacade.CreateCount, 1);
@@ -86,35 +86,35 @@ namespace Zenject.Tests
             MyDispose.HasDisposed = false;
             FooFacade.CreateCount = 0;
 
-            Binder.Install<FacadeCommonInstaller>();
+            Container.Install<FacadeCommonInstaller>();
 
-            Binder.BindAllInterfacesToSingleFacadeMethod<FooFacade>(FacadeInstaller);
+            Container.BindAllInterfaces<FooFacade>().ToSingleFacadeMethod<FooFacade>(FacadeInstaller);
 
             AssertValidates();
 
             Assert.That(!MyInit.HasInitialized);
-            Resolver.Resolve<InitializableManager>().Initialize();
+            Container.Resolve<InitializableManager>().Initialize();
             Assert.That(MyInit.HasInitialized);
 
             Assert.That(!MyTickable.HasTicked);
-            Resolver.Resolve<TickableManager>().Update();
+            Container.Resolve<TickableManager>().Update();
             Assert.That(MyTickable.HasTicked);
 
             Assert.That(!MyDispose.HasDisposed);
-            Resolver.Resolve<DisposableManager>().Dispose();
+            Container.Resolve<DisposableManager>().Dispose();
             Assert.That(MyDispose.HasDisposed);
 
             Assert.IsEqual(FooFacade.CreateCount, 1);
         }
 
-        void FacadeInstaller(IBinder binder)
+        void FacadeInstaller(DiContainer container)
         {
-            binder.Install<FacadeCommonInstaller>();
-            binder.Bind<FooFacade>().ToSingle();
+            container.Install<FacadeCommonInstaller>();
+            container.Bind<FooFacade>().ToSingle();
 
-            binder.Bind<IDisposable>().ToSingle<MyDispose>();
-            binder.Bind<IInitializable>().ToSingle<MyInit>();
-            binder.Bind<ITickable>().ToSingle<MyTickable>();
+            container.Bind<IDisposable>().ToSingle<MyDispose>();
+            container.Bind<IInitializable>().ToSingle<MyInit>();
+            container.Bind<ITickable>().ToSingle<MyTickable>();
         }
     }
 }

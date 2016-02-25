@@ -25,7 +25,7 @@ namespace Zenject
         // Identifier - most of the time this is null
         // It will match 'foo' in this example:
         //      ... In an installer somewhere:
-        //          Binder.Bind<Foo>("foo").ToSingle();
+        //          Container.Bind<Foo>("foo").ToSingle();
         //      ...
         //      ... In a constructor:
         //          public Foo([Inject("foo") Foo foo)
@@ -34,8 +34,8 @@ namespace Zenject
         // ConcreteIdentifier - most of the time this is null
         // It will match 'foo' in this example:
         //      ... In an installer somewhere:
-        //          Binder.Bind<Foo>().ToSingle("foo");
-        //          Binder.Bind<ITickable>().ToSingle<Foo>("foo");
+        //          Container.Bind<Foo>().ToSingle("foo");
+        //          Container.Bind<ITickable>().ToSingle<Foo>("foo");
         //      ...
         // This allows you to create When() conditionals like this:
         //      ...
@@ -106,6 +106,13 @@ namespace Zenject
         }
 
         public InjectContext(
+            DiContainer container, Type memberType, string identifier, InjectSources sourceType)
+            : this(container, memberType, identifier, false, null,
+                null, "", null, null, null, sourceType)
+        {
+        }
+
+        public InjectContext(
             DiContainer container, Type memberType, string identifier)
             : this(container, memberType, identifier, false)
         {
@@ -115,30 +122,6 @@ namespace Zenject
             DiContainer container, Type memberType)
             : this(container, memberType, null, false)
         {
-        }
-
-        public IBinder Binder
-        {
-            get
-            {
-                return Container;
-            }
-        }
-
-        public IInstantiator Instantiator
-        {
-            get
-            {
-                return Container;
-            }
-        }
-
-        public IResolver Resolver
-        {
-            get
-            {
-                return Container;
-            }
         }
 
         public IEnumerable<InjectContext> ParentContexts

@@ -15,23 +15,23 @@ namespace Zenject.Tests
         [Test]
         public void RunTest()
         {
-            Binder.BindSignal<SomethingHappenedSignal>();
-            Binder.BindTrigger<SomethingHappenedSignal.Trigger>();
+            Container.BindSignal<SomethingHappenedSignal>();
+            Container.BindTrigger<SomethingHappenedSignal.Trigger>();
 
-            Binder.Bind<Foo>().ToSingle();
-            Binder.Bind<Bar>().ToSingle();
+            Container.Bind<Foo>().ToSingle();
+            Container.Bind<Bar>().ToSingle();
 
-            Binder.BindSignal<SomethingHappenedSignal>("special");
-            Binder.BindTrigger<SomethingHappenedSignal.Trigger>("special");
+            Container.BindSignal<SomethingHappenedSignal>("special");
+            Container.BindTrigger<SomethingHappenedSignal.Trigger>("special");
 
-            Binder.Bind<FooSpecial>().ToSingle();
-            Binder.Bind<BarSpecial>().ToSingle();
+            Container.Bind<FooSpecial>().ToSingle();
+            Container.Bind<BarSpecial>().ToSingle();
 
-            var foo = Resolver.Resolve<Foo>();
-            var bar = Resolver.Resolve<Bar>();
+            var foo = Container.Resolve<Foo>();
+            var bar = Container.Resolve<Bar>();
 
-            var fooSpecial = Resolver.Resolve<FooSpecial>();
-            var barSpecial = Resolver.Resolve<BarSpecial>();
+            var fooSpecial = Container.Resolve<FooSpecial>();
+            var barSpecial = Container.Resolve<BarSpecial>();
 
             bar.Initialize();
             barSpecial.Initialize();

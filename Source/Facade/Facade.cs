@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using ModestTree;
 
 // Ignore the fact that _initialObjects is not used
 #pragma warning disable 414
@@ -27,11 +28,15 @@ namespace Zenject
         // NOTE!  This method must be called explicitly when creating facades through factories
         public virtual void Initialize()
         {
+            Log.Debug("Facade: Initializing IInitializable's");
+
             _initializableManager.Initialize();
         }
 
         public virtual void Dispose()
         {
+            Log.Debug("Facade: Disposing IDisposable's");
+
             _disposablesManager.Dispose();
         }
 

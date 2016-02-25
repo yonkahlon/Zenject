@@ -9,11 +9,11 @@ namespace ModestTree
         [InstallerTest]
         public void Test1()
         {
-            Binder.Bind<FooMono1>().ToTransientPrefabResource("FooMono1");
-            Binder.Bind<FooMono1>().ToTransientPrefabResource("FooMono1");
-            Binder.Bind<FooMono1>().ToTransientPrefabResource("FooMono1");
+            Container.Bind<FooMono1>().ToTransientPrefabResource("FooMono1");
+            Container.Bind<FooMono1>().ToTransientPrefabResource("FooMono1");
+            Container.Bind<FooMono1>().ToTransientPrefabResource("FooMono1");
 
-            Binder.BindAllInterfacesToSingle<Runner1>();
+            Container.BindAllInterfaces<Runner1>().ToSingle<Runner1>();
         }
 
         public class Runner1 : IInitializable

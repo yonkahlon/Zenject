@@ -15,7 +15,7 @@ namespace ModestTree
 
     public abstract class MonoInstallerTestFixture : MonoBehaviour
     {
-        protected IBinder Binder
+        protected DiContainer Container
         {
             get;
             private set;
@@ -48,8 +48,24 @@ namespace ModestTree
             {
                 wrapper.InstallCallback = () =>
                 {
-                    Binder = wrapper.GetBinder();
+                    Container = wrapper.GetContainer();
                     method.Invoke(this, new object[0]);
+
+                    // Might as well validate after install finishes too
+                    Container.IsValidating = true;
+                    try
+                    {
+                        var firstError = Container.ValidateAll().FirstOrDefault();
+
+                        if (firstError != null)
+                        {
+                            throw firstError;
+                        }
+                    }
+                    finally
+                    {
+                        Container.IsValidating = false;
+                    }
                 };
 
                 var settings = new SceneCompositionRoot.StaticSettings()
@@ -91,9 +107,9 @@ namespace ModestTree
         {
             public Action InstallCallback;
 
-            public IBinder GetBinder()
+            public DiContainer GetContainer()
             {
-                return Binder;
+                return Container;
             }
 
             public override void InstallBindings()
