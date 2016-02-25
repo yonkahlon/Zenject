@@ -36,57 +36,57 @@ namespace Zenject.Tests
         [Test]
         public void TestFieldRequired()
         {
-            Binder.Bind<Test2>().ToSingle();
+            Container.Bind<Test2>().ToSingle();
 
-            Assert.That(Resolver.ValidateResolve<Test2>().Any());
+            Assert.That(Container.ValidateResolve<Test2>().Any());
 
             AssertValidationFails();
 
             Assert.Throws<ZenjectResolveException>(
-                delegate { Resolver.Resolve<Test2>(); });
+                delegate { Container.Resolve<Test2>(); });
         }
 
         [Test]
         public void TestFieldOptional()
         {
-            Binder.Bind<Test3>().ToSingle();
+            Container.Bind<Test3>().ToSingle();
 
             AssertValidates();
 
-            Assert.That(Resolver.ValidateResolve<Test3>().IsEmpty());
-            var test = Resolver.Resolve<Test3>();
+            Assert.That(Container.ValidateResolve<Test3>().IsEmpty());
+            var test = Container.Resolve<Test3>();
             Assert.That(test.val1 == null);
         }
 
         [Test]
         public void TestFieldOptional2()
         {
-            Binder.Bind<Test3>().ToSingle();
+            Container.Bind<Test3>().ToSingle();
 
             var test1 = new Test1();
-            Binder.Bind<Test1>().ToInstance(test1);
+            Container.Bind<Test1>().ToInstance(test1);
 
             AssertValidates();
 
-            Assert.That(Resolver.ValidateResolve<Test3>().IsEmpty());
-            Assert.IsEqual(Resolver.Resolve<Test3>().val1, test1);
+            Assert.That(Container.ValidateResolve<Test3>().IsEmpty());
+            Assert.IsEqual(Container.Resolve<Test3>().val1, test1);
         }
 
         [Test]
         public void TestFieldOptional3()
         {
-            Binder.Bind<Test0>().ToTransient();
+            Container.Bind<Test0>().ToTransient();
 
             AssertValidates();
 
             // Should not redefine the hard coded value in this case
-            Assert.IsEqual(Resolver.Resolve<Test0>().Val1, 5);
+            Assert.IsEqual(Container.Resolve<Test0>().Val1, 5);
 
-            Binder.Bind<int>().ToInstance(3);
+            Container.Bind<int>().ToInstance(3);
 
             AssertValidates();
 
-            Assert.IsEqual(Resolver.Resolve<Test0>().Val1, 3);
+            Assert.IsEqual(Container.Resolve<Test0>().Val1, 3);
         }
 
         class Test4
@@ -111,25 +111,25 @@ namespace Zenject.Tests
         [Test]
         public void TestParameterRequired()
         {
-            Binder.Bind<Test4>().ToSingle();
+            Container.Bind<Test4>().ToSingle();
 
             AssertValidationFails();
 
             Assert.Throws<ZenjectResolveException>(
-                delegate { Resolver.Resolve<Test4>(); });
+                delegate { Container.Resolve<Test4>(); });
 
-            Assert.That(Resolver.ValidateResolve<Test2>().Any());
+            Assert.That(Container.ValidateResolve<Test2>().Any());
         }
 
         [Test]
         public void TestParameterOptional()
         {
-            Binder.Bind<Test5>().ToSingle();
+            Container.Bind<Test5>().ToSingle();
 
             AssertValidates();
 
-            Assert.That(Resolver.ValidateResolve<Test5>().IsEmpty());
-            var test = Resolver.Resolve<Test5>();
+            Assert.That(Container.ValidateResolve<Test5>().IsEmpty());
+            var test = Container.Resolve<Test5>();
             Assert.That(test.Val1 == null);
         }
 
@@ -143,15 +143,15 @@ namespace Zenject.Tests
         [Test]
         public void TestChildDependencyOptional()
         {
-            Binder.Bind<Test6>().ToSingle();
-            Binder.Bind<Test2>().ToSingle();
+            Container.Bind<Test6>().ToSingle();
+            Container.Bind<Test2>().ToSingle();
 
-            Assert.That(Resolver.ValidateResolve<Test6>().Any());
+            Assert.That(Container.ValidateResolve<Test6>().Any());
 
             AssertValidationFails();
 
             Assert.Throws<ZenjectResolveException>(
-                delegate { Resolver.Resolve<Test6>(); });
+                delegate { Container.Resolve<Test6>(); });
         }
 
         class Test7
@@ -169,13 +169,13 @@ namespace Zenject.Tests
         [Test]
         public void TestPrimitiveParamOptionalUsesDefault()
         {
-            Binder.Bind<Test7>().ToSingle();
+            Container.Bind<Test7>().ToSingle();
 
-            Assert.That(Resolver.ValidateResolve<Test7>().IsEmpty());
+            Assert.That(Container.ValidateResolve<Test7>().IsEmpty());
 
             AssertValidates();
 
-            Assert.IsEqual(Resolver.Resolve<Test7>().Val1, 0);
+            Assert.IsEqual(Container.Resolve<Test7>().Val1, 0);
         }
 
         class Test8
@@ -193,12 +193,12 @@ namespace Zenject.Tests
         [Test]
         public void TestPrimitiveParamOptionalUsesExplicitDefault()
         {
-            Binder.Bind<Test8>().ToSingle();
+            Container.Bind<Test8>().ToSingle();
 
             AssertValidates();
 
-            Assert.That(Resolver.ValidateResolve<Test8>().IsEmpty());
-            Assert.IsEqual(Resolver.Resolve<Test8>().Val1, 5);
+            Assert.That(Container.ValidateResolve<Test8>().IsEmpty());
+            Assert.IsEqual(Container.Resolve<Test8>().Val1, 5);
         }
 
         class Test8_2
@@ -214,12 +214,12 @@ namespace Zenject.Tests
         [Test]
         public void TestPrimitiveParamOptionalUsesExplicitDefault2()
         {
-            Binder.Bind<Test8_2>().ToSingle();
+            Container.Bind<Test8_2>().ToSingle();
 
             AssertValidates();
 
-            Assert.That(Resolver.ValidateResolve<Test8_2>().IsEmpty());
-            Assert.IsEqual(Resolver.Resolve<Test8_2>().Val1, 5);
+            Assert.That(Container.ValidateResolve<Test8_2>().IsEmpty());
+            Assert.IsEqual(Container.Resolve<Test8_2>().Val1, 5);
         }
 
         class Test9
@@ -237,13 +237,13 @@ namespace Zenject.Tests
         [Test]
         public void TestPrimitiveParamOptionalNullable()
         {
-            Binder.Bind<Test9>().ToSingle();
+            Container.Bind<Test9>().ToSingle();
 
             AssertValidates();
 
-            Assert.That(Resolver.ValidateResolve<Test9>().IsEmpty());
+            Assert.That(Container.ValidateResolve<Test9>().IsEmpty());
 
-            Assert.That(!Resolver.Resolve<Test9>().Val1.HasValue);
+            Assert.That(!Container.Resolve<Test9>().Val1.HasValue);
         }
     }
 }

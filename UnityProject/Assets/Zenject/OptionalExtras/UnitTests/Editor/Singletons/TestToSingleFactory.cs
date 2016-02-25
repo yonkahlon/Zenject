@@ -22,22 +22,22 @@ namespace Zenject.Tests
         [Test]
         public void TestCase1()
         {
-            Binder.Bind<Foo>().ToSingleFactory<FooFactory>();
-            Binder.Bind<IFoo>().ToSingleFactory<FooFactory, Foo>();
+            Container.Bind<Foo>().ToSingleFactory<FooFactory>();
+            Container.Bind<IFoo>().ToSingleFactory<FooFactory, Foo>();
 
             FooFactory.WasCalled = false;
 
             AssertValidates();
 
-            var foo = Resolver.Resolve<Foo>();
+            var foo = Container.Resolve<Foo>();
             Assert.That(FooFactory.WasCalled);
 
             FooFactory.WasCalled = false;
-            var ifoo = Resolver.Resolve<IFoo>();
+            var ifoo = Container.Resolve<IFoo>();
 
             Assert.That(!FooFactory.WasCalled);
 
-            var foo2 = Resolver.Resolve<Foo>();
+            var foo2 = Container.Resolve<Foo>();
 
             Assert.That(!FooFactory.WasCalled);
 
@@ -50,8 +50,8 @@ namespace Zenject.Tests
         public void TestCase2()
         {
             // Cannot bind different singleton providers
-            Binder.Bind<Foo>().ToSingleFactory<FooFactory>();
-            Binder.Bind<Foo>().ToSingle();
+            Container.Bind<Foo>().ToSingleFactory<FooFactory>();
+            Container.Bind<Foo>().ToSingle();
         }
 
         class FooFactory : IFactory<Foo>

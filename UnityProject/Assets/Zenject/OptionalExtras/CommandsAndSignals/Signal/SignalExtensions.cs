@@ -9,25 +9,25 @@ namespace Zenject.Commands
 {
     public static class SignalExtensions
     {
-        public static BindingConditionSetter BindSignal<TSignal>(this IBinder binder)
+        public static BindingConditionSetter BindSignal<TSignal>(this DiContainer container)
             where TSignal : ISignal
         {
-            return binder.BindSignal<TSignal>(null);
+            return container.BindSignal<TSignal>(null);
         }
 
-        public static BindingConditionSetter BindSignal<TSignal>(this IBinder binder, string identifier)
+        public static BindingConditionSetter BindSignal<TSignal>(this DiContainer container, string identifier)
             where TSignal : ISignal
         {
-            return binder.Bind<TSignal>(identifier).ToSingle(identifier);
+            return container.Bind<TSignal>(identifier).ToSingle(identifier);
         }
 
-        public static BindingConditionSetter BindTrigger<TTrigger>(this IBinder binder)
+        public static BindingConditionSetter BindTrigger<TTrigger>(this DiContainer container)
             where TTrigger : ITrigger
         {
-            return binder.BindTrigger<TTrigger>(null);
+            return container.BindTrigger<TTrigger>(null);
         }
 
-        public static BindingConditionSetter BindTrigger<TTrigger>(this IBinder binder, string identifier)
+        public static BindingConditionSetter BindTrigger<TTrigger>(this DiContainer container, string identifier)
             where TTrigger : ITrigger
         {
             Type concreteSignalType = typeof(TTrigger).DeclaringType;
@@ -35,11 +35,11 @@ namespace Zenject.Commands
             Assert.IsNotNull(concreteSignalType);
             Assert.That(concreteSignalType.DerivesFrom<ISignal>());
 
-            binder.Bind(concreteSignalType.BaseType)
+            container.Bind(concreteSignalType.BaseType)
                 .ToSingle(concreteSignalType, identifier)
                 .When(ctx => ctx.ObjectType != null && ctx.ObjectType.DerivesFromOrEqual<TTrigger>() && ctx.ConcreteIdentifier == identifier);
 
-            return binder.Bind<TTrigger>(identifier).ToSingle(identifier);
+            return container.Bind<TTrigger>(identifier).ToSingle(identifier);
         }
     }
 }

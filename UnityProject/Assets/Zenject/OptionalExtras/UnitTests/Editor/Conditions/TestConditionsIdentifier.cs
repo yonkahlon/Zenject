@@ -33,63 +33,63 @@ namespace Zenject.Tests
         [Test]
         public void TestUnspecifiedNameConstructorInjection()
         {
-            Binder.Bind<Test1>().ToTransient();
-            Binder.Bind<Test0>().ToTransient();
+            Container.Bind<Test1>().ToTransient();
+            Container.Bind<Test0>().ToTransient();
 
             AssertValidationFails();
 
             Assert.Throws<ZenjectResolveException>(
-                delegate { Resolver.Resolve<Test1>(); });
+                delegate { Container.Resolve<Test1>(); });
 
-            Assert.That(Resolver.ValidateResolve<Test1>().Any());
+            Assert.That(Container.ValidateResolve<Test1>().Any());
         }
 
         [Test]
         public void TestUnspecifiedNameFieldInjection()
         {
-            Binder.Bind<Test1>().ToTransient();
-            Binder.Bind<Test2>().ToTransient();
+            Container.Bind<Test1>().ToTransient();
+            Container.Bind<Test2>().ToTransient();
 
-            Binder.Bind<Test0>().ToTransient();
+            Container.Bind<Test0>().ToTransient();
 
             AssertValidationFails();
 
             Assert.Throws<ZenjectResolveException>(
-                delegate { Resolver.Resolve<Test2>(); });
+                delegate { Container.Resolve<Test2>(); });
 
-            Assert.That(Resolver.ValidateResolve<Test2>().Any());
+            Assert.That(Container.ValidateResolve<Test2>().Any());
         }
 
         [Test]
         public void TestSuccessConstructorInjectionString()
         {
-            Binder.Bind<Test1>().ToTransient();
-            Binder.Bind<Test2>().ToTransient();
+            Container.Bind<Test1>().ToTransient();
+            Container.Bind<Test2>().ToTransient();
 
-            Binder.Bind<Test0>().ToInstance(new Test0());
-            Binder.Bind<Test0>("foo").ToInstance(new Test0());
+            Container.Bind<Test0>().ToInstance(new Test0());
+            Container.Bind<Test0>("foo").ToInstance(new Test0());
 
             AssertValidates();
 
             // Should not throw exceptions
-            Resolver.Resolve<Test1>();
+            Container.Resolve<Test1>();
 
-            Assert.IsNotNull(Resolver.Resolve<Test1>());
+            Assert.IsNotNull(Container.Resolve<Test1>());
         }
 
         [Test]
         public void TestSuccessFieldInjectionString()
         {
-            Binder.Bind<Test1>().ToTransient();
-            Binder.Bind<Test2>().ToTransient();
+            Container.Bind<Test1>().ToTransient();
+            Container.Bind<Test2>().ToTransient();
 
-            Binder.Bind<Test0>().ToInstance(new Test0());
-            Binder.Bind<Test0>("foo").ToInstance(new Test0());
+            Container.Bind<Test0>().ToInstance(new Test0());
+            Container.Bind<Test0>("foo").ToInstance(new Test0());
 
             AssertValidates();
 
-            Assert.That(Resolver.ValidateResolve<Test2>().IsEmpty());
-            Assert.IsNotNull(Resolver.Resolve<Test2>());
+            Assert.That(Container.ValidateResolve<Test2>().IsEmpty());
+            Assert.IsNotNull(Container.Resolve<Test2>());
         }
 
         class Test3
@@ -109,67 +109,67 @@ namespace Zenject.Tests
         [Test]
         public void TestFailConstructorInjectionEnum()
         {
-            Binder.Bind<Test1>().ToTransient();
-            Binder.Bind<Test2>().ToTransient();
-            Binder.Bind<Test3>().ToTransient();
+            Container.Bind<Test1>().ToTransient();
+            Container.Bind<Test2>().ToTransient();
+            Container.Bind<Test3>().ToTransient();
 
-            Binder.Bind<Test0>().ToInstance(new Test0());
-            Binder.Bind<Test0>("TestValue1").ToInstance(new Test0());
+            Container.Bind<Test0>().ToInstance(new Test0());
+            Container.Bind<Test0>("TestValue1").ToInstance(new Test0());
 
             AssertValidationFails();
 
             Assert.Throws<ZenjectResolveException>(
-                delegate { Resolver.Resolve<Test3>(); });
+                delegate { Container.Resolve<Test3>(); });
 
-            Assert.That(Resolver.ValidateResolve<Test1>().Any());
+            Assert.That(Container.ValidateResolve<Test1>().Any());
         }
 
         [Test]
         public void TestSuccessConstructorInjectionEnum()
         {
-            Binder.Bind<Test3>().ToTransient();
+            Container.Bind<Test3>().ToTransient();
 
-            Binder.Bind<Test0>().ToInstance(new Test0());
-            Binder.Bind<Test0>("TestValue2").ToInstance(new Test0());
+            Container.Bind<Test0>().ToInstance(new Test0());
+            Container.Bind<Test0>("TestValue2").ToInstance(new Test0());
 
             AssertValidates();
 
             // No exceptions
-            Resolver.Resolve<Test3>();
+            Container.Resolve<Test3>();
 
-            Assert.IsNotNull(Resolver.Resolve<Test3>());
+            Assert.IsNotNull(Container.Resolve<Test3>());
         }
 
         [Test]
         public void TestFailFieldInjectionEnum()
         {
-            Binder.Bind<Test1>().ToTransient();
-            Binder.Bind<Test2>().ToTransient();
-            Binder.Bind<Test3>().ToTransient();
+            Container.Bind<Test1>().ToTransient();
+            Container.Bind<Test2>().ToTransient();
+            Container.Bind<Test3>().ToTransient();
 
-            Binder.Bind<Test0>().ToInstance(new Test0());
-            Binder.Bind<Test0>("TestValue1").ToInstance(new Test0());
+            Container.Bind<Test0>().ToInstance(new Test0());
+            Container.Bind<Test0>("TestValue1").ToInstance(new Test0());
 
             AssertValidationFails();
 
             Assert.Throws<ZenjectResolveException>(
-                delegate { Resolver.Resolve<Test3>(); });
+                delegate { Container.Resolve<Test3>(); });
 
-            Assert.That(Resolver.ValidateResolve<Test3>().Any());
+            Assert.That(Container.ValidateResolve<Test3>().Any());
         }
 
         [Test]
         public void TestSuccessFieldInjectionEnum()
         {
-            Binder.Bind<Test4>().ToTransient();
+            Container.Bind<Test4>().ToTransient();
 
-            Binder.Bind<Test0>().ToInstance(new Test0());
-            Binder.Bind<Test0>("TestValue3").ToInstance(new Test0());
+            Container.Bind<Test0>().ToInstance(new Test0());
+            Container.Bind<Test0>("TestValue3").ToInstance(new Test0());
 
             AssertValidates();
 
-            Assert.That(Resolver.ValidateResolve<Test4>().IsEmpty());
-            Assert.IsNotNull(Resolver.Resolve<Test4>());
+            Assert.That(Container.ValidateResolve<Test4>().IsEmpty());
+            Assert.IsNotNull(Container.Resolve<Test4>());
         }
     }
 }

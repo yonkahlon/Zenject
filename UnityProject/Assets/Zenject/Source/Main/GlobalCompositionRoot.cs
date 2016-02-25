@@ -98,10 +98,10 @@ namespace Zenject
 
             _container = new DiContainer(false);
 
-            InstallBindings(_container.Binder);
-            InjectComponents(_container.Resolver);
+            InstallBindings(_container);
+            InjectComponents(_container);
 
-            _dependencyRoot = _container.Resolver.Resolve<IDependencyRoot>();
+            _dependencyRoot = _container.Resolve<IDependencyRoot>();
         }
 
         public override IEnumerable<GameObject> GetRootGameObjects()
@@ -109,18 +109,18 @@ namespace Zenject
             return UnityUtil.GetDirectChildrenAndSelf(this.gameObject);
         }
 
-        // We pass in the binder here instead of using our own for validation to work
-        public override void InstallBindings(IBinder binder)
+        // We pass in the container here instead of using our own for validation to work
+        public void InstallBindings(DiContainer container)
         {
-            binder.Bind<CompositionRoot>().ToInstance(this);
-            binder.Bind<IDependencyRoot>().ToSingleMonoBehaviour<GlobalFacade>(this.gameObject);
+            container.Bind<CompositionRoot>().ToInstance(this);
+            container.Bind<IDependencyRoot>().ToSingleMonoBehaviour<GlobalFacade>(this.gameObject);
 
-            binder.Bind<Transform>(DiContainer.DefaultParentId)
+            container.Bind<Transform>(DiContainer.DefaultParentId)
                 .ToInstance<Transform>(this.gameObject.transform);
 
-            InstallSceneBindings(binder);
+            InstallSceneBindings(container);
 
-            InstallInstallers(binder);
+            InstallInstallers(container);
         }
     }
 }

@@ -14,9 +14,9 @@ namespace ModestTree
             _gameObject = new GameObject();
             _gameObject.transform.SetParent(this.transform, false);
 
-            Binder.BindInstance(this);
-            Binder.Bind<FooMono1>().ToSingleMonoBehaviour<FooMono1>(_gameObject);
-            Binder.Bind<IInitializable>().ToSingle<Runner1>();
+            Container.BindInstance(this);
+            Container.Bind<FooMono1>().ToSingleMonoBehaviour<FooMono1>(_gameObject);
+            Container.Bind<IInitializable>().ToSingle<Runner1>();
         }
 
         public class Runner1 : IInitializable
@@ -38,10 +38,10 @@ namespace ModestTree
             _gameObject = new GameObject();
             _gameObject.transform.SetParent(this.transform, false);
 
-            Binder.BindInstance(this);
-            Binder.Bind<FooMono1>().ToSingleMonoBehaviour(_gameObject);
-            Binder.Bind<IInitializable>().ToSingleMonoBehaviour<FooMono1>(_gameObject);
-            Binder.Bind<IInitializable>().ToSingle<Runner1>();
+            Container.BindInstance(this);
+            Container.Bind<FooMono1>().ToSingleMonoBehaviour(_gameObject);
+            Container.Bind<IInitializable>().ToSingleMonoBehaviour<FooMono1>(_gameObject);
+            Container.Bind<IInitializable>().ToSingle<Runner1>();
         }
 
         [InstallerTest]
@@ -53,9 +53,9 @@ namespace ModestTree
             var gameObject2 = new GameObject();
             gameObject2.transform.SetParent(this.transform, false);
 
-            Binder.BindInstance(this);
-            Binder.Bind<FooMono1>().ToSingleMonoBehaviour(_gameObject);
-            Assert.Throws<ZenjectBindException>(() => Binder.Bind<IInitializable>().ToSingleMonoBehaviour<FooMono1>(gameObject2));
+            Container.BindInstance(this);
+            Container.Bind<FooMono1>().ToSingleMonoBehaviour(_gameObject);
+            Assert.Throws<ZenjectBindException>(() => Container.Bind<IInitializable>().ToSingleMonoBehaviour<FooMono1>(gameObject2));
         }
     }
 }

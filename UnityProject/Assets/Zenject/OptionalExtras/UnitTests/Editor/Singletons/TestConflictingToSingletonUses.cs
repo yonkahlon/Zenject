@@ -15,49 +15,49 @@ namespace Zenject.Tests
         [Test]
         public void TestToSingleMethod1()
         {
-            Binder.Bind<Foo>().ToSingle();
+            Container.Bind<Foo>().ToSingle();
 
-            Assert.Throws<ZenjectBindException>(() => Binder.Bind<Foo>().ToSingleMethod((container) => new Foo()));
-            Assert.Throws<ZenjectBindException>(() => Binder.Bind<Foo>().ToSingleInstance(new Foo()));
-            Assert.Throws<ZenjectBindException>(() => Binder.Bind<Foo>().ToSingleFactory<FooFactory>());
-            Assert.Throws<ZenjectBindException>(() => Binder.Bind<Foo>().ToInstance(new Foo()));
-            Assert.Throws<ZenjectBindException>(() => Binder.Bind<Foo>().ToTransient());
+            Assert.Throws<ZenjectBindException>(() => Container.Bind<Foo>().ToSingleMethod((container) => new Foo()));
+            Assert.Throws<ZenjectBindException>(() => Container.Bind<Foo>().ToSingleInstance(new Foo()));
+            Assert.Throws<ZenjectBindException>(() => Container.Bind<Foo>().ToSingleFactory<FooFactory>());
+            Assert.Throws<ZenjectBindException>(() => Container.Bind<Foo>().ToInstance(new Foo()));
+            Assert.Throws<ZenjectBindException>(() => Container.Bind<Foo>().ToTransient());
         }
 
         [Test]
         public void TestToSingleMethod()
         {
-            Binder.Bind<Foo>().ToSingleMethod((container) => new Foo());
+            Container.Bind<Foo>().ToSingleMethod((container) => new Foo());
 
-            Assert.Throws<ZenjectBindException>(() => Binder.Bind<Foo>().ToSingle());
-            Assert.Throws<ZenjectBindException>(() => Binder.Bind<Foo>().ToSingleInstance(new Foo()));
-            Assert.Throws<ZenjectBindException>(() => Binder.Bind<Foo>().ToSingleFactory<FooFactory>());
-            Assert.Throws<ZenjectBindException>(() => Binder.Bind<Foo>().ToInstance(new Foo()));
-            Assert.Throws<ZenjectBindException>(() => Binder.Bind<Foo>().ToTransient());
+            Assert.Throws<ZenjectBindException>(() => Container.Bind<Foo>().ToSingle());
+            Assert.Throws<ZenjectBindException>(() => Container.Bind<Foo>().ToSingleInstance(new Foo()));
+            Assert.Throws<ZenjectBindException>(() => Container.Bind<Foo>().ToSingleFactory<FooFactory>());
+            Assert.Throws<ZenjectBindException>(() => Container.Bind<Foo>().ToInstance(new Foo()));
+            Assert.Throws<ZenjectBindException>(() => Container.Bind<Foo>().ToTransient());
         }
 
         [Test]
         public void TestToSingleInstance()
         {
-            Binder.Bind<Foo>().ToSingleInstance(new Foo());
+            Container.Bind<Foo>().ToSingleInstance(new Foo());
 
-            Assert.Throws<ZenjectBindException>(() => Binder.Bind<Foo>().ToSingle());
-            Assert.Throws<ZenjectBindException>(() => Binder.Bind<Foo>().ToSingleMethod((container) => new Foo()));
-            Assert.Throws<ZenjectBindException>(() => Binder.Bind<Foo>().ToSingleFactory<FooFactory>());
-            Assert.Throws<ZenjectBindException>(() => Binder.Bind<Foo>().ToInstance(new Foo()));
-            Assert.Throws<ZenjectBindException>(() => Binder.Bind<Foo>().ToTransient());
+            Assert.Throws<ZenjectBindException>(() => Container.Bind<Foo>().ToSingle());
+            Assert.Throws<ZenjectBindException>(() => Container.Bind<Foo>().ToSingleMethod((container) => new Foo()));
+            Assert.Throws<ZenjectBindException>(() => Container.Bind<Foo>().ToSingleFactory<FooFactory>());
+            Assert.Throws<ZenjectBindException>(() => Container.Bind<Foo>().ToInstance(new Foo()));
+            Assert.Throws<ZenjectBindException>(() => Container.Bind<Foo>().ToTransient());
         }
 
         [Test]
         public void TestToSingleFactory()
         {
-            Binder.Bind<Foo>().ToSingleFactory<FooFactory>();
+            Container.Bind<Foo>().ToSingleFactory<FooFactory>();
 
-            Assert.Throws<ZenjectBindException>(() => Binder.Bind<Foo>().ToSingle());
-            Assert.Throws<ZenjectBindException>(() => Binder.Bind<Foo>().ToSingleMethod((container) => new Foo()));
-            Assert.Throws<ZenjectBindException>(() => Binder.Bind<Foo>().ToSingleInstance(new Foo()));
-            Assert.Throws<ZenjectBindException>(() => Binder.Bind<Foo>().ToInstance(new Foo()));
-            Assert.Throws<ZenjectBindException>(() => Binder.Bind<Foo>().ToTransient());
+            Assert.Throws<ZenjectBindException>(() => Container.Bind<Foo>().ToSingle());
+            Assert.Throws<ZenjectBindException>(() => Container.Bind<Foo>().ToSingleMethod((container) => new Foo()));
+            Assert.Throws<ZenjectBindException>(() => Container.Bind<Foo>().ToSingleInstance(new Foo()));
+            Assert.Throws<ZenjectBindException>(() => Container.Bind<Foo>().ToInstance(new Foo()));
+            Assert.Throws<ZenjectBindException>(() => Container.Bind<Foo>().ToTransient());
         }
 
         class Bar

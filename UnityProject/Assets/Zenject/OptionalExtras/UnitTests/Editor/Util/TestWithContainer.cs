@@ -22,30 +22,6 @@ namespace Zenject.Tests
             }
         }
 
-        protected IBinder Binder
-        {
-            get
-            {
-                return _container.Binder;
-            }
-        }
-
-        protected IResolver Resolver
-        {
-            get
-            {
-                return _container.Resolver;
-            }
-        }
-
-        protected IInstantiator Instantiator
-        {
-            get
-            {
-                return _container.Instantiator;
-            }
-        }
-
         [SetUp]
         public virtual void Setup()
         {
@@ -53,18 +29,20 @@ namespace Zenject.Tests
             InstallBindings();
 
             AssertValidates();
-            _container.Resolver.Inject(this);
+            _container.Inject(this);
         }
 
         protected void AssertValidationFails()
         {
-            Assert.That(Resolver.ValidateAll().HasMoreThan(0),
+            Assert.That(Container.ValidateAll().HasMoreThan(0),
                 "Expected validation to fail but it succeeded");
         }
 
         protected void AssertValidates()
         {
-            var error = Resolver.ValidateAll().FirstOrDefault();
+            _container.IsValidating = true;
+            var error = Container.ValidateAll().FirstOrDefault();
+            _container.IsValidating = false;
 
             if (error != null)
             {

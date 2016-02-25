@@ -58,7 +58,7 @@ namespace Zenject
 
                 _component = gameObj.AddComponent(_id.ConcreteType);
 
-                _container.Resolver.Inject(_component, new object[0], true, context);
+                _container.Inject(_component, new object[0], true, context);
             }
 
             Assert.IsNotNull(_component);
@@ -71,7 +71,7 @@ namespace Zenject
             // since for singletons, the container they are accessed from should not determine
             // the container they are instantiated with
             // Transients can do that but not singletons
-            foreach (var err in _container.Resolver.ValidateObjectGraph(_id.ConcreteType, context))
+            foreach (var err in _container.ValidateObjectGraph(_id.ConcreteType, context))
             {
                 yield return err;
             }

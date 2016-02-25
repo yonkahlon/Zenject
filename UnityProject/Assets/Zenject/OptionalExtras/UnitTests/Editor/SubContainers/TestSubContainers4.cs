@@ -18,11 +18,11 @@ namespace Zenject.Tests
         {
             SetupContainer();
 
-            var view1 = Resolver.Resolve<RotorView>();
+            var view1 = Container.Resolve<RotorView>();
 
             Assert.IsEqual(view1.Controller.Model, view1.Model);
 
-            var view2 = Resolver.Resolve<RotorView>();
+            var view2 = Container.Resolve<RotorView>();
 
             Assert.IsEqual(view2.Controller.Model, view2.Model);
 
@@ -32,13 +32,13 @@ namespace Zenject.Tests
 
         void SetupContainer()
         {
-            Binder.Bind<RotorController>().ToMethod(SubContainerResolve<RotorController>)
+            Container.Bind<RotorController>().ToMethod(SubContainerResolve<RotorController>)
                 .WhenInjectedInto<RotorView>();
 
-            Binder.Bind<RotorModel>().ToMethod(SubContainerResolve<RotorModel>)
+            Container.Bind<RotorModel>().ToMethod(SubContainerResolve<RotorModel>)
                 .WhenInjectedInto<RotorView>();
 
-            Binder.Bind<RotorView>().ToTransient();
+            Container.Bind<RotorView>().ToTransient();
         }
 
         T SubContainerResolve<T>(InjectContext context)
@@ -54,13 +54,13 @@ namespace Zenject.Tests
                 InstallViewBindings(subContainer);
             }
 
-            return (T)subContainer.Resolver.Resolve(context);
+            return (T)subContainer.Resolve(context);
         }
 
         void InstallViewBindings(DiContainer subContainer)
         {
-            subContainer.Binder.Bind<RotorController>().ToSingle();
-            subContainer.Binder.Bind<RotorModel>().ToSingle();
+            subContainer.Bind<RotorController>().ToSingle();
+            subContainer.Bind<RotorModel>().ToSingle();
         }
 
         public class RotorController

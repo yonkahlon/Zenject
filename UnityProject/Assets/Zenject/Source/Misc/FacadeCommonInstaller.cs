@@ -11,9 +11,9 @@ namespace Zenject
     {
         public override void InstallBindings()
         {
-            Binder.Bind<TickableManager>().ToSingle();
-            Binder.Bind<InitializableManager>().ToSingle();
-            Binder.Bind<DisposableManager>().ToSingle();
+            Container.Bind<TickableManager>().ToSingle();
+            Container.Bind<InitializableManager>().ToSingle();
+            Container.Bind<DisposableManager>().ToSingle();
         }
     }
 }

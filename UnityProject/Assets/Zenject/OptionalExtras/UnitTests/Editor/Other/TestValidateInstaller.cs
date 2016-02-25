@@ -15,56 +15,56 @@ namespace Zenject.Tests
         [Test]
         public void TestBasicSuccess()
         {
-            Binder.Bind<IFoo>().ToSingle<Foo>();
-            Binder.Bind<Bar>().ToSingle();
+            Container.Bind<IFoo>().ToSingle<Foo>();
+            Container.Bind<Bar>().ToSingle();
 
-            Assert.That(Resolver.ValidateResolve<IFoo>().IsEmpty());
+            Assert.That(Container.ValidateResolve<IFoo>().IsEmpty());
         }
 
         [Test]
         public void TestBasicFailure()
         {
-            Binder.Bind<IFoo>().ToSingle<Foo>();
+            Container.Bind<IFoo>().ToSingle<Foo>();
             //Container.Bind<Bar>().ToSingle();
 
-            Assert.That(!Resolver.ValidateResolve<IFoo>().IsEmpty());
+            Assert.That(!Container.ValidateResolve<IFoo>().IsEmpty());
         }
 
         [Test]
         public void TestList()
         {
-            Binder.Bind<IFoo>().ToSingle<Foo>();
-            Binder.Bind<IFoo>().ToSingle<Foo2>();
+            Container.Bind<IFoo>().ToSingle<Foo>();
+            Container.Bind<IFoo>().ToSingle<Foo2>();
 
-            Binder.Bind<Bar>().ToSingle();
+            Container.Bind<Bar>().ToSingle();
 
-            Binder.Bind<Qux>().ToSingle();
+            Container.Bind<Qux>().ToSingle();
 
-            Assert.That(Resolver.ValidateResolve<Qux>().IsEmpty());
+            Assert.That(Container.ValidateResolve<Qux>().IsEmpty());
         }
 
         [Test]
         public void TestValidateDynamicSuccess()
         {
-            Binder.Bind<Foo>().ToSingle();
+            Container.Bind<Foo>().ToSingle();
 
-            Assert.That(Resolver.ValidateObjectGraph<Foo>(typeof(Bar)).IsEmpty());
+            Assert.That(Container.ValidateObjectGraph<Foo>(typeof(Bar)).IsEmpty());
         }
 
         [Test]
         public void TestValidateDynamicFailure()
         {
-            Binder.Bind<Foo>().ToSingle();
+            Container.Bind<Foo>().ToSingle();
 
-            Assert.That(!Resolver.ValidateObjectGraph<Foo>().IsEmpty());
+            Assert.That(!Container.ValidateObjectGraph<Foo>().IsEmpty());
         }
 
         [Test]
         public void TestValidateDynamicFailure2()
         {
-            Binder.Bind<Foo>().ToSingle();
+            Container.Bind<Foo>().ToSingle();
 
-            Assert.That(!Resolver.ValidateObjectGraph<Foo>(typeof(Bar), typeof(string)).IsEmpty());
+            Assert.That(!Container.ValidateObjectGraph<Foo>(typeof(Bar), typeof(string)).IsEmpty());
         }
 
         [Test]
@@ -73,11 +73,11 @@ namespace Zenject.Tests
             var nestedContainer = new DiContainer(Container);
 
             // Should fail without Bar<> bound
-            Assert.That(!nestedContainer.Resolver.ValidateObjectGraph<Foo>().IsEmpty());
+            Assert.That(!nestedContainer.ValidateObjectGraph<Foo>().IsEmpty());
 
-            Binder.Bind<Bar>().ToSingle();
+            Container.Bind<Bar>().ToSingle();
 
-            Assert.That(nestedContainer.Resolver.ValidateObjectGraph<Foo>().IsEmpty());
+            Assert.That(nestedContainer.ValidateObjectGraph<Foo>().IsEmpty());
         }
 
         [Test]
@@ -85,22 +85,22 @@ namespace Zenject.Tests
         {
             var nestedContainer = new DiContainer(Container);
 
-            Binder.Bind<IFoo>().ToSingle<Foo>();
-            Binder.Bind<IFoo>().ToSingle<Foo2>();
+            Container.Bind<IFoo>().ToSingle<Foo>();
+            Container.Bind<IFoo>().ToSingle<Foo2>();
 
-            Assert.That(!Resolver.ValidateResolve<List<IFoo>>().IsEmpty());
-            Assert.That(!nestedContainer.Resolver.ValidateResolve<List<IFoo>>().IsEmpty());
+            Assert.That(!Container.ValidateResolve<List<IFoo>>().IsEmpty());
+            Assert.That(!nestedContainer.ValidateResolve<List<IFoo>>().IsEmpty());
 
-            Binder.Bind<Bar>().ToSingle();
+            Container.Bind<Bar>().ToSingle();
 
             AssertValidates();
 
-            Assert.That(Resolver.ValidateResolve<List<IFoo>>().IsEmpty());
+            Assert.That(Container.ValidateResolve<List<IFoo>>().IsEmpty());
 
             // Should not throw
-            nestedContainer.Resolver.Resolve<List<IFoo>>();
+            nestedContainer.Resolve<List<IFoo>>();
 
-            Assert.That(nestedContainer.Resolver.ValidateResolve<List<IFoo>>().IsEmpty());
+            Assert.That(nestedContainer.ValidateResolve<List<IFoo>>().IsEmpty());
         }
 
         interface IFoo

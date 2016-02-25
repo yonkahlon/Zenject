@@ -22,12 +22,12 @@ namespace Zenject
 
         public override object GetInstance(InjectContext context)
         {
-            return _container.Resolver.Resolve(context);
+            return _container.Resolve(context);
         }
 
         public override IEnumerable<ZenjectResolveException> ValidateBinding(InjectContext context)
         {
-            return _container.Resolver.ValidateResolve(context);
+            return _container.ValidateResolve(context);
         }
     }
 }

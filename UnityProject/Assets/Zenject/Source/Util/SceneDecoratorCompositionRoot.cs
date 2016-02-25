@@ -23,8 +23,8 @@ namespace Zenject
         [SerializeField]
         public MonoInstaller[] PostInstallers;
 
-        Action<IBinder> _beforeInstallHooks;
-        Action<IBinder> _afterInstallHooks;
+        Action<DiContainer> _beforeInstallHooks;
+        Action<DiContainer> _afterInstallHooks;
 
         public void Awake()
         {
@@ -43,33 +43,33 @@ namespace Zenject
                 SceneName, AddPreBindings, AddPostBindings);
         }
 
-        public void AddPreBindings(IBinder binder)
+        public void AddPreBindings(DiContainer container)
         {
             if (_beforeInstallHooks != null)
             {
-                _beforeInstallHooks(binder);
+                _beforeInstallHooks(container);
                 _beforeInstallHooks = null;
             }
 
-            binder.Install(PreInstallers);
+            container.Install(PreInstallers);
 
-            ProcessDecoratorInstallers(binder, true);
+            ProcessDecoratorInstallers(container, true);
         }
 
-        public void AddPostBindings(IBinder binder)
+        public void AddPostBindings(DiContainer container)
         {
-            binder.Install(PostInstallers);
+            container.Install(PostInstallers);
 
-            ProcessDecoratorInstallers(binder, false);
+            ProcessDecoratorInstallers(container, false);
 
             if (_afterInstallHooks != null)
             {
-                _afterInstallHooks(binder);
+                _afterInstallHooks(container);
                 _afterInstallHooks = null;
             }
         }
 
-        void ProcessDecoratorInstallers(IBinder binder, bool isBefore)
+        void ProcessDecoratorInstallers(DiContainer container, bool isBefore)
         {
             if (DecoratorInstallers == null)
             {
@@ -82,7 +82,7 @@ namespace Zenject
 
                 if (installer.enabled)
                 {
-                    binder.Resolver.Inject(installer);
+                    container.Inject(installer);
 
                     if (isBefore)
                     {

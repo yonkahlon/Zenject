@@ -35,13 +35,13 @@ namespace Zenject.Tests
         [Test]
         public void TestCaseBaseClassPropertyInjection()
         {
-            Binder.Bind<Test0>().ToSingle();
-            Binder.Bind<Test2>().ToSingle();
+            Container.Bind<Test0>().ToSingle();
+            Container.Bind<Test2>().ToSingle();
 
             AssertValidates();
 
-            Assert.That(Resolver.ValidateResolve<Test2>().IsEmpty());
-            var test1 = Resolver.Resolve<Test2>();
+            Assert.That(Container.ValidateResolve<Test2>().IsEmpty());
+            var test1 = Container.Resolve<Test2>();
 
             Assert.That(test1.GetVal() != null);
         }

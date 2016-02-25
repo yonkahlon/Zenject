@@ -10,36 +10,55 @@ namespace Zenject
     [System.Diagnostics.DebuggerStepThrough]
     public class BindingConditionSetter
     {
-        readonly ProviderBase _provider;
+        readonly List<ProviderBase> _providers;
+
+        public BindingConditionSetter(List<ProviderBase> providers)
+        {
+            _providers = providers;
+        }
 
         public BindingConditionSetter(ProviderBase provider)
         {
-            _provider = provider;
+            _providers = new List<ProviderBase>()
+            {
+                provider
+            };
+        }
+
+        BindingCondition Condition
+        {
+            set
+            {
+                foreach (var provider in _providers)
+                {
+                    provider.Condition = value;
+                }
+            }
         }
 
         public void When(BindingCondition condition)
         {
-            _provider.Condition = condition;
+            Condition = condition;
         }
 
         public void WhenInjectedIntoInstance(object instance)
         {
-            _provider.Condition = r => ReferenceEquals(r.ObjectInstance, instance);
+            Condition = r => ReferenceEquals(r.ObjectInstance, instance);
         }
 
         public void WhenInjectedInto(params Type[] targets)
         {
-            _provider.Condition = r => targets.Where(x => r.ObjectType != null && r.ObjectType.DerivesFromOrEqual(x)).Any();
+            Condition = r => targets.Where(x => r.ObjectType != null && r.ObjectType.DerivesFromOrEqual(x)).Any();
         }
 
         public void WhenInjectedInto<T>()
         {
-            _provider.Condition = r => r.ObjectType != null && r.ObjectType.DerivesFromOrEqual(typeof(T));
+            Condition = r => r.ObjectType != null && r.ObjectType.DerivesFromOrEqual(typeof(T));
         }
 
         public void WhenNotInjectedInto<T>()
         {
-            _provider.Condition = r => r.ObjectType == null || !r.ObjectType.DerivesFromOrEqual(typeof(T));
+            Condition = r => r.ObjectType == null || !r.ObjectType.DerivesFromOrEqual(typeof(T));
         }
     }
 }

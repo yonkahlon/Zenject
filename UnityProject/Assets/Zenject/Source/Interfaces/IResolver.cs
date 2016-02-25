@@ -119,15 +119,5 @@ namespace Zenject
 
         IEnumerable<ZenjectResolveException> ValidateObjectGraph<TConcrete>(
             InjectContext context, params Type[] extras);
-
-        IInstantiator Instantiator
-        {
-            get;
-        }
-
-        IBinder Binder
-        {
-            get;
-        }
     }
 }

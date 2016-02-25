@@ -27,7 +27,7 @@ namespace Zenject
         }
 
         FacadeMethodSingletonLazyCreator AddCreator(
-            SingletonId id, Action<IBinder> installMethod)
+            SingletonId id, Action<DiContainer> installMethod)
         {
             FacadeMethodSingletonLazyCreator creator;
 
@@ -49,7 +49,7 @@ namespace Zenject
         }
 
         public FacadeMethodSingletonProvider CreateProvider(
-            Type concreteType, string concreteIdentifier, Action<IBinder> installMethod)
+            Type concreteType, string concreteIdentifier, Action<DiContainer> installMethod)
         {
             var singletonId = new SingletonId(concreteType, concreteIdentifier);
             var creator = AddCreator(singletonId, installMethod);

@@ -45,11 +45,11 @@ namespace Zenject.Tests
         public void TestToInstance()
         {
             var test4 = new Test4();
-            Binder.BindIFactoryUntyped<Test4>().ToInstance(test4);
+            Container.BindIFactoryUntyped<Test4>().ToInstance(test4);
 
             AssertValidates();
 
-            Assert.IsNotNull(ReferenceEquals(test4, Resolver.Resolve<IFactoryUntyped<Test4>>().Create()));
+            Assert.IsNotNull(ReferenceEquals(test4, Container.Resolve<IFactoryUntyped<Test4>>().Create()));
         }
 
         [Test]
@@ -57,41 +57,41 @@ namespace Zenject.Tests
         {
             var test3 = new Test3();
 
-            Binder.BindIFactoryUntyped<ITest>().ToMethod((c, args) => test3);
+            Container.BindIFactoryUntyped<ITest>().ToMethod((c, args) => test3);
 
             AssertValidates();
 
-            Assert.That(ReferenceEquals(test3, Resolver.Resolve<IFactoryUntyped<ITest>>().Create()));
+            Assert.That(ReferenceEquals(test3, Container.Resolve<IFactoryUntyped<ITest>>().Create()));
         }
 
         [Test]
         public void TestToFactory()
         {
-            Binder.BindIFactoryUntyped<Test4>().ToFactory();
+            Container.BindIFactoryUntyped<Test4>().ToFactory();
 
             AssertValidates();
 
-            Assert.IsNotNull(Resolver.Resolve<IFactoryUntyped<Test4>>().Create());
+            Assert.IsNotNull(Container.Resolve<IFactoryUntyped<Test4>>().Create());
         }
 
         [Test]
         public void TestToDerivedFactory()
         {
-            Binder.BindIFactoryUntyped<ITest>().ToFactory<Test2>();
+            Container.BindIFactoryUntyped<ITest>().ToFactory<Test2>();
 
             AssertValidates();
 
-            Assert.IsNotNull(Resolver.Resolve<IFactoryUntyped<ITest>>().Create() is Test2);
+            Assert.IsNotNull(Container.Resolve<IFactoryUntyped<ITest>>().Create() is Test2);
         }
 
         [Test]
         public void TestToCustomFactory()
         {
-            Binder.BindIFactoryUntyped<ITest>().ToCustomFactory<Test2.Factory>();
+            Container.BindIFactoryUntyped<ITest>().ToCustomFactory<Test2.Factory>();
 
             AssertValidates();
 
-            Assert.IsNotNull(Resolver.Resolve<IFactoryUntyped<ITest>>().Create() is Test2);
+            Assert.IsNotNull(Container.Resolve<IFactoryUntyped<ITest>>().Create() is Test2);
         }
     }
 }

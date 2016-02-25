@@ -39,12 +39,12 @@ namespace Zenject.Tests
         [Test]
         public void Test()
         {
-            Binder.Bind<Test0>().ToSingle();
-            Binder.Bind<Test2.Factory>().ToSingle();
+            Container.Bind<Test0>().ToSingle();
+            Container.Bind<Test2.Factory>().ToSingle();
 
             AssertValidates();
 
-            var factory = Resolver.Resolve<Test2.Factory>();
+            var factory = Container.Resolve<Test2.Factory>();
             var test = factory.Create(5, new Test1());
 
             Assert.That(test.value == 5);

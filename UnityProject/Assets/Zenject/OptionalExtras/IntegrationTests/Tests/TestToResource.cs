@@ -17,9 +17,9 @@ namespace ModestTree
         [InstallerTest]
         public void Test1()
         {
-            Binder.Bind<Texture>().ToResource("TestTexture");
+            Container.Bind<Texture>().ToResource("TestTexture");
 
-            Binder.Bind<IInitializable>().ToSingleGameObject<Runner1>();
+            Container.Bind<IInitializable>().ToSingleGameObject<Runner1>();
         }
 
         public class Runner1 : MonoBehaviour, IInitializable

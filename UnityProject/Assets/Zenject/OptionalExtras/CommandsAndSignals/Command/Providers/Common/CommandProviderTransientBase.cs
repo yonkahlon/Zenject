@@ -17,13 +17,13 @@ namespace Zenject.Commands
                 c.ObjectInstance, c.MemberName, c.ParentContext, c.ConcreteIdentifier,
                 null, c.SourceType);
 
-            return c.Instantiator.InstantiateExplicit<THandler>(new List<TypeValuePair>(), newContext);
+            return c.Container.InstantiateExplicit<THandler>(new List<TypeValuePair>(), newContext);
         }
 
         public override IEnumerable<ZenjectResolveException> ValidateBinding(InjectContext context)
         {
             return base.ValidateBinding(context)
-                .Concat(context.Resolver.ValidateObjectGraph<THandler>(context));
+                .Concat(context.Container.ValidateObjectGraph<THandler>(context));
         }
     }
 }

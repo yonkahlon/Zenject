@@ -24,19 +24,19 @@ namespace Zenject.Tests
         {
             var foo = new Foo();
 
-            Binder.Bind(typeof(Foo)).ToSingleMethod((container) => foo);
+            Container.Bind(typeof(Foo)).ToSingleMethod((container) => foo);
 
             AssertValidates();
 
-            Assert.That(ReferenceEquals(Resolver.Resolve<Foo>(), foo));
+            Assert.That(ReferenceEquals(Container.Resolve<Foo>(), foo));
         }
 
         [Test]
         [ExpectedException(typeof(ZenjectBindException))]
         public void TestDuplicates()
         {
-            Binder.Bind<Foo>().ToSingleMethod((container) => new Foo());
-            Binder.Bind<IFoo>().ToSingleMethod<Foo>((container) => new Foo());
+            Container.Bind<Foo>().ToSingleMethod((container) => new Foo());
+            Container.Bind<IFoo>().ToSingleMethod<Foo>((container) => new Foo());
         }
 
         [Test]
@@ -44,23 +44,23 @@ namespace Zenject.Tests
         {
             Func<InjectContext, Foo> method = (ctx) => new Foo();
 
-            Binder.Bind<Foo>().ToSingleMethod(method);
-            Binder.Bind<IFoo>().ToSingleMethod(method);
+            Container.Bind<Foo>().ToSingleMethod(method);
+            Container.Bind<IFoo>().ToSingleMethod(method);
 
             AssertValidates();
 
-            Assert.ReferenceEquals(Resolver.Resolve<Foo>(), Container.Resolver.Resolve<IFoo>());
+            Assert.ReferenceEquals(Container.Resolve<Foo>(), Container.Resolve<IFoo>());
         }
 
         [Test]
         public void TestDuplicates3()
         {
-            Binder.Bind<Foo>().ToSingleMethod<Foo>(CreateFoo);
-            Binder.Bind<IFoo>().ToSingleMethod<Foo>(CreateFoo);
+            Container.Bind<Foo>().ToSingleMethod<Foo>(CreateFoo);
+            Container.Bind<IFoo>().ToSingleMethod<Foo>(CreateFoo);
 
             AssertValidates();
 
-            Assert.ReferenceEquals(Resolver.Resolve<Foo>(), Container.Resolver.Resolve<IFoo>());
+            Assert.ReferenceEquals(Container.Resolve<Foo>(), Container.Resolve<IFoo>());
         }
 
         Foo CreateFoo(InjectContext ctx)

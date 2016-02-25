@@ -51,7 +51,7 @@ namespace Zenject
 
         public IEnumerable<ZenjectResolveException> ValidateBinding(InjectContext context)
         {
-            return _container.Resolver.ValidateObjectGraph(
+            return _container.ValidateObjectGraph(
                 _id.ConcreteType, context, _id.ConcreteIdentifier);
         }
 
@@ -61,14 +61,14 @@ namespace Zenject
 
             bool autoInject = false;
 
-            _instance = _container.Instantiator.InstantiateExplicit(
+            _instance = _container.InstantiateExplicit(
                 concreteType, new List<TypeValuePair>(), context, _id.ConcreteIdentifier, autoInject);
 
             Assert.IsNotNull(_instance);
 
             // Inject after we've instantiated and set _instance so that we can support circular dependencies
             // as PostInject or field parameters
-            _container.Resolver.InjectExplicit(
+            _container.InjectExplicit(
                 _instance, Enumerable.Empty<TypeValuePair>(), true,
                 TypeAnalyzer.GetInfo(_instance.GetType()), context, _id.ConcreteIdentifier);
         }

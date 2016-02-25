@@ -1,5 +1,5 @@
 using System;
-using ModestTree;
+using System.Collections.Generic;
 
 #if !ZEN_NOT_UNITY3D
 using UnityEngine;
@@ -12,7 +12,7 @@ namespace Zenject
     {
         public GenericBinder(
             DiContainer container, string identifier)
-            : base(container, typeof(TContract), identifier)
+            : base(container, new List<Type>() { typeof(TContract) }, identifier)
         {
         }
 
@@ -197,14 +197,14 @@ namespace Zenject
         }
 #endif
 
-        public BindingConditionSetter ToSingleFacadeMethod<TConcrete>(Action<IBinder> installerFunc)
+        public BindingConditionSetter ToSingleFacadeMethod<TConcrete>(Action<DiContainer> installerFunc)
             where TConcrete : TContract
         {
             return ToSingleFacadeMethod<TConcrete>(null, installerFunc);
         }
 
         public BindingConditionSetter ToSingleFacadeMethod<TConcrete>(
-            string concreteIdentifier, Action<IBinder> installerFunc)
+            string concreteIdentifier, Action<DiContainer> installerFunc)
             where TConcrete : TContract
         {
             return ToSingleFacadeMethod(typeof(TConcrete), concreteIdentifier, installerFunc);
@@ -228,4 +228,3 @@ namespace Zenject
         }
     }
 }
-

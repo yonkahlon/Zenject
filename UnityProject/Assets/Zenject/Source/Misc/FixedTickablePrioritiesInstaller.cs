@@ -22,18 +22,18 @@ namespace Zenject
 
             foreach (var tickableType in _tickables)
             {
-                BindPriority(Binder, tickableType, priorityCount);
+                BindPriority(Container, tickableType, priorityCount);
                 priorityCount++;
             }
         }
 
         public static void BindPriority(
-            IBinder binder, Type tickableType, int priorityCount)
+            DiContainer container, Type tickableType, int priorityCount)
         {
             Assert.That(tickableType.DerivesFrom<IFixedTickable>(),
                 "Expected type '{0}' to derive from IFixedTickable", tickableType.Name());
 
-            binder.Bind<ModestTree.Util.Tuple<Type, int>>("Fixed").ToInstance(
+            container.Bind<ModestTree.Util.Tuple<Type, int>>("Fixed").ToInstance(
                 ModestTree.Util.Tuple.New(tickableType, priorityCount)).WhenInjectedInto<TickableManager>();
         }
     }

@@ -11,25 +11,25 @@ namespace Zenject
     public class FactoryUntyped<TContract, TConcrete> : IFactoryUntyped<TContract> where TConcrete : TContract
     {
         [Inject]
-        IInstantiator _instantiator = null;
+        DiContainer _container = null;
 
         // So it can be created without using instantiator
-        public IInstantiator Instantiator
+        public DiContainer Container
         {
             get
             {
-                return _instantiator;
+                return _container;
             }
         }
 
         public virtual TContract Create(params object[] constructorArgs)
         {
-            return _instantiator.Instantiate<TConcrete>(constructorArgs);
+            return _container.Instantiate<TConcrete>(constructorArgs);
         }
 
         public IEnumerable<ZenjectResolveException> Validate(params Type[] extras)
         {
-            return _instantiator.Resolver.ValidateObjectGraph<TConcrete>(extras);
+            return _container.ValidateObjectGraph<TConcrete>(extras);
         }
     }
 
@@ -38,17 +38,17 @@ namespace Zenject
     public class FactoryUntyped<TContract> : IFactoryUntyped<TContract>
     {
         [Inject]
-        IInstantiator _instantiator = null;
+        DiContainer _container = null;
 
         [InjectOptional]
         Type _concreteType = null;
 
         // So it can be created without using container
-        public IInstantiator Instantiator
+        public DiContainer Container
         {
             get
             {
-                return _instantiator;
+                return _container;
             }
         }
 
@@ -77,12 +77,12 @@ namespace Zenject
 
         public virtual TContract Create(params object[] constructorArgs)
         {
-            return (TContract)_instantiator.Instantiate(_concreteType, constructorArgs);
+            return (TContract)_container.Instantiate(_concreteType, constructorArgs);
         }
 
         public IEnumerable<ZenjectResolveException> Validate(params Type[] extras)
         {
-            return _instantiator.Resolver.ValidateObjectGraph(_concreteType, extras);
+            return _container.ValidateObjectGraph(_concreteType, extras);
         }
     }
 }

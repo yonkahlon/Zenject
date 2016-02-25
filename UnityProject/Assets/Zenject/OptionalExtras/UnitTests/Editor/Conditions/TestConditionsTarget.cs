@@ -32,31 +32,31 @@ namespace Zenject.Tests
         public override void Setup()
         {
             base.Setup();
-            Binder.Bind<Test0>().ToSingle().When(r => r.ObjectType == typeof(Test2));
+            Container.Bind<Test0>().ToSingle().When(r => r.ObjectType == typeof(Test2));
         }
 
         [Test]
         public void TestTargetConditionError()
         {
-            Binder.Bind<Test1>().ToSingle();
+            Container.Bind<Test1>().ToSingle();
 
             AssertValidationFails();
 
             Assert.Throws<ZenjectResolveException>(
-                delegate { Resolver.Resolve<Test1>(); });
+                delegate { Container.Resolve<Test1>(); });
 
-            Assert.That(Resolver.ValidateResolve<Test1>().Any());
+            Assert.That(Container.ValidateResolve<Test1>().Any());
         }
 
         [Test]
         public void TestTargetConditionSuccess()
         {
-            Binder.Bind<Test2>().ToSingle();
+            Container.Bind<Test2>().ToSingle();
 
             AssertValidates();
 
-            Assert.That(Resolver.ValidateResolve<Test2>().IsEmpty());
-            var test2 = Resolver.Resolve<Test2>();
+            Assert.That(Container.ValidateResolve<Test2>().IsEmpty());
+            var test2 = Container.Resolve<Test2>();
 
             Assert.That(test2 != null);
         }

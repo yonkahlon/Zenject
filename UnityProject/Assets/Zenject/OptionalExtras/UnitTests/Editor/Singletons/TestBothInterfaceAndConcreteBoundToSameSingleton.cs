@@ -21,16 +21,16 @@ namespace Zenject.Tests
         [Test]
         public void TestCaseBothInterfaceAndConcreteBoundToSameSingleton()
         {
-            Binder.Bind<Test0>().ToSingle<Test1>();
-            Binder.Bind<Test1>().ToSingle();
+            Container.Bind<Test0>().ToSingle<Test1>();
+            Container.Bind<Test1>().ToSingle();
 
             AssertValidates();
 
-            Assert.That(Resolver.ValidateResolve<Test0>().IsEmpty());
-            var test1 = Resolver.Resolve<Test0>();
+            Assert.That(Container.ValidateResolve<Test0>().IsEmpty());
+            var test1 = Container.Resolve<Test0>();
 
-            Assert.That(Resolver.ValidateResolve<Test1>().IsEmpty());
-            var test2 = Resolver.Resolve<Test1>();
+            Assert.That(Container.ValidateResolve<Test1>().IsEmpty());
+            var test2 = Container.Resolve<Test1>();
 
             Assert.That(ReferenceEquals(test1, test2));
         }

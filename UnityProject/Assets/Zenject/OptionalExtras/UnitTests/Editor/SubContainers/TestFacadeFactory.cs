@@ -51,11 +51,11 @@ namespace Zenject.Tests
             MyInit.HasInitialized = false;
             MyDispose.HasDisposed = false;
 
-            Binder.BindFacadeFactoryMethod<FooFacade, FooFacade.Factory>(FacadeInstaller);
+            Container.BindFacadeFactoryMethod<FooFacade, FooFacade.Factory>(FacadeInstaller);
 
             AssertValidates();
 
-            var facadeFactory = Resolver.Resolve<FooFacade.Factory>();
+            var facadeFactory = Container.Resolve<FooFacade.Factory>();
 
             Assert.That(!MyInit.HasInitialized);
             var facade = facadeFactory.Create();
@@ -78,11 +78,11 @@ namespace Zenject.Tests
             MyInit.HasInitialized = false;
             MyDispose.HasDisposed = false;
 
-            Binder.BindFacadeFactoryInstaller<FooFacade, FooFacade.Factory, FooInstaller>();
+            Container.BindFacadeFactoryInstaller<FooFacade, FooFacade.Factory, FooInstaller>();
 
             AssertValidates();
 
-            var facadeFactory = Resolver.Resolve<FooFacade.Factory>();
+            var facadeFactory = Container.Resolve<FooFacade.Factory>();
 
             Assert.That(!MyInit.HasInitialized);
             var facade = facadeFactory.Create();
@@ -98,26 +98,26 @@ namespace Zenject.Tests
             Assert.That(MyDispose.HasDisposed);
         }
 
-        void FacadeInstaller(IBinder binder)
+        void FacadeInstaller(DiContainer container)
         {
-            binder.Install<FacadeCommonInstaller>();
-            binder.Bind<FooFacade>().ToSingle();
+            container.Install<FacadeCommonInstaller>();
+            container.Bind<FooFacade>().ToSingle();
 
-            binder.Bind<IDisposable>().ToSingle<MyDispose>();
-            binder.Bind<IInitializable>().ToSingle<MyInit>();
-            binder.Bind<ITickable>().ToSingle<MyTickable>();
+            container.Bind<IDisposable>().ToSingle<MyDispose>();
+            container.Bind<IInitializable>().ToSingle<MyInit>();
+            container.Bind<ITickable>().ToSingle<MyTickable>();
         }
 
         class FooInstaller : Installer
         {
             public override void InstallBindings()
             {
-                Binder.Install<FacadeCommonInstaller>();
-                Binder.Bind<FooFacade>().ToSingle();
+                Container.Install<FacadeCommonInstaller>();
+                Container.Bind<FooFacade>().ToSingle();
 
-                Binder.Bind<IDisposable>().ToSingle<MyDispose>();
-                Binder.Bind<IInitializable>().ToSingle<MyInit>();
-                Binder.Bind<ITickable>().ToSingle<MyTickable>();
+                Container.Bind<IDisposable>().ToSingle<MyDispose>();
+                Container.Bind<IInitializable>().ToSingle<MyInit>();
+                Container.Bind<ITickable>().ToSingle<MyTickable>();
             }
         }
     }

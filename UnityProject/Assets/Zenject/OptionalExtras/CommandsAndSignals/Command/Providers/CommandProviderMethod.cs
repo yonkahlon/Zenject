@@ -23,7 +23,7 @@ namespace Zenject.Commands
 
         public override object GetInstance(InjectContext context)
         {
-            var obj = context.Instantiator.InstantiateExplicit<TCommand>(
+            var obj = context.Container.InstantiateExplicit<TCommand>(
                 new List<TypeValuePair>()
                 {
                     InstantiateUtil.CreateTypePair(_method),
@@ -34,7 +34,7 @@ namespace Zenject.Commands
 
         public override IEnumerable<ZenjectResolveException> ValidateBinding(InjectContext context)
         {
-            return context.Resolver.ValidateObjectGraph<TCommand>(context, typeof(TAction));
+            return context.Container.ValidateObjectGraph<TCommand>(context, typeof(TAction));
         }
     }
 }

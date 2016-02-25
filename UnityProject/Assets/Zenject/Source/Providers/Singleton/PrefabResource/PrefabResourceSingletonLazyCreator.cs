@@ -43,12 +43,6 @@ namespace Zenject
             }
         }
 
-        bool ContainsComponent(Type type)
-        {
-            var prefab = (GameObject)Resources.Load(_id.ResourcePath);
-            return !prefab.GetComponentsInChildren(type, true).IsEmpty();
-        }
-
         public object GetComponent(Type componentType, InjectContext context)
         {
             if (_rootObj == null)
@@ -69,7 +63,7 @@ namespace Zenject
 
                 _rootObj.SetActive(true);
 
-                _container.Resolver.InjectGameObject(_rootObj, true, false, new object[0], context);
+                _container.InjectGameObject(_rootObj, true, false, new object[0], context);
             }
 
             var component = _rootObj.GetComponentInChildren(componentType);
@@ -86,26 +80,25 @@ namespace Zenject
         public IEnumerable<ZenjectResolveException> ValidateBinding(
             Type componentType, InjectContext context)
         {
-            if (!ContainsComponent(componentType))
+            var prefab = (GameObject)Resources.Load(_id.ResourcePath);
+
+            if (prefab == null)
             {
                 yield return new ZenjectResolveException(
-                    "Could not find component of type '{0}' in prefab with resource path '{1}' \nObject graph:\n{2}"
-                    .Fmt(componentType.Name(), _id.ResourcePath, context.GetObjectGraphString()));
+                    "Could not find prefab at given resource path '{0}'. \nObject graph:\n{1}"
+                    .Fmt(_id.ResourcePath, context.GetObjectGraphString()));
                 yield break;
             }
 
-            // In most cases componentType will be a MonoBehaviour but we also want to allow interfaces
-            // And in that case we can't validate it
-            if (!componentType.IsAbstract)
+            // Note that we always want to cache _container instead of using context.Container
+            // since for singletons, the container they are accessed from should not determine
+            // the container they are instantiated with
+            // Transients can do that but not singletons
+
+            foreach (var error in ZenValidator.ValidatePrefab(
+                _container, prefab, componentType, context))
             {
-                // Note that we always want to cache _container instead of using context.Container
-                // since for singletons, the container they are accessed from should not determine
-                // the container they are instantiated with
-                // Transients can do that but not singletons
-                foreach (var err in _container.Resolver.ValidateObjectGraph(componentType, context))
-                {
-                    yield return err;
-                }
+                yield return error;
             }
         }
     }

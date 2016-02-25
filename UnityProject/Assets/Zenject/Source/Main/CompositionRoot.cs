@@ -1,10 +1,11 @@
 #if !ZEN_NOT_UNITY3D
 
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using ModestTree;
 using UnityEngine;
 using UnityEngine.Serialization;
-using System.Linq;
 using Zenject.Internal;
 
 #if UNITY_EDITOR
@@ -65,35 +66,52 @@ namespace Zenject
             _installers = installers;
         }
 
-        public abstract void InstallBindings(IBinder binder);
-
-        // We pass in the binder here instead of using our own for validation to work
-        protected void InstallInstallers(IBinder binder)
+        void ValidateInstallers()
         {
-            binder.Install<FacadeCommonInstaller>();
+#if UNITY_EDITOR
+            foreach (var installer in _installers)
+            {
+                Assert.That(PrefabUtility.GetPrefabType(installer.gameObject) != PrefabType.Prefab,
+                    "Found prefab with name '{0}' in the Installer property of CompositionRoot '{1}'.  You should use the property 'InstallerPrefabs' for this instead.", installer.name, this.name);
+            }
+#endif
+
+            foreach (var installerPrefab in _installerPrefabs)
+            {
+                Assert.IsNotNull(installerPrefab, "Found null prefab in CompositionRoot");
+
+#if UNITY_EDITOR
+                Assert.That(PrefabUtility.GetPrefabType(installerPrefab.gameObject) == PrefabType.Prefab,
+                    "Found non-prefab with name '{0}' in the InstallerPrefabs property of CompositionRoot '{1}'.  You should use the property 'Installer' for this instead",
+                    installerPrefab.name, this.name);
+#endif
+                Assert.That(installerPrefab.GetComponent<MonoInstaller>() != null,
+                    "Expected to find component with type 'MonoInstaller' on given installer prefab '{0}'", installerPrefab.name);
+            }
+        }
+
+        protected void InstallInstallers(DiContainer container)
+        {
+            InstallInstallers(container, new Dictionary<Type, List<TypeValuePair>>());
+        }
+
+        // We pass in the container here instead of using our own for validation to work
+        protected void InstallInstallers(
+            DiContainer container, Dictionary<Type, List<TypeValuePair>> extraArgsMap)
+        {
+            container.Install<FacadeCommonInstaller>();
+
+            ValidateInstallers();
 
             var newGameObjects = new List<GameObject>();
-            var allInstallers = _installers.Cast<IInstaller>().ToList();
+            var allInstallers = _installers.ToList();
 
             try
             {
-#if UNITY_EDITOR
-                foreach (var installer in _installers)
-                {
-                    Assert.That(PrefabUtility.GetPrefabType(installer.gameObject) != PrefabType.Prefab,
-                        "Found prefab with name '{0}' in the Installer property of CompositionRoot '{1}'.  You should use the property 'InstallerPrefabs' for this instead.", installer.name, this.name);
-                }
-#endif
-
                 foreach (var installerPrefab in _installerPrefabs)
                 {
-                    Assert.IsNotNull(installerPrefab, "Found null prefab in CompositionRoot");
+                    Assert.IsNotNull(installerPrefab);
 
-#if UNITY_EDITOR
-                    Assert.That(PrefabUtility.GetPrefabType(installerPrefab.gameObject) == PrefabType.Prefab,
-                        "Found non-prefab with name '{0}' in the InstallerPrefabs property of CompositionRoot '{1}'.  You should use the property 'Installer' for this instead",
-                        installerPrefab.name, this.name);
-#endif
                     var installerGameObject = GameObject.Instantiate(installerPrefab.gameObject);
 
                     newGameObjects.Add(installerGameObject);
@@ -101,17 +119,29 @@ namespace Zenject
                     installerGameObject.transform.SetParent(this.transform, false);
                     var installer = installerGameObject.GetComponent<MonoInstaller>();
 
-                    Assert.IsNotNull(installer,
-                        "Expected to find component with type 'MonoInstaller' on given installer prefab '{0}'", installerPrefab.name);
+                    Assert.IsNotNull(installer);
 
                     allInstallers.Add(installer);
                 }
 
-                binder.Install(allInstallers);
+                foreach (var installer in allInstallers)
+                {
+                    List<TypeValuePair> extraArgs;
+
+                    if (extraArgsMap.TryGetValue(installer.GetType(), out extraArgs))
+                    {
+                        extraArgsMap.Remove(installer.GetType());
+                        container.InstallExplicit(installer, extraArgs);
+                    }
+                    else
+                    {
+                        container.Install(installer);
+                    }
+                }
             }
             finally
             {
-                if (binder.IsValidating)
+                if (container.IsValidating)
                 {
                     foreach (var gameObject in newGameObjects)
                     {
@@ -121,7 +151,7 @@ namespace Zenject
             }
         }
 
-        protected void InstallSceneBindings(IBinder binder)
+        protected void InstallSceneBindings(DiContainer container)
         {
             foreach (var autoBinding in GetRootGameObjects().SelectMany(x => x.GetComponentsInChildren<ZenjectBinding>()))
             {
@@ -141,14 +171,41 @@ namespace Zenject
                 if (bindType == ZenjectBinding.BindTypes.ToInstance
                         || bindType == ZenjectBinding.BindTypes.ToInstanceAndInterfaces)
                 {
-                    binder.Bind(component.GetType()).ToInstance(component);
+                    container.Bind(component.GetType()).ToInstance(component);
                 }
 
                 if (bindType == ZenjectBinding.BindTypes.ToInterfaces
                         || bindType == ZenjectBinding.BindTypes.ToInstanceAndInterfaces)
                 {
-                    binder.BindAllInterfacesToInstance(component);
+                    container.BindAllInterfaces(component.GetType()).ToInstance(component);
                 }
+            }
+        }
+
+        public static IEnumerable<Component> GetInjectableComponents(
+            GameObject gameObject, bool onlyInjectWhenActive)
+        {
+            foreach (var component in ZenUtilInternal.GetInjectableComponentsBottomUp(
+                gameObject, true, !onlyInjectWhenActive))
+            {
+                if (component == null)
+                {
+                    // This warning about fiBackupSceneStorage appears in normal cases so just ignore
+                    // Not sure what it is
+                    if (gameObject.name != "fiBackupSceneStorage")
+                    {
+                        Log.Warn("Zenject: Found null component on game object '{0}'.  Possible missing script.", gameObject.name);
+                    }
+                    continue;
+                }
+
+                if (component.GetType().DerivesFrom<MonoInstaller>())
+                {
+                    // Do not inject on installers since these are always injected before they are installed
+                    continue;
+                }
+
+                yield return component;
             }
         }
 
@@ -156,39 +213,21 @@ namespace Zenject
         {
             foreach (var gameObject in GetRootGameObjects())
             {
-                foreach (var component in ZenUtilInternal.GetInjectableComponentsBottomUp(
-                    gameObject, true, !OnlyInjectWhenActive))
+                foreach (var component in GetInjectableComponents(gameObject, OnlyInjectWhenActive))
                 {
-                    if (component == null)
-                    {
-                        // This warning about fiBackupSceneStorage appears in normal cases so just ignore
-                        // Not sure what it is
-                        if (gameObject.name != "fiBackupSceneStorage")
-                        {
-                            Log.Warn("Zenject: Found null component on game object '{0}'.  Possible missing script.", gameObject.name);
-                        }
-                        continue;
-                    }
-
-                    if (component.GetType().DerivesFrom<MonoInstaller>())
-                    {
-                        // Do not inject on installers since these are always injected before they are installed
-                        continue;
-                    }
-
                     yield return component;
                 }
             }
         }
 
-        protected void InjectComponents(IResolver resolver)
+        protected void InjectComponents(DiContainer container)
         {
             // Use ToList in case they do something weird in post inject
             foreach (var component in GetInjectableComponents().ToList())
             {
                 Assert.That(!component.GetType().DerivesFrom<MonoInstaller>());
 
-                resolver.Inject(component);
+                container.Inject(component);
             }
         }
 
@@ -197,4 +236,3 @@ namespace Zenject
 }
 
 #endif
-

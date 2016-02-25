@@ -25,17 +25,17 @@ namespace Zenject.Tests
         [Test]
         public void TestCaseDuplicateInjection()
         {
-            Binder.Bind<Test0>().ToSingle();
-            Binder.Bind<Test0>().ToSingle();
+            Container.Bind<Test0>().ToSingle();
+            Container.Bind<Test0>().ToSingle();
 
-            Binder.Bind<Test1>().ToSingle();
+            Container.Bind<Test1>().ToSingle();
 
             AssertValidationFails();
 
             Assert.Throws<ZenjectResolveException>(
-                delegate { Resolver.Resolve<Test1>(); });
+                delegate { Container.Resolve<Test1>(); });
 
-            Assert.That(Resolver.ValidateResolve<Test1>().Any());
+            Assert.That(Container.ValidateResolve<Test1>().Any());
         }
     }
 }

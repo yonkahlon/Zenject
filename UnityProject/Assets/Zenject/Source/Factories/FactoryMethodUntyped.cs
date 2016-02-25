@@ -8,10 +8,10 @@ namespace Zenject
     public class FactoryMethodUntyped<TContract> : IFactoryUntyped<TContract>
     {
         readonly DiContainer _container;
-        readonly Func<IInstantiator, object[], TContract> _method;
+        readonly Func<DiContainer, object[], TContract> _method;
 
         public FactoryMethodUntyped(
-            DiContainer container, Func<IInstantiator, object[], TContract> method)
+            DiContainer container, Func<DiContainer, object[], TContract> method)
         {
             _container = container;
             _method = method;
