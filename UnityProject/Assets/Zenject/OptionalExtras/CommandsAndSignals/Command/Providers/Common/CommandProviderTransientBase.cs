@@ -10,20 +10,37 @@ namespace Zenject.Commands
         : CommandProviderBase<TCommand, TAction>
         where TCommand : ICommand
     {
+        readonly DiContainer _container;
+        readonly ContainerTypes _containerType;
+
+        public CommandProviderTransientBase(DiContainer container, ContainerTypes containerType)
+        {
+            _container = container;
+            _containerType = containerType;
+        }
+
         protected THandler CreateHandler(InjectContext c)
         {
-            var newContext = new InjectContext(
-                c.Container, typeof(THandler), null, false, c.ObjectType,
-                c.ObjectInstance, c.MemberName, c.ParentContext, c.ConcreteIdentifier,
-                null, c.SourceType);
+            var container = (_containerType == ContainerTypes.RuntimeContainer ? c.Container : _container);
 
-            return c.Container.InstantiateExplicit<THandler>(new List<TypeValuePair>(), newContext);
+            return container.InstantiateExplicit<THandler>(
+                new List<TypeValuePair>(), GetInjectContext(c, container));
         }
 
         public override IEnumerable<ZenjectResolveException> ValidateBinding(InjectContext context)
         {
+            var container = (_containerType == ContainerTypes.RuntimeContainer ? context.Container : _container);
+
             return base.ValidateBinding(context)
-                .Concat(context.Container.ValidateObjectGraph<THandler>(context));
+                .Concat(container.ValidateObjectGraph<THandler>(GetInjectContext(context, container)));
+        }
+
+        InjectContext GetInjectContext(InjectContext c, DiContainer container)
+        {
+            return new InjectContext(
+                container, typeof(THandler), null, false, c.ObjectType,
+                c.ObjectInstance, c.MemberName, c.ParentContext, c.ConcreteIdentifier,
+                null, c.SourceType);
         }
     }
 }

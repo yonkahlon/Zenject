@@ -37,7 +37,7 @@ namespace Zenject
         IUntypedBinder BindAllInterfacesAndSelf<T>();
         IUntypedBinder BindAllInterfacesAndSelf(Type type);
 
-        // _____ BindIFactory _____
+        // _____ BindInstance _____
         //
         BindingConditionSetter BindInstance<TContract>(string identifier, TContract obj);
         BindingConditionSetter BindInstance<TContract>(TContract obj);
@@ -72,25 +72,31 @@ namespace Zenject
 
         // _____ BindIFactory _____
         //
-        IIFactoryBinder<TParam1, TParam2, TParam3, TParam4, TContract> BindIFactory<TParam1, TParam2, TParam3, TParam4, TContract>(string identifier);
-        IIFactoryBinder<TParam1, TParam2, TParam3, TParam4, TContract> BindIFactory<TParam1, TParam2, TParam3, TParam4, TContract>();
-
-        IIFactoryBinder<TParam1, TParam2, TParam3, TContract> BindIFactory<TParam1, TParam2, TParam3, TContract>(string identifier);
-        IIFactoryBinder<TParam1, TParam2, TParam3, TContract> BindIFactory<TParam1, TParam2, TParam3, TContract>();
-
-        IIFactoryBinder<TParam1, TParam2, TContract> BindIFactory<TParam1, TParam2, TContract>(string identifier);
-        IIFactoryBinder<TParam1, TParam2, TContract> BindIFactory<TParam1, TParam2, TContract>();
-
-        IIFactoryBinder<TParam1, TContract> BindIFactory<TParam1, TContract>(string identifier);
-        IIFactoryBinder<TParam1, TContract> BindIFactory<TParam1, TContract>();
-
-        IIFactoryBinder<TContract> BindIFactory<TContract>(string identifier);
         IIFactoryBinder<TContract> BindIFactory<TContract>();
+        IIFactoryBinder<TContract> BindIFactory<TContract>(string identifier);
+        IIFactoryBinder<TContract> BindIFactory<TContract>(string identifier, ContainerTypes containerType);
+
+        IIFactoryBinder<TParam1, TContract> BindIFactory<TParam1, TContract>();
+        IIFactoryBinder<TParam1, TContract> BindIFactory<TParam1, TContract>(string identifier);
+        IIFactoryBinder<TParam1, TContract> BindIFactory<TParam1, TContract>(string identifier, ContainerTypes containerType);
+
+        IIFactoryBinder<TParam1, TParam2, TContract> BindIFactory<TParam1, TParam2, TContract>();
+        IIFactoryBinder<TParam1, TParam2, TContract> BindIFactory<TParam1, TParam2, TContract>(string identifier);
+        IIFactoryBinder<TParam1, TParam2, TContract> BindIFactory<TParam1, TParam2, TContract>(string identifier, ContainerTypes containerType);
+
+        IIFactoryBinder<TParam1, TParam2, TParam3, TContract> BindIFactory<TParam1, TParam2, TParam3, TContract>();
+        IIFactoryBinder<TParam1, TParam2, TParam3, TContract> BindIFactory<TParam1, TParam2, TParam3, TContract>(string identifier);
+        IIFactoryBinder<TParam1, TParam2, TParam3, TContract> BindIFactory<TParam1, TParam2, TParam3, TContract>(string identifier, ContainerTypes containerType);
+
+        IIFactoryBinder<TParam1, TParam2, TParam3, TParam4, TContract> BindIFactory<TParam1, TParam2, TParam3, TParam4, TContract>();
+        IIFactoryBinder<TParam1, TParam2, TParam3, TParam4, TContract> BindIFactory<TParam1, TParam2, TParam3, TParam4, TContract>(string identifier);
+        IIFactoryBinder<TParam1, TParam2, TParam3, TParam4, TContract> BindIFactory<TParam1, TParam2, TParam3, TParam4, TContract>(string identifier, ContainerTypes containerType);
 
         // _____ BindIFactoryUntyped _____
         //
-        IFactoryUntypedBinder<TContract> BindIFactoryUntyped<TContract>(string identifier);
         IFactoryUntypedBinder<TContract> BindIFactoryUntyped<TContract>();
+        IFactoryUntypedBinder<TContract> BindIFactoryUntyped<TContract>(string identifier);
+        IFactoryUntypedBinder<TContract> BindIFactoryUntyped<TContract>(string identifier, ContainerTypes containerType);
 
         // _____ Unbind _____
         //
@@ -106,28 +112,56 @@ namespace Zenject
             Action<DiContainer> facadeInstaller)
             where TFacadeFactory : FacadeFactory<TFacade>;
 
+        BindingConditionSetter BindFacadeFactoryMethod<TFacade, TFacadeFactory>(
+            Action<DiContainer> facadeInstaller, ContainerTypes containerType)
+            where TFacadeFactory : FacadeFactory<TFacade>;
+
         BindingConditionSetter BindFacadeFactoryMethod<TParam1, TFacade, TFacadeFactory>(
             Action<DiContainer, TParam1> facadeInstaller)
+            where TFacadeFactory : FacadeFactory<TParam1, TFacade>;
+
+        BindingConditionSetter BindFacadeFactoryMethod<TParam1, TFacade, TFacadeFactory>(
+            Action<DiContainer, TParam1> facadeInstaller, ContainerTypes containerType)
             where TFacadeFactory : FacadeFactory<TParam1, TFacade>;
 
         BindingConditionSetter BindFacadeFactoryMethod<TParam1, TParam2, TFacade, TFacadeFactory>(
             Action<DiContainer, TParam1, TParam2> facadeInstaller)
             where TFacadeFactory : FacadeFactory<TParam1, TParam2, TFacade> ;
 
+        BindingConditionSetter BindFacadeFactoryMethod<TParam1, TParam2, TFacade, TFacadeFactory>(
+            Action<DiContainer, TParam1, TParam2> facadeInstaller, ContainerTypes containerType)
+            where TFacadeFactory : FacadeFactory<TParam1, TParam2, TFacade> ;
+
         BindingConditionSetter BindFacadeFactoryMethod<TParam1, TParam2, TParam3, TFacade, TFacadeFactory>(
             Action<DiContainer, TParam1, TParam2, TParam3> facadeInstaller)
+            where TFacadeFactory : FacadeFactory<TParam1, TParam2, TParam3, TFacade>;
+
+        BindingConditionSetter BindFacadeFactoryMethod<TParam1, TParam2, TParam3, TFacade, TFacadeFactory>(
+            Action<DiContainer, TParam1, TParam2, TParam3> facadeInstaller, ContainerTypes containerType)
             where TFacadeFactory : FacadeFactory<TParam1, TParam2, TParam3, TFacade>;
 
         BindingConditionSetter BindFacadeFactoryMethod<TParam1, TParam2, TParam3, TParam4, TFacade, TFacadeFactory>(
             ModestTree.Util.Action<DiContainer, TParam1, TParam2, TParam3, TParam4> facadeInstaller)
             where TFacadeFactory : FacadeFactory<TParam1, TParam2, TParam3, TParam4, TFacade>;
 
+        BindingConditionSetter BindFacadeFactoryMethod<TParam1, TParam2, TParam3, TParam4, TFacade, TFacadeFactory>(
+            ModestTree.Util.Action<DiContainer, TParam1, TParam2, TParam3, TParam4> facadeInstaller, ContainerTypes containerType)
+            where TFacadeFactory : FacadeFactory<TParam1, TParam2, TParam3, TParam4, TFacade>;
+
         BindingConditionSetter BindFacadeFactoryMethod<TParam1, TParam2, TParam3, TParam4, TParam5, TFacade, TFacadeFactory>(
             ModestTree.Util.Action<DiContainer, TParam1, TParam2, TParam3, TParam4, TParam5> facadeInstaller)
             where TFacadeFactory : FacadeFactory<TParam1, TParam2, TParam3, TParam4, TParam5, TFacade>;
 
+        BindingConditionSetter BindFacadeFactoryMethod<TParam1, TParam2, TParam3, TParam4, TParam5, TFacade, TFacadeFactory>(
+            ModestTree.Util.Action<DiContainer, TParam1, TParam2, TParam3, TParam4, TParam5> facadeInstaller, ContainerTypes containerType)
+            where TFacadeFactory : FacadeFactory<TParam1, TParam2, TParam3, TParam4, TParam5, TFacade>;
+
         BindingConditionSetter BindFacadeFactoryMethod<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6, TFacade, TFacadeFactory>(
             ModestTree.Util.Action<DiContainer, TParam1, TParam2, TParam3, TParam4, TParam5, TParam6> facadeInstaller)
+            where TFacadeFactory : FacadeFactory<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6, TFacade>;
+
+        BindingConditionSetter BindFacadeFactoryMethod<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6, TFacade, TFacadeFactory>(
+            ModestTree.Util.Action<DiContainer, TParam1, TParam2, TParam3, TParam4, TParam5, TParam6> facadeInstaller, ContainerTypes containerType)
             where TFacadeFactory : FacadeFactory<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6, TFacade>;
 
         // _____ BindFacadeFactoryInstaller _____
@@ -142,6 +176,10 @@ namespace Zenject
         BindingConditionSetter BindFacadeFactoryInstaller<TFacade, TFacadeFactory>(Type installerType)
             where TFacadeFactory : FacadeFactoryBase<TFacade>;
 
+        // Non-generic versions
+        BindingConditionSetter BindFacadeFactoryInstaller<TFacade, TFacadeFactory>(Type installerType, ContainerTypes containerType)
+            where TFacadeFactory : FacadeFactoryBase<TFacade>;
+
 #if !ZEN_NOT_UNITY3D
 
         // _____ BindMonoFacadeFactory _____
@@ -154,6 +192,10 @@ namespace Zenject
             GameObject prefab, string groupName)
             where TFactory : IMonoFacadeFactoryZeroParams;
 
+        BindingConditionSetter BindMonoFacadeFactory<TFactory>(
+            GameObject prefab, string groupName, ContainerTypes containerType)
+            where TFactory : IMonoFacadeFactoryZeroParams;
+
         BindingConditionSetter BindMonoFacadeFactory<TInstaller, TFactory>(
             GameObject prefab)
             where TInstaller : MonoInstaller
@@ -161,6 +203,11 @@ namespace Zenject
 
         BindingConditionSetter BindMonoFacadeFactory<TInstaller, TFactory>(
             GameObject prefab, string groupName)
+            where TInstaller : MonoInstaller
+            where TFactory : IMonoFacadeFactoryMultipleParams;
+
+        BindingConditionSetter BindMonoFacadeFactory<TInstaller, TFactory>(
+            GameObject prefab, string groupName, ContainerTypes containerType)
             where TInstaller : MonoInstaller
             where TFactory : IMonoFacadeFactoryMultipleParams;
 
@@ -173,6 +220,34 @@ namespace Zenject
         BindingConditionSetter BindMonoBehaviourFactory<TFactory>(
             GameObject prefab, string groupName)
             where TFactory : IMonoBehaviourFactory;
+
+        BindingConditionSetter BindMonoBehaviourFactory<TFactory>(
+            string identifier, GameObject prefab, string groupName)
+            where TFactory : IMonoBehaviourFactory;
+
+        BindingConditionSetter BindMonoBehaviourFactory<TFactory>(
+            GameObject prefab, string groupName, ContainerTypes createContainer)
+            where TFactory : IMonoBehaviourFactory;
+
+        BindingConditionSetter BindMonoBehaviourFactory<TFactory>(
+            string identifier, GameObject prefab, string groupName, ContainerTypes createContainer)
+            where TFactory : IMonoBehaviourFactory;
+
+        BindingConditionSetter BindMonoBehaviourFactory(
+            Type factoryType, GameObject prefab);
+
+        BindingConditionSetter BindMonoBehaviourFactory(
+            Type factoryType, GameObject prefab, string groupName);
+
+        BindingConditionSetter BindMonoBehaviourFactory(
+            Type factoryType, string identifier, GameObject prefab, string groupName);
+
+        BindingConditionSetter BindMonoBehaviourFactory(
+            Type factoryType, GameObject prefab, string groupName, ContainerTypes createContainer);
+
+        BindingConditionSetter BindMonoBehaviourFactory(
+            Type factoryType, string identifier, GameObject prefab,
+            string groupName, ContainerTypes createContainer);
 #endif
 
         // Returns true if the DiContainer waas made for validation purposes only

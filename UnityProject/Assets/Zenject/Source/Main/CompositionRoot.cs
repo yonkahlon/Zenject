@@ -153,34 +153,59 @@ namespace Zenject
 
         protected void InstallSceneBindings(DiContainer container)
         {
-            foreach (var autoBinding in GetRootGameObjects().SelectMany(x => x.GetComponentsInChildren<ZenjectBinding>()))
+            foreach (var autoBinding in GetInjectableComponents().OfType<ZenjectBinding>())
             {
                 if (autoBinding == null)
                 {
                     continue;
                 }
 
-                var component = autoBinding.Component;
-                var bindType = autoBinding.BindType;
-
-                if (component == null)
+                if (autoBinding.ContainerType != ZenjectBinding.ContainerTypes.Local)
                 {
                     continue;
                 }
 
-                if (bindType == ZenjectBinding.BindTypes.ToInstance
-                        || bindType == ZenjectBinding.BindTypes.ToInstanceAndInterfaces)
+                InstallAutoBinding(container, autoBinding);
+            }
+        }
+
+        protected void InstallAutoBinding(
+            DiContainer container, ZenjectBinding autoBinding)
+        {
+            var component = autoBinding.Component;
+            var bindType = autoBinding.BindType;
+
+            if (component == null)
+            {
+                return;
+            }
+
+            switch (bindType)
+            {
+                case ZenjectBinding.BindTypes.ToInstance:
                 {
                     container.Bind(component.GetType()).ToInstance(component);
+                    break;
                 }
-
-                if (bindType == ZenjectBinding.BindTypes.ToInterfaces
-                        || bindType == ZenjectBinding.BindTypes.ToInstanceAndInterfaces)
+                case ZenjectBinding.BindTypes.ToInterfaces:
                 {
                     container.BindAllInterfaces(component.GetType()).ToInstance(component);
+                    break;
+                }
+                case ZenjectBinding.BindTypes.ToInterfacesAndSelf:
+                {
+                    container.BindAllInterfacesAndSelf(component.GetType()).ToInstance(component);
+                    break;
+                }
+                default:
+                {
+                    Assert.Throw();
+                    break;
                 }
             }
         }
+
+        public abstract IEnumerable<Component> GetInjectableComponents();
 
         public static IEnumerable<Component> GetInjectableComponents(
             GameObject gameObject, bool onlyInjectWhenActive)
@@ -208,30 +233,6 @@ namespace Zenject
                 yield return component;
             }
         }
-
-        public IEnumerable<Component> GetInjectableComponents()
-        {
-            foreach (var gameObject in GetRootGameObjects())
-            {
-                foreach (var component in GetInjectableComponents(gameObject, OnlyInjectWhenActive))
-                {
-                    yield return component;
-                }
-            }
-        }
-
-        protected void InjectComponents(DiContainer container)
-        {
-            // Use ToList in case they do something weird in post inject
-            foreach (var component in GetInjectableComponents().ToList())
-            {
-                Assert.That(!component.GetType().DerivesFrom<MonoInstaller>());
-
-                container.Inject(component);
-            }
-        }
-
-        public abstract IEnumerable<GameObject> GetRootGameObjects();
     }
 }
 

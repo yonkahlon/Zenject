@@ -18,12 +18,17 @@ namespace Zenject
 
         public BindingConditionSetter ToResolve<TConcrete>()
         {
-            return ToResolveBase<TConcrete>(null);
+            return ToResolveBase<TConcrete>(null, ContainerTypes.RuntimeContainer);
         }
 
         public BindingConditionSetter ToResolve<TConcrete>(string identifier)
         {
-            return ToResolveBase<TConcrete>(identifier);
+            return ToResolveBase<TConcrete>(identifier, ContainerTypes.RuntimeContainer);
+        }
+
+        public BindingConditionSetter ToResolve<TConcrete>(string identifier, ContainerTypes containerType)
+        {
+            return ToResolveBase<TConcrete>(identifier, containerType);
         }
 
         public BindingConditionSetter ToMethod(Type concreteType, Func<InjectContext, object> method)
@@ -40,12 +45,17 @@ namespace Zenject
 
         public BindingConditionSetter ToGetter<TObj, TContract>(Func<TObj, TContract> method)
         {
-            return ToGetterBase<TObj, TContract>(null, method);
+            return ToGetterBase<TObj, TContract>(null, method, ContainerTypes.RuntimeContainer);
         }
 
         public BindingConditionSetter ToGetter<TObj, TContract>(string identifier, Func<TObj, TContract> method)
         {
-            return ToGetterBase<TObj, TContract>(identifier, method);
+            return ToGetterBase<TObj, TContract>(identifier, method, ContainerTypes.RuntimeContainer);
+        }
+
+        public BindingConditionSetter ToGetter<TObj, TContract>(string identifier, Func<TObj, TContract> method, ContainerTypes containerType)
+        {
+            return ToGetterBase<TObj, TContract>(identifier, method, containerType);
         }
 
         public BindingConditionSetter ToTransient<TConcrete>()

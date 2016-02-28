@@ -14,11 +14,14 @@ namespace Zenject
     {
         readonly DiContainer _container;
         readonly string _identifier;
+        readonly ContainerTypes _containerType;
 
-        public IFactoryBinder(DiContainer binder, string identifier)
+        public IFactoryBinder(
+            DiContainer binder, string identifier, ContainerTypes containerType)
         {
             _container = binder;
             _identifier = identifier;
+            _containerType = containerType;
         }
 
         public BindingConditionSetter ToInstance(TContract instance)
@@ -30,7 +33,7 @@ namespace Zenject
             Func<DiContainer, TContract> method)
         {
             return _container.Bind<IFactory<TContract>>(_identifier)
-                .ToMethod((ctx) => ctx.Container.Instantiate<FactoryMethod<TContract>>(method));
+                .ToMethod((c) => (_containerType == ContainerTypes.RuntimeContainer ? c.Container : _container).Instantiate<FactoryMethod<TContract>>(method));
         }
 
         public BindingConditionSetter ToFactory()
@@ -38,7 +41,7 @@ namespace Zenject
             Assert.That(!typeof(TContract).IsAbstract,
                 "Unable to create abstract type '{0}' in Factory", typeof(TContract).Name());
             return _container.Bind<IFactory<TContract>>(_identifier)
-                .ToTransient<Factory<TContract>>();
+                .ToTransient<Factory<TContract>>(_containerType);
         }
 
         public BindingConditionSetter ToFactory<TConcrete>()
@@ -48,7 +51,7 @@ namespace Zenject
             //return ToCustomFactory<TConcrete, Factory<TConcrete>>();
 
             return _container.Bind<IFactory<TContract>>(_identifier)
-                .ToMethod(c => new FactoryNested<TContract, TConcrete>(c.Container.Instantiate<Factory<TConcrete>>()));
+                .ToMethod(c => new FactoryNested<TContract, TConcrete>((_containerType == ContainerTypes.RuntimeContainer ? c.Container : _container).Instantiate<Factory<TConcrete>>()));
         }
 
         public BindingConditionSetter ToFactory(Type concreteType)
@@ -64,14 +67,14 @@ namespace Zenject
             where TConcrete : TContract
         {
             return _container.Bind<IFactory<TContract>>(_identifier)
-                .ToMethod(c => new FactoryNested<TContract, TConcrete>(c.Container.Resolve<IFactory<TConcrete>>()));
+                .ToMethod(c => new FactoryNested<TContract, TConcrete>((_containerType == ContainerTypes.RuntimeContainer ? c.Container : _container).Resolve<IFactory<TConcrete>>()));
         }
 
         public BindingConditionSetter ToFacadeFactoryMethod<TFactory>(Action<DiContainer> facadeInstaller)
             where TFactory : IFactory<TContract>, IFacadeFactory
         {
             return _container.Bind<IFactory<TContract>>(_identifier)
-                .ToMethod(c => c.Container.Instantiate<TFactory>(facadeInstaller));
+                .ToMethod(c => (_containerType == ContainerTypes.RuntimeContainer ? c.Container : _container).Instantiate<TFactory>(facadeInstaller));
         }
 
         public BindingConditionSetter ToFacadeFactoryMethod<TConcrete, TFactory>(Action<DiContainer> facadeInstaller)
@@ -79,7 +82,7 @@ namespace Zenject
             where TConcrete : TContract
         {
             return _container.Bind<IFactory<TContract>>(_identifier)
-                .ToMethod(c => new FactoryNested<TContract, TConcrete>(c.Container.Instantiate<TFactory>(facadeInstaller)));
+                .ToMethod(c => new FactoryNested<TContract, TConcrete>((_containerType == ContainerTypes.RuntimeContainer ? c.Container : _container).Instantiate<TFactory>(facadeInstaller)));
         }
 
         public BindingConditionSetter ToFacadeFactoryInstaller<TFactory, TInstaller>()
@@ -107,7 +110,7 @@ namespace Zenject
             }
 
             return _container.Bind<IFactory<TContract>>(_identifier)
-                .ToMethod(c => c.Container.Instantiate<TFactory>(installerType));
+                .ToMethod(c => (_containerType == ContainerTypes.RuntimeContainer ? c.Container : _container).Instantiate<TFactory>(installerType));
         }
 
         public BindingConditionSetter ToFacadeFactoryInstaller<TConcrete, TFactory>(Type installerType)
@@ -121,7 +124,7 @@ namespace Zenject
             }
 
             return _container.Bind<IFactory<TContract>>(_identifier)
-                .ToMethod(c => new FactoryNested<TContract, TConcrete>(c.Container.Instantiate<TFactory>(installerType)));
+                .ToMethod(c => new FactoryNested<TContract, TConcrete>((_containerType == ContainerTypes.RuntimeContainer ? c.Container : _container).Instantiate<TFactory>(installerType)));
         }
 
         public BindingConditionSetter ToCustomFactory<TFactory>()
@@ -133,7 +136,7 @@ namespace Zenject
         public BindingConditionSetter ToCustomFactory(Type factoryType)
         {
             Assert.DerivesFrom<IFactory<TContract>>(factoryType);
-            return _container.Bind<IFactory<TContract>>(_identifier).ToTransient(factoryType);
+            return _container.Bind<IFactory<TContract>>(_identifier).ToTransient(factoryType, _containerType);
         }
 
         public BindingConditionSetter ToCustomFactory<TConcrete, TFactory>()
@@ -141,7 +144,7 @@ namespace Zenject
             where TConcrete : TContract
         {
             return _container.Bind<IFactory<TContract>>(_identifier)
-                .ToMethod(c => new FactoryNested<TContract, TConcrete>(c.Container.Instantiate<TFactory>()));
+                .ToMethod(c => new FactoryNested<TContract, TConcrete>((_containerType == ContainerTypes.RuntimeContainer ? c.Container : _container).Instantiate<TFactory>()));
         }
 
         public BindingConditionSetter ToCustomFactory(Type concreteType, Type factoryType)
@@ -154,7 +157,12 @@ namespace Zenject
             var genericFactoryNestedType = typeof(FactoryNested<,>).MakeGenericType(typeof(TContract), concreteType);
 
             return _container.Bind<IFactory<TContract>>(_identifier)
-                .ToMethod(c => (IFactory<TContract>)c.Container.Instantiate(genericFactoryNestedType, c.Container.Instantiate(factoryType)));
+                .ToMethod(c =>
+                    {
+                        var container = (_containerType == ContainerTypes.RuntimeContainer ? c.Container : _container);
+                        return (IFactory<TContract>)container.Instantiate(
+                            genericFactoryNestedType, container.Instantiate(factoryType));
+                    });
         }
 
 #if !ZEN_NOT_UNITY3D
@@ -171,7 +179,8 @@ namespace Zenject
             }
 
             return _container.Bind<IFactory<TContract>>(_identifier)
-                .ToMethod((ctx) => ctx.Container.Instantiate<MonoBehaviourFactory<TContract>>(prefab));
+                .ToMethod((c) => (_containerType == ContainerTypes.RuntimeContainer ? c.Container : _container)
+                    .Instantiate<MonoBehaviourFactory<TContract>>(prefab));
         }
 #endif
     }

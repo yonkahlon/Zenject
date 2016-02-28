@@ -24,8 +24,8 @@ GameObject:
   serializedVersion: 4
   m_Component:
   - 4: {fileID: 484544}
+  - 114: {fileID: 11461772}
   - 114: {fileID: 11434476}
-  - 114: {fileID: 11465794}
   m_Layer: 0
   m_Name: FooMonoFacade
   m_TagString: Untagged
@@ -80,7 +80,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: faaac91ffd32067459dc749020b5256a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &11465794
+--- !u!114 &11461772
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}

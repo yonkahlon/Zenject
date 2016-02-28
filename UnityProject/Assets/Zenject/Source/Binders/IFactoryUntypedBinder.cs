@@ -11,11 +11,15 @@ namespace Zenject
     [System.Diagnostics.DebuggerStepThrough]
     public class IFactoryUntypedBinder<TContract>
     {
+        readonly ContainerTypes _containerType;
         readonly DiContainer _container;
         readonly string _identifier;
 
-        public IFactoryUntypedBinder(DiContainer binder, string identifier)
+        public IFactoryUntypedBinder(
+            DiContainer binder, string identifier,
+            ContainerTypes containerType)
         {
+            _containerType = containerType;
             _container = binder;
             _identifier = identifier;
         }
@@ -29,14 +33,14 @@ namespace Zenject
             Func<DiContainer, object[], TContract> method)
         {
             return _container.Bind<IFactoryUntyped<TContract>>()
-                .ToMethod(c => new FactoryMethodUntyped<TContract>(c.Container, method));
+                .ToMethod(c => new FactoryMethodUntyped<TContract>((_containerType == ContainerTypes.RuntimeContainer ? c.Container : _container), method));
         }
 
         public BindingConditionSetter ToCustomFactory<TFactory>()
             where TFactory : IFactoryUntyped<TContract>
         {
             return _container.Bind<IFactoryUntyped<TContract>>(_identifier)
-                .ToTransient<TFactory>();
+                .ToTransient<TFactory>(_containerType);
         }
 
         public BindingConditionSetter ToFactory()

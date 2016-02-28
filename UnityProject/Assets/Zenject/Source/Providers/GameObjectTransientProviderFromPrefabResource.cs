@@ -10,15 +10,21 @@ namespace Zenject
 {
     public class GameObjectTransientProviderFromPrefabResource : ProviderBase
     {
+        readonly ContainerTypes _containerType;
         readonly string _resourcePath;
         readonly Type _concreteType;
+        readonly DiContainer _container;
 
         public GameObjectTransientProviderFromPrefabResource(
-            Type concreteType, string resourcePath)
+            Type concreteType, string resourcePath,
+            DiContainer container,
+            ContainerTypes containerType)
         {
+            _containerType = containerType;
             // Don't do this because it might be an interface
             //Assert.That(_concreteType.DerivesFrom<Component>());
 
+            _container = container;
             _concreteType = concreteType;
             _resourcePath = resourcePath;
         }
@@ -32,7 +38,8 @@ namespace Zenject
         {
             Assert.That(_concreteType.DerivesFromOrEqual(context.MemberType));
 
-            var rootGameObject = context.Container.InstantiatePrefabResource(_resourcePath);
+            var container = _containerType == ContainerTypes.RuntimeContainer ? context.Container : _container;
+            var rootGameObject = container.InstantiatePrefabResource(_resourcePath);
 
             var component = rootGameObject.GetComponentInChildren(_concreteType);
 
@@ -57,8 +64,10 @@ namespace Zenject
                 yield break;
             }
 
+            var container = _containerType == ContainerTypes.RuntimeContainer ? context.Container : _container;
+
             foreach (var error in ZenValidator.ValidatePrefab(
-                context.Container, prefab, _concreteType, context))
+                container, prefab, _concreteType, context))
             {
                 yield return error;
             }

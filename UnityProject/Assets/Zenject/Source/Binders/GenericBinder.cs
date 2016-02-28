@@ -19,13 +19,19 @@ namespace Zenject
         public BindingConditionSetter ToResolve<TConcrete>()
             where TConcrete : TContract
         {
-            return ToResolveBase<TConcrete>(null);
+            return ToResolveBase<TConcrete>(null, ContainerTypes.RuntimeContainer);
         }
 
         public BindingConditionSetter ToResolve<TConcrete>(string identifier)
             where TConcrete : TContract
         {
-            return ToResolveBase<TConcrete>(identifier);
+            return ToResolveBase<TConcrete>(identifier, ContainerTypes.RuntimeContainer);
+        }
+
+        public BindingConditionSetter ToResolve<TConcrete>(string identifier, ContainerTypes containerType)
+            where TConcrete : TContract
+        {
+            return ToResolveBase<TConcrete>(identifier, containerType);
         }
 
         public BindingConditionSetter ToMethod(Func<InjectContext, TContract> method)
@@ -35,18 +41,29 @@ namespace Zenject
 
         public BindingConditionSetter ToGetter<TObj>(Func<TObj, TContract> method)
         {
-            return ToGetterBase<TObj, TContract>(null, method);
+            return ToGetterBase<TObj, TContract>(null, method, ContainerTypes.RuntimeContainer);
         }
 
         public BindingConditionSetter ToGetter<TObj>(string identifier, Func<TObj, TContract> method)
         {
-            return ToGetterBase<TObj, TContract>(identifier, method);
+            return ToGetterBase<TObj, TContract>(identifier, method, ContainerTypes.RuntimeContainer);
+        }
+
+        public BindingConditionSetter ToGetter<TObj>(string identifier, Func<TObj, TContract> method, ContainerTypes containerType)
+        {
+            return ToGetterBase<TObj, TContract>(identifier, method, containerType);
         }
 
         public BindingConditionSetter ToTransient<TConcrete>()
             where TConcrete : TContract
         {
             return ToTransient(typeof(TConcrete));
+        }
+
+        public BindingConditionSetter ToTransient<TConcrete>(ContainerTypes containerType)
+            where TConcrete : TContract
+        {
+            return ToTransient(typeof(TConcrete), containerType);
         }
 
         public BindingConditionSetter ToSingle<TConcrete>(string concreteIdentifier)
@@ -145,10 +162,24 @@ namespace Zenject
         }
 
         // Note: Here we assume that the contract is a component on the given prefab
+        public BindingConditionSetter ToTransientPrefabResource<TConcrete>(string resourcePath, ContainerTypes containerType)
+            where TConcrete : TContract
+        {
+            return ToTransientPrefabResource(typeof(TConcrete), resourcePath, containerType);
+        }
+
+        // Note: Here we assume that the contract is a component on the given prefab
         public BindingConditionSetter ToTransientPrefab<TConcrete>(GameObject prefab)
             where TConcrete : TContract
         {
             return ToTransientPrefab(typeof(TConcrete), prefab);
+        }
+
+        // Note: Here we assume that the contract is a component on the given prefab
+        public BindingConditionSetter ToTransientPrefab<TConcrete>(GameObject prefab, ContainerTypes containerType)
+            where TConcrete : TContract
+        {
+            return ToTransientPrefab(typeof(TConcrete), prefab, containerType);
         }
 
         // Creates a new game object and adds the given type as a new component on it
@@ -156,6 +187,13 @@ namespace Zenject
             where TConcrete : Component, TContract
         {
             return ToTransientGameObject(typeof(TConcrete));
+        }
+
+        // Creates a new game object and adds the given type as a new component on it
+        public BindingConditionSetter ToTransientGameObject<TConcrete>(ContainerTypes containerType)
+            where TConcrete : Component, TContract
+        {
+            return ToTransientGameObject(typeof(TConcrete), containerType);
         }
 
         // Creates a new game object and adds the given type as a new component on it

@@ -10,12 +10,19 @@ namespace Zenject
 {
     public class GameObjectTransientProvider : ProviderBase
     {
+        readonly ContainerTypes _containerType;
         readonly Type _componentType;
+        readonly DiContainer _container;
 
-        public GameObjectTransientProvider(Type componentType)
+        public GameObjectTransientProvider(
+            DiContainer container,
+            Type componentType,
+            ContainerTypes containerType)
         {
+            _containerType = containerType;
             Assert.That(componentType.DerivesFrom<Component>());
             _componentType = componentType;
+            _container = container;
         }
 
         public override Type GetInstanceType()
@@ -27,13 +34,17 @@ namespace Zenject
         {
             Assert.That(_componentType.DerivesFromOrEqual(context.MemberType));
 
-            return context.Container.InstantiateComponentOnNewGameObjectExplicit(
+            var container = _containerType == ContainerTypes.RuntimeContainer ? context.Container : _container;
+
+            return container.InstantiateComponentOnNewGameObjectExplicit(
                 _componentType, _componentType.Name(), new List<TypeValuePair>(), context);
         }
 
         public override IEnumerable<ZenjectResolveException> ValidateBinding(InjectContext context)
         {
-            return context.Container.ValidateObjectGraph(_componentType, context);
+            var container = _containerType == ContainerTypes.RuntimeContainer ? context.Container : _container;
+
+            return container.ValidateObjectGraph(_componentType, context);
         }
     }
 }

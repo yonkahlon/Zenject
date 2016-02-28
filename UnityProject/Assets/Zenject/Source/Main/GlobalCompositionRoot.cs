@@ -104,9 +104,26 @@ namespace Zenject
             _dependencyRoot = _container.Resolve<IDependencyRoot>();
         }
 
-        public override IEnumerable<GameObject> GetRootGameObjects()
+        public override IEnumerable<Component> GetInjectableComponents()
         {
-            return UnityUtil.GetDirectChildrenAndSelf(this.gameObject);
+            foreach (var gameObject in UnityUtil.GetDirectChildrenAndSelf(this.gameObject))
+            {
+                foreach (var component in GetInjectableComponents(gameObject, OnlyInjectWhenActive))
+                {
+                    yield return component;
+                }
+            }
+        }
+
+        void InjectComponents(DiContainer container)
+        {
+            // Use ToList in case they do something weird in post inject
+            foreach (var component in GetInjectableComponents().ToList())
+            {
+                Assert.That(!component.GetType().DerivesFrom<MonoInstaller>());
+
+                container.Inject(component);
+            }
         }
 
         // We pass in the container here instead of using our own for validation to work

@@ -12,7 +12,7 @@ using System.Linq;
 
 namespace Zenject
 {
-    public abstract class TypeBinder : BinderBase
+    public abstract class TypeBinder : BinderBase, ITypeBinder
     {
         public TypeBinder(
             DiContainer container, List<Type> contractTypes, string bindIdentifier)
@@ -20,7 +20,14 @@ namespace Zenject
         {
         }
 
+        // See comment in ITypeBinder.cs
         public BindingConditionSetter ToTransient()
+        {
+            return ToTransient(ContainerTypes.RuntimeContainer);
+        }
+
+        // See comment in ITypeBinder.cs
+        public BindingConditionSetter ToTransient(ContainerTypes containerType)
         {
 #if !ZEN_NOT_UNITY3D
             AssertContractsAreNotComponents();
@@ -28,24 +35,33 @@ namespace Zenject
             AssertContractsAreNotAbstract();
 
             return RegisterProvidersPerContract(
-                ContractTypes.Select(contractType => new TransientProvider(contractType, Container)).Cast<ProviderBase>());
+                ContractTypes.Select(contractType => new TransientProvider(contractType, Container, containerType)).Cast<ProviderBase>());
         }
 
+        // See comment in ITypeBinder.cs
         public BindingConditionSetter ToTransient(Type concreteType)
+        {
+            return ToTransient(concreteType, ContainerTypes.RuntimeContainer);
+        }
+
+        // See comment in ITypeBinder.cs
+        public BindingConditionSetter ToTransient(Type concreteType, ContainerTypes containerType)
         {
 #if !ZEN_NOT_UNITY3D
             AssertIsNotComponent(concreteType);
 #endif
             AssertIsNotAbstract(concreteType);
 
-            return RegisterSingleProvider(new TransientProvider(concreteType, Container));
+            return RegisterSingleProvider(new TransientProvider(concreteType, Container, containerType));
         }
 
+        // See comment in ITypeBinder.cs
         public BindingConditionSetter ToSingle()
         {
             return ToSingle((string)null);
         }
 
+        // See comment in ITypeBinder.cs
         public BindingConditionSetter ToSingle(string concreteIdentifier)
         {
 #if !ZEN_NOT_UNITY3D
@@ -57,11 +73,13 @@ namespace Zenject
                 ContractTypes.Select(contractType => Container.SingletonProviderCreator.CreateProviderFromType(concreteIdentifier, contractType)).Cast<ProviderBase>());
         }
 
+        // See comment in ITypeBinder.cs
         public BindingConditionSetter ToSingle(Type concreteType)
         {
             return ToSingle(concreteType, null);
         }
 
+        // See comment in ITypeBinder.cs
         public BindingConditionSetter ToSingle(Type concreteType, string concreteIdentifier)
         {
             AssertIsDerivedFromContracts(concreteType);
@@ -77,11 +95,13 @@ namespace Zenject
 
 #if !ZEN_NOT_UNITY3D
 
+        // See comment in ITypeBinder.cs
         public BindingConditionSetter ToSingleMonoBehaviour(GameObject gameObject)
         {
             return ToSingleMonoBehaviour((string)null, gameObject);
         }
 
+        // See comment in ITypeBinder.cs
         public BindingConditionSetter ToSingleMonoBehaviour(
             string concreteIdentifier, GameObject gameObject)
         {
@@ -93,11 +113,13 @@ namespace Zenject
                     contractType => Container.SingletonProviderCreator.CreateProviderFromMonoBehaviour(concreteIdentifier, contractType, gameObject)).Cast<ProviderBase>());
         }
 
+        // See comment in ITypeBinder.cs
         public BindingConditionSetter ToSingleMonoBehaviour(Type concreteType, GameObject gameObject)
         {
             return ToSingleMonoBehaviour(null, concreteType, gameObject);
         }
 
+        // See comment in ITypeBinder.cs
         public BindingConditionSetter ToSingleMonoBehaviour(
             string concreteIdentifier, Type concreteType, GameObject gameObject)
         {
@@ -108,11 +130,13 @@ namespace Zenject
             return RegisterSingleProvider(Container.SingletonProviderCreator.CreateProviderFromMonoBehaviour(concreteIdentifier, concreteType, gameObject));
         }
 
+        // See comment in ITypeBinder.cs
         public BindingConditionSetter ToSinglePrefab(GameObject prefab)
         {
             return ToSinglePrefab((string)null, prefab);
         }
 
+        // See comment in ITypeBinder.cs
         public BindingConditionSetter ToSinglePrefab(string concreteIdentifier, GameObject prefab)
         {
             AssertContractsAreComponents();
@@ -126,6 +150,7 @@ namespace Zenject
         }
 
         // Note that concreteType here could be an interface as well
+        // See comment in ITypeBinder.cs
         public BindingConditionSetter ToSinglePrefab(
             Type concreteType, string concreteIdentifier, GameObject prefab)
         {
@@ -140,7 +165,14 @@ namespace Zenject
                 Container.SingletonProviderCreator.CreateProviderFromPrefab(concreteIdentifier, concreteType, prefab));
         }
 
+        // See comment in ITypeBinder.cs
         public BindingConditionSetter ToTransientPrefab(GameObject prefab)
+        {
+            return ToTransientPrefab(prefab, ContainerTypes.RuntimeContainer);
+        }
+
+        // See comment in ITypeBinder.cs
+        public BindingConditionSetter ToTransientPrefab(GameObject prefab, ContainerTypes containerType)
         {
             AssertIsValidPrefab(prefab);
             AssertContractsAreComponents();
@@ -149,10 +181,17 @@ namespace Zenject
             //AssertContractsAreNotAbstract();
 
             return RegisterProvidersPerContract(
-                ContractTypes.Select(contractType => new GameObjectTransientProviderFromPrefab(contractType, prefab, Container)).Cast<ProviderBase>());
+                ContractTypes.Select(contractType => new GameObjectTransientProviderFromPrefab(contractType, prefab, Container, containerType)).Cast<ProviderBase>());
         }
 
+        // See comment in ITypeBinder.cs
         public BindingConditionSetter ToTransientPrefab(Type concreteType, GameObject prefab)
+        {
+            return ToTransientPrefab(concreteType, prefab, ContainerTypes.RuntimeContainer);
+        }
+
+        // See comment in ITypeBinder.cs
+        public BindingConditionSetter ToTransientPrefab(Type concreteType, GameObject prefab, ContainerTypes containerType)
         {
             AssertIsDerivedFromContracts(concreteType);
             AssertIsValidPrefab(prefab);
@@ -160,35 +199,53 @@ namespace Zenject
             // This is fine since it's a lookup on the prefab so we don't instantiate
             //AssertIsNotAbstract(concreteType);
 
-            return RegisterSingleProvider(new GameObjectTransientProviderFromPrefab(concreteType, prefab, Container));
+            return RegisterSingleProvider(new GameObjectTransientProviderFromPrefab(concreteType, prefab, Container, containerType));
         }
 
         // Creates a new game object and adds the given type as a new component on it
+        // See comment in ITypeBinder.cs
         public BindingConditionSetter ToTransientGameObject()
+        {
+            return ToTransientGameObject(ContainerTypes.RuntimeContainer);
+        }
+
+        // Creates a new game object and adds the given type as a new component on it
+        // See comment in ITypeBinder.cs
+        public BindingConditionSetter ToTransientGameObject(ContainerTypes containerType)
         {
             AssertContractsAreComponents();
             AssertContractsAreNotAbstract();
 
             return RegisterProvidersPerContract(
-                ContractTypes.Select(contractType => new GameObjectTransientProvider(contractType)).Cast<ProviderBase>());
+                ContractTypes.Select(contractType => new GameObjectTransientProvider(Container, contractType, containerType)).Cast<ProviderBase>());
         }
 
         // Creates a new game object and adds the given type as a new component on it
+        // See comment in ITypeBinder.cs
         public BindingConditionSetter ToTransientGameObject(Type concreteType)
+        {
+            return ToTransientGameObject(concreteType, ContainerTypes.RuntimeContainer);
+        }
+
+        // Creates a new game object and adds the given type as a new component on it
+        // See comment in ITypeBinder.cs
+        public BindingConditionSetter ToTransientGameObject(Type concreteType, ContainerTypes containerType)
         {
             AssertIsDerivedFromContracts(concreteType);
             AssertContractsAreComponents();
             AssertIsNotAbstract(concreteType);
 
-            return RegisterSingleProvider(new GameObjectTransientProvider(concreteType));
+            return RegisterSingleProvider(new GameObjectTransientProvider(Container, concreteType, containerType));
         }
 
+        // See comment in ITypeBinder.cs
         public BindingConditionSetter ToSingleGameObject()
         {
             return ToSingleGameObject((string)null);
         }
 
         // Creates a new game object and adds the given type as a new component on it
+        // See comment in ITypeBinder.cs
         public BindingConditionSetter ToSingleGameObject(string concreteIdentifier)
         {
             AssertContractsAreComponents();
@@ -199,12 +256,14 @@ namespace Zenject
                     contractType => Container.SingletonProviderCreator.CreateProviderFromGameObject(contractType, concreteIdentifier)).Cast<ProviderBase>());
         }
 
+        // See comment in ITypeBinder.cs
         public BindingConditionSetter ToSingleGameObject(Type concreteType)
         {
             return ToSingleGameObject(concreteType, null);
         }
 
         // Creates a new game object and adds the given type as a new component on it
+        // See comment in ITypeBinder.cs
         public BindingConditionSetter ToSingleGameObject(Type concreteType, string concreteIdentifier)
         {
             AssertIsDerivedFromContracts(concreteType);
@@ -215,7 +274,14 @@ namespace Zenject
                 Container.SingletonProviderCreator.CreateProviderFromGameObject(concreteType, concreteIdentifier));
         }
 
+        // See comment in ITypeBinder.cs
         public BindingConditionSetter ToTransientPrefabResource(string resourcePath)
+        {
+            return ToTransientPrefabResource(resourcePath, ContainerTypes.RuntimeContainer);
+        }
+
+        // See comment in ITypeBinder.cs
+        public BindingConditionSetter ToTransientPrefabResource(string resourcePath, ContainerTypes containerType)
         {
             AssertIsValidResourcePath(resourcePath);
             AssertContractsAreComponents();
@@ -224,10 +290,17 @@ namespace Zenject
             //AssertContractsAreNotAbstract();
 
             return RegisterProvidersPerContract(
-                ContractTypes.Select(contractType => new GameObjectTransientProviderFromPrefabResource(contractType, resourcePath)).Cast<ProviderBase>());
+                ContractTypes.Select(contractType => new GameObjectTransientProviderFromPrefabResource(contractType, resourcePath, Container, containerType)).Cast<ProviderBase>());
         }
 
+        // See comment in ITypeBinder.cs
         public BindingConditionSetter ToTransientPrefabResource(Type concreteType, string resourcePath)
+        {
+            return ToTransientPrefabResource(concreteType, resourcePath, ContainerTypes.RuntimeContainer);
+        }
+
+        // See comment in ITypeBinder.cs
+        public BindingConditionSetter ToTransientPrefabResource(Type concreteType, string resourcePath, ContainerTypes containerType)
         {
             AssertIsValidResourcePath(resourcePath);
             AssertIsComponent(concreteType);
@@ -236,9 +309,10 @@ namespace Zenject
             //AssertIsNotAbstract(concreteType);
 
             return RegisterSingleProvider(
-                new GameObjectTransientProviderFromPrefabResource(concreteType, resourcePath));
+                new GameObjectTransientProviderFromPrefabResource(concreteType, resourcePath, Container, containerType));
         }
 
+        // See comment in ITypeBinder.cs
         public BindingConditionSetter ToSinglePrefabResource(Type concreteType, string concreteIdentifier, string resourcePath)
         {
             AssertIsDerivedFromContracts(concreteType);
@@ -252,11 +326,13 @@ namespace Zenject
                 Container.SingletonProviderCreator.CreateProviderFromPrefabResource(concreteIdentifier, concreteType, resourcePath));
         }
 
+        // See comment in ITypeBinder.cs
         public BindingConditionSetter ToSinglePrefabResource(string resourcePath)
         {
             return ToSinglePrefabResource(null, resourcePath);
         }
 
+        // See comment in ITypeBinder.cs
         public BindingConditionSetter ToSinglePrefabResource(string concreteIdentifier, string resourcePath)
         {
             AssertIsValidResourcePath(resourcePath);
@@ -295,22 +371,31 @@ namespace Zenject
                 new MethodProvider<T>(method, Container));
         }
 
-        protected BindingConditionSetter ToResolveBase<TConcrete>(string identifier)
+        protected BindingConditionSetter ToResolveBase<TConcrete>(string identifier, ContainerTypes containerType)
         {
-            return ToMethodBase<TConcrete>((ctx) => ctx.Container.Resolve<TConcrete>(
-                new InjectContext(
-                    ctx.Container, typeof(TConcrete), identifier,
-                    false, ctx.ObjectType, ctx.ObjectInstance, ctx.MemberName, ctx, null, ctx.FallBackValue, ctx.SourceType)));
+            return ToMethodBase<TConcrete>((ctx) =>
+                {
+                    var container = (containerType == ContainerTypes.RuntimeContainer ? ctx.Container : Container);
+                    return container.Resolve<TConcrete>(
+                        new InjectContext(
+                            container, typeof(TConcrete), identifier,
+                            false, ctx.ObjectType, ctx.ObjectInstance, ctx.MemberName, ctx, null, ctx.FallBackValue, ctx.SourceType));
+                });
         }
 
-        protected BindingConditionSetter ToGetterBase<TObj, TResult>(string identifier, Func<TObj, TResult> method)
+        protected BindingConditionSetter ToGetterBase<TObj, TResult>(string identifier, Func<TObj, TResult> method, ContainerTypes containerType)
         {
-            return ToMethodBase((ctx) => method(ctx.Container.Resolve<TObj>(
-                new InjectContext(
-                    ctx.Container, typeof(TObj), identifier,
-                    false, ctx.ObjectType, ctx.ObjectInstance, ctx.MemberName, ctx, null, ctx.FallBackValue, ctx.SourceType))));
+            return ToMethodBase((ctx) =>
+                {
+                    var container = (containerType == ContainerTypes.RuntimeContainer ? ctx.Container : Container);
+                    return method(container.Resolve<TObj>(
+                        new InjectContext(
+                            container, typeof(TObj), identifier,
+                            false, ctx.ObjectType, ctx.ObjectInstance, ctx.MemberName, ctx, null, ctx.FallBackValue, ctx.SourceType)));
+                });
         }
 
+        // See comment in ITypeBinder.cs
         public BindingConditionSetter ToInstance(Type concreteType, object instance)
         {
             if (ZenUtilInternal.IsNull(instance) && !Container.IsValidating)
@@ -352,11 +437,13 @@ namespace Zenject
                 Container.SingletonProviderCreator.CreateProviderFromInstance(concreteIdentifier, concreteType, instance));
         }
 
+        // See comment in ITypeBinder.cs
         public BindingConditionSetter ToSingleFacadeMethod(Action<DiContainer> installerFunc)
         {
             return ToSingleFacadeMethod((string)null, installerFunc);
         }
 
+        // See comment in ITypeBinder.cs
         public BindingConditionSetter ToSingleFacadeMethod(
             string concreteIdentifier, Action<DiContainer> installerFunc)
         {
@@ -368,6 +455,7 @@ namespace Zenject
                 ContractTypes.Select(contractType => Container.SingletonProviderCreator.CreateProviderFromFacadeMethod(contractType, concreteIdentifier, installerFunc)).Cast<ProviderBase>());
         }
 
+        // See comment in ITypeBinder.cs
         public BindingConditionSetter ToSingleFacadeMethod(
             Type concreteType, string concreteIdentifier, Action<DiContainer> installerFunc)
         {
@@ -379,12 +467,14 @@ namespace Zenject
                 Container.SingletonProviderCreator.CreateProviderFromFacadeMethod(concreteType, concreteIdentifier, installerFunc));
         }
 
+        // See comment in ITypeBinder.cs
         public BindingConditionSetter ToSingleFacadeInstaller<TInstaller>()
             where TInstaller : Installer
         {
             return ToSingleFacadeInstaller(typeof(TInstaller));
         }
 
+        // See comment in ITypeBinder.cs
         public BindingConditionSetter ToSingleFacadeInstaller<TInstaller>(
             string concreteIdentifier)
             where TInstaller : Installer
@@ -392,11 +482,13 @@ namespace Zenject
             return ToSingleFacadeInstaller(concreteIdentifier, typeof(TInstaller));
         }
 
+        // See comment in ITypeBinder.cs
         public BindingConditionSetter ToSingleFacadeInstaller(Type installerType)
         {
             return ToSingleFacadeInstaller((string)null, installerType);
         }
 
+        // See comment in ITypeBinder.cs
         public BindingConditionSetter ToSingleFacadeInstaller(
             string concreteIdentifier, Type installerType)
         {
@@ -415,6 +507,7 @@ namespace Zenject
                     contractType, concreteIdentifier, installerType)).Cast<ProviderBase>());
         }
 
+        // See comment in ITypeBinder.cs
         public BindingConditionSetter ToSingleFacadeInstaller<TInstaller>(
             Type concreteType, string concreteIdentifier)
             where TInstaller : Installer
@@ -422,6 +515,7 @@ namespace Zenject
             return ToSingleFacadeInstaller(concreteType, concreteIdentifier, typeof(TInstaller));
         }
 
+        // See comment in ITypeBinder.cs
         public BindingConditionSetter ToSingleFacadeInstaller(
             Type concreteType, string concreteIdentifier, Type installerType)
         {
@@ -444,6 +538,7 @@ namespace Zenject
 
 #if !ZEN_NOT_UNITY3D
 
+        // See comment in ITypeBinder.cs
         public BindingConditionSetter ToResource(string resourcePath)
         {
             AssertContractsDeriveFromUnityObject();
@@ -452,6 +547,7 @@ namespace Zenject
                 ContractTypes.Select(contractType => new ResourceProvider(contractType, resourcePath)).Cast<ProviderBase>());
         }
 
+        // See comment in ITypeBinder.cs
         public BindingConditionSetter ToResource(Type concreteType, string resourcePath)
         {
             AssertIsDerivedFromContracts(concreteType);

@@ -211,6 +211,11 @@ namespace ModestTree
         }
 
         //[Conditional("UNITY_EDITOR")]
+        public static void Throw()
+        {
+            Throw("Assert hit!");
+        }
+
         public static void Throw(string message)
         {
             throw new ZenjectException(message);
