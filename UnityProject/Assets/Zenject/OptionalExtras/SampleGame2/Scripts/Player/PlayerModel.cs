@@ -5,13 +5,42 @@ namespace ModestTree
     public class PlayerModel
     {
         readonly Rigidbody _rigidBody;
+        readonly MeshRenderer _renderer;
 
         float _health = 100.0f;
 
         public PlayerModel(
-            Rigidbody rigidBody)
+            Rigidbody rigidBody,
+            MeshRenderer renderer)
         {
             _rigidBody = rigidBody;
+            _renderer = renderer;
+        }
+
+        public MeshRenderer Renderer
+        {
+            get
+            {
+                return _renderer;
+            }
+        }
+
+        public bool IsDead
+        {
+            get;
+            set;
+        }
+
+        public float Health
+        {
+            get
+            {
+                return _health;
+            }
+            set
+            {
+                _health = value;
+            }
         }
 
         public Vector3 LookDir

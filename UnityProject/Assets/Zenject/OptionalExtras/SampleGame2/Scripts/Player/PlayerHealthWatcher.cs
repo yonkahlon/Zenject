@@ -1,19 +1,23 @@
+using System;
 using UnityEngine;
 using Zenject;
 
 namespace ModestTree
 {
-    public class EnemyHealthWatcher : ITickable
+    public class PlayerHealthWatcher : ITickable
     {
+        readonly PlayerKilledSignal.Trigger _killedSignal;
         readonly Explosion.Factory _explosionFactory;
         readonly CompositionRoot _compRoot;
-        readonly EnemyModel _model;
+        readonly PlayerModel _model;
 
-        public EnemyHealthWatcher(
-            EnemyModel model,
+        public PlayerHealthWatcher(
+            PlayerModel model,
             CompositionRoot compRoot,
-            Explosion.Factory explosionFactory)
+            Explosion.Factory explosionFactory,
+            PlayerKilledSignal.Trigger killedSignal)
         {
+            _killedSignal = killedSignal;
             _explosionFactory = explosionFactory;
             _compRoot = compRoot;
             _model = model;
@@ -21,7 +25,7 @@ namespace ModestTree
 
         public void Tick()
         {
-            if (_model.Health <= 0)
+            if (_model.Health < 0 && !_model.IsDead)
             {
                 Die();
             }
@@ -29,10 +33,14 @@ namespace ModestTree
 
         void Die()
         {
+            _model.IsDead = true;
+
             var explosion = _explosionFactory.Create();
             explosion.transform.position = _model.Position;
 
-            GameObject.Destroy(_compRoot.gameObject);
+            _model.Renderer.enabled = false;
+
+            _killedSignal.Fire();
         }
     }
 }

@@ -32,6 +32,12 @@ namespace ModestTree
 
         public void Update()
         {
+            if (_player.IsDead)
+            {
+                _stateManager.ChangeState(EnemyStates.Idle);
+                return;
+            }
+
             // look away from player
             _model.DesiredLookDir = -(_player.Position - _model.Position).normalized;
 

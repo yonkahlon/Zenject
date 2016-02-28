@@ -44,10 +44,6 @@ namespace ModestTree
                 {
                     return _container.Instantiate<EnemyStateFollow>();
                 }
-                case EnemyStates.Dead:
-                {
-                    return _container.Instantiate<EnemyStateDead>();
-                }
             }
 
             throw Assert.CreateException();
@@ -61,7 +57,6 @@ namespace ModestTree
             foreach (var error in _container.ValidateObjectGraph<EnemyStateIdle>()
                 .Concat(_container.ValidateObjectGraph<EnemyStateRunAway>())
                 .Concat(_container.ValidateObjectGraph<EnemyStateAttack>())
-                .Concat(_container.ValidateObjectGraph<EnemyStateDead>())
                 .Concat(_container.ValidateObjectGraph<EnemyStateFollow>()))
             {
                 yield return error;

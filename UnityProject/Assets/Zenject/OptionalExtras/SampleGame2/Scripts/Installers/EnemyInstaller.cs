@@ -49,7 +49,6 @@ namespace ModestTree
             Container.BindInstance(_settings.EnemyRotationHandler);
             Container.BindInstance(_settings.EnemyStateFollow);
             Container.BindInstance(_settings.EnemyStateAttack);
-            Container.BindInstance(_settings.EnemyStateDead);
         }
 
         [Serializable]
@@ -67,7 +66,6 @@ namespace ModestTree
             public EnemyRotationHandler.Settings EnemyRotationHandler;
             public EnemyStateFollow.Settings EnemyStateFollow;
             public EnemyStateAttack.Settings EnemyStateAttack;
-            public EnemyStateDead.Settings EnemyStateDead;
         }
     }
 }

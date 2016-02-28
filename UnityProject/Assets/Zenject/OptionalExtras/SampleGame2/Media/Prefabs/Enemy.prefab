@@ -31,7 +31,7 @@ GameObject:
   - 4: {fileID: 471460}
   - 114: {fileID: 11453994}
   m_Layer: 8
-  m_Name: Installer
+  m_Name: Settings
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -143,7 +143,7 @@ MonoBehaviour:
       Speed: 50
       AttackDistance: 25
     EnemyCollisionHandler:
-      HealthLoss: 40
+      HealthLoss: 55
       HitForce: 500
       HitSound: {fileID: 8300000, guid: d2509c8879c3e514485098af04449f3e, type: 3}
     EnemyStateIdle:
@@ -165,11 +165,6 @@ MonoBehaviour:
       AttackRangeBuffer: 8
       StrafeMultiplier: 0.5
       StrafeChangeInterval: 0.8
-    EnemyStateDead:
-      DeathSound: {fileID: 8300000, guid: 0391a139af5d8a346b18c06b476f3ffe, type: 3}
-      DeathSoundVolume: 0.34
-      Delay: 1.5
-      ExplosionPrefab: {fileID: 100002, guid: 93a60ba8e409947b1a0334537c8b38c8, type: 2}
 --- !u!114 &11462742
 MonoBehaviour:
   m_ObjectHideFlags: 1
