@@ -83,6 +83,15 @@ namespace Zenject
         BindingConditionSetter ToSingleFacadeMethod<TConcrete>(Action<DiContainer> installerFunc);
         BindingConditionSetter ToSingleFacadeMethod<TConcrete>(
             string concreteIdentifier, Action<DiContainer> installerFunc);
+
+        //  See description in ITypeBinder
+        BindingConditionSetter ToSingleFacadeInstaller<TConcrete, TInstaller>()
+            where TInstaller : Installer;
+
+        //  See description in ITypeBinder
+        BindingConditionSetter ToSingleFacadeInstaller<TConcrete, TInstaller>(
+            string concreteIdentifier)
+            where TInstaller : Installer;
     }
 }
 

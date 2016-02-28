@@ -103,6 +103,18 @@ namespace Zenject
             return ToSingleFacadeMethod(typeof(TConcrete), null, installerFunc);
         }
 
+        public BindingConditionSetter ToSingleFacadeInstaller<TConcrete, TInstaller>(string concreteIdentifier)
+            where TInstaller : Installer
+        {
+            return ToSingleFacadeInstaller(typeof(TConcrete), concreteIdentifier, typeof(TInstaller));
+        }
+
+        public BindingConditionSetter ToSingleFacadeInstaller<TConcrete, TInstaller>()
+            where TInstaller : Installer
+        {
+            return ToSingleFacadeInstaller(typeof(TConcrete), null, typeof(TInstaller));
+        }
+
         public BindingConditionSetter ToSingle<TConcrete>()
         {
             return ToSingle(typeof(TConcrete), null);
