@@ -1,0 +1,67 @@
+using System;
+using Zenject;
+
+namespace ModestTree
+{
+    public interface IEnemyState : IDisposable
+    {
+        void Initialize();
+        void Update();
+    }
+
+    public class EnemyStateManager : ITickable, IInitializable
+    {
+        readonly EnemyStateFactory _stateFactory;
+
+        IEnemyState _stateHandler;
+        EnemyStates _currentState = EnemyStates.None;
+
+        public EnemyStateManager(EnemyStateFactory stateFactory)
+        {
+            _stateFactory = stateFactory;
+        }
+
+        public EnemyStates CurrentState
+        {
+            get
+            {
+                return _currentState;
+            }
+        }
+
+        public void Initialize()
+        {
+            Assert.IsEqual(_currentState, EnemyStates.None);
+            Assert.IsNull(_stateHandler);
+
+            ChangeState(EnemyStates.Idle);
+        }
+
+        public void ChangeState(EnemyStates state)
+        {
+            if (_currentState == state)
+            {
+                // Already in state
+                return;
+            }
+
+            //Log.Trace("Enemy Changing state from {0} to {1}", _currentState, state);
+
+            _currentState = state;
+
+            if (_stateHandler != null)
+            {
+                _stateHandler.Dispose();
+                _stateHandler = null;
+            }
+
+            _stateHandler = _stateFactory.Create(state);
+            _stateHandler.Initialize();
+        }
+
+        public void Tick()
+        {
+            _stateHandler.Update();
+        }
+    }
+}

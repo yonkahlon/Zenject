@@ -255,5 +255,20 @@ namespace ModestTree
 
             return format;
         }
+
+        public static Exception CreateException()
+        {
+            return new Exception("Assert hit!");
+        }
+
+        public static Exception CreateException(string message)
+        {
+            return new Exception(message);
+        }
+
+        public static Exception CreateException(string message, params object[] parameters)
+        {
+            return new Exception(FormatString(message, parameters));
+        }
     }
 }
