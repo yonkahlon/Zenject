@@ -9,7 +9,8 @@ namespace Zenject
 {
     public interface ITypeBinder
     {
-        // _____ ToSingle _____  - Inject as singleton
+        // --------------------------------------------------
+        // [ ToSingle ] - Inject as singleton
         //
         //     Container.Bind<Foo>().ToSingle();
         //
@@ -34,14 +35,12 @@ namespace Zenject
         //  Note again that the same instance will be used for all dependencies that
         //  take Foo, IFoo, or IBar.
         BindingConditionSetter ToSingle();
-
         BindingConditionSetter ToSingle(string concreteIdentifier);
-
         BindingConditionSetter ToSingle(Type concreteType);
-
         BindingConditionSetter ToSingle(Type concreteType, string concreteIdentifier);
 
-        // _____ ToInstance _____  - Inject as instance
+        // --------------------------------------------------
+        // [ ToInstance ] - Inject as instance
         //
         //  Examples:
         //
@@ -55,7 +54,8 @@ namespace Zenject
         //  In this case the given instance will be used for every dependency with the given type
         BindingConditionSetter ToInstance(Type concreteType, object instance);
 
-        // _____ ToTransient _____  - Inject as newly created object
+        // --------------------------------------------------
+        // [ ToTransient ] - Inject as newly created object
         //
         //    Container.Bind<Foo>().ToTransient();
         //
@@ -65,11 +65,14 @@ namespace Zenject
         //    Container.Bind<IFoo>().ToTransient<Foo>();
         //
         BindingConditionSetter ToTransient();
+        BindingConditionSetter ToTransient(ContainerTypes containerType);
 
         BindingConditionSetter ToTransient(Type concreteType);
+        BindingConditionSetter ToTransient(Type concreteType, ContainerTypes containerType);
 
 #if !ZEN_NOT_UNITY3D
-        // _____ ToSinglePrefab _____  - Inject by instantiating a single unity prefab
+        // --------------------------------------------------
+        // [ ToSinglePrefab ] - Inject by instantiating a single unity prefab
         //
         //   Container.Bind<FooMonoBehaviour>().ToSinglePrefab(PrefabGameObject);
         //
@@ -94,18 +97,22 @@ namespace Zenject
         BindingConditionSetter ToSinglePrefab(
             Type concreteType, string concreteIdentifier, GameObject prefab);
 
-        // _____ ToTransientPrefab  _____  - Inject by instantiating a unity prefab
+        // --------------------------------------------------
+        // [ ToTransientPrefab ] - Inject by instantiating a unity prefab
         //
         //     Container.Bind<FooMonoBehaviour>().ToTransientPrefab(PrefabGameObject);
         //
         //  This works similar to ToSinglePrefab except it will instantiate a new instance of
         //  the given prefab every time the dependency is injected.
         //
-        BindingConditionSetter ToTransientPrefab(Type concreteType, GameObject prefab);
-
         BindingConditionSetter ToTransientPrefab(GameObject prefab);
+        BindingConditionSetter ToTransientPrefab(GameObject prefab, ContainerTypes containerType);
 
-        // _____ ToSinglePrefabResource  _____  - Load singleton prefab via resources folder
+        BindingConditionSetter ToTransientPrefab(Type concreteType, GameObject prefab);
+        BindingConditionSetter ToTransientPrefab(Type concreteType, GameObject prefab, ContainerTypes containerType);
+
+        // --------------------------------------------------
+        // [ ToSinglePrefabResource ] - Load singleton prefab via resources folder
         //
         //  Same as ToSinglePrefab except loads the prefab using a path in Resources folder
         //
@@ -131,15 +138,20 @@ namespace Zenject
         BindingConditionSetter ToSinglePrefabResource(
             string concreteIdentifier, string resourcePath);
 
-        // _____ ToTransientPrefabResource  _____  - Load prefab via resources folder
+        // --------------------------------------------------
+        // [ ToTransientPrefabResource ] - Load prefab via resources folder
         //
         // Same as ToSinglePrefabResource (see above) except instantiates a new prefab
         // each time it is used
         //
         BindingConditionSetter ToTransientPrefabResource(string resourcePath);
-        BindingConditionSetter ToTransientPrefabResource(Type concreteType, string resourcePath);
+        BindingConditionSetter ToTransientPrefabResource(string resourcePath, ContainerTypes containerType);
 
-        // _____ ToSingleGameObject  _____  - Inject by instantiating a new game object and
+        BindingConditionSetter ToTransientPrefabResource(Type concreteType, string resourcePath);
+        BindingConditionSetter ToTransientPrefabResource(Type concreteType, string resourcePath, ContainerTypes containerType);
+
+        // --------------------------------------------------
+        // [ ToSingleGameObject ] - Inject by instantiating a new game object and
         // using that everywhere
         //
         //  Container.Bind<FooMonoBehaviour>().ToSingleGameObject();
@@ -161,16 +173,20 @@ namespace Zenject
         BindingConditionSetter ToSingleGameObject(Type concreteType);
         BindingConditionSetter ToSingleGameObject(Type concreteType, string concreteIdentifier);
 
-        // _____ ToTransientGameObject  _____  - Inject by instantiating a new game object
+        // --------------------------------------------------
+        // [ ToTransientGameObject ] - Inject by instantiating a new game object
         //
         // Same as ToSingleGameObject (see above) except instantiates a new prefab
         // each time it is used
         //
         BindingConditionSetter ToTransientGameObject();
+        BindingConditionSetter ToTransientGameObject(ContainerTypes containerType);
 
         BindingConditionSetter ToTransientGameObject(Type concreteType);
+        BindingConditionSetter ToTransientGameObject(Type concreteType, ContainerTypes containerType);
 
-        // _____ ToSingleMonoBehaviour  _____  - Inject by instantiating a new component on
+        // --------------------------------------------------
+        // [ ToSingleMonoBehaviour ] - Inject by instantiating a new component on
         //  an existing GameObject
         //
         //   Container.Bind<FooMonoBehaviour>().ToSingleMonoBehaviour(MyGameObject);
@@ -187,7 +203,8 @@ namespace Zenject
         BindingConditionSetter ToSingleMonoBehaviour(
             string concreteIdentifier, Type concreteType, GameObject gameObject);
 
-        // _____ ToResource  _____  - Inject using Resources.Load
+        // --------------------------------------------------
+        // [ ToResource ] - Inject using Resources.Load
         //
         //     Container.Bind<Texture>().ToResource("TestTexture")
         //
@@ -201,7 +218,142 @@ namespace Zenject
         BindingConditionSetter ToResource(Type concreteType, string resourcePath);
 #endif
 
-        // _____ ToSingleFacadeMethod _____
+        // --------------------------------------------------
+        // [ ToMethod ] - Inject by custom method
+        //
+        //  This binding allows you to customize creation logic yourself by defining a method.
+        //  For example:
+        //
+        //  Container.Bind<IFoo>().ToMethod(SomeMethod);
+        //
+        //  public IFoo SomeMethod(InjectContext context)
+        //  {
+        //      ...
+        //      return new Foo();
+        //  }
+        //
+        // (See derived classes for function signature)
+
+        // --------------------------------------------------
+        // [ ToSingleMethod ] - Inject using a custom method but only call that method once
+        //
+        //  This binding works similar to ToMethod except that the given method will only be
+        //  called once. The value returned from the method will then be used for every
+        //  subsequent request for the given dependency.
+        //
+        //  Example:
+        //
+        //  Container.Bind<IFoo>().ToSingleMethod(SomeMethod);
+        //
+        //  public IFoo SomeMethod(InjectContext context)
+        //  {
+        //      ...
+        //      return new Foo();
+        //  }
+        //
+        // (See derived classes for function signature)
+
+        // --------------------------------------------------
+        // [ ToGetter ] - Inject by getter.
+        //
+        //  This method can be useful if you want to bind to a property of another object.
+        //
+        //  Example:
+        //
+        //  Container.Bind<IFoo>().ToSingle<Foo>()
+        //  Container.Bind<Bar>().ToGetter<IFoo>(x => x.GetBar())
+        //
+        //  Note here that it gets IFoo by doing a recursive lookup on the container for whatever
+        //  value is bound to <IFoo>
+        //
+        // (See derived classes for function signature)
+
+        // --------------------------------------------------
+        // [ ToResolve ] - Inject by recursive resolve
+        //
+        //  Examples
+        //
+        //    Container.Bind<IFoo>().ToLookup<IBar>()
+        //    Container.Bind<IBar>().ToLookup<Foo>()
+        //
+        //  In some cases it is useful to be able to bind an interface to another interface.
+        //  However, you cannot use ToSingle or ToTransient because they both require concrete
+        //  types.
+        //
+        //  In the example code above we assume that Foo inherits from IBar, which inherits
+        //  from IFoo. The result here will be that all dependencies for IFoo will be bound
+        //  to whatever IBar is bound to (in this case, Foo).
+        //
+        // (See derived classes for function signature)
+
+        // --------------------------------------------------
+        // [ ToSingleInstance ] - Treat the given instance as a singleton.
+        //
+        //  This is the same as ToInstance except it will ensure that there is only ever one
+        //  instance for the given type.
+        //
+        //  When using ToInstance you can do the following:
+        //
+        //  Container.Bind<Foo>().ToInstance(new Foo());
+        //  Container.Bind<Foo>().ToInstance(new Foo());
+        //  Container.Bind<Foo>().ToInstance(new Foo());
+        //
+        //  Or, equivalently:
+        //
+        //  Container.BindInstance(new Foo());
+        //  Container.BindInstance(new Foo());
+        //  Container.BindInstance(new Foo());
+        //
+        //  And then have a class that takes all of them as a list like this:
+        //
+        //  public class Bar
+        //  {
+        //      public Bar(List<Foo> foos)
+        //      {
+        //      }
+        //  }
+        //
+        //  Whereas, if you use ToSingleInstance this would trigger an error.
+        //
+        // (See derived classes for function signature)
+
+        // --------------------------------------------------
+        // [ ToSingleFactory ] - Define a custom factory for a singleton
+        //
+        //  Example:
+        //
+        //  Container.Bind<IFoo>().ToSingleFactory<MyCustomFactory>();
+        //
+        //  class MyCustomFactory : IFactory<IFoo>
+        //  {
+        //      Bar _bar;
+        //
+        //      public MyCustomFactory(Bar bar)
+        //      {
+        //          _bar = bar;
+        //      }
+        //
+        //      public IFoo Create()
+        //      {
+        //          ...
+        //      }
+        //  }
+        //
+        //  The ToSingleFactory binding can be useful when you want to define a singleton,
+        //  but it has complex construction logic that you want to define yourself. You could
+        //  use ToSingleMethod, but this can get ugly if your construction logic itself has
+        //  its own dependencies that it needs. Using ToSingleFactory for this case it is nice
+        //  because any dependencies that you require for construction can be simply added to
+        //  the factory constructor
+        //
+        // (See derived classes for function signature)
+
+        // --------------------------------------------------
+        //  [ ToSingleFacadeMethod ] - Create a new sub container and use the given class as a
+        //  facade for it
+        //
+        //  Example:
+        //
         //
         BindingConditionSetter ToSingleFacadeMethod(Action<DiContainer> installerFunc);
 
@@ -211,8 +363,8 @@ namespace Zenject
         BindingConditionSetter ToSingleFacadeMethod(
             Type concreteType, string concreteIdentifier, Action<DiContainer> installerFunc);
 
-        // _____ ToSingleFacadeInstaller _____
-        //
+        // --------------------------------------------------
+        // [ ToSingleFacadeInstaller]
         BindingConditionSetter ToSingleFacadeInstaller<TInstaller>()
             where TInstaller : Installer;
 
@@ -233,6 +385,4 @@ namespace Zenject
             Type concreteType, string concreteIdentifier, Type installerType);
     }
 }
-
-
 

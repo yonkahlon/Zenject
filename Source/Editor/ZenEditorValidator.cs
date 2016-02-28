@@ -243,6 +243,17 @@ namespace Zenject
             try
             {
                 globalCompRoot = GlobalCompositionRoot.InstantiateNewRoot();
+
+                // Need to do this here even though this is also done in ZenValidator
+                // so these errors are caught for DLL builds
+                ValidateCompositionRootInstallers(globalCompRoot);
+                ValidateCompositionRootInstallers(compRoot);
+
+                foreach (var facadeRoot in GameObject.FindObjectsOfType<FacadeCompositionRoot>())
+                {
+                    ValidateCompositionRootInstallers(facadeRoot);
+                }
+
                 return ZenValidator.ValidateScene(compRoot, globalCompRoot).Take(maxErrors).ToList();
             }
             finally

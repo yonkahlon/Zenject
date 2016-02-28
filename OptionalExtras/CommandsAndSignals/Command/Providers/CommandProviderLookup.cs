@@ -13,8 +13,8 @@ namespace Zenject.Commands
         where TCommand : Command
         where THandler : ICommandHandler
     {
-        public CommandProviderResolve(string identifier, bool isOptional)
-            : base(identifier, isOptional)
+        public CommandProviderResolve(DiContainer container, ContainerTypes containerType, string identifier, bool isOptional)
+            : base(container, containerType, identifier, isOptional)
         {
         }
 
@@ -38,8 +38,8 @@ namespace Zenject.Commands
         where TCommand : Command<TParam1>
         where THandler : ICommandHandler<TParam1>
     {
-        public CommandProviderResolve(string identifier, bool isOptional)
-            : base(identifier, isOptional)
+        public CommandProviderResolve(DiContainer container, ContainerTypes containerType, string identifier, bool isOptional)
+            : base(container, containerType,identifier, isOptional)
         {
         }
 
@@ -63,8 +63,8 @@ namespace Zenject.Commands
         where TCommand : Command<TParam1, TParam2>
         where THandler : ICommandHandler<TParam1, TParam2>
     {
-        public CommandProviderResolve(string identifier, bool isOptional)
-            : base(identifier, isOptional)
+        public CommandProviderResolve(DiContainer container, ContainerTypes containerType, string identifier, bool isOptional)
+            : base(container, containerType, identifier, isOptional)
         {
         }
 
@@ -88,8 +88,8 @@ namespace Zenject.Commands
         where TCommand : Command<TParam1, TParam2, TParam3>
         where THandler : ICommandHandler<TParam1, TParam2, TParam3>
     {
-        public CommandProviderResolve(string identifier, bool isOptional)
-            : base(identifier, isOptional)
+        public CommandProviderResolve(DiContainer container, ContainerTypes containerType, string identifier, bool isOptional)
+            : base(container, containerType, identifier, isOptional)
         {
         }
 
@@ -113,8 +113,8 @@ namespace Zenject.Commands
         where TCommand : Command<TParam1, TParam2, TParam3, TParam4>
         where THandler : ICommandHandler<TParam1, TParam2, TParam3, TParam4>
     {
-        public CommandProviderResolve(string identifier, bool isOptional)
-            : base(identifier, isOptional)
+        public CommandProviderResolve(DiContainer container, ContainerTypes containerType, string identifier, bool isOptional)
+            : base(container, containerType, identifier, isOptional)
         {
         }
 
@@ -138,8 +138,8 @@ namespace Zenject.Commands
         where TCommand : Command<TParam1, TParam2, TParam3, TParam4, TParam5>
         where THandler : ICommandHandler<TParam1, TParam2, TParam3, TParam4, TParam5>
     {
-        public CommandProviderResolve(string identifier, bool isOptional)
-            : base(identifier, isOptional)
+        public CommandProviderResolve(DiContainer container, ContainerTypes containerType, string identifier, bool isOptional)
+            : base(container, containerType, identifier, isOptional)
         {
         }
 
@@ -163,8 +163,8 @@ namespace Zenject.Commands
         where TCommand : Command<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6>
         where THandler : ICommandHandler<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6>
     {
-        public CommandProviderResolve(string identifier, bool isOptional)
-            : base(identifier, isOptional)
+        public CommandProviderResolve(DiContainer container, ContainerTypes containerType, string identifier, bool isOptional)
+            : base(container, containerType, identifier, isOptional)
         {
         }
 

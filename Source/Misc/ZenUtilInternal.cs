@@ -44,8 +44,15 @@ namespace Zenject.Internal
                 yield break;
             }
 
-            // Do not recurse down into Facades
-            if (recursive && gameObject.GetComponent<FacadeCompositionRoot>() == null)
+            var facadeRoot = gameObject.GetComponent<FacadeCompositionRoot>();
+
+            if (facadeRoot != null)
+            {
+                yield return facadeRoot;
+                yield break;
+            }
+
+            if (recursive)
             {
                 foreach (Transform child in gameObject.transform)
                 {

@@ -94,10 +94,10 @@ namespace Zenject
     public abstract class MonoBehaviourFactoryBase<TValue> : IMonoBehaviourFactory
     {
         [Inject]
-        readonly DiContainer _container;
+        readonly DiContainer _container = null;
 
         [Inject]
-        readonly GameObject _prefab;
+        readonly GameObject _prefab = null;
 
         [InjectOptional]
         string _groupName = null;

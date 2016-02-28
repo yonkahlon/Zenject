@@ -14,7 +14,10 @@ namespace Zenject.Commands
     {
         readonly Func<THandler, TAction> _methodGetter;
 
-        public CommandProviderTransientMethodBase(Func<THandler, TAction> methodGetter)
+        public CommandProviderTransientMethodBase(
+            DiContainer container, ContainerTypes containerType,
+            Func<THandler, TAction> methodGetter)
+            : base(container, containerType)
         {
             _methodGetter = methodGetter;
         }
@@ -30,8 +33,10 @@ namespace Zenject.Commands
         : CommandProviderTransientMethodBase<TCommand, THandler, Action>
         where TCommand : Command
     {
-        public CommandProviderTransientMethod(Func<THandler, Action> methodGetter)
-            : base(methodGetter)
+        public CommandProviderTransientMethod(
+            DiContainer container, ContainerTypes containerType,
+            Func<THandler, Action> methodGetter)
+            : base(container, containerType, methodGetter)
         {
         }
 
@@ -50,8 +55,9 @@ namespace Zenject.Commands
         where TCommand : Command<TParam1>
     {
         public CommandProviderTransientMethod(
+            DiContainer container, ContainerTypes containerType,
             Func<THandler, Action<TParam1>> methodGetter)
-            : base(methodGetter)
+            : base(container, containerType, methodGetter)
         {
         }
 
@@ -70,8 +76,9 @@ namespace Zenject.Commands
         where TCommand : Command<TParam1, TParam2>
     {
         public CommandProviderTransientMethod(
+            DiContainer container, ContainerTypes containerType,
             Func<THandler, Action<TParam1, TParam2>> methodGetter)
-            : base(methodGetter)
+            : base(container, containerType, methodGetter)
         {
         }
 
@@ -90,8 +97,9 @@ namespace Zenject.Commands
         where TCommand : Command<TParam1, TParam2, TParam3>
     {
         public CommandProviderTransientMethod(
+            DiContainer container, ContainerTypes containerType,
             Func<THandler, Action<TParam1, TParam2, TParam3>> methodGetter)
-            : base(methodGetter)
+            : base(container, containerType, methodGetter)
         {
         }
 
@@ -110,8 +118,9 @@ namespace Zenject.Commands
         where TCommand : Command<TParam1, TParam2, TParam3, TParam4>
     {
         public CommandProviderTransientMethod(
+            DiContainer container, ContainerTypes containerType,
             Func<THandler, Action<TParam1, TParam2, TParam3, TParam4>> methodGetter)
-            : base(methodGetter)
+            : base(container, containerType, methodGetter)
         {
         }
 
@@ -130,8 +139,9 @@ namespace Zenject.Commands
         where TCommand : Command<TParam1, TParam2, TParam3, TParam4, TParam5>
     {
         public CommandProviderTransientMethod(
+            DiContainer container, ContainerTypes containerType,
             Func<THandler, ModestTree.Util.Action<TParam1, TParam2, TParam3, TParam4, TParam5>> methodGetter)
-            : base(methodGetter)
+            : base(container, containerType, methodGetter)
         {
         }
 
@@ -150,8 +160,9 @@ namespace Zenject.Commands
         where TCommand : Command<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6>
     {
         public CommandProviderTransientMethod(
+            DiContainer container, ContainerTypes containerType,
             Func<THandler, ModestTree.Util.Action<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6>> methodGetter)
-            : base(methodGetter)
+            : base(container, containerType, methodGetter)
         {
         }
 

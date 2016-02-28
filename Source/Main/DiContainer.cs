@@ -1700,21 +1700,21 @@ namespace Zenject
         }
 
         // See comment in IBinder.cs for description of this method
-        public IFactoryUntypedBinder<TContract> BindIFactoryUntyped<TContract>(string identifier)
-        {
-            return new IFactoryUntypedBinder<TContract>(this, identifier);
-        }
-
-        // See comment in IBinder.cs for description of this method
         public IFactoryUntypedBinder<TContract> BindIFactoryUntyped<TContract>()
         {
             return BindIFactoryUntyped<TContract>(null);
         }
 
         // See comment in IBinder.cs for description of this method
-        public IIFactoryBinder<TContract> BindIFactory<TContract>(string identifier)
+        public IFactoryUntypedBinder<TContract> BindIFactoryUntyped<TContract>(string identifier)
         {
-            return new IFactoryBinder<TContract>(this, identifier);
+            return BindIFactoryUntyped<TContract>(identifier, ContainerTypes.RuntimeContainer);
+        }
+
+        // See comment in IBinder.cs for description of this method
+        public IFactoryUntypedBinder<TContract> BindIFactoryUntyped<TContract>(string identifier, ContainerTypes containerType)
+        {
+            return new IFactoryUntypedBinder<TContract>(this, identifier, containerType);
         }
 
         // See comment in IBinder.cs for description of this method
@@ -1724,9 +1724,15 @@ namespace Zenject
         }
 
         // See comment in IBinder.cs for description of this method
-        public IIFactoryBinder<TParam1, TContract> BindIFactory<TParam1, TContract>(string identifier)
+        public IIFactoryBinder<TContract> BindIFactory<TContract>(string identifier)
         {
-            return new IFactoryBinder<TParam1, TContract>(this, identifier);
+            return BindIFactory<TContract>(identifier, ContainerTypes.RuntimeContainer);
+        }
+
+        // See comment in IBinder.cs for description of this method
+        public IIFactoryBinder<TContract> BindIFactory<TContract>(string identifier, ContainerTypes containerType)
+        {
+            return new IFactoryBinder<TContract>(this, identifier, containerType);
         }
 
         // See comment in IBinder.cs for description of this method
@@ -1736,9 +1742,15 @@ namespace Zenject
         }
 
         // See comment in IBinder.cs for description of this method
-        public IIFactoryBinder<TParam1, TParam2, TContract> BindIFactory<TParam1, TParam2, TContract>(string identifier)
+        public IIFactoryBinder<TParam1, TContract> BindIFactory<TParam1, TContract>(string identifier)
         {
-            return new IFactoryBinder<TParam1, TParam2, TContract>(this, identifier);
+            return BindIFactory<TParam1, TContract>(identifier, ContainerTypes.RuntimeContainer);
+        }
+
+        // See comment in IBinder.cs for description of this method
+        public IIFactoryBinder<TParam1, TContract> BindIFactory<TParam1, TContract>(string identifier, ContainerTypes containerType)
+        {
+            return new IFactoryBinder<TParam1, TContract>(this, identifier, containerType);
         }
 
         // See comment in IBinder.cs for description of this method
@@ -1748,9 +1760,15 @@ namespace Zenject
         }
 
         // See comment in IBinder.cs for description of this method
-        public IIFactoryBinder<TParam1, TParam2, TParam3, TContract> BindIFactory<TParam1, TParam2, TParam3, TContract>(string identifier)
+        public IIFactoryBinder<TParam1, TParam2, TContract> BindIFactory<TParam1, TParam2, TContract>(string identifier)
         {
-            return new IFactoryBinder<TParam1, TParam2, TParam3, TContract>(this, identifier);
+            return BindIFactory<TParam1, TParam2, TContract>(identifier, ContainerTypes.RuntimeContainer);
+        }
+
+        // See comment in IBinder.cs for description of this method
+        public IIFactoryBinder<TParam1, TParam2, TContract> BindIFactory<TParam1, TParam2, TContract>(string identifier, ContainerTypes containerType)
+        {
+            return new IFactoryBinder<TParam1, TParam2, TContract>(this, identifier, containerType);
         }
 
         // See comment in IBinder.cs for description of this method
@@ -1760,15 +1778,33 @@ namespace Zenject
         }
 
         // See comment in IBinder.cs for description of this method
-        public IIFactoryBinder<TParam1, TParam2, TParam3, TParam4, TContract> BindIFactory<TParam1, TParam2, TParam3, TParam4, TContract>(string identifier)
+        public IIFactoryBinder<TParam1, TParam2, TParam3, TContract> BindIFactory<TParam1, TParam2, TParam3, TContract>(string identifier)
         {
-            return new IFactoryBinder<TParam1, TParam2, TParam3, TParam4, TContract>(this, identifier);
+            return BindIFactory<TParam1, TParam2, TParam3, TContract>(identifier, ContainerTypes.RuntimeContainer);
+        }
+
+        // See comment in IBinder.cs for description of this method
+        public IIFactoryBinder<TParam1, TParam2, TParam3, TContract> BindIFactory<TParam1, TParam2, TParam3, TContract>(string identifier, ContainerTypes containerType)
+        {
+            return new IFactoryBinder<TParam1, TParam2, TParam3, TContract>(this, identifier, containerType);
         }
 
         // See comment in IBinder.cs for description of this method
         public IIFactoryBinder<TParam1, TParam2, TParam3, TParam4, TContract> BindIFactory<TParam1, TParam2, TParam3, TParam4, TContract>()
         {
             return BindIFactory<TParam1, TParam2, TParam3, TParam4, TContract>(null);
+        }
+
+        // See comment in IBinder.cs for description of this method
+        public IIFactoryBinder<TParam1, TParam2, TParam3, TParam4, TContract> BindIFactory<TParam1, TParam2, TParam3, TParam4, TContract>(string identifier)
+        {
+            return BindIFactory<TParam1, TParam2, TParam3, TParam4, TContract>(identifier, ContainerTypes.RuntimeContainer);
+        }
+
+        // See comment in IBinder.cs for description of this method
+        public IIFactoryBinder<TParam1, TParam2, TParam3, TParam4, TContract> BindIFactory<TParam1, TParam2, TParam3, TParam4, TContract>(string identifier, ContainerTypes containerType)
+        {
+            return new IFactoryBinder<TParam1, TParam2, TParam3, TParam4, TContract>(this, identifier, containerType);
         }
 
         // See comment in IBinder.cs for description of this method
@@ -1799,6 +1835,14 @@ namespace Zenject
             GameObject prefab, string groupName)
             where TFactory : IMonoFacadeFactoryZeroParams
         {
+            return BindMonoFacadeFactory<TFactory>(prefab, groupName, ContainerTypes.RuntimeContainer);
+        }
+
+        // See comment in IBinder.cs for description of this method
+        public BindingConditionSetter BindMonoFacadeFactory<TFactory>(
+            GameObject prefab, string groupName, ContainerTypes containerType)
+            where TFactory : IMonoFacadeFactoryZeroParams
+        {
             if (prefab == null)
             {
                 throw new ZenjectBindException(
@@ -1808,7 +1852,7 @@ namespace Zenject
             // We could bind the factory ToSingle but doing it this way is better
             // since it allows us to have multiple game object factories that
             // use different prefabs and have them injected into different places
-            return Bind<TFactory>().ToMethod((ctx) => ctx.Container.InstantiateExplicit<TFactory>(
+            return Bind<TFactory>().ToMethod((ctx) => (containerType == ContainerTypes.RuntimeContainer ? ctx.Container : this).InstantiateExplicit<TFactory>(
                 new List<TypeValuePair>() { InstantiateUtil.CreateTypePair(prefab), InstantiateUtil.CreateTypePair(groupName) }));
         }
 
@@ -1827,6 +1871,15 @@ namespace Zenject
             where TInstaller : MonoInstaller
             where TFactory : IMonoFacadeFactoryMultipleParams
         {
+            return BindMonoFacadeFactory<TInstaller, TFactory>(prefab, groupName, ContainerTypes.RuntimeContainer);
+        }
+
+        // See comment in IBinder.cs for description of this method
+        public BindingConditionSetter BindMonoFacadeFactory<TInstaller, TFactory>(
+            GameObject prefab, string groupName, ContainerTypes containerType)
+            where TInstaller : MonoInstaller
+            where TFactory : IMonoFacadeFactoryMultipleParams
+        {
             if (prefab == null)
             {
                 throw new ZenjectBindException(
@@ -1836,7 +1889,7 @@ namespace Zenject
             // We could bind the factory ToSingle but doing it this way is better
             // since it allows us to have multiple game object factories that
             // use different prefabs and have them injected into different places
-            return Bind<TFactory>().ToMethod((ctx) => ctx.Container.InstantiateExplicit<TFactory>(
+            return Bind<TFactory>().ToMethod((ctx) => (containerType == ContainerTypes.RuntimeContainer ? ctx.Container : this).InstantiateExplicit<TFactory>(
                 new List<TypeValuePair>()
                 {
                     InstantiateUtil.CreateTypePair(prefab),
@@ -1857,17 +1910,86 @@ namespace Zenject
             GameObject prefab, string groupName)
             where TFactory : IMonoBehaviourFactory
         {
+            return BindMonoBehaviourFactory<TFactory>((string)null, prefab, groupName);
+        }
+
+        public BindingConditionSetter BindMonoBehaviourFactory<TFactory>(
+            string identifier, GameObject prefab, string groupName)
+            where TFactory : IMonoBehaviourFactory
+        {
+            return BindMonoBehaviourFactory<TFactory>(
+                identifier, prefab, groupName, ContainerTypes.RuntimeContainer);
+        }
+
+        public BindingConditionSetter BindMonoBehaviourFactory<TFactory>(
+            GameObject prefab, string groupName, ContainerTypes createContainer)
+            where TFactory : IMonoBehaviourFactory
+        {
+            return BindMonoBehaviourFactory<TFactory>(
+                (string)null, prefab, groupName, createContainer);
+        }
+
+        public BindingConditionSetter BindMonoBehaviourFactory<TFactory>(
+            string identifier, GameObject prefab, string groupName, ContainerTypes createContainer)
+            where TFactory : IMonoBehaviourFactory
+        {
+            return BindMonoBehaviourFactory(
+                typeof(TFactory), identifier, prefab, groupName, createContainer);
+        }
+
+        public BindingConditionSetter BindMonoBehaviourFactory(
+            Type factoryType, GameObject prefab)
+        {
+            return BindMonoBehaviourFactory(factoryType, prefab, null);
+        }
+
+        public BindingConditionSetter BindMonoBehaviourFactory(
+            Type factoryType, GameObject prefab, string groupName)
+        {
+            return BindMonoBehaviourFactory(factoryType, null, prefab, groupName);
+        }
+
+        public BindingConditionSetter BindMonoBehaviourFactory(
+            Type factoryType, string identifier, GameObject prefab, string groupName)
+        {
+            return BindMonoBehaviourFactory(factoryType, identifier, prefab, groupName, ContainerTypes.RuntimeContainer);
+        }
+
+        public BindingConditionSetter BindMonoBehaviourFactory(
+            Type factoryType, GameObject prefab, string groupName, ContainerTypes createContainer)
+        {
+            return BindMonoBehaviourFactory(
+                factoryType, null, prefab, groupName, createContainer);
+        }
+
+        public BindingConditionSetter BindMonoBehaviourFactory(
+            Type factoryType, string identifier, GameObject prefab,
+            string groupName, ContainerTypes createContainer)
+        {
             if (prefab == null)
             {
                 throw new ZenjectBindException(
-                    "Null prefab provided to BindMonoBehaviourFactory for type '{0}'".Fmt(typeof(TFactory).Name()));
+                    "Null prefab provided to BindMonoBehaviourFactory for type '{0}'".Fmt(factoryType.Name()));
+            }
+
+            if (!factoryType.DerivesFrom<IMonoBehaviourFactory>())
+            {
+                throw new ZenjectBindException(
+                    "Expected given type '{0}' to derive from 'IMonoBehaviourFactory'"
+                    .Fmt(factoryType.Name()));
             }
 
             // We could bind the factory ToSingle but doing it this way is better
             // since it allows us to have multiple game object factories that
             // use different prefabs and have them injected into different places
-            return Bind<TFactory>().ToMethod((ctx) => ctx.Container.InstantiateExplicit<TFactory>(
-                new List<TypeValuePair>() { InstantiateUtil.CreateTypePair(prefab), InstantiateUtil.CreateTypePair(groupName) }));
+            return Bind(factoryType, identifier).ToMethod(
+                factoryType, (ctx) => (createContainer == ContainerTypes.BindContainer ? this : ctx.Container).InstantiateExplicit(
+                    factoryType,
+                    new List<TypeValuePair>()
+                    {
+                        InstantiateUtil.CreateTypePair(prefab),
+                        InstantiateUtil.CreateTypePair(groupName)
+                    }));
         }
 #endif
 
@@ -1876,8 +1998,16 @@ namespace Zenject
             Action<DiContainer> facadeInstaller)
             where TFacadeFactory : FacadeFactory<TFacade>
         {
+            return BindFacadeFactoryMethod<TFacade, TFacadeFactory>(facadeInstaller, ContainerTypes.RuntimeContainer);
+        }
+
+        // See comment in IBinder.cs for description of this method
+        public BindingConditionSetter BindFacadeFactoryMethod<TFacade, TFacadeFactory>(
+            Action<DiContainer> facadeInstaller, ContainerTypes containerType)
+            where TFacadeFactory : FacadeFactory<TFacade>
+        {
             return Bind<TFacadeFactory>().ToMethod(
-                x => x.Container.Instantiate<TFacadeFactory>(facadeInstaller));
+                x => (containerType == ContainerTypes.RuntimeContainer ? x.Container : this).Instantiate<TFacadeFactory>(facadeInstaller));
         }
 
         // See comment in IBinder.cs for description of this method
@@ -1885,8 +2015,16 @@ namespace Zenject
             Action<DiContainer, TParam1> facadeInstaller)
             where TFacadeFactory : FacadeFactory<TParam1, TFacade>
         {
+            return BindFacadeFactoryMethod<TParam1, TFacade, TFacadeFactory>(facadeInstaller, ContainerTypes.RuntimeContainer);
+        }
+
+        // See comment in IBinder.cs for description of this method
+        public BindingConditionSetter BindFacadeFactoryMethod<TParam1, TFacade, TFacadeFactory>(
+            Action<DiContainer, TParam1> facadeInstaller, ContainerTypes containerType)
+            where TFacadeFactory : FacadeFactory<TParam1, TFacade>
+        {
             return Bind<TFacadeFactory>().ToMethod(
-                x => x.Container.Instantiate<TFacadeFactory>(facadeInstaller));
+                x => (containerType == ContainerTypes.RuntimeContainer ? x.Container : this).Instantiate<TFacadeFactory>(facadeInstaller));
         }
 
         // See comment in IBinder.cs for description of this method
@@ -1894,8 +2032,16 @@ namespace Zenject
             Action<DiContainer, TParam1, TParam2> facadeInstaller)
             where TFacadeFactory : FacadeFactory<TParam1, TParam2, TFacade>
         {
+            return BindFacadeFactoryMethod<TParam1, TParam2, TFacade, TFacadeFactory>(facadeInstaller, ContainerTypes.RuntimeContainer);
+        }
+
+        // See comment in IBinder.cs for description of this method
+        public BindingConditionSetter BindFacadeFactoryMethod<TParam1, TParam2, TFacade, TFacadeFactory>(
+            Action<DiContainer, TParam1, TParam2> facadeInstaller, ContainerTypes containerType)
+            where TFacadeFactory : FacadeFactory<TParam1, TParam2, TFacade>
+        {
             return Bind<TFacadeFactory>().ToMethod(
-                x => x.Container.Instantiate<TFacadeFactory>(facadeInstaller));
+                x => (containerType == ContainerTypes.RuntimeContainer ? x.Container : this).Instantiate<TFacadeFactory>(facadeInstaller));
         }
 
         // See comment in IBinder.cs for description of this method
@@ -1903,8 +2049,16 @@ namespace Zenject
             Action<DiContainer, TParam1, TParam2, TParam3> facadeInstaller)
             where TFacadeFactory : FacadeFactory<TParam1, TParam2, TParam3, TFacade>
         {
+            return BindFacadeFactoryMethod<TParam1, TParam2, TParam3, TFacade, TFacadeFactory>(facadeInstaller, ContainerTypes.RuntimeContainer);
+        }
+
+        // See comment in IBinder.cs for description of this method
+        public BindingConditionSetter BindFacadeFactoryMethod<TParam1, TParam2, TParam3, TFacade, TFacadeFactory>(
+            Action<DiContainer, TParam1, TParam2, TParam3> facadeInstaller, ContainerTypes containerType)
+            where TFacadeFactory : FacadeFactory<TParam1, TParam2, TParam3, TFacade>
+        {
             return Bind<TFacadeFactory>().ToMethod(
-                x => x.Container.Instantiate<TFacadeFactory>(facadeInstaller));
+                x => (containerType == ContainerTypes.RuntimeContainer ? x.Container : this).Instantiate<TFacadeFactory>(facadeInstaller));
         }
 
         // See comment in IBinder.cs for description of this method
@@ -1912,8 +2066,16 @@ namespace Zenject
             ModestTree.Util.Action<DiContainer, TParam1, TParam2, TParam3, TParam4> facadeInstaller)
             where TFacadeFactory : FacadeFactory<TParam1, TParam2, TParam3, TParam4, TFacade>
         {
+            return BindFacadeFactoryMethod<TParam1, TParam2, TParam3, TParam4, TFacade, TFacadeFactory>(facadeInstaller, ContainerTypes.RuntimeContainer);
+        }
+
+        // See comment in IBinder.cs for description of this method
+        public BindingConditionSetter BindFacadeFactoryMethod<TParam1, TParam2, TParam3, TParam4, TFacade, TFacadeFactory>(
+            ModestTree.Util.Action<DiContainer, TParam1, TParam2, TParam3, TParam4> facadeInstaller, ContainerTypes containerType)
+            where TFacadeFactory : FacadeFactory<TParam1, TParam2, TParam3, TParam4, TFacade>
+        {
             return Bind<TFacadeFactory>().ToMethod(
-                x => x.Container.Instantiate<TFacadeFactory>(facadeInstaller));
+                x => (containerType == ContainerTypes.RuntimeContainer ? x.Container : this).Instantiate<TFacadeFactory>(facadeInstaller));
         }
 
         // See comment in IBinder.cs for description of this method
@@ -1921,8 +2083,16 @@ namespace Zenject
             ModestTree.Util.Action<DiContainer, TParam1, TParam2, TParam3, TParam4, TParam5> facadeInstaller)
             where TFacadeFactory : FacadeFactory<TParam1, TParam2, TParam3, TParam4, TParam5, TFacade>
         {
+            return BindFacadeFactoryMethod<TParam1, TParam2, TParam3, TParam4, TParam5, TFacade, TFacadeFactory>(facadeInstaller, ContainerTypes.RuntimeContainer);
+        }
+
+        // See comment in IBinder.cs for description of this method
+        public BindingConditionSetter BindFacadeFactoryMethod<TParam1, TParam2, TParam3, TParam4, TParam5, TFacade, TFacadeFactory>(
+            ModestTree.Util.Action<DiContainer, TParam1, TParam2, TParam3, TParam4, TParam5> facadeInstaller, ContainerTypes containerType)
+            where TFacadeFactory : FacadeFactory<TParam1, TParam2, TParam3, TParam4, TParam5, TFacade>
+        {
             return Bind<TFacadeFactory>().ToMethod(
-                x => x.Container.Instantiate<TFacadeFactory>(facadeInstaller));
+                x => (containerType == ContainerTypes.RuntimeContainer ? x.Container : this).Instantiate<TFacadeFactory>(facadeInstaller));
         }
 
         // See comment in IBinder.cs for description of this method
@@ -1930,8 +2100,16 @@ namespace Zenject
             ModestTree.Util.Action<DiContainer, TParam1, TParam2, TParam3, TParam4, TParam5, TParam6> facadeInstaller)
             where TFacadeFactory : FacadeFactory<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6, TFacade>
         {
+            return BindFacadeFactoryMethod<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6, TFacade, TFacadeFactory>(facadeInstaller, ContainerTypes.RuntimeContainer);
+        }
+
+        // See comment in IBinder.cs for description of this method
+        public BindingConditionSetter BindFacadeFactoryMethod<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6, TFacade, TFacadeFactory>(
+            ModestTree.Util.Action<DiContainer, TParam1, TParam2, TParam3, TParam4, TParam5, TParam6> facadeInstaller, ContainerTypes containerType)
+            where TFacadeFactory : FacadeFactory<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6, TFacade>
+        {
             return Bind<TFacadeFactory>().ToMethod(
-                x => x.Container.Instantiate<TFacadeFactory>(facadeInstaller));
+                x => (containerType == ContainerTypes.RuntimeContainer ? x.Container : this).Instantiate<TFacadeFactory>(facadeInstaller));
         }
 
         // See comment in IBinder.cs for description of this method
@@ -1946,8 +2124,15 @@ namespace Zenject
         public BindingConditionSetter BindFacadeFactoryInstaller<TFacade, TFacadeFactory>(Type installerType)
             where TFacadeFactory : FacadeFactoryBase<TFacade>
         {
+            return BindFacadeFactoryInstaller<TFacade, TFacadeFactory>(installerType, ContainerTypes.RuntimeContainer);
+        }
+
+        // See comment in IBinder.cs for description of this method
+        public BindingConditionSetter BindFacadeFactoryInstaller<TFacade, TFacadeFactory>(Type installerType, ContainerTypes containerType)
+            where TFacadeFactory : FacadeFactoryBase<TFacade>
+        {
             return Bind<TFacadeFactory>().ToMethod(
-                x => x.Container.InstantiateExplicit<TFacadeFactory>(
+                x => (containerType == ContainerTypes.RuntimeContainer ? x.Container : this).InstantiateExplicit<TFacadeFactory>(
                     InstantiateUtil.CreateTypeValueListExplicit(installerType)));
         }
 

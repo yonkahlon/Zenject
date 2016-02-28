@@ -10,10 +10,14 @@ namespace Zenject.Commands
         : CommandProviderBase<TCommand, TAction>
         where TCommand : ICommand
     {
+        readonly DiContainer _container;
         readonly ProviderBase _singletonProvider;
 
-        public CommandProviderSingleBase(ProviderBase singletonProvider)
+        public CommandProviderSingleBase(
+            DiContainer container,
+            ProviderBase singletonProvider)
         {
+            _container = container;
             _singletonProvider = singletonProvider;
         }
 
@@ -24,18 +28,21 @@ namespace Zenject.Commands
 
         protected THandler GetSingleton(InjectContext c)
         {
-            var newContext = new InjectContext(
-                c.Container, typeof(THandler), null, false, c.ObjectType,
-                c.ObjectInstance, c.MemberName, c.ParentContext, c.ConcreteIdentifier,
-                null, c.SourceType);
-
-            return (THandler)_singletonProvider.GetInstance(newContext);
+            return (THandler)_singletonProvider.GetInstance(GetNewInjectContext(c));
         }
 
         public override IEnumerable<ZenjectResolveException> ValidateBinding(InjectContext context)
         {
             return base.ValidateBinding(context)
-                .Concat(_singletonProvider.ValidateBinding(context));
+                .Concat(_singletonProvider.ValidateBinding(GetNewInjectContext(context)));
+        }
+
+        InjectContext GetNewInjectContext(InjectContext c)
+        {
+            return new InjectContext(
+                _container, typeof(THandler), null, false, c.ObjectType,
+                c.ObjectInstance, c.MemberName, c.ParentContext, c.ConcreteIdentifier,
+                null, c.SourceType);
         }
     }
 }

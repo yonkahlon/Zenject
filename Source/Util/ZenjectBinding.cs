@@ -9,16 +9,27 @@ using ModestTree;
 
 namespace Zenject
 {
-    // We include Zenject as a prefix to make it obvious to whoever sees it in the scene what it is, since
-    // it will likely be spread out throughout the scene
-    [ExecuteInEditMode]
     public class ZenjectBinding : MonoBehaviour
     {
+        [Tooltip("The component to add to the Zenject container")]
         [SerializeField]
         Component _component = null;
 
+        [Tooltip("This value will determine what container the component gets added to.  If set to 'Scene', it will be as if the given component was bound inside an installer on the SceneCompositionRoot.  If set to 'Local', it will be as if it is bound inside an installer on whatever CompositionRoot it is in.  In most cases that will be the SceneCompositionRoot, but if it's inside a FacadeCompositionRoot it will be bound into that instead.  Typically you would only need to use the 'Scene' value when you want to bind something to the SceneCompositionRoot that is inside a FacadeCompositionRoot (eg. typically this would be the MonoFacade derived class)")]
+        [SerializeField]
+        ContainerTypes _containerType = ContainerTypes.Local;
+
+        [Tooltip("This value is used to determine how to bind this component.  When set to 'ToInstance' is equivalent to calling Container.ToInstance inside an installer, and similarly for ToInterfaces and ToInterfacesAndSelf")]
         [SerializeField]
         BindTypes _bindType = BindTypes.ToInstance;
+
+        public ContainerTypes ContainerType
+        {
+            get
+            {
+                return _containerType;
+            }
+        }
 
         public Component Component
         {
@@ -40,7 +51,13 @@ namespace Zenject
         {
             ToInstance,
             ToInterfaces,
-            ToInstanceAndInterfaces,
+            ToInterfacesAndSelf,
+        }
+
+        public enum ContainerTypes
+        {
+            Scene,
+            Local,
         }
     }
 }

@@ -15,8 +15,8 @@ namespace Zenject.Commands
         readonly Func<THandler, Action> _methodGetter;
 
         public CommandProviderSingleMethod(
-            Func<THandler, Action> methodGetter, ProviderBase singletonProvider)
-            : base(singletonProvider)
+            DiContainer container, Func<THandler, Action> methodGetter, ProviderBase singletonProvider)
+            : base(container, singletonProvider)
         {
             _methodGetter = methodGetter;
         }
@@ -40,8 +40,8 @@ namespace Zenject.Commands
         readonly Func<THandler, Action<TParam1>> _methodGetter;
 
         public CommandProviderSingleMethod(
-            Func<THandler, Action<TParam1>> methodGetter, ProviderBase singletonProvider)
-            : base(singletonProvider)
+            DiContainer container, Func<THandler, Action<TParam1>> methodGetter, ProviderBase singletonProvider)
+            : base(container, singletonProvider)
         {
             _methodGetter = methodGetter;
         }
@@ -65,9 +65,9 @@ namespace Zenject.Commands
         readonly Func<THandler, Action<TParam1, TParam2>> _methodGetter;
 
         public CommandProviderSingleMethod(
-            Func<THandler, Action<TParam1, TParam2>> methodGetter,
+            DiContainer container, Func<THandler, Action<TParam1, TParam2>> methodGetter,
             ProviderBase singletonProvider)
-            : base(singletonProvider)
+            : base(container, singletonProvider)
         {
             _methodGetter = methodGetter;
         }
@@ -91,9 +91,9 @@ namespace Zenject.Commands
         readonly Func<THandler, Action<TParam1, TParam2, TParam3>> _methodGetter;
 
         public CommandProviderSingleMethod(
-            Func<THandler, Action<TParam1, TParam2, TParam3>> methodGetter,
+            DiContainer container, Func<THandler, Action<TParam1, TParam2, TParam3>> methodGetter,
             ProviderBase singletonProvider)
-            : base(singletonProvider)
+            : base(container, singletonProvider)
         {
             _methodGetter = methodGetter;
         }
@@ -117,9 +117,9 @@ namespace Zenject.Commands
         readonly Func<THandler, Action<TParam1, TParam2, TParam3, TParam4>> _methodGetter;
 
         public CommandProviderSingleMethod(
-            Func<THandler, Action<TParam1, TParam2, TParam3, TParam4>> methodGetter,
+            DiContainer container, Func<THandler, Action<TParam1, TParam2, TParam3, TParam4>> methodGetter,
             ProviderBase singletonProvider)
-            : base(singletonProvider)
+            : base(container, singletonProvider)
         {
             _methodGetter = methodGetter;
         }
@@ -143,9 +143,9 @@ namespace Zenject.Commands
         readonly Func<THandler, ModestTree.Util.Action<TParam1, TParam2, TParam3, TParam4, TParam5>> _methodGetter;
 
         public CommandProviderSingleMethod(
-            Func<THandler, ModestTree.Util.Action<TParam1, TParam2, TParam3, TParam4, TParam5>> methodGetter,
+            DiContainer container, Func<THandler, ModestTree.Util.Action<TParam1, TParam2, TParam3, TParam4, TParam5>> methodGetter,
             ProviderBase singletonProvider)
-            : base(singletonProvider)
+            : base(container, singletonProvider)
         {
             _methodGetter = methodGetter;
         }
@@ -169,9 +169,9 @@ namespace Zenject.Commands
         readonly Func<THandler, ModestTree.Util.Action<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6>> _methodGetter;
 
         public CommandProviderSingleMethod(
-            Func<THandler, ModestTree.Util.Action<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6>> methodGetter,
+            DiContainer container, Func<THandler, ModestTree.Util.Action<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6>> methodGetter,
             ProviderBase singletonProvider)
-            : base(singletonProvider)
+            : base(container, singletonProvider)
         {
             _methodGetter = methodGetter;
         }

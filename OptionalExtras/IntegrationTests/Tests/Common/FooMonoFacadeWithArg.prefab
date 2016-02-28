@@ -24,8 +24,8 @@ GameObject:
   serializedVersion: 4
   m_Component:
   - 4: {fileID: 484544}
+  - 114: {fileID: 11461772}
   - 114: {fileID: 11499334}
-  - 114: {fileID: 11469122}
   m_Layer: 0
   m_Name: FooMonoFacadeWithArg
   m_TagString: Untagged
@@ -58,7 +58,7 @@ Transform:
   - {fileID: 427260}
   m_Father: {fileID: 0}
   m_RootOrder: 0
---- !u!114 &11469122
+--- !u!114 &11461772
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
@@ -102,7 +102,15 @@ Prefab:
   serializedVersion: 2
   m_Modification:
     m_TransformParent: {fileID: 0}
-    m_Modifications: []
+    m_Modifications:
+    - target: {fileID: 0}
+      propertyPath: _installers.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: _installers.Array.data[0]
+      value: 
+      objectReference: {fileID: 11499334}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}
   m_RootGameObject: {fileID: 141484}

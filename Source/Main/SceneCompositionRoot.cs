@@ -81,39 +81,81 @@ namespace Zenject
             Log.Debug("SceneCompositionRoot: Initialized successfully");
         }
 
-        // We pass in the binder here instead of using our own for validation to work
-        public void InstallBindings(DiContainer binder)
+        // We pass in the container here instead of using our own for validation to work
+        public void InstallBindings(DiContainer container)
         {
             if (_parentNewObjectsUnderRoot)
             {
-                binder.Bind<Transform>(DiContainer.DefaultParentId)
+                container.Bind<Transform>(DiContainer.DefaultParentId)
                     .ToInstance<Transform>(this.transform);
             }
 
-            binder.Bind<CompositionRoot>().ToInstance(this);
+            container.Bind<CompositionRoot>().ToInstance(this);
 
-            InstallSceneBindings(binder);
+            InstallSceneBindingsInternal(container);
 
             if (BeforeInstallHooks != null)
             {
-                BeforeInstallHooks(binder);
+                BeforeInstallHooks(container);
                 // Reset extra bindings for next time we change scenes
                 BeforeInstallHooks = null;
             }
 
-            binder.Bind<IDependencyRoot>().ToSingleMonoBehaviour<SceneFacade>(this.gameObject);
+            container.Bind<IDependencyRoot>().ToSingleMonoBehaviour<SceneFacade>(this.gameObject);
 
-            InstallInstallers(binder);
+            InstallInstallers(container);
 
             if (AfterInstallHooks != null)
             {
-                AfterInstallHooks(binder);
+                AfterInstallHooks(container);
                 // Reset extra bindings for next time we change scenes
                 AfterInstallHooks = null;
             }
         }
 
-        public override IEnumerable<GameObject> GetRootGameObjects()
+        void InstallSceneBindingsInternal(DiContainer container)
+        {
+            InstallSceneBindings(container);
+
+            foreach (var autoBinding in GameObject.FindObjectsOfType<ZenjectBinding>())
+            {
+                if (autoBinding == null)
+                {
+                    continue;
+                }
+
+                if (autoBinding.ContainerType != ZenjectBinding.ContainerTypes.Scene)
+                {
+                    continue;
+                }
+
+                InstallAutoBinding(container, autoBinding);
+            }
+        }
+
+        public override IEnumerable<Component> GetInjectableComponents()
+        {
+            foreach (var gameObject in GetRootGameObjects())
+            {
+                foreach (var component in GetInjectableComponents(gameObject, OnlyInjectWhenActive))
+                {
+                    yield return component;
+                }
+            }
+        }
+
+        void InjectComponents(DiContainer container)
+        {
+            // Use ToList in case they do something weird in post inject
+            foreach (var component in GetInjectableComponents().ToList())
+            {
+                Assert.That(!component.GetType().DerivesFrom<MonoInstaller>());
+
+                container.Inject(component);
+            }
+        }
+
+        IEnumerable<GameObject> GetRootGameObjects()
         {
             var scene = this.gameObject.scene;
             // Note: We can't use activeScene.GetRootObjects() here because that apparently fails with an exception

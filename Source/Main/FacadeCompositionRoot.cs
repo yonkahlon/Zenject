@@ -65,9 +65,49 @@ namespace Zenject
             Log.Debug("FacadeCompositionRoot: Initialized successfully");
         }
 
-        public override IEnumerable<GameObject> GetRootGameObjects()
+        void InjectComponents(DiContainer container)
         {
-            return UnityUtil.GetDirectChildren(this.gameObject);
+            // Use ToList in case they do something weird in post inject
+            foreach (var component in GetInjectableComponents().ToList())
+            {
+                Assert.That(!component.GetType().DerivesFrom<MonoInstaller>());
+
+                container.Inject(component);
+            }
+        }
+
+        public override IEnumerable<Component> GetInjectableComponents()
+        {
+            // We inject on all components on the root except ourself
+            foreach (var component in GetComponents<Component>())
+            {
+                if (component == null)
+                {
+                    Log.Warn("Zenject: Found null component on game object '{0}'.  Possible missing script.", gameObject.name);
+                    continue;
+                }
+
+                if (component.GetType().DerivesFrom<MonoInstaller>())
+                {
+                    // Do not inject on installers since these are always injected before they are installed
+                    continue;
+                }
+
+                if (component == this)
+                {
+                    continue;
+                }
+
+                yield return component;
+            }
+
+            foreach (var gameObject in UnityUtil.GetDirectChildren(this.gameObject))
+            {
+                foreach (var component in GetInjectableComponents(gameObject, OnlyInjectWhenActive))
+                {
+                    yield return component;
+                }
+            }
         }
 
         public void InstallBindings(

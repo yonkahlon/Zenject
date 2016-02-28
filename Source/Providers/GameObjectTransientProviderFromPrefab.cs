@@ -10,15 +10,20 @@ namespace Zenject
 {
     public class GameObjectTransientProviderFromPrefab : ProviderBase
     {
+        readonly ContainerTypes _containerType;
         readonly Type _concreteType;
         readonly GameObject _prefab;
+        readonly DiContainer _container;
 
         public GameObjectTransientProviderFromPrefab(
-            Type concreteType, GameObject prefab, DiContainer container)
+            Type concreteType, GameObject prefab, DiContainer container,
+            ContainerTypes containerType)
         {
+            _containerType = containerType;
             // Don't do this because it might be an interface
             //Assert.That(typeof(T).DerivesFrom<Component>());
 
+            _container = container;
             _concreteType = concreteType;
             _prefab = prefab;
 
@@ -40,7 +45,8 @@ namespace Zenject
         {
             Assert.That(_concreteType.DerivesFromOrEqual(context.MemberType));
 
-            var rootGameObject = context.Container.InstantiatePrefab(_prefab);
+            var container = _containerType == ContainerTypes.RuntimeContainer ? context.Container : _container;
+            var rootGameObject = container.InstantiatePrefab(_prefab);
 
             var component = rootGameObject.GetComponentInChildren(_concreteType);
 
@@ -55,8 +61,10 @@ namespace Zenject
 
         public override IEnumerable<ZenjectResolveException> ValidateBinding(InjectContext context)
         {
+            var container = _containerType == ContainerTypes.RuntimeContainer ? context.Container : _container;
+
             return ZenValidator.ValidatePrefab(
-                context.Container, _prefab, _concreteType, context);
+                container, _prefab, _concreteType, context);
         }
     }
 }

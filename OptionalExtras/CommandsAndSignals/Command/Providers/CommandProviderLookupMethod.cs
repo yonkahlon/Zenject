@@ -15,8 +15,8 @@ namespace Zenject.Commands
         readonly Func<THandler, Action> _methodGetter;
 
         public CommandProviderResolveMethod(
-            Func<THandler, Action> methodGetter, string identifier, bool isOptional)
-            : base(identifier, isOptional)
+            DiContainer container, ContainerTypes containerType, Func<THandler, Action> methodGetter, string identifier, bool isOptional)
+            : base(container, containerType, identifier, isOptional)
         {
             _methodGetter = methodGetter;
         }
@@ -43,8 +43,8 @@ namespace Zenject.Commands
         readonly Func<THandler, Action<TParam1>> _methodGetter;
 
         public CommandProviderResolveMethod(
-            Func<THandler, Action<TParam1>> methodGetter, string identifier, bool isOptional)
-            : base(identifier, isOptional)
+            DiContainer container, ContainerTypes containerType, Func<THandler, Action<TParam1>> methodGetter, string identifier, bool isOptional)
+            : base(container, containerType, identifier, isOptional)
         {
             _methodGetter = methodGetter;
         }
@@ -71,8 +71,8 @@ namespace Zenject.Commands
         readonly Func<THandler, Action<TParam1, TParam2>> _methodGetter;
 
         public CommandProviderResolveMethod(
-            Func<THandler, Action<TParam1, TParam2>> methodGetter, string identifier, bool isOptional)
-            : base(identifier, isOptional)
+            DiContainer container, ContainerTypes containerType, Func<THandler, Action<TParam1, TParam2>> methodGetter, string identifier, bool isOptional)
+            : base(container, containerType, identifier, isOptional)
         {
             _methodGetter = methodGetter;
         }
@@ -99,9 +99,9 @@ namespace Zenject.Commands
         readonly Func<THandler, Action<TParam1, TParam2, TParam3>> _methodGetter;
 
         public CommandProviderResolveMethod(
-            Func<THandler, Action<TParam1, TParam2, TParam3>> methodGetter,
+            DiContainer container, ContainerTypes containerType, Func<THandler, Action<TParam1, TParam2, TParam3>> methodGetter,
             string identifier, bool isOptional)
-            : base(identifier, isOptional)
+            : base(container, containerType, identifier, isOptional)
         {
             _methodGetter = methodGetter;
         }
@@ -128,9 +128,9 @@ namespace Zenject.Commands
         readonly Func<THandler, Action<TParam1, TParam2, TParam3, TParam4>> _methodGetter;
 
         public CommandProviderResolveMethod(
-            Func<THandler, Action<TParam1, TParam2, TParam3, TParam4>> methodGetter,
+            DiContainer container, ContainerTypes containerType, Func<THandler, Action<TParam1, TParam2, TParam3, TParam4>> methodGetter,
             string identifier, bool isOptional)
-            : base(identifier, isOptional)
+            : base(container, containerType, identifier, isOptional)
         {
             _methodGetter = methodGetter;
         }
@@ -157,9 +157,9 @@ namespace Zenject.Commands
         readonly Func<THandler, ModestTree.Util.Action<TParam1, TParam2, TParam3, TParam4, TParam5>> _methodGetter;
 
         public CommandProviderResolveMethod(
-            Func<THandler, ModestTree.Util.Action<TParam1, TParam2, TParam3, TParam4, TParam5>> methodGetter,
+            DiContainer container, ContainerTypes containerType, Func<THandler, ModestTree.Util.Action<TParam1, TParam2, TParam3, TParam4, TParam5>> methodGetter,
             string identifier, bool isOptional)
-            : base(identifier, isOptional)
+            : base(container, containerType, identifier, isOptional)
         {
             _methodGetter = methodGetter;
         }
@@ -186,9 +186,9 @@ namespace Zenject.Commands
         readonly Func<THandler, ModestTree.Util.Action<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6>> _methodGetter;
 
         public CommandProviderResolveMethod(
-            Func<THandler, ModestTree.Util.Action<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6>> methodGetter,
+            DiContainer container, ContainerTypes containerType, Func<THandler, ModestTree.Util.Action<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6>> methodGetter,
             string identifier, bool isOptional)
-            : base(identifier, isOptional)
+            : base(container, containerType, identifier, isOptional)
         {
             _methodGetter = methodGetter;
         }

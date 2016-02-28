@@ -8,9 +8,14 @@ namespace Zenject
     public class TransientProvider : ProviderBase
     {
         readonly Type _concreteType;
+        readonly DiContainer _container;
+        readonly ContainerTypes _containerType;
 
-        public TransientProvider(Type concreteType, DiContainer container)
+        public TransientProvider(
+            Type concreteType, DiContainer container, ContainerTypes containerType)
         {
+            _container = container;
+            _containerType = containerType;
             _concreteType = concreteType;
 
             var singletonMark = container.SingletonRegistry.TryGetSingletonType(concreteType);
@@ -29,7 +34,9 @@ namespace Zenject
 
         public override object GetInstance(InjectContext context)
         {
-            var obj = context.Container.InstantiateExplicit(
+            var container = _containerType == ContainerTypes.RuntimeContainer ? context.Container : _container;
+
+            var obj = container.InstantiateExplicit(
                 GetTypeToInstantiate(context.MemberType), new List<TypeValuePair>(), context, null, true);
             Assert.That(obj != null);
             return obj;
@@ -50,7 +57,9 @@ namespace Zenject
 
         public override IEnumerable<ZenjectResolveException> ValidateBinding(InjectContext context)
         {
-            return context.Container.ValidateObjectGraph(_concreteType, context);
+            var container = _containerType == ContainerTypes.RuntimeContainer ? context.Container : _container;
+
+            return container.ValidateObjectGraph(_concreteType, context);
         }
     }
 }
