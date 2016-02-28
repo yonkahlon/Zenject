@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using Zenject;
 
 namespace ModestTree
@@ -22,6 +23,11 @@ namespace ModestTree
 
         public void Tick()
         {
+            if (_player.IsDead)
+            {
+                return;
+            }
+
             if (_inputState.IsMovingLeft)
             {
                 _player.AddForce(

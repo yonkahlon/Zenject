@@ -17,6 +17,7 @@ namespace ModestTree
         Vector3 _startPos;
         float _theta;
         float _startTime;
+        Vector3 _startLookDir;
 
         public EnemyStateIdle(
             EnemyModel model, Settings settings,
@@ -40,6 +41,7 @@ namespace ModestTree
             _startPos = _model.Position;
             _theta = 0;
             _startTime = Time.realtimeSinceStartup;
+            _startLookDir = _model.LookDir;
 
             _hitSignal.Event += OnHit;
         }
@@ -68,18 +70,28 @@ namespace ModestTree
 
             _model.Position = _startPos + _model.RightDir * _settings.Amplitude * Mathf.Sin(_theta);
 
-            // look away from player
-            _model.DesiredLookDir = -(_player.Position - _model.Position).normalized;
+            if (_player.IsDead)
+            {
+                _model.DesiredLookDir = _startLookDir;
+            }
+            else
+            {
+                // look away from player
+                _model.DesiredLookDir = -(_player.Position - _model.Position).normalized;
+            }
 
             var elapsed = Time.realtimeSinceStartup - _startTime;
 
-            if (_registry.Enemies.Where(x => x.IsAttackingOrChasing).Count() < _globalTunables.NumAttacking)
+            if (!_player.IsDead)
             {
-                _stateManager.ChangeState(EnemyStates.Follow);
-            }
-            else if ((_player.Position - _model.Position).magnitude < _settings.AttackDistance)
-            {
-                _stateManager.ChangeState(EnemyStates.Attack);
+                if (_registry.Enemies.Where(x => x.IsAttackingOrChasing).Count() < _globalTunables.NumAttacking)
+                {
+                    _stateManager.ChangeState(EnemyStates.Follow);
+                }
+                else if ((_player.Position - _model.Position).magnitude < _settings.AttackDistance)
+                {
+                    _stateManager.ChangeState(EnemyStates.Attack);
+                }
             }
         }
 

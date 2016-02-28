@@ -13,6 +13,7 @@ namespace ModestTree
         public override void InstallBindings()
         {
             Container.BindInstance(_settings.Rigidbody).WhenInjectedInto<PlayerModel>();
+            Container.BindInstance(_settings.MeshRenderer).WhenInjectedInto<PlayerModel>();
             Container.Bind<PlayerModel>().ToSingle();
 
             Container.BindAllInterfaces<PlayerInputHandler>().ToSingle<PlayerInputHandler>();
@@ -26,6 +27,8 @@ namespace ModestTree
             Container.BindAllInterfaces<PlayerShootHandler>().ToSingle<PlayerShootHandler>();
 
             Container.Bind<PlayerInputState>().ToSingle();
+
+            Container.BindAllInterfaces<PlayerHealthWatcher>().ToSingle<PlayerHealthWatcher>();
 
             Container.BindSignal<PlayerSignals.Hit>();
             Container.BindTrigger<PlayerSignals.Hit.Trigger>();
@@ -43,8 +46,8 @@ namespace ModestTree
         [Serializable]
         public class Settings
         {
-            public Transform ShootPosition;
             public Rigidbody Rigidbody;
+            public MeshRenderer MeshRenderer;
 
             public PlayerMoveHandler.Settings PlayerMoveHandler;
             public PlayerShootHandler.Settings PlayerShootHandler;

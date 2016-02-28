@@ -6,22 +6,18 @@ namespace ModestTree
     public class PlayerFacade : MonoFacade
     {
         PlayerModel _model;
-        PlayerSignals.Hit.Trigger _hitTrigger;
 
         [PostInject]
-        public void Construct(PlayerModel player, PlayerSignals.Hit.Trigger hitTrigger)
+        public void Construct(PlayerModel player)
         {
             _model = player;
-            _hitTrigger = hitTrigger;
         }
 
-        public void OnTriggerEnter(Collider other)
+        public bool IsDead
         {
-            var bullet = other.GetComponent<Bullet>();
-
-            if (bullet != null && bullet.Type != BulletTypes.FromPlayer)
+            get
             {
-                _hitTrigger.Fire(bullet);
+                return _model.IsDead;
             }
         }
 

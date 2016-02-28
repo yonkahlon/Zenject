@@ -17,9 +17,7 @@ namespace ModestTree
             Container.BindAllInterfaces<CameraHandler>().ToSingle<CameraHandler>();
 
             Container.BindSignal<PlayerKilledSignal>();
-            Container.BindTrigger<PlayerKilledSignal.Trigger>().WhenInjectedInto<PlayerCollisionHandler>();
-
-            Container.BindAllInterfaces<RestartHandler>().ToSingle<RestartHandler>();
+            Container.BindTrigger<PlayerKilledSignal.Trigger>();
 
             Container.BindAllInterfaces<EnemySpawner>().ToSingle<EnemySpawner>();
 
@@ -38,7 +36,12 @@ namespace ModestTree
                 // also be destroyed which is not what we want
                 ContainerTypes.BindContainer);
 
+            Container.BindMonoBehaviourFactory<Explosion.Factory>(
+                _settings.ExplosionPrefab, "Explosions", ContainerTypes.BindContainer);
+
             Container.Bind<AudioPlayer>().ToSingle();
+
+            Container.BindAllInterfaces<GameRestartHandler>().ToSingle<GameRestartHandler>();
 
             InstallSettings();
         }
@@ -48,6 +51,7 @@ namespace ModestTree
             Container.BindInstance(_settings.CameraHandler);
             Container.BindInstance(_settings.EnemySpawner);
             Container.BindInstance(_settings.GameDifficultyHandler);
+            Container.BindInstance(_settings.GameRestartHandler);
             Container.BindInstance(_settings.EnemyGlobalTunables);
         }
 
@@ -55,13 +59,16 @@ namespace ModestTree
         public class Settings
         {
             public GameObject EnemyFacadePrefab;
+
             public GameObject BulletPrefab;
+            public GameObject ExplosionPrefab;
 
             public Camera MainCamera;
 
             public CameraHandler.Settings CameraHandler;
             public EnemySpawner.Settings EnemySpawner;
             public GameDifficultyHandler.Settings GameDifficultyHandler;
+            public GameRestartHandler.Settings GameRestartHandler;
 
             public EnemyGlobalTunables EnemyGlobalTunables;
         }

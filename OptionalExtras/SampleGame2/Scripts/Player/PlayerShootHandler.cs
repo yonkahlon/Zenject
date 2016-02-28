@@ -27,6 +27,11 @@ namespace ModestTree
 
         public void Tick()
         {
+            if (_player.IsDead)
+            {
+                return;
+            }
+
             if (_inputState.IsFiring && Time.realtimeSinceStartup - _lastFireTime > _settings.MaxShootInterval)
             {
                 _lastFireTime = Time.realtimeSinceStartup;
