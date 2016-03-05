@@ -32,7 +32,7 @@ namespace Zenject.Tests
         [Test]
         public void TestMethod()
         {
-            Container.Bind<FooFacade>().ToSingleFacadeMethod(FacadeInstaller);
+            Container.Bind<FooFacade>().ToSingleFacadeMethod(InstallFooFacade);
 
             AssertValidates();
 
@@ -57,7 +57,7 @@ namespace Zenject.Tests
             Assert.IsNotNull(foo.Bar);
         }
 
-        void FacadeInstaller(DiContainer container)
+        void InstallFooFacade(DiContainer container)
         {
             container.Bind<FooFacade>().ToSingle();
             container.Bind<Bar>().ToSingle();

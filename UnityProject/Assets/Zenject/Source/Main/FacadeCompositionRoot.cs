@@ -56,7 +56,17 @@ namespace Zenject
             Log.Debug("FacadeCompositionRoot: Running installers...");
 
             _container = parentContainer.CreateSubContainer();
-            InstallBindings(_container, installerExtraArgs);
+
+            _container.IsInstalling = true;
+
+            try
+            {
+                InstallBindings(_container, installerExtraArgs);
+            }
+            finally
+            {
+                _container.IsInstalling = false;
+            }
 
             Log.Debug("FacadeCompositionRoot: Injecting into child components...");
 

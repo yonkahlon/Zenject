@@ -12,10 +12,14 @@ namespace Zenject
     public interface IInstantiator
     {
         // Use this method to create any non-monobehaviour
+        // Any fields marked [Inject] will be set using the bindings on the container
+        // Any methods marked with a [PostInject] will be called
+        // Any constructor parameters will be filled in with values from the container
         T Instantiate<T>(params object[] extraArgs);
         object Instantiate(Type concreteType, params object[] extraArgs);
 
         // This is used instead of Instantiate to support specifying null values
+        // however the type for each parameter needs to be explicitly provided in this case
         T InstantiateExplicit<T>(List<TypeValuePair> extraArgMap);
 
         T InstantiateExplicit<T>(
@@ -65,7 +69,13 @@ namespace Zenject
             GameObject prefab, params object[] args);
 
         GameObject InstantiatePrefab(
+            string groupName, GameObject prefab, params object[] args);
+
+        GameObject InstantiatePrefab(
             bool includeInactive, GameObject prefab, params object[] args);
+
+        GameObject InstantiatePrefab(
+            bool includeInactive, string groupName, GameObject prefab, params object[] args);
 
         // Create a new game object from a resource path and fill in dependencies for all children
         GameObject InstantiatePrefabResource(

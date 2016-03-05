@@ -43,8 +43,8 @@ namespace Zenject
             {
                 return new string[]
                 {
-                    "",
-                    "",
+                    "Drag any MonoInstallers that you have added to your Scene Hierarchy here.",
+                    "Drag any prefabs that contain a MonoInstaller on them here",
                 };
             }
         }

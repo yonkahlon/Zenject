@@ -98,7 +98,17 @@ namespace Zenject
 
             _container = new DiContainer(false);
 
-            InstallBindings(_container);
+            _container.IsInstalling = true;
+
+            try
+            {
+                InstallBindings(_container);
+            }
+            finally
+            {
+                _container.IsInstalling = false;
+            }
+
             InjectComponents(_container);
 
             _dependencyRoot = _container.Resolve<IDependencyRoot>();
@@ -129,6 +139,10 @@ namespace Zenject
         // We pass in the container here instead of using our own for validation to work
         public void InstallBindings(DiContainer container)
         {
+            container.Bind(typeof(TickableManager), typeof(InitializableManager), typeof(DisposableManager))
+                .ToTransient()
+                .WhenInjectedInto(typeof(MonoFacade), typeof(Facade));
+
             container.Bind<CompositionRoot>().ToInstance(this);
             container.Bind<IDependencyRoot>().ToSingleMonoBehaviour<GlobalFacade>(this.gameObject);
 

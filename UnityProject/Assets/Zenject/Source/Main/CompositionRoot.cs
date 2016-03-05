@@ -99,8 +99,6 @@ namespace Zenject
         protected void InstallInstallers(
             DiContainer container, Dictionary<Type, List<TypeValuePair>> extraArgsMap)
         {
-            container.Install<FacadeCommonInstaller>();
-
             ValidateInstallers();
 
             var newGameObjects = new List<GameObject>();

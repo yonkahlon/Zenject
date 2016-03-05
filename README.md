@@ -1123,7 +1123,8 @@ A Zenject driven application is executed by the following steps:
 1. Steps 13 - 15 is repeated for LateUpdate
 1. At the same time, Steps 13 - 15 is repeated for FixedUpdate according to the physics timestep
 1. App is exited
-1. Dispose() is called on all objects mapped to IDisposable (see <a href="#implementing-idisposable">here</a> for details)
+1. Dispose() is called on all objects mapped to IDisposable within the scene container (see <a href="#implementing-idisposable">here</a> for details)
+1. Dispose() is called on all objects mapped to IDisposable within the global container (see <a href="#implementing-idisposable">here</a> for details)
 
 ## <a id="di-guidelines--recommendations"></a>DI Guidelines / Recommendations / Gotchas / Tips and Tricks
 
