@@ -322,7 +322,7 @@ namespace Zenject.Commands
         public BindingConditionSetter ToTransient<THandler>(
             string concreteIdentifier, Func<THandler, Action<TParam1, TParam2>> methodGetter)
         {
-            return ToTransient<THandler>(concreteIdentifier, methodGetter);
+            return ToTransient<THandler>(concreteIdentifier, methodGetter, ContainerTypes.RuntimeContainer);
         }
 
         public BindingConditionSetter ToTransient<THandler>(
