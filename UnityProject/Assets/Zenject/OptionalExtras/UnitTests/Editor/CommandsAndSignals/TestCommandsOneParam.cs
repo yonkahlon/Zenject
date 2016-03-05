@@ -80,6 +80,7 @@ namespace Zenject.Tests
 
             Assert.IsEqual(Bar.Instances.Count, 0);
             foo.Trigger("asdf");
+
             Assert.IsEqual(Bar.Instances.Count, 1);
 
             var bar1 = Bar.Instances.Single();
