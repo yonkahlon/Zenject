@@ -5,7 +5,7 @@ using Zenject;
 
 namespace ModestTree
 {
-    public class PlayerMoveHandler : ITickable
+    public class PlayerMoveHandler : IFixedTickable
     {
         readonly Settings _settings;
         readonly PlayerModel _player;
@@ -21,7 +21,7 @@ namespace ModestTree
             _inputState = inputState;
         }
 
-        public void Tick()
+        public void FixedTick()
         {
             if (_player.IsDead)
             {

@@ -6,6 +6,7 @@ using Zenject.Commands;
 
 namespace ModestTree
 {
+    // Main installer for our game
     public class GameInstaller : MonoInstaller
     {
         [SerializeField]
@@ -21,6 +22,7 @@ namespace ModestTree
 
             Container.BindAllInterfaces<EnemySpawner>().ToSingle<EnemySpawner>();
 
+            // We provide the installer here so that Zenject knows where to inject the arguments into
             Container.BindMonoFacadeFactory<EnemyInstaller, EnemyFacade.Factory>(_settings.EnemyFacadePrefab, "Enemies");
 
             Container.BindAllInterfaces<GameDifficultyHandler>().ToSingle<GameDifficultyHandler>();

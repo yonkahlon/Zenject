@@ -36,6 +36,7 @@ namespace ModestTree
             Container.BindSignal<EnemySignals.Hit>();
             Container.BindTrigger<EnemySignals.Hit.Trigger>();
 
+            Container.BindAllInterfaces<EnemyStateCommon>().ToSingle<EnemyStateCommon>();
             Container.BindAllInterfaces<EnemyRotationHandler>().ToSingle<EnemyRotationHandler>();
 
             InstallSettings();

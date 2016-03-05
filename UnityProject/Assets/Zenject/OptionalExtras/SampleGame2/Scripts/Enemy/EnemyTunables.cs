@@ -3,6 +3,8 @@ using UnityEngine;
 
 namespace ModestTree
 {
+    // These values are given as parameters into dynamically created
+    // EnemyFacade instances
     [Serializable]
     public class EnemyTunables
     {
@@ -11,6 +13,8 @@ namespace ModestTree
         public float AttackDistance;
     }
 
+    // These values are global and used to ramp up the difficulty of our game
+    // over time
     [Serializable]
     public class EnemyGlobalTunables
     {

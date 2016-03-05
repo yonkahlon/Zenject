@@ -4,14 +4,14 @@ using Zenject;
 
 namespace ModestTree
 {
-    public class PlayerCollisionHandler : IInitializable, IDisposable
+    public class PlayerBulletHitHandler : IInitializable, IDisposable
     {
         readonly PlayerSignals.Hit _hitSignal;
         readonly AudioPlayer _audioPlayer;
         readonly Settings _settings;
         readonly PlayerModel _model;
 
-        public PlayerCollisionHandler(
+        public PlayerBulletHitHandler(
             PlayerModel model,
             Settings settings,
             AudioPlayer audioPlayer,

@@ -10,7 +10,6 @@ namespace ModestTree
         readonly PlayerFacade _player;
         readonly EnemyRegistry _registry;
         readonly EnemyStateManager _stateManager;
-        readonly EnemySignals.Hit _hitSignal;
         readonly Settings _settings;
         readonly EnemyModel _model;
 
@@ -21,7 +20,6 @@ namespace ModestTree
 
         public EnemyStateIdle(
             EnemyModel model, Settings settings,
-            EnemySignals.Hit hitSignal,
             EnemyStateManager stateManager,
             EnemyRegistry registry,
             PlayerFacade player,
@@ -31,7 +29,6 @@ namespace ModestTree
             _player = player;
             _registry = registry;
             _stateManager = stateManager;
-            _hitSignal = hitSignal;
             _settings = settings;
             _model = model;
         }
@@ -42,25 +39,10 @@ namespace ModestTree
             _theta = 0;
             _startTime = Time.realtimeSinceStartup;
             _startLookDir = _model.LookDir;
-
-            _hitSignal.Event += OnHit;
         }
 
         public void Dispose()
         {
-            _hitSignal.Event -= OnHit;
-        }
-
-        void OnHit(Bullet bullet)
-        {
-            if (_model.Health < 50.0f)
-            {
-                _stateManager.ChangeState(EnemyStates.RunAway);
-            }
-            else
-            {
-                _stateManager.ChangeState(EnemyStates.Follow);
-            }
         }
 
         // Just add a bit of subtle movement
@@ -80,11 +62,9 @@ namespace ModestTree
                 _model.DesiredLookDir = -(_player.Position - _model.Position).normalized;
             }
 
-            var elapsed = Time.realtimeSinceStartup - _startTime;
-
             if (!_player.IsDead)
             {
-                if (_registry.Enemies.Where(x => x.IsAttackingOrChasing).Count() < _globalTunables.NumAttacking)
+                if (_registry.Enemies.Where(x => x.IsAttacking || x.IsChasing).Count() < _globalTunables.NumAttacking)
                 {
                     _stateManager.ChangeState(EnemyStates.Follow);
                 }
@@ -93,6 +73,10 @@ namespace ModestTree
                     _stateManager.ChangeState(EnemyStates.Attack);
                 }
             }
+        }
+
+        public void FixedUpdate()
+        {
         }
 
         [Serializable]

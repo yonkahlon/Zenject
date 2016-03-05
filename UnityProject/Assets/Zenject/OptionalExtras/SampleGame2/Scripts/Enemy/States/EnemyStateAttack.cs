@@ -9,7 +9,6 @@ namespace ModestTree
     {
         readonly EnemyRegistry _registry;
         readonly EnemyTunables _tunables;
-        readonly EnemySignals.Hit _hitSignal;
         readonly EnemyStateManager _stateManager;
         readonly PlayerFacade _player;
         readonly Settings _settings;
@@ -26,13 +25,11 @@ namespace ModestTree
             Settings settings,
             PlayerFacade player,
             EnemyStateManager stateManager,
-            EnemySignals.Hit hitSignal,
             EnemyTunables tunables,
             EnemyRegistry registry)
         {
             _registry = registry;
             _tunables = tunables;
-            _hitSignal = hitSignal;
             _stateManager = stateManager;
             _player = player;
             _settings = settings;
@@ -41,11 +38,64 @@ namespace ModestTree
             _strafeRight = Random.Range(0.0f, 1.0f) < 0.5f;
         }
 
+        public void Initialize()
+        {
+        }
+
+        public void Dispose()
+        {
+        }
+
+        public void Update()
+        {
+            if (_player.IsDead)
+            {
+                _stateManager.ChangeState(EnemyStates.Idle);
+                return;
+            }
+
+            _model.DesiredLookDir = (_player.Position - _model.Position).normalized;
+
+            // Strafe back and forth over the given interval
+            if (Time.realtimeSinceStartup - _lastStrafeChangeTime > _settings.StrafeChangeInterval)
+            {
+                _lastStrafeChangeTime = Time.realtimeSinceStartup;
+                _strafeRight = !_strafeRight;
+            }
+
+            // Shoot every X seconds
+            if (Time.realtimeSinceStartup - _lastShootTime > _settings.ShootInterval)
+            {
+                _lastShootTime = Time.realtimeSinceStartup;
+                Fire();
+            }
+
+            // If the player runs away then chase them
+            if ((_player.Position - _model.Position).magnitude > _tunables.AttackDistance + _settings.AttackRangeBuffer)
+            {
+                _stateManager.ChangeState(EnemyStates.Follow);
+            }
+        }
+
+        public void FixedUpdate()
+        {
+            // Strafe to avoid getting hit too easily
+            if (_strafeRight)
+            {
+                _model.AddForce(_model.RightDir * _settings.StrafeMultiplier * _model.MoveSpeed);
+            }
+            else
+            {
+                _model.AddForce(-_model.RightDir * _settings.StrafeMultiplier * _model.MoveSpeed);
+            }
+        }
+
         void Fire()
         {
             var bullet = _bulletFactory.Create(
                 _settings.BulletSpeed, _settings.BulletLifetime, BulletTypes.FromEnemy);
 
+            // Randomize our aim a bit
             var accuracy = Mathf.Clamp(_tunables.Accuracy, 0, 1);
             var maxError = 1.0f - accuracy;
             var error = Random.Range(0, maxError);
@@ -61,66 +111,6 @@ namespace ModestTree
             bullet.transform.rotation = Quaternion.AngleAxis(thetaError, Vector3.forward) * _model.Rotation;
         }
 
-        public void Initialize()
-        {
-            _hitSignal.Event += OnHit;
-        }
-
-        public void Dispose()
-        {
-            _hitSignal.Event -= OnHit;
-        }
-
-        void OnHit(Bullet bullet)
-        {
-            if (_model.Health < _settings.HealthToRunAt)
-            {
-                _stateManager.ChangeState(EnemyStates.RunAway);
-            }
-        }
-
-        public void Update()
-        {
-            if (_player.IsDead)
-            {
-                _stateManager.ChangeState(EnemyStates.Idle);
-                return;
-            }
-
-            _model.DesiredLookDir = (_player.Position - _model.Position).normalized;
-
-            if (Time.realtimeSinceStartup - _lastStrafeChangeTime > _settings.StrafeChangeInterval)
-            {
-                _lastStrafeChangeTime = Time.realtimeSinceStartup;
-                _strafeRight = !_strafeRight;
-            }
-
-            Strafe();
-
-            if (Time.realtimeSinceStartup - _lastShootTime > _settings.ShootInterval)
-            {
-                _lastShootTime = Time.realtimeSinceStartup;
-                Fire();
-            }
-
-            if ((_player.Position - _model.Position).magnitude > _tunables.AttackDistance + _settings.AttackRangeBuffer)
-            {
-                _stateManager.ChangeState(EnemyStates.Follow);
-            }
-        }
-
-        void Strafe()
-        {
-            if (_strafeRight)
-            {
-                _model.AddForce(_model.RightDir * _settings.StrafeMultiplier * _model.MoveSpeed);
-            }
-            else
-            {
-                _model.AddForce(-_model.RightDir * _settings.StrafeMultiplier * _model.MoveSpeed);
-            }
-        }
-
         [Serializable]
         public class Settings
         {
@@ -129,7 +119,6 @@ namespace ModestTree
             public float BulletOffsetDistance;
             public float ShootInterval;
             public float ErrorRangeTheta;
-            public float HealthToRunAt;
             public float AttackRangeBuffer;
             public float StrafeMultiplier;
             public float StrafeChangeInterval;

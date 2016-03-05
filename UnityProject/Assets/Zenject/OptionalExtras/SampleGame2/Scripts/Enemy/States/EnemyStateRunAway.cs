@@ -41,12 +41,15 @@ namespace ModestTree
             // look away from player
             _model.DesiredLookDir = -(_player.Position - _model.Position).normalized;
 
-            MoveAwayFromPlayer();
-
             if ((_player.Position - _model.Position).magnitude > _settings.SafeDistance)
             {
                 _stateManager.ChangeState(EnemyStates.Idle);
             }
+        }
+
+        public void FixedUpdate()
+        {
+            MoveAwayFromPlayer();
         }
 
         void MoveAwayFromPlayer()
