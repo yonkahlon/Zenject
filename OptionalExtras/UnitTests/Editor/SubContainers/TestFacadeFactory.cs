@@ -100,7 +100,10 @@ namespace Zenject.Tests
 
         void FacadeInstaller(DiContainer container)
         {
-            container.Install<FacadeCommonInstaller>();
+            Container.Bind<TickableManager>().ToSingle();
+            Container.Bind<InitializableManager>().ToSingle();
+            Container.Bind<DisposableManager>().ToSingle();
+
             container.Bind<FooFacade>().ToSingle();
 
             container.Bind<IDisposable>().ToSingle<MyDispose>();
@@ -112,7 +115,10 @@ namespace Zenject.Tests
         {
             public override void InstallBindings()
             {
-                Container.Install<FacadeCommonInstaller>();
+                Container.Bind<TickableManager>().ToSingle();
+                Container.Bind<InitializableManager>().ToSingle();
+                Container.Bind<DisposableManager>().ToSingle();
+
                 Container.Bind<FooFacade>().ToSingle();
 
                 Container.Bind<IDisposable>().ToSingle<MyDispose>();

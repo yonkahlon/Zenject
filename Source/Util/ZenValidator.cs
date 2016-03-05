@@ -21,10 +21,15 @@ namespace Zenject
             SceneCompositionRoot sceneRoot, GlobalCompositionRoot globalRoot)
         {
             var globalContainer = new DiContainer(true);
+            globalContainer.IsInstalling = true;
             globalRoot.InstallBindings(globalContainer);
 
             var sceneContainer = new DiContainer(globalContainer, true);
+            sceneContainer.IsInstalling = true;
             sceneRoot.InstallBindings(sceneContainer);
+
+            globalContainer.IsInstalling = false;
+            sceneContainer.IsInstalling = false;
 
             return ValidateCompositionRoot(globalRoot, globalContainer)
                 .Concat(ValidateCompositionRoot(sceneRoot, sceneContainer))
@@ -61,14 +66,14 @@ namespace Zenject
             {
                 // In most cases componentType will be a MonoBehaviour but we also want to allow interfaces
                 // And in that case we can't validate the implementing MonoBehaviour
-                foreach (var error in MonoBehaviourFactoryUtil.Validate(container, prefab))
+                foreach (var error in PrefabBasedFactoryUtil.Validate(container, prefab))
                 {
                     yield return error;
                 }
             }
             else
             {
-                foreach (var error in MonoBehaviourFactoryUtil.Validate(container, prefab, componentType, new Type[0]))
+                foreach (var error in PrefabBasedFactoryUtil.Validate(container, prefab, componentType, new Type[0]))
                 {
                     yield return error;
                 }
@@ -93,7 +98,9 @@ namespace Zenject
             }
 
             var facadeContainer = new DiContainer(sceneContainer, true);
+            facadeContainer.IsInstalling = true;
             facadeRoot.InstallBindings(facadeContainer, null);
+            facadeContainer.IsInstalling = false;
 
             foreach (var err in ValidateCompositionRoot(facadeRoot, facadeContainer))
             {

@@ -29,7 +29,7 @@ namespace Zenject.Tests
         [Test]
         public void Test1()
         {
-            var types = new List<Type>()
+            var types = new Type[]
             {
                 typeof(Bar),
                 typeof(Foo),

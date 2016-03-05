@@ -66,7 +66,16 @@ namespace Zenject
 
             Log.Debug("SceneCompositionRoot: Running installers...");
 
-            InstallBindings(_container);
+            _container.IsInstalling = true;
+
+            try
+            {
+                InstallBindings(_container);
+            }
+            finally
+            {
+                _container.IsInstalling = false;
+            }
 
             Log.Debug("SceneCompositionRoot: Injecting components in the scene...");
 

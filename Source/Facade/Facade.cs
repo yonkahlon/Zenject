@@ -7,17 +7,16 @@ using ModestTree;
 
 namespace Zenject
 {
-    // NOTE: If you inherit from this class you need to also install FacadeCommonInstaller
     [System.Diagnostics.DebuggerStepThrough]
     public class Facade : IInitializable, IDisposable, ITickable, ILateTickable, IFixedTickable, IDependencyRoot
     {
-        [Inject(InjectSources.Local)]
+        [Inject]
         TickableManager _tickableManager = null;
 
-        [Inject(InjectSources.Local)]
+        [Inject]
         InitializableManager _initializableManager = null;
 
-        [Inject(InjectSources.Local)]
+        [Inject]
         DisposableManager _disposablesManager = null;
 
         // For cases where you have objects that aren't referenced anywhere but still want them to be

@@ -11,6 +11,7 @@ namespace Zenject
     {
         // --------------------------------------------------
         // [ ToSingle ] - Inject as singleton
+        // --------------------------------------------------
         //
         //     Container.Bind<Foo>().ToSingle();
         //
@@ -41,6 +42,7 @@ namespace Zenject
 
         // --------------------------------------------------
         // [ ToInstance ] - Inject as instance
+        // --------------------------------------------------
         //
         //  Examples:
         //
@@ -56,6 +58,7 @@ namespace Zenject
 
         // --------------------------------------------------
         // [ ToTransient ] - Inject as newly created object
+        // --------------------------------------------------
         //
         //    Container.Bind<Foo>().ToTransient();
         //
@@ -73,6 +76,7 @@ namespace Zenject
 #if !ZEN_NOT_UNITY3D
         // --------------------------------------------------
         // [ ToSinglePrefab ] - Inject by instantiating a single unity prefab
+        // --------------------------------------------------
         //
         //   Container.Bind<FooMonoBehaviour>().ToSinglePrefab(PrefabGameObject);
         //
@@ -99,6 +103,7 @@ namespace Zenject
 
         // --------------------------------------------------
         // [ ToTransientPrefab ] - Inject by instantiating a unity prefab
+        // --------------------------------------------------
         //
         //     Container.Bind<FooMonoBehaviour>().ToTransientPrefab(PrefabGameObject);
         //
@@ -113,6 +118,7 @@ namespace Zenject
 
         // --------------------------------------------------
         // [ ToSinglePrefabResource ] - Load singleton prefab via resources folder
+        // --------------------------------------------------
         //
         //  Same as ToSinglePrefab except loads the prefab using a path in Resources folder
         //
@@ -140,6 +146,7 @@ namespace Zenject
 
         // --------------------------------------------------
         // [ ToTransientPrefabResource ] - Load prefab via resources folder
+        // --------------------------------------------------
         //
         // Same as ToSinglePrefabResource (see above) except instantiates a new prefab
         // each time it is used
@@ -153,6 +160,7 @@ namespace Zenject
         // --------------------------------------------------
         // [ ToSingleGameObject ] - Inject by instantiating a new game object and
         // using that everywhere
+        // --------------------------------------------------
         //
         //  Container.Bind<FooMonoBehaviour>().ToSingleGameObject();
         //
@@ -175,6 +183,7 @@ namespace Zenject
 
         // --------------------------------------------------
         // [ ToTransientGameObject ] - Inject by instantiating a new game object
+        // --------------------------------------------------
         //
         // Same as ToSingleGameObject (see above) except instantiates a new prefab
         // each time it is used
@@ -188,6 +197,7 @@ namespace Zenject
         // --------------------------------------------------
         // [ ToSingleMonoBehaviour ] - Inject by instantiating a new component on
         //  an existing GameObject
+        // --------------------------------------------------
         //
         //   Container.Bind<FooMonoBehaviour>().ToSingleMonoBehaviour(MyGameObject);
         //
@@ -205,6 +215,7 @@ namespace Zenject
 
         // --------------------------------------------------
         // [ ToResource ] - Inject using Resources.Load
+        // --------------------------------------------------
         //
         //     Container.Bind<Texture>().ToResource("TestTexture")
         //
@@ -220,6 +231,7 @@ namespace Zenject
 
         // --------------------------------------------------
         // [ ToMethod ] - Inject by custom method
+        // --------------------------------------------------
         //
         //  This binding allows you to customize creation logic yourself by defining a method.
         //  For example:
@@ -236,6 +248,7 @@ namespace Zenject
 
         // --------------------------------------------------
         // [ ToSingleMethod ] - Inject using a custom method but only call that method once
+        // --------------------------------------------------
         //
         //  This binding works similar to ToMethod except that the given method will only be
         //  called once. The value returned from the method will then be used for every
@@ -255,6 +268,7 @@ namespace Zenject
 
         // --------------------------------------------------
         // [ ToGetter ] - Inject by getter.
+        // --------------------------------------------------
         //
         //  This method can be useful if you want to bind to a property of another object.
         //
@@ -270,6 +284,7 @@ namespace Zenject
 
         // --------------------------------------------------
         // [ ToResolve ] - Inject by recursive resolve
+        // --------------------------------------------------
         //
         //  Examples
         //
@@ -288,6 +303,7 @@ namespace Zenject
 
         // --------------------------------------------------
         // [ ToSingleInstance ] - Treat the given instance as a singleton.
+        // --------------------------------------------------
         //
         //  This is the same as ToInstance except it will ensure that there is only ever one
         //  instance for the given type.
@@ -319,6 +335,7 @@ namespace Zenject
 
         // --------------------------------------------------
         // [ ToSingleFactory ] - Define a custom factory for a singleton
+        // --------------------------------------------------
         //
         //  Example:
         //
@@ -349,12 +366,26 @@ namespace Zenject
         // (See derived classes for function signature)
 
         // --------------------------------------------------
-        //  [ ToSingleFacadeMethod ] - Create a new sub container and use the given class as a
-        //  facade for it
+        //  [ ToSingleFacadeMethod ] - Initialize a new sub container using the given method
+        //  and use the given class as the facade for it
+        // --------------------------------------------------
         //
         //  Example:
         //
+        //     Container.Bind<FooFacade>().ToSingleFacadeMethod(InstallFooFacade)
         //
+        //     void InstallFooFacade(DiContainer container)
+        //     {
+        //          container.Bind<FooFacade>().ToSingle();
+        //          ...
+        //     }
+        //
+        //  Note that the installer method MUST bind the given facade class to something
+        //  In the example above, FooFacade is bound ToSingle
+        //
+        //  This binding can be useful if you have a sub-system with a related set of dependencies
+        //  which don't need to be in the main container, and which can be interacted with
+        //  entirely through the given facade class (google Facade Pattern)
         BindingConditionSetter ToSingleFacadeMethod(Action<DiContainer> installerFunc);
 
         BindingConditionSetter ToSingleFacadeMethod(
@@ -364,7 +395,29 @@ namespace Zenject
             Type concreteType, string concreteIdentifier, Action<DiContainer> installerFunc);
 
         // --------------------------------------------------
-        // [ ToSingleFacadeInstaller]
+        //  [ ToSingleFacadeInstaller ] - Initialize a new sub container using the given installer
+        //  type and use the given class as the facade for it
+        // --------------------------------------------------
+        //
+        //  Example:
+        //
+        //     Container.Bind<FooFacade>().ToSingleFacadeInstaller<FooInstaller>()
+        //
+        //     class FooInstaller : Installer
+        //     {
+        //         public override void InstallBindings()
+        //         {
+        //             Container.Bind<FooFacade>().ToSingle();
+        //             ...
+        //         }
+        //     }
+        //
+        //  Note that the installer MUST bind the given facade class to something
+        //  In the example above, FooFacade is bound ToSingle
+        //
+        //  This binding can be useful if you have a sub-system with a related set of dependencies
+        //  which don't need to be in the main container, and which can be interacted with
+        //  entirely through the given facade class (google Facade Pattern)
         BindingConditionSetter ToSingleFacadeInstaller<TInstaller>()
             where TInstaller : Installer;
 

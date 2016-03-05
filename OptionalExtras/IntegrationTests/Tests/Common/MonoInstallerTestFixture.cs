@@ -59,6 +59,7 @@ namespace ModestTree
 
                         if (firstError != null)
                         {
+                            Log.Error("Error occurred during validation!");
                             throw firstError;
                         }
                     }
