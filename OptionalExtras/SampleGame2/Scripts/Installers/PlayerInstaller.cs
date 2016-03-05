@@ -17,13 +17,9 @@ namespace ModestTree
             Container.Bind<PlayerModel>().ToSingle();
 
             Container.BindAllInterfaces<PlayerInputHandler>().ToSingle<PlayerInputHandler>();
-
             Container.BindAllInterfaces<PlayerMoveHandler>().ToSingle<PlayerMoveHandler>();
-
-            Container.BindAllInterfaces<PlayerCollisionHandler>().ToSingle<PlayerCollisionHandler>();
-
+            Container.BindAllInterfaces<PlayerBulletHitHandler>().ToSingle<PlayerBulletHitHandler>();
             Container.BindAllInterfaces<PlayerDirectionHandler>().ToSingle<PlayerDirectionHandler>();
-
             Container.BindAllInterfaces<PlayerShootHandler>().ToSingle<PlayerShootHandler>();
 
             Container.Bind<PlayerInputState>().ToSingle();
@@ -51,7 +47,7 @@ namespace ModestTree
 
             public PlayerMoveHandler.Settings PlayerMoveHandler;
             public PlayerShootHandler.Settings PlayerShootHandler;
-            public PlayerCollisionHandler.Settings PlayerCollisionHandler;
+            public PlayerBulletHitHandler.Settings PlayerCollisionHandler;
         }
     }
 }

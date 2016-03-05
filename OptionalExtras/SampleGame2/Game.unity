@@ -192,17 +192,17 @@ MonoBehaviour:
     CameraHandler:
       FollowSpeed: 0.05
     EnemySpawner:
-      SpeedMin: 60
-      SpeedMax: 150
+      SpeedMin: 40
+      SpeedMax: 40
       AccuracyMin: 0
       AccuracyMax: 1
-      AttackDistanceMin: 15
-      AttackDistanceMax: 20
+      AttackDistanceMin: 13
+      AttackDistanceMax: 17
       SpawnDistanceMin: 40
       SpawnDistanceMax: 80
     GameDifficultyHandler:
-      NumAttackingIncreaseRate: 0.1
-      NumEnemiesIncreaseRate: 0.1
+      NumAttackingIncreaseRate: 0.025
+      NumEnemiesIncreaseRate: 0.05
     GameRestartHandler:
       RestartDelay: 3
     EnemyGlobalTunables:
@@ -663,7 +663,7 @@ MonoBehaviour:
     Rigidbody: {fileID: 1303116749}
     MeshRenderer: {fileID: 1303116744}
     PlayerMoveHandler:
-      MoveSpeed: 600
+      MoveSpeed: 180
       SlowDownSpeed: 0.2
     PlayerShootHandler:
       BulletLifetime: 2

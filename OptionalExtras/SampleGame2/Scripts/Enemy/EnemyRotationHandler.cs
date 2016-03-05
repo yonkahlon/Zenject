@@ -4,6 +4,9 @@ using Zenject;
 
 namespace ModestTree
 {
+    // Responsibilities:
+    // - Interpolate rotation of enemy towards the current desired
+    // direction
     public class EnemyRotationHandler : IFixedTickable
     {
         readonly Settings _settings;
@@ -22,7 +25,7 @@ namespace ModestTree
             var lookDir = _model.LookDir;
             var goalDir = _model.DesiredLookDir;
 
-            var error = Vector3.AngleBetween(lookDir, goalDir);
+            var error = Vector3.Angle(lookDir, goalDir);
 
             if (Vector3.Cross(lookDir, goalDir).z < 0)
             {

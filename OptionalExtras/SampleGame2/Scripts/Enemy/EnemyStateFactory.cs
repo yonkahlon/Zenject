@@ -54,13 +54,10 @@ namespace ModestTree
         // we need to (if we care enough about validating the state classes)
         public IEnumerable<ZenjectResolveException> Validate()
         {
-            foreach (var error in _container.ValidateObjectGraph<EnemyStateIdle>()
+            return _container.ValidateObjectGraph<EnemyStateIdle>()
                 .Concat(_container.ValidateObjectGraph<EnemyStateRunAway>())
                 .Concat(_container.ValidateObjectGraph<EnemyStateAttack>())
-                .Concat(_container.ValidateObjectGraph<EnemyStateFollow>()))
-            {
-                yield return error;
-            }
+                .Concat(_container.ValidateObjectGraph<EnemyStateFollow>());
         }
     }
 }

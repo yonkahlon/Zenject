@@ -7,54 +7,38 @@ namespace ModestTree
     public class EnemyFacade : MonoFacade
     {
         EnemyModel _model;
-        EnemySignals.Hit.Trigger _hitTrigger;
-        EnemyRegistry _registry;
+        EnemyRegistry _enemyRegistry;
         EnemyStateManager _stateManager;
 
+        // We can't use a constructor here because MonoFacade derives from
+        // MonoBehaviour
         [PostInject]
         public void Construct(
-            EnemyModel model, EnemySignals.Hit.Trigger hitTrigger,
-            EnemyRegistry registry, EnemyStateManager stateManager)
+            EnemyModel model, EnemyRegistry registry, EnemyStateManager stateManager)
         {
             _model = model;
-            _hitTrigger = hitTrigger;
-            _registry = registry;
+            _enemyRegistry = registry;
             _stateManager = stateManager;
 
             registry.AddEnemy(this);
         }
 
-        public bool IsAttackingOrChasing
+        // Here we can add some high-level methods to give some info to other
+        // parts of the codebase outside of our enemy facade
+        public bool IsAttacking
         {
             get
             {
-                return _stateManager.CurrentState == EnemyStates.Attack || _stateManager.CurrentState == EnemyStates.Follow;
+                return _stateManager.CurrentState == EnemyStates.Attack;
             }
         }
 
-        public void OnTriggerEnter(Collider other)
+        public bool IsChasing
         {
-            var bullet = other.GetComponent<Bullet>();
-
-            if (bullet != null && bullet.Type != BulletTypes.FromEnemy)
+            get
             {
-                _hitTrigger.Fire(bullet);
+                return _stateManager.CurrentState == EnemyStates.Follow;
             }
-        }
-
-        public override void Update()
-        {
-            base.Update();
-
-            // Always ensure we are on the main plane
-            _model.Position = new Vector3(_model.Position.x, _model.Position.y, 0);
-        }
-
-        public override void OnDestroy()
-        {
-            base.OnDestroy();
-
-            _registry.RemoveEnemy(this);
         }
 
         public Vector3 Position
@@ -69,6 +53,18 @@ namespace ModestTree
             }
         }
 
+        public override void OnDestroy()
+        {
+            base.OnDestroy();
+
+            _enemyRegistry.RemoveEnemy(this);
+        }
+
+        // Here we declare a parameter to our facade factory of type EnemyTunables
+        // Note that unlike for normal factories, this parameter gets injected into
+        // an installer instead of the EnemyFacade class itself
+        // It's done this way because in some cases we want to add the arguments
+        // to the container for use by other classes within the facade
         public class Factory : MonoFacadeFactory<EnemyTunables, EnemyFacade>
         {
         }

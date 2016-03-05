@@ -14,6 +14,7 @@ GameObject:
   - 114: {fileID: 11469920}
   - 114: {fileID: 11462742}
   - 65: {fileID: 6529106}
+  - 114: {fileID: 11414686}
   m_Layer: 8
   m_Name: Enemy
   m_TagString: Untagged
@@ -122,6 +123,17 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 2, y: 1.9999999, z: 2}
   m_Center: {x: 0, y: 0, z: 0.06762599}
+--- !u!114 &11414686
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 158650}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3229cbdaa20864545965fa8b687edbcb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &11453994
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -140,7 +152,7 @@ MonoBehaviour:
     Renderer: {fileID: 2329700}
     DefaultSettings:
       Accuracy: 1
-      Speed: 50
+      Speed: 25
       AttackDistance: 25
     EnemyCollisionHandler:
       HealthLoss: 55
@@ -155,13 +167,17 @@ MonoBehaviour:
       SafeDistance: 80
     EnemyRotationHandler:
       TurnSpeed: 10
+    EnemyStateFollow:
+      StrafeMultiplier: 0.5
+      StrafeChangeInterval: 0.8
+      TeleportDistance: 80
+      TeleportNewDistance: 40
     EnemyStateAttack:
       BulletLifetime: 5
-      BulletSpeed: 23
+      BulletSpeed: 30
       BulletOffsetDistance: 2
       ShootInterval: 0.4
       ErrorRangeTheta: 30
-      HealthToRunAt: 70
       AttackRangeBuffer: 8
       StrafeMultiplier: 0.5
       StrafeChangeInterval: 0.8

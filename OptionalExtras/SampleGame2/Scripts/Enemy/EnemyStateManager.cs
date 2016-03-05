@@ -7,9 +7,16 @@ namespace ModestTree
     {
         void Initialize();
         void Update();
+        void FixedUpdate();
     }
 
-    public class EnemyStateManager : ITickable, IInitializable
+    // This class controls the basic "AI" of our enemy
+    // Which works as a finite state machine, between four states:
+    // - Attack
+    // - Follow/Chase
+    // - Idle
+    // - RunAway
+    public class EnemyStateManager : ITickable, IFixedTickable, IInitializable
     {
         readonly EnemyStateFactory _stateFactory;
 
@@ -62,6 +69,11 @@ namespace ModestTree
         public void Tick()
         {
             _stateHandler.Update();
+        }
+
+        public void FixedTick()
+        {
+            _stateHandler.FixedUpdate();
         }
     }
 }

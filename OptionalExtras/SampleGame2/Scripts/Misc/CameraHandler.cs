@@ -4,6 +4,7 @@ using Zenject;
 
 namespace ModestTree
 {
+    // Have the camera follow the player around
     public class CameraHandler : ITickable
     {
         readonly Settings _settings;
