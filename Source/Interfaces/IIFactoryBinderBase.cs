@@ -10,6 +10,38 @@ namespace Zenject
     public interface IIFactoryBinderBase<TContract>
     {
         // --------------------------------------------------
+        // [ ToMethod ] - Create dynamic dependency from a method
+        // --------------------------------------------------
+        //
+        //  Results in a dependency of type IFactory<TContract> that invokes the given method.
+        //  Method must return a new instance of type TContract.
+        //
+        //  Examples:
+        //
+        //      Container.BindIFactory<IFoo>().ToMethod(MyMethod);
+        //
+        //      // Using a lambda:
+        //      Container.BindIFactory<IFoo>().ToMethod(c => new Foo());
+        //
+        //      // With a parameter:
+        //      Container.BindIFactory<string, IFoo>().ToMethod((text, c) => new Foo(text));
+        //
+        //BindingConditionSetter ToMethod(Func<DiContainer, TContract> method);
+
+        // --------------------------------------------------
+        // [ ToInstance<>  ] - Create dynamic dependency from an existing instance
+        // --------------------------------------------------
+        //
+        // Results in a dependency of type IFactory<TContract> that just returns
+        // the given instance
+        //
+        // Examples:
+        //
+        //    Container.BindIFactory<IFoo>().ToInstance(new Foo());
+        //
+        //BindingConditionSetter ToInstance(TContract instance);
+
+        // --------------------------------------------------
         // [ ToFactory  ] - Create dynamic dependency for a concrete type
         // --------------------------------------------------
         //
@@ -68,57 +100,6 @@ namespace Zenject
         BindingConditionSetter ToIFactory<TConcrete>()
             where TConcrete : TContract;
 
-#if !ZEN_NOT_UNITY3D
-
-        // --------------------------------------------------
-        // [ ToPrefab  ] - Create dynamic MonoBehaviour using given prefab
-        // --------------------------------------------------
-        //
-        // Results in a dependency of type IFactory<TContract> that can be used to create
-        // instances of the given prefab. After instantiating the given prefab, the
-        // factory will search it for a component of type TContract and then will return
-        // that from the Create() method. In this case, the TContract class must either be
-        // an interface or derive from Component / MonoBehaviour.
-        //
-        // Examples:
-        //
-        //      Container.BindIFactory<IFoo>().ToPrefab(prefab);
-        //
-        BindingConditionSetter ToPrefab(GameObject prefab);
-#endif
-
-        // --------------------------------------------------
-        // [ ToInstance<>  ] - Create dynamic dependency from an existing instance
-        // --------------------------------------------------
-        //
-        // Results in a dependency of type IFactory<TContract> that just returns
-        // the given instance
-        //
-        // Examples:
-        //
-        //    Container.BindIFactory<IFoo>().ToInstance(new Foo());
-        //
-        //BindingConditionSetter ToInstance(TContract instance);
-
-        // --------------------------------------------------
-        // [ ToMethod ] - Create dynamic dependency from a method
-        // --------------------------------------------------
-        //
-        //  Results in a dependency of type IFactory<TContract> that invokes the given method.
-        //  Method must return a new instance of type TContract.
-        //
-        //  Examples:
-        //
-        //      Container.BindIFactory<IFoo>().ToMethod(MyMethod);
-        //
-        //      // Using a lambda:
-        //      Container.BindIFactory<IFoo>().ToMethod(c => new Foo());
-        //
-        //      // With a parameter:
-        //      Container.BindIFactory<string, IFoo>().ToMethod((text, c) => new Foo(text));
-        //
-        //BindingConditionSetter ToMethod(Func<DiContainer, TContract> method);
-
         // --------------------------------------------------
         // [ ToCustomFactory ] - Create dynamic dependency using user created factory class
         // --------------------------------------------------
@@ -139,6 +120,25 @@ namespace Zenject
         //      }
         //
         //BindingConditionSetter ToCustomFactory<TFactory>();
+
+#if !ZEN_NOT_UNITY3D
+
+        // --------------------------------------------------
+        // [ ToPrefab  ] - Create dynamic MonoBehaviour using given prefab
+        // --------------------------------------------------
+        //
+        // Results in a dependency of type IFactory<TContract> that can be used to create
+        // instances of the given prefab. After instantiating the given prefab, the
+        // factory will search it for a component of type TContract and then will return
+        // that from the Create() method. In this case, the TContract class must either be
+        // an interface or derive from Component / MonoBehaviour.
+        //
+        // Examples:
+        //
+        //      Container.BindIFactory<IFoo>().ToPrefab(prefab);
+        //
+        BindingConditionSetter ToPrefab(GameObject prefab);
+#endif
 
         // --------------------------------------------------
         // [ ToFacadeFactoryMethod ] - Bind IFactory to a facade factory and initialize facade
