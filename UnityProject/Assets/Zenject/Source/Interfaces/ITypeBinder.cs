@@ -288,8 +288,8 @@ namespace Zenject
         //
         //  Examples
         //
-        //    Container.Bind<IFoo>().ToResolve<IBar>()
-        //    Container.Bind<IBar>().ToResolve<Foo>()
+        //    Container.Bind<IFoo>().ToLookup<IBar>()
+        //    Container.Bind<IBar>().ToLookup<Foo>()
         //
         //  In some cases it is useful to be able to bind an interface to another interface.
         //  However, you cannot use ToSingle or ToTransient because they both require concrete

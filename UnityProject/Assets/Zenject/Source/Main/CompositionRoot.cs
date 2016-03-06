@@ -66,7 +66,7 @@ namespace Zenject
             _installers = installers;
         }
 
-        void ValidateInstallers()
+        void CheckInstallerPrefabTypes()
         {
 #if UNITY_EDITOR
             foreach (var installer in _installers)
@@ -99,7 +99,7 @@ namespace Zenject
         protected void InstallInstallers(
             DiContainer container, Dictionary<Type, List<TypeValuePair>> extraArgsMap)
         {
-            ValidateInstallers();
+            CheckInstallerPrefabTypes();
 
             var newGameObjects = new List<GameObject>();
             var allInstallers = _installers.ToList();
@@ -180,17 +180,17 @@ namespace Zenject
 
             switch (bindType)
             {
-                case ZenjectBinding.BindTypes.ToInstance:
+                case ZenjectBinding.BindTypes.Self:
                 {
                     container.Bind(component.GetType()).ToInstance(component);
                     break;
                 }
-                case ZenjectBinding.BindTypes.ToInterfaces:
+                case ZenjectBinding.BindTypes.AllInterfaces:
                 {
                     container.BindAllInterfaces(component.GetType()).ToInstance(component);
                     break;
                 }
-                case ZenjectBinding.BindTypes.ToInterfacesAndSelf:
+                case ZenjectBinding.BindTypes.AllInterfacesAndSelf:
                 {
                     container.BindAllInterfacesAndSelf(component.GetType()).ToInstance(component);
                     break;

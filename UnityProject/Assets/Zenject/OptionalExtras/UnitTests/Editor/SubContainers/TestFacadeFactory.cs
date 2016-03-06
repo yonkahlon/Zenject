@@ -51,7 +51,11 @@ namespace Zenject.Tests
             MyInit.HasInitialized = false;
             MyDispose.HasDisposed = false;
 
-            Container.BindFacadeFactoryMethod<FooFacade, FooFacade.Factory>(FacadeInstaller);
+            Container.Bind<TickableManager>().ToTransient();
+            Container.Bind<InitializableManager>().ToTransient();
+            Container.Bind<DisposableManager>().ToTransient();
+
+            Container.BindFacadeFactoryMethod<FooFacade.Factory>(FacadeInstaller);
 
             AssertValidates();
 
@@ -78,7 +82,11 @@ namespace Zenject.Tests
             MyInit.HasInitialized = false;
             MyDispose.HasDisposed = false;
 
-            Container.BindFacadeFactoryInstaller<FooFacade, FooFacade.Factory, FooInstaller>();
+            Container.Bind<TickableManager>().ToTransient();
+            Container.Bind<InitializableManager>().ToTransient();
+            Container.Bind<DisposableManager>().ToTransient();
+
+            Container.BindFacadeFactoryInstaller<FooFacade.Factory, FooInstaller>();
 
             AssertValidates();
 
@@ -100,10 +108,6 @@ namespace Zenject.Tests
 
         void FacadeInstaller(DiContainer container)
         {
-            Container.Bind<TickableManager>().ToSingle();
-            Container.Bind<InitializableManager>().ToSingle();
-            Container.Bind<DisposableManager>().ToSingle();
-
             container.Bind<FooFacade>().ToSingle();
 
             container.Bind<IDisposable>().ToSingle<MyDispose>();
@@ -115,10 +119,6 @@ namespace Zenject.Tests
         {
             public override void InstallBindings()
             {
-                Container.Bind<TickableManager>().ToSingle();
-                Container.Bind<InitializableManager>().ToSingle();
-                Container.Bind<DisposableManager>().ToSingle();
-
                 Container.Bind<FooFacade>().ToSingle();
 
                 Container.Bind<IDisposable>().ToSingle<MyDispose>();

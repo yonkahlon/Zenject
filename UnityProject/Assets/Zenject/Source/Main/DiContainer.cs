@@ -290,8 +290,6 @@ namespace Zenject
         // See comment in IResolver.cs for description of this method
         public IEnumerable<ZenjectResolveException> ValidateValidatables(params Type[] ignoreTypes)
         {
-            CheckForInstallWarning();
-
             // Use ToList() in case it changes somehow during iteration
             foreach (var pair in _providers.ToList())
             {
@@ -438,7 +436,7 @@ namespace Zenject
         {
             // Note that different types can map to the same provider (eg. a base type to a concrete class and a concrete class to itself)
 
-            CheckForInstallWarning();
+            CheckForInstallWarning(context);
 
             var matches = GetProviderMatchesInternal(context).ToList();
 
@@ -457,20 +455,56 @@ namespace Zenject
             return ReflectionUtil.CreateGenericList(context.MemberType, new object[] {});
         }
 
-        void CheckForInstallWarning()
+        void CheckForInstallWarning(InjectContext context)
         {
-            if (_isInstalling && !_hasDisplayedInstallWarning)
+#if DEBUG || UNITY_EDITOR
+            if (!_isInstalling)
             {
-                _hasDisplayedInstallWarning = true;
-                // Feel free to comment this out if you are comfortable with this practice
-                Log.Warn("Zenject Warning: It is bad practice to call Inject/Resolve/Instantiate before all the Installers have completed!  This is important to ensure that all bindings have properly been installed in case they are needed when injecting/instantiating/resolving");
+                return;
             }
+
+            if (_hasDisplayedInstallWarning)
+            {
+                return;
+            }
+
+            if (context == null)
+            {
+                // No way to tell whether this is ok or not so just assume ok
+                return;
+            }
+
+            var rootContext = context.ParentContextsAndSelf.Last();
+
+            if (rootContext.MemberType.DerivesFrom<IInstaller>())
+            {
+                // Resolving/instantiating/injecting installers is valid during install phase
+                return;
+            }
+
+#if !ZEN_NOT_UNITY3D
+            if (rootContext.MemberType.DerivesFrom<DecoratorInstaller>())
+            {
+                return;
+            }
+
+            if (rootContext.Identifier == DefaultParentId)
+            {
+                // The default transform gets resolved which is also fine
+                return;
+            }
+#endif
+
+            _hasDisplayedInstallWarning = true;
+            // Feel free to comment this out if you are comfortable with this practice
+            Log.Warn("Zenject Warning: It is bad practice to call Inject/Resolve/Instantiate before all the Installers have completed!  This is important to ensure that all bindings have properly been installed in case they are needed when injecting/instantiating/resolving.  Detected when operating on type '{0}'", rootContext.MemberType.Name());
+#endif
         }
 
         // See comment in IResolver.cs for description of this method
         public List<Type> ResolveTypeAll(InjectContext context)
         {
-            CheckForInstallWarning();
+            CheckForInstallWarning(context);
 
             if (_providers.ContainsKey(context.BindingId))
             {
@@ -533,10 +567,9 @@ namespace Zenject
 #if !ZEN_NOT_UNITY3D
             if (installerType.DerivesFrom<MonoInstaller>())
             {
-                // We can't use InstantiatePrefabResourceExplicit here because that ignores MonoInstaller's
-                var gameObject = InstantiatePrefabResource("Installers/" + installerType.Name());
+                var gameObj = InstantiateAndParentPrefabResource("Installers/" + installerType.Name());
 
-                var installer = gameObject.GetComponentInChildren<MonoInstaller>();
+                var installer = gameObj.GetComponentInChildren<MonoInstaller>();
 
                 InjectExplicit(installer, extraArgs);
 
@@ -665,7 +698,7 @@ namespace Zenject
         {
             ProviderBase provider;
 
-            CheckForInstallWarning();
+            CheckForInstallWarning(context);
 
             var result = TryGetUniqueProvider(context, out provider);
 
@@ -788,7 +821,7 @@ namespace Zenject
                 "Error occurred while instantiating object of type '{0}'. Instantiator should not be used to create new mono behaviours.  Must use InstantiatePrefabForComponent, InstantiatePrefab, InstantiateComponentOnNewGameObject, InstantiateGameObject, or InstantiateComponent.  You may also want to use MonoBehaviourFactory class or plain old GameObject.Instantiate.", concreteType.Name());
 #endif
 
-            CheckForInstallWarning();
+            CheckForInstallWarning(currentContext);
 
             var typeInfo = TypeAnalyzer.GetInfo(concreteType);
 
@@ -863,7 +896,7 @@ namespace Zenject
                 "Use InjectGameObject to Inject game objects instead of Inject method");
 #endif
 
-            CheckForInstallWarning();
+            CheckForInstallWarning(context);
 
             // Make a copy since we remove from it below
             var extraArgsList = extraArgs.ToList();
@@ -969,15 +1002,37 @@ namespace Zenject
             return InstantiatePrefabExplicit(prefab, extraArgMap, context, includeInactive, null);
         }
 
-        // See comment in IInstantiator.cs for description of this method
-        public GameObject InstantiatePrefabExplicit(
-            GameObject prefab, IEnumerable<object> extraArgMap, InjectContext context, bool includeInactive, string groupName)
+        GameObject InstantiateAndParentPrefabResource(string resourcePath)
+        {
+            return InstantiateAndParentPrefabResource(resourcePath, null);
+        }
+
+        GameObject InstantiateAndParentPrefabResource(string resourcePath, string groupName)
+        {
+            var prefab = (GameObject)Resources.Load(resourcePath);
+
+            Assert.IsNotNull(prefab,
+                "Could not find prefab at resource location '{0}'".Fmt(resourcePath));
+
+            return InstantiateAndParentPrefab(prefab, groupName);
+        }
+
+        GameObject InstantiateAndParentPrefab(GameObject prefab, string groupName)
         {
             var gameObj = (GameObject)GameObject.Instantiate(prefab);
 
             gameObj.transform.SetParent(GetTransformGroup(groupName), false);
 
             gameObj.SetActive(true);
+
+            return gameObj;
+        }
+
+        // See comment in IInstantiator.cs for description of this method
+        public GameObject InstantiatePrefabExplicit(
+            GameObject prefab, IEnumerable<object> extraArgMap, InjectContext context, bool includeInactive, string groupName)
+        {
+            var gameObj = InstantiateAndParentPrefab(prefab, groupName);
 
             InjectGameObject(gameObj, true, includeInactive, extraArgMap, context);
 
@@ -2135,142 +2190,142 @@ namespace Zenject
 #endif
 
         // See comment in IBinder.cs for description of this method
-        public BindingConditionSetter BindFacadeFactoryMethod<TFacade, TFacadeFactory>(
+        public BindingConditionSetter BindFacadeFactoryMethod<TFacadeFactory>(
             Action<DiContainer> facadeInstaller)
-            where TFacadeFactory : FacadeFactory<TFacade>
+            where TFacadeFactory : IFacadeFactoryParams
         {
-            return BindFacadeFactoryMethod<TFacade, TFacadeFactory>(facadeInstaller, ContainerTypes.RuntimeContainer);
+            return BindFacadeFactoryMethod<TFacadeFactory>(facadeInstaller, ContainerTypes.RuntimeContainer);
         }
 
         // See comment in IBinder.cs for description of this method
-        public BindingConditionSetter BindFacadeFactoryMethod<TFacade, TFacadeFactory>(
+        public BindingConditionSetter BindFacadeFactoryMethod<TFacadeFactory>(
             Action<DiContainer> facadeInstaller, ContainerTypes containerType)
-            where TFacadeFactory : FacadeFactory<TFacade>
+            where TFacadeFactory : IFacadeFactoryParams
         {
             return Bind<TFacadeFactory>().ToMethod(
                 x => (containerType == ContainerTypes.RuntimeContainer ? x.Container : this).Instantiate<TFacadeFactory>(facadeInstaller));
         }
 
         // See comment in IBinder.cs for description of this method
-        public BindingConditionSetter BindFacadeFactoryMethod<TParam1, TFacade, TFacadeFactory>(
+        public BindingConditionSetter BindFacadeFactoryMethod<TParam1, TFacadeFactory>(
             Action<DiContainer, TParam1> facadeInstaller)
-            where TFacadeFactory : FacadeFactory<TParam1, TFacade>
+            where TFacadeFactory : IFacadeFactoryParams<TParam1>
         {
-            return BindFacadeFactoryMethod<TParam1, TFacade, TFacadeFactory>(facadeInstaller, ContainerTypes.RuntimeContainer);
+            return BindFacadeFactoryMethod<TParam1, TFacadeFactory>(facadeInstaller, ContainerTypes.RuntimeContainer);
         }
 
         // See comment in IBinder.cs for description of this method
-        public BindingConditionSetter BindFacadeFactoryMethod<TParam1, TFacade, TFacadeFactory>(
+        public BindingConditionSetter BindFacadeFactoryMethod<TParam1, TFacadeFactory>(
             Action<DiContainer, TParam1> facadeInstaller, ContainerTypes containerType)
-            where TFacadeFactory : FacadeFactory<TParam1, TFacade>
+            where TFacadeFactory : IFacadeFactoryParams<TParam1>
         {
             return Bind<TFacadeFactory>().ToMethod(
                 x => (containerType == ContainerTypes.RuntimeContainer ? x.Container : this).Instantiate<TFacadeFactory>(facadeInstaller));
         }
 
         // See comment in IBinder.cs for description of this method
-        public BindingConditionSetter BindFacadeFactoryMethod<TParam1, TParam2, TFacade, TFacadeFactory>(
+        public BindingConditionSetter BindFacadeFactoryMethod<TParam1, TParam2, TFacadeFactory>(
             Action<DiContainer, TParam1, TParam2> facadeInstaller)
-            where TFacadeFactory : FacadeFactory<TParam1, TParam2, TFacade>
+            where TFacadeFactory : IFacadeFactoryParams<TParam1, TParam2>
         {
-            return BindFacadeFactoryMethod<TParam1, TParam2, TFacade, TFacadeFactory>(facadeInstaller, ContainerTypes.RuntimeContainer);
+            return BindFacadeFactoryMethod<TParam1, TParam2, TFacadeFactory>(facadeInstaller, ContainerTypes.RuntimeContainer);
         }
 
         // See comment in IBinder.cs for description of this method
-        public BindingConditionSetter BindFacadeFactoryMethod<TParam1, TParam2, TFacade, TFacadeFactory>(
+        public BindingConditionSetter BindFacadeFactoryMethod<TParam1, TParam2, TFacadeFactory>(
             Action<DiContainer, TParam1, TParam2> facadeInstaller, ContainerTypes containerType)
-            where TFacadeFactory : FacadeFactory<TParam1, TParam2, TFacade>
+            where TFacadeFactory : IFacadeFactoryParams<TParam1, TParam2>
         {
             return Bind<TFacadeFactory>().ToMethod(
                 x => (containerType == ContainerTypes.RuntimeContainer ? x.Container : this).Instantiate<TFacadeFactory>(facadeInstaller));
         }
 
         // See comment in IBinder.cs for description of this method
-        public BindingConditionSetter BindFacadeFactoryMethod<TParam1, TParam2, TParam3, TFacade, TFacadeFactory>(
+        public BindingConditionSetter BindFacadeFactoryMethod<TParam1, TParam2, TParam3, TFacadeFactory>(
             Action<DiContainer, TParam1, TParam2, TParam3> facadeInstaller)
-            where TFacadeFactory : FacadeFactory<TParam1, TParam2, TParam3, TFacade>
+            where TFacadeFactory : IFacadeFactoryParams<TParam1, TParam2, TParam3>
         {
-            return BindFacadeFactoryMethod<TParam1, TParam2, TParam3, TFacade, TFacadeFactory>(facadeInstaller, ContainerTypes.RuntimeContainer);
+            return BindFacadeFactoryMethod<TParam1, TParam2, TParam3, TFacadeFactory>(facadeInstaller, ContainerTypes.RuntimeContainer);
         }
 
         // See comment in IBinder.cs for description of this method
-        public BindingConditionSetter BindFacadeFactoryMethod<TParam1, TParam2, TParam3, TFacade, TFacadeFactory>(
+        public BindingConditionSetter BindFacadeFactoryMethod<TParam1, TParam2, TParam3, TFacadeFactory>(
             Action<DiContainer, TParam1, TParam2, TParam3> facadeInstaller, ContainerTypes containerType)
-            where TFacadeFactory : FacadeFactory<TParam1, TParam2, TParam3, TFacade>
+            where TFacadeFactory : IFacadeFactoryParams<TParam1, TParam2, TParam3>
         {
             return Bind<TFacadeFactory>().ToMethod(
                 x => (containerType == ContainerTypes.RuntimeContainer ? x.Container : this).Instantiate<TFacadeFactory>(facadeInstaller));
         }
 
         // See comment in IBinder.cs for description of this method
-        public BindingConditionSetter BindFacadeFactoryMethod<TParam1, TParam2, TParam3, TParam4, TFacade, TFacadeFactory>(
+        public BindingConditionSetter BindFacadeFactoryMethod<TParam1, TParam2, TParam3, TParam4, TFacadeFactory>(
             ModestTree.Util.Action<DiContainer, TParam1, TParam2, TParam3, TParam4> facadeInstaller)
-            where TFacadeFactory : FacadeFactory<TParam1, TParam2, TParam3, TParam4, TFacade>
+            where TFacadeFactory : IFacadeFactoryParams<TParam1, TParam2, TParam3, TParam4>
         {
-            return BindFacadeFactoryMethod<TParam1, TParam2, TParam3, TParam4, TFacade, TFacadeFactory>(facadeInstaller, ContainerTypes.RuntimeContainer);
+            return BindFacadeFactoryMethod<TParam1, TParam2, TParam3, TParam4, TFacadeFactory>(facadeInstaller, ContainerTypes.RuntimeContainer);
         }
 
         // See comment in IBinder.cs for description of this method
-        public BindingConditionSetter BindFacadeFactoryMethod<TParam1, TParam2, TParam3, TParam4, TFacade, TFacadeFactory>(
+        public BindingConditionSetter BindFacadeFactoryMethod<TParam1, TParam2, TParam3, TParam4, TFacadeFactory>(
             ModestTree.Util.Action<DiContainer, TParam1, TParam2, TParam3, TParam4> facadeInstaller, ContainerTypes containerType)
-            where TFacadeFactory : FacadeFactory<TParam1, TParam2, TParam3, TParam4, TFacade>
+            where TFacadeFactory : IFacadeFactoryParams<TParam1, TParam2, TParam3, TParam4>
         {
             return Bind<TFacadeFactory>().ToMethod(
                 x => (containerType == ContainerTypes.RuntimeContainer ? x.Container : this).Instantiate<TFacadeFactory>(facadeInstaller));
         }
 
         // See comment in IBinder.cs for description of this method
-        public BindingConditionSetter BindFacadeFactoryMethod<TParam1, TParam2, TParam3, TParam4, TParam5, TFacade, TFacadeFactory>(
+        public BindingConditionSetter BindFacadeFactoryMethod<TParam1, TParam2, TParam3, TParam4, TParam5, TFacadeFactory>(
             ModestTree.Util.Action<DiContainer, TParam1, TParam2, TParam3, TParam4, TParam5> facadeInstaller)
-            where TFacadeFactory : FacadeFactory<TParam1, TParam2, TParam3, TParam4, TParam5, TFacade>
+            where TFacadeFactory : IFacadeFactoryParams<TParam1, TParam2, TParam3, TParam4, TParam5>
         {
-            return BindFacadeFactoryMethod<TParam1, TParam2, TParam3, TParam4, TParam5, TFacade, TFacadeFactory>(facadeInstaller, ContainerTypes.RuntimeContainer);
+            return BindFacadeFactoryMethod<TParam1, TParam2, TParam3, TParam4, TParam5, TFacadeFactory>(facadeInstaller, ContainerTypes.RuntimeContainer);
         }
 
         // See comment in IBinder.cs for description of this method
-        public BindingConditionSetter BindFacadeFactoryMethod<TParam1, TParam2, TParam3, TParam4, TParam5, TFacade, TFacadeFactory>(
+        public BindingConditionSetter BindFacadeFactoryMethod<TParam1, TParam2, TParam3, TParam4, TParam5, TFacadeFactory>(
             ModestTree.Util.Action<DiContainer, TParam1, TParam2, TParam3, TParam4, TParam5> facadeInstaller, ContainerTypes containerType)
-            where TFacadeFactory : FacadeFactory<TParam1, TParam2, TParam3, TParam4, TParam5, TFacade>
+            where TFacadeFactory : IFacadeFactoryParams<TParam1, TParam2, TParam3, TParam4, TParam5>
         {
             return Bind<TFacadeFactory>().ToMethod(
                 x => (containerType == ContainerTypes.RuntimeContainer ? x.Container : this).Instantiate<TFacadeFactory>(facadeInstaller));
         }
 
         // See comment in IBinder.cs for description of this method
-        public BindingConditionSetter BindFacadeFactoryMethod<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6, TFacade, TFacadeFactory>(
+        public BindingConditionSetter BindFacadeFactoryMethod<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6, TFacadeFactory>(
             ModestTree.Util.Action<DiContainer, TParam1, TParam2, TParam3, TParam4, TParam5, TParam6> facadeInstaller)
-            where TFacadeFactory : FacadeFactory<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6, TFacade>
+            where TFacadeFactory : IFacadeFactoryParams<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6>
         {
-            return BindFacadeFactoryMethod<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6, TFacade, TFacadeFactory>(facadeInstaller, ContainerTypes.RuntimeContainer);
+            return BindFacadeFactoryMethod<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6, TFacadeFactory>(facadeInstaller, ContainerTypes.RuntimeContainer);
         }
 
         // See comment in IBinder.cs for description of this method
-        public BindingConditionSetter BindFacadeFactoryMethod<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6, TFacade, TFacadeFactory>(
+        public BindingConditionSetter BindFacadeFactoryMethod<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6, TFacadeFactory>(
             ModestTree.Util.Action<DiContainer, TParam1, TParam2, TParam3, TParam4, TParam5, TParam6> facadeInstaller, ContainerTypes containerType)
-            where TFacadeFactory : FacadeFactory<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6, TFacade>
+            where TFacadeFactory : IFacadeFactoryParams<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6>
         {
             return Bind<TFacadeFactory>().ToMethod(
                 x => (containerType == ContainerTypes.RuntimeContainer ? x.Container : this).Instantiate<TFacadeFactory>(facadeInstaller));
         }
 
         // See comment in IBinder.cs for description of this method
-        public BindingConditionSetter BindFacadeFactoryInstaller<TFacade, TFacadeFactory, TInstaller>()
-            where TFacadeFactory : FacadeFactoryBase<TFacade>
+        public BindingConditionSetter BindFacadeFactoryInstaller<TFacadeFactory, TInstaller>()
+            where TFacadeFactory : IFacadeFactory
             where TInstaller : Installer
         {
-            return BindFacadeFactoryInstaller<TFacade, TFacadeFactory>(typeof(TInstaller));
+            return BindFacadeFactoryInstaller<TFacadeFactory>(typeof(TInstaller));
         }
 
         // See comment in IBinder.cs for description of this method
-        public BindingConditionSetter BindFacadeFactoryInstaller<TFacade, TFacadeFactory>(Type installerType)
-            where TFacadeFactory : FacadeFactoryBase<TFacade>
+        public BindingConditionSetter BindFacadeFactoryInstaller<TFacadeFactory>(Type installerType)
+            where TFacadeFactory : IFacadeFactory
         {
-            return BindFacadeFactoryInstaller<TFacade, TFacadeFactory>(installerType, ContainerTypes.RuntimeContainer);
+            return BindFacadeFactoryInstaller<TFacadeFactory>(installerType, ContainerTypes.RuntimeContainer);
         }
 
         // See comment in IBinder.cs for description of this method
-        public BindingConditionSetter BindFacadeFactoryInstaller<TFacade, TFacadeFactory>(Type installerType, ContainerTypes containerType)
-            where TFacadeFactory : FacadeFactoryBase<TFacade>
+        public BindingConditionSetter BindFacadeFactoryInstaller<TFacadeFactory>(Type installerType, ContainerTypes containerType)
+            where TFacadeFactory : IFacadeFactory
         {
             return Bind<TFacadeFactory>().ToMethod(
                 x => (containerType == ContainerTypes.RuntimeContainer ? x.Container : this).InstantiateExplicit<TFacadeFactory>(
@@ -2282,7 +2337,7 @@ namespace Zenject
         // See comment in IResolver.cs for description of this method
         public IEnumerable<ZenjectResolveException> ValidateResolve(InjectContext context)
         {
-            CheckForInstallWarning();
+            CheckForInstallWarning(context);
 
             ProviderBase provider = null;
             var result = TryGetUniqueProvider(context, out provider);
@@ -2415,7 +2470,7 @@ namespace Zenject
         public IEnumerable<ZenjectResolveException> ValidateObjectGraph(
             Type concreteType, InjectContext currentContext, string concreteIdentifier, params Type[] extras)
         {
-            CheckForInstallWarning();
+            CheckForInstallWarning(currentContext);
 
             if (concreteType.IsAbstract)
             {

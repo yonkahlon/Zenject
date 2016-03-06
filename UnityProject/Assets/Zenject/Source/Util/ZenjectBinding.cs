@@ -19,9 +19,9 @@ namespace Zenject
         [SerializeField]
         ContainerTypes _containerType = ContainerTypes.Local;
 
-        [Tooltip("This value is used to determine how to bind this component.  When set to 'ToInstance' is equivalent to calling Container.ToInstance inside an installer, and similarly for ToInterfaces and ToInterfacesAndSelf")]
+        [Tooltip("This value is used to determine how to bind this component.  When set to 'Self' is equivalent to calling Container.ToInstance inside an installer. When set to 'AllInterfaces' this is equivalent to calling 'Container.BindAllInterfaces<MyMonoBehaviour>().ToInstance', and similarly for AllInterfacesAndSelf")]
         [SerializeField]
-        BindTypes _bindType = BindTypes.ToInstance;
+        BindTypes _bindType = BindTypes.Self;
 
         public ContainerTypes ContainerType
         {
@@ -49,9 +49,9 @@ namespace Zenject
 
         public enum BindTypes
         {
-            ToInstance,
-            ToInterfaces,
-            ToInterfacesAndSelf,
+            Self,
+            AllInterfaces,
+            AllInterfacesAndSelf,
         }
 
         public enum ContainerTypes

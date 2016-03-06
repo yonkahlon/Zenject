@@ -10,7 +10,7 @@ namespace Zenject.Tests
         [Test]
         public void TestParam1Method()
         {
-            Container.BindFacadeFactoryMethod<string, FooFacadeOne, FooFacadeOne.Factory>(FacadeInstallerOne);
+            Container.BindFacadeFactoryMethod<string, FooFacadeOne.Factory>(FacadeInstallerOne);
 
             AssertValidates();
 
@@ -23,7 +23,7 @@ namespace Zenject.Tests
         [Test]
         public void TestParam1Installer()
         {
-            Container.BindFacadeFactoryInstaller<FooFacadeOne, FooFacadeOne.Factory, FooInstallerOne>();
+            Container.BindFacadeFactoryInstaller<FooFacadeOne.Factory, FooInstallerOne>();
 
             AssertValidates();
 
@@ -76,7 +76,7 @@ namespace Zenject.Tests
         [Test]
         public void TestParam6Method()
         {
-            Container.BindFacadeFactoryMethod<string, int, float, int, string, int, FooFacadeSix, FooFacadeSix.Factory>(FacadeInstallerSix);
+            Container.BindFacadeFactoryMethod<string, int, float, int, string, int, FooFacadeSix.Factory>(FacadeInstallerSix);
 
             AssertValidates();
 
@@ -89,7 +89,7 @@ namespace Zenject.Tests
         [Test]
         public void TestParam6Installer()
         {
-            Container.BindFacadeFactoryInstaller<FooFacadeSix, FooFacadeSix.Factory, FooInstallerSix>();
+            Container.BindFacadeFactoryInstaller<FooFacadeSix.Factory, FooInstallerSix>();
 
             AssertValidates();
 

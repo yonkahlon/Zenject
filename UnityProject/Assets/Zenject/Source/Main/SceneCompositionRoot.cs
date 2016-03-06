@@ -59,10 +59,12 @@ namespace Zenject
             _container = new DiContainer(
                 GlobalCompositionRoot.Instance.Container, false);
 
-            if (Installers.IsEmpty() && InstallerPrefabs.IsEmpty())
-            {
-                Log.Warn("No installers found while initializing CompositionRoot '{0}'", this.name);
-            }
+            // This can be valid in cases where you have everything in either facade installers
+            // or global installers so just ignore
+            //if (Installers.IsEmpty() && InstallerPrefabs.IsEmpty())
+            //{
+                //Log.Warn("No installers found while initializing CompositionRoot '{0}'", this.name);
+            //}
 
             Log.Debug("SceneCompositionRoot: Running installers...");
 
