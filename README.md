@@ -41,7 +41,6 @@ __Quick Start__:  If you are already familiar with dependency injection and are 
         * <a href="#iinitializable-and-postinject">IInitializable and PostInject</a>
         * <a href="#implementing-idisposable">Implementing IDisposable</a>
         * <a href="#installers">Installers</a>
-    * <a href="#zenject-order-of-operations">Zenject Order Of Operations</a>
     * <a href="#di-guidelines--recommendations">Guidelines / Recommendations / Gotchas / Miscellaneous Tips and Tricks</a>
     * Advanced Features
         * <a href="#global-bindings">Global Bindings</a>
@@ -58,6 +57,7 @@ __Quick Start__:  If you are already familiar with dependency injection and are 
         * <a href="#sub-containers-and-facades">Sub-Containers and Facades</a>
         * <a href="#commands-and-signals">Commands And Signals</a>
         * <a href="#autobind">Automatic Bindings</a>
+        * <a href="#zenject-order-of-operations">Zenject Order Of Operations</a>
         * <a href="#auto-mocking-using-moq">Auto-Mocking Using Moq</a>
 * <a href="#questions">Frequently Asked Questions</a>
     * <a href="#isthisoverkill">Isn't this overkill?  I mean, is using statically accessible singletons really that bad?</a>
@@ -1145,31 +1145,6 @@ public class FooInstaller : MonoInstaller
 ```
 
 As mentioned in the above code, Zenject will search for a prefab named `QuxInstaller.prefab` in all the `Resources/Installers` directories in your project.  This is sometimes a useful alternative to adding installer prefabs to every scene because it allows you to keep the objects in your scenes extremely light.
-
-## <a id="zenject-order-of-operations"></a>Zenject Order Of Operations
-
-A Zenject driven application is executed by the following steps:
-
-1. Unity Awake() phase begins
-1. SceneCompositionRoot.Awake() method is called.  NOTE: This should always be the first thing executed in your scene.  By default this should work this way out of the box, because the executionOrder property is set to -9999 for the SceneCompositionRoot classes.  You can also verify that this is the case by selecting `Edit -> Project Settings -> Script Execution Order` and making sure that GlobalCompositionRoot and SceneCompositionRoot are at the top.  (GlobalCompositionRoot goes first because global bindings should alway get updated before scene bindings)
-1. Composition Root creates a new DiContainer object to be used to contain all instances used in the scene
-1. Composition Root iterates through all the Installers that have been added to it via the Unity Inspector, and updates them to point to the new DiContainer.  It then calls InstallBindings() on each installer.
-1. Each Installer then registers different sets of dependencies directly on to the given DiContainer by calling one of the Bind<> methods.  Note that the order that this binding occurs should not generally matter. Each installer may also include other installers by calling Container.Install<>. Each installer can also add bindings to configure other installers, however note that in this case order might actually matter, since you will have to make sure that code configuring other installers is executed before the installers that you are configuring! You can control the order by simply re-ordering the Installers property of the SceneCompositionRoot
-1. The Composition Root then injects all MonoBehaviours that are in the scene with their dependencies. Note that since MonoBehaviours are instantiated by Unity we cannot use constructor injection in this case and therefore [PostInject] injection, field injection or property injection must be used instead.
-1. After filling in the scene dependencies the Composition Root then executes a single resolve for 'IFacade'.  This class represents the root of the object graph.  The Facade class by default has dependencies on TickableManager, InitializableManager, and DisposableManager classes, and therefore Zenject constructs instances of those as well before creating the main dependency root.  Those classes contains dependencies for lists of ITickable, IInitializable, and IDisposables.  So once again Zenject resolves all instances bound to any of these interfaces before constructing the manager classes.  This is important to know because it is why when you bind something to ITickable/IInitializable/IDisposable, it is always created at startup.
-1. If any required dependencies cannot be resolved, a ZenjectResolveException is thrown
-1. All other MonoBehaviour's in your scene has their Awake() method called
-1. Unity Start() phase begins
-1. SceneCompositionRoot.Start() method is called.  This will trigger the Initialize() method on all IInitializable objects in the order specified in the installers.  The execution order mentioned above should guarantee that IInitializable.Initialize() occurs before any Start() method in your scene
-1. All other MonoBehaviour's in your scene has their Start() method called
-1. Unity Update() phase begins
-1. Facade.Update() is called, which results in Tick() being called for all ITickable objects (in the order specified in the installers)
-1. All other MonoBehaviour's in your scene has their Update() method called
-1. Steps 13 - 15 is repeated for LateUpdate
-1. At the same time, Steps 13 - 15 is repeated for FixedUpdate according to the physics timestep
-1. App is exited
-1. Dispose() is called on all objects mapped to IDisposable within the scene container (see <a href="#implementing-idisposable">here</a> for details)
-1. Dispose() is called on all objects mapped to IDisposable within the global container (see <a href="#implementing-idisposable">here</a> for details)
 
 ## <a id="di-guidelines--recommendations"></a>DI Guidelines / Recommendations / Gotchas / Tips and Tricks
 
@@ -2537,6 +2512,38 @@ Note however, in this case, that `GameRunner` must ask for type `IFoo` in its co
 This bind type is equivalent to the following:
 
     Container.BindAllInterfacesAndSelf(_foo.GetType()).ToInstance(_foo);
+
+## <a id="zenject-order-of-operations"></a>Zenject Order Of Operations
+
+Warning: This section gets fairly in depth so if you're not interested in peering under the hood of Zenject, you might want to skip it!
+
+A Zenject driven application is executed by the following steps:
+
+    1. Unity Awake() phase begins
+1. SceneCompositionRoot.Awake() method is called.  *NOTE:* This should always be the first thing executed in your scene.  By default it should work this way out of the box, because the executionOrder property should be set to -9999 for the SceneCompositionRoot class.  You can verify that this is the case by selecting `Edit -> Project Settings -> Script Execution Order` and making sure that SceneCompositionRoot is at the top (which should then be followed by GlobalFacade and SceneFacade as well)
+    1. If this is the first scene to be loaded during this play session, SceneCompositionRoot will create the GlobalCompositionRoot prefab.  If GlobalCompositionRoot has already been created by a previous scene, we skip to step 10 to directly initialize the SceneCompositionRoot
+    1. GlobalCompositionRoot creates a new DiContainer object to be used to contain all instances meant to persist across scenes
+    1. GlobalCompositionRoot iterates through all the Installers that have been added to its prefab via the Unity Inspector, and updates them to point to the new DiContainer.  It then calls InstallBindings() on each installer.
+1. Each Installer registers different sets of dependencies directly on to the given DiContainer by calling one of the Bind<> methods.  Note that the order that this binding occurs should not generally matter, because nothing should be instantiated using the DiContainer until all the installers are fully completed.  Each installer can also call other installers by executing Container.Install<> (Note that you can pass arguments to this method as well)
+    1. The GlobalCompositionRoot then injects all MonoBehaviours that have been added to its prefab with their dependencies. All [PostInject] methods within the GlobalCompositionRoot prefab are called at this time as well.  Note that since MonoBehaviours are instantiated by Unity we cannot use constructor injection and therefore [PostInject] injection, field injection or property injection must be used instead.
+    1. After filling in the dependencies for each game object on its prefab, the GlobalCompositionRoot then constructs an instance of GlobalFacade.  This class represents the root of the object graph for the GlobalCompositionRoot.  The GlobalFacade class has dependencies on TickableManager, InitializableManager, and DisposableManager classes.  Therefore Zenject constructs instances of those before creating GlobalFacade.  Those manager classes contain dependencies for all objects bound to the ITickable, IInitializable, and IDisposable interfaces.  So once again Zenject resolves all instances bound to any of these interfaces before constructing the manager classes.  This is important to know because this is why when you bind something to ITickable/IInitializable/IDisposable, it is always created at startup.
+    1. If any required dependencies cannot be resolved, a ZenjectResolveException is thrown
+    1. Steps 4-9 are repeated except this time with the SceneCompositionRoot.  All objects in the scene (except those objects that are parented to the GlobalCompositionRoot) are injected using the bindings that have been installed in the SceneCompositionRoot's installers.  Also note that because the DiContainer used by SceneCompositionRoot is a sub-container of the DiContainer for the GlobalCompositionRoot, objects in the scene will also be injected using bindings declared in a global installer as well. And similar to the process for GlobalCompositionRoot, a SceneFacade object is created which represents the root of the object graph for all dependencies in the scene.
+    1. Once again, if any required dependencies in the scene cannot be resolved, a ZenjectResolveException is thrown
+    1. All other MonoBehaviour's in the scene have their Awake() method called
+    1. Unity Start() phase begins
+    1. GlobalFacade.Start() method is called.  This will trigger the Initialize() method on all IInitializable objects in the order specified in the GlobalCompositionRoot installers.
+    1. SceneFacade.Start() method is called.  This will trigger the Initialize() method on all IInitializable objects in the order specified in the SceneCompositionRoot installers.
+    1. All other MonoBehaviour's in your scene has their Start() method called
+    1. Unity Update() phase begins
+    1. GlobalFacade.Update() is called, which results in Tick() being called for all ITickable objects (in the order specified in the GlobalCompositionRoot installers)
+1. SceneFacade.Update() is called, which results in Tick() being called for all ITickable objects (in the order specified in the SceneCompositionRoot installers)
+    1. All other MonoBehaviour's in your scene has their Update() method called
+    1. Steps 18 - 19 is repeated for LateUpdate
+    1. At the same time, Steps 18 - 19 is repeated for FixedUpdate according to the physics timestep
+    1. App is exited
+    1. Dispose() is called on all objects mapped to IDisposable within the SceneCompositionRoot installers (see <a href="#implementing-idisposable">here</a> for details)
+    1. Dispose() is called on all objects mapped to IDisposable within the GlobalCompositionRoot installers (see <a href="#implementing-idisposable">here</a> for details)
 
 ## <a id="auto-mocking-using-moq"></a>Auto-Mocking using Moq
 
