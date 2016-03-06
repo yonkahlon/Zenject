@@ -7,11 +7,6 @@ using System.Linq;
 
 namespace Asteroids
 {
-    public enum Cameras
-    {
-        Main,
-    }
-
     public class AsteroidsInstaller : MonoInstaller
     {
         [SerializeField]
