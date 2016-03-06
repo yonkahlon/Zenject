@@ -53,10 +53,15 @@ __Quick Start__:  If you are already familiar with dependency injection and are 
         * <a href="#custom-factories">Custom Factories</a>
         * <a href="#injecting-data-across-scenes">Injecting Data Across Scenes</a>
         * <a href="#scenes-decorator">Scenes Decorators</a>
-        * <a href="#advanced-factory-construction-using-subcontainers">Advanced Factory Construction Using SubContainers</a>
-        * <a href="#sub-containers-and-facades">Sub-Containers and Facades</a>
         * <a href="#commands-and-signals">Commands And Signals</a>
-        * <a href="#autobind">Automatic Bindings</a>
+        * <a href="#scene-bindings">Scene Bindings</a>
+        * Using SubContainers / Facades
+            * <a href="#advanced-factory-construction-using-subcontainers">Advanced Factory Construction Using SubContainers</a>
+            * <a href="#sub-containers-and-facades">Sub-Containers and Facades</a>
+            * <a href="#dynamic-facades">Creating Facade's Dynamically</a>
+            * <a href="#non-monoBehaviour-facades-method">Non-MonoBehaviour Facades (By Method)</a>
+            * <a href="#non-monoBehaviour-facades-installer">Non-MonoBehaviour Facades (By Installer)</a>
+            * <a href="#non-monoBehaviour-facade-interfaces">Using ITickable / IInitializable / IDisposable with Non-MonoBehaviour Facades</a>
         * <a href="#zenject-order-of-operations">Zenject Order Of Operations</a>
         * <a href="#auto-mocking-using-moq">Auto-Mocking Using Moq</a>
 * <a href="#questions">Frequently Asked Questions</a>
@@ -81,13 +86,14 @@ __Quick Start__:  If you are already familiar with dependency injection and are 
 * Optional dependencies
 * Support for building dynamic object graphs at runtime using factories
 * Injection across different Unity scenes
+* Convention based binding, based on class name, namespace, or any other criteria
 * Support for global, project-wide bindings to add dependencies for all scenes
 * "Scene Decorators" which allow adding functionality to a different scene without changing it directly
 * Ability to validate object graphs at editor time including dynamic object graphs created via factories
 * Nested Containers aka Sub-Containers
 * Support for Commands and Signals
 * Ability to easily define discrete 'islands' of dependencies using 'Facade' classes
-* Ability to automatically add bindings by dropping `ZenjectBinding` on a game object in your scene
+* Ability to automatically add bindings within your scene by dropping `ZenjectBinding` components on to game objects
 * Auto-Mocking using the Moq library
 
 ## <a id="installation"></a>Installation
@@ -2004,6 +2010,309 @@ Note also that Zenject validate (using CTRL+SHIFT+V or the menu item via Edit->Z
 
 Note also that you can add a decorator scene for another decorator scene, and this should work fine.
 
+## <a id="commands-and-signals"></a>Commands And Signals
+
+Zenject also includes an optional extension that allows you to define "Commands" and "Signals".
+
+A signal can be thought of as a single event, that when triggered will notify a number of listeners.  A command is an object with a single method named `Execute`, that will forward the request to a specific handler.
+
+The advantage of using Signals and Commands is that the result will often be more loosely coupled code.  Given two classes A and B that need to communicate, your options are usually:
+
+1. Directly call a method on B from A.  In this case, A is strongly coupled with B.
+2. Inverse the dependency by having B observe an event on A.  In this case, B is strongly coupled with A.
+
+Both cases result in the classes being coupled in some way.  Now if instead you create a command object, which is called by A and which invokes a method on B, then the result is less coupling.  Granted, A is still coupled to the command class, but in some cases that is better than being directly coupled to B.  Using signals works similarly, in that you can remove the coupling by having A trigger a signal, which is observed by B.
+
+Signals are defined like this:
+
+```csharp
+public class GameLoadedSignal : Signal
+{
+    public class Trigger : TriggerBase { }
+}
+
+public class GameLoadedSignalWithParameter : Signal<string>
+{
+    public class Trigger : TriggerBase { }
+}
+```
+
+The trigger class is used to invoke the signal event.  We make the trigger a separate class so that we can control which classes can trigger the signal and which classes can listen on the signal separately.
+
+Note that the Signal base class is defined within the Zenject.Commands namespace.
+
+Signals are declared in an installer like this:
+
+```csharp
+
+public override void InstallBindings()
+{
+    ...
+    Container.BindSignal<GameLoadedSignal>();
+    ...
+    Container.BindSignal<GameLoadedSignalWithParameter>().WhenInjectedInto<Foo>();
+}
+
+```
+
+These statements will do the following:
+* Bind the class `GameLoadedSignal` as `ToSingle<>` without a condition.  This means that any class can declare `GameLoadedSignal` as a dependency.
+* Bind the class `GameLoadedSignalWithParameter` as `ToSingle<>` as well, except it will limit its usage strictly to class `Foo`.
+
+Once you have added the signal to your container by binding it within an installer, you can use it like this:
+
+```csharp
+
+public class Foo : IInitializable, IDisposable
+{
+    readonly GameLoadedSignal _signal;
+
+    public Foo(GameLoadedSignal signal)
+    {
+        _signal = signal;
+    }
+
+    public void Initialize()
+    {
+        _signal.Event += OnGameLoaded;
+    }
+
+    public void Dispose()
+    {
+        _signal.Event -= OnGameLoaded;
+    }
+
+    void OnGameLoaded()
+    {
+        ...
+    }
+}
+```
+
+Here we use the convention of prefixing event handlers with On, but of course you don't have to follow this convention.
+
+After binding the signal, you will almost always want to also bind a trigger, so that you can actually invoke the signal.  Signals and Triggers are bound as separate statements so that you can optionally add conditional binding on both the trigger and the signal separately.
+
+Triggers are declared in an installer like this:
+
+```csharp
+
+public override void InstallBindings()
+{
+    ...
+    Container.BindTrigger<GameLoadedSignal.Trigger>();
+    ...
+    Container.BindTrigger<GameLoadedSignalWithParameter.Trigger>().WhenInjectedInto<Foo>();
+}
+
+```
+
+Once you have added the trigger to your container by binding it within an installer, you can use it like this:
+
+```csharp
+public class Foo
+{
+    readonly GameLoadedSignal.Trigger _trigger;
+
+    public Foo(GameLoadedSignal.Trigger trigger)
+    {
+        _trigger = trigger;
+    }
+
+    public void DoSomething()
+    {
+        _trigger.Fire();
+    }
+}
+```
+
+Commands are defined like this
+
+```csharp
+public class ResetSceneCommand : Command { }
+
+public class ResetSceneCommandWithParameter : Command<string> { }
+```
+
+Note again that the Command base class is defined within the Zenject.Commands namespace here.
+
+Unlike with signals, there are several different ways of declaring a command in an installer.  Perhaps the simplest way would be the following:
+
+```csharp
+public override void InstallBindings()
+{
+    ...
+    Container.BindCommand<ResetSceneCommand>().ToSingle<ResetSceneHandler>();
+    ...
+    Container.BindCommand<ResetSceneCommandWithParameter, string>().ToSingle<ResetSceneHandler>();
+    ...
+}
+
+public class ResetSceneHandler : ICommandHandler
+{
+    public void Execute()
+    {
+        ... [reset scene] ...
+    }
+}
+```
+
+This bind statement will result in an object of type `ResetSceneCommand` being added to the container.  Any time a class calls Execute on `ResetSceneCommand`, it will trigger the Execute method on the `ResetSceneHandler` class as well.  For example:
+
+```csharp
+public class Foo : ITickable
+{
+    readonly ResetSceneCommand _command;
+
+    public Foo(ResetSceneCommand command)
+    {
+        _command = command;
+    }
+
+    public void Tick()
+    {
+        ...
+        _command.Execute();
+        ...
+    }
+}
+```
+
+We might also want to restrict usage of our command to the Foo class only, which we could do with the following
+
+```csharp
+public override void InstallBindings()
+{
+    ...
+    Container.BindCommand<ResetSceneCommand>().ToSingle<ResetSceneHandler>().WhenInjectedInto<Foo>();
+    ...
+}
+```
+
+Note that in this case we are using `ToSingle<>` - this means that the same instance of `ResetSceneHandler` will be used every time the command is executed.  Alternatively, you could declare it using `ToTransient<>` which would instantiate a new instance of `ResetSceneHandler` every time Execute() is called.  For example:
+
+```csharp
+Container.BindCommand<ResetSceneCommand>().ToTransient<ResetSceneHandler>();
+```
+
+This might be useful if the `ResetSceneCommand` class involves some long-running operations that require unique sets of member variables/dependencies.
+
+You can also bind commands directly to methods instead of classes by doing the following:
+
+```csharp
+public override void InstallBindings()
+{
+    ...
+    Container.BindCommand<ResetSceneCommand>().ToSingle<MyOtherHandler>(x => x.ResetScene);
+    ...
+}
+
+public class ResetSceneHandler
+{
+    public void ResetScene()
+    {
+        ... [reset scene] ...
+    }
+}
+```
+
+This approach does not require that you derive from `ICommandHandler` at all.  There is also a `ToTransient` version of this which works similarly (instantiates a new instance of MyOtherHandler).
+
+```csharp
+Container.BindCommand<ResetSceneCommand>().ToTransient<MyOtherHandler>(x => x.ResetScene);
+```
+
+## <a id="scene-bindings"></a>Scene Bindings
+
+In many cases, you have a number of MonoBehaviour's that have been added to the scene within the Unity editor (ie. at editor time not runtime) and you want to also have these MonoBehaviour's added to the Zenject Container so that they can be injected into other classes.
+
+The usual way this is done is to add public references to these objects within your installer like this:
+
+    public class Foo : MonoBehaviour
+    {
+    }
+
+    public class GameInstaller : MonoInstaller
+    {
+        [SerializeField]
+        Foo _foo;
+
+        public override void InstallBindings()
+        {
+            Container.BindInstance(_foo);
+            Container.Bind<IInitializable>().ToSingle<GameRunner>();
+        }
+    }
+
+    public class GameRunner : IInitializable
+    {
+        readonly Foo _foo;
+
+        public GameRunner(Foo foo)
+        {
+            _foo = foo;
+        }
+
+        public void Initialize()
+        {
+            ...
+        }
+    }
+
+(Note that you could also just make `Foo` public here - my personal convention is just to always use `SerializeField` instead to avoid breaking encapsulation)
+
+This works fine however in some cases this can get cumbersome.  For example, if you want to allow an artist to add any number of `Enemy` objects to the scene, and you also want all those `Enemy` objects added to the Zenject Container.  In this case, you would have to manually drag each one to the inspector of one of your installers.  This is very error prone since its easy to forget one, or to delete the `Enemy` game object but forget to delete the null reference in the inspector for your installer, etc.
+
+So another way to do this is to use the `ZenjectBinding` component.  You can do this by adding a `ZenjectBinding` MonoBehaviour to the same game object that you want to be automatically added to the Zenject container.
+
+For example, if I have a MonoBehaviour of type `Foo` in my scene, I can just add `ZenjectBinding` alongside it, and then drag the Foo component into the Component property of the ZenjectBinding component.
+
+<img src="UnityProject/Assets/Zenject/Documentation/ReadMe_files/AutoBind1.png?raw=true" alt="ZenjectBinding"/>
+
+Then our installer becomes:
+
+    public class GameInstaller : MonoInstaller
+    {
+        public override void InstallBindings()
+        {
+            Container.Bind<IInitializable>().ToSingle<GameRunner>();
+        }
+    }
+
+When using `ZenjectBinding` this way, by default it will bind `Foo` using the `Self` method, so it is equivalent to the first example where we did this:
+
+    Container.Bind<Foo>().ToInstance(_foo);
+
+Which is also the same as this:
+
+    Container.BindInstance(_foo);
+
+So if we duplicate this game object to have multiple game objects with `Foo` on them (and its `ZenjectBinding`), they will all be bound to the Container this way.  So after doing this, we would have to change `GameRunner` above to take a `List<Foo>` otherwise we would get Zenject exceptions.
+
+Also note that the `ZenjectBinding` component contains a `Bind Type` property in its inspector.  By default this simply binds the instance as shown above but it can also be set to the following:
+
+1 - `AllInterfaces`
+
+This bind type is equivalent to the following:
+
+    Container.BindAllInterfaces(_foo.GetType()).ToInstance(_foo);
+
+Note however, in this case, that `GameRunner` must ask for type `IFoo` in its constructor.  If we left `GameRunner` asking for type `Foo` then Zenject would throw exceptions, since the `BindAllInterfaces` method only binds the interfaces, not the concrete type.  If you want the concrete type as well then you can use:
+
+2 - `AllInterfacesAndSelf`
+
+This bind type is equivalent to the following:
+
+    Container.BindAllInterfacesAndSelf(_foo.GetType()).ToInstance(_foo);
+
+This is the same as AllInterfaces except we can directly access Foo using type Foo instead of needing an interface.
+
+The final property you will notice on the ZenjectBinding component is the "Container Type".
+
+In most cases you can leave this as its default "Local".  However, if you are using FacadeCompositionRoot in places, then the other value might be useful here.
+
+"Container Type" will determine what container the component gets added to.  If set to 'Scene', it will be as if the given component was bound inside an installer on the SceneCompositionRoot.  If set to 'Local', it will be as if it is bound inside an installer on whatever CompositionRoot it is in.  In most cases that will be the SceneCompositionRoot, but if it's inside a FacadeCompositionRoot it will be bound into that instead.  Typically you would only need to use the 'Scene' value when you want to bind something to the SceneCompositionRoot that is inside a FacadeCompositionRoot (eg. typically this would be the MonoFacade derived class)
+
 ## <a id="advanced-factory-construction-using-subcontainers"></a>Advanced Factory Construction Using SubContainers
 
 In the real world there can sometimes be complex construction that needs to occur in your custom factory classes.  One way to deal with this is to use a temporary sub-container.
@@ -2059,38 +2368,51 @@ Another example might be if you are designing an open-world space ship game, you
 
 This is actually how global bindings work.  There is one global container for the entire application, and when a unity scene starts up, it creates a new sub-container "underneath" the global container.  All the bindings that you add in your scene MonoInstaller are bound to your sub-container.  This allows the dependencies in your scene to automatically get injected with global bindings, because sub-containers automatically inherit all the bindings in its parent (and grandparent, etc.).
 
-A common design pattern that we like to use in relation to sub-containers is the <a href="https://en.wikipedia.org/wiki/Facade_pattern">Facade pattern</a>.  This pattern is used to abstract away a related group of dependencies so that it can be used at a higher level when used by other modules in the code base.  This is relevant here because often when you are defining sub-containers in your application it is very useful to also define a Facade class that is used to interact with this sub-container as a whole.  So, to apply it to the spaceship example above, you might have a SpaceshipFacade class that represents very high-level operations on a spaceship such as "Start Engine", "Take Damage", "Fly to destination", etc.  And then internally, the SpaceshipFacade class can delegate the specific handling of all the parts of these requests to the relevant single-responsibility dependencies that exist within the sub-container.  Let's see what the code would look like in this example (read the comments for an explanation)
+A common design pattern that we like to use in relation to sub-containers is the <a href="https://en.wikipedia.org/wiki/Facade_pattern">Facade pattern</a>.  This pattern is used to abstract away a related group of dependencies so that it can be used at a higher level when used by other modules in the code base.  This is relevant here because often when you are defining sub-containers in your application it is very useful to also define a Facade class that is used to interact with this sub-container as a whole.  So, to apply it to the spaceship example above, you might have a SpaceshipFacade class that represents very high-level operations on a spaceship such as "Start Engine", "Take Damage", "Fly to destination", etc.  And then internally, the SpaceshipFacade class can delegate the specific handling of all the parts of these requests to the relevant single-responsibility dependencies that exist within the sub-container.
+
+<a id="simplefacadeexample"></a>
+Let's see how we would actually do this for this spaceship example:
+
+* Create a new scene
+* Right Click inside the Hierarchy tab and select `Zenject -> Scene Composition Root`
+* Right Click inside the Hierarchy tab again and select `Zenject -> Facade Composition Root`
+* Rename the object FacadeCompositionRoot to just "Ship"
+* Create a new MonoBehaviour named `Ship.cs` with the following contents:
 
 ```csharp
-// First we define our facade class to represent all the classes associated with a ship
-// Facade is a class that is built into Zenject
-public class ShipFacade : Facade
-{
-    public class Factory : FacadeFactory<ShipFacade>
-    {
-    }
-}
+using Zenject;
 
-// Now we define a few classes that will be installed into our ship sub-container
-// This class will just move the ship in a specific direction
+public class Ship : MonoFacade
+{
+}
+```
+
+* This class will be used as a Facade for our ship (as in the <a href="https://en.wikipedia.org/wiki/Facade_pattern">Facade pattern</a>) and will be used by other systems to interact with the ship at a high level
+* Drag the `Ship.cs` script from the Project tab and drop it on to the `Ship` game object next to the `FacadeCompositionRoot` component.
+* Drag the newly added `Ship` component into the Facade property of `FacadeCompositionRoot`
+* Create a new MonoBehaviour named `ShipMoveHandler.cs` with the following contents:
+
+```csharp
+using Zenject;
+using UnityEngine;
+using System;
+
 public class ShipMoveHandler : ITickable
 {
     readonly Settings _settings;
 
-    ShipView _view;
-    Vector3 _direction = Vector3.forward;
+    Transform _rootTransform;
 
     public ShipMoveHandler(
-        ShipView view,
-        Settings settings)
+        Transform rootTransform, Settings settings)
     {
         _settings = settings;
-        _view = view;
+        _rootTransform = rootTransform;
     }
 
     public void Tick()
     {
-        _view.transform.position += _direction * _settings.Speed * Time.deltaTime;
+        _rootTransform.position += Vector3.forward * _settings.Speed * Time.deltaTime;
     }
 
     [Serializable]
@@ -2099,149 +2421,138 @@ public class ShipMoveHandler : ITickable
         public float Speed;
     }
 }
+```
 
-// We define an empty monobehaviour that will allow us to manipulate the game object
-// that contains the ship mesh, animations, etc.
-// This would normally contain references to all the different parts of the model that we're
-// interested in
-// It is attached to the prefab that we install below in GameInstaller
-public class ShipView : MonoBehaviour
-{
-}
+* We will add this class to the sub-container associated with the ship.  It will be responsibile for propelling the ship forward
+* Create a new MonoBehaviour named `ShipInstaller.cs` with the following contents:
 
-// We also need to define a class that will contain our ship facade
-public class GameController : IInitializable, ITickable
-{
-    readonly ShipFacade.Factory _shipFactory;
-    ShipFacade _ship;
+```csharp
+using Zenject;
+using UnityEngine;
+using System;
 
-    public GameController(ShipFacade.Factory shipFactory)
-    {
-        _shipFactory = shipFactory;
-    }
-
-    public void Initialize()
-    {
-        // Note that all the IInitializable's will automatically have their Initialize
-        // methods call here so there is no need to do it ourselves
-        _ship = _shipFactory.Create();
-    }
-
-    public void Tick()
-    {
-        // However, the facade class must have its Tick() called manually
-        // in order to have any ITickable's in the container get their Tick() methods called
-        _ship.Tick();
-    }
-}
-
-// Finally, we install everything!
-public class GameInstaller : MonoInstaller
+public class ShipInstaller : MonoInstaller
 {
     [SerializeField]
     Settings _settings;
 
     public override void InstallBindings()
     {
-        // Add our main game class
-        Container.Bind<IInitializable>().ToSingle<GameController>();
-        Container.Bind<ITickable>().ToSingle<GameController>();
-        Container.Bind<GameController>().ToSingle();
-
-        // This will result in a binding of type ShipFacade.Factory
-        // Note that you can add conditions to this just like for other bindings
-        Container.BindFacadeFactory<ShipFacade, ShipFacade.Factory>(InstallShipFacade);
-
-        // This could be either bound in the subcontainer or in the main container, it doesn't matter
+        Container.BindAllInterfacesAndSelf<ShipMoveHandler>().ToSingle<ShipMoveHandler>();
+        Container.BindInstance(this.transform).WhenInjectedInto<ShipMoveHandler>();
         Container.BindInstance(_settings.ShipMoveHandler);
-    }
-
-    // This method will be called to initialize the container every time a new ship is created
-    void InstallShipFacade(DiContainer subContainer)
-    {
-        // Note here that we are using subContainer and NOT Container
-        subContainer.Bind<ITickable>().ToSingle<ShipMoveHandler>();
-        subContainer.Bind<ShipView>().ToSinglePrefab(_settings.ShipPrefab);
     }
 
     [Serializable]
     public class Settings
     {
-        public GameObject ShipPrefab;
         public ShipMoveHandler.Settings ShipMoveHandler;
     }
 }
 ```
 
-By doing the above we can now easily create multiple ship facade's and this will result in new instances of ship-handling classes such as `ShipMoveHandler` being created for each individual ship.  And within the ship subcontainer, all these classes can treat each other as singletons.  This is very nice, because just like in other examples above, when writing new classes to handle the ship, we don't need to think about where our dependencies come from, we just need to worry about fulfilling our own single responsibilities and then ask for whatever other dependencies we need in our constructor.
+* Drag the `ShipInstaller.cs` script from the Project tab and drop it on to the `Ship` game object next to the `FacadeCompositionRoot` component.
+* Drag the newly added `ShipInstaller` component into the Installers property of `FacadeCompositionRoot`
+* Validate your scene by pressing `CTRL+SHIFT+V`.  This should pass successfully.
+* Add a cube underneath the 'Ship' GameObject so we have something to represent the ship
+* Set the value for `Settings -> Ship Move Handler -> Speed` on the ShipInstaller component to `1`.
+* Run the scene.
+* You should observe the cube moving forward.
+* Duplicate the entire Ship game object by selecting it and pressing `CTRL+D`
+* Move it over slightly so we can see it is separate from the original ship
+* Change the value of `Settings -> Ship Move Handler -> Speed` to `0.5`
+* Run the scene.
+* You should observe both ships moving now at different speeds.
 
-Finally, we can also operate on each individual ship from the main game code by interacting with the ShipFacade, which abstracts away the low level functionality from within the ship.
+This is an extremely simple example, but as you can see, both Ship objects are now operating entirely within their own custom sub-container.  They will both have their own instances of all the dependencies declared in the ShipInstaller such as `ShipMoveHandler`.  And furthermore, all of these objects can treat each other as singletons.  This is very nice, because just like in other examples above, when writing new classes to handle the ship, we don't need to think about where our dependencies come from - we just need to worry about fulfilling our own single responsibilities and then ask for whatever other dependencies we need in our constructor.
 
-This is a simple example.  In the real-world, almost all facades will take some parameters.  This can be done in a similar way to how parameters are added to the other kinds of factories.   For example, let's say we want to construct the "ShipView" class outside of the facade and then pass that into it.  To make things a bit more interesting, let's also add a high-level method on the ShipFacade.
-
-The code would then just need to be changed to the following:
+Finally, we can also operate on each individual ship from the main game code by interacting with the Ship facade class, which abstracts away the low level functionality from within the ship.  For example, we might change the `Ship` class to the following:
 
 ```csharp
-public class ShipFacade : Facade
-{
-    ShipMoveHandler _moveHandler;
+using Zenject;
 
-    // Note that the facade class is itself created from inside the subcontainer
-    // and therefore can add dependencies for any of its contents
-    public ShipFacade(ShipMoveHandler moveHandler)
+public class Ship : MonoFacade
+{
+    readonly ShipMoveHandler _moveHandler;
+
+    public Ship(ShipMoveHandler moveHandler)
     {
         _moveHandler = moveHandler;
     }
 
-    public void StartEngine()
+    public float Speed
     {
-        // Delegate to the engine handler
-        _moveHandler.StartEngine();
+        get
+        {
+            return _moveHandler.Speed;
+        }
+        set
+        {
+            _moveHandler.Speed = value;
+        }
     }
+}
+```
 
-    // Add any parameters that we want to take from outside to the list here
-    public class Factory : FacadeFactory<ShipView, ShipFacade>
+This way, classes that are added at the scene-level do not need to even know that ShipMoveHandler exists - they can instead operate on the ship via the Ship facade class, which can that delegate those requests to the appropriate single-responsibility class within the subcontainer.
+
+For a description on how to create these facade classes dynamically, see the <a href="#dynamic-facades">next section</a>.
+
+For a much more interesting example of using facades and sub-containers, be sure to take a look at the included sample game (not the Asteroids game, the other one, underneath the "Sample2" folder)
+
+A more in-depth explanation of what's going on here:  The facade class, in addition to being used by scene-level classes to interact with the sub-container, is also the "root" of the object graph for the sub-container.  If you look inside the `MonoFacade` base class, you will find dependencies on `TickableManager`, `DisposableManager`, and `InitializableManager`.  This is why when we bind ShipMoveHandler to ITickable, it automatically gets created - because it is part of this object graph since `TickableManager` depends on all `ITickables`.
+
+## <a id="dynamic-facades"></a>Creating Facade's Dynamically
+
+Continuing with the facade example <a href="#simplefacadeexample">above</a>, let's pretend that we now want to create ships dynamically, after the game has started.
+
+* First, create a prefab for the entire `Ship` GameObject that we created above
+* Change `Ship.cs` to the following
+
+```csharp
+using Zenject;
+
+public class Ship : MonoFacade
+{
+    public class Factory : MonoFacadeFactory<Ship>
     {
     }
 }
+```
 
-public class ShipView : MonoBehaviour
+* Then create a new MonoBehaviour named `GameController.cs` with the following contents:
+
+```csharp
+using UnityEngine;
+using Zenject;
+
+public class GameController : ITickable
 {
-    public class Factory : MonoBehaviourFactory<ShipView>
-    {
-    }
-}
+    readonly Ship.Factory _shipFactory;
 
-public class GameController : IInitializable, ITickable
-{
-    readonly ShipFacade.Factory _shipFactory;
-    readonly ShipView.Factory _shipViewFactory;
-    ShipFacade _ship;
-
-    public GameController(ShipFacade.Factory shipFactory, ShipView.Factory shipViewFactory)
+    public GameController(Ship.Factory shipFactory)
     {
         _shipFactory = shipFactory;
-        _shipViewFactory = shipViewFactory;
-    }
-
-    public void Initialize()
-    {
-        var shipView = _shipViewFactory.Create();
-
-        ...
-
-        _ship = _shipFactory.Create(shipView);
-
-        ....
-
-        _ship.StartEngine();
     }
 
     public void Tick()
     {
-        _ship.Tick();
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            _shipFactory.Create();
+        }
     }
 }
+```
+
+* This class will create a new ship every time the user presses the space bar.
+* Now let's wire these up in an installer.  Create a new MonoBehaviour named `GameInstaller.cs` with the following contents:
+
+```csharp
+using System;
+using UnityEngine;
+using System.Collections;
+using Zenject;
 
 public class GameInstaller : MonoInstaller
 {
@@ -2250,348 +2561,436 @@ public class GameInstaller : MonoInstaller
 
     public override void InstallBindings()
     {
-        Container.Bind<IInitializable>().ToSingle<GameController>();
-        Container.Bind<ITickable>().ToSingle<GameController>();
-        Container.Bind<GameController>().ToSingle();
-
-        Container.BindMonoBehaviourFactory<ShipView.Factory>(_settings.ShipPrefab);
-        Container.BindFacadeFactory<ShipView, ShipFacade, ShipFacade.Factory>(InstallShipFacade);
-
-        Container.BindInstance(_settings.ShipMoveHandler);
-    }
-
-    // Any parameters passed to the factory are then forwarded to this method
-    // This allows us to bind the parameters however we want
-    // This also allows us to conditionally add different bindings depending on the parameter values
-    void InstallShipFacade(DiContainer subContainer, ShipView view)
-    {
-        subContainer.BindInstance(view);
-        subContainer.Bind<ITickable>().ToSingle<ShipMoveHandler>();
+        Container.BindAllInterfaces<GameController>().ToSingle<GameController>();
+        Container.BindMonoFacadeFactory<Ship.Factory>(_settings.ShipPrefab);
     }
 
     [Serializable]
     public class Settings
     {
         public GameObject ShipPrefab;
-        public ShipMoveHandler.Settings ShipMoveHandler;
     }
 }
 ```
 
-If you find yourself using a lot of sub-containers / facades, you may find yourself in a situation where you want to inject a dependency from the parent container, or you want to explicitly not inject from the parent container.  For these cases you can pass an extra parameter to the `[Inject]` attribute to specify this.  For example, the following will guarantee that the `Bar` dependencies always comes from the same container that `Foo` is created in.
+* As you can see, installing a MonoFacadeFactory is very similar to how MonoBehaviourFactories are installed.  You simply provide the prefab that contains the `FacadeCompositionRoot` and associated installers  as a parameter to the BindMonoFacadeFactory method
+* Now drag the `GameInstaller.cs` file from the Project tab and drop it on to the `SceneCompositionRoot` game object
+* Drag the newly added GameInstaller component into the Installers property of the `SceneCompositionRoot`
+* Drag the Ship prefab from the Project tab into the inspector for the GameInstaller component
+* Hit `CTRL+SHIFT+V` to validate the scene.  This should pass successfully.
+* Run the scene.
+* You should see that the Ship object that we left in the scene starts moving away.  And now, if we hit the space bar we can create new ship objects.
 
-    class Foo
+Let's make this a bit more interesting by passing a parameter into our ship facade.  Let's make the speed of the ship configurable from within the GameController class.
+
+* Change the Ship class to the following:
+
+```csharp
+using Zenject;
+
+public class Ship : MonoFacade
+{
+    public class Factory : MonoFacadeFactory<float, Ship>
     {
-        public Bar val;
+    }
+}
+```
 
-        public Foo(
-            [Inject(InjectSources.Local)]
-            Bar val)
+Just like with other factory types, to add a parameter to the factory we just need to add an extra generic parameter to the base class for our factory.
+
+However, you'll notice that in this case, unlike with other factory types, we have not added the float as a constructor parameter to the Ship class.  This is because parameters for Facades are treated a bit differently.  Instead of injecting the parameter into the facade class, the parameter gets injected into an Installer instead.  This is better for cases where we want to add the given parameter to the initial container (which happens often).
+
+* Now change the GameInstaller class to the following:
+
+```csharp
+using System;
+using UnityEngine;
+using System.Collections;
+using Zenject;
+
+namespace ModestTree
+{
+    public class GameInstaller : MonoInstaller
+    {
+        [SerializeField]
+        Settings _settings;
+
+        public override void InstallBindings()
         {
-            this.val = val;
+            Container.BindAllInterfaces<GameController>().ToSingle<GameController>();
+            Container.BindMonoFacadeFactory<ShipInstaller, Ship.Factory>(_settings.ShipPrefab);
+        }
+
+        [Serializable]
+        public class Settings
+        {
+            public GameObject ShipPrefab;
         }
     }
-
-`InjectSources` can be any of the following.  Note that `Any` is the default when unspecified.
-
-* `Any` - Current Container or any parent
-* `Local` - Inject strictly from the current container and ignore any parent dependencies
-* `Parent` - Inject strictly from the immediate parent container and ignore any dependency matches in the current container or grant-parent container
-* `AnyParent` - Inject from any parent, but ignore the current container.
-
-## <a id="commands-and-signals"></a>Commands And Signals
-
-Zenject also includes an optional extension that allows you to define "Commands" and "Signals".
-
-A signal can be thought of as a single event, that when triggered will notify a number of listeners.  A command is an object with a single method named `Execute`, that will forward the request to a specific handler.
-
-The advantage of using Signals and Commands is that the result will often be more loosely coupled code.  Given two classes A and B that need to communicate, your options are usually:
-
-1. Directly call a method on B from A.  In this case, A is strongly coupled with B.
-2. Inverse the dependency by having B observe an event on A.  In this case, B is strongly coupled with A.
-
-Both cases result in the classes being coupled in some way.  Now if instead you create a command object, which is called by A and which invokes a method on B, then the result is less coupling.  Granted, A is still coupled to the command class, but in some cases that is better than being directly coupled to B.  Using signals works similarly, in that you can remove the coupling by having A trigger a signal, which is observed by B.
-
-Signals are defined like this:
-
-```csharp
-public class GameLoadedSignal : Signal
-{
-    public class Trigger : TriggerBase { }
-}
-
-public class GameLoadedSignalWithParameter : Signal<string>
-{
-    public class Trigger : TriggerBase { }
 }
 ```
 
-The trigger class is used to invoke the signal event.  We make the trigger a separate class so that we can control which classes can trigger the signal and which classes can listen on the signal separately.
+The only change we've made here is that the line BindMonoFacadeFactory now includes an extra generic argument `ShipInstaller`.  The installer type is provided here so that Zenject knows where to inject the parameters given to the MonoFacadeFactory.  In the previous example, it was not necessary to provide the installer type because there were no parameters.
 
-Note that the Signal base class is defined within the Zenject.Commands namespace.
-
-Signals are declared in an installer like this:
+* Change GameController to the following:
 
 ```csharp
+using UnityEngine;
+using Zenject;
 
-public override void InstallBindings()
+public class GameController : ITickable
 {
-    ...
-    Container.BindSignal<GameLoadedSignal>();
-    ...
-    Container.BindSignal<GameLoadedSignalWithParameter, string>().WhenInjectedInto<Foo>();
-}
+    readonly Ship.Factory _shipFactory;
 
+    public GameController(Ship.Factory shipFactory)
+    {
+        _shipFactory = shipFactory;
+    }
+
+    public void Tick()
+    {
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            var speed = UnityEngine.Random.RandomRange(1.0f, 5.0f);
+            _shipFactory.Create(speed);
+        }
+    }
+}
 ```
 
-These statements will do the following:
-* Bind the class `GameLoadedSignal` as `ToSingle<>` without a condition.  This means that any class can declare `GameLoadedSignal` as a dependency.
-* Bind the class `GameLoadedSignalWithParameter` as `ToSingle<>` as well, except it will limit its usage strictly to class `Foo`.
-
-Once you have added the signal to your container by binding it within an installer, you can use it like this:
+* Change ShipInstaller to the following:
 
 ```csharp
+using Zenject;
+using UnityEngine;
+using System;
 
-public class Foo : IInitializable, IDisposable
+public class ShipInstaller : MonoInstaller
 {
-    readonly GameLoadedSignal _signal;
+    [InjectOptional]
+    float _speed = 1;
 
-    public Foo(GameLoadedSignal signal)
+    public override void InstallBindings()
     {
-        _signal = signal;
+        Container.BindInstance(_speed).WhenInjectedInto<ShipMoveHandler>();
+        Container.BindAllInterfacesAndSelf<ShipMoveHandler>().ToSingle<ShipMoveHandler>();
+
+        Container.BindInstance(this.transform).WhenInjectedInto<ShipMoveHandler>();
+    }
+}
+```
+
+* Note that we've made the injected speed parameter optional here so that we can still drop the Ship prefab directly into the scene at edit-time
+* Finally, also change ShipMoveHandler to the following:
+
+```csharp
+using Zenject;
+using UnityEngine;
+using System;
+
+public class ShipMoveHandler : ITickable
+{
+    Transform _rootTransform;
+    float _speed;
+
+    public ShipMoveHandler(
+        Transform rootTransform, float speed)
+    {
+        _speed = speed;
+        _rootTransform = rootTransform;
     }
 
-    public void Initialize()
+    public void Tick()
     {
-        _signal.Event += OnGameLoaded;
+        _rootTransform.position += Vector3.forward * _speed * Time.deltaTime;
     }
+}
+```
 
-    public void Dispose()
-    {
-        _signal.Event -= OnGameLoaded;
-    }
+* Now if we run the scene we should find that whenever we hit Space bar the ship gets created with a different speed
 
-    void OnGameLoaded()
+For a more real-world example see the "Sample2" demo project which makes heavy use of MonoFacades.
+
+## <a id="non-monoBehaviour-facades-method"></a>Non-MonoBehaviour Facades (by method)
+
+The examples above show how to create a facade/sub-container using Unity GameObject's to represent the facade/sub-container.  However, it is also possible to do this entirely using plain old C# classes.
+
+For example, given the following classes:
+
+```csharp
+public class CarEngine
+{
+    public void StartEngine()
     {
         ...
     }
 }
-```
 
-Here we use the convention of prefixing event handlers with On, but of course you don't have to follow this convention.
-
-After binding the signal, you will almost always want to also bind a trigger, so that you can actually invoke the signal.  Signals and Triggers are bound as separate statements so that you can optionally add conditional binding on both the trigger and the signal separately.
-
-Triggers are declared in an installer like this:
-
-```csharp
-
-public override void InstallBindings()
+public class CarTrunk
 {
-    ...
-    Container.BindTrigger<GameLoadedSignal.Trigger>();
-    ...
-    Container.BindTrigger<GameLoadedSignalWithParameter.Trigger, string>().WhenInjectedInto<Foo>();
+    public void Open()
+    {
+        ...
+    }
 }
 
-```
-
-Once you have added the trigger to your container by binding it within an installer, you can use it like this:
-
-```csharp
-public class Foo
+public class Car
 {
-    readonly GameLoadedSignal.Trigger _trigger;
+    readonly CarTrunk _trunk;
+    readonly CarEngine _engine;
 
-    public Foo(GameLoadedSignal.Trigger trigger)
+    public Car(
+        CarEngine engine,
+        CarTrunk trunk)
     {
-        _trigger = trigger;
+        _trunk = trunk;
+        _engine = engine;
     }
 
-    public void DoSomething()
+    public void StartEngine()
     {
-        _trigger.Fire();
+        _engine.StartEngine();
+    }
+
+    public void OpenTrunk()
+    {
+        _trunk.Open();
     }
 }
 ```
 
-Commands are defined like this
-
-```csharp
-public class ResetSceneCommand : Command { }
-
-public class ResetSceneCommandWithParameter : Command<string> { }
-```
-
-Note again that the Command base class is defined within the Zenject.Commands namespace here.
-
-Unlike with signals, there are several different ways of declaring a command in an installer.  Perhaps the simplest way would be the following:
+We could simply install these classes like this:
 
 ```csharp
 public override void InstallBindings()
 {
-    ...
-    Container.BindCommand<ResetSceneCommand>().HandleWithSingle<ResetSceneHandler>();
-    ...
-    Container.BindCommand<ResetSceneCommandWithParameter, string>().HandleWithSingle<ResetSceneHandler>();
-    ...
+    Container.Bind<Car>().ToSingle();
+    Container.Bind<CarTrunk>().ToSingle();
+    Container.Bind<CarEngine>().ToSingle();
+}
+```
+
+However, if the functionality of the `Car` object gets complicated enough, or if we want to add support for multiple `Car` objects, we might want to use a sub-container/facade for this.
+
+We can do this very easily by changing our installer to the following instead:
+
+```csharp
+public override void InstallBindings()
+{
+    Container.Bind<Car>().ToSingleFacadeMethod(InstallCarFacade);
 }
 
-public class ResetSceneHandler : ICommandHandler
+void InstallCarFacade(DiContainer subContainer)
 {
-    public void Execute()
+    subContainer.Bind<Car>().ToSingle();
+    subContainer.Bind<CarTrunk>().ToSingle();
+    subContainer.Bind<CarEngine>().ToSingle();
+}
+```
+
+Now, the `CarEngine` and `CarTrunk` cannot be referenced anymore within the main container.  Any objects in the main container that want to interact with these objects have to do so entirely through the Car class.
+
+Just like with other Facade types, we always *must* bind the facade class ourselves (here we do that with this line: `subContainer.Bind<Car>().ToSingle()`)
+
+If we wanted to create our Car facade dynamically using a factory, this is pretty straightforward:
+
+```csharp
+public class Car
+{
+    ...
+
+    public class Factory : FacadeFactory<Car>
     {
-        ... [reset scene] ...
     }
 }
 ```
 
-This bind statement will result in an object of type `ResetSceneCommand` being added to the container.  Any time a class calls Execute on `ResetSceneCommand`, it will trigger the Execute method on the `ResetSceneHandler` class as well.  For example:
+* First add a factory to our Car class deriving from FacadeFactory
 
 ```csharp
-public class Foo : ITickable
+public override void InstallBindings()
 {
-    readonly ResetSceneCommand _command;
+    Container.BindFacadeFactoryMethod<Car.Factory>(InstallCarFacade);
+}
+```
 
-    public Foo(ResetSceneCommand command)
+* Then change the line in our installer to the above line instead.  The InstallCarFacade method can remain the same.
+* That's it.  Now you can add references to Car.Factory in any classes within the main container and create as many Car facades as you like.
+
+We can also add parameters to our Car factory by changing it to the following:
+
+```csharp
+public class CarEngine
+{
+    int _horsePower;
+
+    public CarEngine(int horsePower)
     {
-        _command = command;
+        _horsePower = horsePower;
+    }
+
+    public void Start()
+    {
+        ...
+    }
+}
+
+
+public class Car
+{
+    ...
+
+    public class Factory : FacadeFactory<int, Car>
+    {
+    }
+}
+
+public override void InstallBindings()
+{
+    Container.BindFacadeFactoryMethod<int, Car.Factory>(InstallCarFacade);
+}
+
+void InstallCarFacade(DiContainer subContainer, int horsePower)
+{
+    subContainer.Bind<Car>().ToSingle();
+    subContainer.Bind<CarTrunk>().ToSingle();
+
+    subContainer.Bind<CarEngine>().ToSingle();
+    subContainer.BindInstance(horsePower).WhenInjectedInto<CarEngine>();
+}
+```
+
+* Here, we've changed it so that any class that wants a new Car facade must provide an integer parameter representing the horsepower of the engine.  This integer is then forwarded as a parameter to the installer method for Car.
+
+Note that when using the `ToSingleFacadeMethod`, you should be careful to always use the `subContainer` parameter in your installer method, and not the Container member variable.  
+
+Using `ToSingleFacadeMethod` is often the quickest and simplest way to add sub-containers, but it is often better practice to use `ToSingleFacadeInstaller` instead, as described in the <a href="non-monoBehaviour-facades-installer">next section</a>.
+
+Also, note here that we cannot currently make use of `ITickable`, `IInitializable`, or `IDisposable` interfaces within our subcontainer.  See <a href="#non-monoBehaviour-facade-interfaces">here</a> for why and how to address this.
+
+## <a id="non-monoBehaviour-facades-installer"></a>Non-MonoBehaviour Facades (by installer)
+
+Let's change the example outlined above so that it uses an Installer instead of a method:
+
+```csharp
+public override void InstallBindings()
+{
+    Container.Bind<Car>().ToSingleFacadeInstaller<CarInstaller>();
+}
+
+public class CarInstaller : Installer
+{
+    public override void InstallBindings()
+    {
+        Container.Bind<Car>().ToSingle();
+        Container.Bind<CarTrunk>().ToSingle();
+        Container.Bind<CarEngine>().ToSingle();
+    }
+}
+```
+
+This can be cleaner than using methods since it is consistent with the way other installers work and doesn't have the possibility that you will accidentally use Container instead of subContainer as is the case when using `ToSingleFacadeMethod`.
+
+We can also add parameters to our facade by doing the following:
+
+```csharp
+
+public class CarEngine
+{
+    int _horsePower;
+    public CarEngine(int horsePower)
+    {
+        _horsePower = horsePower;
+    }
+
+    public void Start()
+    {
+        ...
+    }
+}
+
+public class Car
+{
+    ...
+    public class Factory : FacadeFactory<int, Car>
+    {
+    }
+}
+
+public class CarInstaller : Installer
+{
+    int _horsePower;
+
+    public CarInstaller(int horsePower)
+    {
+        _horsePower = horsePower;
+    }
+
+    public override void InstallBindings()
+    {
+        Container.Bind<Car>().ToSingle();
+        Container.Bind<CarTrunk>().ToSingle();
+
+        Container.Bind<CarEngine>().ToSingle();
+        Container.BindInstance(_horsePower).WhenInjectedInto<CarEngine>();
+    }
+}
+```
+
+* Note that unlike when using `ToSingleFacadeMethod`, we don't have to change the `Container.BindFacadeFactory` line when changing the parameter list.
+
+## <a id="non-monoBehaviour-facade-interfaces"></a>Using ITickable / IInitializable / IDisposable with Non-MonoBehaviour Facades
+
+One important thing to understand about the above Car example is that you cannot add the standard interfaces such as `ITickable`, `IInitializable`, and `IDisposable` to the Car facade sub-container.  For example, if you needed to add per-frame behaviour to the `CarEngine` class, you might try changing it to this:
+
+```csharp
+public class CarEngine : ITickable
+{
+    public void StartEngine()
+    {
+        ...
     }
 
     public void Tick()
     {
         ...
-        _command.Execute();
-        ...
     }
 }
 ```
 
-We might also want to restrict usage of our command to the Foo class only, which we could do with the following
+```csharp
+public class CarInstaller : Installer
+{
+    public override void InstallBindings()
+    {
+        Container.Bind<Car>().ToSingle();
+        Container.Bind<CarTrunk>().ToSingle();
+
+        Container.Bind<CarEngine>().ToSingle();
+        Container.Bind<ITickable>().ToSingle<CarEngine>();
+    }
+}
+```
+
+However, in this case, the `Tick` method of `CarEngine` will never be called.  To fix this, we need to make these additional changes:
+
+```csharp
+public class Car : Facade
+{
+    ...
+}
+```
+
+* Our Car facade needs to now derive from the Zenject.Facade class.  The Zenject.Facade implements ITickable and also has its own TickableManager which will handle forwarding the Tick event to the ITickable's that are inside our sub-container
 
 ```csharp
 public override void InstallBindings()
 {
-    ...
-    Container.BindCommand<ResetSceneCommand>().HandleWithSingle<ResetSceneHandler>().WhenInjectedInto<Foo>();
-    ...
+    Container.BindAllInterfacesAndSelf<Car>().ToSingleFacadeInstaller<Car, CarInstaller>();
 }
 ```
 
-Note that in this case we are using `HandleWithSingle<>` - this means that the same instance of `ResetSceneHandler` will be used every time the command is executed.  Alternatively, you could declare it using `HandleWithTransient<>` which would instantiate a new instance of `ResetSceneHandler` every time Execute() is called.  For example:
-
-```csharp
-Container.BindCommand<ResetSceneCommand>().HandleWithTransient<ResetSceneHandler>();
-```
-
-This might be useful if the `ResetSceneCommand` class involves some long-running operations that require unique sets of member variables/dependencies.
-
-You can also bind commands directly to methods instead of classes by doing the following:
-
-```csharp
-public override void InstallBindings()
-{
-    ...
-    Container.BindCommand<ResetSceneCommand>().HandleWithSingle<MyOtherHandler>(x => x.ResetScene);
-    ...
-}
-
-public class ResetSceneHandler
-{
-    public void ResetScene()
-    {
-        ... [reset scene] ...
-    }
-}
-```
-
-This approach does not require that you derive from `ICommandHandler` at all.  There is also a `HandleWithTransient` version of this which works similarly (instantiates a new instance of MyOtherHandler).
-
-```csharp
-Container.BindCommand<ResetSceneCommand>().HandleWithTransient<MyOtherHandler>(x => x.ResetScene);
-```
-
-## <a id="autobind"></a>Automatic Bindings
-
-In many cases, you have a number of MonoBehaviour's that have been added to the scene within the Unity editor (ie. at editor time not runtime) and you want to also have these MonoBehaviour's added to the Zenject Container so that they can be injected into other classes.
-
-The usual way this is done is to add public references to these objects within your installer like this:
-
-    public class Foo : MonoBehaviour
-    {
-    }
-
-    public class GameInstaller : MonoInstaller
-    {
-        [SerializeField]
-        Foo _foo;
-
-        public override void InstallBindings()
-        {
-            Container.BindInstance(_foo);
-            Container.Bind<IInitializable>().ToSingle<GameRunner>();
-        }
-    }
-
-    public class GameRunner : IInitializable
-    {
-        readonly Foo _foo;
-
-        public GameRunner(Foo foo)
-        {
-            _foo = foo;
-        }
-
-        public void Initialize()
-        {
-            ...
-        }
-    }
-
-(Note that you could also just make `Foo` public here - my personal convention is to just always use `SerializeField` instead to avoid breaking encapsulation)
-
-This works fine however in some cases this can get cumbersome.  For example, if you want to allow an artist to add any number of `Enemy` objects to the scene, and you also want all those `Enemy` objects added to the Zenject Container.  In this case, you would have to manually drag each one to the inspector of one of your installers.  This is very error prone since its easy to forget one, or to delete the `Enemy` game object but forget to delete the null reference in the inspector for your installer, etc.
-
-So another way to do this is to use the `AutoBindInstaller`.  You can do this by adding a `ZenjectBinding` monobehaviour to the same game object that you want to be automatically added to the Zenject container.
-
-For example, if I have a MonoBehaviour of type `Foo` in my scene, I can just add `ZenjectBinding` alongside it:
-
-<img src="UnityProject/Assets/Zenject/Documentation/ReadMe_files/AutoBind1.png?raw=true" alt="ZenjectBinding"/>
-
-Then our installer becomes:
-
-    public class GameInstaller : MonoInstaller
-    {
-        public override void InstallBindings()
-        {
-            Container.Install<AutoBindInstaller>();
-            Container.Bind<IInitializable>().ToSingle<GameRunner>();
-        }
-    }
-
-Note that when using the `ZenjectBinding` MonoBehaviour you always need to add `Container.Install<AutoBindInstaller>()` to one of the installers in your scene.
-
-When using `ZenjectBinding` this way, by default it will bind `Foo` using the `ToInstance` method, so it is equivalent to the first example where we did this:
-
-    Container.BindInstance(_foo);
-
-Also note that if we duplicate this game object to have multiple game objects with `Foo` on them (and its `ZenjectBinding`), they will all be bound to the Container this way.  So after doing this, we would have to change `GameRunner` above to take a `List<Foo>` otherwise we would get Zenject exceptions.
-
-Also note that the `ZenjectBinding` component contains a `Bind Type` property in its inspector.  By default this simply binds the instance as shown above but it can also be set to the following:
-
-1 - `ToInterfaces`
-
-This bind type is equivalent to the following:
-
-    Container.BindAllInterfaces(_foo.GetType()).ToInstance(_foo);
-
-Note however, in this case, that `GameRunner` must ask for type `IFoo` in its constructor.  If we left `GameRunner` asking for type `Foo` then Zenject would throw exceptions, since the `BindAllInterfaces` method only binds the interfaces, not the concrete type.  If you want the concrete type as well then you can use:
-
-2 - `ToInstanceAndSelf`
-
-This bind type is equivalent to the following:
-
-    Container.BindAllInterfacesAndSelf(_foo.GetType()).ToInstance(_foo);
+* Here, we are binding all the interfaces that Car has to the Car singleton.  Since Car inherits from Facade, which implements ITickable, IInitializable, etc., then the Tick method of Car will now be called and all the ITickable's defined in the subcontainer will also now have their Tick's called, including the CarEngine class.
 
 ## <a id="zenject-order-of-operations"></a>Zenject Order Of Operations
 
