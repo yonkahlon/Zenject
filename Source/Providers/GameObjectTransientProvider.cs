@@ -36,6 +36,12 @@ namespace Zenject
 
             var container = _containerType == ContainerTypes.RuntimeContainer ? context.Container : _container;
 
+            if (container.IsValidating)
+            {
+                // This can happen when injecting into installers
+                return null;
+            }
+
             return container.InstantiateComponentOnNewGameObjectExplicit(
                 _componentType, _componentType.Name(), new List<TypeValuePair>(), context);
         }

@@ -46,6 +46,13 @@ namespace Zenject
             Assert.That(_concreteType.DerivesFromOrEqual(context.MemberType));
 
             var container = _containerType == ContainerTypes.RuntimeContainer ? context.Container : _container;
+
+            if (container.IsValidating)
+            {
+                // This can happen when injecting into installers
+                return null;
+            }
+
             var rootGameObject = container.InstantiatePrefab(_prefab);
 
             var component = rootGameObject.GetComponentInChildren(_concreteType);

@@ -55,9 +55,9 @@ namespace Zenject.Tests
             MyDispose.HasDisposed = false;
             FooFacade.CreateCount = 0;
 
-            Container.Bind<TickableManager>().ToSingle();
-            Container.Bind<InitializableManager>().ToSingle();
-            Container.Bind<DisposableManager>().ToSingle();
+            Container.Bind<TickableManager>().ToTransient();
+            Container.Bind<InitializableManager>().ToTransient();
+            Container.Bind<DisposableManager>().ToTransient();
 
             Container.Bind<ITickable>().ToSingleFacadeMethod<FooFacade>(FacadeInstaller);
             Container.Bind<IInitializable>().ToSingleFacadeMethod<FooFacade>(FacadeInstaller);
@@ -88,9 +88,9 @@ namespace Zenject.Tests
             MyDispose.HasDisposed = false;
             FooFacade.CreateCount = 0;
 
-            Container.Bind<TickableManager>().ToSingle();
-            Container.Bind<InitializableManager>().ToSingle();
-            Container.Bind<DisposableManager>().ToSingle();
+            Container.Bind<TickableManager>().ToTransient();
+            Container.Bind<InitializableManager>().ToTransient();
+            Container.Bind<DisposableManager>().ToTransient();
 
             Container.BindAllInterfaces<FooFacade>().ToSingleFacadeMethod<FooFacade>(FacadeInstaller);
 
@@ -113,10 +113,6 @@ namespace Zenject.Tests
 
         void FacadeInstaller(DiContainer container)
         {
-            Container.Bind<TickableManager>().ToSingle();
-            Container.Bind<InitializableManager>().ToSingle();
-            Container.Bind<DisposableManager>().ToSingle();
-
             container.Bind<FooFacade>().ToSingle();
 
             container.Bind<IDisposable>().ToSingle<MyDispose>();

@@ -149,61 +149,61 @@ namespace Zenject
         //
         //  NOTE: It is assumed that TFacade is bound to something within the given method
         //
-        BindingConditionSetter BindFacadeFactoryMethod<TFacade, TFacadeFactory>(
+        BindingConditionSetter BindFacadeFactoryMethod<TFacadeFactory>(
             Action<DiContainer> facadeInstaller)
-            where TFacadeFactory : FacadeFactory<TFacade>;
+            where TFacadeFactory : IFacadeFactoryParams;
 
-        BindingConditionSetter BindFacadeFactoryMethod<TFacade, TFacadeFactory>(
+        BindingConditionSetter BindFacadeFactoryMethod<TFacadeFactory>(
             Action<DiContainer> facadeInstaller, ContainerTypes containerType)
-            where TFacadeFactory : FacadeFactory<TFacade>;
+            where TFacadeFactory : IFacadeFactoryParams;
 
-        BindingConditionSetter BindFacadeFactoryMethod<TParam1, TFacade, TFacadeFactory>(
+        BindingConditionSetter BindFacadeFactoryMethod<TParam1, TFacadeFactory>(
             Action<DiContainer, TParam1> facadeInstaller)
-            where TFacadeFactory : FacadeFactory<TParam1, TFacade>;
+            where TFacadeFactory : IFacadeFactoryParams<TParam1>;
 
-        BindingConditionSetter BindFacadeFactoryMethod<TParam1, TFacade, TFacadeFactory>(
+        BindingConditionSetter BindFacadeFactoryMethod<TParam1, TFacadeFactory>(
             Action<DiContainer, TParam1> facadeInstaller, ContainerTypes containerType)
-            where TFacadeFactory : FacadeFactory<TParam1, TFacade>;
+            where TFacadeFactory : IFacadeFactoryParams<TParam1>;
 
-        BindingConditionSetter BindFacadeFactoryMethod<TParam1, TParam2, TFacade, TFacadeFactory>(
+        BindingConditionSetter BindFacadeFactoryMethod<TParam1, TParam2, TFacadeFactory>(
             Action<DiContainer, TParam1, TParam2> facadeInstaller)
-            where TFacadeFactory : FacadeFactory<TParam1, TParam2, TFacade> ;
+            where TFacadeFactory : IFacadeFactoryParams<TParam1, TParam2> ;
 
-        BindingConditionSetter BindFacadeFactoryMethod<TParam1, TParam2, TFacade, TFacadeFactory>(
+        BindingConditionSetter BindFacadeFactoryMethod<TParam1, TParam2, TFacadeFactory>(
             Action<DiContainer, TParam1, TParam2> facadeInstaller, ContainerTypes containerType)
-            where TFacadeFactory : FacadeFactory<TParam1, TParam2, TFacade> ;
+            where TFacadeFactory : IFacadeFactoryParams<TParam1, TParam2> ;
 
-        BindingConditionSetter BindFacadeFactoryMethod<TParam1, TParam2, TParam3, TFacade, TFacadeFactory>(
+        BindingConditionSetter BindFacadeFactoryMethod<TParam1, TParam2, TParam3, TFacadeFactory>(
             Action<DiContainer, TParam1, TParam2, TParam3> facadeInstaller)
-            where TFacadeFactory : FacadeFactory<TParam1, TParam2, TParam3, TFacade>;
+            where TFacadeFactory : IFacadeFactoryParams<TParam1, TParam2, TParam3>;
 
-        BindingConditionSetter BindFacadeFactoryMethod<TParam1, TParam2, TParam3, TFacade, TFacadeFactory>(
+        BindingConditionSetter BindFacadeFactoryMethod<TParam1, TParam2, TParam3, TFacadeFactory>(
             Action<DiContainer, TParam1, TParam2, TParam3> facadeInstaller, ContainerTypes containerType)
-            where TFacadeFactory : FacadeFactory<TParam1, TParam2, TParam3, TFacade>;
+            where TFacadeFactory : IFacadeFactoryParams<TParam1, TParam2, TParam3>;
 
-        BindingConditionSetter BindFacadeFactoryMethod<TParam1, TParam2, TParam3, TParam4, TFacade, TFacadeFactory>(
+        BindingConditionSetter BindFacadeFactoryMethod<TParam1, TParam2, TParam3, TParam4, TFacadeFactory>(
             ModestTree.Util.Action<DiContainer, TParam1, TParam2, TParam3, TParam4> facadeInstaller)
-            where TFacadeFactory : FacadeFactory<TParam1, TParam2, TParam3, TParam4, TFacade>;
+            where TFacadeFactory : IFacadeFactoryParams<TParam1, TParam2, TParam3, TParam4>;
 
-        BindingConditionSetter BindFacadeFactoryMethod<TParam1, TParam2, TParam3, TParam4, TFacade, TFacadeFactory>(
+        BindingConditionSetter BindFacadeFactoryMethod<TParam1, TParam2, TParam3, TParam4, TFacadeFactory>(
             ModestTree.Util.Action<DiContainer, TParam1, TParam2, TParam3, TParam4> facadeInstaller, ContainerTypes containerType)
-            where TFacadeFactory : FacadeFactory<TParam1, TParam2, TParam3, TParam4, TFacade>;
+            where TFacadeFactory : IFacadeFactoryParams<TParam1, TParam2, TParam3, TParam4>;
 
-        BindingConditionSetter BindFacadeFactoryMethod<TParam1, TParam2, TParam3, TParam4, TParam5, TFacade, TFacadeFactory>(
+        BindingConditionSetter BindFacadeFactoryMethod<TParam1, TParam2, TParam3, TParam4, TParam5, TFacadeFactory>(
             ModestTree.Util.Action<DiContainer, TParam1, TParam2, TParam3, TParam4, TParam5> facadeInstaller)
-            where TFacadeFactory : FacadeFactory<TParam1, TParam2, TParam3, TParam4, TParam5, TFacade>;
+            where TFacadeFactory : IFacadeFactoryParams<TParam1, TParam2, TParam3, TParam4, TParam5>;
 
-        BindingConditionSetter BindFacadeFactoryMethod<TParam1, TParam2, TParam3, TParam4, TParam5, TFacade, TFacadeFactory>(
+        BindingConditionSetter BindFacadeFactoryMethod<TParam1, TParam2, TParam3, TParam4, TParam5, TFacadeFactory>(
             ModestTree.Util.Action<DiContainer, TParam1, TParam2, TParam3, TParam4, TParam5> facadeInstaller, ContainerTypes containerType)
-            where TFacadeFactory : FacadeFactory<TParam1, TParam2, TParam3, TParam4, TParam5, TFacade>;
+            where TFacadeFactory : IFacadeFactoryParams<TParam1, TParam2, TParam3, TParam4, TParam5>;
 
-        BindingConditionSetter BindFacadeFactoryMethod<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6, TFacade, TFacadeFactory>(
+        BindingConditionSetter BindFacadeFactoryMethod<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6, TFacadeFactory>(
             ModestTree.Util.Action<DiContainer, TParam1, TParam2, TParam3, TParam4, TParam5, TParam6> facadeInstaller)
-            where TFacadeFactory : FacadeFactory<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6, TFacade>;
+            where TFacadeFactory : IFacadeFactoryParams<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6>;
 
-        BindingConditionSetter BindFacadeFactoryMethod<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6, TFacade, TFacadeFactory>(
+        BindingConditionSetter BindFacadeFactoryMethod<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6, TFacadeFactory>(
             ModestTree.Util.Action<DiContainer, TParam1, TParam2, TParam3, TParam4, TParam5, TParam6> facadeInstaller, ContainerTypes containerType)
-            where TFacadeFactory : FacadeFactory<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6, TFacade>;
+            where TFacadeFactory : IFacadeFactoryParams<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6>;
 
         // _____ BindFacadeFactoryInstaller _____
         //  Add a factory to a Facade on the container and use the given installer to initialize the
@@ -213,17 +213,17 @@ namespace Zenject
         //
         //  NOTE: It is assumed that TFacade is bound to something within the given instasller
         //
-        BindingConditionSetter BindFacadeFactoryInstaller<TFacade, TFacadeFactory, TInstaller>()
-            where TFacadeFactory : FacadeFactoryBase<TFacade>
+        BindingConditionSetter BindFacadeFactoryInstaller<TFacadeFactory, TInstaller>()
+            where TFacadeFactory : IFacadeFactory
             where TInstaller : Installer;
 
         // Non-generic versions
-        BindingConditionSetter BindFacadeFactoryInstaller<TFacade, TFacadeFactory>(Type installerType)
-            where TFacadeFactory : FacadeFactoryBase<TFacade>;
+        BindingConditionSetter BindFacadeFactoryInstaller<TFacadeFactory>(Type installerType)
+            where TFacadeFactory : IFacadeFactory;
 
         // Non-generic versions
-        BindingConditionSetter BindFacadeFactoryInstaller<TFacade, TFacadeFactory>(Type installerType, ContainerTypes containerType)
-            where TFacadeFactory : FacadeFactoryBase<TFacade>;
+        BindingConditionSetter BindFacadeFactoryInstaller<TFacadeFactory>(Type installerType, ContainerTypes containerType)
+            where TFacadeFactory : IFacadeFactory;
 
 #if !ZEN_NOT_UNITY3D
 

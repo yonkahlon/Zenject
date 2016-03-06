@@ -20,9 +20,38 @@ namespace Zenject
         public abstract IEnumerable<ZenjectResolveException> Validate();
     }
 
+    // These interfaces are added purely just for the generic constraints in IBinder
+    public interface IFacadeFactoryParams
+    {
+    }
+
+    public interface IFacadeFactoryParams<TParam1>
+    {
+    }
+
+    public interface IFacadeFactoryParams<TParam1, TParam2>
+    {
+    }
+
+    public interface IFacadeFactoryParams<TParam1, TParam2, TParam3>
+    {
+    }
+
+    public interface IFacadeFactoryParams<TParam1, TParam2, TParam3, TParam4>
+    {
+    }
+
+    public interface IFacadeFactoryParams<TParam1, TParam2, TParam3, TParam4, TParam5>
+    {
+    }
+
+    public interface IFacadeFactoryParams<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6>
+    {
+    }
+
     // Zero Parameters
 
-    public abstract class FacadeFactory<TFacade> : FacadeFactoryBase<TFacade>, IFactory<TFacade>
+    public abstract class FacadeFactory<TFacade> : FacadeFactoryBase<TFacade>, IFactory<TFacade>, IFacadeFactoryParams
     {
         [InjectOptional]
         Action<DiContainer> _installMethod = null;
@@ -52,7 +81,7 @@ namespace Zenject
     // One Parameter
 
     public abstract class FacadeFactory<TParam1, TFacade>
-        : FacadeFactoryBase<TFacade>, IFactory<TParam1, TFacade>
+        : FacadeFactoryBase<TFacade>, IFactory<TParam1, TFacade>, IFacadeFactoryParams<TParam1>
     {
         [InjectOptional]
         Action<DiContainer, TParam1> _installMethod = null;
@@ -105,7 +134,7 @@ namespace Zenject
     // Two Parameters
 
     public abstract class FacadeFactory<TParam1, TParam2, TFacade>
-        : FacadeFactoryBase<TFacade>, IFactory<TParam1, TParam2, TFacade>
+        : FacadeFactoryBase<TFacade>, IFactory<TParam1, TParam2, TFacade>, IFacadeFactoryParams<TParam1, TParam2>
     {
         [InjectOptional]
         Action<DiContainer, TParam1, TParam2> _installMethod = null;
@@ -158,7 +187,7 @@ namespace Zenject
     // Three Parameters
 
     public abstract class FacadeFactory<TParam1, TParam2, TParam3, TFacade>
-        : FacadeFactoryBase<TFacade>, IFactory<TParam1, TParam2, TParam3, TFacade>
+        : FacadeFactoryBase<TFacade>, IFactory<TParam1, TParam2, TParam3, TFacade>, IFacadeFactoryParams<TParam1, TParam2, TParam3>
     {
         [InjectOptional]
         Action<DiContainer, TParam1, TParam2, TParam3> _installMethod = null;
@@ -211,7 +240,7 @@ namespace Zenject
     // Four Parameters
 
     public abstract class FacadeFactory<TParam1, TParam2, TParam3, TParam4, TFacade>
-        : FacadeFactoryBase<TFacade>, IFactory<TParam1, TParam2, TParam3, TParam4, TFacade>
+        : FacadeFactoryBase<TFacade>, IFactory<TParam1, TParam2, TParam3, TParam4, TFacade>, IFacadeFactoryParams<TParam1, TParam2, TParam3, TParam4>
     {
         [InjectOptional]
         ModestTree.Util.Action<DiContainer, TParam1, TParam2, TParam3, TParam4> _installMethod = null;
@@ -264,7 +293,7 @@ namespace Zenject
     // Five Parameters
 
     public abstract class FacadeFactory<TParam1, TParam2, TParam3, TParam4, TParam5, TFacade>
-        : FacadeFactoryBase<TFacade>, IFactory<TParam1, TParam2, TParam3, TParam4, TParam5, TFacade>
+        : FacadeFactoryBase<TFacade>, IFactory<TParam1, TParam2, TParam3, TParam4, TParam5, TFacade>, IFacadeFactoryParams<TParam1, TParam2, TParam3, TParam4, TParam5>
     {
         [InjectOptional]
         ModestTree.Util.Action<DiContainer, TParam1, TParam2, TParam3, TParam4, TParam5> _installMethod = null;
@@ -317,7 +346,7 @@ namespace Zenject
     // Six Parameters
 
     public abstract class FacadeFactory<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6, TFacade>
-        : FacadeFactoryBase<TFacade>, IFactory<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6, TFacade>
+        : FacadeFactoryBase<TFacade>, IFactory<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6, TFacade>, IFacadeFactoryParams<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6>
     {
         [InjectOptional]
         ModestTree.Util.Action<DiContainer, TParam1, TParam2, TParam3, TParam4, TParam5, TParam6> _installMethod = null;
