@@ -12,4 +12,12 @@ namespace ModestTree
         {
         }
     }
+
+    // Triggered when the enemy explodes
+    public class EnemyKilledSignal : Signal
+    {
+        public class Trigger : TriggerBase
+        {
+        }
+    }
 }

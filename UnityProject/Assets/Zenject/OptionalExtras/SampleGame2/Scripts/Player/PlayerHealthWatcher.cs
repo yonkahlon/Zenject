@@ -25,7 +25,7 @@ namespace ModestTree
 
         public void Tick()
         {
-            if (_model.Health < 0 && !_model.IsDead)
+            if (_model.Health <= 0 && !_model.IsDead)
             {
                 Die();
             }

@@ -37,10 +37,6 @@ namespace ModestTree
             {
                 return _health;
             }
-            set
-            {
-                _health = value;
-            }
         }
 
         public Vector3 LookDir
@@ -85,7 +81,7 @@ namespace ModestTree
 
         public void TakeDamage(float healthLoss)
         {
-            _health -= healthLoss;
+            _health = Mathf.Max(0.0f, _health - healthLoss);
         }
 
         public void AddForce(Vector3 force)

@@ -5,6 +5,7 @@ namespace ModestTree
 {
     public class EnemyHealthWatcher : ITickable
     {
+        readonly EnemyKilledSignal.Trigger _killedSignal;
         readonly Explosion.Factory _explosionFactory;
         readonly CompositionRoot _compRoot;
         readonly EnemyModel _model;
@@ -12,8 +13,10 @@ namespace ModestTree
         public EnemyHealthWatcher(
             EnemyModel model,
             CompositionRoot compRoot,
-            Explosion.Factory explosionFactory)
+            Explosion.Factory explosionFactory,
+            EnemyKilledSignal.Trigger killedSignal)
         {
+            _killedSignal = killedSignal;
             _explosionFactory = explosionFactory;
             _compRoot = compRoot;
             _model = model;
@@ -33,6 +36,8 @@ namespace ModestTree
             explosion.transform.position = _model.Position;
 
             GameObject.Destroy(_compRoot.gameObject);
+
+            _killedSignal.Fire();
         }
     }
 }
