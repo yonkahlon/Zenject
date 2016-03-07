@@ -20,6 +20,9 @@ namespace ModestTree
             Container.BindSignal<PlayerKilledSignal>();
             Container.BindTrigger<PlayerKilledSignal.Trigger>();
 
+            Container.BindSignal<EnemyKilledSignal>();
+            Container.BindTrigger<EnemyKilledSignal.Trigger>();
+
             Container.BindAllInterfaces<EnemySpawner>().ToSingle<EnemySpawner>();
 
             // We provide the installer here so that Zenject knows where to inject the arguments into
