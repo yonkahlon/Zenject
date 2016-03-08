@@ -28,6 +28,11 @@ namespace Zenject
             get;
         }
 
+        public abstract bool AllowInjectInactive
+        {
+            get;
+        }
+
         public void Update()
         {
             // Avoid spamming the log if RootFacade failed to initialize

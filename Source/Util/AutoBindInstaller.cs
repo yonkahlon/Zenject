@@ -25,7 +25,7 @@ namespace Zenject
 
         public override void InstallBindings()
         {
-            foreach (var autoBinding in SceneCompositionRoot.GetSceneRootObjects(_compRoot.gameObject.scene)
+            foreach (var autoBinding in SceneCompositionRoot.GetSceneRootObjects(_compRoot.gameObject.scene, _compRoot.AllowInjectInactive)
                 .SelectMany(x => x.GetComponentsInChildren<ZenjectAutoBinding>()))
             {
                 if (autoBinding == null)
