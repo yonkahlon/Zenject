@@ -36,6 +36,14 @@ namespace Zenject
             }
         }
 
+        public override bool AllowInjectInactive
+        {
+            get
+            {
+                return false;
+            }
+        }
+
         public static GlobalCompositionRoot Instance
         {
             get

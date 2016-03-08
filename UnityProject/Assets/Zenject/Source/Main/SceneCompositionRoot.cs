@@ -50,6 +50,14 @@ namespace Zenject
             }
         }
 
+        public override bool AllowInjectInactive
+        {
+            get
+            {
+                return !OnlyInjectWhenActive;
+            }
+        }
+
         public void Awake()
         {
             var extraInstallers = new List<IInstaller>();
@@ -144,7 +152,7 @@ namespace Zenject
             return container;
         }
 
-        public static IEnumerable<GameObject> GetSceneRootObjects(Scene scene)
+        public static IEnumerable<GameObject> GetSceneRootObjects(Scene scene, bool includeInactive)
         {
             // Note: We can't use activeScene.GetRootObjects() here because that apparently fails with an exception
             // about the scene not being loaded yet when executed in Awake
@@ -152,16 +160,15 @@ namespace Zenject
             // Otherwise, if there is an object that is marked with DontDestroyOnLoad, then it will
             // be injected multiple times when another scene is loaded
             // Also make sure not to inject into the global root objects which are handled in GlobalCompositionRoot
-            return GameObject.FindObjectsOfType<Transform>()
-                .Where(x => x.parent == null && x.GetComponent<GlobalCompositionRoot>() == null && (x.gameObject.scene == scene || DecoratedScenes.Contains(x.gameObject.scene)))
-                .Select(x => x.gameObject);
+            return Resources.FindObjectsOfTypeAll<GameObject>()
+                .Where(x => (includeInactive || x.activeSelf) && x.transform.parent == null && x.GetComponent<GlobalCompositionRoot>() == null && (x.scene == scene || DecoratedScenes.Contains(x.scene)));
         }
 
         void InjectObjectsInScene()
         {
             Log.Debug("Injecting all objects in scene '{0}'", this.gameObject.scene.name);
 
-            foreach (var rootObj in GetSceneRootObjects(this.gameObject.scene))
+            foreach (var rootObj in GetSceneRootObjects(this.gameObject.scene, !OnlyInjectWhenActive))
             {
                 _container.InjectGameObject(rootObj, true, !OnlyInjectWhenActive);
             }
