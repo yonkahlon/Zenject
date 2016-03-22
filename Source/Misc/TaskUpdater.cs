@@ -13,8 +13,6 @@ namespace Zenject
         readonly LinkedList<TaskInfo> _tasks = new LinkedList<TaskInfo>();
         readonly List<TaskInfo> _queuedTasks = new List<TaskInfo>();
 
-        bool _isPaused;
-
         IEnumerable<TaskInfo> AllTasks
         {
             get
@@ -70,7 +68,7 @@ namespace Zenject
         {
             var node = _tasks.First;
 
-            while (!_isPaused && node != null)
+            while (node != null)
             {
                 var next = node.Next;
                 var taskInfo = node.Value;
@@ -133,16 +131,6 @@ namespace Zenject
             }
 
             _tasks.AddLast(task);
-        }
-
-        public void Pause()
-        {
-            _isPaused = true;
-        }
-
-        public void Resume()
-        {
-            _isPaused = false;
         }
 
         protected abstract void UpdateItem(TTask task);

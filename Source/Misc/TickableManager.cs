@@ -30,6 +30,8 @@ namespace Zenject
         readonly FixedTickablesTaskUpdater _fixedUpdater = new FixedTickablesTaskUpdater();
         readonly LateTickablesTaskUpdater _lateUpdater = new LateTickablesTaskUpdater();
 
+        bool _isPaused;
+
         public IEnumerable<ITickable> Tickables
         {
             get
@@ -150,34 +152,36 @@ namespace Zenject
 
         public void Update()
         {
+            if(_isPaused)
+                return;
             _updater.OnFrameStart();
             _updater.UpdateAll();
         }
 
         public void FixedUpdate()
         {
+            if(_isPaused)
+                return;
             _fixedUpdater.OnFrameStart();
             _fixedUpdater.UpdateAll();
         }
 
         public void LateUpdate()
         {
+            if(_isPaused)
+                return;
             _lateUpdater.OnFrameStart();
             _lateUpdater.UpdateAll();
         }
 
         public void Pause()
         {
-            _updater.Pause();
-            _fixedUpdater.Pause();
-            _lateUpdater.Pause();
+            _isPaused = true;
         }
 
         public void Resume()
         {
-            _updater.Resume();
-            _fixedUpdater.Resume();
-            _lateUpdater.Resume();
+            _isPaused = false;
         }
     }
 }
