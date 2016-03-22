@@ -152,24 +152,33 @@ namespace Zenject
 
         public void Update()
         {
-            if(_isPaused)
+            if (_isPaused)
+            {
                 return;
+            }
+
             _updater.OnFrameStart();
             _updater.UpdateAll();
         }
 
         public void FixedUpdate()
         {
-            if(_isPaused)
+            if (_isPaused)
+            {
                 return;
+            }
+
             _fixedUpdater.OnFrameStart();
             _fixedUpdater.UpdateAll();
         }
 
         public void LateUpdate()
         {
-            if(_isPaused)
+            if (_isPaused)
+            {
                 return;
+            }
+
             _lateUpdater.OnFrameStart();
             _lateUpdater.UpdateAll();
         }
