@@ -91,7 +91,7 @@ namespace Zenject
 
                 if (contractType.FullName.StartsWith("System.Collections.Generic.List"))
                 {
-                    var subTypes = contractType.GetGenericArguments();
+                    var subTypes = contractType.GenericArguments();
                     Assert.IsEqual(subTypes.Length, 1);
 
                     var subType = subTypes[0];

@@ -49,7 +49,7 @@ namespace Zenject
 
         bool AreFunctionsEqual(Delegate left, Delegate right)
         {
-            return left.Target == right.Target && left.Method == right.Method;
+            return left.Target == right.Target && left.Method() == right.Method();
         }
 
         public MethodSingletonProvider CreateProvider<TConcrete>(

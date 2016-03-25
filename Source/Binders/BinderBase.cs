@@ -43,7 +43,7 @@ namespace Zenject
             _container.RegisterProvider(
                 provider, new BindingId(_contractType, _bindIdentifier));
 
-            if (_contractType.IsValueType)
+            if (_contractType.IsValueType())
             {
                 var nullableType = typeof(Nullable<>).MakeGenericType(_contractType);
 

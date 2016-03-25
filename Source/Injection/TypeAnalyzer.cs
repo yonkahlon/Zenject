@@ -199,13 +199,10 @@ namespace Zenject
             var constructors = parentType.GetConstructors(
                 BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
 
-#if !ZEN_NOT_UNITY3D
-            if (Application.platform == RuntimePlatform.WP8Player)
-            {
-                // WP8 generates a dummy constructor with signature (internal Classname(UIntPtr dummy))
-                // So just ignore that
-                constructors = constructors.Where(c => !IsWp8GeneratedConstructor(c)).ToArray();
-            }
+#if UNITY_WSA && !UNITY_EDITOR
+            // WP8 generates a dummy constructor with signature (internal Classname(UIntPtr dummy))
+            // So just ignore that
+            constructors = constructors.Where(c => !IsWp8GeneratedConstructor(c)).ToArray();
 #endif
 
             if (constructors.IsEmpty())
@@ -222,10 +219,12 @@ namespace Zenject
             return constructors[0];
         }
 
+#if UNITY_WSA && !UNITY_EDITOR
         static bool IsWp8GeneratedConstructor(ConstructorInfo c)
         {
             ParameterInfo[] args = c.GetParameters();
             return args.Length == 1 && args[0].ParameterType == typeof(UIntPtr) && args[0].Name == "dummy";
         }
+#endif
     }
 }

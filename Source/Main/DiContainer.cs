@@ -144,7 +144,7 @@ namespace Zenject
         {
             get
             {
-                return (from x in _providers from p in x.Value select p.GetInstanceType()).Where(x => x != null && !x.IsInterface && !x.IsAbstract).Distinct();
+                return (from x in _providers from p in x.Value select p.GetInstanceType()).Where(x => x != null && !x.IsInterface() && !x.IsAbstract()).Distinct();
             }
         }
 
@@ -340,7 +340,7 @@ namespace Zenject
 
             // If we are asking for a List<int>, we should also match for any localProviders that are bound to the open generic type List<>
             // Currently it only matches one and not the other - not totally sure if this is better than returning both
-            if (bindingId.Type.IsGenericType && _providers.TryGetValue(new BindingId(bindingId.Type.GetGenericTypeDefinition(), bindingId.Identifier), out localProviders))
+            if (bindingId.Type.IsGenericType() && _providers.TryGetValue(new BindingId(bindingId.Type.GetGenericTypeDefinition(), bindingId.Identifier), out localProviders))
             {
                 return localProviders;
             }
@@ -555,7 +555,7 @@ namespace Zenject
                 // If it's a generic list then try matching multiple instances to its generic type
                 if (ReflectionUtil.IsGenericList(context.MemberType))
                 {
-                    var subType = context.MemberType.GetGenericArguments().Single();
+                    var subType = context.MemberType.GenericArguments().Single();
                     var subContext = context.ChangeMemberType(subType);
 
                     return ResolveAll(subContext);
@@ -906,7 +906,7 @@ namespace Zenject
 
             // It could be an interface so this may fail in valid cases so you may want to comment out
             // Leaving it in for now to catch the more likely scenario of it being a mistake
-            Assert.That(componentType.IsInterface || componentType.DerivesFrom<Component>(), "Expected type '{0}' to derive from UnityEngine.Component", componentType.Name());
+            Assert.That(componentType.IsInterface() || componentType.DerivesFrom<Component>(), "Expected type '{0}' to derive from UnityEngine.Component", componentType.Name());
 
             var gameObj = (GameObject)GameObject.Instantiate(prefab);
 
@@ -1475,7 +1475,7 @@ namespace Zenject
 
         public void BindAllInterfacesToSingle(Type concreteType)
         {
-            foreach (var interfaceType in concreteType.GetInterfaces())
+            foreach (var interfaceType in concreteType.Interfaces())
             {
                 Assert.That(concreteType.DerivesFrom(interfaceType));
                 Bind(interfaceType).ToSingle(concreteType);
@@ -1491,7 +1491,7 @@ namespace Zenject
         {
             Assert.That((value == null && IsValidating) || value.GetType().DerivesFromOrEqual(concreteType));
 
-            foreach (var interfaceType in concreteType.GetInterfaces())
+            foreach (var interfaceType in concreteType.Interfaces())
             {
                 Assert.That(concreteType.DerivesFrom(interfaceType));
                 Bind(interfaceType).ToInstance(concreteType, value);
@@ -1718,7 +1718,7 @@ namespace Zenject
 
                 if (ReflectionUtil.IsGenericList(context.MemberType))
                 {
-                    var subType = context.MemberType.GetGenericArguments().Single();
+                    var subType = context.MemberType.GenericArguments().Single();
                     var subContext = context.ChangeMemberType(subType);
 
                     var matches = GetAllProviderMatches(subContext);
@@ -1788,7 +1788,7 @@ namespace Zenject
         public IEnumerable<ZenjectResolveException> ValidateObjectGraph(
             Type concreteType, InjectContext currentContext, string concreteIdentifier, params Type[] extras)
         {
-            if (concreteType.IsAbstract)
+            if (concreteType.IsAbstract())
             {
                 throw new ZenjectResolveException(
                     "Expected contract type '{0}' to be non-abstract".Fmt(concreteType.Name()));

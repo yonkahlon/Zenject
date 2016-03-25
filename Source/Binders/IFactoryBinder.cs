@@ -35,7 +35,7 @@ namespace Zenject
 
         public BindingConditionSetter ToFactory()
         {
-            Assert.That(!typeof(TContract).IsAbstract,
+            Assert.That(!typeof(TContract).IsAbstract(),
                 "Unable to create abstract type '{0}' in Factory", typeof(TContract).Name());
             return _container.Bind<IFactory<TContract>>(_identifier)
                 .ToTransient<Factory<TContract>>();
@@ -116,7 +116,7 @@ namespace Zenject
         public BindingConditionSetter ToPrefab(GameObject prefab)
         {
             var contractType = typeof(TContract);
-            Assert.That(contractType.IsInterface || contractType.DerivesFrom<Component>());
+            Assert.That(contractType.IsInterface() || contractType.DerivesFrom<Component>());
 
             if (prefab == null)
             {
@@ -152,7 +152,7 @@ namespace Zenject
 
         public BindingConditionSetter ToFactory()
         {
-            Assert.That(!typeof(TContract).IsAbstract);
+            Assert.That(!typeof(TContract).IsAbstract());
             return _container.Bind<IFactory<TParam1, TContract>>(_identifier)
                 .ToTransient<Factory<TParam1, TContract>>();
         }
@@ -229,7 +229,7 @@ namespace Zenject
 
         public BindingConditionSetter ToFactory()
         {
-            Assert.That(!typeof(TContract).IsAbstract);
+            Assert.That(!typeof(TContract).IsAbstract());
             return _container.Bind<IFactory<TParam1, TParam2, TContract>>(_identifier)
                 .ToTransient<Factory<TParam1, TParam2, TContract>>();
         }
@@ -306,7 +306,7 @@ namespace Zenject
 
         public BindingConditionSetter ToFactory()
         {
-            Assert.That(!typeof(TContract).IsAbstract);
+            Assert.That(!typeof(TContract).IsAbstract());
             return _container.Bind<IFactory<TParam1, TParam2, TParam3, TContract>>(_identifier)
                 .ToTransient<Factory<TParam1, TParam2, TParam3, TContract>>();
         }
@@ -384,7 +384,7 @@ namespace Zenject
 
         public BindingConditionSetter ToFactory()
         {
-            Assert.That(!typeof(TContract).IsAbstract);
+            Assert.That(!typeof(TContract).IsAbstract());
             return _container.Bind<IFactory<TParam1, TParam2, TParam3, TParam4, TContract>>(_identifier)
                 .ToTransient<Factory<TParam1, TParam2, TParam3, TParam4, TContract>>();
         }
