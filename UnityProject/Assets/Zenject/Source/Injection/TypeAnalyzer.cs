@@ -96,8 +96,7 @@ namespace Zenject
             // This is so that we can ignore inherited attributes, which is necessary
             // otherwise a base class method marked with [Inject] would cause all overridden
             // derived methods to be added as well
-            var methods = type.GetAllMethods(
-                BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
+            var methods = type.GetAllInstanceMethods()
                 .Where(x => x.GetCustomAttributes(typeof(PostInjectAttribute), false).Any()).ToList();
 
             var heirarchyList = type.Yield().Concat(type.GetParentTypes()).Reverse().ToList();
@@ -124,8 +123,7 @@ namespace Zenject
 
         static IEnumerable<InjectableInfo> GetPropertyInjectables(Type type)
         {
-            var propInfos = type.GetAllProperties(
-                BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
+            var propInfos = type.GetAllInstanceProperties()
                 .Where(x => x.HasAttribute(typeof(InjectAttributeBase)));
 
             foreach (var propInfo in propInfos)
@@ -136,8 +134,7 @@ namespace Zenject
 
         static IEnumerable<InjectableInfo> GetFieldInjectables(Type type)
         {
-            var fieldInfos = type.GetAllFields(
-                BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
+            var fieldInfos = type.GetAllInstanceFields()
                 .Where(x => x.HasAttribute(typeof(InjectAttributeBase)));
 
             foreach (var fieldInfo in fieldInfos)
@@ -196,8 +193,7 @@ namespace Zenject
 
         static ConstructorInfo GetInjectConstructor(Type parentType)
         {
-            var constructors = parentType.GetConstructors(
-                BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+            var constructors = parentType.Constructors();
 
 #if UNITY_WSA && !UNITY_EDITOR
             // WP8 generates a dummy constructor with signature (internal Classname(UIntPtr dummy))

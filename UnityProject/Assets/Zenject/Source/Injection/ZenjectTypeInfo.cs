@@ -9,14 +9,30 @@ namespace Zenject
 {
     public class PostInjectableInfo
     {
-        public readonly MethodInfo MethodInfo;
-        public readonly ReadOnlyCollection<InjectableInfo> InjectableInfo;
+        readonly MethodInfo _methodInfo;
+        readonly List<InjectableInfo> _injectableInfo;
 
         public PostInjectableInfo(
             MethodInfo methodInfo, List<InjectableInfo> injectableInfo)
         {
-            MethodInfo = methodInfo;
-            InjectableInfo = injectableInfo.AsReadOnly();
+            _methodInfo = methodInfo;
+            _injectableInfo = injectableInfo;
+        }
+
+        public MethodInfo MethodInfo
+        {
+            get
+            {
+                return _methodInfo;
+            }
+        }
+
+        public IEnumerable<InjectableInfo> InjectableInfo
+        {
+            get
+            {
+                return _injectableInfo;
+            }
         }
     }
 
