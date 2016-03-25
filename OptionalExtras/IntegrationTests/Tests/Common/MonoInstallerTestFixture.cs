@@ -30,8 +30,7 @@ namespace ModestTree
         {
             GlobalCompositionRoot.Instance.EnsureIsInitialized();
 
-            var testMethods = this.GetType().GetAllMethods(
-                BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
+            var testMethods = this.GetType().GetAllInstanceMethods()
                 .Where(x => x.GetCustomAttributes(typeof(InstallerTestAttribute), false).Any()).ToList();
 
             foreach (var method in testMethods)

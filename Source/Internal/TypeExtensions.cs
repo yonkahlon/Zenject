@@ -15,7 +15,7 @@ namespace ModestTree
         // This seems easier to think about than IsAssignableFrom
         public static bool DerivesFrom(this Type a, Type b)
         {
-            return b != a && b.IsAssignableFrom(a);
+            return b != a && a.DerivesFromOrEqual(b);
         }
 
         public static bool DerivesFromOrEqual<T>(this Type a)
@@ -25,7 +25,11 @@ namespace ModestTree
 
         public static bool DerivesFromOrEqual(this Type a, Type b)
         {
+#if UNITY_WSA && !UNITY_EDITOR
+            return b == a || b.GetTypeInfo().IsAssignableFrom(a.GetTypeInfo());
+#else
             return b == a || b.IsAssignableFrom(a);
+#endif
         }
 
         public static bool IsValueType(this Type type)
@@ -34,6 +38,40 @@ namespace ModestTree
             return type.GetTypeInfo().IsValueType;
 #else
             return type.IsValueType;
+#endif
+        }
+
+        public static MethodInfo[] DeclaredInstanceMethods(this Type type)
+        {
+#if UNITY_WSA && !UNITY_EDITOR
+            return type.GetRuntimeMethods()
+                .Where(x => x.DeclaringType == type).ToArray();
+#else
+            return type.GetMethods(
+                BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly);
+#endif
+        }
+
+        public static PropertyInfo[] DeclaredInstanceProperties(this Type type)
+        {
+#if UNITY_WSA && !UNITY_EDITOR
+            // There doesn't appear to be an IsStatic member on PropertyInfo
+            return type.GetRuntimeProperties()
+                .Where(x => x.DeclaringType == type).ToArray();
+#else
+            return type.GetProperties(
+                BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly);
+#endif
+        }
+
+        public static FieldInfo[] DeclaredInstanceFields(this Type type)
+        {
+#if UNITY_WSA && !UNITY_EDITOR
+            return type.GetRuntimeFields()
+                .Where(x => x.DeclaringType == type && !x.IsStatic).ToArray();
+#else
+            return type.GetFields(
+                BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly);
 #endif
         }
 
@@ -100,6 +138,16 @@ namespace ModestTree
 #endif
         }
 
+        public static ConstructorInfo[] Constructors(this Type type)
+        {
+#if UNITY_WSA && !UNITY_EDITOR
+            return type.GetTypeInfo().DeclaredConstructors.ToArray();
+#else
+            return type.GetConstructors(
+                BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+#endif
+        }
+
         public static object GetDefaultValue(this Type type)
         {
             if (type.IsValueType())
@@ -157,92 +205,53 @@ namespace ModestTree
             return type.IsGenericType() && type == type.GetGenericTypeDefinition();
         }
 
-        // This is the same as the standard GetFields except it also supports getting the private
-        // fields in base classes
-        public static IEnumerable<FieldInfo> GetAllFields(this Type type, BindingFlags flags)
+        // Returns all instance fields, including private and public and also those in base classes
+        public static IEnumerable<FieldInfo> GetAllInstanceFields(this Type type)
         {
-            if ((int)(flags & BindingFlags.DeclaredOnly) != 0)
+            foreach (var fieldInfo in type.DeclaredInstanceFields())
             {
-                // Can use normal method in this case
-                foreach (var fieldInfo in type.GetFields(flags))
+                yield return fieldInfo;
+            }
+
+            if (type.BaseType() != null && type.BaseType() != typeof(object))
+            {
+                foreach (var fieldInfo in type.BaseType().GetAllInstanceFields())
                 {
                     yield return fieldInfo;
                 }
             }
-            else
-            {
-                // Add DeclaredOnly because we will get the base classes below
-                foreach (var fieldInfo in type.GetFields(flags | BindingFlags.DeclaredOnly))
-                {
-                    yield return fieldInfo;
-                }
+        }
 
-                if (type.BaseType() != null && type.BaseType() != typeof(object))
+        // Returns all instance properties, including private and public and also those in base classes
+        public static IEnumerable<PropertyInfo> GetAllInstanceProperties(this Type type)
+        {
+            foreach (var propInfo in type.DeclaredInstanceProperties())
+            {
+                yield return propInfo;
+            }
+
+            if (type.BaseType() != null && type.BaseType() != typeof(object))
+            {
+                foreach (var propInfo in type.BaseType().GetAllInstanceProperties())
                 {
-                    foreach (var fieldInfo in type.BaseType().GetAllFields(flags))
-                    {
-                        yield return fieldInfo;
-                    }
+                    yield return propInfo;
                 }
             }
         }
 
-        // This is the same as the standard GetProperties except it also supports getting the private
-        // members in base classes
-        public static IEnumerable<PropertyInfo> GetAllProperties(this Type type, BindingFlags flags)
+        // Returns all instance methods, including private and public and also those in base classes
+        public static IEnumerable<MethodInfo> GetAllInstanceMethods(this Type type)
         {
-            if ((int)(flags & BindingFlags.DeclaredOnly) != 0)
+            foreach (var methodInfo in type.DeclaredInstanceMethods())
             {
-                // Can use normal method in this case
-                foreach (var propertyInfo in type.GetProperties(flags))
-                {
-                    yield return propertyInfo;
-                }
+                yield return methodInfo;
             }
-            else
-            {
-                // Add DeclaredOnly because we will get the base classes below
-                foreach (var propertyInfo in type.GetProperties(flags | BindingFlags.DeclaredOnly))
-                {
-                    yield return propertyInfo;
-                }
 
-                if (type.BaseType() != null && type.BaseType() != typeof(object))
-                {
-                    foreach (var propertyInfo in type.BaseType().GetAllProperties(flags))
-                    {
-                        yield return propertyInfo;
-                    }
-                }
-            }
-        }
-
-        // This is the same as the standard GetMethods except it also supports getting the private
-        // members in base classes
-        public static IEnumerable<MethodInfo> GetAllMethods(this Type type, BindingFlags flags)
-        {
-            if ((int)(flags & BindingFlags.DeclaredOnly) != 0)
+            if (type.BaseType() != null && type.BaseType() != typeof(object))
             {
-                // Can use normal method in this case
-                foreach (var methodInfo in type.GetMethods(flags))
+                foreach (var methodInfo in type.BaseType().GetAllInstanceMethods())
                 {
                     yield return methodInfo;
-                }
-            }
-            else
-            {
-                // Add DeclaredOnly because we will get the base classes below
-                foreach (var methodInfo in type.GetMethods(flags | BindingFlags.DeclaredOnly))
-                {
-                    yield return methodInfo;
-                }
-
-                if (type.BaseType() != null && type.BaseType() != typeof(object))
-                {
-                    foreach (var methodInfo in type.BaseType().GetAllMethods(flags))
-                    {
-                        yield return methodInfo;
-                    }
                 }
             }
         }
