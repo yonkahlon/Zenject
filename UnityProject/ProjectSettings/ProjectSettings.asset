@@ -339,11 +339,11 @@ PlayerSettings:
   scriptingDefineSymbols: {}
   metroPackageName: Game1
   metroPackageVersion: 
-  metroCertificatePath: 
+  metroCertificatePath: Assets\WSATestCertificate.pfx
   metroCertificatePassword: 
-  metroCertificateSubject: 
-  metroCertificateIssuer: 
-  metroCertificateNotAfter: 0000000000000000
+  metroCertificateSubject: ModestTree
+  metroCertificateIssuer: ModestTree
+  metroCertificateNotAfter: 005b7405dea5d201
   metroApplicationDescription: Game1
   wsaImages: {}
   metroTileShortName: 

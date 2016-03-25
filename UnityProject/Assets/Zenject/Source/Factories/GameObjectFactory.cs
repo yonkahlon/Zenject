@@ -34,7 +34,7 @@ namespace Zenject
     {
         public GameObjectFactory()
         {
-            Assert.That(typeof(TValue).IsInterface || typeof(TValue).DerivesFrom<Component>());
+            Assert.That(typeof(TValue).IsInterface() || typeof(TValue).DerivesFrom<Component>());
         }
 
         public virtual TValue Create()
@@ -55,7 +55,7 @@ namespace Zenject
     {
         public GameObjectFactory()
         {
-            Assert.That(typeof(TValue).IsInterface || typeof(TValue).DerivesFrom<Component>());
+            Assert.That(typeof(TValue).IsInterface() || typeof(TValue).DerivesFrom<Component>());
         }
 
         public virtual TValue Create(TParam1 param)
@@ -80,7 +80,7 @@ namespace Zenject
     {
         public GameObjectFactory()
         {
-            Assert.That(typeof(TValue).IsInterface || typeof(TValue).DerivesFrom<Component>());
+            Assert.That(typeof(TValue).IsInterface() || typeof(TValue).DerivesFrom<Component>());
         }
 
         public virtual TValue Create(TParam1 param1, TParam2 param2)
@@ -106,7 +106,7 @@ namespace Zenject
     {
         public GameObjectFactory()
         {
-            Assert.That(typeof(TValue).IsInterface || typeof(TValue).DerivesFrom<Component>());
+            Assert.That(typeof(TValue).IsInterface() || typeof(TValue).DerivesFrom<Component>());
         }
 
         public virtual TValue Create(TParam1 param1, TParam2 param2, TParam3 param3)
@@ -133,7 +133,7 @@ namespace Zenject
     {
         public GameObjectFactory()
         {
-            Assert.That(typeof(TValue).IsInterface || typeof(TValue).DerivesFrom<Component>());
+            Assert.That(typeof(TValue).IsInterface() || typeof(TValue).DerivesFrom<Component>());
         }
 
         public virtual TValue Create(TParam1 param1, TParam2 param2, TParam3 param3, TParam4 param4)

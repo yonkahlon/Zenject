@@ -92,7 +92,7 @@ namespace Zenject
 
             // In most cases componentType will be a MonoBehaviour but we also want to allow interfaces
             // And in that case we can't validate it
-            if (!componentType.IsAbstract)
+            if (!componentType.IsAbstract())
             {
                 // Note that we always want to cache _container instead of using context.Container
                 // since for singletons, the container they are accessed from should not determine

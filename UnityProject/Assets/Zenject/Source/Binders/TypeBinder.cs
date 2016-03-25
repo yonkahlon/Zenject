@@ -169,7 +169,7 @@ namespace Zenject
         // Creates a new game object and adds the given type as a new component on it
         public BindingConditionSetter ToTransientGameObject()
         {
-            if (!ContractType.IsSubclassOf(typeof(Component)))
+            if (!ContractType.DerivesFrom(typeof(Component)))
             {
                 throw new ZenjectBindException(
                     "Expected UnityEngine.Component derived type when binding type '{0}'".Fmt(ContractType.Name()));

@@ -28,9 +28,81 @@ namespace ModestTree
             return b == a || b.IsAssignableFrom(a);
         }
 
+        public static bool IsValueType(this Type type)
+        {
+#if UNITY_WSA && !UNITY_EDITOR
+            return type.GetTypeInfo().IsValueType;
+#else
+            return type.IsValueType;
+#endif
+        }
+
+        public static Type BaseType(this Type type)
+        {
+#if UNITY_WSA && !UNITY_EDITOR
+            return type.GetTypeInfo().BaseType;
+#else
+            return type.BaseType;
+#endif
+        }
+
+        public static bool IsGenericType(this Type type)
+        {
+#if UNITY_WSA && !UNITY_EDITOR
+            return type.GetTypeInfo().IsGenericType;
+#else
+            return type.IsGenericType;
+#endif
+        }
+
+        public static bool IsInterface(this Type type)
+        {
+#if UNITY_WSA && !UNITY_EDITOR
+            return type.GetTypeInfo().IsInterface;
+#else
+            return type.IsInterface;
+#endif
+        }
+
+        public static bool IsAbstract(this Type type)
+        {
+#if UNITY_WSA && !UNITY_EDITOR
+            return type.GetTypeInfo().IsAbstract;
+#else
+            return type.IsAbstract;
+#endif
+        }
+
+        public static MethodInfo Method(this Delegate del)
+        {
+#if UNITY_WSA && !UNITY_EDITOR
+            return del.GetMethodInfo();
+#else
+            return del.Method;
+#endif
+        }
+
+        public static Type[] GenericArguments(this Type type)
+        {
+#if UNITY_WSA && !UNITY_EDITOR
+            return type.GetTypeInfo().GenericTypeArguments;
+#else
+            return type.GetGenericArguments();
+#endif
+        }
+
+        public static Type[] Interfaces(this Type type)
+        {
+#if UNITY_WSA && !UNITY_EDITOR
+            return type.GetTypeInfo().ImplementedInterfaces.ToArray();
+#else
+            return type.GetInterfaces();
+#endif
+        }
+
         public static object GetDefaultValue(this Type type)
         {
-            if (type.IsValueType)
+            if (type.IsValueType())
             {
                 return Activator.CreateInstance(type);
             }
@@ -56,14 +128,14 @@ namespace ModestTree
 
         public static IEnumerable<Type> GetParentTypes(this Type type)
         {
-            if (type == null || type.BaseType == null || type == typeof(object) || type.BaseType == typeof(object))
+            if (type == null || type.BaseType() == null || type == typeof(object) || type.BaseType() == typeof(object))
             {
                 yield break;
             }
 
-            yield return type.BaseType;
+            yield return type.BaseType();
 
-            foreach (var ancestor in type.BaseType.GetParentTypes())
+            foreach (var ancestor in type.BaseType().GetParentTypes())
             {
                 yield return ancestor;
             }
@@ -77,12 +149,12 @@ namespace ModestTree
 
         public static bool IsClosedGenericType(this Type type)
         {
-            return type.IsGenericType && type != type.GetGenericTypeDefinition();
+            return type.IsGenericType() && type != type.GetGenericTypeDefinition();
         }
 
         public static bool IsOpenGenericType(this Type type)
         {
-            return type.IsGenericType && type == type.GetGenericTypeDefinition();
+            return type.IsGenericType() && type == type.GetGenericTypeDefinition();
         }
 
         // This is the same as the standard GetFields except it also supports getting the private
@@ -105,9 +177,9 @@ namespace ModestTree
                     yield return fieldInfo;
                 }
 
-                if (type.BaseType != null && type.BaseType != typeof(object))
+                if (type.BaseType() != null && type.BaseType() != typeof(object))
                 {
-                    foreach (var fieldInfo in type.BaseType.GetAllFields(flags))
+                    foreach (var fieldInfo in type.BaseType().GetAllFields(flags))
                     {
                         yield return fieldInfo;
                     }
@@ -135,9 +207,9 @@ namespace ModestTree
                     yield return propertyInfo;
                 }
 
-                if (type.BaseType != null && type.BaseType != typeof(object))
+                if (type.BaseType() != null && type.BaseType() != typeof(object))
                 {
-                    foreach (var propertyInfo in type.BaseType.GetAllProperties(flags))
+                    foreach (var propertyInfo in type.BaseType().GetAllProperties(flags))
                     {
                         yield return propertyInfo;
                     }
@@ -165,9 +237,9 @@ namespace ModestTree
                     yield return methodInfo;
                 }
 
-                if (type.BaseType != null && type.BaseType != typeof(object))
+                if (type.BaseType() != null && type.BaseType() != typeof(object))
                 {
-                    foreach (var methodInfo in type.BaseType.GetAllMethods(flags))
+                    foreach (var methodInfo in type.BaseType().GetAllMethods(flags))
                     {
                         yield return methodInfo;
                     }
@@ -182,20 +254,6 @@ namespace ModestTree
                 return string.Format("{0}[]", type.GetElementType().Name());
             }
 
-            if (type.ContainsGenericParameters || type.IsGenericType)
-            {
-                if (type.BaseType == typeof(Nullable<>) || (type.BaseType == typeof(ValueType) && type.UnderlyingSystemType.Name.StartsWith("Nullable")))
-                {
-                    return GetCSharpTypeName(type.GetGenericArguments().Single().Name) + "?";
-                }
-
-                int index = type.Name.IndexOf("`");
-                string genericTypeName = index > 0 ? type.Name.Substring(0, index) : type.Name;
-                string genericArgs = string.Join(",", type.GetGenericArguments().Select(t => t.Name()).ToArray());
-                return genericArgs.Length == 0 ? genericTypeName : genericTypeName + "<" + genericArgs + ">";
-            }
-
-            // If a nested class, include the parent classes as well
             return (type.DeclaringType == null ? "" : type.DeclaringType.Name() + ".") + GetCSharpTypeName(type.Name);
         }
 
@@ -226,26 +284,60 @@ namespace ModestTree
         }
 
         public static bool HasAttribute(
-            this ICustomAttributeProvider provider, params Type[] attributeTypes)
+            this MemberInfo provider, params Type[] attributeTypes)
         {
             return provider.AllAttributes(attributeTypes).Any();
         }
 
-        public static bool HasAttribute<T>(this ICustomAttributeProvider provider)
+        public static bool HasAttribute<T>(this MemberInfo provider)
             where T : Attribute
         {
             return provider.AllAttributes(typeof(T)).Any();
         }
 
         public static IEnumerable<T> AllAttributes<T>(
-            this ICustomAttributeProvider provider)
+            this MemberInfo provider)
             where T : Attribute
         {
             return provider.AllAttributes(typeof(T)).Cast<T>();
         }
 
         public static IEnumerable<Attribute> AllAttributes(
-            this ICustomAttributeProvider provider, params Type[] attributeTypes)
+            this MemberInfo provider, params Type[] attributeTypes)
+        {
+            var allAttributes = provider.GetCustomAttributes(true).Cast<Attribute>();
+
+            if (attributeTypes.Length == 0)
+            {
+                return allAttributes;
+            }
+
+            return allAttributes.Where(a => attributeTypes.Any(x => a.GetType().DerivesFromOrEqual(x)));
+        }
+
+        // We could avoid this duplication here by using ICustomAttributeProvider but this class
+        // does not exist on the WP8 platform
+        public static bool HasAttribute(
+            this ParameterInfo provider, params Type[] attributeTypes)
+        {
+            return provider.AllAttributes(attributeTypes).Any();
+        }
+
+        public static bool HasAttribute<T>(this ParameterInfo provider)
+            where T : Attribute
+        {
+            return provider.AllAttributes(typeof(T)).Any();
+        }
+
+        public static IEnumerable<T> AllAttributes<T>(
+            this ParameterInfo provider)
+            where T : Attribute
+        {
+            return provider.AllAttributes(typeof(T)).Cast<T>();
+        }
+
+        public static IEnumerable<Attribute> AllAttributes(
+            this ParameterInfo provider, params Type[] attributeTypes)
         {
             var allAttributes = provider.GetCustomAttributes(true).Cast<Attribute>();
 

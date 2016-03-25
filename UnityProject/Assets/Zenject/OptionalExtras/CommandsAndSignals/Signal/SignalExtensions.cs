@@ -37,7 +37,7 @@ namespace Zenject.Commands
             Assert.IsNotNull(concreteSignalType);
             Assert.That(concreteSignalType.DerivesFrom<ISignal>());
 
-            container.Bind(concreteSignalType.BaseType)
+            container.Bind(concreteSignalType.BaseType())
                 .ToSingle(concreteSignalType, identifier)
                 .When(ctx => ctx.ObjectType != null && ctx.ObjectType.DerivesFromOrEqual<TTrigger>() && ctx.ConcreteIdentifier == identifier);
 
