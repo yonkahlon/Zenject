@@ -42,6 +42,7 @@ namespace UnityTest.IntegrationTestRunner
         {
             var test = testCollection[currentTestGroup].First();
             testCollection[currentTestGroup].Remove(test);
+            test.EnableTest(true);
             return test;
         }
 

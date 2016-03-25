@@ -3,6 +3,7 @@
 /Library
 /Build
 /obj
+/UWP
 
 #Un-ignore these specific files
 !/Library/*.asset

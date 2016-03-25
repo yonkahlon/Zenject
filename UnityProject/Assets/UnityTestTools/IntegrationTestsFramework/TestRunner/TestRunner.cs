@@ -5,11 +5,10 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using UnityEditor;
-using UnityEditorInternal;
 using UnityEngine;
 using UnityTest.IntegrationTestRunner;
 using System.IO;
+using UnityEngine.SceneManagement;
 
 namespace UnityTest
 {
@@ -76,7 +75,7 @@ namespace UnityTest
             }
 
             TestComponent.DestroyAllDynamicTests();
-            var dynamicTestTypes = TestComponent.GetTypesWithHelpAttribute(Application.loadedLevelName);
+            var dynamicTestTypes = TestComponent.GetTypesWithHelpAttribute(SceneManager.GetActiveScene().name);
             foreach (var dynamicTestType in dynamicTestTypes)
                 TestComponent.CreateDynamicTest(dynamicTestType);
 
@@ -281,11 +280,7 @@ namespace UnityTest
         {
             PrintResultToLog();
             TestRunnerCallback.RunFinished(m_ResultList);
-
-            if (InternalEditorUtility.inBatchMode)
-            {
-                EditorApplication.Exit(m_ResultList.Count(t => t.IsFailure) > 0 ? 1 : 0);
-            }
+            LoadNextLevelOrQuit();
         }
 
         private void PrintResultToLog()
@@ -304,6 +299,34 @@ namespace UnityTest
                                                           m_ResultList.Where(t => t.IsIgnored).Select(result => result.Name).ToArray()));
             }
             Debug.Log(resultString);
+        }
+
+        private void LoadNextLevelOrQuit()
+        {
+            if (isInitializedByRunner) return;
+
+
+            TestSceneNumber += 1;
+            string testScene = m_Configurator.GetIntegrationTestScenes(TestSceneNumber);
+
+            if (testScene != null)
+                SceneManager.LoadScene(Path.GetFileNameWithoutExtension(testScene));
+            else
+            {
+                TestRunnerCallback.AllScenesFinished();
+                k_ResultRenderer.ShowResults();
+
+#if UNITY_EDITOR
+                var prevScenes = m_Configurator.GetPreviousScenesToRestore();
+                if(prevScenes!=null)
+                {
+                    UnityEditor.EditorBuildSettings.scenes = prevScenes;
+                }
+#endif
+
+                if (m_Configurator.isBatchRun && m_Configurator.sendResultsOverNetwork)
+                    Application.Quit();
+            }
         }
 
         public void OnGUI()
@@ -332,14 +355,7 @@ namespace UnityTest
             if (currentTest != null
                 && (currentTest.IsIgnored()
                     && !(isInitializedByRunner && m_ResultList.Count == 1)))
-            {
                 m_TestState = TestState.Ignored;
-            }
-
-            if (currentTest != null && m_TestState != TestState.Ignored)
-            {
-                currentTest.EnableTest(true);
-            }
 
             LogMessage(k_StartedMessage);
             TestRunnerCallback.TestStarted(testResult);
@@ -357,7 +373,7 @@ namespace UnityTest
             currentTest = null;
             if (!testResult.IsSuccess
                 && testResult.Executed
-                && !testResult.IsIgnored) k_ResultRenderer.AddResults(Application.loadedLevelName, testResult);
+                && !testResult.IsIgnored) k_ResultRenderer.AddResults(SceneManager.GetActiveScene().name, testResult);
         }
 
         #region Test Runner Helpers

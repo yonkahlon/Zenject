@@ -6,6 +6,7 @@ using UnityEditor;
 using UnityEditorInternal;
 using UnityEngine;
 using UnityTest.IntegrationTests;
+using UnityEditor.SceneManagement;
 
 namespace UnityTest
 {
@@ -32,7 +33,7 @@ namespace UnityTest
 
             RunIntegrationTests(targetPlatform, testScenes, otherBuildScenes);
         }
-
+        
         public static void RunIntegrationTests(BuildTarget ? targetPlatform)
         {
             var sceneList = FindTestScenesInProject();
@@ -47,7 +48,7 @@ namespace UnityTest
             else
                 RunInEditor(testScenes,  otherBuildScenes);
         }
-
+        
         private static void BuildAndRun(BuildTarget target, List<string> testScenes, List<string> otherBuildScenes)
         {
             var resultFilePath = GetParameterArgument(k_ResultFileDirParam);
@@ -81,17 +82,24 @@ namespace UnityTest
         {
             CheckActiveBuildTarget();
 
-            // Steve V. 2016 - This causes exceptions and it's a feature I don't care about
-            //NetworkResultsReceiver.StopReceiver();
-
+            NetworkResultsReceiver.StopReceiver();
             if (testScenes == null || testScenes.Count == 0)
             {
                 Debug.Log("No test scenes on the list");
                 EditorApplication.Exit(returnCodeRunError);
                 return;
             }
+             
+            string previousScenesXml = "";
+            var serializer = new System.Xml.Serialization.XmlSerializer(typeof(EditorBuildSettingsScene[]));
+            using(StringWriter textWriter = new StringWriter())
+            {
+                serializer.Serialize(textWriter, EditorBuildSettings.scenes);
+                previousScenesXml = textWriter.ToString();
+            }
+                
             EditorBuildSettings.scenes = (testScenes.Concat(otherBuildScenes).ToList()).Select(s => new EditorBuildSettingsScene(s, true)).ToArray();
-            EditorApplication.OpenScene(testScenes.First());
+            EditorSceneManager.OpenScene(testScenes.First());
             GuiHelper.SetConsoleErrorPause(false);
 
             var config = new PlatformRunnerConfiguration
@@ -101,12 +109,13 @@ namespace UnityTest
                 port = PlatformRunnerConfiguration.TryToGetFreePort(),
                 runInEditor = true
             };
-
+                    
             var settings = new PlayerSettingConfigurator(true);
             settings.AddConfigurationFile(TestRunnerConfigurator.integrationTestsNetwork, string.Join("\n", config.GetConnectionIPs()));
-
-            // Steve V. 2016 - This causes exceptions and it's a feature I don't care about
-            //NetworkResultsReceiver.StartReceiver(config);
+            settings.AddConfigurationFile(TestRunnerConfigurator.testScenesToRun, string.Join ("\n", testScenes.ToArray()));
+            settings.AddConfigurationFile(TestRunnerConfigurator.previousScenes, previousScenesXml);
+         
+            NetworkResultsReceiver.StartReceiver(config);
 
             EditorApplication.isPlaying = true;
         }
@@ -129,7 +138,7 @@ namespace UnityTest
             if (notSupportedPlatforms.Contains(EditorUserBuildSettings.activeBuildTarget.ToString()))
             {
                 Debug.Log("activeBuildTarget can not be  "
-                    + EditorUserBuildSettings.activeBuildTarget +
+                    + EditorUserBuildSettings.activeBuildTarget + 
                     " use buildTarget parameter to open Unity.");
             }
         }
