@@ -2971,6 +2971,11 @@ For general troubleshooting / support, please use the [zenject subreddit](http:/
 
 ## <a id="release-notes"></a>Release Notes
 
+3.10 (March 26, 2016)
+- Fixed to actually support Windows Store platform
+- Added pause/resume methods to TickableManager
+- Bug fix - OnlyInjectWhenActive flag did not work on root inactive game objects 
+
 3.9 (Feb 7, 2016)
 - Added a lot more error checking when using the ToSingle bindings. It will no longer allow mixing different ToSingle types
 - Fixed ToSingleGameObject and ToSingleMonoBehaviour to allow multiple bindings to the same result
