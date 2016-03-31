@@ -70,6 +70,7 @@ __Quick Start__:  If you are already familiar with dependency injection and are 
     * <a href="#faq-performance">How is Performance?</a>
     * <a href="#net-framework">Can I use .NET framework 4.0 and above?</a>
     * <a href="#howtousecoroutines">How do I use Unity style Coroutines in normal C# classes?</a>
+    * <a href="#memorypools">How do I use Zenject with pools to minimize memory allocations?</a>
 * <a href="#cheatsheet">Cheat Sheet</a>
 * <a href="#further-help">Further Help</a>
 * <a href="#release-notes">Release Notes</a>
@@ -3158,6 +3159,10 @@ However, this approach will not allow you to take advantage of the advanced feat
         }
 
     If you need more control than this, another option is to use a coroutine library that implements similar functionality to what Unity provides.  This is what we do.  See [here](https://github.com/svermeulen/UnityCoroutinesWithoutMonoBehaviours) for the library that we use for this.
+
+* **<a id="memorypools"></a>How do I use Zenject with pools to minimize memory allocations?**
+
+    Currently, Zenject does not support memory pooling.  When you bind something to transient or use a factory, Zenject will always create a brand new instance from scratch.  We realize that this can be inefficient in cases where you are creating many objects (especially on mobile) so it is something we want to address at some point.
 
 ## <a id="cheatsheet"></a>Installers Cheat-Sheet
 
