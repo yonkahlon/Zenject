@@ -6,7 +6,7 @@ using System.Linq;
 using ModestTree;
 using Assert=ModestTree.Assert;
 
-namespace Zenject.Tests
+namespace Zenject.Tests.Conditions
 {
     [TestFixture]
     public class TestConditionsIdentifier : TestWithContainer
@@ -33,12 +33,12 @@ namespace Zenject.Tests
         [Test]
         public void TestUnspecifiedNameConstructorInjection()
         {
-            Container.Bind<Test1>().ToTransient();
-            Container.Bind<Test0>().ToTransient();
+            Container.Bind<Test1>().ToSelf().AsTransient();
+            Container.Bind<Test0>().ToSelf().AsTransient();
 
             AssertValidationFails();
 
-            Assert.Throws<ZenjectResolveException>(
+            Assert.Throws(
                 delegate { Container.Resolve<Test1>(); });
 
             Assert.That(Container.ValidateResolve<Test1>().Any());
@@ -47,14 +47,14 @@ namespace Zenject.Tests
         [Test]
         public void TestUnspecifiedNameFieldInjection()
         {
-            Container.Bind<Test1>().ToTransient();
-            Container.Bind<Test2>().ToTransient();
+            Container.Bind<Test1>().ToSelf().AsTransient();
+            Container.Bind<Test2>().ToSelf().AsTransient();
 
-            Container.Bind<Test0>().ToTransient();
+            Container.Bind<Test0>().ToSelf().AsTransient();
 
             AssertValidationFails();
 
-            Assert.Throws<ZenjectResolveException>(
+            Assert.Throws(
                 delegate { Container.Resolve<Test2>(); });
 
             Assert.That(Container.ValidateResolve<Test2>().Any());
@@ -63,8 +63,8 @@ namespace Zenject.Tests
         [Test]
         public void TestSuccessConstructorInjectionString()
         {
-            Container.Bind<Test1>().ToTransient();
-            Container.Bind<Test2>().ToTransient();
+            Container.Bind<Test1>().ToSelf().AsTransient();
+            Container.Bind<Test2>().ToSelf().AsTransient();
 
             Container.Bind<Test0>().ToInstance(new Test0());
             Container.Bind<Test0>("foo").ToInstance(new Test0());
@@ -80,8 +80,8 @@ namespace Zenject.Tests
         [Test]
         public void TestSuccessFieldInjectionString()
         {
-            Container.Bind<Test1>().ToTransient();
-            Container.Bind<Test2>().ToTransient();
+            Container.Bind<Test1>().ToSelf().AsTransient();
+            Container.Bind<Test2>().ToSelf().AsTransient();
 
             Container.Bind<Test0>().ToInstance(new Test0());
             Container.Bind<Test0>("foo").ToInstance(new Test0());
@@ -109,16 +109,16 @@ namespace Zenject.Tests
         [Test]
         public void TestFailConstructorInjectionEnum()
         {
-            Container.Bind<Test1>().ToTransient();
-            Container.Bind<Test2>().ToTransient();
-            Container.Bind<Test3>().ToTransient();
+            Container.Bind<Test1>().ToSelf().AsTransient();
+            Container.Bind<Test2>().ToSelf().AsTransient();
+            Container.Bind<Test3>().ToSelf().AsTransient();
 
             Container.Bind<Test0>().ToInstance(new Test0());
             Container.Bind<Test0>("TestValue1").ToInstance(new Test0());
 
             AssertValidationFails();
 
-            Assert.Throws<ZenjectResolveException>(
+            Assert.Throws(
                 delegate { Container.Resolve<Test3>(); });
 
             Assert.That(Container.ValidateResolve<Test1>().Any());
@@ -127,7 +127,7 @@ namespace Zenject.Tests
         [Test]
         public void TestSuccessConstructorInjectionEnum()
         {
-            Container.Bind<Test3>().ToTransient();
+            Container.Bind<Test3>().ToSelf().AsTransient();
 
             Container.Bind<Test0>().ToInstance(new Test0());
             Container.Bind<Test0>("TestValue2").ToInstance(new Test0());
@@ -143,16 +143,16 @@ namespace Zenject.Tests
         [Test]
         public void TestFailFieldInjectionEnum()
         {
-            Container.Bind<Test1>().ToTransient();
-            Container.Bind<Test2>().ToTransient();
-            Container.Bind<Test3>().ToTransient();
+            Container.Bind<Test1>().ToSelf().AsTransient();
+            Container.Bind<Test2>().ToSelf().AsTransient();
+            Container.Bind<Test3>().ToSelf().AsTransient();
 
             Container.Bind<Test0>().ToInstance(new Test0());
             Container.Bind<Test0>("TestValue1").ToInstance(new Test0());
 
             AssertValidationFails();
 
-            Assert.Throws<ZenjectResolveException>(
+            Assert.Throws(
                 delegate { Container.Resolve<Test3>(); });
 
             Assert.That(Container.ValidateResolve<Test3>().Any());
@@ -161,7 +161,7 @@ namespace Zenject.Tests
         [Test]
         public void TestSuccessFieldInjectionEnum()
         {
-            Container.Bind<Test4>().ToTransient();
+            Container.Bind<Test4>().ToSelf().AsTransient();
 
             Container.Bind<Test0>().ToInstance(new Test0());
             Container.Bind<Test0>("TestValue3").ToInstance(new Test0());

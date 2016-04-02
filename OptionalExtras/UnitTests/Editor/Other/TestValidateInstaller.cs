@@ -7,7 +7,7 @@ using System.Linq;
 using ModestTree;
 using Assert=ModestTree.Assert;
 
-namespace Zenject.Tests
+namespace Zenject.Tests.Other
 {
     [TestFixture]
     public class TestValidateInstaller : TestWithContainer
@@ -15,8 +15,8 @@ namespace Zenject.Tests
         [Test]
         public void TestBasicSuccess()
         {
-            Container.Bind<IFoo>().ToSingle<Foo>();
-            Container.Bind<Bar>().ToSingle();
+            Container.Bind<IFoo>().To<Foo>().AsSingle();
+            Container.Bind<Bar>().ToSelf().AsSingle();
 
             Assert.That(Container.ValidateResolve<IFoo>().IsEmpty());
         }
@@ -24,8 +24,8 @@ namespace Zenject.Tests
         [Test]
         public void TestBasicFailure()
         {
-            Container.Bind<IFoo>().ToSingle<Foo>();
-            //Container.Bind<Bar>().ToSingle();
+            Container.Bind<IFoo>().To<Foo>().AsSingle();
+            //Container.Bind<Bar>().ToSelf().AsSingle();
 
             Assert.That(!Container.ValidateResolve<IFoo>().IsEmpty());
         }
@@ -33,12 +33,12 @@ namespace Zenject.Tests
         [Test]
         public void TestList()
         {
-            Container.Bind<IFoo>().ToSingle<Foo>();
-            Container.Bind<IFoo>().ToSingle<Foo2>();
+            Container.Bind<IFoo>().To<Foo>().AsSingle();
+            Container.Bind<IFoo>().To<Foo2>().AsSingle();
 
-            Container.Bind<Bar>().ToSingle();
+            Container.Bind<Bar>().ToSelf().AsSingle();
 
-            Container.Bind<Qux>().ToSingle();
+            Container.Bind<Qux>().ToSelf().AsSingle();
 
             Assert.That(Container.ValidateResolve<Qux>().IsEmpty());
         }
@@ -46,15 +46,15 @@ namespace Zenject.Tests
         [Test]
         public void TestValidateDynamicSuccess()
         {
-            Container.Bind<Foo>().ToSingle();
+            Container.Bind<Foo>().ToSelf().AsSingle();
 
-            Assert.That(Container.ValidateObjectGraph<Foo>(typeof(Bar)).IsEmpty());
+            Assert.That(Container.ValidateObjectGraph<Foo>(new List<Type>() { typeof(Bar) }).IsEmpty());
         }
 
         [Test]
         public void TestValidateDynamicFailure()
         {
-            Container.Bind<Foo>().ToSingle();
+            Container.Bind<Foo>().ToSelf().AsSingle();
 
             Assert.That(!Container.ValidateObjectGraph<Foo>().IsEmpty());
         }
@@ -62,20 +62,20 @@ namespace Zenject.Tests
         [Test]
         public void TestValidateDynamicFailure2()
         {
-            Container.Bind<Foo>().ToSingle();
+            Container.Bind<Foo>().ToSelf().AsSingle();
 
-            Assert.That(!Container.ValidateObjectGraph<Foo>(typeof(Bar), typeof(string)).IsEmpty());
+            Assert.That(!Container.ValidateObjectGraph<Foo>(new List<Type>() { typeof(Bar), typeof(string) }).IsEmpty());
         }
 
         [Test]
         public void TestValidateNestedContainerSuccess()
         {
-            var nestedContainer = new DiContainer(Container);
+            var nestedContainer = Container.CreateSubContainer();
 
             // Should fail without Bar<> bound
             Assert.That(!nestedContainer.ValidateObjectGraph<Foo>().IsEmpty());
 
-            Container.Bind<Bar>().ToSingle();
+            Container.Bind<Bar>().ToSelf().AsSingle();
 
             Assert.That(nestedContainer.ValidateObjectGraph<Foo>().IsEmpty());
         }
@@ -83,15 +83,15 @@ namespace Zenject.Tests
         [Test]
         public void TestValidateNestedContainerList()
         {
-            var nestedContainer = new DiContainer(Container);
+            var nestedContainer = Container.CreateSubContainer();
 
-            Container.Bind<IFoo>().ToSingle<Foo>();
-            Container.Bind<IFoo>().ToSingle<Foo2>();
+            Container.Bind<IFoo>().To<Foo>().AsSingle();
+            Container.Bind<IFoo>().To<Foo2>().AsSingle();
 
             Assert.That(!Container.ValidateResolve<List<IFoo>>().IsEmpty());
             Assert.That(!nestedContainer.ValidateResolve<List<IFoo>>().IsEmpty());
 
-            Container.Bind<Bar>().ToSingle();
+            Container.Bind<Bar>().ToSelf().AsSingle();
 
             AssertValidates();
 

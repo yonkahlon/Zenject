@@ -6,7 +6,7 @@ using System.Linq;
 using ModestTree;
 using Assert=ModestTree.Assert;
 
-namespace Zenject.Tests
+namespace Zenject.Tests.Other
 {
     [TestFixture]
     public class TestTransientMockProvider : TestWithContainer

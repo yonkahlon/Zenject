@@ -20,10 +20,7 @@ namespace Zenject.Commands
 
         public void Execute()
         {
-            if (_handler != null)
-            {
-                _handler();
-            }
+            _handler();
         }
     }
 
@@ -40,10 +37,7 @@ namespace Zenject.Commands
 
         public void Execute(TParam1 param1)
         {
-            if (_handler != null)
-            {
-                _handler(param1);
-            }
+            _handler(param1);
         }
     }
 
@@ -60,10 +54,7 @@ namespace Zenject.Commands
 
         public void Execute(TParam1 param1, TParam2 param2)
         {
-            if (_handler != null)
-            {
-                _handler(param1, param2);
-            }
+            _handler(param1, param2);
         }
     }
 
@@ -80,10 +71,7 @@ namespace Zenject.Commands
 
         public void Execute(TParam1 param1, TParam2 param2, TParam3 param3)
         {
-            if (_handler != null)
-            {
-                _handler(param1, param2, param3);
-            }
+            _handler(param1, param2, param3);
         }
     }
 
@@ -100,10 +88,7 @@ namespace Zenject.Commands
 
         public void Execute(TParam1 param1, TParam2 param2, TParam3 param3, TParam4 param4)
         {
-            if (_handler != null)
-            {
-                _handler(param1, param2, param3, param4);
-            }
+            _handler(param1, param2, param3, param4);
         }
     }
 
@@ -120,10 +105,7 @@ namespace Zenject.Commands
 
         public void Execute(TParam1 param1, TParam2 param2, TParam3 param3, TParam4 param4, TParam5 param5)
         {
-            if (_handler != null)
-            {
-                _handler(param1, param2, param3, param4, param5);
-            }
+            _handler(param1, param2, param3, param4, param5);
         }
     }
 
@@ -140,10 +122,7 @@ namespace Zenject.Commands
 
         public void Execute(TParam1 param1, TParam2 param2, TParam3 param3, TParam4 param4, TParam5 param5, TParam6 param6)
         {
-            if (_handler != null)
-            {
-                _handler(param1, param2, param3, param4, param5, param6);
-            }
+            _handler(param1, param2, param3, param4, param5, param6);
         }
     }
 }

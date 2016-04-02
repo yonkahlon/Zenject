@@ -5,100 +5,110 @@ using System.Collections.Generic;
 using System.Linq;
 using ModestTree;
 using UnityEngine;
+using Zenject.Internal;
 
 namespace Zenject
 {
-    [System.Diagnostics.DebuggerStepThrough]
     public class PrefabSingletonProviderCreator
     {
-        readonly SingletonRegistry _singletonRegistry;
-        readonly Dictionary<PrefabSingletonId, PrefabSingletonLazyCreator> _creators = new Dictionary<PrefabSingletonId, PrefabSingletonLazyCreator>();
+        readonly SingletonMarkRegistry _markRegistry;
         readonly DiContainer _container;
-        readonly Dictionary<SingletonId, PrefabMarkInfo> _prefabMarks = new Dictionary<SingletonId, PrefabMarkInfo>();
+        readonly Dictionary<PrefabId, IPrefabInstantiator> _prefabCreators =
+            new Dictionary<PrefabId, IPrefabInstantiator>();
 
         public PrefabSingletonProviderCreator(
             DiContainer container,
-            SingletonRegistry singletonRegistry)
+            SingletonMarkRegistry markRegistry)
         {
-            _singletonRegistry = singletonRegistry;
+            _markRegistry = markRegistry;
             _container = container;
         }
 
-        // Need to do this to ensure that we don't use multiple different prefabs
-        // with the same singleton ID
-        public void MarkPrefab(SingletonId id, GameObject prefab)
+        public IProvider CreateProvider(
+            GameObject prefab, Type resultType, string gameObjectName,
+            List<TypeValuePair> extraArguments, string concreteIdentifier)
         {
-            PrefabMarkInfo markInfo;
+            IPrefabInstantiator creator;
 
-            if (_prefabMarks.TryGetValue(id, out markInfo))
+            var prefabId = new PrefabId(concreteIdentifier, prefab);
+
+            _markRegistry.MarkSingleton(
+                resultType, concreteIdentifier, SingletonTypes.ToPrefab);
+
+            if (_prefabCreators.TryGetValue(prefabId, out creator))
             {
-                if (markInfo.Prefab != prefab)
-                {
-                    throw new ZenjectBindException(
-                        "Attempted to use multiple different prefabs with ToSinglePrefab using the same type/identifier: '{0}' / '{1}'"
-                        .Fmt(id.ConcreteType, id.ConcreteIdentifier));
-                }
+                // TODO: Check the arguments are the same?
+                Assert.That(creator.ExtraArguments.IsEmpty() && extraArguments.IsEmpty(),
+                    "Ambiguous creation parameters (arguments) when using ToPrefab with AsSingle");
+
+                Assert.IsEqual(creator.GameObjectName, gameObjectName,
+                    "Ambiguous creation parameters (gameObjectName) when using ToPrefab with AsSingle");
             }
             else
             {
-                markInfo = new PrefabMarkInfo()
+                creator = new PrefabInstantiatorCached(
+                    new PrefabInstantiator(
+                        _container, gameObjectName, extraArguments, prefab));
+
+                _prefabCreators.Add(prefabId, creator);
+            }
+
+            return new GetFromPrefabComponentProvider(resultType, creator);
+        }
+
+        class PrefabId : IEquatable<PrefabId>
+        {
+            public readonly string ConcreteIdentifier;
+            public readonly GameObject Prefab;
+
+            public PrefabId(string concreteIdentifier, GameObject prefab)
+            {
+                Assert.IsNotNull(prefab);
+
+                ConcreteIdentifier = concreteIdentifier;
+                Prefab = prefab;
+            }
+
+            public override int GetHashCode()
+            {
+                unchecked // Overflow is fine, just wrap
                 {
-                    Prefab = prefab,
-                };
-                _prefabMarks.Add(id, markInfo);
+                    int hash = 17;
+                    hash = hash * 29 + (this.ConcreteIdentifier == null ? 0 : this.ConcreteIdentifier.GetHashCode());
+                    hash = hash * 29 + (ZenUtilInternal.IsNull(this.Prefab) ? 0 : this.Prefab.GetHashCode());
+                    return hash;
+                }
             }
 
-            markInfo.RefCount += 1;
-        }
-
-        public void UnmarkPrefab(SingletonId id, GameObject prefab)
-        {
-            var markInfo = _prefabMarks[id];
-
-            Assert.IsEqual(markInfo.Prefab, prefab);
-
-            markInfo.RefCount -= 1;
-
-            if (markInfo.RefCount == 0)
+            public override bool Equals(object other)
             {
-                _prefabMarks.RemoveWithConfirm(id);
+                if (other is PrefabId)
+                {
+                    PrefabId otherId = (PrefabId)other;
+                    return otherId == this;
+                }
+                else
+                {
+                    return false;
+                }
             }
-        }
 
-        internal void RemoveCreator(PrefabSingletonId id)
-        {
-            bool success = _creators.Remove(id);
-            Assert.That(success);
-        }
-
-        PrefabSingletonLazyCreator AddCreator(PrefabSingletonId id)
-        {
-            PrefabSingletonLazyCreator creator;
-
-            if (!_creators.TryGetValue(id, out creator))
+            public bool Equals(PrefabId that)
             {
-                creator = new PrefabSingletonLazyCreator(_container, this, id);
-                _creators.Add(id, creator);
+                return this == that;
             }
 
-            return creator;
-        }
+            public static bool operator ==(PrefabId left, PrefabId right)
+            {
+                return object.Equals(left.Prefab, right.Prefab) && object.Equals(left.ConcreteIdentifier, right.ConcreteIdentifier);
+            }
 
-        public PrefabSingletonProvider CreateProvider(
-            string concreteIdentifier, Type concreteType, GameObject prefab)
-        {
-            var id = new PrefabSingletonId(concreteIdentifier, prefab);
-            var creator = AddCreator(id);
-
-            return new PrefabSingletonProvider(
-                id, concreteType, creator, _singletonRegistry, this);
-        }
-
-        class PrefabMarkInfo
-        {
-            public GameObject Prefab;
-            public int RefCount;
+            public static bool operator !=(PrefabId left, PrefabId right)
+            {
+                return !left.Equals(right);
+            }
         }
     }
 }
+
 #endif

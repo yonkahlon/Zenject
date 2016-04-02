@@ -8,7 +8,7 @@ using ModestTree;
 using Assert=ModestTree.Assert;
 using ModestTree.Util;
 
-namespace Zenject.Tests
+namespace Zenject.Tests.Other
 {
     [TestFixture]
     public class TestTaskUpdater
@@ -20,12 +20,12 @@ namespace Zenject.Tests
         {
             _container = new DiContainer();
 
-            _container.Bind<TaskUpdater<ITickable>>().ToSingleInstance(new TickablesTaskUpdater());
+            _container.Bind<TaskUpdater<ITickable>>().ToInstance(new TickablesTaskUpdater());
         }
 
         public void BindTickable<TTickable>(int priority) where TTickable : ITickable
         {
-            _container.Bind<ITickable>().ToSingle<TTickable>();
+            _container.Bind<ITickable>().To<TTickable>().AsSingle();
             _container.Bind<ModestTree.Util.Tuple<Type, int>>().ToInstance(ModestTree.Util.Tuple.New(typeof(TTickable), priority));
         }
 
@@ -40,9 +40,9 @@ namespace Zenject.Tests
         // Test that tickables get called in the correct order
         public void TestOrder()
         {
-            _container.Bind<Tickable1>().ToSingle();
-            _container.Bind<Tickable2>().ToSingle();
-            _container.Bind<Tickable3>().ToSingle();
+            _container.Bind<Tickable1>().ToSelf().AsSingle();
+            _container.Bind<Tickable2>().ToSelf().AsSingle();
+            _container.Bind<Tickable3>().ToSelf().AsSingle();
 
             BindTickable<Tickable3>(2);
             BindTickable<Tickable1>(0);

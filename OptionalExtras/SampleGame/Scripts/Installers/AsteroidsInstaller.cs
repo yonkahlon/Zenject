@@ -39,7 +39,7 @@ namespace Asteroids
 
         void InstallAsteroids()
         {
-            Container.Bind<LevelHelper>().ToSingle();
+            Container.Bind<LevelHelper>().ToSelf().AsSingle();
 
             // ITickable, IFixedTickable, IInitializable and IDisposable are special Zenject interfaces.
             // Binding a class to any of these interfaces creates an instance of the class at startup.
@@ -50,13 +50,13 @@ namespace Asteroids
             // Binding to IDisposable means that Dispose() will be called when the app closes, the scene changes,
             // or the composition root object is destroyed.
 
-            // Any time you use ToSingle<>, what that means is that the DiContainer will only ever instantiate
-            // one instance of the type given inside the ToSingle<>. So in this case, any classes that take ITickable,
+            // Any time you use To<Foo>().AsSingle, what that means is that the DiContainer will only ever instantiate
+            // one instance of the type given inside the To<> (in this example, Foo). So in this case, any classes that take ITickable,
             // IFixedTickable, or AsteroidManager as inputs will receive the same instance of AsteroidManager.
             // We create multiple bindings for ITickable, so any dependencies that reference this type must be lists of ITickable.
-            Container.Bind<ITickable>().ToSingle<AsteroidManager>();
-            Container.Bind<IFixedTickable>().ToSingle<AsteroidManager>();
-            Container.Bind<AsteroidManager>().ToSingle();
+            Container.Bind<ITickable>().To<AsteroidManager>().AsSingle();
+            Container.Bind<IFixedTickable>().To<AsteroidManager>().AsSingle();
+            Container.Bind<AsteroidManager>().ToSelf().AsSingle();
 
             // Here, we're defining a generic factory to create asteroid objects using the given prefab
             // There's several different ways of instantiating new game objects in zenject, this is
@@ -65,36 +65,38 @@ namespace Asteroids
             // or constructor parameter of type Asteroid.Factory, then call create on that
             // The extra string parameter here is optional, but if provided will group the dynamically created
             // game objects underneath a new game object named Asteroids
-            Container.BindMonoBehaviourFactory<Asteroid.Factory>(_settings.Asteroid.Prefab, "Asteroids");
+            Container.BindFactory<Asteroid, Asteroid.Factory>()
+                .ToPrefabSelf(_settings.Asteroid.Prefab, "Asteroids");
 
-            Container.Bind<IInitializable>().ToSingle<GameController>();
-            Container.Bind<ITickable>().ToSingle<GameController>();
-            Container.Bind<GameController>().ToSingle();
+            Container.Bind<IInitializable>().To<GameController>().AsSingle();
+            Container.Bind<ITickable>().To<GameController>().AsSingle();
+            Container.Bind<GameController>().ToSelf().AsSingle();
 
-            Container.Bind<ShipStateFactory>().ToSingle();
+            Container.Bind<ShipStateFactory>().ToSelf().AsSingle();
 
             // Here's another way to create game objects dynamically, by using ToTransientPrefab
             // We prefer to use ITickable / IInitializable in favour of the Monobehaviour methods
             // so we just use a monobehaviour wrapper class here to pass in asset data
-            Container.Bind<ShipHooks>().ToTransientPrefab<ShipHooks>(_settings.Ship.Prefab).WhenInjectedInto<Ship>();
+            Container.Bind<ShipHooks>().ToPrefab<ShipHooks>(_settings.Ship.Prefab)
+                .AsTransient().WhenInjectedInto<Ship>();
 
             // In this game there is only one camera so an enum isn't necessary
             // but used here to show how it would work if there were multiple
-            Container.Bind<Camera>("Main").ToSingleInstance(_settings.MainCamera);
+            Container.Bind<Camera>("Main").ToInstance(_settings.MainCamera);
 
-            Container.Bind<Ship>().ToSingle();
-            Container.Bind<ITickable>().ToSingle<Ship>();
-            Container.Bind<IInitializable>().ToSingle<Ship>();
+            Container.Bind<Ship>().ToSelf().AsSingle();
+            Container.Bind<ITickable>().To<Ship>().AsSingle();
+            Container.Bind<IInitializable>().To<Ship>().AsSingle();
         }
 
         void InstallSettings()
         {
-            Container.Bind<ShipStateMoving.Settings>().ToSingleInstance(_settings.Ship.StateMoving);
-            Container.Bind<ShipStateDead.Settings>().ToSingleInstance(_settings.Ship.StateDead);
-            Container.Bind<ShipStateWaitingToStart.Settings>().ToSingleInstance(_settings.Ship.StateStarting);
+            Container.Bind<ShipStateMoving.Settings>().ToInstance(_settings.Ship.StateMoving);
+            Container.Bind<ShipStateDead.Settings>().ToInstance(_settings.Ship.StateDead);
+            Container.Bind<ShipStateWaitingToStart.Settings>().ToInstance(_settings.Ship.StateStarting);
 
-            Container.Bind<AsteroidManager.Settings>().ToSingleInstance(_settings.Asteroid.Spawner);
-            Container.Bind<Asteroid.Settings>().ToSingleInstance(_settings.Asteroid.General);
+            Container.Bind<AsteroidManager.Settings>().ToInstance(_settings.Asteroid.Spawner);
+            Container.Bind<Asteroid.Settings>().ToInstance(_settings.Asteroid.General);
         }
 
         // We don't need to include these bindings but often its nice to have
@@ -102,12 +104,15 @@ namespace Asteroids
         void InitExecutionOrder()
         {
             Container.Install<ExecutionOrderInstaller>(
-                new List<Type>()
+                new object[]
                 {
-                    // Re-arrange this list to control update order
-                    // These classes will be initialized and updated in this order and disposed of in reverse order
-                    typeof(AsteroidManager),
-                    typeof(GameController),
+                    new List<Type>()
+                    {
+                        // Re-arrange this list to control update order
+                        // These classes will be initialized and updated in this order and disposed of in reverse order
+                        typeof(AsteroidManager),
+                        typeof(GameController),
+                    }
                 });
         }
 

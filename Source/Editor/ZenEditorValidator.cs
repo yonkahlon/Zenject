@@ -54,7 +54,7 @@ namespace Zenject
 
         public static void ValidateScenesFromScript()
         {
-            var sceneNames = UnityEditorUtil.GetArgument("scenes").Split(',');
+            var sceneNames = UnityCustomCommandLineHandler.GetArgument("scenes").Split(',');
 
             Assert.That(sceneNames.Length > 0);
 
@@ -113,17 +113,17 @@ namespace Zenject
             }
         }
 
-        static List<ZenjectResolveException> ValidateDecoratorCompRoot(SceneDecoratorCompositionRoot decoratorCompRoot, int maxErrors)
+        static List<ZenjectException> ValidateDecoratorCompRoot(SceneDecoratorCompositionRoot decoratorCompRoot, int maxErrors)
         {
             var sceneName = decoratorCompRoot.SceneName;
             var scenePath = UnityEditorUtil.GetScenePath(sceneName);
 
             if (scenePath == null)
             {
-                return new List<ZenjectResolveException>()
+                return new List<ZenjectException>()
                 {
-                    new ZenjectResolveException(
-                        "Could not find scene path for decorated scene '{0}'".Fmt(sceneName)),
+                    new ZenjectException(
+                        "Could not find scene path for decorated scene '{0}'", sceneName),
                 };
             }
 
@@ -172,10 +172,10 @@ namespace Zenject
                     return ValidateDecoratorCompRoot(newDecoratorCompRoot, maxErrors);
                 }
 
-                return new List<ZenjectResolveException>()
+                return new List<ZenjectException>()
                 {
-                    new ZenjectResolveException(
-                        "Could not find composition root for decorated scene '{0}'".Fmt(sceneName)),
+                    new ZenjectException(
+                        "Could not find composition root for decorated scene '{0}'", sceneName),
                 };
             }
             finally
@@ -214,7 +214,7 @@ namespace Zenject
             return true;
         }
 
-        static List<ZenjectResolveException> GetCurrentSceneValidationErrors(int maxErrors)
+        static List<ZenjectException> GetCurrentSceneValidationErrors(int maxErrors)
         {
             var compRoot = GameObject.FindObjectsOfType<SceneCompositionRoot>().OnlyOrDefault();
 
@@ -230,13 +230,13 @@ namespace Zenject
                 return ValidateDecoratorCompRoot(decoratorCompRoot, maxErrors);
             }
 
-            return new List<ZenjectResolveException>()
+            return new List<ZenjectException>()
             {
-                new ZenjectResolveException("Unable to find unique composition root in current scene"),
+                new ZenjectException("Unable to find unique composition root in current scene"),
             };
         }
 
-        public static List<ZenjectResolveException> ValidateScene(SceneCompositionRoot compRoot, int maxErrors)
+        public static List<ZenjectException> ValidateScene(SceneCompositionRoot compRoot, int maxErrors)
         {
             GlobalCompositionRoot globalCompRoot = null;
 

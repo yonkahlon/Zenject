@@ -65,7 +65,7 @@ namespace ModestTree
         // an installer instead of the EnemyFacade class itself
         // It's done this way because in some cases we want to add the arguments
         // to the container for use by other classes within the facade
-        public class Factory : MonoFacadeFactory<EnemyTunables, EnemyFacade>
+        public class Factory : Factory<EnemyTunables, EnemyFacade>
         {
         }
     }

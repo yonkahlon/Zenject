@@ -29,7 +29,7 @@ namespace Zenject.Commands
                 }
             }
 
-            public virtual void Fire()
+            public void Fire()
             {
                 _signal.Event();
             }
@@ -54,7 +54,7 @@ namespace Zenject.Commands
                 }
             }
 
-            public virtual void Fire(TParam1 arg1)
+            public void Fire(TParam1 arg1)
             {
                 _signal.Event(arg1);
             }
@@ -79,7 +79,7 @@ namespace Zenject.Commands
                 }
             }
 
-            public virtual void Fire(TParam1 arg1, TParam2 arg2)
+            public void Fire(TParam1 arg1, TParam2 arg2)
             {
                 _signal.Event(arg1, arg2);
             }
@@ -104,7 +104,7 @@ namespace Zenject.Commands
                 }
             }
 
-            public virtual void Fire(TParam1 arg1, TParam2 arg2, TParam3 arg3)
+            public void Fire(TParam1 arg1, TParam2 arg2, TParam3 arg3)
             {
                 _signal.Event(arg1, arg2, arg3);
             }
@@ -129,7 +129,7 @@ namespace Zenject.Commands
                 }
             }
 
-            public virtual void Fire(TParam1 arg1, TParam2 arg2, TParam3 arg3, TParam4 arg4)
+            public void Fire(TParam1 arg1, TParam2 arg2, TParam3 arg3, TParam4 arg4)
             {
                 _signal.Event(arg1, arg2, arg3, arg4);
             }
@@ -154,7 +154,7 @@ namespace Zenject.Commands
                 }
             }
 
-            public virtual void Fire(TParam1 arg1, TParam2 arg2, TParam3 arg3, TParam4 arg4, TParam5 arg5)
+            public void Fire(TParam1 arg1, TParam2 arg2, TParam3 arg3, TParam4 arg4, TParam5 arg5)
             {
                 _signal.Event(arg1, arg2, arg3, arg4, arg5);
             }
@@ -179,7 +179,7 @@ namespace Zenject.Commands
                 }
             }
 
-            public virtual void Fire(TParam1 arg1, TParam2 arg2, TParam3 arg3, TParam4 arg4, TParam5 arg5, TParam6 arg6)
+            public void Fire(TParam1 arg1, TParam2 arg2, TParam3 arg3, TParam4 arg4, TParam5 arg5, TParam6 arg6)
             {
                 _signal.Event(arg1, arg2, arg3, arg4, arg5, arg6);
             }

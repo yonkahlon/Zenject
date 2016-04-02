@@ -14,17 +14,17 @@ namespace ModestTree
         {
             Container.BindInstance(_settings.Rigidbody).WhenInjectedInto<PlayerModel>();
             Container.BindInstance(_settings.MeshRenderer).WhenInjectedInto<PlayerModel>();
-            Container.Bind<PlayerModel>().ToSingle();
+            Container.Bind<PlayerModel>().ToSelf().AsSingle();
 
-            Container.BindAllInterfaces<PlayerInputHandler>().ToSingle<PlayerInputHandler>();
-            Container.BindAllInterfaces<PlayerMoveHandler>().ToSingle<PlayerMoveHandler>();
-            Container.BindAllInterfaces<PlayerBulletHitHandler>().ToSingle<PlayerBulletHitHandler>();
-            Container.BindAllInterfaces<PlayerDirectionHandler>().ToSingle<PlayerDirectionHandler>();
-            Container.BindAllInterfaces<PlayerShootHandler>().ToSingle<PlayerShootHandler>();
+            Container.BindAllInterfaces<PlayerInputHandler>().To<PlayerInputHandler>().AsSingle();
+            Container.BindAllInterfaces<PlayerMoveHandler>().To<PlayerMoveHandler>().AsSingle();
+            Container.BindAllInterfaces<PlayerBulletHitHandler>().To<PlayerBulletHitHandler>().AsSingle();
+            Container.BindAllInterfaces<PlayerDirectionHandler>().To<PlayerDirectionHandler>().AsSingle();
+            Container.BindAllInterfaces<PlayerShootHandler>().To<PlayerShootHandler>().AsSingle();
 
-            Container.Bind<PlayerInputState>().ToSingle();
+            Container.Bind<PlayerInputState>().ToSelf().AsSingle();
 
-            Container.BindAllInterfaces<PlayerHealthWatcher>().ToSingle<PlayerHealthWatcher>();
+            Container.BindAllInterfaces<PlayerHealthWatcher>().To<PlayerHealthWatcher>().AsSingle();
 
             Container.BindSignal<PlayerSignals.Hit>();
             Container.BindTrigger<PlayerSignals.Hit.Trigger>();

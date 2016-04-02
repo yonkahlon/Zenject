@@ -6,7 +6,7 @@ using System.Linq;
 using ModestTree;
 using Assert=ModestTree.Assert;
 
-namespace Zenject.Tests
+namespace Zenject.Tests.Injection
 {
     [TestFixture]
     public class TestTestOptional : TestWithContainer
@@ -36,20 +36,20 @@ namespace Zenject.Tests
         [Test]
         public void TestFieldRequired()
         {
-            Container.Bind<Test2>().ToSingle();
+            Container.Bind<Test2>().ToSelf().AsSingle();
 
             Assert.That(Container.ValidateResolve<Test2>().Any());
 
             AssertValidationFails();
 
-            Assert.Throws<ZenjectResolveException>(
+            Assert.Throws(
                 delegate { Container.Resolve<Test2>(); });
         }
 
         [Test]
         public void TestFieldOptional()
         {
-            Container.Bind<Test3>().ToSingle();
+            Container.Bind<Test3>().ToSelf().AsSingle();
 
             AssertValidates();
 
@@ -61,7 +61,7 @@ namespace Zenject.Tests
         [Test]
         public void TestFieldOptional2()
         {
-            Container.Bind<Test3>().ToSingle();
+            Container.Bind<Test3>().ToSelf().AsSingle();
 
             var test1 = new Test1();
             Container.Bind<Test1>().ToInstance(test1);
@@ -75,7 +75,7 @@ namespace Zenject.Tests
         [Test]
         public void TestFieldOptional3()
         {
-            Container.Bind<Test0>().ToTransient();
+            Container.Bind<Test0>().ToSelf().AsTransient();
 
             AssertValidates();
 
@@ -111,11 +111,11 @@ namespace Zenject.Tests
         [Test]
         public void TestParameterRequired()
         {
-            Container.Bind<Test4>().ToSingle();
+            Container.Bind<Test4>().ToSelf().AsSingle();
 
             AssertValidationFails();
 
-            Assert.Throws<ZenjectResolveException>(
+            Assert.Throws(
                 delegate { Container.Resolve<Test4>(); });
 
             Assert.That(Container.ValidateResolve<Test2>().Any());
@@ -124,7 +124,7 @@ namespace Zenject.Tests
         [Test]
         public void TestParameterOptional()
         {
-            Container.Bind<Test5>().ToSingle();
+            Container.Bind<Test5>().ToSelf().AsSingle();
 
             AssertValidates();
 
@@ -143,14 +143,14 @@ namespace Zenject.Tests
         [Test]
         public void TestChildDependencyOptional()
         {
-            Container.Bind<Test6>().ToSingle();
-            Container.Bind<Test2>().ToSingle();
+            Container.Bind<Test6>().ToSelf().AsSingle();
+            Container.Bind<Test2>().ToSelf().AsSingle();
 
             Assert.That(Container.ValidateResolve<Test6>().Any());
 
             AssertValidationFails();
 
-            Assert.Throws<ZenjectResolveException>(
+            Assert.Throws(
                 delegate { Container.Resolve<Test6>(); });
         }
 
@@ -169,7 +169,7 @@ namespace Zenject.Tests
         [Test]
         public void TestPrimitiveParamOptionalUsesDefault()
         {
-            Container.Bind<Test7>().ToSingle();
+            Container.Bind<Test7>().ToSelf().AsSingle();
 
             Assert.That(Container.ValidateResolve<Test7>().IsEmpty());
 
@@ -193,7 +193,7 @@ namespace Zenject.Tests
         [Test]
         public void TestPrimitiveParamOptionalUsesExplicitDefault()
         {
-            Container.Bind<Test8>().ToSingle();
+            Container.Bind<Test8>().ToSelf().AsSingle();
 
             AssertValidates();
 
@@ -214,7 +214,7 @@ namespace Zenject.Tests
         [Test]
         public void TestPrimitiveParamOptionalUsesExplicitDefault2()
         {
-            Container.Bind<Test8_2>().ToSingle();
+            Container.Bind<Test8_2>().ToSelf().AsSingle();
 
             AssertValidates();
 
@@ -237,7 +237,7 @@ namespace Zenject.Tests
         [Test]
         public void TestPrimitiveParamOptionalNullable()
         {
-            Container.Bind<Test9>().ToSingle();
+            Container.Bind<Test9>().ToSelf().AsSingle();
 
             AssertValidates();
 

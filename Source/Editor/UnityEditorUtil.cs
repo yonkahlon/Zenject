@@ -9,32 +9,40 @@ namespace ModestTree.Util
 {
     public static class UnityEditorUtil
     {
-        const string ArgPrefix = "-CustomArg:";
-
-        static Dictionary<string, string> _customArgs;
-
-        // Returns the best guess directory in projects pane
-        // Useful when adding to Assets -> Create context menu
-        // Returns null if it can't find one
-        // Note that the path is relative to the Assets folder for use in AssetDatabase.GenerateUniqueAssetPath etc.
-        public static string TryGetCurrentDirectoryInProjectsTab()
+        // Note that the path is relative to the Assets folder
+        public static List<string> TryGetSelectedFolderPathsInProjectsTab()
         {
-            foreach (var item in Selection.objects)
+            var result = new List<string>();
+
+            UnityEngine.Object[] selectedAssets = Selection.GetFiltered(
+                typeof(UnityEngine.Object), SelectionMode.Assets);
+
+            foreach (var item in selectedAssets)
             {
                 var relativePath = AssetDatabase.GetAssetPath(item);
 
                 if (!string.IsNullOrEmpty(relativePath))
                 {
-                    var fullPath = Path.GetFullPath(Path.Combine(Application.dataPath, Path.Combine("..", relativePath)));
+                    var fullPath = Path.GetFullPath(Path.Combine(
+                        Application.dataPath, Path.Combine("..", relativePath)));
 
                     if (Directory.Exists(fullPath))
                     {
-                        return relativePath;
+                        result.Add(relativePath);
                     }
                 }
             }
 
-            return null;
+            return result;
+        }
+
+        // Returns the best guess directory in projects pane
+        // Useful when adding to Assets -> Create context menu
+        // Returns null if it can't find one
+        // Note that the path is relative to the Assets folder for use in AssetDatabase.GenerateUniqueAssetPath etc.
+        public static string TryGetSelectedFolderPathInProjectsTab()
+        {
+            return TryGetSelectedFolderPathsInProjectsTab().OnlyOrDefault();
         }
 
         public static string GetScenePath(string sceneName)
@@ -65,50 +73,6 @@ namespace ModestTree.Util
         {
             return UnityEditor.EditorBuildSettings.scenes.Where(x => x.enabled)
                 .Select(x => x.path).ToList();
-        }
-
-        static void LazyInitArgs()
-        {
-            if (_customArgs != null)
-            {
-                return;
-            }
-
-            _customArgs = new Dictionary<string, string>();
-
-            string[] args = Environment.GetCommandLineArgs();
-
-            foreach (var arg in args)
-            {
-                if (!arg.StartsWith(ArgPrefix))
-                {
-                    continue;
-                }
-
-                var assignStr = arg.Substring(ArgPrefix.Length);
-
-                var equalsPos = assignStr.IndexOf("=");
-
-                if (equalsPos == -1)
-                {
-                    continue;
-                }
-
-                var name = assignStr.Substring(0, equalsPos).Trim();
-                var value = assignStr.Substring(equalsPos + 1).Trim();
-
-                if (name.Length > 0 && value.Length > 0)
-                {
-                    _customArgs[name] = value;
-                }
-            }
-        }
-
-        public static string GetArgument(string name)
-        {
-            LazyInitArgs();
-            Assert.That(_customArgs.ContainsKey(name), "Could not find custom command line argument '{0}'", name);
-            return _customArgs[name];
         }
     }
 }

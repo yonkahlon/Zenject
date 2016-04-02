@@ -15,7 +15,7 @@ namespace ModestTree
         public override void InstallBindings()
         {
             Container.BindInstance(_settings.MainCamera).WhenInjectedInto<CameraHandler>();
-            Container.BindAllInterfaces<CameraHandler>().ToSingle<CameraHandler>();
+            Container.BindAllInterfaces<CameraHandler>().To<CameraHandler>().AsSingle();
 
             Container.BindSignal<PlayerKilledSignal>();
             Container.BindTrigger<PlayerKilledSignal.Trigger>();
@@ -23,30 +23,25 @@ namespace ModestTree
             Container.BindSignal<EnemyKilledSignal>();
             Container.BindTrigger<EnemyKilledSignal.Trigger>();
 
-            Container.BindAllInterfaces<EnemySpawner>().ToSingle<EnemySpawner>();
+            Container.BindAllInterfaces<EnemySpawner>().To<EnemySpawner>().AsSingle();
 
             // We provide the installer here so that Zenject knows where to inject the arguments into
-            Container.BindMonoFacadeFactory<EnemyInstaller, EnemyFacade.Factory>(_settings.EnemyFacadePrefab, "Enemies");
+            throw Assert.CreateException("TODO");
+            //Container.BindFacadeFactory<EnemyInstaller, EnemyFacade.Factory>(_settings.EnemyFacadePrefab, "Enemies");
 
-            Container.BindAllInterfaces<GameDifficultyHandler>().ToSingle<GameDifficultyHandler>();
+            Container.BindAllInterfaces<GameDifficultyHandler>().To<GameDifficultyHandler>().AsSingle();
 
-            Container.Bind<EnemyRegistry>().ToSingle();
+            Container.Bind<EnemyRegistry>().ToSelf().AsSingle();
 
-            Container.BindMonoBehaviourFactory<Bullet.Factory>(
-                _settings.BulletPrefab, "Bullets",
-                // We use FactoryCreateContainers.RuntimeContainer instead of the default
-                // (FactoryCreateContainers.BindContainer) so that the bullets get created as root game
-                // objects.  Otherwise, our bullets would be created inside the enemy and player facade
-                // composition roots.  In that case, if an enemy was destroyed then its bullets would
-                // also be destroyed which is not what we want
-                ContainerTypes.BindContainer);
+            Container.BindFactory<float, float, BulletTypes, Bullet, Bullet.Factory>()
+                .ToPrefabSelf(_settings.BulletPrefab, "Bullets");
 
-            Container.BindMonoBehaviourFactory<Explosion.Factory>(
-                _settings.ExplosionPrefab, "Explosions", ContainerTypes.BindContainer);
+            Container.BindFactory<Explosion, Explosion.Factory>()
+                .ToPrefabSelf(_settings.ExplosionPrefab, "Explosions");
 
-            Container.Bind<AudioPlayer>().ToSingle();
+            Container.Bind<AudioPlayer>().ToSelf().AsSingle();
 
-            Container.BindAllInterfaces<GameRestartHandler>().ToSingle<GameRestartHandler>();
+            Container.BindAllInterfaces<GameRestartHandler>().To<GameRestartHandler>().AsSingle();
 
             InstallSettings();
         }

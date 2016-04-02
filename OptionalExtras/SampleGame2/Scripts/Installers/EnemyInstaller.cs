@@ -23,21 +23,21 @@ namespace ModestTree
             Container.BindInstance(_settings.Collider).WhenInjectedInto<EnemyModel>();
             Container.BindInstance(_settings.Renderer).WhenInjectedInto<EnemyModel>();
 
-            Container.Bind<EnemyModel>().ToSingle();
+            Container.Bind<EnemyModel>().ToSelf().AsSingle();
 
-            Container.BindAllInterfaces<EnemyCollisionHandler>().ToSingle<EnemyCollisionHandler>();
+            Container.BindAllInterfaces<EnemyCollisionHandler>().To<EnemyCollisionHandler>().AsSingle();
 
-            Container.BindAllInterfacesAndSelf<EnemyStateManager>().ToSingle<EnemyStateManager>();
+            Container.BindAllInterfacesAndSelf<EnemyStateManager>().To<EnemyStateManager>().AsSingle();
 
-            Container.Bind<EnemyStateFactory>().ToSingle();
+            Container.Bind<EnemyStateFactory>().ToSelf().AsSingle();
 
-            Container.BindAllInterfaces<EnemyHealthWatcher>().ToSingle<EnemyHealthWatcher>();
+            Container.BindAllInterfaces<EnemyHealthWatcher>().To<EnemyHealthWatcher>().AsSingle();
 
             Container.BindSignal<EnemySignals.Hit>();
             Container.BindTrigger<EnemySignals.Hit.Trigger>();
 
-            Container.BindAllInterfaces<EnemyStateCommon>().ToSingle<EnemyStateCommon>();
-            Container.BindAllInterfaces<EnemyRotationHandler>().ToSingle<EnemyRotationHandler>();
+            Container.BindAllInterfaces<EnemyStateCommon>().To<EnemyStateCommon>().AsSingle();
+            Container.BindAllInterfaces<EnemyRotationHandler>().To<EnemyRotationHandler>().AsSingle();
 
             InstallSettings();
         }

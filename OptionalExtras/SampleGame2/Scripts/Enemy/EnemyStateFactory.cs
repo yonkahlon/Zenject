@@ -52,7 +52,7 @@ namespace ModestTree
         // If we were using a factory then we wouldn't need to do this
         // However, since we are instantiating these classes directly
         // we need to (if we care enough about validating the state classes)
-        public IEnumerable<ZenjectResolveException> Validate()
+        public IEnumerable<ZenjectException> Validate()
         {
             return _container.ValidateObjectGraph<EnemyStateIdle>()
                 .Concat(_container.ValidateObjectGraph<EnemyStateRunAway>())

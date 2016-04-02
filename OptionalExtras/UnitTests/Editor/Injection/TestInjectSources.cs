@@ -6,7 +6,7 @@ using ModestTree;
 using Assert=ModestTree.Assert;
 using System.Linq;
 
-namespace Zenject.Tests
+namespace Zenject.Tests.Injection
 {
     [TestFixture]
     public class TestInjectSources
@@ -69,8 +69,8 @@ namespace Zenject.Tests
             var rootContainer = new DiContainer();
             var sub1 = rootContainer.CreateSubContainer();
 
-            rootContainer.Bind<Test0>().ToSingle();
-            sub1.Bind<Test4>().ToSingle();
+            rootContainer.Bind<Test0>().ToSelf().AsSingle();
+            sub1.Bind<Test4>().ToSelf().AsSingle();
 
             Assert.IsNotNull(sub1.Resolve<Test4>());
             Assert.That(sub1.ValidateResolve<Test4>().IsEmpty());
@@ -82,10 +82,10 @@ namespace Zenject.Tests
             var rootContainer = new DiContainer();
             var sub1 = rootContainer.CreateSubContainer();
 
-            rootContainer.Bind<Test0>().ToSingle();
-            sub1.Bind<Test1>().ToSingle();
+            rootContainer.Bind<Test0>().ToSelf().AsSingle();
+            sub1.Bind<Test1>().ToSelf().AsSingle();
 
-            Assert.Throws<ZenjectResolveException>(() => sub1.Resolve<Test1>());
+            Assert.Throws(() => sub1.Resolve<Test1>());
             Assert.That(sub1.ValidateResolve<Test1>().Any());
         }
 
@@ -95,8 +95,8 @@ namespace Zenject.Tests
             var rootContainer = new DiContainer();
             var sub1 = rootContainer.CreateSubContainer();
 
-            sub1.Bind<Test0>().ToSingle();
-            sub1.Bind<Test1>().ToSingle();
+            sub1.Bind<Test0>().ToSelf().AsSingle();
+            sub1.Bind<Test1>().ToSelf().AsSingle();
 
             Assert.IsNotNull(sub1.Resolve<Test1>());
             Assert.That(sub1.ValidateResolve<Test1>().IsEmpty());
@@ -108,8 +108,8 @@ namespace Zenject.Tests
             var rootContainer = new DiContainer();
             var sub1 = rootContainer.CreateSubContainer();
 
-            rootContainer.Bind<Test0>().ToSingle();
-            sub1.Bind<Test2>().ToSingle();
+            rootContainer.Bind<Test0>().ToSelf().AsSingle();
+            sub1.Bind<Test2>().ToSelf().AsSingle();
 
             Assert.IsNotNull(sub1.Resolve<Test2>());
             Assert.That(sub1.ValidateResolve<Test2>().IsEmpty());
@@ -122,10 +122,10 @@ namespace Zenject.Tests
             var sub1 = rootContainer.CreateSubContainer();
             var sub2 = sub1.CreateSubContainer();
 
-            rootContainer.Bind<Test0>().ToSingle();
-            sub2.Bind<Test2>().ToSingle();
+            rootContainer.Bind<Test0>().ToSelf().AsSingle();
+            sub2.Bind<Test2>().ToSelf().AsSingle();
 
-            Assert.Throws<ZenjectResolveException>(() => sub2.Resolve<Test2>());
+            Assert.Throws(() => sub2.Resolve<Test2>());
             Assert.That(sub2.ValidateResolve<Test2>().Any());
         }
 
@@ -134,10 +134,10 @@ namespace Zenject.Tests
         {
             var rootContainer = new DiContainer();
 
-            rootContainer.Bind<Test0>().ToSingle();
-            rootContainer.Bind<Test2>().ToSingle();
+            rootContainer.Bind<Test0>().ToSelf().AsSingle();
+            rootContainer.Bind<Test2>().ToSelf().AsSingle();
 
-            Assert.Throws<ZenjectResolveException>(() => rootContainer.Resolve<Test2>());
+            Assert.Throws(() => rootContainer.Resolve<Test2>());
             Assert.That(rootContainer.ValidateResolve<Test2>().Any());
         }
 
@@ -148,8 +148,8 @@ namespace Zenject.Tests
             var sub1 = rootContainer.CreateSubContainer();
             var sub2 = sub1.CreateSubContainer();
 
-            rootContainer.Bind<Test0>().ToSingle();
-            sub2.Bind<Test3>().ToSingle();
+            rootContainer.Bind<Test0>().ToSelf().AsSingle();
+            sub2.Bind<Test3>().ToSelf().AsSingle();
 
             Assert.IsNotNull(sub2.Resolve<Test3>());
             Assert.That(sub2.ValidateResolve<Test3>().IsEmpty());
