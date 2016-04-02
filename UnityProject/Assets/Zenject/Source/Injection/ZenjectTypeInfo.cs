@@ -45,7 +45,7 @@ namespace Zenject
             _typeAnalyzed = typeAnalyzed;
         }
 
-        public Type TypeAnalyzed
+        public Type Type
         {
             get
             {

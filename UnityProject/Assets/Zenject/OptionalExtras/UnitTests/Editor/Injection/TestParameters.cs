@@ -6,7 +6,7 @@ using System.Linq;
 using ModestTree;
 using Assert=ModestTree.Assert;
 
-namespace Zenject.Tests
+namespace Zenject.Tests.Injection
 {
     [TestFixture]
     public class TestParameters : TestWithContainer
@@ -26,12 +26,12 @@ namespace Zenject.Tests
         [Test]
         public void TestExtraParametersSameType()
         {
-            var test1 = Container.Instantiate<Test1>(5, 10);
+            var test1 = Container.Instantiate<Test1>(new object[] { 5, 10 });
 
             Assert.That(test1 != null);
             Assert.That(test1.f1 == 5 && test1.f2 == 10);
 
-            var test2 = Container.Instantiate<Test1>(10, 5);
+            var test2 = Container.Instantiate<Test1>(new object[] { 10, 5 });
 
             Assert.That(test2 != null);
             Assert.That(test2.f1 == 10 && test2.f2 == 5);
@@ -40,11 +40,11 @@ namespace Zenject.Tests
         [Test]
         public void TestMissingParameterThrows()
         {
-            Container.Bind<Test1>().ToTransient();
+            Container.Bind<Test1>().ToSelf().AsTransient();
 
             AssertValidationFails();
 
-            Assert.Throws<ZenjectResolveException>(
+            Assert.Throws(
                 delegate { Container.Resolve<Test1>(); });
 
             Assert.That(Container.ValidateResolve<Test1>().Any());

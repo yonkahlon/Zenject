@@ -5,7 +5,7 @@ using NUnit.Framework;
 using ModestTree;
 using Assert=ModestTree.Assert;
 
-namespace Zenject.Tests
+namespace Zenject.Tests.Injection
 {
     [TestFixture]
     public class TestConstructorInjectionOptional : TestWithContainer
@@ -37,7 +37,7 @@ namespace Zenject.Tests
         [Test]
         public void TestCase1()
         {
-            Container.Bind<Test2>().ToSingle();
+            Container.Bind<Test2>().ToSelf().AsSingle();
 
             AssertValidates();
 
@@ -48,10 +48,10 @@ namespace Zenject.Tests
         }
 
         [Test]
-        [ExpectedException(typeof(ZenjectResolveException))]
+        [ExpectedException]
         public void TestCase2()
         {
-            Container.Bind<Test3>().ToSingle();
+            Container.Bind<Test3>().ToSelf().AsSingle();
 
             var test1 = Container.Instantiate<Test3>();
 
@@ -61,7 +61,7 @@ namespace Zenject.Tests
         [Test]
         public void TestConstructByFactory()
         {
-            Container.Bind<Test2>().ToSingle();
+            Container.Bind<Test2>().ToSelf().AsSingle();
 
             var test1 = Container.Instantiate<Test2>();
 

@@ -10,12 +10,20 @@ using UnityEngine;
 
 namespace Zenject
 {
-    internal static class TypeAnalyzer
+    public static class TypeAnalyzer
     {
         static Dictionary<Type, ZenjectTypeInfo> _typeInfo = new Dictionary<Type, ZenjectTypeInfo>();
 
+        public static ZenjectTypeInfo GetInfo<T>()
+        {
+            return GetInfo(typeof(T));
+        }
+
         public static ZenjectTypeInfo GetInfo(Type type)
         {
+            Assert.That(!type.IsAbstract,
+                "Tried to analyze abstract type '{0}'", type.Name());
+
             ZenjectTypeInfo info;
 
 #if ZEN_MULTITHREADING

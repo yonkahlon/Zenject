@@ -5,7 +5,7 @@ using NUnit.Framework;
 using ModestTree;
 using Assert=ModestTree.Assert;
 
-namespace Zenject.Tests
+namespace Zenject.Tests.Injection
 {
     [TestFixture]
     public class TestNullableValues : TestWithContainer
@@ -23,7 +23,7 @@ namespace Zenject.Tests
         [Test]
         public void RunTest1()
         {
-            Container.Bind<Test2>().ToSingle();
+            Container.Bind<Test2>().ToSelf().AsSingle();
             Container.Bind<int>().ToInstance(1);
 
             AssertValidates();

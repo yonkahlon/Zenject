@@ -126,7 +126,7 @@ namespace Asteroids
             public float maxSpeed;
         }
 
-        public class Factory : MonoBehaviourFactory<Asteroid>
+        public class Factory : Factory<Asteroid>
         {
         }
     }

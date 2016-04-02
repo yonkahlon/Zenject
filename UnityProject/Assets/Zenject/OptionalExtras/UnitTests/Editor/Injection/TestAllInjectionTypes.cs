@@ -5,7 +5,7 @@ using NUnit.Framework;
 using ModestTree;
 using Assert=ModestTree.Assert;
 
-namespace Zenject.Tests
+namespace Zenject.Tests.Injection
 {
     [TestFixture]
     public class TestAllInjectionTypes : TestWithContainer
@@ -15,7 +15,7 @@ namespace Zenject.Tests
         public void TestCase1()
         {
             Container.Bind<Test0>().ToInstance(new Test0());
-            Container.Bind<IFoo>().ToSingle<FooDerived>();
+            Container.Bind<IFoo>().To<FooDerived>().AsSingle();
 
             AssertValidates();
 

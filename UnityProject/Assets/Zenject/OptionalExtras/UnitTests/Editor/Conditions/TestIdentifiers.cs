@@ -6,7 +6,7 @@ using System.Linq;
 using ModestTree;
 using Assert=ModestTree.Assert;
 
-namespace Zenject.Tests
+namespace Zenject.Tests.Conditions
 {
     [TestFixture]
     public class TestIdentifiers : TestWithContainer
@@ -18,11 +18,11 @@ namespace Zenject.Tests
         [Test]
         public void TestBasic()
         {
-            Container.Bind<Test0>("foo").ToTransient();
+            Container.Bind<Test0>("foo").ToSelf().AsTransient();
 
             AssertValidates();
 
-            Assert.Throws<ZenjectResolveException>(
+            Assert.Throws(
                 delegate { Container.Resolve<Test0>(); });
 
             Container.Resolve<Test0>("foo");
@@ -32,11 +32,11 @@ namespace Zenject.Tests
         [Test]
         public void TestBasic2()
         {
-            Container.Bind<Test0>("foo").ToSingle();
+            Container.Bind<Test0>("foo").ToSelf().AsSingle();
 
             AssertValidates();
 
-            Assert.Throws<ZenjectResolveException>(
+            Assert.Throws(
                 delegate { Container.Resolve<Test0>(); });
 
             Container.Resolve<Test0>("foo");
@@ -50,7 +50,7 @@ namespace Zenject.Tests
 
             AssertValidates();
 
-            Assert.Throws<ZenjectResolveException>(
+            Assert.Throws(
                 delegate { Container.Resolve<Test0>(); });
 
             Container.Resolve<Test0>("foo");
@@ -60,15 +60,15 @@ namespace Zenject.Tests
         [Test]
         public void TestBasic4()
         {
-            Container.Bind<Test0>("foo").ToTransient();
-            Container.Bind<Test0>("foo").ToTransient();
+            Container.Bind<Test0>("foo").ToSelf().AsTransient();
+            Container.Bind<Test0>("foo").ToSelf().AsTransient();
 
             AssertValidates();
 
-            Assert.Throws<ZenjectResolveException>(
+            Assert.Throws(
                 delegate { Container.Resolve<Test0>(); });
 
-            Assert.Throws<ZenjectResolveException>(
+            Assert.Throws(
                 delegate { Container.Resolve<Test0>("foo"); });
 
             Assert.IsEqual(Container.ResolveAll<Test0>("foo").Count, 2);

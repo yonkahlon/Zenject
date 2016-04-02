@@ -92,7 +92,7 @@ namespace Zenject
         [MenuItem("Assets/Create/Zenject/Global Composition Root")]
         public static void CreateGlobalCompositionRoot()
         {
-            var dir = UnityEditorUtil.TryGetCurrentDirectoryInProjectsTab();
+            var dir = UnityEditorUtil.TryGetSelectedFolderPathInProjectsTab();
 
             if (dir == null)
             {

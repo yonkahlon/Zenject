@@ -30,6 +30,15 @@ namespace ModestTree
             }
         }
 
+        public static void IsEmpty<T>(IEnumerable<T> sequence)
+        {
+            if (!sequence.IsEmpty())
+            {
+                Throw("Expected collection to be empty but instead found '{0}' elements",
+                    sequence.Count());
+            }
+        }
+
         public static void DerivesFrom<T>(Type type)
         {
             if (!type.DerivesFrom<T>())
@@ -43,6 +52,14 @@ namespace ModestTree
             if (!type.DerivesFromOrEqual<T>())
             {
                 Throw("Expected type '{0}' to derive from or be equal to '{1}'", type.Name, typeof(T).Name);
+            }
+        }
+
+        public static void DerivesFromOrEqual(Type childType, Type parentType)
+        {
+            if (!childType.DerivesFromOrEqual(parentType))
+            {
+                Throw("Expected type '{0}' to derive from or be equal to '{1}'", childType.Name, parentType.Name);
             }
         }
 
@@ -164,7 +181,7 @@ namespace ModestTree
         {
             if (val != null)
             {
-                Throw("Assert Hit! Expected null pointer but instead found '" + val.ToString() + "': " + FormatString(message, parameters));
+                Throw("Assert Hit! Expected null pointer but instead found '" + val.ToString() + "': " + SafeFormatString(message, parameters));
             }
         }
 
@@ -173,7 +190,7 @@ namespace ModestTree
         {
             if (val == null)
             {
-                Throw("Assert Hit! Found null pointer when value was expected. " + FormatString(message, parameters));
+                Throw("Assert Hit! Found null pointer when value was expected. " + SafeFormatString(message, parameters));
             }
         }
 
@@ -206,7 +223,7 @@ namespace ModestTree
         {
             if (!condition)
             {
-                Throw("Assert hit! " + FormatString(message, parameters));
+                Throw("Assert hit! " + SafeFormatString(message, parameters));
             }
         }
 
@@ -224,10 +241,10 @@ namespace ModestTree
         public static void Throw(string message, params object[] parameters)
         {
             throw new ZenjectException(
-                FormatString(message, parameters));
+                SafeFormatString(message, parameters));
         }
 
-        static string FormatString(string format, params object[] parameters)
+        public static string SafeFormatString(string format, params object[] parameters)
         {
             // doin this funky loop to ensure nulls are replaced with "NULL"
             // and that the original parameters array will not be modified
@@ -268,7 +285,12 @@ namespace ModestTree
 
         public static Exception CreateException(string message, params object[] parameters)
         {
-            return new Exception(FormatString(message, parameters));
+            return new Exception(SafeFormatString(message, parameters));
+        }
+
+        public static Exception CreateException(Exception innerException, string message, params object[] parameters)
+        {
+            return new Exception(SafeFormatString(message, parameters), innerException);
         }
     }
 }

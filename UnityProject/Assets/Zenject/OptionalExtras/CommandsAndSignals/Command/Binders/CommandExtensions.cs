@@ -13,91 +13,79 @@ namespace Zenject.Commands
         public static CommandBinder<TCommand> BindCommand<TCommand>(this DiContainer container, string identifier)
             where TCommand : Command
         {
-            return new CommandBinder<TCommand>(container, identifier, container.SingletonProviderCreator);
+            return new CommandBinder<TCommand>(identifier, container);
         }
 
         public static CommandBinder<TCommand> BindCommand<TCommand>(this DiContainer container)
             where TCommand : Command
         {
-            return BindCommand<TCommand>((DiContainer)container, null);
+            return BindCommand<TCommand>(container, null);
         }
 
         // One parameter
         public static CommandBinder<TCommand, TParam1> BindCommand<TCommand, TParam1>(this DiContainer container, string identifier)
             where TCommand : Command<TParam1>
         {
-            return new CommandBinder<TCommand, TParam1>(container, identifier, container.SingletonProviderCreator);
+            return new CommandBinder<TCommand, TParam1>(identifier, container);
         }
 
         public static CommandBinder<TCommand, TParam1> BindCommand<TCommand, TParam1>(this DiContainer container)
             where TCommand : Command<TParam1>
         {
-            return BindCommand<TCommand, TParam1>((DiContainer)container, null);
+            return BindCommand<TCommand, TParam1>(container, null);
         }
 
         // Two parameters
+
         public static CommandBinder<TCommand, TParam1, TParam2> BindCommand<TCommand, TParam1, TParam2>(this DiContainer container, string identifier)
             where TCommand : Command<TParam1, TParam2>
         {
-            return new CommandBinder<TCommand, TParam1, TParam2>(container, identifier, container.SingletonProviderCreator);
+            return new CommandBinder<TCommand, TParam1, TParam2>(identifier, container);
         }
 
         public static CommandBinder<TCommand, TParam1, TParam2> BindCommand<TCommand, TParam1, TParam2>(this DiContainer container)
             where TCommand : Command<TParam1, TParam2>
         {
-            return BindCommand<TCommand, TParam1, TParam2>((DiContainer)container, null);
+            return BindCommand<TCommand, TParam1, TParam2>(container, null);
         }
 
         // Three parameters
         public static CommandBinder<TCommand, TParam1, TParam2, TParam3> BindCommand<TCommand, TParam1, TParam2, TParam3>(this DiContainer container, string identifier)
             where TCommand : Command<TParam1, TParam2, TParam3>
         {
-            return new CommandBinder<TCommand, TParam1, TParam2, TParam3>(container, identifier, container.SingletonProviderCreator);
+            return new CommandBinder<TCommand, TParam1, TParam2, TParam3>(identifier, container);
         }
 
         public static CommandBinder<TCommand, TParam1, TParam2, TParam3> BindCommand<TCommand, TParam1, TParam2, TParam3>(this DiContainer container)
             where TCommand : Command<TParam1, TParam2, TParam3>
         {
-            return BindCommand<TCommand, TParam1, TParam2, TParam3>((DiContainer)container, null);
+            return BindCommand<TCommand, TParam1, TParam2, TParam3>(container, null);
         }
 
         // Four parameters
         public static CommandBinder<TCommand, TParam1, TParam2, TParam3, TParam4> BindCommand<TCommand, TParam1, TParam2, TParam3, TParam4>(this DiContainer container, string identifier)
             where TCommand : Command<TParam1, TParam2, TParam3, TParam4>
         {
-            return new CommandBinder<TCommand, TParam1, TParam2, TParam3, TParam4>(container, identifier, container.SingletonProviderCreator);
+            return new CommandBinder<TCommand, TParam1, TParam2, TParam3, TParam4>(identifier, container);
         }
 
         public static CommandBinder<TCommand, TParam1, TParam2, TParam3, TParam4> BindCommand<TCommand, TParam1, TParam2, TParam3, TParam4>(this DiContainer container)
             where TCommand : Command<TParam1, TParam2, TParam3, TParam4>
         {
-            return BindCommand<TCommand, TParam1, TParam2, TParam3, TParam4>((DiContainer)container, null);
+            return BindCommand<TCommand, TParam1, TParam2, TParam3, TParam4>(container, null);
         }
 
         // Five parameters
         public static CommandBinder<TCommand, TParam1, TParam2, TParam3, TParam4, TParam5> BindCommand<TCommand, TParam1, TParam2, TParam3, TParam4, TParam5>(this DiContainer container, string identifier)
             where TCommand : Command<TParam1, TParam2, TParam3, TParam4, TParam5>
         {
-            return new CommandBinder<TCommand, TParam1, TParam2, TParam3, TParam4, TParam5>(container, identifier, container.SingletonProviderCreator);
+            return new CommandBinder<TCommand, TParam1, TParam2, TParam3, TParam4, TParam5>(identifier, container);
         }
 
         public static CommandBinder<TCommand, TParam1, TParam2, TParam3, TParam4, TParam5> BindCommand<TCommand, TParam1, TParam2, TParam3, TParam4, TParam5>(this DiContainer container)
             where TCommand : Command<TParam1, TParam2, TParam3, TParam4, TParam5>
         {
-            return BindCommand<TCommand, TParam1, TParam2, TParam3, TParam4, TParam5>((DiContainer)container, null);
-        }
-
-        // Six parameters
-        public static CommandBinder<TCommand, TParam1, TParam2, TParam3, TParam4, TParam5, TParam6> BindCommand<TCommand, TParam1, TParam2, TParam3, TParam4, TParam5, TParam6>(this DiContainer container, string identifier)
-            where TCommand : Command<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6>
-        {
-            return new CommandBinder<TCommand, TParam1, TParam2, TParam3, TParam4, TParam5, TParam6>(container, identifier, container.SingletonProviderCreator);
-        }
-
-        public static CommandBinder<TCommand, TParam1, TParam2, TParam3, TParam4, TParam5, TParam6> BindCommand<TCommand, TParam1, TParam2, TParam3, TParam4, TParam5, TParam6>(this DiContainer container)
-            where TCommand : Command<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6>
-        {
-            return BindCommand<TCommand, TParam1, TParam2, TParam3, TParam4, TParam5, TParam6>((DiContainer)container, null);
+            return BindCommand<TCommand, TParam1, TParam2, TParam3, TParam4, TParam5>(container, null);
         }
     }
 }

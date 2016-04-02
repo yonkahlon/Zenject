@@ -33,7 +33,7 @@ namespace ModestTree
             }
         }
 
-        public class Factory : MonoBehaviourFactory<Explosion>
+        public class Factory : Factory<Explosion>
         {
         }
     }

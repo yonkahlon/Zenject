@@ -5,7 +5,7 @@ using NUnit.Framework;
 using ModestTree;
 using Assert=ModestTree.Assert;
 
-namespace Zenject.Tests
+namespace Zenject.Tests.Injection
 {
     [TestFixture]
     public class TestPostInjectCall : TestWithContainer
@@ -60,10 +60,10 @@ namespace Zenject.Tests
         [Test]
         public void Test()
         {
-            Container.Bind<Test0>().ToSingle();
-            Container.Bind<Test1>().ToSingle();
-            Container.Bind<Test2>().ToSingle();
-            Container.Bind<Test3>().ToSingle();
+            Container.Bind<Test0>().ToSelf().AsSingle();
+            Container.Bind<Test1>().ToSelf().AsSingle();
+            Container.Bind<Test2>().ToSelf().AsSingle();
+            Container.Bind<Test3>().ToSelf().AsSingle();
 
             AssertValidates();
 
@@ -91,7 +91,7 @@ namespace Zenject.Tests
         [Test]
         public void TestPrivateBaseClassPostInject()
         {
-            Container.Bind<SimpleBase>().ToSingle<SimpleDerived>();
+            Container.Bind<SimpleBase>().To<SimpleDerived>().AsSingle();
 
             AssertValidates();
 
@@ -103,7 +103,7 @@ namespace Zenject.Tests
         [Test]
         public void TestInheritance()
         {
-            Container.Bind<IFoo>().ToSingle<FooDerived>();
+            Container.Bind<IFoo>().To<FooDerived>().AsSingle();
 
             AssertValidates();
 
@@ -119,7 +119,7 @@ namespace Zenject.Tests
         [Test]
         public void TestInheritanceOrder()
         {
-            Container.Bind<IFoo>().ToSingle<FooDerived2>();
+            Container.Bind<IFoo>().To<FooDerived2>().AsSingle();
 
             // base post inject methods should be called first
             _initOrder = 0;

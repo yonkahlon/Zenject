@@ -5,7 +5,7 @@ using NUnit.Framework;
 using ModestTree;
 using Assert=ModestTree.Assert;
 
-namespace Zenject.Tests
+namespace Zenject.Tests.Injection
 {
     [TestFixture]
     public class TestPropertyInjection : TestWithContainer
@@ -33,7 +33,7 @@ namespace Zenject.Tests
         {
             var test1 = new Test1();
 
-            Container.Bind<Test2>().ToSingle();
+            Container.Bind<Test2>().ToSelf().AsSingle();
             Container.Bind<Test1>().ToInstance(test1);
 
             AssertValidates();

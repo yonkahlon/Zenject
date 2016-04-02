@@ -6,7 +6,7 @@ using System.Linq;
 using ModestTree;
 using Assert=ModestTree.Assert;
 
-namespace Zenject.Tests
+namespace Zenject.Tests.Conditions
 {
     [TestFixture]
     public class TestConditionsBasic : TestWithContainer
@@ -46,10 +46,10 @@ namespace Zenject.Tests
         [Test]
         public void Test1()
         {
-            Container.Bind<Bar1>().ToSingle();
-            Container.Bind<Bar2>().ToSingle();
-            Container.Bind<IFoo>().ToSingle<Foo1>();
-            Container.Bind<IFoo>().ToSingle<Foo2>().WhenInjectedInto<Bar2>();
+            Container.Bind<Bar1>().ToSelf().AsSingle();
+            Container.Bind<Bar2>().ToSelf().AsSingle();
+            Container.Bind<IFoo>().To<Foo1>().AsSingle();
+            Container.Bind<IFoo>().To<Foo2>().AsSingle().WhenInjectedInto<Bar2>();
 
             AssertValidates();
 

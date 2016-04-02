@@ -11,7 +11,7 @@ namespace Zenject
 {
     public class CompositionRootEditor : UnityInspectorListEditor
     {
-        SerializedProperty _onlyInjectWhenActiveProperty;
+        SerializedProperty _includeInactiveProperty;
 
         protected override string[] PropertyNames
         {
@@ -53,14 +53,14 @@ namespace Zenject
         {
             base.OnEnable();
 
-            _onlyInjectWhenActiveProperty = serializedObject.FindProperty("_onlyInjectWhenActive");
+            _includeInactiveProperty = serializedObject.FindProperty("_includeInactive");
         }
 
         protected override void OnGui()
         {
             base.OnGui();
 
-            EditorGUILayout.PropertyField(_onlyInjectWhenActiveProperty);
+            EditorGUILayout.PropertyField(_includeInactiveProperty);
         }
     }
 
@@ -108,6 +108,44 @@ namespace Zenject
     public class GlobalCompositionRooEditor : CompositionRootEditor
     {
     }
+
+    [CustomEditor(typeof(EditorWindowCompositionRoot))]
+    public class EditorWindowCompositionRootEditor : UnityInspectorListEditor
+    {
+        protected override string[] PropertyNames
+        {
+            get
+            {
+                return new string[]
+                {
+                    "_installers",
+                };
+            }
+        }
+
+        protected override string[] PropertyDisplayNames
+        {
+            get
+            {
+                return new string[]
+                {
+                    "Installers",
+                };
+            }
+        }
+
+        protected override string[] PropertyDescriptions
+        {
+            get
+            {
+                return new string[]
+                {
+                    "Drag any MonoEditorInstallers that you have added to your project here.",
+                };
+            }
+        }
+    }
+
 }
 
 

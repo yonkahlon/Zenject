@@ -15,7 +15,7 @@ namespace Asteroids
         // If you are injecting into an installer then you will need to put the binding in PreInstall
         public override void PreInstallBindings()
         {
-            Container.Bind<ITickable>().ToSingle<TestHotKeysAdder>();
+            Container.Bind<ITickable>().To<TestHotKeysAdder>().AsSingle();
             // Do not spawn asteroids automatically
             Container.Bind<bool>().ToInstance(false).WhenInjectedInto<AsteroidManager>();
         }
@@ -23,7 +23,8 @@ namespace Asteroids
         public override void PostInstallBindings()
         {
             // Rebinds should occur as a post-install binding so that they have a chance to override
-            Container.Rebind<ShipStateMoving.Settings>().ToSingleInstance(OverrideMoveSettings);
+            throw Assert.CreateException("TODO");
+            //Container.Rebind<ShipStateMoving.Settings>().ToInstance(OverrideMoveSettings);
         }
     }
 

@@ -66,7 +66,7 @@ namespace ModestTree
             }
         }
 
-        public class Factory : MonoBehaviourFactory<float, float, BulletTypes, Bullet>
+        public class Factory : Factory<float, float, BulletTypes, Bullet>
         {
         }
     }
