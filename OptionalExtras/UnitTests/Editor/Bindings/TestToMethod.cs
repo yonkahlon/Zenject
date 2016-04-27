@@ -16,9 +16,9 @@ namespace Zenject.Tests.Bindings
         {
             var foo = new Foo();
 
-            Container.Bind<Foo>().ToMethod((ctx) => foo).AsSingle();
+            Container.Bind<Foo>().FromMethod((ctx) => foo).AsSingle().NonLazy();
 
-            AssertValidates();
+            Container.Validate();
 
             Assert.IsEqual(Container.Resolve<Foo>(), foo);
         }
@@ -28,9 +28,9 @@ namespace Zenject.Tests.Bindings
         {
             var foo = new Foo();
 
-            Container.Bind<Foo>().ToMethod((ctx) => foo).AsTransient();
+            Container.Bind<Foo>().FromMethod((ctx) => foo).AsTransient().NonLazy();
 
-            AssertValidates();
+            Container.Validate();
 
             Assert.IsEqual(Container.Resolve<Foo>(), foo);
         }
@@ -40,9 +40,9 @@ namespace Zenject.Tests.Bindings
         {
             var foo = new Foo();
 
-            Container.Bind<Foo>().ToMethod((ctx) => foo).AsCached();
+            Container.Bind<Foo>().FromMethod((ctx) => foo).AsCached().NonLazy();
 
-            AssertValidates();
+            Container.Validate();
 
             Assert.IsEqual(Container.Resolve<Foo>(), foo);
         }
@@ -51,10 +51,10 @@ namespace Zenject.Tests.Bindings
         [ExpectedException]
         public void TestSingleConflict()
         {
-            Container.Bind<Foo>().ToMethod((ctx) => new Foo()).AsSingle();
-            Container.Bind<Foo>().ToSelf().AsSingle();
+            Container.Bind<Foo>().FromMethod((ctx) => new Foo()).AsSingle().NonLazy();
+            Container.Bind<Foo>().AsSingle().NonLazy();
 
-            AssertValidates();
+            Container.Validate();
 
             Container.ResolveAll<Foo>();
         }
@@ -65,10 +65,10 @@ namespace Zenject.Tests.Bindings
             var foo = new Foo();
             Func<InjectContext, Foo> method = (ctx) => foo;
 
-            Container.Bind<Foo>().ToMethod(method).AsSingle();
-            Container.Bind<IFoo>().ToMethod(method).AsSingle();
+            Container.Bind<Foo>().FromMethod(method).AsSingle().NonLazy();
+            Container.Bind<IFoo>().To<Foo>().FromMethod(method).AsSingle().NonLazy();
 
-            AssertValidates();
+            Container.Validate();
 
             Assert.IsEqual(Container.Resolve<Foo>(), Container.Resolve<Foo>());
             Assert.IsEqual(Container.Resolve<Foo>(), Container.Resolve<IFoo>());
@@ -78,10 +78,10 @@ namespace Zenject.Tests.Bindings
         [Test]
         public void TestSingle3()
         {
-            Container.Bind<Foo>().ToMethodSelf(CreateFoo).AsSingle();
-            Container.Bind<IFoo>().ToMethod<Foo>(CreateFoo).AsSingle();
+            Container.Bind<Foo>().FromMethod(CreateFoo).AsSingle().NonLazy();
+            Container.Bind<IFoo>().To<Foo>().FromMethod(CreateFoo).AsSingle().NonLazy();
 
-            AssertValidates();
+            Container.Validate();
 
             Assert.IsEqual(Container.Resolve<Foo>(), Container.Resolve<Foo>());
             Assert.IsEqual(Container.Resolve<Foo>(), Container.Resolve<IFoo>());
@@ -103,10 +103,10 @@ namespace Zenject.Tests.Bindings
                     return null;
                 };
 
-            Container.Bind<Foo>().ToMethod(method).AsSingle();
-            Container.Bind<IFoo>().ToMethod(method).AsSingle();
+            Container.Bind<Foo>().FromMethod(method).AsSingle().NonLazy();
+            Container.Bind<IFoo>().To<Foo>().FromMethod(method).AsSingle().NonLazy();
 
-            AssertValidates();
+            Container.Validate();
 
             Container.Resolve<Foo>();
             Container.Resolve<Foo>();
@@ -127,10 +127,10 @@ namespace Zenject.Tests.Bindings
                 return null;
             };
 
-            Container.Bind<Foo>().ToMethod(method).AsTransient();
-            Container.Bind<IFoo>().ToMethod(method).AsTransient();
+            Container.Bind<Foo>().FromMethod(method).AsTransient().NonLazy();
+            Container.Bind<IFoo>().To<Foo>().FromMethod(method).AsTransient().NonLazy();
 
-            AssertValidates();
+            Container.Validate();
 
             Container.Resolve<Foo>();
             Container.Resolve<Foo>();
@@ -143,9 +143,9 @@ namespace Zenject.Tests.Bindings
         [Test]
         public void TestCached2()
         {
-            Container.Bind(typeof(Foo), typeof(IFoo)).ToMethod((ctx) => new Foo()).AsCached();
+            Container.Bind(typeof(Foo), typeof(IFoo)).To<Foo>().FromMethod((ctx) => new Foo()).AsCached().NonLazy();
 
-            AssertValidates();
+            Container.Validate();
 
             Assert.IsEqual(Container.Resolve<Foo>(), Container.Resolve<Foo>());
             Assert.IsEqual(Container.Resolve<Foo>(), Container.Resolve<IFoo>());

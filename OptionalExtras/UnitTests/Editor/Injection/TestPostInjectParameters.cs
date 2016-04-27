@@ -49,16 +49,12 @@ namespace Zenject.Tests.Injection
         [Test]
         public void Test()
         {
-            Container.Bind<Test1>().ToSelf().AsSingle();
-            Container.Bind<Test3>().ToSelf().AsSingle();
+            Container.Bind<Test1>().AsSingle().NonLazy();
+            Container.Bind<Test3>().AsSingle().NonLazy();
 
-            Assert.That(!Container.ValidateResolve<Test3>().IsEmpty());
+            Container.Bind<Test0>().AsSingle().NonLazy();
 
-            Container.Bind<Test0>().ToSelf().AsSingle();
-
-            Assert.That(Container.ValidateResolve<Test3>().IsEmpty());
-
-            AssertValidates();
+            Container.Validate();
 
             var test3 = Container.Resolve<Test3>();
 

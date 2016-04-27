@@ -13,10 +13,10 @@ namespace Zenject.Tests.Bindings
         [Test]
         public void TestTransient()
         {
-            Container.Bind<Foo>().ToSelf().AsSingle();
-            Container.Bind<Bar>().ToGetterSelf<Foo>(x => x.Bar).AsTransient();
+            Container.Bind<Foo>().AsSingle().NonLazy();
+            Container.Bind<Bar>().FromGetter<Foo>(x => x.Bar).AsTransient().NonLazy();
 
-            AssertValidates();
+            Container.Validate();
 
             Assert.IsNotNull(Container.Resolve<Bar>());
             Assert.IsEqual(Container.Resolve<Bar>(), Container.Resolve<Foo>().Bar);
@@ -33,10 +33,10 @@ namespace Zenject.Tests.Bindings
         [Test]
         public void TestCached()
         {
-            Container.Bind<Foo>().ToSelf().AsSingle();
-            Container.Bind<Bar>().ToGetterSelf<Foo>(x => x.Bar).AsCached();
+            Container.Bind<Foo>().AsSingle().NonLazy();
+            Container.Bind<Bar>().FromGetter<Foo>(x => x.Bar).AsCached().NonLazy();
 
-            AssertValidates();
+            Container.Validate();
 
             Foo.NumCalls = 0;
 
@@ -50,14 +50,14 @@ namespace Zenject.Tests.Bindings
         [Test]
         public void TestSingle()
         {
-            Container.Bind<Foo>().ToSelf().AsSingle();
+            Container.Bind<Foo>().AsSingle().NonLazy();
 
-            Container.Bind<Bar>().ToGetterSelf<Foo>(BarGetter).AsSingle();
+            Container.Bind<Bar>().FromGetter<Foo>(BarGetter).AsSingle().NonLazy();
 
             // Not sure why I need to specify the "<Bar,"
-            Container.Bind<IBar>().ToGetter<Bar, Foo>(BarGetter).AsSingle();
+            Container.Bind<IBar>().To<Bar>().FromGetter<Foo>(BarGetter).AsSingle().NonLazy();
 
-            AssertValidates();
+            Container.Validate();
 
             Foo.NumCalls = 0;
 

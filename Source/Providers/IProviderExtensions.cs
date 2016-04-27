@@ -6,12 +6,6 @@ namespace Zenject
 {
     public static class IProviderExtensions
     {
-        public static IEnumerable<ZenjectException> Validate(
-            this IProvider creator, InjectContext context)
-        {
-            return creator.Validate(context, new List<Type>());
-        }
-
         public static IEnumerator<List<object>> GetAllInstancesWithInjectSplit(
             this IProvider creator, InjectContext context)
         {

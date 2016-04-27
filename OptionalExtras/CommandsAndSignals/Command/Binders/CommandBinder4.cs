@@ -17,14 +17,14 @@ namespace Zenject.Commands
         {
         }
 
-        public ScopeBinder To<THandler>(Func<THandler, Action<TParam1, TParam2, TParam3, TParam4>> methodGetter)
+        public ScopeArgBinder To<THandler>(Func<THandler, Action<TParam1, TParam2, TParam3, TParam4>> methodGetter)
         {
-            Binding.Finalizer = new CommandBindingFinalizer<TCommand, THandler, TParam1, TParam2, TParam3, TParam4>(
-                methodGetter,
+            Finalizer = new CommandBindingFinalizer<TCommand, THandler, TParam1, TParam2, TParam3, TParam4>(
+                BindInfo, methodGetter,
                 () => new TransientProvider(
-                    typeof(THandler), Container, Binding.Arguments, Binding.ConcreteIdentifier));
+                    typeof(THandler), Container, BindInfo.Arguments, BindInfo.ConcreteIdentifier));
 
-            return new ScopeBinder(Binding);
+            return new ScopeArgBinder(BindInfo);
         }
 
         public ScopeBinder ToResolve<THandler>(Func<THandler, Action<TParam1, TParam2, TParam3, TParam4>> methodGetter)
@@ -58,23 +58,24 @@ namespace Zenject.Commands
         public ConditionBinder ToMethod(Action<TParam1, TParam2, TParam3, TParam4> action)
         {
             // Create the command class once and re-use it everywhere
-            Binding.Finalizer = new SingleProviderBindingFinalizer(
+            Finalizer = new SingleProviderBindingFinalizer(
+                BindInfo,
                 new CachedProvider(
                     new TransientProvider(
                         typeof(TCommand), Container,
                         InjectUtil.CreateArgListExplicit(action), null)));
 
-            return new ConditionBinder(Binding);
+            return new ConditionBinder(BindInfo);
         }
 
         ScopeBinder ToResolveInternal<THandler>(
             string identifier, Func<THandler, Action<TParam1, TParam2, TParam3, TParam4>> methodGetter, bool optional)
         {
-            Binding.Finalizer = new CommandBindingFinalizer<TCommand, THandler, TParam1, TParam2, TParam3, TParam4>(
-                methodGetter,
+            Finalizer = new CommandBindingFinalizer<TCommand, THandler, TParam1, TParam2, TParam3, TParam4>(
+                BindInfo, methodGetter,
                 () => new ResolveProvider(typeof(THandler), Container, identifier, optional));
 
-            return new ScopeBinder(Binding);
+            return new ScopeBinder(BindInfo);
         }
     }
 }

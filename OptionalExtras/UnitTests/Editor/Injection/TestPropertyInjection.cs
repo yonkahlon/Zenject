@@ -33,12 +33,11 @@ namespace Zenject.Tests.Injection
         {
             var test1 = new Test1();
 
-            Container.Bind<Test2>().ToSelf().AsSingle();
-            Container.Bind<Test1>().ToInstance(test1);
+            Container.Bind<Test2>().AsSingle().NonLazy();
+            Container.Bind<Test1>().FromInstance(test1).NonLazy();
 
-            AssertValidates();
+            Container.Validate();
 
-            Assert.That(Container.ValidateResolve<Test2>().IsEmpty());
             var test2 = Container.Resolve<Test2>();
 
             Assert.IsEqual(test2.val2, test1);

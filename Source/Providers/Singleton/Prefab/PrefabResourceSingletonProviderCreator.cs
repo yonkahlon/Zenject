@@ -25,7 +25,7 @@ namespace Zenject
         }
 
         public IProvider CreateProvider(
-            string resourcePath, Type resultType, string gameObjectName,
+            string resourcePath, Type resultType, string gameObjectName, string gameObjectGroupName,
             List<TypeValuePair> extraArguments, string concreteIdentifier)
         {
             IPrefabInstantiator creator;
@@ -43,14 +43,24 @@ namespace Zenject
 
                 Assert.IsEqual(creator.GameObjectName, gameObjectName,
                     "Ambiguous creation parameters (gameObjectName) when using ToPrefabResource with AsSingle");
+
+                Assert.IsEqual(creator.GameObjectGroupName, gameObjectGroupName,
+                    "Ambiguous creation parameters (gameObjectGroupName) when using ToPrefabResource with AsSingle");
             }
             else
             {
                 creator = new PrefabInstantiatorCached(
-                    new PrefabInstantiatorResource(
-                        _container, gameObjectName, extraArguments, resourcePath));
+                    new PrefabInstantiator(
+                        _container, gameObjectName,
+                        gameObjectGroupName, extraArguments,
+                        new PrefabProviderResource(resourcePath)));
 
                 _prefabCreators.Add(prefabId, creator);
+            }
+
+            if (resultType == typeof(GameObject))
+            {
+                return new PrefabGameObjectProvider(creator);
             }
 
             return new GetFromPrefabComponentProvider(resultType, creator);
@@ -100,7 +110,8 @@ namespace Zenject
 
             public static bool operator ==(PrefabId left, PrefabId right)
             {
-                return object.Equals(left.ResourcePath, right.ResourcePath) && object.Equals(left.ConcreteIdentifier, right.ConcreteIdentifier);
+                return object.Equals(left.ResourcePath, right.ResourcePath)
+                    && object.Equals(left.ConcreteIdentifier, right.ConcreteIdentifier);
             }
 
             public static bool operator !=(PrefabId left, PrefabId right)

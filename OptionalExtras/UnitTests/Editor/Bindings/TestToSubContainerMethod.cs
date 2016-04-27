@@ -14,9 +14,9 @@ namespace Zenject.Tests.Bindings
         [Test]
         public void TestMethodSelfSingle()
         {
-            Container.Bind<Foo>().ToSubContainerSelf(InstallFooFacade).AsSingle();
+            Container.Bind<Foo>().FromSubContainerResolve().ByMethod(InstallFooFacade).AsSingle().NonLazy();
 
-            AssertValidates();
+            Container.Validate();
 
             Assert.IsNotNull(Container.Resolve<Foo>().Bar);
         }
@@ -24,19 +24,27 @@ namespace Zenject.Tests.Bindings
         [Test]
         public void TestMethodSelfTransient()
         {
-            Container.Bind<Foo>().ToSubContainerSelf(InstallFooFacade).AsTransient();
+            Container.Bind<Foo>().FromSubContainerResolve().ByMethod(InstallFooFacade).AsTransient().NonLazy();
 
-            AssertValidates();
+            Container.Validate();
 
             Assert.IsNotNull(Container.Resolve<Foo>().Bar);
         }
 
         [Test]
+        public void TestDanglingBinding()
+        {
+            Container.Bind<Bar>().FromSubContainerResolve();
+
+            Assert.Throws(() => Container.Resolve<Bar>());
+        }
+
+        [Test]
         public void TestMethodSelfCached()
         {
-            Container.Bind<Foo>().ToSubContainerSelf(InstallFooFacade).AsCached();
+            Container.Bind<Foo>().FromSubContainerResolve().ByMethod(InstallFooFacade).AsCached().NonLazy();
 
-            AssertValidates();
+            Container.Validate();
 
             Assert.IsNotNull(Container.Resolve<Foo>().Bar);
         }
@@ -44,10 +52,10 @@ namespace Zenject.Tests.Bindings
         [Test]
         public void TestMethodSelfSingleMultipleContracts()
         {
-            Container.Bind<Foo>().ToSubContainerSelf(InstallFooFacade).AsSingle();
-            Container.Bind<Bar>().ToSubContainerSelf(InstallFooFacade).AsSingle();
+            Container.Bind<Foo>().FromSubContainerResolve().ByMethod(InstallFooFacade).AsSingle().NonLazy();
+            Container.Bind<Bar>().FromSubContainerResolve().ByMethod(InstallFooFacade).AsSingle().NonLazy();
 
-            AssertValidates();
+            Container.Validate();
 
             Assert.IsEqual(Container.Resolve<Foo>().Bar, Container.Resolve<Bar>());
         }
@@ -55,9 +63,9 @@ namespace Zenject.Tests.Bindings
         [Test]
         public void TestMethodSelfCachedMultipleContracts()
         {
-            Container.Bind(typeof(Foo), typeof(Bar)).ToSubContainerSelf(InstallFooFacade).AsCached();
+            Container.Bind(typeof(Foo), typeof(Bar)).FromSubContainerResolve().ByMethod(InstallFooFacade).AsCached().NonLazy();
 
-            AssertValidates();
+            Container.Validate();
 
             Assert.IsEqual(Container.Resolve<Foo>().Bar, Container.Resolve<Bar>());
         }
@@ -65,9 +73,9 @@ namespace Zenject.Tests.Bindings
         [Test]
         public void TestMethodConcreteSingle()
         {
-            Container.Bind<IFoo>().ToSubContainer<Foo>(InstallFooFacade).AsSingle();
+            Container.Bind<IFoo>().To<Foo>().FromSubContainerResolve().ByMethod(InstallFooFacade).AsSingle().NonLazy();
 
-            AssertValidates();
+            Container.Validate();
 
             Assert.IsNotNull(Container.Resolve<IFoo>().Bar);
         }
@@ -75,9 +83,9 @@ namespace Zenject.Tests.Bindings
         [Test]
         public void TestMethodConcreteTransient()
         {
-            Container.Bind<IFoo>().ToSubContainer<Foo>(InstallFooFacade).AsTransient();
+            Container.Bind<IFoo>().To<Foo>().FromSubContainerResolve().ByMethod(InstallFooFacade).AsTransient().NonLazy();
 
-            AssertValidates();
+            Container.Validate();
 
             Assert.IsNotNull(Container.Resolve<IFoo>().Bar);
         }
@@ -85,9 +93,9 @@ namespace Zenject.Tests.Bindings
         [Test]
         public void TestMethodConcreteCached()
         {
-            Container.Bind<IFoo>().ToSubContainer<Foo>(InstallFooFacade).AsCached();
+            Container.Bind<IFoo>().To<Foo>().FromSubContainerResolve().ByMethod(InstallFooFacade).AsCached().NonLazy();
 
-            AssertValidates();
+            Container.Validate();
 
             Assert.IsNotNull(Container.Resolve<IFoo>().Bar);
         }
@@ -95,10 +103,10 @@ namespace Zenject.Tests.Bindings
         [Test]
         public void TestMethodConcreteSingleMultipleContracts()
         {
-            Container.Bind<IFoo>().ToSubContainer<Foo>(InstallFooFacade).AsSingle();
-            Container.Bind<Bar>().ToSubContainerSelf(InstallFooFacade).AsSingle();
+            Container.Bind<IFoo>().To<Foo>().FromSubContainerResolve().ByMethod(InstallFooFacade).AsSingle().NonLazy();
+            Container.Bind<Bar>().FromSubContainerResolve().ByMethod(InstallFooFacade).AsSingle().NonLazy();
 
-            AssertValidates();
+            Container.Validate();
 
             Assert.IsEqual(Container.Resolve<IFoo>().Bar, Container.Resolve<Bar>());
         }
@@ -106,9 +114,9 @@ namespace Zenject.Tests.Bindings
         [Test]
         public void TestMethodConcreteCachedMultipleContracts()
         {
-            Container.Bind(typeof(Foo), typeof(IFoo)).ToSubContainer<Foo>(InstallFooFacade).AsCached();
+            Container.Bind(typeof(Foo), typeof(IFoo)).To<Foo>().FromSubContainerResolve().ByMethod(InstallFooFacade).AsCached().NonLazy();
 
-            AssertValidates();
+            Container.Validate();
 
             Assert.IsEqual(Container.Resolve<IFoo>(), Container.Resolve<Foo>());
         }
@@ -116,9 +124,9 @@ namespace Zenject.Tests.Bindings
         [Test]
         public void TestMethodSelfIdentifiersFails()
         {
-            Container.Bind<Gorp>().ToSubContainerSelf(InstallFooFacade).AsSingle();
+            Container.Bind<Gorp>().FromSubContainerResolve().ByMethod(InstallFooFacade).AsSingle().NonLazy();
 
-            AssertValidationFails();
+            Assert.Throws(() => Container.Validate());
 
             Assert.Throws(() => Container.Resolve<Gorp>());
         }
@@ -126,9 +134,9 @@ namespace Zenject.Tests.Bindings
         [Test]
         public void TestMethodSelfIdentifiers()
         {
-            Container.Bind<Gorp>().ToSubContainerSelf(InstallFooFacade, "gorp").AsSingle();
+            Container.Bind<Gorp>().FromSubContainerResolve("gorp").ByMethod(InstallFooFacade).AsSingle().NonLazy();
 
-            AssertValidates();
+            Container.Validate();
 
             Assert.IsNotNull(Container.Resolve<Gorp>());
         }
@@ -165,10 +173,10 @@ namespace Zenject.Tests.Bindings
 
         void InstallFooFacade(DiContainer container)
         {
-            container.Bind<Foo>().ToSelf().AsSingle();
-            container.Bind<Bar>().ToSelf().AsSingle();
+            container.Bind<Foo>().AsSingle();
+            container.Bind<Bar>().AsSingle();
 
-            container.Bind<Gorp>("gorp").ToSelf();
+            container.Bind<Gorp>("gorp");
         }
     }
 }

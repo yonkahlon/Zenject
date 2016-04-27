@@ -18,7 +18,5 @@ namespace Zenject
         // to the newly created instance
         IEnumerator<List<object>> GetAllInstancesWithInjectSplit(
             InjectContext context, List<TypeValuePair> args);
-
-        IEnumerable<ZenjectException> Validate(InjectContext context, List<Type> argTypes);
     }
 }

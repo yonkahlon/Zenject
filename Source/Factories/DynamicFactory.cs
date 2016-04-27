@@ -18,22 +18,43 @@ namespace Zenject
         [PostInject]
         void Init(IProvider provider, InjectContext injectContext)
         {
+            Assert.IsNotNull(provider);
+            Assert.IsNotNull(injectContext);
+
             _provider = provider;
             _injectContext = injectContext;
         }
 
         protected TValue CreateInternal(List<TypeValuePair> extraArgs)
         {
-            var result = _provider.GetInstance(_injectContext, extraArgs);
+            try
+            {
+                var result = _provider.GetInstance(_injectContext, extraArgs);
 
-            Assert.That(result == null || result.GetType().DerivesFromOrEqual<TValue>());
+                Assert.That(result == null || result.GetType().DerivesFromOrEqual<TValue>());
 
-            return (TValue)result;
+                return (TValue)result;
+            }
+            catch (Exception e)
+            {
+                throw new ZenjectException(
+                    e, "Error during construction of type '{0}' via {1}.Create method!",
+                    typeof(TValue).Name(), this.GetType().Name());
+            }
         }
 
-        public IEnumerable<ZenjectException> Validate()
+        public virtual void Validate()
         {
-            return _provider.Validate(_injectContext, ParamTypes.ToList());
+            try
+            {
+                _provider.GetInstance(
+                    _injectContext, ValidationUtil.CreateDefaultArgs(ParamTypes.ToArray()));
+            }
+            catch (Exception e)
+            {
+                throw new ZenjectException(
+                    e, "Validation for factory '{0}' failed", this.GetType().Name());
+            }
         }
 
         protected abstract IEnumerable<Type> ParamTypes

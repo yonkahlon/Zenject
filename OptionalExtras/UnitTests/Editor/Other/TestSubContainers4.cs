@@ -32,13 +32,13 @@ namespace Zenject.Tests.Other
 
         void SetupContainer()
         {
-            Container.Bind<RotorController>().ToMethodSelf(SubContainerResolve<RotorController>).AsTransient()
+            Container.Bind<RotorController>().FromMethod(SubContainerResolve<RotorController>).AsTransient()
                 .WhenInjectedInto<RotorView>();
 
-            Container.Bind<RotorModel>().ToMethodSelf(SubContainerResolve<RotorModel>).AsTransient()
+            Container.Bind<RotorModel>().FromMethod(SubContainerResolve<RotorModel>).AsTransient()
                 .WhenInjectedInto<RotorView>();
 
-            Container.Bind<RotorView>().ToSelf().AsTransient();
+            Container.Bind<RotorView>().AsTransient();
         }
 
         T SubContainerResolve<T>(InjectContext context)
@@ -59,8 +59,8 @@ namespace Zenject.Tests.Other
 
         void InstallViewBindings(DiContainer subContainer)
         {
-            subContainer.Bind<RotorController>().ToSelf().AsSingle();
-            subContainer.Bind<RotorModel>().ToSelf().AsSingle();
+            subContainer.Bind<RotorController>().AsSingle();
+            subContainer.Bind<RotorModel>().AsSingle();
         }
 
         public class RotorController

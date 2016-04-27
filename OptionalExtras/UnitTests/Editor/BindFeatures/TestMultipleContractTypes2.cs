@@ -35,9 +35,9 @@ namespace Zenject.Tests.BindFeatures
                 typeof(Foo),
             };
 
-            Container.Bind(types).ToSelf().AsSingle();
+            Container.Bind(types).AsSingle().NonLazy();
 
-            AssertValidates();
+            Container.Validate();
 
             Container.Resolve<Bar>();
             Container.Resolve<Foo>();
@@ -47,17 +47,17 @@ namespace Zenject.Tests.BindFeatures
         [ExpectedException]
         public void TestInterfaces()
         {
-            Container.Bind<IFoo>().ToSelf().AsSingle();
+            Container.Bind<IFoo>().AsSingle().NonLazy();
 
-            AssertValidates();
+            Container.Validate();
         }
 
         [Test]
         public void TestAllInterfaces()
         {
-            Container.BindAllInterfaces<Foo>().To<Foo>().AsSingle();
+            Container.BindAllInterfaces<Foo>().To<Foo>().AsSingle().NonLazy();
 
-            AssertValidates();
+            Container.Validate();
 
             Assert.IsNull(Container.TryResolve<Foo>());
             Assert.IsNotNull(Container.Resolve<IFoo>());
@@ -67,9 +67,9 @@ namespace Zenject.Tests.BindFeatures
         [Test]
         public void TestAllInterfacesAndSelf()
         {
-            Container.BindAllInterfacesAndSelf<Foo>().To<Foo>().AsSingle();
+            Container.BindAllInterfacesAndSelf<Foo>().To<Foo>().AsSingle().NonLazy();
 
-            AssertValidates();
+            Container.Validate();
 
             Assert.IsNotNull(Container.Resolve<Foo>());
             Assert.IsNotNull(Container.Resolve<IFoo>());

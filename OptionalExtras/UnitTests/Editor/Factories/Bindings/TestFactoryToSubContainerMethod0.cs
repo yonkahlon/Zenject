@@ -16,9 +16,9 @@ namespace Zenject.Tests.Bindings
         [Test]
         public void TestSelf()
         {
-            Container.BindFactory<Foo, Foo.Factory>().ToSubContainerSelf(InstallFoo);
+            Container.BindFactory<Foo, Foo.Factory>().FromSubContainerResolve().ByMethod(InstallFoo).NonLazy();
 
-            AssertValidates();
+            Container.Validate();
 
             Assert.IsEqual(Container.Resolve<Foo.Factory>().Create(), ConstFoo);
         }
@@ -26,16 +26,17 @@ namespace Zenject.Tests.Bindings
         [Test]
         public void TestConcrete()
         {
-            Container.BindFactory<IFoo, IFooFactory>().ToSubContainer<Foo>(InstallFoo);
+            Container.BindFactory<IFoo, IFooFactory>()
+                .To<Foo>().FromSubContainerResolve().ByMethod(InstallFoo).NonLazy();
 
-            AssertValidates();
+            Container.Validate();
 
             Assert.IsEqual(Container.Resolve<IFooFactory>().Create(), ConstFoo);
         }
 
         void InstallFoo(DiContainer subContainer)
         {
-            subContainer.Bind<Foo>().ToInstance(ConstFoo);
+            subContainer.Bind<Foo>().FromInstance(ConstFoo);
         }
 
         interface IFoo

@@ -47,13 +47,12 @@ namespace Zenject.Tests.BindFeatures
         public void TestMultiBind2()
         {
             // Multi-binds should not map to single-binds
-            Container.Bind<Test0>().To<Test3>().AsSingle();
-            Container.Bind<Test0>().To<Test4>().AsSingle();
-            Container.Bind<Test2>().ToSelf().AsSingle();
+            Container.Bind<Test0>().To<Test3>().AsSingle().NonLazy();
+            Container.Bind<Test0>().To<Test4>().AsSingle().NonLazy();
+            Container.Bind<Test2>().AsSingle().NonLazy();
 
-            AssertValidates();
+            Container.Validate();
 
-            Assert.That(Container.ValidateResolve<Test2>().IsEmpty());
             Container.Resolve<Test2>();
         }
     }

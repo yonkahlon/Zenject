@@ -28,26 +28,8 @@ namespace Zenject.Tests
             _container = new DiContainer(false);
             InstallBindings();
 
-            AssertValidates();
+            _container.Validate();
             _container.Inject(this);
-        }
-
-        protected void AssertValidationFails()
-        {
-            Assert.That(Container.ValidateAll().HasMoreThan(0),
-                "Expected validation to fail but it succeeded");
-        }
-
-        protected void AssertValidates()
-        {
-            _container.IsValidating = true;
-            var error = Container.ValidateAll().FirstOrDefault();
-            _container.IsValidating = false;
-
-            if (error != null)
-            {
-                throw error;
-            }
         }
 
         public virtual void InstallBindings()

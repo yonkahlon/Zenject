@@ -9,9 +9,7 @@ using ModestTree;
 using ModestTree.Util;
 
 #if !ZEN_NOT_UNITY3D
-#if UNITY_5_3
 using UnityEngine.SceneManagement;
-#endif
 using UnityEngine;
 #endif
 
@@ -19,13 +17,6 @@ namespace Zenject.Internal
 {
     public class ZenUtilInternal
     {
-        // This method is used when we need to instantiate something so we can
-        // validate it, but that something requires arguments
-        public static List<TypeValuePair> CreateDummyArgList(List<Type> argTypes)
-        {
-            return argTypes.Select(x => new TypeValuePair(x, x.GetDefaultValue())).ToList();
-        }
-
         // Due to the way that Unity overrides the Equals operator,
         // normal null checks such as (x == null) do not always work as
         // expected
@@ -42,20 +33,15 @@ namespace Zenject.Internal
         }
 
 #if !ZEN_NOT_UNITY3D
-        // NOTE: This method will not return components that are within a FacadeCompositionRoot
+        // NOTE: This method will not return components that are within a GameObjectCompositionRoot
         public static IEnumerable<Component> GetInjectableComponentsBottomUp(
-            GameObject gameObject, bool recursive, bool includeInactive)
+            GameObject gameObject, bool recursive)
         {
-            if (!gameObject.activeInHierarchy && !includeInactive)
-            {
-                yield break;
-            }
+            var compRoot = gameObject.GetComponent<GameObjectCompositionRoot>();
 
-            var facadeRoot = gameObject.GetComponent<FacadeCompositionRoot>();
-
-            if (facadeRoot != null)
+            if (compRoot != null)
             {
-                yield return facadeRoot;
+                yield return compRoot;
                 yield break;
             }
 
@@ -63,7 +49,7 @@ namespace Zenject.Internal
             {
                 foreach (Transform child in gameObject.transform)
                 {
-                    foreach (var component in GetInjectableComponentsBottomUp(child.gameObject, recursive, includeInactive))
+                    foreach (var component in GetInjectableComponentsBottomUp(child.gameObject, recursive))
                     {
                         yield return component;
                     }

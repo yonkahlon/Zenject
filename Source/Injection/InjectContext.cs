@@ -62,7 +62,7 @@ namespace Zenject
         // Identifier - most of the time this is null
         // It will match 'foo' in this example:
         //      ... In an installer somewhere:
-        //          Container.Bind<Foo>("foo").ToSelf().AsSingle();
+        //          Container.Bind<Foo>("foo").ToSingle();
         //      ...
         //      ... In a constructor:
         //          public Foo([Inject("foo") Foo foo)
@@ -75,8 +75,8 @@ namespace Zenject
         // ConcreteIdentifier - most of the time this is null
         // It will match 'foo' in this example:
         //      ... In an installer somewhere:
-        //          Container.Bind<Foo>().ToSelf("foo").AsSingle();
-        //          Container.Bind<ITickable>().To<Foo>("foo").AsSingle();
+        //          Container.Bind<Foo>().ToSingle("foo");
+        //          Container.Bind<ITickable>().ToSingle<Foo>("foo");
         //      ...
         // This allows you to create When() conditionals like this:
         //      ...

@@ -18,12 +18,12 @@ namespace Zenject
                 installer.InstallBindings();
             }
 
-            container.Bind<TickableManager>().ToSelf().AsSingle();
-            container.Bind<InitializableManager>().ToSelf().AsSingle();
-            container.Bind<DisposableManager>().ToSelf().AsSingle();
-            container.Bind<GuiRenderableManager>().ToSelf().AsSingle();
+            container.Bind<TickableManager>().AsSingle();
+            container.Bind<InitializableManager>().AsSingle();
+            container.Bind<DisposableManager>().AsSingle();
+            container.Bind<GuiRenderableManager>().AsSingle();
 
-            container.Bind<IDependencyRoot>().ToInstance(root);
+            container.Bind<EditorWindowFacade>().FromInstance(root).NonLazy();
 
             container.Inject(root);
         }

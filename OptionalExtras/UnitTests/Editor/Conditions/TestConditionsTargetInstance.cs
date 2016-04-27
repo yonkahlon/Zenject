@@ -27,8 +27,8 @@ namespace Zenject.Tests.Conditions
             base.Setup();
 
             _test1 = new Test1();
-            Container.Bind<Test0>().ToSelf().AsSingle().When(r => r.ObjectInstance == _test1);
-            Container.Bind<Test1>().ToInstance(_test1);
+            Container.Bind<Test0>().AsSingle().When(r => r.ObjectInstance == _test1);
+            Container.Bind<Test1>().FromInstance(_test1);
         }
 
         [Test]

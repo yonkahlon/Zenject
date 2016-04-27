@@ -1,0 +1,72 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{E22B1CBF-7E4D-48BD-953B-2B730BD9FF13}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>BuildLib</RootNamespace>
+    <AssemblyName>$(MSBuildProjectName)</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\..\..\..\Bin\Assemblies\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <OutputPath>..\..\..\..\Bin\Assemblies\Debug\</OutputPath>
+    <IntermediateOutputPath>..\..\..\..\Temp\obj\Debug\Zenject-usage\</IntermediateOutputPath>
+    <BaseIntermediateOutputPath>..\..\..\..\Temp\obj\Debug\Zenject-usage\</BaseIntermediateOutputPath>
+    <GenerateSerializationAssemblies>On</GenerateSerializationAssemblies>
+    <DefineConstants>TRACE;DEBUG;ZEN_NOT_UNITY3D</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+    <OutputPath>..\..\..\..\Bin\Assemblies\Release\</OutputPath>
+    <IntermediateOutputPath>..\..\..\..\Temp\obj\Release\Zenject-usage\</IntermediateOutputPath>
+    <BaseIntermediateOutputPath>..\..\..\..\Temp\obj\Release\Zenject-usage\</BaseIntermediateOutputPath>
+    <Optimize>true</Optimize>
+    <DefineConstants>TRACE;DEBUG;ZEN_NOT_UNITY3D</DefineConstants>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="nunit.framework, Version=2.6.0.12051, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\Libraries\nunit\nunit.framework.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="IInitializable.cs" />
+    <Compile Include="InjectAttribute.cs" />
+    <Compile Include="InjectOptionalAttribute.cs" />
+    <Compile Include="InjectSources.cs" />
+    <Compile Include="ITickable.cs" />
+    <Compile Include="PostInjectAttribute.cs" />
+    <Compile Include="InjectAttributeBase.cs" />
+    <Compile Include="ZenjectAllowDuringValidationAttribute.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Mtm.Debugging\Scripts\Mtm.Debugging.csproj">
+      <Project>{02c3386d-7132-4c1f-aef0-9e5432dbfc25}</Project>
+      <Name>Mtm.Debugging</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+  </PropertyGroup>
+</Project>

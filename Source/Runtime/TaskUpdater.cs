@@ -37,7 +37,7 @@ namespace Zenject
         void AddTaskInternal(TTask task, int priority)
         {
             Assert.That(!AllTasks.Select(x => x.Task).ContainsItem(task),
-                "Duplicate task added to kernel with name '" + task.GetType().FullName + "'");
+                "Duplicate task added to DependencyRoot with name '" + task.GetType().FullName + "'");
 
             // Wait until next frame to add the task, otherwise whether it gets updated
             // on the current frame depends on where in the update order it was added

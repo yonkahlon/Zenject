@@ -17,51 +17,51 @@ namespace Zenject
         // Map the given type to a way of obtaining it
         // See ITypeBinderOld.cs for the full list of methods to call on the return value
         // Note that this can include open generic types as well such as List<>
-        TypeBinderGeneric<TContract> Bind<TContract>(string identifier);
-        TypeBinderGeneric<TContract> Bind<TContract>();
+        ConcreteBinderGeneric<TContract> Bind<TContract>(string identifier);
+        ConcreteBinderGeneric<TContract> Bind<TContract>();
 
         // _____ Bind _____
         // Non-generic version of Bind<> for cases where you only have the runtime type
         // Note that this can include open generic types as well such as List<>
-        TypeBinderNonGeneric Bind(params Type[] contractTypes);
-        TypeBinderNonGeneric Bind(string identifier, params Type[] contractTypes);
+        ConcreteBinderNonGeneric Bind(params Type[] contractTypes);
+        ConcreteBinderNonGeneric Bind(string identifier, params Type[] contractTypes);
 
         // _____ BindFactory<> _____
         // TBD
-        FactoryBinder<TContract, TFactory> BindFactory<TContract, TFactory>()
+        FactoryToChoiceBinder<TContract> BindFactory<TContract, TFactory>()
             where TFactory : Factory<TContract>;
 
-        FactoryBinder<TContract, TFactory> BindFactory<TContract, TFactory>(string identifier)
+        FactoryToChoiceBinder<TContract> BindFactory<TContract, TFactory>(string identifier)
             where TFactory : Factory<TContract>;
 
-        FactoryBinder<TParam1, TContract, TFactory> BindFactory<TParam1, TContract, TFactory>()
+        FactoryToChoiceBinder<TParam1, TContract> BindFactory<TParam1, TContract, TFactory>()
             where TFactory : Factory<TParam1, TContract>;
 
-        FactoryBinder<TParam1, TContract, TFactory> BindFactory<TParam1, TContract, TFactory>(string identifier)
+        FactoryToChoiceBinder<TParam1, TContract> BindFactory<TParam1, TContract, TFactory>(string identifier)
             where TFactory : Factory<TParam1, TContract>;
 
-        FactoryBinder<TParam1, TParam2, TContract, TFactory> BindFactory<TParam1, TParam2, TContract, TFactory>()
+        FactoryToChoiceBinder<TParam1, TParam2, TContract> BindFactory<TParam1, TParam2, TContract, TFactory>()
             where TFactory : Factory<TParam1, TParam2, TContract>;
 
-        FactoryBinder<TParam1, TParam2, TContract, TFactory> BindFactory<TParam1, TParam2, TContract, TFactory>(string identifier)
+        FactoryToChoiceBinder<TParam1, TParam2, TContract> BindFactory<TParam1, TParam2, TContract, TFactory>(string identifier)
             where TFactory : Factory<TParam1, TParam2, TContract>;
 
-        FactoryBinder<TParam1, TParam2, TParam3, TContract, TFactory> BindFactory<TParam1, TParam2, TParam3, TContract, TFactory>()
+        FactoryToChoiceBinder<TParam1, TParam2, TParam3, TContract> BindFactory<TParam1, TParam2, TParam3, TContract, TFactory>()
             where TFactory : Factory<TParam1, TParam2, TParam3, TContract>;
 
-        FactoryBinder<TParam1, TParam2, TParam3, TContract, TFactory> BindFactory<TParam1, TParam2, TParam3, TContract, TFactory>(string identifier)
+        FactoryToChoiceBinder<TParam1, TParam2, TParam3, TContract> BindFactory<TParam1, TParam2, TParam3, TContract, TFactory>(string identifier)
             where TFactory : Factory<TParam1, TParam2, TParam3, TContract>;
 
-        FactoryBinder<TParam1, TParam2, TParam3, TParam4, TContract, TFactory> BindFactory<TParam1, TParam2, TParam3, TParam4, TContract, TFactory>()
+        FactoryToChoiceBinder<TParam1, TParam2, TParam3, TParam4, TContract> BindFactory<TParam1, TParam2, TParam3, TParam4, TContract, TFactory>()
             where TFactory : Factory<TParam1, TParam2, TParam3, TParam4, TContract>;
 
-        FactoryBinder<TParam1, TParam2, TParam3, TParam4, TContract, TFactory> BindFactory<TParam1, TParam2, TParam3, TParam4, TContract, TFactory>(string identifier)
+        FactoryToChoiceBinder<TParam1, TParam2, TParam3, TParam4, TContract> BindFactory<TParam1, TParam2, TParam3, TParam4, TContract, TFactory>(string identifier)
             where TFactory : Factory<TParam1, TParam2, TParam3, TParam4, TContract>;
 
-        FactoryBinder<TParam1, TParam2, TParam3, TParam4, TParam5, TContract, TFactory> BindFactory<TParam1, TParam2, TParam3, TParam4, TParam5, TContract, TFactory>()
+        FactoryToChoiceBinder<TParam1, TParam2, TParam3, TParam4, TParam5, TContract> BindFactory<TParam1, TParam2, TParam3, TParam4, TParam5, TContract, TFactory>()
             where TFactory : Factory<TParam1, TParam2, TParam3, TParam4, TParam5, TContract>;
 
-        FactoryBinder<TParam1, TParam2, TParam3, TParam4, TParam5, TContract, TFactory> BindFactory<TParam1, TParam2, TParam3, TParam4, TParam5, TContract, TFactory>(string identifier)
+        FactoryToChoiceBinder<TParam1, TParam2, TParam3, TParam4, TParam5, TContract> BindFactory<TParam1, TParam2, TParam3, TParam4, TParam5, TContract, TFactory>(string identifier)
             where TFactory : Factory<TParam1, TParam2, TParam3, TParam4, TParam5, TContract>;
 
         // _____ BindAllInterfaces _____
@@ -73,31 +73,31 @@ namespace Zenject
         //    {
         //    }
         //
-        //    Container.BindAllInterfaces<Foo>().To<Foo>().AsSingle();
+        //    Container.BindAllInterfacesToSingle<Foo>();
         //
         //  This line above is equivalent to the following:
         //
-        //    Container.Bind<ITickable>().To<Foo>().AsSingle();
-        //    Container.Bind<IInitializable>().To<Foo>().AsSingle();
+        //    Container.Bind<ITickable>().ToSingle<Foo>();
+        //    Container.Bind<IInitializable>().ToSingle<Foo>();
         //
         // Note here that we do not bind Foo to itself.  For that, use BindAllInterfacesAndSelf
-        TypeBinderNonGeneric BindAllInterfaces<T>();
-        TypeBinderNonGeneric BindAllInterfaces(Type type);
+        ConcreteBinderNonGeneric BindAllInterfaces<T>();
+        ConcreteBinderNonGeneric BindAllInterfaces(Type type);
 
         // _____ BindAllInterfacesAndSelf _____
         // Same as BindAllInterfaces except also binds to self
-        TypeBinderNonGeneric BindAllInterfacesAndSelf<T>();
-        TypeBinderNonGeneric BindAllInterfacesAndSelf(Type type);
+        ConcreteBinderNonGeneric BindAllInterfacesAndSelf<T>();
+        ConcreteBinderNonGeneric BindAllInterfacesAndSelf(Type type);
 
         // _____ BindInstance _____
-        //  This is simply a shortcut to using the ToInstance method.
+        //  This is simply a shortcut to using the FromInstance method.
         //
         //  Example:
         //      Container.BindInstance(new Foo());
         //
         //  This line above is equivalent to the following:
         //
-        //      Container.Bind<Foo>().ToInstance(new Foo());
+        //      Container.Bind<Foo>().FromInstance(new Foo());
         //
         ScopeBinder BindInstance<TContract>(string identifier, TContract obj);
         ScopeBinder BindInstance<TContract>(TContract obj);
@@ -137,15 +137,5 @@ namespace Zenject
 
         bool HasInstalled<T>()
             where T : IInstaller;
-
-        // Returns true if the DiContainer waas made for validation purposes only
-        // This is run at edit time.  This is one of the reasons you should never instantiate
-        // any objects during the bind phase.
-        bool IsValidating
-        {
-            get;
-            set;
-        }
     }
 }
-

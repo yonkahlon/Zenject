@@ -14,8 +14,8 @@ namespace Zenject.Tests.Other
         [Test]
         public void TestThrows()
         {
-            Container.Bind<Foo1>().ToSelf().AsSingle();
-            Container.Bind<Bar1>().ToSelf().AsSingle();
+            Container.Bind<Foo1>().AsSingle();
+            Container.Bind<Bar1>().AsSingle();
 
             Assert.Throws(() => Container.Resolve<Foo1>());
             Assert.Throws(() => Container.Resolve<Bar1>());
@@ -38,8 +38,8 @@ namespace Zenject.Tests.Other
         [Test]
         public void TestPostInject()
         {
-            Container.Bind<Foo2>().ToSelf().AsSingle();
-            Container.Bind<Bar2>().ToSelf().AsSingle();
+            Container.Bind<Foo2>().AsSingle();
+            Container.Bind<Bar2>().AsSingle();
 
             Assert.IsNotNull(Container.Resolve<Foo2>());
             Assert.IsNotNull(Container.Resolve<Bar2>());
@@ -64,8 +64,8 @@ namespace Zenject.Tests.Other
         [Test]
         public void TestField()
         {
-            Container.Bind<Foo3>().ToSelf().AsSingle();
-            Container.Bind<Bar3>().ToSelf().AsSingle();
+            Container.Bind<Foo3>().AsSingle();
+            Container.Bind<Bar3>().AsSingle();
 
             Assert.IsNotNull(Container.Resolve<Foo3>().Bar);
             Assert.IsNotNull(Container.Resolve<Bar3>().Foo);

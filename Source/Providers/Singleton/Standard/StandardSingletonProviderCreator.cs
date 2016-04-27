@@ -23,7 +23,7 @@ namespace Zenject
         }
 
         public IProvider GetOrCreateProvider(
-            StandardSingletonDeclaration dec, Func<Type, IProvider> providerCreator)
+            StandardSingletonDeclaration dec, Func<DiContainer, Type, IProvider> providerCreator)
         {
             // These ones are actually fine when used with Bind<GameObject>() (see TypeBinderBase.ToPrefabSelf)
             //Assert.IsNotEqual(dec.Type, SingletonTypes.ToPrefab);
@@ -31,6 +31,8 @@ namespace Zenject
 
             Assert.IsNotEqual(dec.Type, SingletonTypes.ToSubContainerInstaller);
             Assert.IsNotEqual(dec.Type, SingletonTypes.ToSubContainerMethod);
+            Assert.IsNotEqual(dec.Type, SingletonTypes.ToSubContainerPrefab);
+            Assert.IsNotEqual(dec.Type, SingletonTypes.ToSubContainerPrefabResource);
 
             _markRegistry.MarkSingleton(dec.Id, dec.Type);
 
@@ -38,24 +40,32 @@ namespace Zenject
 
             if (_providerMap.TryGetValue(dec.Id, out providerInfo))
             {
-                if (providerInfo.Type != dec.Type)
+                Assert.That(providerInfo.Type == dec.Type,
+                    "Cannot use both '{0}' and '{1}' for the same dec.Type/ConcreteIdentifier!", providerInfo.Type, dec.Type);
+
+                Assert.That(providerInfo.Arguments.Count == dec.Arguments.Count,
+                    "Invalid use of binding '{0}'.  Ambiguous set of creation properties found (argument length mismatch)", dec.Type);
+
+                foreach (var pair in providerInfo.Arguments.Zipper(dec.Arguments))
                 {
-                    throw Assert.CreateException(
-                        "Cannot use both '{0}' and '{1}' for the same dec.Type/ConcreteIdentifier!", providerInfo.Type, dec.Type);
+                    var arg1 = pair.First;
+                    var arg2 = pair.Second;
+
+                    Assert.That(arg1.Type == arg2.Type && object.Equals(arg1.Value, arg2.Value),
+                        "Invalid use of binding '{0}'.  Ambiguous set of creation properties found (argument value mismatch)", dec.Type);
                 }
 
-                if (!object.Equals(providerInfo.SingletonSpecificId, dec.SpecificId))
-                {
-                    throw Assert.CreateException(
-                        "Invalid use of binding '{0}'.  Found ambiguous set of creation properties.", dec.Type);
-                }
+                Assert.That(object.Equals(providerInfo.SingletonSpecificId, dec.SpecificId),
+                    "Invalid use of binding '{0}'.  Found ambiguous set of creation properties.", dec.Type);
             }
             else
             {
                 providerInfo = new ProviderInfo(
                     dec.Type,
                     new CachedProvider(
-                        providerCreator(dec.Id.ConcreteType)), dec.SpecificId);
+                        providerCreator(_container, dec.Id.ConcreteType)),
+                    dec.SpecificId,
+                    dec.Arguments);
 
                 _providerMap.Add(dec.Id, providerInfo);
             }
@@ -66,11 +76,21 @@ namespace Zenject
         public class ProviderInfo
         {
             public ProviderInfo(
-                SingletonTypes type, CachedProvider provider, object singletonSpecificId)
+                SingletonTypes type,
+                CachedProvider provider,
+                object singletonSpecificId,
+                List<TypeValuePair> arguments)
             {
                 Type = type;
                 Provider = provider;
                 SingletonSpecificId = singletonSpecificId;
+                Arguments = arguments;
+            }
+
+            public List<TypeValuePair> Arguments
+            {
+                get;
+                private set;
             }
 
             public object SingletonSpecificId

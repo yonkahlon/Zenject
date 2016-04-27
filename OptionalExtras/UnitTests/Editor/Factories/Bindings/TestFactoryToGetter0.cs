@@ -13,10 +13,10 @@ namespace Zenject.Tests.Bindings
         [Test]
         public void TestSelf()
         {
-            Container.Bind<Foo>().ToSelf().AsSingle();
-            Container.BindFactory<Bar, Bar.Factory>().ToGetterSelf<Foo>(x => x.Bar);
+            Container.Bind<Foo>().AsSingle().NonLazy();
+            Container.BindFactory<Bar, Bar.Factory>().FromGetter<Foo>(x => x.Bar).NonLazy();
 
-            AssertValidates();
+            Container.Validate();
 
             Assert.IsNotNull(Container.Resolve<Bar.Factory>().Create());
             Assert.IsEqual(Container.Resolve<Bar.Factory>().Create(), Container.Resolve<Foo>().Bar);
