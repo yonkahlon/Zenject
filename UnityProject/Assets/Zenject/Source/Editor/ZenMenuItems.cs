@@ -9,75 +9,54 @@ using UnityEditor;
 using UnityEngine;
 using ModestTree;
 using Zenject.Internal;
-
-#if UNITY_5_3
 using UnityEditor.SceneManagement;
-#endif
 
 namespace Zenject
 {
     public static class ZenMenuItems
     {
+        [MenuItem("Edit/Zenject/Validate Current Scene #%v")]
+        public static void ValidateCurrentScene()
+        {
+            ProjectCompositionRoot.PersistentIsValidating = true;
+            EditorApplication.isPlaying = true;
+        }
+
         [MenuItem("Edit/Zenject/Help...")]
         public static void OpenDocumentation()
         {
             Application.OpenURL("https://github.com/modesttree/zenject");
         }
 
-        [MenuItem("Edit/Zenject/Validate All Active Scenes")]
-        public static void ValidateAllActiveScenes()
-        {
-            ZenEditorValidator.ValidateAllActiveScenes();
-        }
-
-        [MenuItem("Edit/Zenject/Validate Current Scene #%v")]
-        public static void ValidateCurrentScene()
-        {
-            ZenEditorValidator.ValidateCurrentScene();
-        }
-
-        // Returns true if we should continue
-        static bool CheckForExistingCompositionRoot()
-        {
-            if (ZenEditorUtil.TryGetSceneCompositionRoot() != null)
-            {
-                var shouldContinue = EditorUtility.DisplayDialog(
-                    "Error", "There already exists a SceneCompositionRoot in the scene.  Are you sure you want to add another?", "Yes", "Cancel");
-                return shouldContinue;
-            }
-
-            return true;
-        }
-
         [MenuItem("GameObject/Zenject/Scene Composition Root", false, 9)]
         public static void CreateSceneCompositionRoot(MenuCommand menuCommand)
         {
-            if (CheckForExistingCompositionRoot())
-            {
-                var root = new GameObject("SceneCompositionRoot").AddComponent<SceneCompositionRoot>();
-                Selection.activeGameObject = root.gameObject;
-            }
+            var root = new GameObject("SceneCompositionRoot").AddComponent<SceneCompositionRoot>();
+            Selection.activeGameObject = root.gameObject;
+
+            EditorSceneManager.MarkSceneDirty(EditorSceneManager.GetActiveScene());
         }
 
         [MenuItem("GameObject/Zenject/Decorator Composition Root", false, 9)]
         public static void CreateDecoratorCompositionRoot(MenuCommand menuCommand)
         {
-            if (CheckForExistingCompositionRoot())
-            {
-                var root = new GameObject("DecoratorCompositionRoot").AddComponent<SceneDecoratorCompositionRoot>();
-                Selection.activeGameObject = root.gameObject;
-            }
-        }
-
-        [MenuItem("GameObject/Zenject/Facade Composition Root", false, 9)]
-        public static void CreateFacadeCompositionRoot(MenuCommand menuCommand)
-        {
-            var root = new GameObject("FacadeCompositionRoot").AddComponent<FacadeCompositionRoot>();
+            var root = new GameObject("DecoratorCompositionRoot").AddComponent<SceneDecoratorCompositionRoot>();
             Selection.activeGameObject = root.gameObject;
+
+            EditorSceneManager.MarkSceneDirty(EditorSceneManager.GetActiveScene());
         }
 
-        [MenuItem("Edit/Zenject/Create Global Composition Root")]
-        public static void CreateGlobalCompositionRootInDefaultLocation()
+        [MenuItem("GameObject/Zenject/Game Object Composition Root", false, 9)]
+        public static void CreateGameObjectCompositionRoot(MenuCommand menuCommand)
+        {
+            var root = new GameObject("GameObjectCompositionRoot").AddComponent<GameObjectCompositionRoot>();
+            Selection.activeGameObject = root.gameObject;
+
+            EditorSceneManager.MarkSceneDirty(EditorSceneManager.GetActiveScene());
+        }
+
+        [MenuItem("Edit/Zenject/Create Project Composition Root")]
+        public static void CreateProjectCompositionRootInDefaultLocation()
         {
             var fullDirPath = Path.Combine(Application.dataPath, "Resources");
 
@@ -86,19 +65,19 @@ namespace Zenject
                 Directory.CreateDirectory(fullDirPath);
             }
 
-            CreateGlobalCompositionRootInternal("Assets/Resources");
+            CreateProjectCompositionRootInternal("Assets/Resources");
         }
 
-        [MenuItem("Assets/Create/Zenject/Global Composition Root")]
-        public static void CreateGlobalCompositionRoot()
+        [MenuItem("Assets/Create/Zenject/Project Composition Root")]
+        public static void CreateProjectCompositionRoot()
         {
-            var dir = UnityEditorUtil.TryGetSelectedFolderPathInProjectsTab();
+            var dir = ZenUnityEditorUtil.TryGetSelectedFolderPathInProjectsTab();
 
             if (dir == null)
             {
                 EditorUtility.DisplayDialog("Error",
                     "Could not find directory to place the '{0}.prefab' asset.  Please try again by right clicking in the desired folder within the projects pane."
-                    .Fmt(GlobalCompositionRoot.GlobalCompRootResourcePath), "Ok");
+                    .Fmt(ProjectCompositionRoot.ProjectCompRootResourcePath), "Ok");
                 return;
             }
 
@@ -108,23 +87,23 @@ namespace Zenject
             {
                 EditorUtility.DisplayDialog("Error",
                     "'{0}.prefab' must be placed inside a directory named 'Resources'.  Please try again by right clicking within the Project pane in a valid Resources folder."
-                    .Fmt(GlobalCompositionRoot.GlobalCompRootResourcePath), "Ok");
+                    .Fmt(ProjectCompositionRoot.ProjectCompRootResourcePath), "Ok");
                 return;
             }
 
-            CreateGlobalCompositionRootInternal(dir);
+            CreateProjectCompositionRootInternal(dir);
         }
 
-        static void CreateGlobalCompositionRootInternal(string dir)
+        static void CreateProjectCompositionRootInternal(string dir)
         {
-            var prefabPath = (Path.Combine(dir, GlobalCompositionRoot.GlobalCompRootResourcePath) + ".prefab").Replace("\\", "/");
+            var prefabPath = (Path.Combine(dir, ProjectCompositionRoot.ProjectCompRootResourcePath) + ".prefab").Replace("\\", "/");
             var emptyPrefab = PrefabUtility.CreateEmptyPrefab(prefabPath);
 
             var gameObject = new GameObject();
 
             try
             {
-                gameObject.AddComponent<GlobalCompositionRoot>();
+                gameObject.AddComponent<ProjectCompositionRoot>();
 
                 var prefabObj = PrefabUtility.ReplacePrefab(gameObject, emptyPrefab);
 
@@ -135,7 +114,7 @@ namespace Zenject
                 GameObject.DestroyImmediate(gameObject);
             }
 
-            Debug.Log("Created new GlobalCompositionRoot at '{0}'".Fmt(prefabPath));
+            Debug.Log("Created new ProjectCompositionRoot at '{0}'".Fmt(prefabPath));
         }
     }
 }

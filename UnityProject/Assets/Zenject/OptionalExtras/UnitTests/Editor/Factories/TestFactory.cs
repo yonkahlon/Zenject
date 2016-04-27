@@ -14,9 +14,9 @@ namespace Zenject.Tests.AbstractFactory
         [Test]
         public void TestToSelf()
         {
-            Container.BindFactory<Foo, Foo.Factory>().ToSelf();
+            Container.BindFactory<Foo, Foo.Factory>().NonLazy();
 
-            AssertValidates();
+            Container.Validate();
 
             Assert.IsNotNull(Container.Resolve<Foo.Factory>().Create());
         }

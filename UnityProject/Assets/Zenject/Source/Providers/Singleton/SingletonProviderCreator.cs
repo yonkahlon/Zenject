@@ -14,6 +14,9 @@ namespace Zenject
         readonly SubContainerSingletonProviderCreatorByInstaller _subContainerInstallerProviderCreator;
 
 #if !ZEN_NOT_UNITY3D
+        readonly SubContainerSingletonProviderCreatorByPrefab _subContainerPrefabProviderCreator;
+        readonly SubContainerSingletonProviderCreatorByPrefabResource _subContainerPrefabResourceProviderCreator;
+
         readonly PrefabSingletonProviderCreator _prefabProviderCreator;
         readonly PrefabResourceSingletonProviderCreator _prefabResourceProviderCreator;
 #endif
@@ -26,13 +29,16 @@ namespace Zenject
             _subContainerInstallerProviderCreator = new SubContainerSingletonProviderCreatorByInstaller(container, markRegistry);
 
 #if !ZEN_NOT_UNITY3D
+            _subContainerPrefabProviderCreator = new SubContainerSingletonProviderCreatorByPrefab(container, markRegistry);
+            _subContainerPrefabResourceProviderCreator = new SubContainerSingletonProviderCreatorByPrefabResource(container, markRegistry);
+
             _prefabProviderCreator = new PrefabSingletonProviderCreator(container, markRegistry);
             _prefabResourceProviderCreator = new PrefabResourceSingletonProviderCreator(container, markRegistry);
 #endif
         }
 
         public IProvider CreateProviderStandard(
-            StandardSingletonDeclaration dec, Func<Type, IProvider> providerCreator)
+            StandardSingletonDeclaration dec, Func<DiContainer, Type, IProvider> providerCreator)
         {
             return _standardProviderCreator.GetOrCreateProvider(dec, providerCreator);
         }
@@ -55,21 +61,37 @@ namespace Zenject
 
 #if !ZEN_NOT_UNITY3D
         public IProvider CreateProviderForPrefab(
-            GameObject prefab, Type resultType, string gameObjectName,
+            GameObject prefab, Type resultType, string gameObjectName, string gameObjectGroupName,
             List<TypeValuePair> extraArguments, string concreteIdentifier)
         {
             return _prefabProviderCreator.CreateProvider(
-                prefab, resultType, gameObjectName,
+                prefab, resultType, gameObjectName, gameObjectGroupName,
                 extraArguments, concreteIdentifier);
         }
 
         public IProvider CreateProviderForPrefabResource(
-            string resourcePath, Type resultType, string gameObjectName,
+            string resourcePath, Type resultType, string gameObjectName, string gameObjectGroupName,
             List<TypeValuePair> extraArguments, string concreteIdentifier)
         {
             return _prefabResourceProviderCreator.CreateProvider(
-                resourcePath, resultType, gameObjectName,
+                resourcePath, resultType, gameObjectName, gameObjectGroupName,
                 extraArguments, concreteIdentifier);
+        }
+
+        public IProvider CreateProviderForSubContainerPrefab(
+            Type resultType, string concreteIdentifier, string gameObjectName, string gameObjectGroupName,
+            GameObject prefab, string identifier)
+        {
+            return _subContainerPrefabProviderCreator.CreateProvider(
+                resultType, concreteIdentifier, prefab, identifier, gameObjectName, gameObjectGroupName);
+        }
+
+        public IProvider CreateProviderForSubContainerPrefabResource(
+            Type resultType, string concreteIdentifier, string gameObjectName, string gameObjectGroupName,
+            string resourcePath, string identifier)
+        {
+            return _subContainerPrefabResourceProviderCreator.CreateProvider(
+                resultType, concreteIdentifier, resourcePath, identifier, gameObjectName, gameObjectGroupName);
         }
 #endif
     }

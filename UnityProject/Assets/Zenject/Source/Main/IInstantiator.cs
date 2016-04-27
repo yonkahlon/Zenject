@@ -50,10 +50,7 @@ namespace Zenject
             GameObject prefab, IEnumerable<object> extraArgs);
 
         GameObject InstantiatePrefab(
-            GameObject prefab, IEnumerable<object> extraArgs, bool includeInactive);
-
-        GameObject InstantiatePrefab(
-            GameObject prefab, IEnumerable<object> extraArgs, bool includeInactive, string groupName);
+            GameObject prefab, IEnumerable<object> extraArgs, string groupName);
 
         // Create a new game object from a resource path and fill in dependencies for all children
         GameObject InstantiatePrefabResource(string resourcePath);
@@ -62,10 +59,7 @@ namespace Zenject
             string resourcePath, IEnumerable<object> extraArgs);
 
         GameObject InstantiatePrefabResource(
-            string resourcePath, IEnumerable<object> extraArgs, bool includeInactive);
-
-        GameObject InstantiatePrefabResource(
-            string resourcePath, IEnumerable<object> extraArgs, bool includeInactive, string groupName);
+            string resourcePath, IEnumerable<object> extraArgs, string groupName);
 
         /////////////// InstantiatePrefabForComponent
 
@@ -76,14 +70,8 @@ namespace Zenject
         T InstantiatePrefabForComponent<T>(
             GameObject prefab, IEnumerable<object> extraArgs);
 
-        T InstantiatePrefabForComponent<T>(
-            GameObject prefab, IEnumerable<object> extraArgs, bool includeInactive);
-
         object InstantiatePrefabForComponent(
             Type concreteType, GameObject prefab, IEnumerable<object> extraArgs);
-
-        object InstantiatePrefabForComponent(
-            Type concreteType, GameObject prefab, IEnumerable<object> extraArgs, bool includeInactive);
 
         /////////////// InstantiatePrefabResourceForComponent
 
@@ -102,14 +90,11 @@ namespace Zenject
             GameObject prefab, List<TypeValuePair> extraArgs);
 
         GameObject InstantiatePrefabExplicit(
-            GameObject prefab, List<TypeValuePair> extraArgs, bool includeInactive);
-
-        GameObject InstantiatePrefabExplicit(
-            GameObject prefab, List<TypeValuePair> extraArgs, bool includeInactive,
+            GameObject prefab, List<TypeValuePair> extraArgs, 
             string groupName);
 
         GameObject InstantiatePrefabExplicit(
-            GameObject prefab, List<TypeValuePair> extraArgs, bool includeInactive,
+            GameObject prefab, List<TypeValuePair> extraArgs, 
             string groupName, bool useAllArgs);
 
         ////
@@ -119,15 +104,11 @@ namespace Zenject
 
         GameObject InstantiatePrefabResourceExplicit(
             string resourcePath, List<TypeValuePair> extraArgs,
-            bool includeInactive);
+            string groupName);
 
         GameObject InstantiatePrefabResourceExplicit(
             string resourcePath, List<TypeValuePair> extraArgs,
-            bool includeInactive, string groupName);
-
-        GameObject InstantiatePrefabResourceExplicit(
-            string resourcePath, List<TypeValuePair> extraArgs, 
-            bool includeInactive, string groupName, bool useAllArgs);
+            string groupName, bool useAllArgs);
 
         // Instantiate the given prefab, inject on all components, then return the instance of 'componentType'
         // Any arguments supplied are assumed to be used as extra parameters into 'componentType'
@@ -144,11 +125,11 @@ namespace Zenject
         // Note: Any arguments that are used will be removed from extraArgs
         object InstantiatePrefabForComponentExplicit(
             Type componentType, GameObject prefab, List<TypeValuePair> extraArgs,
-            bool includeInactive, string groupName);
+            string groupName);
 
         // Note: Any arguments that are used will be removed from extraArgs
         object InstantiatePrefabForComponentExplicit(
-            GameObject prefab, bool includeInactive, string groupName, InjectArgs args);
+            GameObject prefab, string groupName, InjectArgs args);
 
         // This is used instead of Instantiate to support specifying null values
         // Note: Any arguments that are used will be removed from extraArgs
@@ -161,11 +142,12 @@ namespace Zenject
 
         // Note: Any arguments that are used will be removed from extraArgs
         object InstantiatePrefabResourceForComponentExplicit(
-            string resourcePath, bool includeInactive, string groupName, InjectArgs args);
+            string resourcePath, string groupName, InjectArgs args);
 
         // This is the same as GameObject.Instantiate(name) except that it will use
         // the default parent, which can sometimes be set to the CompositionRoot
         GameObject CreateEmptyGameObject(string name);
+        GameObject CreateEmptyGameObject(string name, string groupName);
 #endif
     }
 }

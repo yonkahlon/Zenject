@@ -20,15 +20,6 @@ namespace Zenject
         public string ConcreteIdentifier;
     }
 
-    public class InjectValidationArgs
-    {
-        public List<Type> ArgTypes;
-        public ZenjectTypeInfo TypeInfo;
-        public InjectContext Context;
-        public string ConcreteIdentifier;
-        public bool UseAllArgs;
-    }
-
     public interface IResolver
     {
         // When you call any of these Inject methods
@@ -51,7 +42,7 @@ namespace Zenject
         // Resolve<> - Lookup a value in the container.
         //
         // Note that this may result in a new object being created (for transient bindings) or it
-        // may return an already created object (for ToInstance or AsSingle, etc. bindings)
+        // may return an already created object (for FromInstance or ToSingle, etc. bindings)
         //
         // If a single unique value for the given type cannot be found, an exception is thrown.
         //
@@ -94,41 +85,6 @@ namespace Zenject
         List<Type> ResolveTypeAll(InjectContext context);
         List<Type> ResolveTypeAll(Type type);
 
-        // Validation can be used at edit-time to ensure that no bindings are missing before actually
-        // starting your game
-        // Normally you don't need to call this yourself
-        //
-        // Walks the object graph for the given type
-        // Should never throw an exception - returns them instead
-        //
-        // Note: If you just want to know whether a binding exists for the given TContract,
-        // use HasBinding instead
-        IEnumerable<ZenjectException> ValidateResolve<TContract>();
-        IEnumerable<ZenjectException> ValidateResolve<TContract>(string identifier);
-
-        IEnumerable<ZenjectException> ValidateResolve(InjectContext context);
-
-        IEnumerable<ZenjectException> ValidateResolve(Type contractType);
-        IEnumerable<ZenjectException> ValidateResolve(Type contractType, string identifier);
-
-        IEnumerable<ZenjectException> ValidateValidatables(IEnumerable<Type> ignoreTypes);
-
-        // This will validate everything - not just those types that are are in the initial
-        // object graph which is what ValidateValidatables does
-        // However, this will fail in some valid cases, when using complex conditions that
-        // involve looking at the inject stack
-        // You probably want to use ValidateValidatables
-        IEnumerable<ZenjectException> ValidateAll(IEnumerable<Type> ignoreTypes);
-
-        IEnumerable<ZenjectException> ValidateObjectGraph<TConcrete>();
-        IEnumerable<ZenjectException> ValidateObjectGraph<TConcrete>(List<Type> argTypes);
-
-        IEnumerable<ZenjectException> ValidateObjectGraph(Type concreteType);
-        IEnumerable<ZenjectException> ValidateObjectGraph(Type concreteType, List<Type> argTypes);
-        IEnumerable<ZenjectException> ValidateObjectGraph(Type concreteType, List<Type> argTypes, bool useAll);
-
-        IEnumerable<ZenjectException> ValidateObjectGraph(InjectValidationArgs args);
-
 #if !ZEN_NOT_UNITY3D
         // Inject dependencies into any and all child components on the given game object
         void InjectGameObject(
@@ -138,18 +94,15 @@ namespace Zenject
             GameObject gameObject, bool recursive);
 
         void InjectGameObject(
-            GameObject gameObject, bool recursive, bool includeInactive);
-
-        void InjectGameObject(
-            GameObject gameObject, bool recursive, bool includeInactive,
+            GameObject gameObject, bool recursive, 
             IEnumerable<object> extraArgs);
 
         void InjectGameObjectExplicit(
-            GameObject gameObject, bool recursive, bool includeInactive,
+            GameObject gameObject, bool recursive, 
             List<TypeValuePair> extraArgs);
 
         void InjectGameObjectExplicit(
-            GameObject gameObject, bool recursive, bool includeInactive,
+            GameObject gameObject, bool recursive, 
             List<TypeValuePair> extraArgs, bool useAllArgs);
 #endif
     }

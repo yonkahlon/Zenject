@@ -24,12 +24,11 @@ namespace Zenject.Tests.Injection
         [Test]
         public void TestCase1()
         {
-            Container.Bind<Test1>().ToInstance(new Test1());
-            Container.Bind<Test2>().ToSelf().AsSingle();
+            Container.Bind<Test1>().FromInstance(new Test1()).NonLazy();
+            Container.Bind<Test2>().AsSingle().NonLazy();
 
-            AssertValidates();
+            Container.Validate();
 
-            Assert.That(Container.ValidateResolve<Test2>().IsEmpty());
             var t2 = Container.Resolve<Test2>();
 
             Assert.That(t2 != null);

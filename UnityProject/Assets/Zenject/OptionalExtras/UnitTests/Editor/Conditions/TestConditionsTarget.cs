@@ -32,30 +32,27 @@ namespace Zenject.Tests.Conditions
         public override void Setup()
         {
             base.Setup();
-            Container.Bind<Test0>().ToSelf().AsSingle().When(r => r.ObjectType == typeof(Test2));
+            Container.Bind<Test0>().AsSingle().When(r => r.ObjectType == typeof(Test2));
         }
 
         [Test]
         public void TestTargetConditionError()
         {
-            Container.Bind<Test1>().ToSelf().AsSingle();
+            Container.Bind<Test1>().AsSingle().NonLazy();
 
-            AssertValidationFails();
+            Assert.Throws(() => Container.Validate());
 
             Assert.Throws(
                 delegate { Container.Resolve<Test1>(); });
-
-            Assert.That(Container.ValidateResolve<Test1>().Any());
         }
 
         [Test]
         public void TestTargetConditionSuccess()
         {
-            Container.Bind<Test2>().ToSelf().AsSingle();
+            Container.Bind<Test2>().AsSingle().NonLazy();
 
-            AssertValidates();
+            Container.Validate();
 
-            Assert.That(Container.ValidateResolve<Test2>().IsEmpty());
             var test2 = Container.Resolve<Test2>();
 
             Assert.That(test2 != null);

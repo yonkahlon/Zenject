@@ -14,9 +14,9 @@ namespace Zenject.Tests.Bindings
         [Test]
         public void TestSelf()
         {
-            Container.BindFactory<string, Foo, Foo.Factory>().ToFactorySelf<CustomFooFactory>();
+            Container.BindFactory<string, Foo, Foo.Factory>().FromFactory<CustomFooFactory>().NonLazy();
 
-            AssertValidates();
+            Container.Validate();
 
             Assert.IsEqual(Container.Resolve<Foo.Factory>().Create("asdf").Value, "asdf");
         }
@@ -24,9 +24,9 @@ namespace Zenject.Tests.Bindings
         [Test]
         public void TestConcrete()
         {
-            Container.BindFactory<string, IFoo, IFooFactory>().ToFactory<Foo, CustomFooFactory>();
+            Container.BindFactory<string, IFoo, IFooFactory>().To<Foo>().FromFactory<CustomFooFactory>().NonLazy();
 
-            AssertValidates();
+            Container.Validate();
 
             Assert.IsEqual(Container.Resolve<IFooFactory>().Create("asdf").Value, "asdf");
         }

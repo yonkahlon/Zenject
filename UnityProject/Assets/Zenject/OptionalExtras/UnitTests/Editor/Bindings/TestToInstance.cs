@@ -16,10 +16,10 @@ namespace Zenject.Tests.Bindings
         {
             var foo = new Foo();
 
-            Container.Bind<IFoo>().ToInstance(foo);
-            Container.Bind<Foo>().ToInstance(foo);
+            Container.Bind<IFoo>().FromInstance(foo).NonLazy();
+            Container.Bind<Foo>().FromInstance(foo).NonLazy();
 
-            AssertValidates();
+            Container.Validate();
 
             Assert.IsEqual(Container.Resolve<Foo>(), Container.Resolve<IFoo>());
             Assert.IsEqual(Container.Resolve<Foo>(), foo);
@@ -29,10 +29,10 @@ namespace Zenject.Tests.Bindings
         [ExpectedException]
         public void TestSingle()
         {
-            Container.Bind<Foo>().ToInstance(new Foo()).AsSingle();
-            Container.Bind<Foo>().ToSelf().AsSingle();
+            Container.Bind<Foo>().FromInstance(new Foo()).AsSingle().NonLazy();
+            Container.Bind<Foo>().AsSingle().NonLazy();
 
-            AssertValidates();
+            Container.Validate();
 
             Container.Resolve<Foo>();
         }
@@ -43,10 +43,10 @@ namespace Zenject.Tests.Bindings
         {
             var foo = new Foo();
 
-            Container.Bind<IFoo>().ToInstance(foo).AsCached();
-            Container.Bind<Foo>().ToInstance(foo).AsCached();
+            Container.Bind<IFoo>().FromInstance(foo).AsCached().NonLazy();
+            Container.Bind<Foo>().FromInstance(foo).AsCached().NonLazy();
 
-            AssertValidates();
+            Container.Validate();
 
             Assert.IsEqual(Container.Resolve<Foo>(), Container.Resolve<IFoo>());
             Assert.IsEqual(Container.Resolve<Foo>(), foo);

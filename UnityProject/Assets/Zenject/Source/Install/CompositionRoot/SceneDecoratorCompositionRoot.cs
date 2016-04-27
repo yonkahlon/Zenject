@@ -6,6 +6,7 @@ using System.Linq;
 using ModestTree;
 using ModestTree.Util;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace Zenject
 {
@@ -23,34 +24,44 @@ namespace Zenject
         [SerializeField]
         public MonoInstaller[] PostInstallers;
 
-        Action<DiContainer> _beforeInstallHooks;
-        Action<DiContainer> _afterInstallHooks;
-
         public void Awake()
         {
-            // We always want to initialize GlobalCompositionRoot as early as possible
-            GlobalCompositionRoot.Instance.EnsureIsInitialized();
+            // We always want to initialize ProjectCompositionRoot as early as possible
+            ProjectCompositionRoot.Instance.EnsureIsInitialized();
 
-            _beforeInstallHooks = SceneCompositionRoot.BeforeInstallHooks;
-            SceneCompositionRoot.BeforeInstallHooks = null;
-
-            _afterInstallHooks = SceneCompositionRoot.AfterInstallHooks;
-            SceneCompositionRoot.AfterInstallHooks = null;
+            SceneCompositionRoot.BeforeInstallHooks += AddPreBindings;
+            SceneCompositionRoot.AfterInstallHooks += AddPostBindings;
 
             SceneCompositionRoot.DecoratedScenes.Add(this.gameObject.scene);
 
-            ZenUtil.LoadSceneAdditive(
-                SceneName, AddPreBindings, AddPostBindings);
+            if (ShouldLoadNextScene())
+            {
+                SceneManager.LoadScene(SceneName, LoadSceneMode.Additive);
+            }
+        }
+
+        bool ShouldLoadNextScene()
+        {
+            // This is the only way I can figure out to do this
+            // We can't use GetSceneByName(SceneName).isLoaded since that doesn't work in Awake
+            return GetSceneIndex(this.gameObject.scene) == SceneManager.sceneCount - 1;
+        }
+
+        int GetSceneIndex(Scene scene)
+        {
+            for (int i = 0; i < SceneManager.sceneCount; i++)
+            {
+                if (SceneManager.GetSceneAt(i) == scene)
+                {
+                    return i;
+                }
+            }
+
+            throw Assert.CreateException();
         }
 
         public void AddPreBindings(DiContainer container)
         {
-            if (_beforeInstallHooks != null)
-            {
-                _beforeInstallHooks(container);
-                _beforeInstallHooks = null;
-            }
-
             container.Install(PreInstallers);
 
             ProcessDecoratorInstallers(container, true);
@@ -61,12 +72,6 @@ namespace Zenject
             container.Install(PostInstallers);
 
             ProcessDecoratorInstallers(container, false);
-
-            if (_afterInstallHooks != null)
-            {
-                _afterInstallHooks(container);
-                _afterInstallHooks = null;
-            }
         }
 
         void ProcessDecoratorInstallers(DiContainer container, bool isBefore)

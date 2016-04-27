@@ -25,7 +25,7 @@ namespace Zenject
         }
 
         public IProvider CreateProvider(
-            GameObject prefab, Type resultType, string gameObjectName,
+            GameObject prefab, Type resultType, string gameObjectName, string gameObjectGroupName,
             List<TypeValuePair> extraArguments, string concreteIdentifier)
         {
             IPrefabInstantiator creator;
@@ -43,14 +43,22 @@ namespace Zenject
 
                 Assert.IsEqual(creator.GameObjectName, gameObjectName,
                     "Ambiguous creation parameters (gameObjectName) when using ToPrefab with AsSingle");
+
+                Assert.IsEqual(creator.GameObjectGroupName, gameObjectGroupName,
+                    "Ambiguous creation parameters (gameObjectGroupName) when using ToPrefab with AsSingle");
             }
             else
             {
                 creator = new PrefabInstantiatorCached(
                     new PrefabInstantiator(
-                        _container, gameObjectName, extraArguments, prefab));
+                        _container, gameObjectName, gameObjectGroupName, extraArguments, new PrefabProvider(prefab)));
 
                 _prefabCreators.Add(prefabId, creator);
+            }
+
+            if (resultType == typeof(GameObject))
+            {
+                return new PrefabGameObjectProvider(creator);
             }
 
             return new GetFromPrefabComponentProvider(resultType, creator);

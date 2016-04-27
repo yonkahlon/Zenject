@@ -16,10 +16,6 @@ namespace Zenject
 {
     public abstract class CompositionRoot : MonoBehaviour
     {
-        [Tooltip("When true, inactive objects will still have their members injected")]
-        [SerializeField]
-        bool _includeInactive = false;
-
         [FormerlySerializedAs("Installers")]
         [SerializeField]
         List<MonoInstaller> _installers = new List<MonoInstaller>();
@@ -27,24 +23,10 @@ namespace Zenject
         [SerializeField]
         List<MonoInstaller> _installerPrefabs = new List<MonoInstaller>();
 
+        [SerializeField]
+        List<ScriptableObjectInstaller> _scriptableObjectInstallers = new List<ScriptableObjectInstaller>();
+
         List<Installer> _normalInstallers = new List<Installer>();
-
-        public abstract IDependencyRoot DependencyRoot
-        {
-            get;
-        }
-
-        public bool IncludeInactiveComponents
-        {
-            get
-            {
-                return _includeInactive;
-            }
-            set
-            {
-                _includeInactive = value;
-            }
-        }
 
         public IEnumerable<MonoInstaller> Installers
         {
@@ -72,6 +54,19 @@ namespace Zenject
             }
         }
 
+        public IEnumerable<ScriptableObjectInstaller> ScriptableObjectInstallers
+        {
+            get
+            {
+                return _scriptableObjectInstallers;
+            }
+            set
+            {
+                _scriptableObjectInstallers.Clear();
+                _scriptableObjectInstallers.AddRange(value);
+            }
+        }
+
         // Unlike other installer types this has to be set through code
         public IEnumerable<Installer> NormalInstallers
         {
@@ -88,13 +83,15 @@ namespace Zenject
 
         void CheckInstallerPrefabTypes()
         {
-#if UNITY_EDITOR
             foreach (var installer in _installers)
             {
+                Assert.IsNotNull(installer, "Found null installer in CompositionRoot '{0}'", this.name);
+
+#if UNITY_EDITOR
                 Assert.That(PrefabUtility.GetPrefabType(installer.gameObject) != PrefabType.Prefab,
                     "Found prefab with name '{0}' in the Installer property of CompositionRoot '{1}'.  You should use the property 'InstallerPrefabs' for this instead.", installer.name, this.name);
-            }
 #endif
+            }
 
             foreach (var installerPrefab in _installerPrefabs)
             {
@@ -122,113 +119,142 @@ namespace Zenject
             CheckInstallerPrefabTypes();
 
             var newGameObjects = new List<GameObject>();
-            var allInstallers = _normalInstallers.Cast<IInstaller>().Concat(_installers.Cast<IInstaller>()).ToList();
+            var allInstallers = _normalInstallers.Cast<IInstaller>()
+                .Concat(_installers.Cast<IInstaller>()).Concat(_scriptableObjectInstallers.Cast<IInstaller>()).ToList();
 
-            try
+            foreach (var installerPrefab in _installerPrefabs)
             {
-                foreach (var installerPrefab in _installerPrefabs)
-                {
-                    Assert.IsNotNull(installerPrefab);
+                Assert.IsNotNull(installerPrefab, "Found null installer prefab in '{0}'", this.GetType().Name());
 
-                    var installerGameObject = GameObject.Instantiate(installerPrefab.gameObject);
+                var installerGameObject = GameObject.Instantiate(installerPrefab.gameObject);
 
-                    newGameObjects.Add(installerGameObject);
+                newGameObjects.Add(installerGameObject);
 
-                    installerGameObject.transform.SetParent(this.transform, false);
-                    var installer = installerGameObject.GetComponent<MonoInstaller>();
+                installerGameObject.transform.SetParent(this.transform, false);
+                var installer = installerGameObject.GetComponent<MonoInstaller>();
 
-                    Assert.IsNotNull(installer);
+                Assert.IsNotNull(installer, "Could not find installer component on prefab '{0}'", installerPrefab.name);
 
-                    allInstallers.Add(installer);
-                }
-
-                foreach (var installer in allInstallers)
-                {
-                    List<TypeValuePair> extraArgs;
-
-                    if (extraArgsMap.TryGetValue(installer.GetType(), out extraArgs))
-                    {
-                        extraArgsMap.Remove(installer.GetType());
-                        container.InstallExplicit(installer, extraArgs);
-                    }
-                    else
-                    {
-                        container.Install(installer);
-                    }
-                }
+                allInstallers.Add(installer);
             }
-            finally
+
+            foreach (var installer in allInstallers)
             {
-                if (container.IsValidating)
+                List<TypeValuePair> extraArgs;
+
+                Assert.IsNotNull(installer,
+                    "Found null installer in '{0}'", this.GetType().Name());
+
+                if (extraArgsMap.TryGetValue(installer.GetType(), out extraArgs))
                 {
-                    foreach (var gameObject in newGameObjects)
-                    {
-                        GameObject.DestroyImmediate(gameObject);
-                    }
+                    extraArgsMap.Remove(installer.GetType());
+                    container.InstallExplicit(installer, extraArgs);
+                }
+                else
+                {
+                    container.Install(installer);
                 }
             }
         }
 
         protected void InstallSceneBindings(DiContainer container)
         {
-            foreach (var autoBinding in GetInjectableComponents().OfType<ZenjectBinding>())
+            foreach (var binding in GetInjectableComponents().OfType<ZenjectBinding>())
             {
-                if (autoBinding == null)
+                if (binding == null)
                 {
                     continue;
                 }
 
-                if (autoBinding.ContainerType != ZenjectBinding.ContainerTypes.Local)
+                if (binding.CompositionRoot == null)
+                {
+                    InstallZenjectBinding(container, binding);
+                }
+            }
+
+            // We'd prefer to use GameObject.FindObjectsOfType<ZenjectBinding>() here
+            // instead but that doesn't find inactive gameobjects
+            // Resources.FindObjectsOfTypeAll isn't ideal since it does return prefabs
+            // and stuff but our assumption here is that we can ignore these values by
+            // checking for a non-null scene
+            foreach (var binding in Resources.FindObjectsOfTypeAll<ZenjectBinding>()
+                .Where(x => x.gameObject.scene != null))
+            {
+                if (binding == null)
                 {
                     continue;
                 }
 
-                InstallAutoBinding(container, autoBinding);
+                if (binding.CompositionRoot == this)
+                {
+                    InstallZenjectBinding(container, binding);
+                }
             }
         }
 
-        protected void InstallAutoBinding(
-            DiContainer container, ZenjectBinding autoBinding)
+        protected void InstallZenjectBinding(
+            DiContainer container, ZenjectBinding binding)
         {
-            var component = autoBinding.Component;
-            var bindType = autoBinding.BindType;
-
-            if (component == null)
+            if (!binding.enabled)
             {
                 return;
             }
 
-            switch (bindType)
+            if (binding.Components == null || binding.Components.IsEmpty())
             {
-                case ZenjectBinding.BindTypes.Self:
+                Log.Warn("Found empty list of components on ZenjectBinding on object '{0}'", binding.name);
+                return;
+            }
+
+            string identifier = null;
+
+            if (binding.Identifier.Trim().Length > 0)
+            {
+                identifier = binding.Identifier;
+            }
+
+            foreach (var component in binding.Components)
+            {
+                var bindType = binding.BindType;
+
+                if (component == null)
                 {
-                    container.Bind(component.GetType()).ToInstance(component);
-                    break;
+                    Log.Warn("Found null component in ZenjectBinding on object '{0}'", binding.name);
+                    continue;
                 }
-                case ZenjectBinding.BindTypes.AllInterfaces:
+
+                switch (bindType)
                 {
-                    container.BindAllInterfaces(component.GetType()).ToInstance(component);
-                    break;
-                }
-                case ZenjectBinding.BindTypes.AllInterfacesAndSelf:
-                {
-                    container.BindAllInterfacesAndSelf(component.GetType()).ToInstance(component);
-                    break;
-                }
-                default:
-                {
-                    throw Assert.CreateException();
+                    case ZenjectBinding.BindTypes.Self:
+                    {
+                        container.Bind(identifier, component.GetType()).FromInstance(component);
+                        break;
+                    }
+                    case ZenjectBinding.BindTypes.AllInterfaces:
+                    {
+                        container.BindAllInterfaces(identifier, component.GetType()).FromInstance(component);
+                        break;
+                    }
+                    case ZenjectBinding.BindTypes.AllInterfacesAndSelf:
+                    {
+                        container.BindAllInterfacesAndSelf(identifier, component.GetType()).FromInstance(component);
+                        break;
+                    }
+                    default:
+                    {
+                        throw Assert.CreateException();
+                    }
                 }
             }
         }
 
+        public abstract void InstallBindings(DiContainer container);
+
         public abstract IEnumerable<Component> GetInjectableComponents();
 
-        public static IEnumerable<Component> GetInjectableComponents(
-            GameObject gameObject, bool includeInactive)
+        public static IEnumerable<Component> GetInjectableComponents(GameObject gameObject)
         {
-            foreach (var component in ZenUtilInternal.GetInjectableComponentsBottomUp(
-                gameObject, true, includeInactive))
+            foreach (var component in ZenUtilInternal.GetInjectableComponentsBottomUp(gameObject, true))
             {
                 if (component == null)
                 {

@@ -11,20 +11,27 @@ namespace Zenject
     public class StandardSingletonDeclaration
     {
         public StandardSingletonDeclaration(
-            SingletonId id, SingletonTypes type, object singletonSpecificId)
+            SingletonId id, List<TypeValuePair> args, SingletonTypes type, object singletonSpecificId)
         {
             Id = id;
             Type = type;
             SpecificId = singletonSpecificId;
+            Arguments = args;
         }
 
         public StandardSingletonDeclaration(
-            Type concreteType, string concreteIdentifier,
+            Type concreteType, string concreteIdentifier, List<TypeValuePair> args,
             SingletonTypes type, object singletonSpecificId)
             : this(
-                new SingletonId(concreteType, concreteIdentifier),
+                new SingletonId(concreteType, concreteIdentifier), args,
                 type, singletonSpecificId)
         {
+        }
+
+        public List<TypeValuePair> Arguments
+        {
+            get;
+            private set;
         }
 
         public SingletonId Id

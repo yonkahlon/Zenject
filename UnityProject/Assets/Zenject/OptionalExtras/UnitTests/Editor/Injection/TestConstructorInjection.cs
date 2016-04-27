@@ -27,12 +27,11 @@ namespace Zenject.Tests.Injection
         [Test]
         public void TestCase1()
         {
-            Container.Bind<Test2>().ToSelf().AsSingle();
-            Container.Bind<Test1>().ToSelf().AsSingle();
+            Container.Bind<Test2>().AsSingle().NonLazy();
+            Container.Bind<Test1>().AsSingle().NonLazy();
 
-            AssertValidates();
+            Container.Validate();
 
-            Assert.That(Container.ValidateResolve<Test2>().IsEmpty());
             var test1 = Container.Resolve<Test2>();
 
             Assert.That(test1.val != null);
@@ -41,7 +40,7 @@ namespace Zenject.Tests.Injection
         [Test]
         public void TestConstructByFactory()
         {
-            Container.Bind<Test2>().ToSelf().AsSingle();
+            Container.Bind<Test2>().AsSingle();
 
             var val = new Test1();
             var test1 = Container.Instantiate<Test2>(new object[] { val });

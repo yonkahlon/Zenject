@@ -46,12 +46,12 @@ namespace Zenject.Tests.Conditions
         [Test]
         public void Test1()
         {
-            Container.Bind<Bar1>().ToSelf().AsSingle();
-            Container.Bind<Bar2>().ToSelf().AsSingle();
-            Container.Bind<IFoo>().To<Foo1>().AsSingle();
-            Container.Bind<IFoo>().To<Foo2>().AsSingle().WhenInjectedInto<Bar2>();
+            Container.Bind<Bar1>().AsSingle().NonLazy();
+            Container.Bind<Bar2>().AsSingle().NonLazy();
+            Container.Bind<IFoo>().To<Foo1>().AsSingle().NonLazy();
+            Container.Bind<IFoo>().To<Foo2>().AsSingle().WhenInjectedInto<Bar2>().NonLazy();
 
-            AssertValidates();
+            Container.Validate();
 
             Assert.IsNotEqual(
                 Container.Resolve<Bar1>().Foo, Container.Resolve<Bar2>().Foo);

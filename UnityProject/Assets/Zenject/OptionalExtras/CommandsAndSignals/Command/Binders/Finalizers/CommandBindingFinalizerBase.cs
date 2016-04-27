@@ -15,53 +15,57 @@ namespace Zenject
         readonly Func<IProvider> _handlerProviderFactory;
 
         public CommandBindingFinalizerBase(
+            BindInfo bindInfo,
             Func<IProvider> handlerProviderFactory)
+            : base(bindInfo)
         {
             _handlerProviderFactory = handlerProviderFactory;
         }
 
-        public override void FinalizeBinding()
+        protected override void OnFinalizeBinding(DiContainer container)
         {
-            Assert.That(Binding.ContractTypes.IsLength(1));
-            Assert.IsEqual(Binding.ContractTypes.Single(), typeof(TCommand));
+            Assert.That(BindInfo.ContractTypes.IsLength(1));
+            Assert.IsEqual(BindInfo.ContractTypes.Single(), typeof(TCommand));
 
             // Note that the singleton here applies to the handler, not the command class
             // The command itself is always cached
             RegisterProvider<TCommand>(
+                container,
                 new CachedProvider(
                     new TransientProvider(
-                        typeof(TCommand), Container,
-                        InjectUtil.CreateArgListExplicit(GetCommandAction()), null)));
+                        typeof(TCommand), container,
+                        InjectUtil.CreateArgListExplicit(GetCommandAction(container)), null)));
         }
 
         // The returned delegate is executed every time the command is executed
-        TAction GetCommandAction()
+        TAction GetCommandAction(DiContainer container)
         {
-            var handlerProvider = GetHandlerProvider();
-            var handlerInjectContext = new InjectContext(Container, typeof(THandler));
+            var handlerProvider = GetHandlerProvider(container);
+            var handlerInjectContext = new InjectContext(container, typeof(THandler));
 
             return GetCommandAction(handlerProvider, handlerInjectContext);
         }
 
-        IProvider GetHandlerProvider()
+        IProvider GetHandlerProvider(DiContainer container)
         {
-            switch (Binding.CreationType)
+            switch (BindInfo.Scope)
             {
-                case CreationTypes.Singleton:
+                case ScopeTypes.Singleton:
                 {
-                    return Container.SingletonProviderCreator.CreateProviderStandard(
+                    return container.SingletonProviderCreator.CreateProviderStandard(
                         new StandardSingletonDeclaration(
                             typeof(THandler),
-                            Binding.ConcreteIdentifier,
+                            BindInfo.ConcreteIdentifier,
+                            BindInfo.Arguments,
                             SingletonTypes.To,
                             null),
-                        (type) => _handlerProviderFactory());
+                        (_, type) => _handlerProviderFactory());
                 }
-                case CreationTypes.Transient:
+                case ScopeTypes.Transient:
                 {
                     return _handlerProviderFactory();
                 }
-                case CreationTypes.Cached:
+                case ScopeTypes.Cached:
                 {
                     return new CachedProvider(
                         _handlerProviderFactory());

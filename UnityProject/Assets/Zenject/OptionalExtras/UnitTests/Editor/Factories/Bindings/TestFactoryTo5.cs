@@ -12,11 +12,21 @@ namespace Zenject.Tests.Bindings
     public class TestFactoryTo5 : TestWithContainer
     {
         [Test]
-        public void TestSelf()
+        public void TestSelf1()
         {
-            Container.BindFactory<string, int, string, float, int, Foo, Foo.Factory>().ToSelf();
+            Container.BindFactory<string, int, string, float, int, Foo, Foo.Factory>().NonLazy();
 
-            AssertValidates();
+            Container.Validate();
+
+            Assert.IsEqual(Container.Resolve<Foo.Factory>().Create("asdf", 2, "a", 4.2f, 6).P1, "asdf");
+        }
+
+        [Test]
+        public void TestSelf2()
+        {
+            Container.BindFactory<string, int, string, float, int, Foo, Foo.Factory>().NonLazy();
+
+            Container.Validate();
 
             Assert.IsEqual(Container.Resolve<Foo.Factory>().Create("asdf", 2, "a", 4.2f, 6).P1, "asdf");
         }
@@ -24,9 +34,9 @@ namespace Zenject.Tests.Bindings
         [Test]
         public void TestConcrete()
         {
-            Container.BindFactory<string, int, string, float, int, IFoo, IFooFactory>().To<Foo>();
+            Container.BindFactory<string, int, string, float, int, IFoo, IFooFactory>().To<Foo>().NonLazy();
 
-            AssertValidates();
+            Container.Validate();
 
             var ifoo = Container.Resolve<IFooFactory>().Create("asdf", 2, "a", 4.2f, 6);
 

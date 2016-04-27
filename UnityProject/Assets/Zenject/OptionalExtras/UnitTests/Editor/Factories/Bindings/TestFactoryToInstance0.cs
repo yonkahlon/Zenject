@@ -16,9 +16,9 @@ namespace Zenject.Tests.Bindings
         {
             var foo = new Foo();
 
-            Container.BindFactory<Foo, Foo.Factory>().ToInstance(foo);
+            Container.BindFactory<Foo, Foo.Factory>().FromInstance(foo).NonLazy();
 
-            AssertValidates();
+            Container.Validate();
 
             Assert.IsEqual(Container.Resolve<Foo.Factory>().Create(), foo);
         }
@@ -28,9 +28,9 @@ namespace Zenject.Tests.Bindings
         {
             var foo = new Foo();
 
-            Container.BindFactory<IFoo, IFooFactory>().ToInstance(foo);
+            Container.BindFactory<IFoo, IFooFactory>().FromInstance(foo).NonLazy();
 
-            AssertValidates();
+            Container.Validate();
 
             Assert.IsEqual(Container.Resolve<IFooFactory>().Create(), foo);
         }

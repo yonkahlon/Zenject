@@ -14,9 +14,10 @@ namespace Zenject.Tests.Bindings
         [Test]
         public void TestSelf()
         {
-            Container.BindFactory<string, Foo, Foo.Factory>().ToSubContainerSelf(InstallFoo);
+            Container.BindFactory<string, Foo, Foo.Factory>()
+                .FromSubContainerResolve().ByMethod(InstallFoo).NonLazy();
 
-            AssertValidates();
+            Container.Validate();
 
             Assert.IsEqual(Container.Resolve<Foo.Factory>().Create("asdf").Value, "asdf");
         }
@@ -24,16 +25,16 @@ namespace Zenject.Tests.Bindings
         [Test]
         public void TestConcrete()
         {
-            Container.BindFactory<string, IFoo, IFooFactory>().ToSubContainer<Foo>(InstallFoo);
+            Container.BindFactory<string, IFoo, IFooFactory>().To<Foo>().FromSubContainerResolve().ByMethod(InstallFoo).NonLazy();
 
-            AssertValidates();
+            Container.Validate();
 
             Assert.IsEqual(Container.Resolve<IFooFactory>().Create("asdf").Value, "asdf");
         }
 
         void InstallFoo(DiContainer subContainer, string value)
         {
-            subContainer.Bind<Foo>().ToSelf().AsSingle().WithArgumentsExplicit(
+            subContainer.Bind<Foo>().AsSingle().WithArgumentsExplicit(
                 InjectUtil.CreateArgListExplicit(value));
         }
 

@@ -5,6 +5,6 @@ namespace Zenject
 {
     public interface IValidatable
     {
-        IEnumerable<ZenjectException> Validate();
+        void Validate();
     }
 }

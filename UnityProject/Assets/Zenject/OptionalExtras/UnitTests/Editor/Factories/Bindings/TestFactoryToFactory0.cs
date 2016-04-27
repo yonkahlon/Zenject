@@ -16,9 +16,9 @@ namespace Zenject.Tests.Bindings
         [Test]
         public void TestSelf()
         {
-            Container.BindFactory<Foo, Foo.Factory>().ToFactorySelf<CustomFooFactory>();
+            Container.BindFactory<Foo, Foo.Factory>().FromFactory<CustomFooFactory>().NonLazy();
 
-            AssertValidates();
+            Container.Validate();
 
             Assert.IsEqual(Container.Resolve<Foo.Factory>().Create(), StaticFoo);
         }
@@ -26,9 +26,10 @@ namespace Zenject.Tests.Bindings
         [Test]
         public void TestConcrete()
         {
-            Container.BindFactory<IFoo, IFooFactory>().ToFactory<Foo, CustomFooFactory>();
+            Container.BindFactory<IFoo, IFooFactory>()
+                .To<Foo>().FromFactory<CustomFooFactory>().NonLazy();
 
-            AssertValidates();
+            Container.Validate();
 
             Assert.IsEqual(Container.Resolve<IFooFactory>().Create(), StaticFoo);
         }
@@ -36,9 +37,10 @@ namespace Zenject.Tests.Bindings
         [Test]
         public void TestFactoryValidation()
         {
-            Container.BindFactory<IFoo, IFooFactory>().ToFactory<Foo, CustomFooFactoryWithValidate>();
+            Container.BindFactory<IFoo, IFooFactory>()
+                .To<Foo>().FromFactory<CustomFooFactoryWithValidate>().NonLazy();
 
-            AssertValidationFails();
+            Assert.Throws(() => Container.Validate());
         }
 
         class CustomFooFactoryWithValidate : IFactory<Foo>, IValidatable
@@ -48,9 +50,9 @@ namespace Zenject.Tests.Bindings
                 return StaticFoo;
             }
 
-            public IEnumerable<ZenjectException> Validate()
+            public void Validate()
             {
-                yield return new ZenjectException("Test error");
+                throw Assert.CreateException("Test error");
             }
         }
 

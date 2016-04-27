@@ -40,14 +40,12 @@ namespace Zenject.Tests.Injection
         [Test]
         public void TestMissingParameterThrows()
         {
-            Container.Bind<Test1>().ToSelf().AsTransient();
+            Container.Bind<Test1>().AsTransient().NonLazy();
 
-            AssertValidationFails();
+            Assert.Throws(() => Container.Validate());
 
             Assert.Throws(
                 delegate { Container.Resolve<Test1>(); });
-
-            Assert.That(Container.ValidateResolve<Test1>().Any());
         }
     }
 }

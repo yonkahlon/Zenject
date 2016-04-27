@@ -8,9 +8,10 @@ using ModestTree.Util;
 using UnityEngine;
 using UnityEngine.Serialization;
 using Zenject.Internal;
-
-#if UNITY_5_3
 using UnityEngine.SceneManagement;
+
+#if UNITY_EDITOR
+using UnityEditor;
 #endif
 
 namespace Zenject
@@ -22,17 +23,58 @@ namespace Zenject
         public static Action<DiContainer> BeforeInstallHooks;
         public static Action<DiContainer> AfterInstallHooks;
 
+        public static DiContainer ParentContainer;
+
         [FormerlySerializedAs("ParentNewObjectsUnderRoot")]
         [Tooltip("When true, objects that are created at runtime will be parented to the SceneCompositionRoot")]
         [SerializeField]
         bool _parentNewObjectsUnderRoot = false;
 
         DiContainer _container;
-        IDependencyRoot _dependencyRoot;
+        readonly List<object> _dependencyRoots = new List<object>();
 
         bool _hasInitialized;
 
-        static bool _autoInitialize = true;
+#if UNITY_EDITOR
+        bool _isValidating;
+        bool _validateShutDownAfterwards = true;
+#endif
+
+        static bool _autoRun = true;
+
+        public DiContainer Container
+        {
+            get
+            {
+                return _container;
+            }
+        }
+
+#if UNITY_EDITOR
+        public bool IsValidating
+        {
+            get
+            {
+                return _isValidating;
+            }
+            set
+            {
+                _isValidating = value;
+            }
+        }
+
+        public bool ValidateShutDownAfterwards
+        {
+            get
+            {
+                return _validateShutDownAfterwards;
+            }
+            set
+            {
+                _validateShutDownAfterwards = value;
+            }
+        }
+#endif
 
         public bool ParentNewObjectsUnderRoot
         {
@@ -46,45 +88,80 @@ namespace Zenject
             }
         }
 
-        public override IDependencyRoot DependencyRoot
-        {
-            get
-            {
-                return _dependencyRoot;
-            }
-        }
-
         public void Awake()
         {
-            if (_autoInitialize)
-            {
-                Initialize();
-            }
+            // We always want to initialize ProjectCompositionRoot as early as possible
+            ProjectCompositionRoot.Instance.EnsureIsInitialized();
 
-            // Always reset it after use to avoid affecting other SceneCompositionRoot's
-            _autoInitialize = true;
+            _isValidating = ProjectCompositionRoot.Instance.Container.IsValidating;
+
+            if (_autoRun)
+            {
+                Run();
+            }
+            else
+            {
+                // True should always be default
+                _autoRun = true;
+            }
         }
 
-        public void Initialize()
+#if UNITY_EDITOR
+        public void Run()
+        {
+            if (_isValidating)
+            {
+                try
+                {
+                    RunInternal();
+
+                    Assert.That(_container.IsValidating);
+
+                    _container.ValidateIValidatables();
+
+                    Log.Info("Scene '{0}' Validated Successfully", this.gameObject.scene.name);
+                }
+                catch (Exception e)
+                {
+                    Log.ErrorException("Scene '{0}' Failed Validation!".Fmt(this.gameObject.scene.name), e);
+                }
+            }
+            else
+            {
+                RunInternal();
+            }
+        }
+#else
+        public void Run()
+        {
+            RunInternal();
+        }
+#endif
+
+        public void RunInternal()
         {
             Assert.That(!_hasInitialized);
             _hasInitialized = true;
 
-            // We always want to initialize GlobalCompositionRoot as early as possible
-            GlobalCompositionRoot.Instance.EnsureIsInitialized();
-
             Assert.IsNull(_container);
 
-            _container = GlobalCompositionRoot.Instance.Container.CreateSubContainer();
+            var parentContainer = ParentContainer ?? ProjectCompositionRoot.Instance.Container;
 
-            _container.IncludeInactiveDefault = IncludeInactiveComponents;
+            // ParentContainer is optionally set temporarily before calling ZenUtil.LoadScene
+            ParentContainer = null;
 
-            // This can be valid in cases where you have everything in either facade installers
-            // or global installers so just ignore
-            //if (Installers.IsEmpty() && InstallerPrefabs.IsEmpty())
-            //{
-                //Log.Warn("No installers found while initializing CompositionRoot '{0}'", this.name);
-            //}
+            _container = parentContainer.CreateSubContainer(_isValidating);
+
+#if !UNITY_EDITOR
+            Assert.That(!_isValidating);
+#endif
+
+            // This can happen if you run a decorated scene with immediately running a normal scene afterwards
+            foreach (var decoratedScene in DecoratedScenes)
+            {
+                Assert.That(decoratedScene.isLoaded,
+                    "Unexpected state in SceneCompositionRoot - found unloaded decorated scene");
+            }
 
             Log.Debug("SceneCompositionRoot: Running installers...");
 
@@ -103,9 +180,10 @@ namespace Zenject
 
             InjectComponents(_container);
 
-            Log.Debug("SceneCompositionRoot: Resolving dependency root...");
+            Log.Debug("SceneCompositionRoot: Resolving dependency roots...");
 
-            _dependencyRoot = _container.Resolve<IDependencyRoot>();
+            Assert.That(_dependencyRoots.IsEmpty());
+            _dependencyRoots.AddRange(_container.ResolveDependencyRoots());
 
             DecoratedScenes.Clear();
 
@@ -113,18 +191,22 @@ namespace Zenject
         }
 
         // We pass in the container here instead of using our own for validation to work
-        public void InstallBindings(DiContainer container)
+        public override void InstallBindings(DiContainer container)
         {
             if (_parentNewObjectsUnderRoot)
             {
-                container.Bind<Transform>(DiContainer.DefaultParentId)
-                    .ToInstance<Transform>(this.transform);
+                container.DefaultParent = this.transform;
+            }
+            else
+            {
+                // This is necessary otherwise we inherit the project root DefaultParent
+                container.DefaultParent = null;
             }
 
-            container.Bind(typeof(TickableManager), typeof(InitializableManager), typeof(DisposableManager)).ToSelf().AsSingle();
-            container.Bind<CompositionRoot>().ToInstance(this);
+            container.Bind<CompositionRoot>().FromInstance(this);
+            container.Bind<SceneCompositionRoot>().FromInstance(this);
 
-            InstallSceneBindingsInternal(container);
+            InstallSceneBindings(container);
 
             if (BeforeInstallHooks != null)
             {
@@ -133,7 +215,9 @@ namespace Zenject
                 BeforeInstallHooks = null;
             }
 
-            container.Bind<IDependencyRoot>().ToComponent<SceneFacade>(this.gameObject);
+            container.Bind<SceneFacade>().FromComponent(this.gameObject).AsSingle().NonLazy();
+
+            container.Bind<ZenjectSceneLoader>().AsSingle();
 
             InstallInstallers(container);
 
@@ -145,35 +229,17 @@ namespace Zenject
             }
         }
 
-        void InstallSceneBindingsInternal(DiContainer container)
-        {
-            InstallSceneBindings(container);
-
-            foreach (var autoBinding in GameObject.FindObjectsOfType<ZenjectBinding>())
-            {
-                if (autoBinding == null)
-                {
-                    continue;
-                }
-
-                if (autoBinding.ContainerType != ZenjectBinding.ContainerTypes.Scene)
-                {
-                    continue;
-                }
-
-                InstallAutoBinding(container, autoBinding);
-            }
-        }
-
         public override IEnumerable<Component> GetInjectableComponents()
         {
             foreach (var gameObject in GetRootGameObjects())
             {
-                foreach (var component in GetInjectableComponents(gameObject, IncludeInactiveComponents))
+                foreach (var component in GetInjectableComponents(gameObject))
                 {
                     yield return component;
                 }
             }
+
+            yield break;
         }
 
         void InjectComponents(DiContainer container)
@@ -187,52 +253,44 @@ namespace Zenject
             }
         }
 
-        IEnumerable<GameObject> GetRootGameObjects()
+        public IEnumerable<GameObject> GetRootGameObjects()
         {
             var scene = this.gameObject.scene;
+
             // Note: We can't use activeScene.GetRootObjects() here because that apparently fails with an exception
             // about the scene not being loaded yet when executed in Awake
             // We also can't use GameObject.FindObjectsOfType<Transform>() because that does not include inactive game objects
             // So we use Resources.FindObjectsOfTypeAll, even though that may include prefabs.  However, our assumption here
             // is that prefabs do not have their "scene" property set correctly so this should work
             //
-            // It's important here that we only inject into root objects that are part of our scene
-            // Otherwise, if there is an object that is marked with DontDestroyOnLoad, then it will
+            // It's important here that we only inject into root objects that are part of our scene, to properly support
+            // multi-scene editing features of Unity 5.x
+            //
+            // Also, even with older Unity versions, if there is an object that is marked with DontDestroyOnLoad, then it will
             // be injected multiple times when another scene is loaded
-            // We also make sure not to inject into the global root objects which are injected in GlobalCompositionRoot
+            //
+            // We also make sure not to inject into the project root objects which are injected by ProjectCompositionRoot.
             return Resources.FindObjectsOfTypeAll<GameObject>()
-                .Where(x => (IncludeInactiveComponents || x.activeSelf)
-                    && x.transform.parent == null
-                    && x.GetComponent<GlobalCompositionRoot>() == null
+                .Where(x => x.transform.parent == null
+                    && x.GetComponent<ProjectCompositionRoot>() == null
                     && (x.scene == scene || DecoratedScenes.Contains(x.scene)));
         }
 
         // These methods can be used for cases where you need to create the SceneCompositionRoot entirely in code
-        // Note that if you use these methods that you have to call Initialize() yourself
+        // Note that if you use these methods that you have to call Run() yourself
         // This is useful because it allows you to create a SceneCompositionRoot and configure it how you want
         // and add what installers you want before kicking off the Install/Resolve
         public static SceneCompositionRoot Create()
         {
-            return Create(null);
-        }
-
-        public static SceneCompositionRoot Create(GameObject parent)
-        {
-            var gameObject = new GameObject("SceneCompositionRoot");
-
-            if (parent != null)
-            {
-                gameObject.transform.SetParent(parent.transform, false);
-            }
-
-            return CreateComponent(gameObject);
+            return CreateComponent(
+                new GameObject("SceneCompositionRoot"));
         }
 
         public static SceneCompositionRoot CreateComponent(GameObject gameObject)
         {
-            _autoInitialize = false;
+            _autoRun = false;
             var result = gameObject.AddComponent<SceneCompositionRoot>();
-            Assert.That(_autoInitialize); // Should be reset
+            Assert.That(_autoRun); // Should be reset
             return result;
         }
     }

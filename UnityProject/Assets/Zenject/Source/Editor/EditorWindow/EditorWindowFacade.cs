@@ -10,7 +10,7 @@ using System.Linq;
 
 namespace Zenject
 {
-    public abstract class EditorWindowFacade : EditorWindow, IDependencyRoot
+    public abstract class EditorWindowFacade : EditorWindow
     {
         [Inject]
         TickableManager _tickableManager = null;

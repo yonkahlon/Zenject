@@ -30,15 +30,6 @@ namespace ModestTree
             }
         }
 
-        public static void IsEmpty<T>(IEnumerable<T> sequence)
-        {
-            if (!sequence.IsEmpty())
-            {
-                Throw("Expected collection to be empty but instead found '{0}' elements",
-                    sequence.Count());
-            }
-        }
-
         public static void DerivesFrom<T>(Type type)
         {
             if (!type.DerivesFrom<T>())
@@ -60,6 +51,23 @@ namespace ModestTree
             if (!childType.DerivesFromOrEqual(parentType))
             {
                 Throw("Expected type '{0}' to derive from or be equal to '{1}'", childType.Name, parentType.Name);
+            }
+        }
+
+        public static void IsEmpty<T>(IEnumerable<T> sequence)
+        {
+            if (!sequence.IsEmpty())
+            {
+                Throw("Expected collection to be empty but instead found '{0}' elements",
+                    sequence.Count());
+            }
+        }
+
+        public static void IsNotEmpty<T>(IEnumerable<T> val, string message = "")
+        {
+            if (!val.Any())
+            {
+                Throw("Assert Hit! Expected empty collection but found {0} values. {1}", val.Count(), message);
             }
         }
 
@@ -181,7 +189,7 @@ namespace ModestTree
         {
             if (val != null)
             {
-                Throw("Assert Hit! Expected null pointer but instead found '" + val.ToString() + "': " + SafeFormatString(message, parameters));
+                Throw("Assert Hit! Expected null pointer but instead found '" + val.ToString() + "': " + FormatString(message, parameters));
             }
         }
 
@@ -190,7 +198,7 @@ namespace ModestTree
         {
             if (val == null)
             {
-                Throw("Assert Hit! Found null pointer when value was expected. " + SafeFormatString(message, parameters));
+                Throw("Assert Hit! Found null pointer when value was expected. " + FormatString(message, parameters));
             }
         }
 
@@ -223,7 +231,7 @@ namespace ModestTree
         {
             if (!condition)
             {
-                Throw("Assert hit! " + SafeFormatString(message, parameters));
+                Throw("Assert hit! " + FormatString(message, parameters));
             }
         }
 
@@ -241,10 +249,10 @@ namespace ModestTree
         public static void Throw(string message, params object[] parameters)
         {
             throw new ZenjectException(
-                SafeFormatString(message, parameters));
+                FormatString(message, parameters));
         }
 
-        public static string SafeFormatString(string format, params object[] parameters)
+        public static string FormatString(string format, params object[] parameters)
         {
             // doin this funky loop to ensure nulls are replaced with "NULL"
             // and that the original parameters array will not be modified
@@ -273,24 +281,24 @@ namespace ModestTree
             return format;
         }
 
-        public static Exception CreateException()
+        public static ZenjectException CreateException()
         {
-            return new Exception("Assert hit!");
+            return new ZenjectException("Assert hit!");
         }
 
-        public static Exception CreateException(string message)
+        public static ZenjectException CreateException(string message)
         {
-            return new Exception(message);
+            return new ZenjectException(message);
         }
 
-        public static Exception CreateException(string message, params object[] parameters)
+        public static ZenjectException CreateException(string message, params object[] parameters)
         {
-            return new Exception(SafeFormatString(message, parameters));
+            return new ZenjectException(FormatString(message, parameters));
         }
 
-        public static Exception CreateException(Exception innerException, string message, params object[] parameters)
+        public static ZenjectException CreateException(Exception innerException, string message, params object[] parameters)
         {
-            return new Exception(SafeFormatString(message, parameters), innerException);
+            return new ZenjectException(FormatString(message, parameters), innerException);
         }
     }
 }

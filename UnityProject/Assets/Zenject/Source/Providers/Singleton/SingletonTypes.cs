@@ -24,6 +24,8 @@ namespace Zenject
         ToGetter,
         ToResolve,
         ToResource,
+        ToSubContainerPrefab,
+        ToSubContainerPrefabResource,
     }
 }
 

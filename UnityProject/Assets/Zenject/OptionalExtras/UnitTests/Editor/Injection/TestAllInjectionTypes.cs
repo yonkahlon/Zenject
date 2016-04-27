@@ -14,12 +14,11 @@ namespace Zenject.Tests.Injection
         // Test all variations of injection
         public void TestCase1()
         {
-            Container.Bind<Test0>().ToInstance(new Test0());
-            Container.Bind<IFoo>().To<FooDerived>().AsSingle();
+            Container.Bind<Test0>().FromInstance(new Test0()).NonLazy();
+            Container.Bind<IFoo>().To<FooDerived>().AsSingle().NonLazy();
 
-            AssertValidates();
+            Container.Validate();
 
-            Assert.That(Container.ValidateResolve<IFoo>().IsEmpty());
             var foo = Container.Resolve<IFoo>();
 
             Assert.That(foo.DidPostInjectBase);

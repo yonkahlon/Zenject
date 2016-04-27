@@ -1,0 +1,208 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{9D5E0D93-7D67-40C0-8435-C0A14789836E}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>BuildLib</RootNamespace>
+    <AssemblyName>$(MSBuildProjectName)</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\..\..\..\Bin\Assemblies\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <OutputPath>..\..\..\..\Bin\Assemblies\Debug\</OutputPath>
+    <IntermediateOutputPath>..\..\..\..\Temp\obj\Debug\Zenject\</IntermediateOutputPath>
+    <BaseIntermediateOutputPath>..\..\..\..\Temp\obj\Debug\Zenject\</BaseIntermediateOutputPath>
+    <GenerateSerializationAssemblies>On</GenerateSerializationAssemblies>
+    <DefineConstants>TRACE;DEBUG;ZEN_NOT_UNITY3D;ZEN_MULTITHREADING</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+    <OutputPath>..\..\..\..\Bin\Assemblies\Release\</OutputPath>
+    <IntermediateOutputPath>..\..\..\..\Temp\obj\Release\Zenject\</IntermediateOutputPath>
+    <BaseIntermediateOutputPath>..\..\..\..\Temp\obj\Release\Zenject\</BaseIntermediateOutputPath>
+    <Optimize>true</Optimize>
+    <DefineConstants>TRACE;DEBUG;ZEN_NOT_UNITY3D;ZEN_MULTITHREADING</DefineConstants>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Mtm.Debugging\Scripts\Mtm.Debugging.csproj">
+      <Project>{02c3386d-7132-4c1f-aef0-9e5432dbfc25}</Project>
+      <Name>Mtm.Debugging</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Mtm.Zenject-usage\Mtm.Zenject-usage.csproj">
+      <Project>{e22b1cbf-7e4d-48bd-953b-2b730bd9ff13}</Project>
+      <Name>Mtm.Zenject-usage</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Binding\BindingUtil.cs" />
+    <Compile Include="Binding\Binders\ArgumentsBinder.cs" />
+    <Compile Include="Binding\Binders\ConditionBinder.cs" />
+    <Compile Include="Binding\Binders\GameObject\GameObjectGroupNameScopeArgBinder.cs" />
+    <Compile Include="Binding\Binders\GameObject\GameObjectNameGroupNameBinder.cs" />
+    <Compile Include="Binding\Binders\GameObject\GameObjectNameGroupNameScopeArgBinder.cs" />
+    <Compile Include="Binding\Binders\Factory\FactoryFromBinder\FactoryFromBinder0.cs" />
+    <Compile Include="Binding\Binders\Factory\FactoryFromBinder\FactoryFromBinder1.cs" />
+    <Compile Include="Binding\Binders\Factory\FactoryFromBinder\FactoryFromBinder2.cs" />
+    <Compile Include="Binding\Binders\Factory\FactoryFromBinder\FactoryFromBinder3.cs" />
+    <Compile Include="Binding\Binders\Factory\FactoryFromBinder\FactoryFromBinder4.cs" />
+    <Compile Include="Binding\Binders\Factory\FactoryFromBinder\FactoryFromBinder5.cs" />
+    <Compile Include="Binding\Binders\Factory\FactoryFromBinder\SubContainerBinder\FactorySubContainerBinder2.cs" />
+    <Compile Include="Binding\Binders\Factory\FactoryFromBinder\SubContainerBinder\FactorySubContainerBinder3.cs" />
+    <Compile Include="Binding\Binders\Factory\FactoryFromBinder\SubContainerBinder\FactorySubContainerBinder4.cs" />
+    <Compile Include="Binding\Binders\Factory\FactoryFromBinder\SubContainerBinder\FactorySubContainerBinder5.cs" />
+    <Compile Include="Binding\Binders\Factory\FactoryToChoiceBinder\FactoryToChoiceBinder0.cs" />
+    <Compile Include="Binding\Binders\Factory\FactoryToChoiceBinder\FactoryToChoiceBinder1.cs" />
+    <Compile Include="Binding\Binders\Factory\FactoryToChoiceBinder\FactoryToChoiceBinder2.cs" />
+    <Compile Include="Binding\Binders\Factory\FactoryToChoiceBinder\FactoryToChoiceBinder3.cs" />
+    <Compile Include="Binding\Binders\Factory\FactoryToChoiceBinder\FactoryToChoiceBinder4.cs" />
+    <Compile Include="Binding\Binders\Factory\FactoryToChoiceBinder\FactoryToChoiceBinder5.cs" />
+    <Compile Include="Binding\Binders\ConcreteBinders\ConcreteBinderGeneric.cs" />
+    <Compile Include="Binding\Binders\ConcreteBinders\ConcreteBinderNonGeneric.cs" />
+    <Compile Include="Binding\Binders\FromBinders\FromBinder.cs" />
+    <Compile Include="Injection\InjectUtil.cs" />
+    <Compile Include="Runtime\Facades\ProjectFacade.cs" />
+    <Compile Include="Providers\ComponentProviders\GetFromPrefabComponentProvider.cs" />
+    <Compile Include="Providers\PrefabProviders\PrefabProvider.cs" />
+    <Compile Include="Providers\PrefabProviders\PrefabProviderResource.cs" />
+    <Compile Include="Validation\IValidatable.cs" />
+    <Compile Include="Factories\KeyedFactory.cs" />
+    <Compile Include="Injection\InjectableInfo.cs" />
+    <Compile Include="Util\TypeAnalyzer.cs" />
+    <Compile Include="Util\ZenjectTypeInfo.cs" />
+    <Compile Include="Main\IInstantiator.cs" />
+    <Compile Include="Main\IResolver.cs" />
+    <Compile Include="Main\BindingId.cs" />
+    <Compile Include="Install\IInstaller.cs" />
+    <Compile Include="Install\Installer.cs" />
+    <Compile Include="Install\MonoInstaller.cs" />
+    <Compile Include="Install\CompositionRoot\SceneCompositionRoot.cs" />
+    <Compile Include="Runtime\DisposableManager.cs" />
+    <Compile Include="Runtime\InitializableManager.cs" />
+    <Compile Include="Injection\InjectContext.cs" />
+    <Compile Include="Runtime\TaskUpdater.cs" />
+    <Compile Include="Runtime\TickableManager.cs" />
+    <Compile Include="Runtime\UnityEventManager.cs" />
+    <Compile Include="Providers\GetterProvider.cs" />
+    <Compile Include="Providers\InstanceProvider.cs" />
+    <Compile Include="Providers\MethodProvider.cs" />
+    <Compile Include="Providers\Singleton\SingletonMarkRegistry.cs" />
+    <Compile Include="Install\DecoratorInstaller.cs" />
+    <Compile Include="Install\CompositionRoot\SceneDecoratorCompositionRoot.cs" />
+    <Compile Include="Util\UnityUtil.cs" />
+    <Compile Include="Main\DiContainer.cs" />
+    <Compile Include="Factories\PrefabFactory.cs" />
+    <Compile Include="Util\ExecutionOrderInstaller.cs" />
+    <Compile Include="Util\ZenUtilInternal.cs" />
+    <Compile Include="Install\CompositionRoot\CompositionRoot.cs" />
+    <Compile Include="Install\ZenjectBinding.cs" />
+    <Compile Include="Providers\ProviderUtil.cs" />
+    <Compile Include="Main\IBinder.cs" />
+    <Compile Include="Providers\IProvider.cs" />
+    <Compile Include="Providers\ResolveProvider.cs" />
+    <Compile Include="Providers\Singleton\SingletonImplIds.cs" />
+    <Compile Include="Providers\Singleton\Prefab\PrefabSingletonProviderCreator.cs" />
+    <Compile Include="Providers\Singleton\SingletonId.cs" />
+    <Compile Include="Binding\Binders\InheritInSubContainersBinder.cs" />
+    <Compile Include="Providers\Singleton\SingletonTypes.cs" />
+    <Compile Include="Providers\Singleton\Standard\StandardSingletonProviderCreator.cs" />
+    <Compile Include="Providers\ResourceProvider.cs" />
+    <Compile Include="Providers\TransientProvider.cs" />
+    <Compile Include="Util\ZenjectException.cs" />
+    <Compile Include="Providers\MethodProviderSimple.cs" />
+    <Compile Include="Providers\Singleton\Standard\StandardSingletonDeclaration.cs" />
+    <Compile Include="Providers\Singleton\SingletonProviderCreator.cs" />
+    <Compile Include="Providers\Singleton\Prefab\PrefabResourceSingletonProviderCreator.cs" />
+    <Compile Include="Util\ExecutionOrderExtensions.cs" />
+    <Compile Include="Providers\MethodProviderWithContainer.cs" />
+    <Compile Include="Providers\SubContainerDependencyProvider.cs" />
+    <Compile Include="Providers\Singleton\SubContainer\SubContainerSingletonProviderCreatorByInstaller.cs" />
+    <Compile Include="Providers\Singleton\SubContainer\SubContainerSingletonProviderCreatorByMethod.cs" />
+    <Compile Include="Factories\Factory.cs" />
+    <Compile Include="Providers\IProviderExtensions.cs" />
+    <Compile Include="Providers\SubContainerCreators\ISubContainerCreator.cs" />
+    <Compile Include="Providers\SubContainerCreators\SubContainerCreatorByMethod.cs" />
+    <Compile Include="Providers\SubContainerCreators\SubContainerCreatorByInstaller.cs" />
+    <Compile Include="Providers\SubContainerCreators\SubContainerCreatorCached.cs" />
+    <Compile Include="Providers\ComponentProviders\AddToGameObjectComponentProviders\AddToNewGameObjectComponentProvider.cs" />
+    <Compile Include="Providers\ComponentProviders\AddToGameObjectComponentProviders\AddToExistingGameObjectComponentProvider.cs" />
+    <Compile Include="Providers\ComponentProviders\AddToGameObjectComponentProviders\AddToGameObjectComponentProviderBase.cs" />
+    <Compile Include="Providers\GameObjectProviders\EmptyGameObjectProvider.cs" />
+    <Compile Include="Providers\GameObjectProviders\PrefabGameObjectProvider.cs" />
+    <Compile Include="Providers\PrefabCreators\IPrefabInstantiator.cs" />
+    <Compile Include="Providers\PrefabCreators\PrefabInstantiatorCached.cs" />
+    <Compile Include="Providers\PrefabCreators\PrefabInstantiator.cs" />
+    <Compile Include="Providers\CachedProvider.cs" />
+    <Compile Include="Providers\FactoryProvider.cs" />
+    <Compile Include="Factories\IFactory.cs" />
+    <Compile Include="Factories\DynamicFactory.cs" />
+    <Compile Include="Install\CompositionRoot\GameObjectCompositionRoot.cs" />
+    <Compile Include="Install\CompositionRoot\ProjectCompositionRoot.cs" />
+    <Compile Include="Providers\SubContainerCreators\SubContainerCreatorByPrefab.cs" />
+    <Compile Include="Providers\Singleton\SubContainer\SubContainerSingletonProviderCreatorByPrefab.cs" />
+    <Compile Include="Runtime\Facades\SceneFacade.cs" />
+    <Compile Include="Runtime\Facades\MonoFacade.cs" />
+    <Compile Include="Runtime\Facades\Facade.cs" />
+    <Compile Include="Providers\Singleton\SubContainer\SubContainerSingletonProviderCreatorByPrefabResource.cs" />
+    <Compile Include="Providers\PrefabProviders\IPrefabProvider.cs" />
+    <Compile Include="Binding\BindInfo\BindInfo.cs" />
+    <Compile Include="Binding\Binders\ScopeArgBinder.cs" />
+    <Compile Include="Binding\Binders\ScopeBinder.cs" />
+    <Compile Include="Binding\Binders\GameObject\GameObjectGroupNameBinder.cs" />
+    <Compile Include="Binding\Binders\FromBinders\FromBinderGeneric.cs" />
+    <Compile Include="Binding\Binders\FromBinders\FromBinderNonGeneric.cs" />
+    <Compile Include="Binding\Finalizers\ScopableBindingFinalizer.cs" />
+    <Compile Include="Binding\Finalizers\ProviderBindingFinalizer.cs" />
+    <Compile Include="Binding\Finalizers\IBindingFinalizer.cs" />
+    <Compile Include="Binding\Finalizers\BindFinalizerWrapper.cs" />
+    <Compile Include="Binding\Binders\Factory\DynamicFactoryBindingFinalizer.cs" />
+    <Compile Include="Binding\Finalizers\SingleProviderBindingFinalizer.cs" />
+    <Compile Include="Binding\Binders\SubContainerBinder.cs" />
+    <Compile Include="Binding\Finalizers\SubContainerInstallerBindingFinalizer.cs" />
+    <Compile Include="Binding\BindInfo\GameObjectBindInfo.cs" />
+    <Compile Include="Binding\Finalizers\PrefabBindingFinalizer.cs" />
+    <Compile Include="Binding\Finalizers\PrefabResourceBindingFinalizer.cs" />
+    <Compile Include="Binding\Finalizers\SubContainerPrefabBindingFinalizer.cs" />
+    <Compile Include="Binding\Finalizers\SubContainerPrefabResourceBindingFinalizer.cs" />
+    <Compile Include="Binding\Finalizers\SubContainerMethodBindingFinalizer.cs" />
+    <Compile Include="Binding\Binders\Factory\FactoryFromBinderWithParams.cs" />
+    <Compile Include="Binding\Binders\Factory\FactoryFromBinderBase.cs" />
+    <Compile Include="Binding\Binders\Factory\FactoryFromBinder\SubContainerBinder\FactorySubContainerBinder0.cs" />
+    <Compile Include="Binding\Binders\Factory\FactoryFromBinder\SubContainerBinder\FactorySubContainerBinderBase.cs" />
+    <Compile Include="Binding\Binders\Factory\FactoryFromBinder\SubContainerBinder\FactorySubContainerBinderWithParams.cs" />
+    <Compile Include="Binding\Binders\Factory\FactoryFromBinder\SubContainerBinder\FactorySubContainerBinder1.cs" />
+    <Compile Include="Providers\SubContainerCreators\SubContainerCreatorByPrefabWithParams.cs" />
+    <Compile Include="Binding\Binders\GameObject\GameObjectNameGroupNameScopeBinder.cs" />
+    <Compile Include="Binding\Binders\GameObject\GameObjectGroupNameScopeBinder.cs" />
+    <Compile Include="Runtime\Facades\DefaultGameObjectFacade.cs" />
+    <Compile Include="Install\ScriptableObjectInstaller.cs" />
+    <Compile Include="Install\SettingsInstaller.cs" />
+    <Compile Include="Util\ZenjectSceneLoader.cs" />
+    <Compile Include="Util\ValidationUtil.cs" />
+    <Compile Include="Validation\ValidationMarker.cs" />
+    <Compile Include="Binding\Binders\NonLazyBinder.cs" />
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+  </PropertyGroup>
+</Project>

@@ -11,28 +11,37 @@ namespace Zenject.Commands
         where TCommand : ICommand
         where TAction : class
     {
-        readonly StandardBindingDescriptor _binding;
         readonly DiContainer _container;
+        readonly BindFinalizerWrapper _finalizerWrapper;
+        readonly BindInfo _bindInfo;
 
         public CommandBinderBase(string identifier, DiContainer container)
         {
             _container = container;
 
-            _binding = new StandardBindingDescriptor();
-            _binding.ContractTypes = new List<Type>()
-            {
-                typeof(TCommand),
-            };
-            _binding.Identifier = identifier;
+            _bindInfo = new BindInfo();
+            _bindInfo.Identifier = identifier;
+            _bindInfo.ContractTypes = new List<Type>()
+                {
+                    typeof(TCommand),
+                };
 
-            container.StartBinding(_binding);
+            _finalizerWrapper = container.StartBinding();
         }
 
-        protected StandardBindingDescriptor Binding
+        protected BindInfo BindInfo
         {
             get
             {
-                return _binding;
+                return _bindInfo;
+            }
+        }
+
+        protected IBindingFinalizer Finalizer
+        {
+            set
+            {
+                _finalizerWrapper.SubFinalizer = value;
             }
         }
 

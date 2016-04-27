@@ -59,6 +59,11 @@ namespace ModestTree.Util
             return 1 + GetDepthLevel(transform.parent);
         }
 
+        public static GameObject GetRootParentOrSelf(GameObject gameObject)
+        {
+            return GetParentsAndSelf(gameObject.transform).Select(x => x.gameObject).LastOrDefault();
+        }
+
         public static IEnumerable<Transform> GetParents(Transform transform)
         {
             if (transform == null)

@@ -18,9 +18,9 @@ namespace Zenject.Tests.Bindings
         {
             FooFactory.InstanceCount = 0;
 
-            Container.Bind<Foo>().ToFactorySelf<FooFactory>().AsSingle();
+            Container.Bind<Foo>().FromFactory<FooFactory>().AsSingle().NonLazy();
 
-            AssertValidates();
+            Container.Validate();
 
             Assert.IsEqual(Container.Resolve<Foo>(), StaticFoo);
 
@@ -36,9 +36,9 @@ namespace Zenject.Tests.Bindings
         {
             FooFactory.InstanceCount = 0;
 
-            Container.Bind<IFoo>().ToFactory<Foo, FooFactory>().AsSingle();
+            Container.Bind<IFoo>().To<Foo>().FromFactory<FooFactory>().AsSingle().NonLazy();
 
-            AssertValidates();
+            Container.Validate();
 
             Assert.IsEqual(Container.Resolve<IFoo>(), StaticFoo);
 
@@ -54,10 +54,10 @@ namespace Zenject.Tests.Bindings
         {
             FooFactory.InstanceCount = 0;
 
-            Container.Bind<Foo>().ToFactorySelf<FooFactory>().AsSingle();
-            Container.Bind<IFoo>().ToFactory<Foo, FooFactory>().AsSingle();
+            Container.Bind<Foo>().FromFactory<FooFactory>().AsSingle().NonLazy();
+            Container.Bind<IFoo>().To<Foo>().FromFactory<FooFactory>().AsSingle().NonLazy();
 
-            AssertValidates();
+            Container.Validate();
 
             Assert.IsEqual(Container.Resolve<IFoo>(), StaticFoo);
             Assert.IsEqual(Container.Resolve<Foo>(), StaticFoo);
@@ -74,9 +74,9 @@ namespace Zenject.Tests.Bindings
         {
             FooFactory.InstanceCount = 0;
 
-            Container.Bind<Foo>().ToFactorySelf<FooFactory>().AsTransient();
+            Container.Bind<Foo>().FromFactory<FooFactory>().AsTransient().NonLazy();
 
-            AssertValidates();
+            Container.Validate();
 
             Assert.IsEqual(Container.Resolve<Foo>(), StaticFoo);
 
@@ -92,9 +92,9 @@ namespace Zenject.Tests.Bindings
         {
             FooFactory.InstanceCount = 0;
 
-            Container.Bind<IFoo>().ToFactory<Foo, FooFactory>().AsTransient();
+            Container.Bind<IFoo>().To<Foo>().FromFactory<FooFactory>().AsTransient().NonLazy();
 
-            AssertValidates();
+            Container.Validate();
 
             Assert.IsEqual(Container.Resolve<IFoo>(), StaticFoo);
 
@@ -110,9 +110,9 @@ namespace Zenject.Tests.Bindings
         {
             FooFactory.InstanceCount = 0;
 
-            Container.Bind<Foo>().ToFactorySelf<FooFactory>().AsCached();
+            Container.Bind<Foo>().FromFactory<FooFactory>().AsCached().NonLazy();
 
-            AssertValidates();
+            Container.Validate();
 
             Assert.IsEqual(Container.Resolve<Foo>(), StaticFoo);
 
@@ -128,9 +128,9 @@ namespace Zenject.Tests.Bindings
         {
             FooFactory.InstanceCount = 0;
 
-            Container.Bind<IFoo>().ToFactory<Foo, FooFactory>().AsCached();
+            Container.Bind<IFoo>().To<Foo>().FromFactory<FooFactory>().AsCached().NonLazy();
 
-            AssertValidates();
+            Container.Validate();
 
             Assert.IsEqual(Container.Resolve<IFoo>(), StaticFoo);
 

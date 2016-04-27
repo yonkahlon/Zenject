@@ -16,11 +16,11 @@ namespace Zenject.Tests.Bindings
         {
             var foo = new Foo();
 
-            Container.BindInstance(foo);
+            Container.BindInstance(foo).NonLazy();
 
-            Container.BindFactory<Foo, Foo.Factory>().ToResolve<Foo>();
+            Container.BindFactory<Foo, Foo.Factory>().FromResolve().NonLazy();
 
-            AssertValidates();
+            Container.Validate();
 
             Assert.IsEqual(Container.Resolve<Foo.Factory>().Create(), foo);
         }
@@ -30,11 +30,11 @@ namespace Zenject.Tests.Bindings
         {
             var foo = new Foo();
 
-            Container.BindInstance(foo);
+            Container.BindInstance(foo).NonLazy();
 
-            Container.BindFactory<IFoo, IFooFactory>().ToResolve<Foo>();
+            Container.BindFactory<IFoo, IFooFactory>().To<Foo>().FromResolve().NonLazy();
 
-            AssertValidates();
+            Container.Validate();
 
             Assert.IsEqual(Container.Resolve<IFooFactory>().Create(), foo);
         }
@@ -44,11 +44,11 @@ namespace Zenject.Tests.Bindings
         {
             var foo = new Foo();
 
-            Container.BindInstance("foo", foo);
+            Container.BindInstance("foo", foo).NonLazy();
 
-            Container.BindFactory<Foo, Foo.Factory>().ToResolve<Foo>("foo");
+            Container.BindFactory<Foo, Foo.Factory>().FromResolve("foo").NonLazy();
 
-            AssertValidates();
+            Container.Validate();
 
             Assert.IsEqual(Container.Resolve<Foo.Factory>().Create(), foo);
         }
@@ -58,11 +58,11 @@ namespace Zenject.Tests.Bindings
         {
             var foo = new Foo();
 
-            Container.BindInstance("foo", foo);
+            Container.BindInstance("foo", foo).NonLazy();
 
-            Container.BindFactory<IFoo, IFooFactory>().ToResolve<Foo>("foo");
+            Container.BindFactory<IFoo, IFooFactory>().To<Foo>().FromResolve("foo").NonLazy();
 
-            AssertValidates();
+            Container.Validate();
 
             Assert.IsEqual(Container.Resolve<IFooFactory>().Create(), foo);
         }

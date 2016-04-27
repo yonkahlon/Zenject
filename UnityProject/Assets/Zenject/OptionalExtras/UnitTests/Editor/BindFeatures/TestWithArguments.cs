@@ -10,9 +10,48 @@ namespace Zenject.Tests.BindFeatures
     [TestFixture]
     public class TestWithArguments : TestWithContainer
     {
-        class Foo
+        [Test]
+        public void Test1()
         {
-            public Foo(int value)
+            Container.Bind<Foo>().AsTransient().WithArguments(3).NonLazy();
+
+            Container.Validate();
+
+            Assert.IsEqual(Container.Resolve<Foo>().Value, 3);
+        }
+
+        [Test]
+        public void TestSingleSameArgument()
+        {
+            Container.Bind<IFoo>().To<Foo>().AsSingle().WithArguments(3).NonLazy();
+            Container.Bind<Foo>().AsSingle().WithArguments(3).NonLazy();
+
+            Container.Validate();
+
+            Assert.IsNotNull(Container.Resolve<IFoo>());
+            Assert.IsEqual(Container.Resolve<IFoo>(), Container.Resolve<Foo>());
+        }
+
+        [Test]
+        [ExpectedException]
+        public void TestSingleDifferentArguments()
+        {
+            Container.Bind<IFoo>().To<Foo>().AsSingle().WithArguments(3);
+            Container.Bind<Foo>().AsSingle().WithArguments(2);
+
+            Container.Resolve<IFoo>();
+        }
+
+        interface IFoo
+        {
+        }
+
+        class Foo : IFoo
+        {
+            public Foo(
+                int value,
+                [InjectOptional]
+                string value2)
             {
                 Value = value;
             }
@@ -22,16 +61,6 @@ namespace Zenject.Tests.BindFeatures
                 get;
                 private set;
             }
-        }
-
-        [Test]
-        public void Test1()
-        {
-            Container.Bind<Foo>().ToSelf().AsTransient().WithArguments(3);
-
-            AssertValidates();
-
-            Assert.IsEqual(Container.Resolve<Foo>().Value, 3);
         }
     }
 }

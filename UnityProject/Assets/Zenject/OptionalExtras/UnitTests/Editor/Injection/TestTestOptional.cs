@@ -36,11 +36,9 @@ namespace Zenject.Tests.Injection
         [Test]
         public void TestFieldRequired()
         {
-            Container.Bind<Test2>().ToSelf().AsSingle();
+            Container.Bind<Test2>().AsSingle().NonLazy();
 
-            Assert.That(Container.ValidateResolve<Test2>().Any());
-
-            AssertValidationFails();
+            Assert.Throws(() => Container.Validate());
 
             Assert.Throws(
                 delegate { Container.Resolve<Test2>(); });
@@ -49,11 +47,10 @@ namespace Zenject.Tests.Injection
         [Test]
         public void TestFieldOptional()
         {
-            Container.Bind<Test3>().ToSelf().AsSingle();
+            Container.Bind<Test3>().AsSingle().NonLazy();
 
-            AssertValidates();
+            Container.Validate();
 
-            Assert.That(Container.ValidateResolve<Test3>().IsEmpty());
             var test = Container.Resolve<Test3>();
             Assert.That(test.val1 == null);
         }
@@ -61,30 +58,29 @@ namespace Zenject.Tests.Injection
         [Test]
         public void TestFieldOptional2()
         {
-            Container.Bind<Test3>().ToSelf().AsSingle();
+            Container.Bind<Test3>().AsSingle().NonLazy();
 
             var test1 = new Test1();
-            Container.Bind<Test1>().ToInstance(test1);
+            Container.Bind<Test1>().FromInstance(test1).NonLazy();
 
-            AssertValidates();
+            Container.Validate();
 
-            Assert.That(Container.ValidateResolve<Test3>().IsEmpty());
             Assert.IsEqual(Container.Resolve<Test3>().val1, test1);
         }
 
         [Test]
         public void TestFieldOptional3()
         {
-            Container.Bind<Test0>().ToSelf().AsTransient();
+            Container.Bind<Test0>().AsTransient().NonLazy();
 
-            AssertValidates();
+            Container.Validate();
 
             // Should not redefine the hard coded value in this case
             Assert.IsEqual(Container.Resolve<Test0>().Val1, 5);
 
-            Container.Bind<int>().ToInstance(3);
+            Container.Bind<int>().FromInstance(3).NonLazy();
 
-            AssertValidates();
+            Container.Validate();
 
             Assert.IsEqual(Container.Resolve<Test0>().Val1, 3);
         }
@@ -111,24 +107,21 @@ namespace Zenject.Tests.Injection
         [Test]
         public void TestParameterRequired()
         {
-            Container.Bind<Test4>().ToSelf().AsSingle();
+            Container.Bind<Test4>().AsSingle().NonLazy();
 
-            AssertValidationFails();
+            Assert.Throws(() => Container.Validate());
 
             Assert.Throws(
                 delegate { Container.Resolve<Test4>(); });
-
-            Assert.That(Container.ValidateResolve<Test2>().Any());
         }
 
         [Test]
         public void TestParameterOptional()
         {
-            Container.Bind<Test5>().ToSelf().AsSingle();
+            Container.Bind<Test5>().AsSingle().NonLazy();
 
-            AssertValidates();
+            Container.Validate();
 
-            Assert.That(Container.ValidateResolve<Test5>().IsEmpty());
             var test = Container.Resolve<Test5>();
             Assert.That(test.Val1 == null);
         }
@@ -143,12 +136,10 @@ namespace Zenject.Tests.Injection
         [Test]
         public void TestChildDependencyOptional()
         {
-            Container.Bind<Test6>().ToSelf().AsSingle();
-            Container.Bind<Test2>().ToSelf().AsSingle();
+            Container.Bind<Test6>().AsSingle().NonLazy();
+            Container.Bind<Test2>().AsSingle().NonLazy();
 
-            Assert.That(Container.ValidateResolve<Test6>().Any());
-
-            AssertValidationFails();
+            Assert.Throws(() => Container.Validate());
 
             Assert.Throws(
                 delegate { Container.Resolve<Test6>(); });
@@ -169,11 +160,9 @@ namespace Zenject.Tests.Injection
         [Test]
         public void TestPrimitiveParamOptionalUsesDefault()
         {
-            Container.Bind<Test7>().ToSelf().AsSingle();
+            Container.Bind<Test7>().AsSingle().NonLazy();
 
-            Assert.That(Container.ValidateResolve<Test7>().IsEmpty());
-
-            AssertValidates();
+            Container.Validate();
 
             Assert.IsEqual(Container.Resolve<Test7>().Val1, 0);
         }
@@ -193,11 +182,10 @@ namespace Zenject.Tests.Injection
         [Test]
         public void TestPrimitiveParamOptionalUsesExplicitDefault()
         {
-            Container.Bind<Test8>().ToSelf().AsSingle();
+            Container.Bind<Test8>().AsSingle().NonLazy();
 
-            AssertValidates();
+            Container.Validate();
 
-            Assert.That(Container.ValidateResolve<Test8>().IsEmpty());
             Assert.IsEqual(Container.Resolve<Test8>().Val1, 5);
         }
 
@@ -214,11 +202,10 @@ namespace Zenject.Tests.Injection
         [Test]
         public void TestPrimitiveParamOptionalUsesExplicitDefault2()
         {
-            Container.Bind<Test8_2>().ToSelf().AsSingle();
+            Container.Bind<Test8_2>().AsSingle().NonLazy();
 
-            AssertValidates();
+            Container.Validate();
 
-            Assert.That(Container.ValidateResolve<Test8_2>().IsEmpty());
             Assert.IsEqual(Container.Resolve<Test8_2>().Val1, 5);
         }
 
@@ -237,11 +224,9 @@ namespace Zenject.Tests.Injection
         [Test]
         public void TestPrimitiveParamOptionalNullable()
         {
-            Container.Bind<Test9>().ToSelf().AsSingle();
+            Container.Bind<Test9>().AsSingle().NonLazy();
 
-            AssertValidates();
-
-            Assert.That(Container.ValidateResolve<Test9>().IsEmpty());
+            Container.Validate();
 
             Assert.That(!Container.Resolve<Test9>().Val1.HasValue);
         }

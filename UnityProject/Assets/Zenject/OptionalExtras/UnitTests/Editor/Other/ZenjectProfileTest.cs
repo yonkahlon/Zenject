@@ -76,9 +76,9 @@ namespace Zenject.Tests.Other
         public void Test()
         {
             //var container = new DiContainer();
-            //container.Bind<Test0>().ToSelf().AsTransient();
-            //container.Bind<Test1>().ToSelf().AsTransient();
-            //container.Bind<Test2>().ToSelf().AsTransient();
+            //container.Bind<Test0>().AsTransient();
+            //container.Bind<Test1>().AsTransient();
+            //container.Bind<Test2>().AsTransient();
 
             //var stopwatch = new Stopwatch();
 

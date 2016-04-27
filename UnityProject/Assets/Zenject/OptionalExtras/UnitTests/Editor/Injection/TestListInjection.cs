@@ -41,7 +41,7 @@ namespace Zenject.Tests.Injection
         [ExpectedException]
         public void TestCase1()
         {
-            Container.Bind<Test1>().ToSelf().AsSingle();
+            Container.Bind<Test1>().AsSingle();
 
             Container.ResolveAll<Test1>();
         }
@@ -49,9 +49,8 @@ namespace Zenject.Tests.Injection
         [Test]
         public void TestCase2()
         {
-            Container.Bind<Test2>().ToSelf().AsSingle();
+            Container.Bind<Test2>().AsSingle();
 
-            Assert.That(Container.ValidateResolve<Test2>().IsEmpty());
             var result = Container.ResolveAll<Test2>();
 
             Assert.That(result != null);
@@ -61,7 +60,7 @@ namespace Zenject.Tests.Injection
         [ExpectedException]
         public void TestCase3()
         {
-            Container.Bind<Test3>().ToSelf().AsSingle();
+            Container.Bind<Test3>().AsSingle();
 
             Container.ResolveAll<Test3>();
         }
@@ -69,7 +68,7 @@ namespace Zenject.Tests.Injection
         [Test]
         public void TestCase4()
         {
-            Container.Bind<Test4>().ToSelf().AsSingle();
+            Container.Bind<Test4>().AsSingle();
 
             var result = Container.ResolveAll<Test4>();
 

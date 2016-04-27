@@ -12,11 +12,31 @@ namespace Zenject.Tests.Bindings
     public class TestFactoryTo0 : TestWithContainer
     {
         [Test]
-        public void TestSelf()
+        public void TestSelf1()
         {
-            Container.BindFactory<Foo, Foo.Factory>().ToSelf();
+            Container.BindFactory<Foo, Foo.Factory>().NonLazy();
 
-            AssertValidates();
+            Container.Validate();
+
+            Assert.IsNotNull(Container.Resolve<Foo.Factory>().Create());
+        }
+
+        [Test]
+        public void TestSelf2()
+        {
+            Container.BindFactory<Foo, Foo.Factory>().NonLazy();
+
+            Container.Validate();
+
+            Assert.IsNotNull(Container.Resolve<Foo.Factory>().Create());
+        }
+
+        [Test]
+        public void TestSelf3()
+        {
+            Container.BindFactory<Foo, Foo.Factory>().FromNew().NonLazy();
+
+            Container.Validate();
 
             Assert.IsNotNull(Container.Resolve<Foo.Factory>().Create());
         }
@@ -24,9 +44,9 @@ namespace Zenject.Tests.Bindings
         [Test]
         public void TestConcrete()
         {
-            Container.BindFactory<IFoo, IFooFactory>().To<Foo>();
+            Container.BindFactory<IFoo, IFooFactory>().To<Foo>().NonLazy();
 
-            AssertValidates();
+            Container.Validate();
 
             Assert.IsNotNull(Container.Resolve<IFooFactory>().Create());
 

@@ -22,9 +22,13 @@ namespace Zenject.Tests.Other
         [Test]
         public void TestToSingle()
         {
-            Container.Bind(typeof(Test1<>)).ToSelf().AsSingle();
+            Container.Bind(typeof(Test1<>)).AsSingle();
 
-            AssertValidates();
+            Container.BindRootResolve<Test1<int>>();
+            Container.BindRootResolve<Test1<bool>>();
+            Container.BindRootResolve<Test1<string>>();
+
+            Container.Validate();
 
             var test1 = Container.Resolve<Test1<int>>();
             Assert.That(test1.Data == 0);
@@ -39,9 +43,13 @@ namespace Zenject.Tests.Other
         [Test]
         public void TestToTransient()
         {
-            Container.Bind(typeof(Test1<>)).ToSelf().AsTransient();
+            Container.Bind(typeof(Test1<>)).AsTransient();
 
-            AssertValidates();
+            Container.BindRootResolve<Test1<int>>();
+            Container.BindRootResolve<Test1<bool>>();
+            Container.BindRootResolve<Test1<string>>();
+
+            Container.Validate();
 
             var test1 = Container.Resolve<Test1<int>>();
             Assert.That(test1.Data == 0);

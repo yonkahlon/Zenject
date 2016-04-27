@@ -33,30 +33,27 @@ namespace Zenject.Tests.Conditions
         public override void Setup()
         {
             base.Setup();
-            Container.Bind<Test0>().ToSelf().AsSingle().When(r => r.MemberName == "name1");
+            Container.Bind<Test0>().AsSingle().When(r => r.MemberName == "name1");
         }
 
         [Test]
         public void TestNameConditionError()
         {
-            Container.Bind<Test2>().ToSelf().AsSingle();
+            Container.Bind<Test2>().AsSingle().NonLazy();
 
             Assert.Throws(
                 delegate { Container.Resolve<Test2>(); });
 
-            AssertValidationFails();
-
-            Assert.That(Container.ValidateResolve<Test2>().Any());
+            Assert.Throws(() => Container.Validate());
         }
 
         [Test]
         public void TestNameConditionSuccess()
         {
-            Container.Bind<Test1>().ToSelf().AsSingle();
+            Container.Bind<Test1>().AsSingle().NonLazy();
 
-            AssertValidates();
+            Container.Validate();
 
-            Assert.That(Container.ValidateResolve<Test1>().IsEmpty());
             var test1 = Container.Resolve<Test1>();
 
             Assert.That(test1 != null);

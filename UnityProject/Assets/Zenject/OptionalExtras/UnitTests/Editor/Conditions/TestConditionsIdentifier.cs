@@ -33,43 +33,39 @@ namespace Zenject.Tests.Conditions
         [Test]
         public void TestUnspecifiedNameConstructorInjection()
         {
-            Container.Bind<Test1>().ToSelf().AsTransient();
-            Container.Bind<Test0>().ToSelf().AsTransient();
+            Container.Bind<Test1>().AsTransient().NonLazy();
+            Container.Bind<Test0>().AsTransient().NonLazy();
 
-            AssertValidationFails();
+            Assert.Throws(() => Container.Validate());
 
             Assert.Throws(
                 delegate { Container.Resolve<Test1>(); });
-
-            Assert.That(Container.ValidateResolve<Test1>().Any());
         }
 
         [Test]
         public void TestUnspecifiedNameFieldInjection()
         {
-            Container.Bind<Test1>().ToSelf().AsTransient();
-            Container.Bind<Test2>().ToSelf().AsTransient();
+            Container.Bind<Test1>().AsTransient().NonLazy();
+            Container.Bind<Test2>().AsTransient().NonLazy();
 
-            Container.Bind<Test0>().ToSelf().AsTransient();
+            Container.Bind<Test0>().AsTransient().NonLazy();
 
-            AssertValidationFails();
+            Assert.Throws(() => Container.Validate());
 
             Assert.Throws(
                 delegate { Container.Resolve<Test2>(); });
-
-            Assert.That(Container.ValidateResolve<Test2>().Any());
         }
 
         [Test]
         public void TestSuccessConstructorInjectionString()
         {
-            Container.Bind<Test1>().ToSelf().AsTransient();
-            Container.Bind<Test2>().ToSelf().AsTransient();
+            Container.Bind<Test1>().AsTransient().NonLazy();
+            Container.Bind<Test2>().AsTransient().NonLazy();
 
-            Container.Bind<Test0>().ToInstance(new Test0());
-            Container.Bind<Test0>("foo").ToInstance(new Test0());
+            Container.Bind<Test0>().FromInstance(new Test0()).NonLazy();
+            Container.Bind<Test0>("foo").FromInstance(new Test0()).NonLazy();
 
-            AssertValidates();
+            Container.Validate();
 
             // Should not throw exceptions
             Container.Resolve<Test1>();
@@ -80,15 +76,14 @@ namespace Zenject.Tests.Conditions
         [Test]
         public void TestSuccessFieldInjectionString()
         {
-            Container.Bind<Test1>().ToSelf().AsTransient();
-            Container.Bind<Test2>().ToSelf().AsTransient();
+            Container.Bind<Test1>().AsTransient().NonLazy();
+            Container.Bind<Test2>().AsTransient().NonLazy();
 
-            Container.Bind<Test0>().ToInstance(new Test0());
-            Container.Bind<Test0>("foo").ToInstance(new Test0());
+            Container.Bind<Test0>().FromInstance(new Test0()).NonLazy();
+            Container.Bind<Test0>("foo").FromInstance(new Test0()).NonLazy();
 
-            AssertValidates();
+            Container.Validate();
 
-            Assert.That(Container.ValidateResolve<Test2>().IsEmpty());
             Assert.IsNotNull(Container.Resolve<Test2>());
         }
 
@@ -109,30 +104,28 @@ namespace Zenject.Tests.Conditions
         [Test]
         public void TestFailConstructorInjectionEnum()
         {
-            Container.Bind<Test1>().ToSelf().AsTransient();
-            Container.Bind<Test2>().ToSelf().AsTransient();
-            Container.Bind<Test3>().ToSelf().AsTransient();
+            Container.Bind<Test1>().AsTransient().NonLazy();
+            Container.Bind<Test2>().AsTransient().NonLazy();
+            Container.Bind<Test3>().AsTransient().NonLazy();
 
-            Container.Bind<Test0>().ToInstance(new Test0());
-            Container.Bind<Test0>("TestValue1").ToInstance(new Test0());
+            Container.Bind<Test0>().FromInstance(new Test0()).NonLazy();
+            Container.Bind<Test0>("TestValue1").FromInstance(new Test0()).NonLazy();
 
-            AssertValidationFails();
+            Assert.Throws(() => Container.Validate());
 
             Assert.Throws(
                 delegate { Container.Resolve<Test3>(); });
-
-            Assert.That(Container.ValidateResolve<Test1>().Any());
         }
 
         [Test]
         public void TestSuccessConstructorInjectionEnum()
         {
-            Container.Bind<Test3>().ToSelf().AsTransient();
+            Container.Bind<Test3>().AsTransient().NonLazy();
 
-            Container.Bind<Test0>().ToInstance(new Test0());
-            Container.Bind<Test0>("TestValue2").ToInstance(new Test0());
+            Container.Bind<Test0>().FromInstance(new Test0()).NonLazy();
+            Container.Bind<Test0>("TestValue2").FromInstance(new Test0()).NonLazy();
 
-            AssertValidates();
+            Container.Validate();
 
             // No exceptions
             Container.Resolve<Test3>();
@@ -143,32 +136,29 @@ namespace Zenject.Tests.Conditions
         [Test]
         public void TestFailFieldInjectionEnum()
         {
-            Container.Bind<Test1>().ToSelf().AsTransient();
-            Container.Bind<Test2>().ToSelf().AsTransient();
-            Container.Bind<Test3>().ToSelf().AsTransient();
+            Container.Bind<Test1>().AsTransient().NonLazy();
+            Container.Bind<Test2>().AsTransient().NonLazy();
+            Container.Bind<Test3>().AsTransient().NonLazy();
 
-            Container.Bind<Test0>().ToInstance(new Test0());
-            Container.Bind<Test0>("TestValue1").ToInstance(new Test0());
+            Container.Bind<Test0>().FromInstance(new Test0()).NonLazy();
+            Container.Bind<Test0>("TestValue1").FromInstance(new Test0()).NonLazy();
 
-            AssertValidationFails();
+            Assert.Throws(() => Container.Validate());
 
             Assert.Throws(
                 delegate { Container.Resolve<Test3>(); });
-
-            Assert.That(Container.ValidateResolve<Test3>().Any());
         }
 
         [Test]
         public void TestSuccessFieldInjectionEnum()
         {
-            Container.Bind<Test4>().ToSelf().AsTransient();
+            Container.Bind<Test4>().AsTransient().NonLazy();
 
-            Container.Bind<Test0>().ToInstance(new Test0());
-            Container.Bind<Test0>("TestValue3").ToInstance(new Test0());
+            Container.Bind<Test0>().FromInstance(new Test0()).NonLazy();
+            Container.Bind<Test0>("TestValue3").FromInstance(new Test0()).NonLazy();
 
-            AssertValidates();
+            Container.Validate();
 
-            Assert.That(Container.ValidateResolve<Test4>().IsEmpty());
             Assert.IsNotNull(Container.Resolve<Test4>());
         }
     }

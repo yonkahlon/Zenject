@@ -16,14 +16,15 @@ namespace Zenject.Commands
         {
         }
 
-        public ScopeBinder To<THandler>(Func<THandler, Action<TParam1>> methodGetter)
+        public ScopeArgBinder To<THandler>(Func<THandler, Action<TParam1>> methodGetter)
         {
-            Binding.Finalizer = new CommandBindingFinalizer<TCommand, THandler, TParam1>(
+            Finalizer = new CommandBindingFinalizer<TCommand, THandler, TParam1>(
+                BindInfo,
                 methodGetter,
                 () => new TransientProvider(
-                    typeof(THandler), Container, Binding.Arguments, Binding.ConcreteIdentifier));
+                    typeof(THandler), Container, BindInfo.Arguments, BindInfo.ConcreteIdentifier));
 
-            return new ScopeBinder(Binding);
+            return new ScopeArgBinder(BindInfo);
         }
 
         public ScopeBinder ToResolve<THandler>(Func<THandler, Action<TParam1>> methodGetter)
@@ -57,23 +58,23 @@ namespace Zenject.Commands
         public ConditionBinder ToMethod(Action<TParam1> action)
         {
             // Create the command class once and re-use it everywhere
-            Binding.Finalizer = new SingleProviderBindingFinalizer(
-                new CachedProvider(
+            Finalizer = new SingleProviderBindingFinalizer(
+                BindInfo, new CachedProvider(
                     new TransientProvider(
                         typeof(TCommand), Container,
                         InjectUtil.CreateArgListExplicit(action), null)));
 
-            return new ConditionBinder(Binding);
+            return new ConditionBinder(BindInfo);
         }
 
         ScopeBinder ToResolveInternal<THandler>(
             string identifier, Func<THandler, Action<TParam1>> methodGetter, bool optional)
         {
-            Binding.Finalizer = new CommandBindingFinalizer<TCommand, THandler, TParam1>(
-                methodGetter,
+            Finalizer = new CommandBindingFinalizer<TCommand, THandler, TParam1>(
+                BindInfo, methodGetter,
                 () => new ResolveProvider(typeof(THandler), Container, identifier, optional));
 
-            return new ScopeBinder(Binding);
+            return new ScopeBinder(BindInfo);
         }
     }
 }

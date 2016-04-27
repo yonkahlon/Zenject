@@ -1,0 +1,147 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{5C7284E4-3A0F-41BF-99E8-26ECE0FF02FE}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>BuildLib</RootNamespace>
+    <AssemblyName>$(MSBuildProjectName)</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\..\..\..\Bin\Assemblies\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <OutputPath>..\..\..\..\..\Bin\Assemblies\</OutputPath>
+    <IntermediateOutputPath>..\..\..\..\..\Temp\obj\Debug\Zenject-test\</IntermediateOutputPath>
+    <BaseIntermediateOutputPath>..\..\..\..\..\Temp\obj\Debug\Zenject-test\</BaseIntermediateOutputPath>
+    <GenerateSerializationAssemblies>On</GenerateSerializationAssemblies>
+    <DefineConstants>TRACE;DEBUG;ZEN_NOT_UNITY3D</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+    <OutputPath>..\..\..\..\..\Bin\Assemblies\Release\</OutputPath>
+    <IntermediateOutputPath>..\..\..\..\..\Temp\obj\Release\Zenject-test\</IntermediateOutputPath>
+    <BaseIntermediateOutputPath>..\..\..\..\..\Temp\obj\Release\Zenject-test\</BaseIntermediateOutputPath>
+    <Optimize>true</Optimize>
+    <DefineConstants>TRACE;DEBUG;ZEN_NOT_UNITY3D</DefineConstants>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="nunit.framework, Version=2.6.0.12051, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\Libraries\nunit\nunit.framework.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Mtm.Debugging\Scripts\Mtm.Debugging.csproj">
+      <Project>{02c3386d-7132-4c1f-aef0-9e5432dbfc25}</Project>
+      <Name>Mtm.Debugging</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Mtm.Util\Mtm.Util.csproj">
+      <Project>{9f77d9d6-9db4-4743-b331-397f344f3092}</Project>
+      <Name>Mtm.Util</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Mtm.Zenject-usage\Mtm.Zenject-usage.csproj">
+      <Project>{e22b1cbf-7e4d-48bd-953b-2b730bd9ff13}</Project>
+      <Name>Mtm.Zenject-usage</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Mtm.Zenject\Mtm.Zenject.csproj">
+      <Project>{9d5e0d93-7d67-40c0-8435-c0a14789836e}</Project>
+      <Name>Mtm.Zenject</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Bindings\TestTo.cs" />
+    <Compile Include="BindFeatures\TestMultipleContractTypes.cs" />
+    <Compile Include="BindFeatures\TestMultipleContractTypes2.cs" />
+    <Compile Include="BindFeatures\TestMultipleContractTypes3.cs" />
+    <Compile Include="BindFeatures\TestWithArguments.cs" />
+    <Compile Include="Bindings\TestToFactory.cs" />
+    <Compile Include="Bindings\TestToGetter.cs" />
+    <Compile Include="Bindings\TestToInstance.cs" />
+    <Compile Include="Bindings\TestToResolve.cs" />
+    <Compile Include="Bindings\TestToSubContainerInstaller.cs" />
+    <Compile Include="Bindings\TestToSubContainerMethod.cs" />
+    <Compile Include="Conditions\TestConditionsBasic.cs" />
+    <Compile Include="Conditions\TestConditionsComplex.cs" />
+    <Compile Include="Conditions\TestConditionsFieldName.cs" />
+    <Compile Include="Conditions\TestConditionsIdentifier.cs" />
+    <Compile Include="Conditions\TestConditionsParents.cs" />
+    <Compile Include="Conditions\TestConditionsTarget.cs" />
+    <Compile Include="Conditions\TestConditionsTargetInstance.cs" />
+    <Compile Include="Conditions\TestIdentifiers.cs" />
+    <Compile Include="Factories\Bindings\TestFactoryTo0.cs" />
+    <Compile Include="Factories\Bindings\TestFactoryToGetter0.cs" />
+    <Compile Include="Factories\Bindings\TestFactoryToInstance0.cs" />
+    <Compile Include="Factories\Bindings\TestFactoryToMethod0.cs" />
+    <Compile Include="Factories\Bindings\TestFactoryToResolve0.cs" />
+    <Compile Include="Factories\Bindings\TestFactoryToSubContainerInstaller0.cs" />
+    <Compile Include="Factories\Bindings\TestFactoryToSubContainerMethod0.cs" />
+    <Compile Include="Factories\TestFactory.cs" />
+    <Compile Include="Injection\TestAllInjectionTypes.cs" />
+    <Compile Include="Injection\TestBaseClassPropertyInjection.cs" />
+    <Compile Include="Injection\TestCircularDependencies.cs" />
+    <Compile Include="Injection\TestConstructorInjection.cs" />
+    <Compile Include="Injection\TestConstructorInjectionOptional.cs" />
+    <Compile Include="Injection\TestDuplicateInjection.cs" />
+    <Compile Include="Injection\TestInjectSources.cs" />
+    <Compile Include="Injection\TestListInjection.cs" />
+    <Compile Include="Injection\TestNullableValues.cs" />
+    <Compile Include="Injection\TestParameters.cs" />
+    <Compile Include="Injection\TestPostInjectCall.cs" />
+    <Compile Include="Injection\TestPostInjectParameters.cs" />
+    <Compile Include="Injection\TestPropertyInjection.cs" />
+    <Compile Include="Injection\TestStructInjection.cs" />
+    <Compile Include="Injection\TestTestOptional.cs" />
+    <Compile Include="Other\TestGenericContract.cs" />
+    <Compile Include="Other\TestMoq.cs" />
+    <Compile Include="Other\TestNestedContainer.cs" />
+    <Compile Include="Other\TestResolveMany.cs" />
+    <Compile Include="Other\TestSubContainers.cs" />
+    <Compile Include="Other\TestSubContainers4.cs" />
+    <Compile Include="Other\TestTaskUpdater.cs" />
+    <Compile Include="Other\TestTestUtil.cs" />
+    <Compile Include="Other\TestTransientMockProvider.cs" />
+    <Compile Include="Other\TestValidateInstaller.cs" />
+    <Compile Include="Other\ZenjectProfileTest.cs" />
+    <Compile Include="Util\TestListComparer.cs" />
+    <Compile Include="Util\TestWithContainer.cs" />
+    <Compile Include="Other\TestInheritInSubContainers.cs" />
+    <Compile Include="Other\TestCircularDependencies.cs" />
+    <Compile Include="Other\TestConflictingToSingletonUses.cs" />
+    <Compile Include="Factories\Bindings\TestFactoryTo1.cs" />
+    <Compile Include="Factories\Bindings\TestFactoryToMethod1.cs" />
+    <Compile Include="Factories\Bindings\TestFactoryToSubContainerInstaller1.cs" />
+    <Compile Include="Factories\Bindings\TestFactoryToSubContainerMethod1.cs" />
+    <Compile Include="Factories\Bindings\TestFactoryToFactory0.cs" />
+    <Compile Include="Factories\Bindings\TestFactoryToFactory1.cs" />
+    <Compile Include="Factories\Bindings\TestFactoryTo5.cs" />
+    <Compile Include="Bindings\TestToMethod.cs" />
+    <Compile Include="Other\TestFacadeSubContainer.cs" />
+    <Compile Include="Validation\TestValidate1.cs" />
+    <Compile Include="Validation\TestValidateFactories.cs" />
+    <Compile Include="BindFeatures\TestNonLazy.cs" />
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+  </PropertyGroup>
+</Project>

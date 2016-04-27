@@ -60,14 +60,13 @@ namespace Zenject.Tests.Injection
         [Test]
         public void Test()
         {
-            Container.Bind<Test0>().ToSelf().AsSingle();
-            Container.Bind<Test1>().ToSelf().AsSingle();
-            Container.Bind<Test2>().ToSelf().AsSingle();
-            Container.Bind<Test3>().ToSelf().AsSingle();
+            Container.Bind<Test0>().AsSingle().NonLazy();
+            Container.Bind<Test1>().AsSingle().NonLazy();
+            Container.Bind<Test2>().AsSingle().NonLazy();
+            Container.Bind<Test3>().AsSingle().NonLazy();
 
-            AssertValidates();
+            Container.Validate();
 
-            Assert.That(Container.ValidateResolve<Test3>().IsEmpty());
             var test3 = Container.Resolve<Test3>();
             Assert.That(test3.HasInitialized);
             Assert.That(test3.HasInitialized2);
@@ -91,9 +90,9 @@ namespace Zenject.Tests.Injection
         [Test]
         public void TestPrivateBaseClassPostInject()
         {
-            Container.Bind<SimpleBase>().To<SimpleDerived>().AsSingle();
+            Container.Bind<SimpleBase>().To<SimpleDerived>().AsSingle().NonLazy();
 
-            AssertValidates();
+            Container.Validate();
 
             var simple = Container.Resolve<SimpleBase>();
 
@@ -103,11 +102,10 @@ namespace Zenject.Tests.Injection
         [Test]
         public void TestInheritance()
         {
-            Container.Bind<IFoo>().To<FooDerived>().AsSingle();
+            Container.Bind<IFoo>().To<FooDerived>().AsSingle().NonLazy();
 
-            AssertValidates();
+            Container.Validate();
 
-            Assert.That(Container.ValidateResolve<IFoo>().IsEmpty());
             var foo = Container.Resolve<IFoo>();
 
             Assert.That(((FooDerived)foo).WasDerivedCalled);
@@ -119,7 +117,7 @@ namespace Zenject.Tests.Injection
         [Test]
         public void TestInheritanceOrder()
         {
-            Container.Bind<IFoo>().To<FooDerived2>().AsSingle();
+            Container.Bind<IFoo>().To<FooDerived2>().AsSingle().NonLazy();
 
             // base post inject methods should be called first
             _initOrder = 0;
@@ -127,7 +125,7 @@ namespace Zenject.Tests.Injection
             FooDerived.DerivedCallOrder = 0;
             FooDerived2.Derived2CallOrder = 0;
 
-            AssertValidates();
+            Container.Validate();
 
             Container.Resolve<IFoo>();
 
