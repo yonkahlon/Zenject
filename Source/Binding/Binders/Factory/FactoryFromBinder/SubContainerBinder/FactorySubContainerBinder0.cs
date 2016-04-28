@@ -2,7 +2,7 @@ using System;
 using ModestTree;
 using System.Linq;
 
-#if !ZEN_NOT_UNITY3D
+#if !NOT_UNITY3D
 using UnityEngine;
 #endif
 
@@ -29,7 +29,7 @@ namespace Zenject
             return new ConditionBinder(BindInfo);
         }
 
-#if !ZEN_NOT_UNITY3D
+#if !NOT_UNITY3D
 
         public GameObjectNameGroupNameBinder ByPrefab(GameObject prefab)
         {

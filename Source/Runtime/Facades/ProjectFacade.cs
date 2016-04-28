@@ -1,4 +1,4 @@
-#if !ZEN_NOT_UNITY3D
+#if !NOT_UNITY3D
 
 using System;
 

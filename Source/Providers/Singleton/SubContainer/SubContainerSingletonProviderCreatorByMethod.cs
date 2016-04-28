@@ -65,7 +65,7 @@ namespace Zenject
                     int hash = 17;
                     hash = hash * 29 + (this.ConcreteIdentifier == null ? 0 : this.ConcreteIdentifier.GetHashCode());
                     hash = hash * 29 + this.InstallerDelegate.Target.GetHashCode();
-                    hash = hash * 29 + this.InstallerDelegate.Method.GetHashCode();
+                    hash = hash * 29 + this.InstallerDelegate.Method().GetHashCode();
                     return hash;
                 }
             }
@@ -91,7 +91,7 @@ namespace Zenject
             public static bool operator ==(MethodSingletonId left, MethodSingletonId right)
             {
                 return object.Equals(left.InstallerDelegate.Target, right.InstallerDelegate.Target)
-                    && object.Equals(left.InstallerDelegate.Method, right.InstallerDelegate.Method)
+                    && object.Equals(left.InstallerDelegate.Method(), right.InstallerDelegate.Method())
                     && object.Equals(left.ConcreteIdentifier, right.ConcreteIdentifier);
             }
 

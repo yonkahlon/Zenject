@@ -15,7 +15,7 @@ namespace ModestTree
         // This seems easier to think about than IsAssignableFrom
         public static bool DerivesFrom(this Type a, Type b)
         {
-            return b != a && b.IsAssignableFrom(a);
+            return b != a && a.DerivesFromOrEqual(b);
         }
 
         public static bool DerivesFromOrEqual<T>(this Type a)
@@ -25,12 +25,132 @@ namespace ModestTree
 
         public static bool DerivesFromOrEqual(this Type a, Type b)
         {
+#if UNITY_WSA && !UNITY_EDITOR
+            return b == a || b.GetTypeInfo().IsAssignableFrom(a.GetTypeInfo());
+#else
             return b == a || b.IsAssignableFrom(a);
+#endif
+        }
+
+        public static bool IsValueType(this Type type)
+        {
+#if UNITY_WSA && !UNITY_EDITOR
+            return type.GetTypeInfo().IsValueType;
+#else
+            return type.IsValueType;
+#endif
+        }
+
+        public static MethodInfo[] DeclaredInstanceMethods(this Type type)
+        {
+#if UNITY_WSA && !UNITY_EDITOR
+            return type.GetRuntimeMethods()
+                .Where(x => x.DeclaringType == type).ToArray();
+#else
+            return type.GetMethods(
+                BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly);
+#endif
+        }
+
+        public static PropertyInfo[] DeclaredInstanceProperties(this Type type)
+        {
+#if UNITY_WSA && !UNITY_EDITOR
+            // There doesn't appear to be an IsStatic member on PropertyInfo
+            return type.GetRuntimeProperties()
+                .Where(x => x.DeclaringType == type).ToArray();
+#else
+            return type.GetProperties(
+                BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly);
+#endif
+        }
+
+        public static FieldInfo[] DeclaredInstanceFields(this Type type)
+        {
+#if UNITY_WSA && !UNITY_EDITOR
+            return type.GetRuntimeFields()
+                .Where(x => x.DeclaringType == type && !x.IsStatic).ToArray();
+#else
+            return type.GetFields(
+                BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly);
+#endif
+        }
+
+        public static Type BaseType(this Type type)
+        {
+#if UNITY_WSA && !UNITY_EDITOR
+            return type.GetTypeInfo().BaseType;
+#else
+            return type.BaseType;
+#endif
+        }
+
+        public static bool IsGenericType(this Type type)
+        {
+#if UNITY_WSA && !UNITY_EDITOR
+            return type.GetTypeInfo().IsGenericType;
+#else
+            return type.IsGenericType;
+#endif
+        }
+
+        public static bool IsInterface(this Type type)
+        {
+#if UNITY_WSA && !UNITY_EDITOR
+            return type.GetTypeInfo().IsInterface;
+#else
+            return type.IsInterface;
+#endif
+        }
+
+        public static bool IsAbstract(this Type type)
+        {
+#if UNITY_WSA && !UNITY_EDITOR
+            return type.GetTypeInfo().IsAbstract;
+#else
+            return type.IsAbstract;
+#endif
+        }
+
+        public static MethodInfo Method(this Delegate del)
+        {
+#if UNITY_WSA && !UNITY_EDITOR
+            return del.GetMethodInfo();
+#else
+            return del.Method;
+#endif
+        }
+
+        public static Type[] GenericArguments(this Type type)
+        {
+#if UNITY_WSA && !UNITY_EDITOR
+            return type.GetTypeInfo().GenericTypeArguments;
+#else
+            return type.GetGenericArguments();
+#endif
+        }
+
+        public static Type[] Interfaces(this Type type)
+        {
+#if UNITY_WSA && !UNITY_EDITOR
+            return type.GetTypeInfo().ImplementedInterfaces.ToArray();
+#else
+            return type.GetInterfaces();
+#endif
+        }
+
+        public static ConstructorInfo[] Constructors(this Type type)
+        {
+#if UNITY_WSA && !UNITY_EDITOR
+            return type.GetTypeInfo().DeclaredConstructors.ToArray();
+#else
+            return type.GetConstructors(
+                BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+#endif
         }
 
         public static object GetDefaultValue(this Type type)
         {
-            if (type.IsValueType)
+            if (type.IsValueType())
             {
                 return Activator.CreateInstance(type);
             }
@@ -56,14 +176,14 @@ namespace ModestTree
 
         public static IEnumerable<Type> GetParentTypes(this Type type)
         {
-            if (type == null || type.BaseType == null || type == typeof(object) || type.BaseType == typeof(object))
+            if (type == null || type.BaseType() == null || type == typeof(object) || type.BaseType() == typeof(object))
             {
                 yield break;
             }
 
-            yield return type.BaseType;
+            yield return type.BaseType();
 
-            foreach (var ancestor in type.BaseType.GetParentTypes())
+            foreach (var ancestor in type.BaseType().GetParentTypes())
             {
                 yield return ancestor;
             }
@@ -77,100 +197,61 @@ namespace ModestTree
 
         public static bool IsClosedGenericType(this Type type)
         {
-            return type.IsGenericType && type != type.GetGenericTypeDefinition();
+            return type.IsGenericType() && type != type.GetGenericTypeDefinition();
         }
 
         public static bool IsOpenGenericType(this Type type)
         {
-            return type.IsGenericType && type == type.GetGenericTypeDefinition();
+            return type.IsGenericType() && type == type.GetGenericTypeDefinition();
         }
 
-        // This is the same as the standard GetFields except it also supports getting the private
-        // fields in base classes
-        public static IEnumerable<FieldInfo> GetAllFields(this Type type, BindingFlags flags)
+        // Returns all instance fields, including private and public and also those in base classes
+        public static IEnumerable<FieldInfo> GetAllInstanceFields(this Type type)
         {
-            if ((int)(flags & BindingFlags.DeclaredOnly) != 0)
+            foreach (var fieldInfo in type.DeclaredInstanceFields())
             {
-                // Can use normal method in this case
-                foreach (var fieldInfo in type.GetFields(flags))
+                yield return fieldInfo;
+            }
+
+            if (type.BaseType() != null && type.BaseType() != typeof(object))
+            {
+                foreach (var fieldInfo in type.BaseType().GetAllInstanceFields())
                 {
                     yield return fieldInfo;
                 }
             }
-            else
-            {
-                // Add DeclaredOnly because we will get the base classes below
-                foreach (var fieldInfo in type.GetFields(flags | BindingFlags.DeclaredOnly))
-                {
-                    yield return fieldInfo;
-                }
+        }
 
-                if (type.BaseType != null && type.BaseType != typeof(object))
+        // Returns all instance properties, including private and public and also those in base classes
+        public static IEnumerable<PropertyInfo> GetAllInstanceProperties(this Type type)
+        {
+            foreach (var propInfo in type.DeclaredInstanceProperties())
+            {
+                yield return propInfo;
+            }
+
+            if (type.BaseType() != null && type.BaseType() != typeof(object))
+            {
+                foreach (var propInfo in type.BaseType().GetAllInstanceProperties())
                 {
-                    foreach (var fieldInfo in type.BaseType.GetAllFields(flags))
-                    {
-                        yield return fieldInfo;
-                    }
+                    yield return propInfo;
                 }
             }
         }
 
-        // This is the same as the standard GetProperties except it also supports getting the private
-        // members in base classes
-        public static IEnumerable<PropertyInfo> GetAllProperties(this Type type, BindingFlags flags)
+        // Returns all instance methods, including private and public and also those in base classes
+        public static IEnumerable<MethodInfo> GetAllInstanceMethods(this Type type)
         {
-            if ((int)(flags & BindingFlags.DeclaredOnly) != 0)
+            foreach (var methodInfo in type.DeclaredInstanceMethods())
             {
-                // Can use normal method in this case
-                foreach (var propertyInfo in type.GetProperties(flags))
-                {
-                    yield return propertyInfo;
-                }
+                yield return methodInfo;
             }
-            else
-            {
-                // Add DeclaredOnly because we will get the base classes below
-                foreach (var propertyInfo in type.GetProperties(flags | BindingFlags.DeclaredOnly))
-                {
-                    yield return propertyInfo;
-                }
 
-                if (type.BaseType != null && type.BaseType != typeof(object))
-                {
-                    foreach (var propertyInfo in type.BaseType.GetAllProperties(flags))
-                    {
-                        yield return propertyInfo;
-                    }
-                }
-            }
-        }
-
-        // This is the same as the standard GetMethods except it also supports getting the private
-        // members in base classes
-        public static IEnumerable<MethodInfo> GetAllMethods(this Type type, BindingFlags flags)
-        {
-            if ((int)(flags & BindingFlags.DeclaredOnly) != 0)
+            if (type.BaseType() != null && type.BaseType() != typeof(object))
             {
-                // Can use normal method in this case
-                foreach (var methodInfo in type.GetMethods(flags))
+                foreach (var methodInfo in type.BaseType().GetAllInstanceMethods())
                 {
                     yield return methodInfo;
-                }
-            }
-            else
-            {
-                // Add DeclaredOnly because we will get the base classes below
-                foreach (var methodInfo in type.GetMethods(flags | BindingFlags.DeclaredOnly))
-                {
-                    yield return methodInfo;
-                }
-
-                if (type.BaseType != null && type.BaseType != typeof(object))
-                {
-                    foreach (var methodInfo in type.BaseType.GetAllMethods(flags))
-                    {
-                        yield return methodInfo;
-                    }
                 }
             }
         }
@@ -182,20 +263,6 @@ namespace ModestTree
                 return string.Format("{0}[]", type.GetElementType().Name());
             }
 
-            if (type.ContainsGenericParameters || type.IsGenericType)
-            {
-                if (type.BaseType == typeof(Nullable<>) || (type.BaseType == typeof(ValueType) && type.UnderlyingSystemType.Name.StartsWith("Nullable")))
-                {
-                    return GetCSharpTypeName(type.GetGenericArguments().Single().Name) + "?";
-                }
-
-                int index = type.Name.IndexOf("`");
-                string genericTypeName = index > 0 ? type.Name.Substring(0, index) : type.Name;
-                string genericArgs = string.Join(",", type.GetGenericArguments().Select(t => t.Name()).ToArray());
-                return genericArgs.Length == 0 ? genericTypeName : genericTypeName + "<" + genericArgs + ">";
-            }
-
-            // If a nested class, include the parent classes as well
             return (type.DeclaringType == null ? "" : type.DeclaringType.Name() + ".") + GetCSharpTypeName(type.Name);
         }
 
@@ -226,26 +293,60 @@ namespace ModestTree
         }
 
         public static bool HasAttribute(
-            this ICustomAttributeProvider provider, params Type[] attributeTypes)
+            this MemberInfo provider, params Type[] attributeTypes)
         {
             return provider.AllAttributes(attributeTypes).Any();
         }
 
-        public static bool HasAttribute<T>(this ICustomAttributeProvider provider)
+        public static bool HasAttribute<T>(this MemberInfo provider)
             where T : Attribute
         {
             return provider.AllAttributes(typeof(T)).Any();
         }
 
         public static IEnumerable<T> AllAttributes<T>(
-            this ICustomAttributeProvider provider)
+            this MemberInfo provider)
             where T : Attribute
         {
             return provider.AllAttributes(typeof(T)).Cast<T>();
         }
 
         public static IEnumerable<Attribute> AllAttributes(
-            this ICustomAttributeProvider provider, params Type[] attributeTypes)
+            this MemberInfo provider, params Type[] attributeTypes)
+        {
+            var allAttributes = provider.GetCustomAttributes(true).Cast<Attribute>();
+
+            if (attributeTypes.Length == 0)
+            {
+                return allAttributes;
+            }
+
+            return allAttributes.Where(a => attributeTypes.Any(x => a.GetType().DerivesFromOrEqual(x)));
+        }
+
+        // We could avoid this duplication here by using ICustomAttributeProvider but this class
+        // does not exist on the WP8 platform
+        public static bool HasAttribute(
+            this ParameterInfo provider, params Type[] attributeTypes)
+        {
+            return provider.AllAttributes(attributeTypes).Any();
+        }
+
+        public static bool HasAttribute<T>(this ParameterInfo provider)
+            where T : Attribute
+        {
+            return provider.AllAttributes(typeof(T)).Any();
+        }
+
+        public static IEnumerable<T> AllAttributes<T>(
+            this ParameterInfo provider)
+            where T : Attribute
+        {
+            return provider.AllAttributes(typeof(T)).Cast<T>();
+        }
+
+        public static IEnumerable<Attribute> AllAttributes(
+            this ParameterInfo provider, params Type[] attributeTypes)
         {
             var allAttributes = provider.GetCustomAttributes(true).Cast<Attribute>();
 

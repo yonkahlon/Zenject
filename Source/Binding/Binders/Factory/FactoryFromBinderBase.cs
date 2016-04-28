@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using ModestTree;
 
-#if !ZEN_NOT_UNITY3D
+#if !NOT_UNITY3D
 using UnityEngine;
 #endif
 
@@ -100,7 +100,7 @@ namespace Zenject
             return this;
         }
 
-#if !ZEN_NOT_UNITY3D
+#if !NOT_UNITY3D
 
         public GameObjectNameGroupNameBinder FromGameObject()
         {

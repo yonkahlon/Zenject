@@ -64,7 +64,7 @@ namespace Zenject
                 BindInfo, FactoryType, FinalizerWrapper, subIdentifier);
         }
 
-#if !ZEN_NOT_UNITY3D
+#if !NOT_UNITY3D
 
         public ConditionBinder FromResource(string resourcePath)
         {

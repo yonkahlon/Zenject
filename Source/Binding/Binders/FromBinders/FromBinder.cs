@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using ModestTree;
 using System.Linq;
 
-#if !ZEN_NOT_UNITY3D
+#if !NOT_UNITY3D
 using UnityEngine;
 #endif
 
@@ -92,7 +92,7 @@ namespace Zenject
                 BindInfo, FinalizerWrapper, subIdentifier);
         }
 
-#if !ZEN_NOT_UNITY3D
+#if !NOT_UNITY3D
 
         public ScopeArgBinder FromComponent(GameObject gameObject)
         {

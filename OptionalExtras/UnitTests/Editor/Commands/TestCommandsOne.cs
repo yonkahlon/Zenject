@@ -23,7 +23,7 @@ namespace Zenject.Tests
             Container.BindCommand<DoSomethingCommand, string>()
                 .To<Bar>(x => x.Execute).AsSingle();
 
-            var bar = Container.Resolve<Bar>();
+            Container.Resolve<Bar>();
             var cmd = Container.Resolve<DoSomethingCommand>();
 
             Assert.IsEqual(Bar.InstanceCount, 1);
@@ -73,7 +73,7 @@ namespace Zenject.Tests
             Container.BindCommand<DoSomethingCommand, string>()
                 .To<Bar>(x => x.Execute).AsCached();
 
-            var bar = Container.Resolve<Bar>();
+            Container.Resolve<Bar>();
             var cmd = Container.Resolve<DoSomethingCommand>();
 
             Assert.IsEqual(Bar.InstanceCount, 1);
@@ -102,7 +102,7 @@ namespace Zenject.Tests
             Container.BindCommand<DoSomethingCommand, string>()
                 .ToResolve<Bar>(x => x.Execute);
 
-            var bar = Container.Resolve<Bar>();
+            Container.Resolve<Bar>();
             var cmd = Container.Resolve<DoSomethingCommand>();
 
             Assert.IsNull(Bar.Value);
@@ -124,7 +124,7 @@ namespace Zenject.Tests
             Container.BindCommand<DoSomethingCommand, string>()
                 .ToOptionalResolve<Bar>(x => x.Execute);
 
-            var bar = Container.Resolve<Bar>();
+            Container.Resolve<Bar>();
             var cmd = Container.Resolve<DoSomethingCommand>();
 
             Assert.IsNull(Bar.Value);
