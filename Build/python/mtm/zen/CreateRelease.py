@@ -53,7 +53,7 @@ class Runner:
         self._varMgr.set('AssetsDir', '[RootDir]/UnityProject/Assets')
         self._varMgr.set('ZenjectDir', '[AssetsDir]/Zenject')
         self._varMgr.set('DistDir', '[BuildDir]/Dist')
-        self._varMgr.set('BinDir', '[RootDir]/AssemblyBuild/Bin')
+        self._varMgr.set('BinDir', '[RootDir]/NonUnityBuild/Bin')
 
         versionStr = self._sys.readFileAsText('[ZenjectDir]/Version.txt').strip()
 
@@ -76,11 +76,8 @@ class Runner:
         self._sys.createDirectory('[TempDir]')
 
         try:
-            self._createCSharpPackage(True, '[DistDir]/Zenject-WithAsteroidsDemo@v{0}.unitypackage'.format(versionStr))
+            self._createCSharpPackage(True, '[DistDir]/Zenject-WithSampleGames@v{0}.unitypackage'.format(versionStr))
             self._createCSharpPackage(False, '[DistDir]/Zenject@v{0}.unitypackage'.format(versionStr))
-
-            self._createDllPackage('[DistDir]/Zenject-BinariesOnly@v{0}.unitypackage'.format(versionStr))
-
             self._createNonUnityZip('[DistDir]/Zenject-NonUnity@v{0}.zip'.format(versionStr))
         finally:
             self._sys.deleteDirectory('[TempDir]')
@@ -89,67 +86,20 @@ class Runner:
 
         self._log.heading('Creating non unity zip')
 
-        tempDir = '[TempDir]/NonUnity'
+        tempDir = '[TempDir]/Debug'
         self._sys.createDirectory(tempDir)
         self._sys.clearDirectoryContents(tempDir)
 
-        binDir = '[BinDir]/Not Unity Release'
+        binDir = '[BinDir]/Release'
         self._sys.deleteDirectoryIfExists(binDir)
         self._sys.createDirectory(binDir)
-        self._vsSolutionHelper.buildVisualStudioProject('[RootDir]/AssemblyBuild/Zenject.sln', 'Not Unity Release')
+        self._vsSolutionHelper.buildVisualStudioProject('[RootDir]/NonUnityBuild/Zenject.sln', 'Release')
 
         self._log.info('Copying Zenject dlls')
         self._sys.copyFile('{0}/Zenject.dll'.format(binDir), '{0}/Zenject.dll'.format(tempDir))
         self._sys.copyFile('{0}/Zenject.Commands.dll'.format(binDir), '{0}/Zenject.Commands.dll'.format(tempDir))
 
         self._zipHelper.createZipFile(tempDir, zipPath)
-
-    def _createDllPackage(self, outputPath):
-
-        self._log.heading('Creating {0}'.format(os.path.basename(outputPath)))
-
-        self._varMgr.set('PackageTempDir', '[TempDir]/Packager')
-        self._varMgr.set('ZenTempDir', '[PackageTempDir]/Assets/Zenject')
-
-        self._sys.createDirectory('[PackageTempDir]')
-        self._sys.createDirectory('[PackageTempDir]/ProjectSettings')
-
-        try:
-            self._log.info('Building zenject dlls')
-
-            self._varMgr.set('ZenDllDir', '[BinDir]/Release')
-            self._varMgr.set('ZenDllMetaDir', '[BuildDir]/BinaryMetas')
-
-            self._sys.deleteDirectoryIfExists('[ZenDllDir]')
-            self._sys.createDirectory('[ZenDllDir]')
-
-            self._vsSolutionHelper.buildVisualStudioProject('[RootDir]/AssemblyBuild/Zenject.sln', 'Release')
-
-            self._log.info('Copying Zenject dlls')
-
-            self._sys.copyFile('[ZenDllDir]/Zenject.dll', '[ZenTempDir]/Zenject.dll')
-            self._sys.copyFile('[ZenDllMetaDir]/Zenject.dll.meta', '[ZenTempDir]/Zenject.dll.meta')
-
-            self._sys.copyFile('[ZenDllDir]/Zenject-editor.dll', '[ZenTempDir]/Editor/Zenject-editor.dll')
-            self._sys.copyFile('[ZenDllMetaDir]/Zenject-editor.dll.meta', '[ZenTempDir]/Editor/Zenject-editor.dll.meta')
-
-            self._sys.copyFile('[ZenDllDir]/Zenject.Commands.dll', '[ZenTempDir]/Zenject.Commands.dll')
-            self._sys.copyFile('[ZenDllMetaDir]/Zenject.Commands.dll.meta', '[ZenTempDir]/Zenject.Commands.dll.meta')
-
-            self._sys.copyFile('[ZenjectDir]/Version.txt', '[ZenTempDir]/Version.txt')
-            self._sys.copyFile('[ZenjectDir]/Version.txt.meta', '[ZenTempDir]/Version.txt.meta')
-
-            self._sys.copyFile('[ZenjectDir]/LICENSE.txt', '[ZenTempDir]/LICENSE.txt')
-            self._sys.copyFile('[ZenjectDir]/LICENSE.txt.meta', '[ZenTempDir]/LICENSE.txt.meta')
-
-            self._sys.copyDirectory('[ZenjectDir]/Documentation', '[ZenTempDir]/Documentation')
-            self._sys.copyFile('[ZenjectDir]/Documentation.meta', '[ZenTempDir]/Documentation.meta')
-
-            self._createUnityPackage('[PackageTempDir]', outputPath)
-        finally:
-            self._sys.deleteDirectory('[PackageTempDir]')
-
-        self._log.heading('Creating {0}'.format(os.path.basename(outputPath)))
 
     def _createCSharpPackage(self, includeSample, outputPath):
 
@@ -170,21 +120,16 @@ class Runner:
             self._sys.deleteDirectory('[ZenTempDir]/OptionalExtras/UnitTests')
             self._sys.removeFile('[ZenTempDir]/OptionalExtras/UnitTests.meta')
 
-            self._zipHelper.createZipFile('[ZenTempDir]/OptionalExtras/IntegrationTests', '[ZenTempDir]/OptionalExtras/IntegrationTests.zip')
-            self._sys.deleteDirectory('[ZenTempDir]/OptionalExtras/IntegrationTests')
-            self._sys.removeFile('[ZenTempDir]/OptionalExtras/IntegrationTests.meta')
-
             self._zipHelper.createZipFile('[ZenTempDir]/OptionalExtras/AutoMocking', '[ZenTempDir]/OptionalExtras/AutoMocking.zip')
             self._sys.deleteDirectory('[ZenTempDir]/OptionalExtras/AutoMocking')
             self._sys.removeFile('[ZenTempDir]/OptionalExtras/AutoMocking.meta')
 
             self._sys.removeFile('[ZenTempDir]/Source/Zenject.csproj')
-            self._sys.removeFile('[ZenTempDir]/Source/Zenject.csproj.user')
             self._sys.removeFile('[ZenTempDir]/OptionalExtras/CommandsAndSignals/Zenject.Commands.csproj')
-            self._sys.removeFile('[ZenTempDir]/OptionalExtras/CommandsAndSignals/Zenject.Commands.csproj.user')
 
             if not includeSample:
-                self._sys.deleteDirectory('[ZenTempDir]/OptionalExtras/SampleGame')
+                self._sys.deleteDirectory('[ZenTempDir]/OptionalExtras/SampleGame1 (Beginner)')
+                self._sys.deleteDirectory('[ZenTempDir]/OptionalExtras/SampleGame2 (Advanced)')
 
             self._createUnityPackage('[PackageTempDir]', outputPath)
         finally:
