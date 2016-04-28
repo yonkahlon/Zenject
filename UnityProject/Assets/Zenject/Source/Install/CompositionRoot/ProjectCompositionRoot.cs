@@ -30,7 +30,7 @@ namespace Zenject
 
         readonly List<object> _dependencyRoots = new List<object>();
 
-        public DiContainer Container
+        public override DiContainer Container
         {
             get
             {
@@ -147,51 +147,50 @@ namespace Zenject
 
             try
             {
-                InstallBindings(_container);
+                InstallBindings();
             }
             finally
             {
                 _container.IsInstalling = false;
             }
 
-            InjectComponents(_container);
+            InjectComponents();
 
             Assert.That(_dependencyRoots.IsEmpty());
 
             _dependencyRoots.AddRange(_container.ResolveDependencyRoots());
         }
 
-        public override IEnumerable<Component> GetInjectableComponents()
+        protected override IEnumerable<Component> GetInjectableComponents()
         {
             return GetInjectableComponents(this.gameObject);
         }
 
-        void InjectComponents(DiContainer container)
+        void InjectComponents()
         {
             // Use ToList in case they do something weird in post inject
             foreach (var component in GetInjectableComponents().ToList())
             {
                 Assert.That(!component.GetType().DerivesFrom<MonoInstaller>());
 
-                container.Inject(component);
+                _container.Inject(component);
             }
         }
 
-        // We pass in the container here instead of using our own for validation to work
-        public override void InstallBindings(DiContainer container)
+        void InstallBindings()
         {
-            container.DefaultParent = this.transform;
+            _container.DefaultParent = this.transform;
 
-            container.Bind(typeof(TickableManager), typeof(InitializableManager), typeof(DisposableManager))
+            _container.Bind(typeof(TickableManager), typeof(InitializableManager), typeof(DisposableManager))
                 .ToSelf().AsSingle().InheritInSubContainers();
 
-            container.Bind<CompositionRoot>().FromInstance(this);
+            _container.Bind<CompositionRoot>().FromInstance(this);
 
-            container.Bind<ProjectFacade>().FromComponent(this.gameObject).AsSingle().NonLazy();
+            _container.Bind<ProjectFacade>().FromComponent(this.gameObject).AsSingle().NonLazy();
 
-            InstallSceneBindings(container);
+            InstallSceneBindings();
 
-            InstallInstallers(container);
+            InstallInstallers();
         }
     }
 }

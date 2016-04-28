@@ -81,6 +81,11 @@ namespace Zenject
             }
         }
 
+        public abstract DiContainer Container
+        {
+            get;
+        }
+
         void CheckInstallerPrefabTypes()
         {
             foreach (var installer in _installers)
@@ -107,14 +112,12 @@ namespace Zenject
             }
         }
 
-        protected void InstallInstallers(DiContainer container)
+        protected void InstallInstallers()
         {
-            InstallInstallers(container, new Dictionary<Type, List<TypeValuePair>>());
+            InstallInstallers(new Dictionary<Type, List<TypeValuePair>>());
         }
 
-        // We pass in the container here instead of using our own for validation to work
-        protected void InstallInstallers(
-            DiContainer container, Dictionary<Type, List<TypeValuePair>> extraArgsMap)
+        protected void InstallInstallers(Dictionary<Type, List<TypeValuePair>> extraArgsMap)
         {
             CheckInstallerPrefabTypes();
 
@@ -148,16 +151,16 @@ namespace Zenject
                 if (extraArgsMap.TryGetValue(installer.GetType(), out extraArgs))
                 {
                     extraArgsMap.Remove(installer.GetType());
-                    container.InstallExplicit(installer, extraArgs);
+                    Container.InstallExplicit(installer, extraArgs);
                 }
                 else
                 {
-                    container.Install(installer);
+                    Container.Install(installer);
                 }
             }
         }
 
-        protected void InstallSceneBindings(DiContainer container)
+        protected void InstallSceneBindings()
         {
             foreach (var binding in GetInjectableComponents().OfType<ZenjectBinding>())
             {
@@ -168,7 +171,7 @@ namespace Zenject
 
                 if (binding.CompositionRoot == null)
                 {
-                    InstallZenjectBinding(container, binding);
+                    InstallZenjectBinding(binding);
                 }
             }
 
@@ -183,13 +186,12 @@ namespace Zenject
 
                 if (binding.CompositionRoot == this)
                 {
-                    InstallZenjectBinding(container, binding);
+                    InstallZenjectBinding(binding);
                 }
             }
         }
 
-        protected void InstallZenjectBinding(
-            DiContainer container, ZenjectBinding binding)
+        protected void InstallZenjectBinding(ZenjectBinding binding)
         {
             if (!binding.enabled)
             {
@@ -223,17 +225,17 @@ namespace Zenject
                 {
                     case ZenjectBinding.BindTypes.Self:
                     {
-                        container.Bind(identifier, component.GetType()).FromInstance(component);
+                        Container.Bind(identifier, component.GetType()).FromInstance(component);
                         break;
                     }
                     case ZenjectBinding.BindTypes.AllInterfaces:
                     {
-                        container.BindAllInterfaces(identifier, component.GetType()).FromInstance(component);
+                        Container.BindAllInterfaces(identifier, component.GetType()).FromInstance(component);
                         break;
                     }
                     case ZenjectBinding.BindTypes.AllInterfacesAndSelf:
                     {
-                        container.BindAllInterfacesAndSelf(identifier, component.GetType()).FromInstance(component);
+                        Container.BindAllInterfacesAndSelf(identifier, component.GetType()).FromInstance(component);
                         break;
                     }
                     default:
@@ -244,11 +246,9 @@ namespace Zenject
             }
         }
 
-        public abstract void InstallBindings(DiContainer container);
+        protected abstract IEnumerable<Component> GetInjectableComponents();
 
-        public abstract IEnumerable<Component> GetInjectableComponents();
-
-        public static IEnumerable<Component> GetInjectableComponents(GameObject gameObject)
+        protected static IEnumerable<Component> GetInjectableComponents(GameObject gameObject)
         {
             foreach (var component in ZenUtilInternal.GetInjectableComponentsBottomUp(gameObject, true))
             {
