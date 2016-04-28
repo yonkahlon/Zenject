@@ -4,7 +4,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{8FB1D1DE-C5E7-47C2-AFF0-1E1A49DA08BD}</ProjectGuid>
+    <ProjectGuid>{E22B1CBF-7E4D-48BD-953B-2B730BD9FF13}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>BuildLib</RootNamespace>
@@ -23,19 +23,23 @@
   <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
     <PlatformTarget>AnyCPU</PlatformTarget>
     <OutputPath>..\..\..\..\Bin\Assemblies\Debug\</OutputPath>
-    <IntermediateOutputPath>..\..\..\..\Temp\obj\Debug\Zenject.Commands\</IntermediateOutputPath>
-    <BaseIntermediateOutputPath>..\..\..\..\Temp\obj\Debug\Zenject.Commands\</BaseIntermediateOutputPath>
+    <IntermediateOutputPath>..\..\..\..\Temp\obj\Debug\Zenject-usage\</IntermediateOutputPath>
+    <BaseIntermediateOutputPath>..\..\..\..\Temp\obj\Debug\Zenject-usage\</BaseIntermediateOutputPath>
     <GenerateSerializationAssemblies>On</GenerateSerializationAssemblies>
-    <DefineConstants>TRACE;DEBUG;ZEN_NOT_UNITY3D;ZEN_MULTITHREADING</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;ZEN_NOT_UNITY3D</DefineConstants>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)' == 'Release'">
     <OutputPath>..\..\..\..\Bin\Assemblies\Release\</OutputPath>
-    <IntermediateOutputPath>..\..\..\..\Temp\obj\Release\Zenject.Commands\</IntermediateOutputPath>
-    <BaseIntermediateOutputPath>..\..\..\..\Temp\obj\Release\Zenject.Commands\</BaseIntermediateOutputPath>
+    <IntermediateOutputPath>..\..\..\..\Temp\obj\Release\Zenject-usage\</IntermediateOutputPath>
+    <BaseIntermediateOutputPath>..\..\..\..\Temp\obj\Release\Zenject-usage\</BaseIntermediateOutputPath>
     <Optimize>true</Optimize>
-    <DefineConstants>TRACE;DEBUG;ZEN_NOT_UNITY3D;ZEN_MULTITHREADING</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;ZEN_NOT_UNITY3D</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="nunit.framework, Version=2.6.0.12051, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\Libraries\nunit\nunit.framework.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -44,33 +48,23 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="IInitializable.cs" />
+    <Compile Include="InjectAttribute.cs" />
+    <Compile Include="InjectOptionalAttribute.cs" />
+    <Compile Include="InjectSources.cs" />
+    <Compile Include="ITickable.cs" />
+    <Compile Include="PostInjectAttribute.cs" />
+    <Compile Include="InjectAttributeBase.cs" />
+    <Compile Include="ZenjectAllowDuringValidationAttribute.cs" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\Mtm.Debugging\Scripts\Mtm.Debugging.csproj">
       <Project>{02c3386d-7132-4c1f-aef0-9e5432dbfc25}</Project>
       <Name>Mtm.Debugging</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Mtm.Zenject-usage\Mtm.Zenject-usage.csproj">
-      <Project>{e22b1cbf-7e4d-48bd-953b-2b730bd9ff13}</Project>
-      <Name>Mtm.Zenject-usage</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Source\Mtm.Zenject.csproj">
-      <Project>{9d5e0d93-7d67-40c0-8435-c0a14789836e}</Project>
-      <Name>Mtm.Zenject</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Command\Binders\CommandExtensions.cs" />
-    <Compile Include="Command\Binders\Finalizers\CommandBindingFinalizerBase.cs" />
-    <Compile Include="Command\Command.cs" />
-    <Compile Include="Signal\Signal.cs" />
-    <Compile Include="Signal\SignalExtensions.cs" />
-    <Compile Include="Command\Binders\CommandBinderBase.cs" />
-    <Compile Include="Command\Binders\CommandBinder0.cs" />
-    <Compile Include="Command\Binders\CommandBinder1.cs" />
-    <Compile Include="Command\Binders\CommandBinder2.cs" />
-    <Compile Include="Command\Binders\CommandBinder3.cs" />
-    <Compile Include="Command\Binders\CommandBinder4.cs" />
-    <Compile Include="Command\Binders\Finalizers\CommandBindingFinalizer.cs" />
-    <Compile Include="Command\Binders\CommandBinder5.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
