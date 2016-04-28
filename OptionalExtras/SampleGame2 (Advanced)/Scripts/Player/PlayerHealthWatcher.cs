@@ -8,18 +8,15 @@ namespace Zenject.SpaceFighter
     {
         readonly PlayerKilledSignal.Trigger _killedSignal;
         readonly Explosion.Factory _explosionFactory;
-        readonly CompositionRoot _compRoot;
         readonly PlayerModel _model;
 
         public PlayerHealthWatcher(
             PlayerModel model,
-            CompositionRoot compRoot,
             Explosion.Factory explosionFactory,
             PlayerKilledSignal.Trigger killedSignal)
         {
             _killedSignal = killedSignal;
             _explosionFactory = explosionFactory;
-            _compRoot = compRoot;
             _model = model;
         }
 

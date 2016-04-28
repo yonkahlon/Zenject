@@ -174,11 +174,7 @@ namespace Zenject
 
             // We'd prefer to use GameObject.FindObjectsOfType<ZenjectBinding>() here
             // instead but that doesn't find inactive gameobjects
-            // Resources.FindObjectsOfTypeAll isn't ideal since it does return prefabs
-            // and stuff but our assumption here is that we can ignore these values by
-            // checking for a non-null scene
-            foreach (var binding in Resources.FindObjectsOfTypeAll<ZenjectBinding>()
-                .Where(x => x.gameObject.scene != null))
+            foreach (var binding in Resources.FindObjectsOfTypeAll<ZenjectBinding>())
             {
                 if (binding == null)
                 {

@@ -15,7 +15,6 @@ namespace Zenject.SpaceFighter
 
         Vector3 _startPos;
         float _theta;
-        float _startTime;
         Vector3 _startLookDir;
 
         public EnemyStateIdle(
@@ -37,7 +36,6 @@ namespace Zenject.SpaceFighter
         {
             _startPos = _model.Position;
             _theta = 0;
-            _startTime = Time.realtimeSinceStartup;
             _startLookDir = _model.LookDir;
         }
 

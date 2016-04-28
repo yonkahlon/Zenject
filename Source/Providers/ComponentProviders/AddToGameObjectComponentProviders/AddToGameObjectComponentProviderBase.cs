@@ -15,7 +15,6 @@ namespace Zenject
         readonly Type _componentType;
         readonly DiContainer _container;
         readonly List<TypeValuePair> _extraArguments;
-        readonly List<Type> _extraArgumentTypes;
 
         public AddToGameObjectComponentProviderBase(
             DiContainer container, Type componentType,
@@ -27,9 +26,6 @@ namespace Zenject
             _extraArguments = extraArguments;
             _componentType = componentType;
             _container = container;
-
-            // Cache this since _extraArguments changes
-            _extraArgumentTypes = extraArguments.Select(x => x.Type).ToList();
         }
 
         protected DiContainer Container

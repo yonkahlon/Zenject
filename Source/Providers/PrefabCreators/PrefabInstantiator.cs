@@ -15,7 +15,6 @@ namespace Zenject
         readonly string _gameObjectName;
         readonly string _gameObjectGroupName;
         readonly List<TypeValuePair> _extraArguments;
-        readonly List<Type> _extraArgumentTypes;
 
         public PrefabInstantiator(
             DiContainer container,
@@ -29,9 +28,6 @@ namespace Zenject
             _container = container;
             _gameObjectName = gameObjectName;
             _gameObjectGroupName = gameObjectGroupName;
-
-            // Cache this since _extraArguments changes
-            _extraArgumentTypes = extraArguments.Select(x => x.Type).ToList();
         }
 
         public string GameObjectGroupName

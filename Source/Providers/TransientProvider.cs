@@ -12,7 +12,6 @@ namespace Zenject
         readonly Type _concreteType;
         readonly string _concreteIdentifier;
         readonly List<TypeValuePair> _extraArguments;
-        readonly List<Type> _extraArgumentTypes;
 
         public TransientProvider(
             Type concreteType, DiContainer container,
@@ -22,8 +21,6 @@ namespace Zenject
             _concreteType = concreteType;
             _concreteIdentifier = concreteIdentifier;
             _extraArguments = extraArguments;
-            // Cache this since _extraArguments changes
-            _extraArgumentTypes = extraArguments.Select(x => x.Type).ToList();
         }
 
         public TransientProvider(

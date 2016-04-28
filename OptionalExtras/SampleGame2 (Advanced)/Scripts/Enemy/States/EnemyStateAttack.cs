@@ -7,7 +7,6 @@ namespace Zenject.SpaceFighter
 {
     public class EnemyStateAttack : IEnemyState
     {
-        readonly EnemyRegistry _registry;
         readonly EnemyTunables _tunables;
         readonly EnemyStateManager _stateManager;
         readonly PlayerFacade _player;
@@ -25,10 +24,8 @@ namespace Zenject.SpaceFighter
             Settings settings,
             PlayerFacade player,
             EnemyStateManager stateManager,
-            EnemyTunables tunables,
-            EnemyRegistry registry)
+            EnemyTunables tunables)
         {
-            _registry = registry;
             _tunables = tunables;
             _stateManager = stateManager;
             _player = player;
