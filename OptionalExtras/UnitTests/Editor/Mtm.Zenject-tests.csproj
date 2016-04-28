@@ -56,11 +56,11 @@
       <Project>{9f77d9d6-9db4-4743-b331-397f344f3092}</Project>
       <Name>Mtm.Util</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\Mtm.Zenject-usage\Mtm.Zenject-usage.csproj">
+    <ProjectReference Include="..\..\..\Source\Usage\Mtm.Zenject-usage.csproj">
       <Project>{e22b1cbf-7e4d-48bd-953b-2b730bd9ff13}</Project>
       <Name>Mtm.Zenject-usage</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\Mtm.Zenject\Mtm.Zenject.csproj">
+    <ProjectReference Include="..\..\..\Source\Mtm.Zenject.csproj">
       <Project>{9d5e0d93-7d67-40c0-8435-c0a14789836e}</Project>
       <Name>Mtm.Zenject</Name>
     </ProjectReference>
