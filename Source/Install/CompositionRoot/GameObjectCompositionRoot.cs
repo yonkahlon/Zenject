@@ -22,7 +22,7 @@ namespace Zenject
 
         DiContainer _container;
 
-        public DiContainer Container
+        public override DiContainer Container
         {
             get
             {
@@ -44,7 +44,7 @@ namespace Zenject
 
             try
             {
-                InstallBindings(_container, installerExtraArgs);
+                InstallBindings(installerExtraArgs);
             }
             finally
             {
@@ -53,7 +53,7 @@ namespace Zenject
 
             Log.Debug("GameObjectCompositionRoot: Injecting into child components...");
 
-            InjectComponents(_container);
+            InjectComponents();
 
             Assert.That(_dependencyRoots.IsEmpty());
             _dependencyRoots.AddRange(_container.ResolveDependencyRoots());
@@ -61,18 +61,18 @@ namespace Zenject
             Log.Debug("GameObjectCompositionRoot: Initialized successfully");
         }
 
-        void InjectComponents(DiContainer container)
+        void InjectComponents()
         {
             // Use ToList in case they do something weird in post inject
             foreach (var component in GetInjectableComponents().ToList())
             {
                 Assert.That(!component.GetType().DerivesFrom<MonoInstaller>());
 
-                container.Inject(component);
+                _container.Inject(component);
             }
         }
 
-        public override IEnumerable<Component> GetInjectableComponents()
+        protected override IEnumerable<Component> GetInjectableComponents()
         {
             // We inject on all components on the root except ourself
             foreach (var component in GetComponents<Component>())
@@ -106,29 +106,23 @@ namespace Zenject
             }
         }
 
-        public override void InstallBindings(DiContainer container)
+        void InstallBindings(InstallerExtraArgs installerExtraArgs)
         {
-            InstallBindings(container, null);
-        }
+            _container.DefaultParent = this.transform;
 
-        public void InstallBindings(
-            DiContainer container, InstallerExtraArgs installerExtraArgs)
-        {
-            container.DefaultParent = this.transform;
-
-            container.Bind<CompositionRoot>().FromInstance(this);
+            _container.Bind<CompositionRoot>().FromInstance(this);
 
             if (_facade == null)
             {
-                container.Bind<MonoFacade>()
+                _container.Bind<MonoFacade>()
                     .To<DefaultGameObjectFacade>().FromComponent(this.gameObject).AsSingle().NonLazy();
             }
             else
             {
-                container.Bind<MonoFacade>().FromInstance(_facade).AsSingle().NonLazy();
+                _container.Bind<MonoFacade>().FromInstance(_facade).AsSingle().NonLazy();
             }
 
-            InstallSceneBindings(container);
+            InstallSceneBindings();
 
             var extraArgsMap = new Dictionary<Type, List<TypeValuePair>>();
 
@@ -138,7 +132,7 @@ namespace Zenject
                     installerExtraArgs.InstallerType, installerExtraArgs.ExtraArgs);
             }
 
-            InstallInstallers(container, extraArgsMap);
+            InstallInstallers(extraArgsMap);
         }
 
         public class InstallerExtraArgs

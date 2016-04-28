@@ -42,7 +42,7 @@ namespace Zenject
 
         static bool _autoRun = true;
 
-        public DiContainer Container
+        public override DiContainer Container
         {
             get
             {
@@ -169,7 +169,7 @@ namespace Zenject
 
             try
             {
-                InstallBindings(_container);
+                InstallBindings();
             }
             finally
             {
@@ -178,7 +178,7 @@ namespace Zenject
 
             Log.Debug("SceneCompositionRoot: Injecting components in the scene...");
 
-            InjectComponents(_container);
+            InjectComponents();
 
             Log.Debug("SceneCompositionRoot: Resolving dependency roots...");
 
@@ -190,46 +190,45 @@ namespace Zenject
             Log.Debug("SceneCompositionRoot: Initialized successfully");
         }
 
-        // We pass in the container here instead of using our own for validation to work
-        public override void InstallBindings(DiContainer container)
+        void InstallBindings()
         {
             if (_parentNewObjectsUnderRoot)
             {
-                container.DefaultParent = this.transform;
+                _container.DefaultParent = this.transform;
             }
             else
             {
                 // This is necessary otherwise we inherit the project root DefaultParent
-                container.DefaultParent = null;
+                _container.DefaultParent = null;
             }
 
-            container.Bind<CompositionRoot>().FromInstance(this);
-            container.Bind<SceneCompositionRoot>().FromInstance(this);
+            _container.Bind<CompositionRoot>().FromInstance(this);
+            _container.Bind<SceneCompositionRoot>().FromInstance(this);
 
-            InstallSceneBindings(container);
+            InstallSceneBindings();
 
             if (BeforeInstallHooks != null)
             {
-                BeforeInstallHooks(container);
+                BeforeInstallHooks(_container);
                 // Reset extra bindings for next time we change scenes
                 BeforeInstallHooks = null;
             }
 
-            container.Bind<SceneFacade>().FromComponent(this.gameObject).AsSingle().NonLazy();
+            _container.Bind<SceneFacade>().FromComponent(this.gameObject).AsSingle().NonLazy();
 
-            container.Bind<ZenjectSceneLoader>().AsSingle();
+            _container.Bind<ZenjectSceneLoader>().AsSingle();
 
-            InstallInstallers(container);
+            InstallInstallers();
 
             if (AfterInstallHooks != null)
             {
-                AfterInstallHooks(container);
+                AfterInstallHooks(_container);
                 // Reset extra bindings for next time we change scenes
                 AfterInstallHooks = null;
             }
         }
 
-        public override IEnumerable<Component> GetInjectableComponents()
+        protected override IEnumerable<Component> GetInjectableComponents()
         {
             foreach (var gameObject in GetRootGameObjects())
             {
@@ -242,14 +241,14 @@ namespace Zenject
             yield break;
         }
 
-        void InjectComponents(DiContainer container)
+        void InjectComponents()
         {
             // Use ToList in case they do something weird in post inject
             foreach (var component in GetInjectableComponents().ToList())
             {
                 Assert.That(!component.GetType().DerivesFrom<MonoInstaller>());
 
-                container.Inject(component);
+                _container.Inject(component);
             }
         }
 

@@ -2,6 +2,8 @@ using System;
 using UnityEngine;
 using Zenject;
 
+#pragma warning disable 649
+
 namespace Zenject.SpaceFighter
 {
     public class Explosion : MonoBehaviour
