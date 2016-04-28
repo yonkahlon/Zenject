@@ -1,39 +1,38 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{8FB1D1DE-C5E7-47C2-AFF0-1E1A49DA08BD}</ProjectGuid>
+    <ProjectGuid>{B543A0B8-2630-424E-B628-53457BE4884B}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>BuildLib</RootNamespace>
-    <AssemblyName>$(MSBuildProjectName)</AssemblyName>
+    <RootNamespace>Zenject</RootNamespace>
+    <AssemblyName>Zenject.Commands</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>..\..\..\..\Bin\Assemblies\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <IntermediateOutputPath>..\..\..\..\..\NonUnityBuild\Temp\Debug\</IntermediateOutputPath>
+    <BaseIntermediateOutputPath>..\..\..\..\..\NonUnityBuild\Temp\Debug\</BaseIntermediateOutputPath>
+    <OutputPath>..\..\..\..\..\NonUnityBuild\Bin\Debug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;ZEN_NOT_UNITY3D</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <OutputPath>..\..\..\..\Bin\Assemblies\Debug\</OutputPath>
-    <IntermediateOutputPath>..\..\..\..\Temp\obj\Debug\Zenject.Commands\</IntermediateOutputPath>
-    <BaseIntermediateOutputPath>..\..\..\..\Temp\obj\Debug\Zenject.Commands\</BaseIntermediateOutputPath>
-    <GenerateSerializationAssemblies>On</GenerateSerializationAssemblies>
-    <DefineConstants>TRACE;DEBUG;ZEN_NOT_UNITY3D;ZEN_MULTITHREADING</DefineConstants>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
-    <OutputPath>..\..\..\..\Bin\Assemblies\Release\</OutputPath>
-    <IntermediateOutputPath>..\..\..\..\Temp\obj\Release\Zenject.Commands\</IntermediateOutputPath>
-    <BaseIntermediateOutputPath>..\..\..\..\Temp\obj\Release\Zenject.Commands\</BaseIntermediateOutputPath>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <DefineConstants>TRACE;DEBUG;ZEN_NOT_UNITY3D;ZEN_MULTITHREADING</DefineConstants>
+    <IntermediateOutputPath>..\..\..\..\..\NonUnityBuild\Temp\Release\</IntermediateOutputPath>
+    <BaseIntermediateOutputPath>..\..\..\..\..\NonUnityBuild\Temp\Release\</BaseIntermediateOutputPath>
+    <OutputPath>..\..\..\..\..\NonUnityBuild\Bin\Release\</OutputPath>
+    <DefineConstants>TRACE;ZEN_NOT_UNITY3D</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -42,20 +41,6 @@
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Mtm.Debugging\Scripts\Mtm.Debugging.csproj">
-      <Project>{02c3386d-7132-4c1f-aef0-9e5432dbfc25}</Project>
-      <Name>Mtm.Debugging</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Mtm.Zenject-usage\Mtm.Zenject-usage.csproj">
-      <Project>{e22b1cbf-7e4d-48bd-953b-2b730bd9ff13}</Project>
-      <Name>Mtm.Zenject-usage</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Source\Mtm.Zenject.csproj">
-      <Project>{9d5e0d93-7d67-40c0-8435-c0a14789836e}</Project>
-      <Name>Mtm.Zenject</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Command\Binders\CommandExtensions.cs" />
@@ -72,7 +57,18 @@
     <Compile Include="Command\Binders\Finalizers\CommandBindingFinalizer.cs" />
     <Compile Include="Command\Binders\CommandBinder5.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Source\Zenject.csproj">
+      <Project>{46f25a62-2e29-48cb-95f3-bdbcb0976ddc}</Project>
+      <Name>Zenject</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <PropertyGroup>
-  </PropertyGroup>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
 </Project>
