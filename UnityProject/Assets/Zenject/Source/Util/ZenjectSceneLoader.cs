@@ -107,8 +107,6 @@ namespace Zenject
             SceneCompositionRoot.BeforeInstallHooks = preBindings;
             SceneCompositionRoot.AfterInstallHooks = postBindings;
 
-            var scene = SceneManager.GetSceneByName(sceneName);
-
             Assert.That(Application.CanStreamedLevelBeLoaded(sceneName),
                 "Unable to load scene '{0}'", sceneName);
 
