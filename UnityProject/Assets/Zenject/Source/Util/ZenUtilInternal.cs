@@ -8,7 +8,7 @@ using System.Diagnostics;
 using ModestTree;
 using ModestTree.Util;
 
-#if !ZEN_NOT_UNITY3D
+#if !NOT_UNITY3D
 using UnityEngine.SceneManagement;
 using UnityEngine;
 #endif
@@ -29,10 +29,10 @@ namespace Zenject.Internal
 
         public static bool AreFunctionsEqual(Delegate left, Delegate right)
         {
-            return left.Target == right.Target && left.Method == right.Method;
+            return left.Target == right.Target && left.Method() == right.Method();
         }
 
-#if !ZEN_NOT_UNITY3D
+#if !NOT_UNITY3D
         // NOTE: This method will not return components that are within a GameObjectCompositionRoot
         public static IEnumerable<Component> GetInjectableComponentsBottomUp(
             GameObject gameObject, bool recursive)

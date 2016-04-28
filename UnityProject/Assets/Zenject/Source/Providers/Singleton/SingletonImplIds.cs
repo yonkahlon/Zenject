@@ -33,7 +33,7 @@ namespace Zenject
                     return false;
                 }
 
-                return _method.Target == other._method.Target && _method.Method == other._method.Method;
+                return _method.Target == other._method.Target && _method.Method() == other._method.Method();
             }
         }
 
@@ -70,7 +70,7 @@ namespace Zenject
 
                 return _identifier == other._identifier 
                     && _method.Target == other._method.Target 
-                    && _method.Method == other._method.Method;
+                    && _method.Method() == other._method.Method();
             }
         }
     }

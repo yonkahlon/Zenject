@@ -4,7 +4,7 @@ using System.Reflection;
 using System.Linq;
 using ModestTree;
 
-#if !ZEN_NOT_UNITY3D
+#if !NOT_UNITY3D
 using UnityEngine;
 #endif
 
@@ -21,7 +21,7 @@ namespace Zenject
 
         public static ZenjectTypeInfo GetInfo(Type type)
         {
-            Assert.That(!type.IsAbstract,
+            Assert.That(!type.IsAbstract(),
                 "Tried to analyze abstract type '{0}'", type.Name());
 
             ZenjectTypeInfo info;
@@ -104,8 +104,7 @@ namespace Zenject
             // This is so that we can ignore inherited attributes, which is necessary
             // otherwise a base class method marked with [Inject] would cause all overridden
             // derived methods to be added as well
-            var methods = type.GetAllMethods(
-                BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
+            var methods = type.GetAllInstanceMethods()
                 .Where(x => x.GetCustomAttributes(typeof(PostInjectAttribute), false).Any()).ToList();
 
             var heirarchyList = type.Yield().Concat(type.GetParentTypes()).Reverse().ToList();
@@ -132,8 +131,7 @@ namespace Zenject
 
         static IEnumerable<InjectableInfo> GetPropertyInjectables(Type type)
         {
-            var propInfos = type.GetAllProperties(
-                BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
+            var propInfos = type.GetAllInstanceProperties()
                 .Where(x => x.HasAttribute(typeof(InjectAttributeBase)));
 
             foreach (var propInfo in propInfos)
@@ -144,8 +142,7 @@ namespace Zenject
 
         static IEnumerable<InjectableInfo> GetFieldInjectables(Type type)
         {
-            var fieldInfos = type.GetAllFields(
-                BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
+            var fieldInfos = type.GetAllInstanceFields()
                 .Where(x => x.HasAttribute(typeof(InjectAttributeBase)));
 
             foreach (var fieldInfo in fieldInfos)
@@ -204,16 +201,12 @@ namespace Zenject
 
         static ConstructorInfo GetInjectConstructor(Type parentType)
         {
-            var constructors = parentType.GetConstructors(
-                BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+            var constructors = parentType.Constructors();
 
-#if !ZEN_NOT_UNITY3D
-            if (Application.platform == RuntimePlatform.WP8Player)
-            {
-                // WP8 generates a dummy constructor with signature (internal Classname(UIntPtr dummy))
-                // So just ignore that
-                constructors = constructors.Where(c => !IsWp8GeneratedConstructor(c)).ToArray();
-            }
+#if UNITY_WSA && !UNITY_EDITOR
+            // WP8 generates a dummy constructor with signature (internal Classname(UIntPtr dummy))
+            // So just ignore that
+            constructors = constructors.Where(c => !IsWp8GeneratedConstructor(c)).ToArray();
 #endif
 
             if (constructors.IsEmpty())
@@ -230,10 +223,12 @@ namespace Zenject
             return constructors[0];
         }
 
+#if UNITY_WSA && !UNITY_EDITOR
         static bool IsWp8GeneratedConstructor(ConstructorInfo c)
         {
             ParameterInfo[] args = c.GetParameters();
             return args.Length == 1 && args[0].ParameterType == typeof(UIntPtr) && args[0].Name == "dummy";
         }
+#endif
     }
 }

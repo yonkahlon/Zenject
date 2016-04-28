@@ -27,6 +27,20 @@ namespace ModestTree
             }
         }
 
+        // Inclusive because it includes the item that meets the predicate
+        public static IEnumerable<TSource> TakeUntilInclusive<TSource>(
+            this IEnumerable<TSource> source, Func<TSource, bool> predicate)
+        {
+            foreach (var item in source)
+            {
+                yield return item;
+                if (predicate(item))
+                {
+                    yield break;
+                }
+            }
+        }
+
         // Return the first item when the list is of length one and otherwise returns default
         public static TSource OnlyOrDefault<TSource>(this IEnumerable<TSource> source)
         {
@@ -37,6 +51,13 @@ namespace ModestTree
 
             var results = source.Take(2).ToArray();
             return results.Length == 1 ? results[0] : default(TSource);
+        }
+
+        // Another name for IEnumerable.Reverse()
+        // This is useful to distinguish betweeh List.Reverse() when dealing with a list
+        public static IEnumerable<T> Reversed<T>(this IEnumerable<T> list)
+        {
+            return list.Reverse();
         }
 
         public static IEnumerable<T> Prepend<T>(this IEnumerable<T> first, IEnumerable<T> second)
@@ -150,12 +171,6 @@ namespace ModestTree
             {
                 return objectArray.Where(x => x is T).Cast<T>().SingleOrDefault();
             }
-        }
-
-        public static IEnumerable<T> OfType<T>(this IEnumerable<T> source, Type type)
-        {
-            Assert.That(type.DerivesFromOrEqual<T>());
-            return source.Where(x => x.GetType() == type);
         }
 
         public static IEnumerable<TSource> DistinctBy<TSource, TKey>(this IEnumerable<TSource> source,

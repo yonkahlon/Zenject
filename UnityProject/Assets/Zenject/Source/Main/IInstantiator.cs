@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using ModestTree;
 
-#if !ZEN_NOT_UNITY3D
+#if !NOT_UNITY3D
 using UnityEngine;
 #endif
 
@@ -24,7 +24,7 @@ namespace Zenject
         object InstantiateExplicit(Type concreteType, List<TypeValuePair> extraArgs);
         object InstantiateExplicit(bool autoInject, InjectArgs extraArgs);
 
-#if !ZEN_NOT_UNITY3D
+#if !NOT_UNITY3D
 
         // Add new component to existing game object and fill in its dependencies
         // NOTE: Gameobject here is not a prefab prototype, it is an instance

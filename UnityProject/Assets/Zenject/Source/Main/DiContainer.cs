@@ -6,7 +6,7 @@ using ModestTree;
 using ModestTree.Util;
 using Zenject.Internal;
 
-#if !ZEN_NOT_UNITY3D
+#if !NOT_UNITY3D
 using UnityEngine;
 #endif
 
@@ -99,7 +99,7 @@ namespace Zenject
             }
         }
 
-#if !ZEN_NOT_UNITY3D
+#if !NOT_UNITY3D
 
         public Transform DefaultParent
         {
@@ -276,7 +276,7 @@ namespace Zenject
             FlushBindings();
 
             var container = new DiContainer(this, isValidating);
-#if !ZEN_NOT_UNITY3D
+#if !NOT_UNITY3D
             container.DefaultParent = this.DefaultParent;
 #endif
             foreach (var binding in _processedBindings.Where(x => x.InheritInSubContainers))
@@ -374,7 +374,7 @@ namespace Zenject
 
             // If we are asking for a List<int>, we should also match for any localProviders that are bound to the open generic type List<>
             // Currently it only matches one and not the other - not totally sure if this is better than returning both
-            if (bindingId.Type.IsGenericType && _providers.TryGetValue(new BindingId(bindingId.Type.GetGenericTypeDefinition(), bindingId.Identifier), out localProviders))
+            if (bindingId.Type.IsGenericType() && _providers.TryGetValue(new BindingId(bindingId.Type.GetGenericTypeDefinition(), bindingId.Identifier), out localProviders))
             {
                 return localProviders;
             }
@@ -439,7 +439,7 @@ namespace Zenject
                 return;
             }
 
-#if !ZEN_NOT_UNITY3D
+#if !NOT_UNITY3D
             if (rootContext.MemberType.DerivesFrom<DecoratorInstaller>())
             {
                 return;
@@ -551,7 +551,7 @@ namespace Zenject
 
             FlushBindings();
 
-#if !ZEN_NOT_UNITY3D
+#if !NOT_UNITY3D
             if (installerType.DerivesFrom<MonoInstaller>())
             {
                 var gameObj = CreateAndParentPrefabResource("Installers/" + installerType.Name());
@@ -694,7 +694,7 @@ namespace Zenject
                 // If it's a generic list then try matching multiple instances to its generic type
                 if (ReflectionUtil.IsGenericList(context.MemberType))
                 {
-                    var subType = context.MemberType.GetGenericArguments().Single();
+                    var subType = context.MemberType.GenericArguments().Single();
 
                     var subContext = context.Clone();
                     subContext.MemberType = subType;
@@ -824,7 +824,7 @@ namespace Zenject
             // inject into factories
             return type.DerivesFrom<IInstaller>()
                 || type.DerivesFrom<IValidatable>()
-#if !ZEN_NOT_UNITY3D
+#if !NOT_UNITY3D
                 || type.DerivesFrom<CompositionRoot>()
                 || type.DerivesFrom<DecoratorInstaller>()
 #endif
@@ -835,7 +835,7 @@ namespace Zenject
         {
             Type concreteType = args.TypeInfo.Type;
 
-#if !ZEN_NOT_UNITY3D
+#if !NOT_UNITY3D
             Assert.That(!concreteType.DerivesFrom<UnityEngine.Component>(),
                 "Error occurred while instantiating object of type '{0}'. Instantiator should not be used to create new mono behaviours.  Must use InstantiatePrefabForComponent, InstantiatePrefab, or InstantiateComponent.", concreteType.Name());
 #endif
@@ -951,7 +951,7 @@ namespace Zenject
                 Assert.IsEqual(injectable.GetType(), injectableType);
             }
 
-#if !ZEN_NOT_UNITY3D
+#if !NOT_UNITY3D
             Assert.That(injectableType != typeof(GameObject),
                 "Use InjectGameObject to Inject game objects instead of Inject method");
 #endif
@@ -1049,7 +1049,7 @@ namespace Zenject
             }
         }
 
-#if !ZEN_NOT_UNITY3D
+#if !NOT_UNITY3D
 
         public GameObject InstantiatePrefabResourceExplicit(
             string resourcePath, List<TypeValuePair> extraArgs)
@@ -1217,7 +1217,7 @@ namespace Zenject
 
             var componentType = args.TypeInfo.Type;
 
-            Assert.That(componentType.IsInterface || componentType.DerivesFrom<Component>(),
+            Assert.That(componentType.IsInterface() || componentType.DerivesFrom<Component>(),
                 "Expected type '{0}' to derive from UnityEngine.Component", componentType.Name());
 
             var gameObj = (GameObject)GameObject.Instantiate(prefab);
@@ -1288,7 +1288,7 @@ namespace Zenject
                 concreteType, InjectUtil.CreateArgList(extraArgs));
         }
 
-#if !ZEN_NOT_UNITY3D
+#if !NOT_UNITY3D
         // See comment in IInstantiator.cs for description of this method
         public TContract InstantiateComponent<TContract>(GameObject gameObject)
             where TContract : Component
@@ -1459,7 +1459,7 @@ namespace Zenject
 
         ////////////// Convenience methods for IResolver ////////////////
 
-#if !ZEN_NOT_UNITY3D
+#if !NOT_UNITY3D
         // See comment in IResolver.cs for description of this method
         public void InjectGameObject(
             GameObject gameObject)
@@ -1873,7 +1873,7 @@ namespace Zenject
         {
             // We must only have one dependency root per container
             // We need this when calling this with a GameObjectCompositionRoot
-            return Bind(identifier, type.GetInterfaces().ToArray());
+            return Bind(identifier, type.Interfaces().ToArray());
         }
 
         public ConcreteBinderNonGeneric BindAllInterfacesAndSelf<T>()
@@ -1897,7 +1897,7 @@ namespace Zenject
             // We need this when calling this with a GameObjectCompositionRoot
             return Bind(
                 identifier,
-                type.GetInterfaces().Append(type).ToArray());
+                type.Interfaces().Append(type).ToArray());
         }
 
         public ScopeBinder BindInstance<TContract>(string identifier, TContract obj)

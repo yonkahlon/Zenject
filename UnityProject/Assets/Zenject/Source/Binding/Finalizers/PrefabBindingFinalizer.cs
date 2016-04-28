@@ -1,4 +1,4 @@
-#if !ZEN_NOT_UNITY3D
+#if !NOT_UNITY3D
 
 using System;
 using System.Collections.Generic;
@@ -43,7 +43,7 @@ namespace Zenject
                 return new PrefabGameObjectProvider(instantiator);
             }
 
-            Assert.That(contractType.IsInterface || contractType.DerivesFrom<Component>());
+            Assert.That(contractType.IsInterface() || contractType.DerivesFrom<Component>());
 
             return new GetFromPrefabComponentProvider(
                 contractType, instantiator);

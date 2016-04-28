@@ -4,7 +4,7 @@ using ModestTree;
 using Zenject.Internal;
 using System.Linq;
 
-#if !ZEN_NOT_UNITY3D
+#if !NOT_UNITY3D
 using UnityEngine;
 
 #if UNITY_EDITOR
@@ -17,7 +17,7 @@ namespace Zenject
 {
     internal static class BindingUtil
     {
-#if !ZEN_NOT_UNITY3D
+#if !NOT_UNITY3D
 
         public static void AssertIsValidPrefab(GameObject prefab)
         {
@@ -109,7 +109,7 @@ namespace Zenject
 
         public static void AssertIsAbstractOrComponent(Type type)
         {
-            Assert.That(type.DerivesFrom(typeof(Component)) || type.IsInterface,
+            Assert.That(type.DerivesFrom(typeof(Component)) || type.IsInterface(),
                 "Invalid type given during bind command.  Expected type '{0}' to either derive from UnityEngine.Component or be an interface", type.Name());
         }
 
@@ -128,7 +128,7 @@ namespace Zenject
 
         public static void AssertIsAbstractOrComponentOrGameObject(Type type)
         {
-            Assert.That(type.DerivesFrom(typeof(Component)) || type.IsInterface || type == typeof(GameObject) || type == typeof(UnityEngine.Object),
+            Assert.That(type.DerivesFrom(typeof(Component)) || type.IsInterface() || type == typeof(GameObject) || type == typeof(UnityEngine.Object),
                 "Invalid type given during bind command.  Expected type '{0}' to either derive from UnityEngine.Component or be an interface or be GameObject", type.Name());
         }
 
@@ -210,7 +210,7 @@ namespace Zenject
 
         public static void AssertIsNotAbstract(Type type)
         {
-            Assert.That(!type.IsAbstract,
+            Assert.That(!type.IsAbstract(),
                 "Invalid type given during bind command.  Expected type '{0}' to not be abstract.", type);
         }
 

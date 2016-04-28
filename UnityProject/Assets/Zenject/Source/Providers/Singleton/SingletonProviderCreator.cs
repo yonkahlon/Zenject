@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-#if !ZEN_NOT_UNITY3D
+#if !NOT_UNITY3D
 using UnityEngine;
 #endif
 
@@ -13,7 +13,7 @@ namespace Zenject
         readonly SubContainerSingletonProviderCreatorByMethod _subContainerMethodProviderCreator;
         readonly SubContainerSingletonProviderCreatorByInstaller _subContainerInstallerProviderCreator;
 
-#if !ZEN_NOT_UNITY3D
+#if !NOT_UNITY3D
         readonly SubContainerSingletonProviderCreatorByPrefab _subContainerPrefabProviderCreator;
         readonly SubContainerSingletonProviderCreatorByPrefabResource _subContainerPrefabResourceProviderCreator;
 
@@ -28,7 +28,7 @@ namespace Zenject
             _subContainerMethodProviderCreator = new SubContainerSingletonProviderCreatorByMethod(container, markRegistry);
             _subContainerInstallerProviderCreator = new SubContainerSingletonProviderCreatorByInstaller(container, markRegistry);
 
-#if !ZEN_NOT_UNITY3D
+#if !NOT_UNITY3D
             _subContainerPrefabProviderCreator = new SubContainerSingletonProviderCreatorByPrefab(container, markRegistry);
             _subContainerPrefabResourceProviderCreator = new SubContainerSingletonProviderCreatorByPrefabResource(container, markRegistry);
 
@@ -59,7 +59,7 @@ namespace Zenject
                 resultType, concreteIdentifier, installerType, identifier);
         }
 
-#if !ZEN_NOT_UNITY3D
+#if !NOT_UNITY3D
         public IProvider CreateProviderForPrefab(
             GameObject prefab, Type resultType, string gameObjectName, string gameObjectGroupName,
             List<TypeValuePair> extraArguments, string concreteIdentifier)
