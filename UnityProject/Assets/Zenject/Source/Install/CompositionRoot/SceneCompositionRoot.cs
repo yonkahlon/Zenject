@@ -36,7 +36,6 @@ namespace Zenject
         bool _hasInitialized;
 
 #if UNITY_EDITOR
-        bool _isValidating;
         bool _validateShutDownAfterwards = true;
 #endif
 
@@ -53,14 +52,8 @@ namespace Zenject
 #if UNITY_EDITOR
         public bool IsValidating
         {
-            get
-            {
-                return _isValidating;
-            }
-            set
-            {
-                _isValidating = value;
-            }
+            get;
+            set;
         }
 
         public bool ValidateShutDownAfterwards
@@ -72,6 +65,14 @@ namespace Zenject
             set
             {
                 _validateShutDownAfterwards = value;
+            }
+        }
+#else
+        public bool IsValidating
+        {
+            get
+            {
+                return false;
             }
         }
 #endif
@@ -93,7 +94,9 @@ namespace Zenject
             // We always want to initialize ProjectCompositionRoot as early as possible
             ProjectCompositionRoot.Instance.EnsureIsInitialized();
 
-            _isValidating = ProjectCompositionRoot.Instance.Container.IsValidating;
+#if UNITY_EDITOR
+            IsValidating = ProjectCompositionRoot.Instance.Container.IsValidating;
+#endif
 
             if (_autoRun)
             {
@@ -109,7 +112,7 @@ namespace Zenject
 #if UNITY_EDITOR
         public void Run()
         {
-            if (_isValidating)
+            if (IsValidating)
             {
                 try
                 {
@@ -150,10 +153,10 @@ namespace Zenject
             // ParentContainer is optionally set temporarily before calling ZenUtil.LoadScene
             ParentContainer = null;
 
-            _container = parentContainer.CreateSubContainer(_isValidating);
+            _container = parentContainer.CreateSubContainer(IsValidating);
 
 #if !UNITY_EDITOR
-            Assert.That(!_isValidating);
+            Assert.That(!IsValidating);
 #endif
 
             // This can happen if you run a decorated scene with immediately running a normal scene afterwards
