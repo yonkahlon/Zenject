@@ -7,8 +7,10 @@ namespace Zenject
     public class FactoryFromBinder<TContract> : FactoryFromBinderBase<TContract>
     {
         public FactoryFromBinder(
-            BindInfo bindInfo, BindFinalizerWrapper finalizerWrapper)
-            : base(bindInfo, finalizerWrapper)
+            BindInfo bindInfo,
+            Type factoryType,
+            BindFinalizerWrapper finalizerWrapper)
+            : base(bindInfo, factoryType, finalizerWrapper)
         {
         }
 

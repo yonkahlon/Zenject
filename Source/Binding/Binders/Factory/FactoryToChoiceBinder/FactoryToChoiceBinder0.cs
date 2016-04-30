@@ -12,9 +12,9 @@ namespace Zenject
     public class FactoryToChoiceBinder<TContract> : FactoryFromBinder<TContract>
     {
         public FactoryToChoiceBinder(
-            BindInfo bindInfo,
+            BindInfo bindInfo, Type factoryType, 
             BindFinalizerWrapper finalizerWrapper)
-            : base(bindInfo, finalizerWrapper)
+            : base(bindInfo, factoryType, finalizerWrapper)
         {
         }
 
@@ -35,7 +35,7 @@ namespace Zenject
             };
 
             return new FactoryFromBinder<TConcrete>(
-                BindInfo, FinalizerWrapper);
+                BindInfo, FactoryType, FinalizerWrapper);
         }
     }
 }

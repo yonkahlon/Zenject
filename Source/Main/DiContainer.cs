@@ -1910,6 +1910,18 @@ namespace Zenject
             return Bind<TContract>().FromInstance(obj);
         }
 
+        public FactoryToChoiceBinder<TContract> BindIFactory<TContract>()
+        {
+            return BindIFactory<TContract>(null);
+        }
+
+        public FactoryToChoiceBinder<TContract> BindIFactory<TContract>(string identifier)
+        {
+            var bindInfo = new BindInfo(identifier, typeof(IFactory<TContract>));
+            return new FactoryToChoiceBinder<TContract>(
+                bindInfo, typeof(Factory<TContract>), StartBinding());
+        }
+
         public FactoryToChoiceBinder<TContract> BindFactory<TContract, TFactory>()
             where TFactory : Factory<TContract>
         {
@@ -1921,7 +1933,19 @@ namespace Zenject
         {
             var bindInfo = new BindInfo(identifier, typeof(TFactory));
             return new FactoryToChoiceBinder<TContract>(
-                bindInfo, StartBinding());
+                bindInfo, typeof(TFactory), StartBinding());
+        }
+
+        public FactoryToChoiceBinder<TParam1, TContract> BindIFactory<TParam1, TContract>()
+        {
+            return BindIFactory<TParam1, TContract>(null);
+        }
+
+        public FactoryToChoiceBinder<TParam1, TContract> BindIFactory<TParam1, TContract>(string identifier)
+        {
+            var bindInfo = new BindInfo(identifier, typeof(IFactory<TParam1, TContract>));
+            return new FactoryToChoiceBinder<TParam1, TContract>(
+                bindInfo, typeof(Factory<TParam1, TContract>), StartBinding());
         }
 
         public FactoryToChoiceBinder<TParam1, TContract> BindFactory<TParam1, TContract, TFactory>()
@@ -1935,7 +1959,19 @@ namespace Zenject
         {
             var bindInfo = new BindInfo(identifier, typeof(TFactory));
             return new FactoryToChoiceBinder<TParam1, TContract>(
-                bindInfo, StartBinding());
+                bindInfo, typeof(TFactory), StartBinding());
+        }
+
+        public FactoryToChoiceBinder<TParam1, TParam2, TContract> BindIFactory<TParam1, TParam2, TContract>()
+        {
+            return BindIFactory<TParam1, TParam2, TContract>(null);
+        }
+
+        public FactoryToChoiceBinder<TParam1, TParam2, TContract> BindIFactory<TParam1, TParam2, TContract>(string identifier)
+        {
+            var bindInfo = new BindInfo(identifier, typeof(IFactory<TParam1, TParam2, TContract>));
+            return new FactoryToChoiceBinder<TParam1, TParam2, TContract>(
+                bindInfo, typeof(Factory<TParam1, TParam2, TContract>), StartBinding());
         }
 
         public FactoryToChoiceBinder<TParam1, TParam2, TContract> BindFactory<TParam1, TParam2, TContract, TFactory>()
@@ -1949,7 +1985,19 @@ namespace Zenject
         {
             var bindInfo = new BindInfo(identifier, typeof(TFactory));
             return new FactoryToChoiceBinder<TParam1, TParam2, TContract>(
-                bindInfo, StartBinding());
+                bindInfo, typeof(TFactory), StartBinding());
+        }
+
+        public FactoryToChoiceBinder<TParam1, TParam2, TParam3, TContract> BindIFactory<TParam1, TParam2, TParam3, TContract>()
+        {
+            return BindIFactory<TParam1, TParam2, TParam3, TContract>(null);
+        }
+
+        public FactoryToChoiceBinder<TParam1, TParam2, TParam3, TContract> BindIFactory<TParam1, TParam2, TParam3, TContract>(string identifier)
+        {
+            var bindInfo = new BindInfo(identifier, typeof(IFactory<TParam1, TParam2, TParam3, TContract>));
+            return new FactoryToChoiceBinder<TParam1, TParam2, TParam3, TContract>(
+                bindInfo, typeof(Factory<TParam1, TParam2, TParam3, TContract>), StartBinding());
         }
 
         public FactoryToChoiceBinder<TParam1, TParam2, TParam3, TContract> BindFactory<TParam1, TParam2, TParam3, TContract, TFactory>()
@@ -1963,7 +2011,19 @@ namespace Zenject
         {
             var bindInfo = new BindInfo(identifier, typeof(TFactory));
             return new FactoryToChoiceBinder<TParam1, TParam2, TParam3, TContract>(
-                bindInfo, StartBinding());
+                bindInfo, typeof(TFactory), StartBinding());
+        }
+
+        public FactoryToChoiceBinder<TParam1, TParam2, TParam3, TParam4, TContract> BindIFactory<TParam1, TParam2, TParam3, TParam4, TContract>()
+        {
+            return BindIFactory<TParam1, TParam2, TParam3, TParam4, TContract>(null);
+        }
+
+        public FactoryToChoiceBinder<TParam1, TParam2, TParam3, TParam4, TContract> BindIFactory<TParam1, TParam2, TParam3, TParam4, TContract>(string identifier)
+        {
+            var bindInfo = new BindInfo(identifier, typeof(IFactory<TParam1, TParam2, TParam3, TParam4, TContract>));
+            return new FactoryToChoiceBinder<TParam1, TParam2, TParam3, TParam4, TContract>(
+                bindInfo, typeof(Factory<TParam1, TParam2, TParam3, TParam4, TContract>), StartBinding());
         }
 
         public FactoryToChoiceBinder<TParam1, TParam2, TParam3, TParam4, TContract> BindFactory<TParam1, TParam2, TParam3, TParam4, TContract, TFactory>()
@@ -1977,7 +2037,19 @@ namespace Zenject
         {
             var bindInfo = new BindInfo(identifier, typeof(TFactory));
             return new FactoryToChoiceBinder<TParam1, TParam2, TParam3, TParam4, TContract>(
-                bindInfo, StartBinding());
+                bindInfo, typeof(TFactory), StartBinding());
+        }
+
+        public FactoryToChoiceBinder<TParam1, TParam2, TParam3, TParam4, TParam5, TContract> BindIFactory<TParam1, TParam2, TParam3, TParam4, TParam5, TContract>()
+        {
+            return BindIFactory<TParam1, TParam2, TParam3, TParam4, TParam5, TContract>(null);
+        }
+
+        public FactoryToChoiceBinder<TParam1, TParam2, TParam3, TParam4, TParam5, TContract> BindIFactory<TParam1, TParam2, TParam3, TParam4, TParam5, TContract>(string identifier)
+        {
+            var bindInfo = new BindInfo(identifier, typeof(IFactory<TParam1, TParam2, TParam3, TParam4, TParam5, TContract>));
+            return new FactoryToChoiceBinder<TParam1, TParam2, TParam3, TParam4, TParam5, TContract>(
+                bindInfo, typeof(Factory<TParam1, TParam2, TParam3, TParam4, TParam5, TContract>), StartBinding());
         }
 
         public FactoryToChoiceBinder<TParam1, TParam2, TParam3, TParam4, TParam5, TContract> BindFactory<TParam1, TParam2, TParam3, TParam4, TParam5, TContract, TFactory>()
@@ -1991,7 +2063,7 @@ namespace Zenject
         {
             var bindInfo = new BindInfo(identifier, typeof(TFactory));
             return new FactoryToChoiceBinder<TParam1, TParam2, TParam3, TParam4, TParam5, TContract>(
-                bindInfo, StartBinding());
+                bindInfo, typeof(TFactory), StartBinding());
         }
 
         ////////////// Types ////////////////

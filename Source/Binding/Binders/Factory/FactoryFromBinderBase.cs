@@ -13,11 +13,10 @@ namespace Zenject
     {
         public FactoryFromBinderBase(
             BindInfo bindInfo,
+            Type factoryType,
             BindFinalizerWrapper finalizerWrapper)
             : base(bindInfo)
         {
-            var factoryType = bindInfo.ContractTypes.Single();
-
             // Note that it doesn't derive from Factory<TContract>
             // when used with To<>, so we can only check IDynamicFactory
             Assert.That(factoryType.DerivesFrom<IDynamicFactory>());
