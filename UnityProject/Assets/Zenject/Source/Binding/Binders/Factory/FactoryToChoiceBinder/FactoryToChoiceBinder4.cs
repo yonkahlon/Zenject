@@ -12,9 +12,9 @@ namespace Zenject
     public class FactoryToChoiceBinder<TParam1, TParam2, TParam3, TParam4, TContract> : FactoryFromBinder<TParam1, TParam2, TParam3, TParam4, TContract>
     {
         public FactoryToChoiceBinder(
-            BindInfo bindInfo,
+            BindInfo bindInfo, Type factoryType, 
             BindFinalizerWrapper finalizerWrapper)
-            : base(bindInfo, finalizerWrapper)
+            : base(bindInfo, factoryType, finalizerWrapper)
         {
         }
 
@@ -35,7 +35,7 @@ namespace Zenject
             };
 
             return new FactoryFromBinder<TParam1, TParam2, TParam3, TParam4, TConcrete>(
-                BindInfo, FinalizerWrapper);
+                BindInfo, FactoryType, FinalizerWrapper);
         }
     }
 }

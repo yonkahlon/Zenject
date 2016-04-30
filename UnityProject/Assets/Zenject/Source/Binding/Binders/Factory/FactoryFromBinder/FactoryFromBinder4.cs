@@ -4,8 +4,8 @@ namespace Zenject
 {
     public class FactoryFromBinder<TParam1, TParam2, TParam3, TParam4, TContract> : FactoryFromBinderWithParams<TContract>
     {
-        public FactoryFromBinder(BindInfo bindInfo, BindFinalizerWrapper finalizerWrapper)
-            : base(bindInfo, finalizerWrapper)
+        public FactoryFromBinder(BindInfo bindInfo, Type factoryType, BindFinalizerWrapper finalizerWrapper)
+            : base(bindInfo, factoryType, finalizerWrapper)
         {
         }
 

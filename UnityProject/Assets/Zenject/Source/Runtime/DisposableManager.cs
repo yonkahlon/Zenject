@@ -49,7 +49,7 @@ namespace Zenject
 
         public void Dispose()
         {
-            Assert.That(!_disposed);
+            Assert.That(!_disposed, "Tried to dispose DisposableManager twice!");
             _disposed = true;
 
             // Dispose in the reverse order that they are initialized in
