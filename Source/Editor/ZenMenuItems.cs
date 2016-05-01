@@ -71,9 +71,9 @@ namespace Zenject
         [MenuItem("Assets/Create/Zenject/Project Composition Root")]
         public static void CreateProjectCompositionRoot()
         {
-            var dir = ZenUnityEditorUtil.TryGetSelectedFolderPathInProjectsTab();
+            var absoluteDir = ZenUnityEditorUtil.TryGetSelectedFolderPathInProjectsTab();
 
-            if (dir == null)
+            if (absoluteDir == null)
             {
                 EditorUtility.DisplayDialog("Error",
                     "Could not find directory to place the '{0}.prefab' asset.  Please try again by right clicking in the desired folder within the projects pane."
@@ -81,7 +81,7 @@ namespace Zenject
                 return;
             }
 
-            var parentFolderName = Path.GetFileName(dir);
+            var parentFolderName = Path.GetFileName(absoluteDir);
 
             if (parentFolderName != "Resources")
             {
@@ -91,12 +91,13 @@ namespace Zenject
                 return;
             }
 
-            CreateProjectCompositionRootInternal(dir);
+            CreateProjectCompositionRootInternal(absoluteDir);
         }
 
-        static void CreateProjectCompositionRootInternal(string dir)
+        static void CreateProjectCompositionRootInternal(string absoluteDir)
         {
-            var prefabPath = (Path.Combine(dir, ProjectCompositionRoot.ProjectCompRootResourcePath) + ".prefab").Replace("\\", "/");
+            var assetPath = ZenUnityEditorUtil.ConvertFullAbsolutePathToAssetPath(absoluteDir);
+            var prefabPath = (Path.Combine(assetPath, ProjectCompositionRoot.ProjectCompRootResourcePath) + ".prefab").Replace("\\", "/");
             var emptyPrefab = PrefabUtility.CreateEmptyPrefab(prefabPath);
 
             var gameObject = new GameObject();

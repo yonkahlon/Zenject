@@ -15,6 +15,13 @@ namespace Zenject
 {
     public static class ZenUnityEditorUtil
     {
+        public static string ConvertFullAbsolutePathToAssetPath(string fullPath)
+        {
+            return "Assets/" + Path.GetFullPath(fullPath)
+                .Substring(Path.GetFullPath(Application.dataPath).Length + 1)
+                .Replace("\\", "/");
+        }
+
         public static string TryGetSelectedFilePathInProjectsTab()
         {
             return GetSelectedFilePathsInProjectsTab().OnlyOrDefault();
