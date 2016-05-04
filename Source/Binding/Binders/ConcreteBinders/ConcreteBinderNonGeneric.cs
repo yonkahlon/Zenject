@@ -1,11 +1,11 @@
 using System;
 using System.Collections.Generic;
 using ModestTree;
+using System.Linq;
 
 #if !NOT_UNITY3D
 using UnityEngine;
 #endif
-
 
 namespace Zenject
 {
@@ -37,21 +37,32 @@ namespace Zenject
             return To(typeof(TConcrete));
         }
 
-        public FromBinderNonGeneric To(Type concreteType)
+        public FromBinderNonGeneric To(params Type[] concreteTypes)
         {
-            return To(new List<Type>() { concreteType });
+            return To((IEnumerable<Type>)concreteTypes);
         }
 
-        // We don't just use params so that we ensure a min of 1
-        public FromBinderNonGeneric To(List<Type> concreteTypes)
+        public FromBinderNonGeneric To(IEnumerable<Type> concreteTypes)
         {
-            BindingUtil.AssertConcreteTypeListIsNotEmpty(concreteTypes);
             BindingUtil.AssertIsDerivedFromTypes(concreteTypes, BindInfo.ContractTypes);
 
             BindInfo.ToChoice = ToChoices.Concrete;
-            BindInfo.ToTypes = concreteTypes;
+            BindInfo.ToTypes = concreteTypes.ToList();
 
             return this;
+        }
+
+        public FromBinderNonGeneric To(
+            Action<ConventionSelectTypesBinder> generator)
+        {
+            var bindInfo = new ConventionBindInfo();
+
+            // Automatically filter by the given contract types
+            bindInfo.AddTypeFilter(
+                concreteType => BindInfo.ContractTypes.All(contractType => concreteType.DerivesFromOrEqual(contractType)));
+
+            generator(new ConventionSelectTypesBinder(bindInfo));
+            return To(bindInfo.ResolveTypes());
         }
     }
 }

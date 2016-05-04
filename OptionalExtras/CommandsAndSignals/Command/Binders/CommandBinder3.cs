@@ -5,7 +5,7 @@ using ModestTree;
 using ModestTree.Util;
 using System.Linq;
 
-namespace Zenject.Commands
+namespace Zenject
 {
     // Three parameters
 

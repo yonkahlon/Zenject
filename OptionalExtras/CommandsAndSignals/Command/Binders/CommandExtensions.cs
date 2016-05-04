@@ -5,7 +5,7 @@ using System.Linq;
 using ModestTree;
 using ModestTree.Util;
 
-namespace Zenject.Commands
+namespace Zenject
 {
     public static class CommandExtensions
     {
