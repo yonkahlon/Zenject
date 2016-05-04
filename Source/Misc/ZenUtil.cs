@@ -141,18 +141,18 @@ namespace Zenject
 
             yield return asyncOp;
 
-            var scene = SceneManager.GetSceneByName(levelName);
+            var newScene = SceneManager.GetSceneAt(SceneManager.sceneCount - 1);
 
-            if (scene.IsValid())
+            if (newScene.IsValid())
             {
-                foreach (var go in scene.GetRootGameObjects())
+                foreach (var go in newScene.GetRootGameObjects())
                 {
                     parentContainer.InjectGameObject(go);
                 }
 
                 if (callback != null)
                 {
-                    callback(scene);
+                    callback(newScene);
                 }
             }
         }
