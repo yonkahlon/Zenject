@@ -413,7 +413,7 @@ Container.Bind<IFoo>().ToSingle<Foo>();
 Container.Bind<IBar>().ToSingle<Foo>();
 ```
 
-This will cause any dependencies of type IFoo or IBar to use the same instance of Foo.  Of course, Foo must implement both IFoo and IBar for this to compile.  However, with only the above two lines the Foo singleton will not be accessible directly.  You can achieve this by using another line to uses ToSingle directly:
+This will cause any dependencies of type IFoo or IBar to use the same instance of Foo.  Of course, Foo must implement both IFoo and IBar for this to compile.  You may also wish to bind Foo to itself like this:
 
 ```csharp
 Container.Bind<Foo>().ToSingle();
