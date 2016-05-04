@@ -36,7 +36,7 @@ namespace Zenject.Tests.Other
         [Test]
         public void TestOptional()
         {
-            List<Test0> many = Container.ResolveAll<Test0>(true);
+            List<Test0> many = Container.ResolveAll<Test0>();
             Assert.That(many.Count == 0);
         }
     }

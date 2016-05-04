@@ -2,7 +2,6 @@ using System;
 using UnityEngine;
 using System.Collections;
 using Zenject;
-using Zenject.Commands;
 
 namespace Zenject.SpaceFighter
 {

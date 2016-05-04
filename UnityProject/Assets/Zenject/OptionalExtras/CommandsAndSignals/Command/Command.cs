@@ -1,7 +1,7 @@
 using ModestTree.Util;
 using System;
 
-namespace Zenject.Commands
+namespace Zenject
 {
     public interface ICommand
     {

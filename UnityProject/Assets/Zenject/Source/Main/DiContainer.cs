@@ -1674,7 +1674,7 @@ namespace Zenject
         // See comment in IResolver.cs for description of this method
         public List<TContract> ResolveAll<TContract>(string identifier)
         {
-            return ResolveAll<TContract>(identifier, false);
+            return ResolveAll<TContract>(identifier, true);
         }
 
         // See comment in IResolver.cs for description of this method
@@ -1701,7 +1701,7 @@ namespace Zenject
         // See comment in IResolver.cs for description of this method
         public IList ResolveAll(Type contractType, string identifier)
         {
-            return ResolveAll(contractType, identifier, false);
+            return ResolveAll(contractType, identifier, true);
         }
 
         // See comment in IResolver.cs for description of this method
@@ -1820,16 +1820,35 @@ namespace Zenject
 
         public ConcreteBinderNonGeneric Bind(params Type[] contractTypes)
         {
+            return Bind((IEnumerable<Type>)contractTypes);
+        }
+
+        public ConcreteBinderNonGeneric Bind(IEnumerable<Type> contractTypes)
+        {
             return Bind((string)null, contractTypes);
         }
 
         public ConcreteBinderNonGeneric Bind(string identifier, params Type[] contractTypes)
         {
-            Assert.That(contractTypes.All(x => !x.DerivesFrom<IDynamicFactory>()),
+            return Bind(identifier, (IEnumerable<Type>)contractTypes);
+        }
+
+        public ConcreteBinderNonGeneric Bind(string identifier, IEnumerable<Type> contractTypes)
+        {
+            var contractTypesList = contractTypes.ToList();
+            Assert.That(contractTypesList.All(x => !x.DerivesFrom<IDynamicFactory>()),
                 "You should not use Container.Bind for factory classes.  Use Container.BindFactory instead.");
 
-            var bindInfo = new BindInfo(identifier, contractTypes.ToList());
+            var bindInfo = new BindInfo(identifier, contractTypesList);
             return new ConcreteBinderNonGeneric(bindInfo, StartBinding());
+        }
+
+        public ConcreteBinderNonGeneric Bind(
+            Action<ConventionSelectTypesBinder> generator)
+        {
+            var bindInfo = new ConventionBindInfo();
+            generator(new ConventionSelectTypesBinder(bindInfo));
+            return Bind(bindInfo.ResolveTypes());
         }
 
         // This is equivalent to calling NonLazy() at the end of your bind statement

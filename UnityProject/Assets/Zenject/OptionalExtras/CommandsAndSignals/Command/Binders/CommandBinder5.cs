@@ -4,7 +4,7 @@ using System.Linq.Expressions;
 using ModestTree;
 using System.Linq;
 
-namespace Zenject.Commands
+namespace Zenject
 {
     // Five parameters
 

@@ -36,7 +36,11 @@ namespace Zenject
 
         void FinalizeBindingConcrete(DiContainer container, List<Type> concreteTypes)
         {
-            BindingUtil.AssertConcreteTypeListIsNotEmpty(concreteTypes);
+            if (concreteTypes.IsEmpty())
+            {
+                // This can be common when using convention based bindings
+                return;
+            }
 
             switch (BindInfo.Scope)
             {

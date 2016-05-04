@@ -5,7 +5,7 @@ using System.Text;
 using NUnit.Framework;
 using ModestTree;
 using Assert=ModestTree.Assert;
-using Zenject.Commands;
+using Zenject;
 
 namespace Zenject.Tests
 {

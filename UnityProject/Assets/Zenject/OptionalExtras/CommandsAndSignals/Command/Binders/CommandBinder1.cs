@@ -5,7 +5,7 @@ using ModestTree;
 using ModestTree.Util;
 using System.Linq;
 
-namespace Zenject.Commands
+namespace Zenject
 {
     // One parameter
     public class CommandBinder<TCommand, TParam1> : CommandBinderBase<TCommand, Action<TParam1>>

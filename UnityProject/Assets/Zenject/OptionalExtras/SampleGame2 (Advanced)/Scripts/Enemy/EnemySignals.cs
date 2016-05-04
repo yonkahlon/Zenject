@@ -1,5 +1,4 @@
 using System;
-using Zenject.Commands;
 
 namespace Zenject.SpaceFighter
 {

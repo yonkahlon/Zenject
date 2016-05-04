@@ -35,7 +35,7 @@ namespace Zenject
             }
         }
 
-        public IEnumerable<Type> AllParentTypes
+        protected IEnumerable<Type> AllParentTypes
         {
             get
             {
@@ -43,7 +43,7 @@ namespace Zenject
             }
         }
 
-        public IEnumerable<Type> ConcreteTypes
+        protected IEnumerable<Type> ConcreteTypes
         {
             get
             {

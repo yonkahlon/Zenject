@@ -1,7 +1,7 @@
 using System;
 using ModestTree.Util;
 
-namespace Zenject.Commands
+namespace Zenject
 {
     public interface ITrigger
     {
