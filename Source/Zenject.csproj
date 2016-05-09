@@ -123,6 +123,7 @@
     <Compile Include="Main\SceneCompositionRoot.cs" />
     <Compile Include="Main\SingletonId.cs" />
     <Compile Include="Main\SingletonRegistry.cs" />
+    <Compile Include="Main\StaticCompositionRoot.cs" />
     <Compile Include="Main\ZenConstants.cs" />
     <Compile Include="Misc\DisposableManager.cs" />
     <Compile Include="Misc\ExecutionOrderInstaller.cs" />
