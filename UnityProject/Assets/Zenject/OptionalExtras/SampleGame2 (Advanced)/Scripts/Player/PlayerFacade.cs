@@ -7,7 +7,7 @@ namespace Zenject.SpaceFighter
     {
         PlayerModel _model;
 
-        [PostInject]
+        [Inject]
         public void Construct(PlayerModel player)
         {
             _model = player;

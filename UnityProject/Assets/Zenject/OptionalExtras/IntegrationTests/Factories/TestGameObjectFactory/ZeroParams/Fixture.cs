@@ -1,10 +1,10 @@
-﻿using ModestTree.UnityUnitTester;
-using UnityEngine;
+﻿using UnityEngine;
 using Zenject;
+using Zenject.TestFramework;
 
-namespace ModestTree.Tests.Zenject.TestGameObjectFactory.ZeroParams
+namespace Zenject.Tests.TestGameObjectFactory.ZeroParams
 {
-    public class Fixture : MonoTestFixture
+    public class Fixture : ZenjectIntegrationTestFixture
     {
         public GameObject CubePrefab;
 

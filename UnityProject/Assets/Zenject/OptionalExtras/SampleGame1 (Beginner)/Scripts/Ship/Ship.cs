@@ -19,7 +19,7 @@ namespace Zenject.Asteroids
         ShipStateFactory _stateFactory;
         ShipState _state = null;
 
-        [PostInject]
+        [Inject]
         public void Construct(ShipStateFactory stateFactory)
         {
             _stateFactory = stateFactory;

@@ -7,24 +7,24 @@ namespace ModestTree.Tests.Zenject
 {
     public class GameObjectNameCountAsserter : IInitializable
     {
-        readonly GameObject _root;
+        readonly GameObject _context;
         readonly int _expectedCount;
         readonly string _name;
 
         public GameObjectNameCountAsserter(
             string name,
             int expectedCount,
-            CompositionRoot root)
+            Context context)
         {
             _name = name;
-            _root = root.gameObject;
+            _context = context.gameObject;
             _expectedCount = expectedCount;
         }
 
         public void Initialize()
         {
             Assert.IsEqual(
-                _root.transform.Cast<Transform>()
+                _context.transform.Cast<Transform>()
                     .Where(x => x.name == _name).Count(),
                 _expectedCount);
 

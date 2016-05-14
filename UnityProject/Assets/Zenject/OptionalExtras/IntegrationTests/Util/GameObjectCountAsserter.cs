@@ -6,20 +6,20 @@ namespace ModestTree.Tests.Zenject
 {
     public class GameObjectCountAsserter : IInitializable
     {
-        readonly GameObject _root;
+        readonly GameObject _context;
         readonly int _expectedCount;
 
         public GameObjectCountAsserter(
             int expectedCount,
-            CompositionRoot root)
+            Context context)
         {
-            _root = root.gameObject;
+            _context = context.gameObject;
             _expectedCount = expectedCount;
         }
 
         public void Initialize()
         {
-            Assert.IsEqual(_root.transform.childCount, _expectedCount);
+            Assert.IsEqual(_context.transform.childCount, _expectedCount);
 
             Log.Info("Correctly detected '{0}' game objects", _expectedCount);
         }

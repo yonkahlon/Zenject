@@ -38,7 +38,7 @@ namespace Zenject.Asteroids
 
         float _gameOverElapsed;
 
-        [PostInject]
+        [Inject]
         public void Construct(
             GameController gameController, Signals.ShipCrashed shipCrashed)
         {

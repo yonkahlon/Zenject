@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace ModestTree.Tests.Zenject.ToPrefabResource
+namespace Zenject.Tests.ToPrefabResource
 {
     public interface IFoo
     {

@@ -7,7 +7,7 @@ namespace Zenject.SpaceFighter
     {
         EnemySignals.Hit.Trigger _hitTrigger;
 
-        [PostInject]
+        [Inject]
         public void Construct(EnemySignals.Hit.Trigger hitTrigger)
         {
             _hitTrigger = hitTrigger;

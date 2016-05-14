@@ -12,7 +12,7 @@ namespace Zenject.SpaceFighter
 
         // We can't use a constructor here because MonoFacade derives from
         // MonoBehaviour
-        [PostInject]
+        [Inject]
         public void Construct(
             EnemyModel model, EnemyRegistry registry, EnemyStateManager stateManager)
         {

@@ -1,10 +1,9 @@
 using System;
 using UnityEngine;
-using Zenject;
 
-namespace ModestTree.UnityUnitTester
+namespace Zenject.TestFramework
 {
-    public class MonoTestFixture : MonoBehaviour
+    public abstract class ZenjectIntegrationTestFixture : MonoBehaviour
     {
         public DiContainer Container
         {
@@ -13,4 +12,3 @@ namespace ModestTree.UnityUnitTester
         }
     }
 }
-

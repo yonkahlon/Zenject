@@ -2,7 +2,7 @@
 using System.Collections;
 using Zenject;
 
-namespace ModestTree.Tests.Zenject.ToSubContainerPrefab
+namespace Zenject.Tests.ToSubContainerPrefab
 {
     public class FooInstaller : MonoInstaller
     {

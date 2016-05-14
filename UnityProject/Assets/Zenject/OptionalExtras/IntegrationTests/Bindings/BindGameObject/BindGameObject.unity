@@ -110,26 +110,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 978433746}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0e516af87ca41694bbaa70c373f993e0, type: 3}
+  m_Script: {fileID: 11500000, guid: 57e9f8d61f46990469aa69332fed4a02, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _runAll: 1
-  _testMethod:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 978433750}
-        m_MethodName: TestGameObjectConcreteSingle
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 1
-    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
-      PublicKeyToken=null
+  TestMethod: Fixture/TestGameObjectSelfSingle1
 --- !u!4 &978433749
 Transform:
   m_ObjectHideFlags: 0

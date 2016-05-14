@@ -1,14 +1,15 @@
-﻿using UnityEngine;
+﻿using ModestTree;
+using UnityEngine;
 using Zenject;
 
-namespace ModestTree.Tests.Zenject.ToPrefabResource
+namespace Zenject.Tests.ToPrefabResource
 {
     public class Qux : MonoBehaviour
     {
         [Inject]
         int _arg;
 
-        [PostInject]
+        [Inject]
         public void Initialize()
         {
             Log.Trace("Received arg '{0}' in Qux", _arg);

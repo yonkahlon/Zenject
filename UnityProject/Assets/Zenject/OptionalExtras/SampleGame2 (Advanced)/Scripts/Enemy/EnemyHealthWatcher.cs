@@ -7,18 +7,18 @@ namespace Zenject.SpaceFighter
     {
         readonly EnemyKilledSignal.Trigger _killedSignal;
         readonly Explosion.Factory _explosionFactory;
-        readonly CompositionRoot _compRoot;
+        readonly Context _context;
         readonly EnemyModel _model;
 
         public EnemyHealthWatcher(
             EnemyModel model,
-            CompositionRoot compRoot,
+            Context context,
             Explosion.Factory explosionFactory,
             EnemyKilledSignal.Trigger killedSignal)
         {
             _killedSignal = killedSignal;
             _explosionFactory = explosionFactory;
-            _compRoot = compRoot;
+            _context = context;
             _model = model;
         }
 
@@ -35,7 +35,7 @@ namespace Zenject.SpaceFighter
             var explosion = _explosionFactory.Create();
             explosion.transform.position = _model.Position;
 
-            GameObject.Destroy(_compRoot.gameObject);
+            GameObject.Destroy(_context.gameObject);
 
             _killedSignal.Fire();
         }

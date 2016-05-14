@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace ModestTree.Tests.Zenject.ToSubContainerPrefab
+namespace Zenject.Tests.ToSubContainerPrefab
 {
     public class Gorp
     {

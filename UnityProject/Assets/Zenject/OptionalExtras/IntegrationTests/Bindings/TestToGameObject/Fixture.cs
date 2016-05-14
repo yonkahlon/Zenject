@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using ModestTree.UnityUnitTester;
+using ModestTree;
 using UnityEngine;
 using Zenject;
+using Zenject.TestFramework;
 
-namespace ModestTree.Tests.Zenject.ToGameObject
+namespace Zenject.Tests.ToGameObject
 {
-    public class Fixture : MonoTestFixture
+    public class Fixture : ZenjectIntegrationTestFixture
     {
         const string GameObjName = "TestObj";
 

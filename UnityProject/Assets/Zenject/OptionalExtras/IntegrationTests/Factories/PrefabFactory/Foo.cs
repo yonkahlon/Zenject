@@ -2,13 +2,13 @@ using System;
 using Zenject;
 using UnityEngine;
 
-namespace ModestTree.Tests.Zenject.TestPrefabFactory
+namespace Zenject.Tests.TestPrefabFactory
 {
     public class Foo : MonoBehaviour
     {
         public bool WasInitialized;
 
-        [PostInject]
+        [Inject]
         public void Init()
         {
             WasInitialized = true;

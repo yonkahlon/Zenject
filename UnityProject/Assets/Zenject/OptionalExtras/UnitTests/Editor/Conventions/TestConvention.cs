@@ -42,7 +42,7 @@ namespace Zenject.Tests.Convention
         public void TestDerivingFromFail()
         {
             Container.Bind<IFoo>()
-                .To(x => x.AllTypes().DerivingFrom<IFoo>().FromAssemblyContaining<LogLevel>());
+                .To(x => x.AllTypes().DerivingFrom<IFoo>().FromAssemblyContaining<UnityEngine.Vector3>());
 
             Assert.That(Container.ResolveAll<IFoo>().IsEmpty());
         }

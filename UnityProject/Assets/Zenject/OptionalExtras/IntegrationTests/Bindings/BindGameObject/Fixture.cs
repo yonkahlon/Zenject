@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using ModestTree.UnityUnitTester;
 using UnityEngine;
+using Zenject.TestFramework;
+using ModestTree;
 
-namespace ModestTree.Tests.Zenject.BindGameObject
+namespace Zenject.Tests.BindGameObject
 {
-    public class Fixture : MonoTestFixture
+    public class Fixture : ZenjectIntegrationTestFixture
     {
         public GameObject CubePrefab;
 

@@ -1,7 +1,7 @@
 using System;
 using Zenject;
 
-namespace ModestTree.Tests.Zenject.TestBindFactoryFive
+namespace Zenject.Tests.TestBindFactoryFive
 {
     public class FooInstaller : MonoInstaller
     {
@@ -11,7 +11,7 @@ namespace ModestTree.Tests.Zenject.TestBindFactoryFive
         string _param4;
         char _param5;
 
-        [PostInject]
+        [Inject]
         public void Init(double p1, int p2, float p3, string p4, char p5)
         {
             _param1 = p1;

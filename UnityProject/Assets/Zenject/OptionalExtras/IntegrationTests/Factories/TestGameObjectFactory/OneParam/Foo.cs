@@ -1,11 +1,11 @@
 ﻿using UnityEngine;
 using Zenject;
 
-namespace ModestTree.Tests.Zenject.TestGameObjectFactory.OneParams
+namespace Zenject.Tests.TestGameObjectFactory.OneParams
 {
     public class Foo : MonoBehaviour
     {
-        [PostInject]
+        [Inject]
         public void Init(string value)
         {
             Value = value;
