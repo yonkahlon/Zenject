@@ -1,10 +1,11 @@
-﻿using ModestTree.UnityUnitTester;
+﻿using ModestTree;
 using UnityEngine;
+using Zenject.TestFramework;
 using Zenject;
 
-namespace ModestTree.Tests.Zenject.TestBindFactoryFive
+namespace Zenject.Tests.TestBindFactoryFive
 {
-    public class Fixture : MonoTestFixture
+    public class Fixture : ZenjectIntegrationTestFixture
     {
         public GameObject FooPrefab;
         public GameObject FooSubContainerPrefab;

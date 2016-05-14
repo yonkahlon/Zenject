@@ -1,13 +1,13 @@
 using System;
 using Zenject;
 
-namespace ModestTree.Tests.Zenject.TestBindFactoryOne
+namespace Zenject.Tests.TestBindFactoryOne
 {
     public class FooInstaller : MonoInstaller
     {
         string _param1;
 
-        [PostInject]
+        [Inject]
         public void Init(string param1)
         {
             _param1 = param1;

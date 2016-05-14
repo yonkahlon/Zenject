@@ -1,11 +1,12 @@
 ﻿using System.Collections.Generic;
-using ModestTree.UnityUnitTester;
+using ModestTree;
 using UnityEngine;
+using Zenject.TestFramework;
 using Zenject;
 
-namespace ModestTree.Tests.Zenject.ToResource
+namespace Zenject.Tests.ToResource
 {
-    public class Fixture : MonoTestFixture
+    public class Fixture : ZenjectIntegrationTestFixture
     {
         const string ResourcePath = "TestToResource/TestTexture";
         const string ResourcePath2 = "TestToResource/TestTexture2";
@@ -65,7 +66,7 @@ namespace ModestTree.Tests.Zenject.ToResource
         {
             List<Texture> _textures;
 
-            [PostInject]
+            [Inject]
             public void Construct(List<Texture> textures, int expectedAmount)
             {
                 _textures = textures;

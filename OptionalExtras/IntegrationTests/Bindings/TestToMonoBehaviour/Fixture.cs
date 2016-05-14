@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using ModestTree.UnityUnitTester;
 using UnityEngine;
+using Zenject.TestFramework;
 
-namespace ModestTree.Tests.Zenject.ToMonoBehaviour
+namespace Zenject.Tests.ToMonoBehaviour
 {
-    public class Fixture : MonoTestFixture
+    public class Fixture : ZenjectIntegrationTestFixture
     {
         [Test]
         public void TestBasic()

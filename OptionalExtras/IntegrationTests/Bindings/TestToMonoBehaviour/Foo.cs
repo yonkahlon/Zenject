@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace ModestTree.Tests.Zenject.ToTransientPrefab
+namespace Zenject.Tests.ToTransientPrefab
 {
     public interface IFoo
     {

@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using Zenject;
 
-namespace ModestTree.Tests.Zenject.TestBindFactory
+namespace Zenject.Tests.TestBindFactory
 {
     public interface IFoo
     {

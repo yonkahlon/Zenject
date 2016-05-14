@@ -1,57 +1,60 @@
+#if UNITY_EDITOR
 
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using ModestTree.Util;
-using UnityEngine;
-using UnityEngine.Events;
-using UnityEngine.SceneManagement;
-using UnityEngine.Serialization;
-using Zenject;
-
-#if UNITY_EDITOR
+using ModestTree;
 using UnityEditor;
-#endif
+using UnityEngine;
 
-namespace ModestTree.UnityUnitTester
+namespace Zenject.TestFramework
 {
-    public class UnityUnitTestMultiRunner : MonoBehaviour
+    public class ZenjectIntegrationTestMultiRunner : MonoBehaviour
     {
-        [SerializeField]
-        [FormerlySerializedAs("_waitTime")]
-        public float WaitTime = 0.5f;
+        public const string EditorPrefsKeyIgnoreError = "Zenject.TestFramework.IgnoreErrors";
 
-        bool _hitAnyError;
-        bool _suppressAllErrors;
+        const float DefaultWaitTime = 0.5f;
+
         bool _hasFailed;
+        bool _hitAnyError;
 
         public void Start()
         {
-            StartCoroutine(Run());
             ListenOnAllErrors();
-
-            Debug.Log("Starting UnityUnitTestMultiRunner...");
+            StartCoroutine(RunTests());
         }
 
-        IEnumerator Run()
+        void ListenOnAllErrors()
         {
-            foreach (var fixture in GameObject.FindObjectsOfType<MonoTestFixture>())
+            Application.logMessageReceived += OnLogMessageReceived;
+        }
+
+        void OnLogMessageReceived(string condition, string stacktrace, LogType level)
+        {
+            if (level == LogType.Exception || level == LogType.Assert || level == LogType.Error)
+            {
+                _hitAnyError = true;
+            }
+        }
+
+        IEnumerator RunTests()
+        {
+            foreach (var fixture in gameObject.GetComponentsInChildren<ZenjectIntegrationTestFixture>())
             {
                 var testMethods = fixture.GetType().GetAllInstanceMethods()
-                    .Where(x => x.GetCustomAttributes(typeof(TestAttribute), false).Any());
+                    .Where(x => x.HasAttribute<TestAttribute>());
 
                 foreach (var methodInfo in testMethods)
                 {
-                    yield return StartCoroutine(RunFixture(fixture, methodInfo, true));
+                    yield return StartCoroutine(RunTest(fixture, methodInfo, true));
 
                     if (_hasFailed)
                     {
                         break;
                     }
 
-                    yield return StartCoroutine(RunFixture(fixture, methodInfo, false));
+                    yield return StartCoroutine(RunTest(fixture, methodInfo, false));
 
                     if (_hasFailed)
                     {
@@ -67,22 +70,20 @@ namespace ModestTree.UnityUnitTester
 
             if (_hasFailed)
             {
-                Log.Error("Unity Unit Tests failed with errors");
+                Log.Error("Integration tests failed with errors");
             }
             else
             {
-                Log.Info("Unity Unit Tests passed successfully");
+                Log.Info("Integration tests passed successfully");
             }
 
-#if UNITY_EDITOR
             EditorApplication.isPlaying = false;
-#endif
         }
 
-        IEnumerator RunFixture(MonoTestFixture fixture, MethodInfo methodInfo, bool validateOnly)
+        IEnumerator RunTest(ZenjectIntegrationTestFixture fixture, MethodInfo methodInfo, bool validateOnly)
         {
-            // These should be reset each time
-            Assert.That(!_suppressAllErrors, "_suppressAllErrors is false");
+            // This should be reset each time
+            Assert.That(!EditorPrefs.GetBool(EditorPrefsKeyIgnoreError, false));
 
             bool isExpectingErrorDuringTest;
 
@@ -95,19 +96,30 @@ namespace ModestTree.UnityUnitTester
                 isExpectingErrorDuringTest = methodInfo.HasAttribute<ExpectedExceptionAttribute>();
             }
 
+            var waitTimeAttribute = methodInfo.AllAttributes<WaitTimeSecondsAttribute>().OnlyOrDefault();
+
+            var waitSeconds = waitTimeAttribute == null ? DefaultWaitTime : waitTimeAttribute.Seconds;
+
             var testName = "{0}.{1}".Fmt(fixture.GetType().Name(), methodInfo.Name);
 
-            Log.Trace("{0} test '{1}'{2}", validateOnly ? "Validating" : "Running", testName, isExpectingErrorDuringTest ? "(expecting error)" : "");
+            if (validateOnly)
+            {
+                Log.Info("Validating test '{0}'{1}", testName, isExpectingErrorDuringTest ? " (expecting error)" : "");
+            }
+            else
+            {
+                Log.Info("Running test '{0}' and waiting {1} seconds. {2}", testName, waitSeconds, isExpectingErrorDuringTest ? " (expecting error)" : "");
+            }
 
-            var compRoot = SceneCompositionRoot.Create();
+            var context = SceneContext.Create();
 
             // Put under ourself otherwise it disables us during validation
-            compRoot.transform.parent = this.transform;
+            context.transform.parent = this.transform;
 
-            compRoot.IsValidating = validateOnly;
-            compRoot.ValidateShutDownAfterwards = false;
+            context.IsValidating = validateOnly;
+            context.ValidateShutDownAfterwards = false;
 
-            compRoot.NormalInstallers = new Installer[]
+            context.NormalInstallers = new Installer[]
             {
                 new ActionInstaller((container) =>
                     {
@@ -117,14 +129,14 @@ namespace ModestTree.UnityUnitTester
                     })
             };
 
-            compRoot.ParentNewObjectsUnderRoot = true;
+            context.ParentNewObjectsUnderRoot = true;
 
             _hitAnyError = false;
-            _suppressAllErrors = isExpectingErrorDuringTest;
+            EditorPrefs.SetBool(EditorPrefsKeyIgnoreError, isExpectingErrorDuringTest);
 
             try
             {
-                compRoot.Run();
+                context.Run();
             }
             catch (Exception e)
             {
@@ -133,13 +145,13 @@ namespace ModestTree.UnityUnitTester
 
             if (!validateOnly)
             {
-                yield return new WaitForSeconds(WaitTime);
+                yield return new WaitForSeconds(waitSeconds);
             }
 
-            _suppressAllErrors = false;
+            EditorPrefs.SetBool(EditorPrefsKeyIgnoreError, false);
             bool hitErrorDuringTest = _hitAnyError;
 
-            GameObject.Destroy(compRoot.gameObject);
+            GameObject.Destroy(context.gameObject);
 
             yield return null;
 
@@ -147,7 +159,7 @@ namespace ModestTree.UnityUnitTester
             {
                 if (hitErrorDuringTest)
                 {
-                    Log.Trace("Hit expected error during test '{0}'. Ignoring.", testName);
+                    Log.Info("Hit expected error during test '{0}'. Ignoring.", testName);
                 }
                 else
                 {
@@ -164,20 +176,7 @@ namespace ModestTree.UnityUnitTester
             }
         }
 
-        void ListenOnAllErrors()
-        {
-            Application.logMessageReceived += OnLogCallback;
-        }
-
-        public void OnLogCallback(string message, string stackTrace, LogType logType)
-        {
-            if (logType == LogType.Assert || logType == LogType.Error || logType == LogType.Exception)
-            {
-                _hitAnyError = true;
-            }
-        }
-
-        public class ActionInstaller : Installer
+        class ActionInstaller : Installer
         {
             readonly Action<DiContainer> _installMethod;
 
@@ -194,3 +193,4 @@ namespace ModestTree.UnityUnitTester
     }
 }
 
+#endif

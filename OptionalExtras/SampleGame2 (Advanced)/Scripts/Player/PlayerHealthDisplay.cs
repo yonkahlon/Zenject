@@ -40,7 +40,7 @@ namespace Zenject.SpaceFighter
         Texture2D _textureBackground;
         int _killCount;
 
-        [PostInject]
+        [Inject]
         public void Construct(PlayerModel model, EnemyKilledSignal enemyKilledSignal)
         {
             _model = model;

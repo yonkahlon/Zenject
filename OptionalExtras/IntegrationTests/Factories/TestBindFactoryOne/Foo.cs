@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using Zenject;
 
-namespace ModestTree.Tests.Zenject.TestBindFactoryOne
+namespace Zenject.Tests.TestBindFactoryOne
 {
     public interface IFoo
     {
@@ -17,7 +17,7 @@ namespace ModestTree.Tests.Zenject.TestBindFactoryOne
 
     public class Foo : MonoBehaviour, IFoo
     {
-        [PostInject]
+        [Inject]
         public void Init(string value)
         {
             Value = value;

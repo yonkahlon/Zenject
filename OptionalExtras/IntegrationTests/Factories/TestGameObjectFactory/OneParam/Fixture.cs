@@ -1,10 +1,11 @@
-﻿using ModestTree.UnityUnitTester;
+﻿using ModestTree;
 using UnityEngine;
+using Zenject.TestFramework;
 using Zenject;
 
-namespace ModestTree.Tests.Zenject.TestGameObjectFactory.OneParams
+namespace Zenject.Tests.TestGameObjectFactory.OneParams
 {
-    public class Fixture : MonoTestFixture
+    public class Fixture : ZenjectIntegrationTestFixture
     {
         public GameObject CubePrefab;
 
@@ -108,4 +109,3 @@ namespace ModestTree.Tests.Zenject.TestGameObjectFactory.OneParams
         }
     }
 }
-

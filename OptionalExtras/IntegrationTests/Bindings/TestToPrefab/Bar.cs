@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace ModestTree.Tests.Zenject.ToPrefab
+namespace Zenject.Tests.ToPrefab
 {
     public class Bar : MonoBehaviour
     {

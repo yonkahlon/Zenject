@@ -2,7 +2,7 @@ using System;
 using UnityEngine;
 using Zenject;
 
-namespace ModestTree.Tests.Zenject.ToPrefab
+namespace Zenject.Tests.ToPrefab
 {
     public class Jim : MonoBehaviour
     {

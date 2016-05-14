@@ -19,7 +19,7 @@ namespace Zenject.SpaceFighter
 
         float _startTime;
 
-        [PostInject]
+        [Inject]
         public void Construct(AudioPlayer audioPlayer)
         {
             _startTime = Time.realtimeSinceStartup;

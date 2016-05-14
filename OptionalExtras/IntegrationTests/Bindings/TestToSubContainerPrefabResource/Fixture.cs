@@ -1,11 +1,11 @@
 ﻿using System.Collections.Generic;
-using ModestTree.UnityUnitTester;
 using UnityEngine;
+using Zenject.TestFramework;
 using Zenject;
 
-namespace ModestTree.Tests.Zenject.ToSubContainerPrefabResource
+namespace Zenject.Tests.ToSubContainerPrefabResource
 {
-    public class Fixture : MonoTestFixture
+    public class Fixture : ZenjectIntegrationTestFixture
     {
         const string PathPrefix = "ToSubContainerPrefabResource/";
         const string FooResourcePath = PathPrefix + "FooSubContainer";

@@ -1,14 +1,15 @@
-﻿using UnityEngine;
+﻿using ModestTree;
+using UnityEngine;
 using Zenject;
 
-namespace ModestTree.Tests.Zenject.ToPrefabResource
+namespace Zenject.Tests.ToPrefabResource
 {
     public class Gorp : MonoBehaviour
     {
         [Inject]
         string _arg;
 
-        [PostInject]
+        [Inject]
         public void Initialize()
         {
             Log.Trace("Received arg '{0}' in Gorp", _arg);

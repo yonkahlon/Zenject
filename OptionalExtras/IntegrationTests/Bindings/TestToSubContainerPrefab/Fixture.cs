@@ -1,11 +1,11 @@
 ﻿using System.Collections.Generic;
-using ModestTree.UnityUnitTester;
 using UnityEngine;
+using Zenject.TestFramework;
 using Zenject;
 
-namespace ModestTree.Tests.Zenject.ToSubContainerPrefab
+namespace Zenject.Tests.ToSubContainerPrefab
 {
-    public class Fixture : MonoTestFixture
+    public class Fixture : ZenjectIntegrationTestFixture
     {
         [SerializeField]
         GameObject _fooPrefab;

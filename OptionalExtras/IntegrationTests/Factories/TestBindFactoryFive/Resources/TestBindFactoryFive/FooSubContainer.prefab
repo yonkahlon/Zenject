@@ -44,7 +44,7 @@ MonoBehaviour:
   - {fileID: 11491928}
   _installerPrefabs: []
   _scriptableObjectInstallers: []
-  _facade: {fileID: 0}
+  _kernel: {fileID: 0}
 --- !u!114 &11491928
 MonoBehaviour:
   m_ObjectHideFlags: 1
