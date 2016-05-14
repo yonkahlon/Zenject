@@ -7,7 +7,7 @@ using System.Linq;
 namespace Zenject.Tests.Conditions
 {
     [TestFixture]
-    public class TestConditionsComplex : TestWithContainer
+    public class TestConditionsComplex : ZenjectUnitTestFixture
     {
         class Foo
         {

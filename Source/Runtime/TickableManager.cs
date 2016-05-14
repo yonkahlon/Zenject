@@ -40,7 +40,7 @@ namespace Zenject
             }
         }
 
-        [PostInject]
+        [Inject]
         public void Initialize()
         {
             InitTickables();

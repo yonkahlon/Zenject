@@ -10,7 +10,7 @@ using Assert=ModestTree.Assert;
 namespace Zenject.Tests.Bindings.Singletons
 {
     [TestFixture]
-    public class TestConflictingToSingletonUses : TestWithContainer
+    public class TestConflictingToSingletonUses : ZenjectUnitTestFixture
     {
         [Test]
         public void TestToSingleMethod1()

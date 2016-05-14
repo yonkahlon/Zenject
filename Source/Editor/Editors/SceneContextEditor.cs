@@ -9,8 +9,8 @@ using ModestTree;
 
 namespace Zenject
 {
-    [CustomEditor(typeof(SceneCompositionRoot))]
-    public class SceneCompositionRootEditor : CompositionRootEditor
+    [CustomEditor(typeof(SceneContext))]
+    public class SceneContextEditor : ContextEditor
     {
         SerializedProperty _parentNewObjectsUnderRootProperty;
 

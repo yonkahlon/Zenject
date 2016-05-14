@@ -6,19 +6,21 @@ using System.Linq;
 using ModestTree;
 using ModestTree.Util;
 using UnityEngine;
+using UnityEngine.Serialization;
 using Zenject.Internal;
 
 #pragma warning disable 649
 
 namespace Zenject
 {
-    public class GameObjectCompositionRoot : CompositionRoot
+    public class GameObjectContext : Context
     {
         readonly List<object> _dependencyRoots = new List<object>();
 
         [SerializeField]
-        [Tooltip("Note that this field is optional and can be ignored in most cases.  This is really only needed if you want to control the 'Script Execution Order' of your subcontainer.  In this case, define a new class that derives from MonoFacade, add it to this game object, then drag it into this field.  Then you can set a value for 'Script Execution Order' for this new class and this will control when all ITickable/IInitializable classes bound within this subcontainer get called.")]
-        MonoFacade _facade;
+        [Tooltip("Note that this field is optional and can be ignored in most cases.  This is really only needed if you want to control the 'Script Execution Order' of your subcontainer.  In this case, define a new class that derives from MonoKernel, add it to this game object, then drag it into this field.  Then you can set a value for 'Script Execution Order' for this new class and this will control when all ITickable/IInitializable classes bound within this subcontainer get called.")]
+        [FormerlySerializedAs("_facade")]
+        MonoKernel _kernel;
 
         DiContainer _container;
 
@@ -30,7 +32,7 @@ namespace Zenject
             }
         }
 
-        [PostInject]
+        [Inject]
         public void Construct(
             DiContainer parentContainer,
             [InjectOptional]
@@ -51,14 +53,14 @@ namespace Zenject
                 _container.IsInstalling = false;
             }
 
-            Log.Debug("GameObjectCompositionRoot: Injecting into child components...");
+            Log.Debug("GameObjectContext: Injecting into child components...");
 
             InjectComponents();
 
             Assert.That(_dependencyRoots.IsEmpty());
             _dependencyRoots.AddRange(_container.ResolveDependencyRoots());
 
-            Log.Debug("GameObjectCompositionRoot: Initialized successfully");
+            Log.Debug("GameObjectContext: Initialized successfully");
         }
 
         void InjectComponents()
@@ -68,10 +70,10 @@ namespace Zenject
             {
                 Assert.That(!component.GetType().DerivesFrom<MonoInstaller>());
 
-                if (component is MonoFacade)
+                if (component is MonoKernel)
                 {
-                    Assert.That(component == _facade,
-                        "Found MonoFacade derived class that is not hooked up to GameObjectCompositionRoot.  If you use MonoFacade, you must indicate this to GameObjectCompositionRoot by dragging and dropping it to the Facade field in the inspector");
+                    Assert.That(component == _kernel,
+                        "Found MonoKernel derived class that is not hooked up to GameObjectContext.  If you use MonoKernel, you must indicate this to GameObjectContext by dragging and dropping it to the Kernel field in the inspector");
                 }
 
                 _container.Inject(component);
@@ -116,16 +118,16 @@ namespace Zenject
         {
             _container.DefaultParent = this.transform;
 
-            _container.Bind<CompositionRoot>().FromInstance(this);
+            _container.Bind<Context>().FromInstance(this);
 
-            if (_facade == null)
+            if (_kernel == null)
             {
-                _container.Bind<MonoFacade>()
-                    .To<DefaultGameObjectFacade>().FromComponent(this.gameObject).AsSingle().NonLazy();
+                _container.Bind<MonoKernel>()
+                    .To<DefaultGameObjectKernel>().FromComponent(this.gameObject).AsSingle().NonLazy();
             }
             else
             {
-                _container.Bind<MonoFacade>().FromInstance(_facade).AsSingle().NonLazy();
+                _container.Bind<MonoKernel>().FromInstance(_kernel).AsSingle().NonLazy();
             }
 
             InstallSceneBindings();

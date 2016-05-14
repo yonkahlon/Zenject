@@ -8,7 +8,7 @@ using Assert=ModestTree.Assert;
 namespace Zenject.Tests.Injection
 {
     [TestFixture]
-    public class TestListInjection : TestWithContainer
+    public class TestListInjection : ZenjectUnitTestFixture
     {
         class Test1
         {

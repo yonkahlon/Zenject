@@ -9,8 +9,8 @@ using ModestTree;
 
 namespace Zenject
 {
-    [CustomEditor(typeof(ProjectCompositionRoot))]
-    public class ProjectCompositionRootEditor : CompositionRootEditor
+    [CustomEditor(typeof(ProjectContext))]
+    public class ProjectContextEditor : ContextEditor
     {
     }
 }

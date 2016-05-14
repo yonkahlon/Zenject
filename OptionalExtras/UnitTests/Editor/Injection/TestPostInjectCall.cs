@@ -8,7 +8,7 @@ using Assert=ModestTree.Assert;
 namespace Zenject.Tests.Injection
 {
     [TestFixture]
-    public class TestPostInjectCall : TestWithContainer
+    public class TestPostInjectCall : ZenjectUnitTestFixture
     {
         class Test0
         {
@@ -40,7 +40,7 @@ namespace Zenject.Tests.Injection
                 _test2 = test2;
             }
 
-            [PostInject]
+            [Inject]
             public void Init()
             {
                 Assert.That(!HasInitialized);
@@ -50,7 +50,7 @@ namespace Zenject.Tests.Injection
                 HasInitialized = true;
             }
 
-            [PostInject]
+            [Inject]
             void TestPrivatePostInject()
             {
                 HasInitialized2 = true;
@@ -76,7 +76,7 @@ namespace Zenject.Tests.Injection
         {
             public bool WasCalled = false;
 
-            [PostInject]
+            [Inject]
             void Init()
             {
                 WasCalled = true;
@@ -149,7 +149,7 @@ namespace Zenject.Tests.Injection
             public bool WasBaseCalled2;
             public static int BaseCallOrder;
 
-            [PostInject]
+            [Inject]
             void TestBase()
             {
                 Assert.That(!WasBaseCalled);
@@ -157,7 +157,7 @@ namespace Zenject.Tests.Injection
                 BaseCallOrder = _initOrder++;
             }
 
-            [PostInject]
+            [Inject]
             public virtual void TestVirtual1()
             {
                 Assert.That(!WasBaseCalled2);
@@ -171,7 +171,7 @@ namespace Zenject.Tests.Injection
             public bool WasDerivedCalled2;
             public static int DerivedCallOrder;
 
-            [PostInject]
+            [Inject]
             void TestDerived()
             {
                 Assert.That(!WasDerivedCalled);
@@ -192,7 +192,7 @@ namespace Zenject.Tests.Injection
             public bool WasDerived2Called;
             public static int Derived2CallOrder;
 
-            [PostInject]
+            [Inject]
             public void TestVirtual2()
             {
                 Assert.That(!WasDerived2Called);

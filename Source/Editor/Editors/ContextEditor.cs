@@ -9,8 +9,7 @@ using ModestTree;
 
 namespace Zenject
 {
-    [CustomEditor(typeof(EditorWindowCompositionRoot))]
-    public class EditorWindowCompositionRootEditor : UnityInspectorListEditor
+    public class ContextEditor : UnityInspectorListEditor
     {
         protected override string[] PropertyNames
         {
@@ -19,6 +18,8 @@ namespace Zenject
                 return new string[]
                 {
                     "_installers",
+                    "_installerPrefabs",
+                    "_scriptableObjectInstallers",
                 };
             }
         }
@@ -30,6 +31,8 @@ namespace Zenject
                 return new string[]
                 {
                     "Installers",
+                    "Prefab Installers",
+                    "Scriptable Object Installers",
                 };
             }
         }
@@ -40,9 +43,14 @@ namespace Zenject
             {
                 return new string[]
                 {
-                    "Drag any MonoEditorInstallers that you have added to your project here.",
+                    "Drag any MonoInstallers that you have added to your Scene Hierarchy here.",
+                    "Drag any prefabs that contain a MonoInstaller on them here",
+                    "Drag any assets in your Project that implement ScriptableObjectInstaller here",
                 };
             }
         }
     }
 }
+
+
+

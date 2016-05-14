@@ -33,15 +33,15 @@ namespace Zenject.Internal
         }
 
 #if !NOT_UNITY3D
-        // NOTE: This method will not return components that are within a GameObjectCompositionRoot
+        // NOTE: This method will not return components that are within a GameObjectContext
         public static IEnumerable<Component> GetInjectableComponentsBottomUp(
             GameObject gameObject, bool recursive)
         {
-            var compRoot = gameObject.GetComponent<GameObjectCompositionRoot>();
+            var context = gameObject.GetComponent<GameObjectContext>();
 
-            if (compRoot != null)
+            if (context != null)
             {
-                yield return compRoot;
+                yield return context;
                 yield break;
             }
 

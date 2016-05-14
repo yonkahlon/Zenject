@@ -9,7 +9,7 @@ using Assert=ModestTree.Assert;
 namespace Zenject.Tests.Conditions
 {
     [TestFixture]
-    public class TestConditionsBasic : TestWithContainer
+    public class TestConditionsBasic : ZenjectUnitTestFixture
     {
         public interface IFoo
         {

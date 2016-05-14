@@ -10,7 +10,7 @@ using Zenject;
 namespace Zenject.Tests
 {
     [TestFixture]
-    public class TestSignals : TestWithContainer
+    public class TestSignals : ZenjectUnitTestFixture
     {
         [Test]
         public void RunTest()

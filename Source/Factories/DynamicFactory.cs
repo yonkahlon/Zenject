@@ -15,7 +15,7 @@ namespace Zenject
         IProvider _provider;
         InjectContext _injectContext;
 
-        [PostInject]
+        [Inject]
         void Init(IProvider provider, InjectContext injectContext)
         {
             Assert.IsNotNull(provider);

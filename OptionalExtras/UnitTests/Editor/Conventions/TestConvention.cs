@@ -9,7 +9,7 @@ using Assert=ModestTree.Assert;
 namespace Zenject.Tests.Convention
 {
     [TestFixture]
-    public class TestConvention : TestWithContainer
+    public class TestConvention : ZenjectUnitTestFixture
     {
         [Test]
         public void TestDerivingFrom()
@@ -42,7 +42,7 @@ namespace Zenject.Tests.Convention
         public void TestDerivingFromFail()
         {
             Container.Bind<IFoo>()
-                .To(x => x.AllTypes().DerivingFrom<IFoo>().FromAssemblyContaining<UnityEngine.Vector3>());
+                .To(x => x.AllTypes().DerivingFrom<IFoo>().FromAssemblyContaining<LogLevel>());
 
             Assert.That(Container.ResolveAll<IFoo>().IsEmpty());
         }

@@ -10,23 +10,23 @@ using ModestTree;
 
 namespace Zenject
 {
-    [CustomEditor(typeof(GameObjectCompositionRoot))]
-    public class GameObjectCompositionRootEditor : CompositionRootEditor
+    [CustomEditor(typeof(GameObjectContext))]
+    public class GameObjectContextEditor : ContextEditor
     {
-        SerializedProperty _facade;
+        SerializedProperty _kernel;
 
         public override void OnEnable()
         {
             base.OnEnable();
 
-            _facade = serializedObject.FindProperty("_facade");
+            _kernel = serializedObject.FindProperty("_kernel");
         }
 
         protected override void OnGui()
         {
             base.OnGui();
 
-            EditorGUILayout.PropertyField(_facade);
+            EditorGUILayout.PropertyField(_kernel);
         }
     }
 }

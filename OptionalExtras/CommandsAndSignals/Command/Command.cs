@@ -12,7 +12,7 @@ namespace Zenject
     {
         Action _handler;
 
-        [PostInject]
+        [Inject]
         public void Construct(Action handler)
         {
             _handler = handler;
@@ -29,7 +29,7 @@ namespace Zenject
     {
         Action<TParam1> _handler;
 
-        [PostInject]
+        [Inject]
         public void Construct(Action<TParam1> handler)
         {
             _handler = handler;
@@ -46,7 +46,7 @@ namespace Zenject
     {
         Action<TParam1, TParam2> _handler;
 
-        [PostInject]
+        [Inject]
         public void Construct(Action<TParam1, TParam2> handler)
         {
             _handler = handler;
@@ -63,7 +63,7 @@ namespace Zenject
     {
         Action<TParam1, TParam2, TParam3> _handler;
 
-        [PostInject]
+        [Inject]
         public void Construct(Action<TParam1, TParam2, TParam3> handler)
         {
             _handler = handler;
@@ -80,7 +80,7 @@ namespace Zenject
     {
         Action<TParam1, TParam2, TParam3, TParam4> _handler;
 
-        [PostInject]
+        [Inject]
         public void Construct(Action<TParam1, TParam2, TParam3, TParam4> handler)
         {
             _handler = handler;
@@ -97,7 +97,7 @@ namespace Zenject
     {
         ModestTree.Util.Action<TParam1, TParam2, TParam3, TParam4, TParam5> _handler;
 
-        [PostInject]
+        [Inject]
         public void Construct(ModestTree.Util.Action<TParam1, TParam2, TParam3, TParam4, TParam5> handler)
         {
             _handler = handler;
@@ -114,7 +114,7 @@ namespace Zenject
     {
         ModestTree.Util.Action<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6> _handler;
 
-        [PostInject]
+        [Inject]
         public void Construct(ModestTree.Util.Action<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6> handler)
         {
             _handler = handler;

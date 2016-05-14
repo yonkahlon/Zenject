@@ -9,7 +9,7 @@ using Assert=ModestTree.Assert;
 namespace Zenject.Tests.Other
 {
     [TestFixture]
-    public class TestFacadeSubContainer : TestWithContainer
+    public class TestFacadeSubContainer
     {
         static int NumInstalls;
 
@@ -21,16 +21,18 @@ namespace Zenject.Tests.Other
             TickTest.WasRun = false;
             DisposeTest.WasRun = false;
 
-            Container.Bind(typeof(TickableManager), typeof(InitializableManager), typeof(DisposableManager))
+            var container = new DiContainer();
+
+            container.Bind(typeof(TickableManager), typeof(InitializableManager), typeof(DisposableManager))
                 .ToSelf().AsSingle().InheritInSubContainers();
 
             // This is how you add ITickables / etc. within sub containers
-            Container.BindAllInterfacesAndSelf<FooFacade>()
-                .To<FooFacade>().FromSubContainerResolve().ByMethod(InstallFoo).AsSingle();
+            container.BindAllInterfacesAndSelf<FooKernel>()
+                .To<FooKernel>().FromSubContainerResolve().ByMethod(InstallFoo).AsSingle();
 
-            var tickManager = Container.Resolve<TickableManager>();
-            var initManager = Container.Resolve<InitializableManager>();
-            var disposeManager = Container.Resolve<DisposableManager>();
+            var tickManager = container.Resolve<TickableManager>();
+            var initManager = container.Resolve<InitializableManager>();
+            var disposeManager = container.Resolve<DisposableManager>();
 
             Assert.That(!InitTest.WasRun);
             Assert.That(!TickTest.WasRun);
@@ -49,14 +51,14 @@ namespace Zenject.Tests.Other
         {
             NumInstalls++;
 
-            subContainer.Bind<FooFacade>().AsSingle();
+            subContainer.Bind<FooKernel>().AsSingle();
 
             subContainer.Bind<IInitializable>().To<InitTest>().AsSingle();
             subContainer.Bind<ITickable>().To<TickTest>().AsSingle();
             subContainer.Bind<IDisposable>().To<DisposeTest>().AsSingle();
         }
 
-        public class FooFacade : Facade
+        public class FooKernel : Kernel
         {
         }
 

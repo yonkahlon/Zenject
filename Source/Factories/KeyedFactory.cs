@@ -43,7 +43,7 @@ namespace Zenject
             get { return _typeMap; }
         }
 
-        [PostInject]
+        [Inject]
         public void Initialize()
         {
             Assert.That(_fallbackType == null || _fallbackType.DerivesFromOrEqual<TBase>(),

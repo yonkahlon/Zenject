@@ -4,10 +4,10 @@ using System;
 
 namespace Zenject
 {
-    public class ProjectFacade : MonoFacade
+    public class ProjectKernel : MonoKernel
     {
         // Intentional left empty
-        // We just need this class to exist so we can make ProjectFacade have a higher
+        // We just need this class to exist so we can make ProjectKernel have a higher
         // script execution order
     }
 }

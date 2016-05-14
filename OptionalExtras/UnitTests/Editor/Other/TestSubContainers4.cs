@@ -9,7 +9,7 @@ using Assert=ModestTree.Assert;
 namespace Zenject.Tests.Other
 {
     [TestFixture]
-    public class TestSubContainers4 : TestWithContainer
+    public class TestSubContainers4 : ZenjectUnitTestFixture
     {
         readonly Dictionary<object, DiContainer> _subContainers = new Dictionary<object, DiContainer>();
 

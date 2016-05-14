@@ -119,17 +119,46 @@ namespace Zenject
         // This will create a new instance of the given type, inject all dependencies into it,
         // and then call InstallBindings() on them to add more bindings to the container.
         void Install<T>()
-            where T : IInstaller;
+            where T : Installer;
 
         void Install<T>(IEnumerable<object> extraArgs)
-            where T : IInstaller;
+            where T : Installer;
 
         void Install(Type installerType);
         void Install(Type installerType, IEnumerable<object> extraArgs);
 
         // This is only necessary if you have to pass in null values as parameters to the installer
-        void InstallExplicit(IInstaller installer, List<TypeValuePair> extraArgs);
         void InstallExplicit(Type installerType, List<TypeValuePair> extraArgs);
+
+#if !NOT_UNITY3D
+        // _____ InstallPrefab _____
+        void InstallPrefab<T>()
+            where T : MonoInstaller;
+
+        void InstallPrefab<T>(IEnumerable<object> extraArgs)
+            where T : MonoInstaller;
+
+        void InstallPrefab(Type installerType);
+        void InstallPrefab(Type installerType, IEnumerable<object> extraArgs);
+
+        // This is only necessary if you have to pass in null values as parameters to the installer
+        void InstallPrefabExplicit(Type installerType, List<TypeValuePair> extraArgs);
+
+        // _____ InstallScriptableObject _____
+
+        void InstallScriptableObject<T>()
+            where T : ScriptableObjectInstaller;
+
+        void InstallScriptableObject<T>(IEnumerable<object> extraArgs)
+            where T : ScriptableObjectInstaller;
+
+        void InstallScriptableObject(Type installerType);
+        void InstallScriptableObject(Type installerType, IEnumerable<object> extraArgs);
+        void InstallScriptableObjectExplicit(Type installerType, List<TypeValuePair> extraArgs);
+#endif
+
+        // _____ InstallExplicit _____
+        void InstallExplicit(IInstaller installer, List<TypeValuePair> extraArgs);
 
         // _____ Install _____
         // Returns true if the given installer type has already been installed on this container

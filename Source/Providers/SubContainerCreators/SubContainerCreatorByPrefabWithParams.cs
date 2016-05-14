@@ -61,12 +61,12 @@ namespace Zenject
                 gameObject.name = _gameObjectName;
             }
 
-            var compRoot = gameObject.GetComponent<GameObjectCompositionRoot>();
+            var context = gameObject.GetComponent<GameObjectContext>();
 
-            Assert.IsNotNull(compRoot,
-                "Expected prefab with name '{0}' to container a component of type 'GameObjectCompositionRoot'", prefab.name);
+            Assert.IsNotNull(context,
+                "Expected prefab with name '{0}' to container a component of type 'GameObjectContext'", prefab.name);
 
-            return compRoot.Container;
+            return context.Container;
         }
     }
 }
