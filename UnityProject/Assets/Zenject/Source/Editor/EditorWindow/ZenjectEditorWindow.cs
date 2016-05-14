@@ -10,20 +10,25 @@ using System.Linq;
 
 namespace Zenject
 {
-    public abstract class EditorWindowFacade : EditorWindow
+    public abstract class ZenjectEditorWindow : EditorWindow
     {
         [Inject]
+        [NonSerialized]
         TickableManager _tickableManager = null;
 
         [Inject]
+        [NonSerialized]
         InitializableManager _initializableManager = null;
 
         [Inject]
+        [NonSerialized]
         DisposableManager _disposableManager = null;
 
         [Inject]
+        [NonSerialized]
         GuiRenderableManager _guiRenderableManager = null;
 
+        [NonSerialized]
         DiContainer _container;
 
         protected DiContainer Container
@@ -36,25 +41,21 @@ namespace Zenject
 
         public virtual void OnEnable()
         {
-            var windowName = this.GetType().Name;
-            var resourcePath = "EditorWindows/{0}".Fmt(windowName);
-            var compRoot = Resources.Load<EditorWindowCompositionRoot>(resourcePath);
+            _container = new DiContainer(StaticContext.Container);
 
-            Assert.IsNotNull(compRoot,
-                "Could not find EditorWindowCompositionRoot for window '{0}'!  Expected to find it at '{1}'", windowName, resourcePath);
+            // Make sure we don't create any game objects since editor windows don't have a scene
+            _container.AssertOnNewGameObjects = true;
 
-            _container = new DiContainer();
+            _container.Bind<TickableManager>().AsSingle();
+            _container.Bind<InitializableManager>().AsSingle();
+            _container.Bind<DisposableManager>().AsSingle();
+            _container.Bind<GuiRenderableManager>().AsSingle();
 
             InstallBindings();
 
-            compRoot.Initialize(_container, this);
+            _container.Inject(this);
 
             _initializableManager.Initialize();
-        }
-
-        public virtual void InstallBindings()
-        {
-            // Optional
         }
 
         public virtual void OnDisable()
@@ -73,7 +74,7 @@ namespace Zenject
                 _tickableManager.Update();
             }
 
-            // Doesn't seem worth trying to detect changes, just redraw every frame
+            // We might also consider only calling Repaint when changes occur
             Repaint();
         }
 
@@ -84,5 +85,7 @@ namespace Zenject
                 _guiRenderableManager.OnGui();
             }
         }
+
+        public abstract void InstallBindings();
     }
 }

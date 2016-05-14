@@ -9,7 +9,7 @@ using Assert=ModestTree.Assert;
 namespace Zenject.Tests.Other
 {
     [TestFixture]
-    public class TestTransientMockProvider : TestWithContainer
+    public class TestTransientMockProvider : ZenjectUnitTestFixture
     {
         public interface IFoo
         {

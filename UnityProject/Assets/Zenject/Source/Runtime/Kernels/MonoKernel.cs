@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace Zenject
 {
-    public abstract class MonoFacade : MonoBehaviour
+    public abstract class MonoKernel : MonoBehaviour
     {
         [Inject(InjectSources.Local)]
         TickableManager _tickableManager = null;

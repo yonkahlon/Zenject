@@ -10,7 +10,7 @@ using Zenject;
 namespace Zenject.Tests
 {
     [TestFixture]
-    public class TestCommandsOne : TestWithContainer
+    public class TestCommandsOne : ZenjectUnitTestFixture
     {
         [Test]
         public void TestToSingle1()

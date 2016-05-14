@@ -5,7 +5,7 @@ using Assert=ModestTree.Assert;
 namespace Zenject.Tests.Other
 {
     [TestFixture]
-    public class TestInheritInSubContainers : TestWithContainer
+    public class TestInheritInSubContainers : ZenjectUnitTestFixture
     {
         [Test]
         public void TestFromNew1()

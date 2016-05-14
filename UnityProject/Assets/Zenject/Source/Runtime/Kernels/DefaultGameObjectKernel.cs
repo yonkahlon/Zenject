@@ -4,7 +4,7 @@ using System;
 
 namespace Zenject
 {
-    public class DefaultGameObjectFacade : MonoFacade
+    public class DefaultGameObjectKernel : MonoKernel
     {
     }
 }

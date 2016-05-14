@@ -11,7 +11,7 @@ using UnityEngine.SceneManagement;
 namespace Zenject
 {
     [System.Diagnostics.DebuggerStepThrough]
-    public sealed class SceneDecoratorCompositionRoot : MonoBehaviour
+    public sealed class SceneDecoratorContext : MonoBehaviour
     {
         public string SceneName;
 
@@ -26,13 +26,13 @@ namespace Zenject
 
         public void Awake()
         {
-            // We always want to initialize ProjectCompositionRoot as early as possible
-            ProjectCompositionRoot.Instance.EnsureIsInitialized();
+            // We always want to initialize ProjectContext as early as possible
+            ProjectContext.Instance.EnsureIsInitialized();
 
-            SceneCompositionRoot.BeforeInstallHooks += AddPreBindings;
-            SceneCompositionRoot.AfterInstallHooks += AddPostBindings;
+            SceneContext.BeforeInstallHooks += AddPreBindings;
+            SceneContext.AfterInstallHooks += AddPostBindings;
 
-            SceneCompositionRoot.DecoratedScenes.Add(this.gameObject.scene);
+            SceneContext.DecoratedScenes.Add(this.gameObject.scene);
 
             if (ShouldLoadNextScene())
             {
@@ -83,7 +83,7 @@ namespace Zenject
 
             foreach (var installer in DecoratorInstallers)
             {
-                Assert.IsNotNull(installer, "Found null installer in composition root");
+                Assert.IsNotNull(installer, "Found null installer in SceneDecoratorContext");
 
                 if (installer.enabled)
                 {

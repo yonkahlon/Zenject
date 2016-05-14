@@ -8,7 +8,7 @@ using Assert=ModestTree.Assert;
 namespace Zenject.Tests.Injection
 {
     [TestFixture]
-    public class TestAllInjectionTypes : TestWithContainer
+    public class TestAllInjectionTypes : ZenjectUnitTestFixture
     {
         [Test]
         // Test all variations of injection
@@ -107,7 +107,7 @@ namespace Zenject.Tests.Injection
                 set;
             }
 
-            [PostInject]
+            [Inject]
             public void PostInjectBase()
             {
                 Assert.IsNull(BaseStaticFieldPublic);
@@ -190,7 +190,7 @@ namespace Zenject.Tests.Injection
                 ConstructorParam = param;
             }
 
-            [PostInject]
+            [Inject]
             public void PostInject()
             {
                 Assert.IsNull(DerivedStaticFieldPublic);

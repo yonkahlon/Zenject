@@ -16,7 +16,7 @@ namespace Zenject
 {
     public enum LoadSceneContainerMode
     {
-        // This will use the ProjectCompositionRoot container as parent for the new scene
+        // This will use the ProjectContext container as parent for the new scene
         // This is similar to just running the new scene normally
         None,
         // This will use current scene as parent for the new scene
@@ -31,7 +31,7 @@ namespace Zenject
     {
         readonly DiContainer _sceneContainer;
 
-        public ZenjectSceneLoader(SceneCompositionRoot sceneRoot)
+        public ZenjectSceneLoader(SceneContext sceneRoot)
         {
             _sceneContainer = sceneRoot.Container;
         }
@@ -89,27 +89,27 @@ namespace Zenject
 
             if (containerMode == LoadSceneContainerMode.None)
             {
-                SceneCompositionRoot.ParentContainer = null;
+                SceneContext.ParentContainer = null;
             }
             else if (containerMode == LoadSceneContainerMode.Child)
             {
-                SceneCompositionRoot.ParentContainer = _sceneContainer;
+                SceneContext.ParentContainer = _sceneContainer;
             }
             else
             {
                 Assert.IsEqual(containerMode, LoadSceneContainerMode.Sibling);
-                SceneCompositionRoot.ParentContainer = _sceneContainer.ParentContainer;
+                SceneContext.ParentContainer = _sceneContainer.ParentContainer;
             }
 
-            SceneCompositionRoot.BeforeInstallHooks = preBindings;
-            SceneCompositionRoot.AfterInstallHooks = postBindings;
+            SceneContext.BeforeInstallHooks = preBindings;
+            SceneContext.AfterInstallHooks = postBindings;
 
             Assert.That(Application.CanStreamedLevelBeLoaded(sceneName),
                 "Unable to load scene '{0}'", sceneName);
 
             SceneManager.LoadScene(sceneName, loadMode);
 
-            // It would be nice here to actually verify that the new scene has a SceneCompositionRoot
+            // It would be nice here to actually verify that the new scene has a SceneContext
             // if we have extra binding hooks, or LoadSceneContainerMode != None, but
             // it doesn't seem like we can do that immediately after calling SceneManager.LoadScene
         }

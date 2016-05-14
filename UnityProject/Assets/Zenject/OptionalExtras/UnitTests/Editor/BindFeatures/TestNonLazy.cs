@@ -4,7 +4,7 @@ using Assert=ModestTree.Assert;
 namespace Zenject.Tests.Bindings
 {
     [TestFixture]
-    public class TestNonLazy : TestWithContainer
+    public class TestNonLazy : ZenjectUnitTestFixture
     {
         [Test]
         public void Test1()

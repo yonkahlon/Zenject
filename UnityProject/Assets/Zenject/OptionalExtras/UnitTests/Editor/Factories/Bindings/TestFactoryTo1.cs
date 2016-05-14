@@ -9,7 +9,7 @@ using Assert=ModestTree.Assert;
 namespace Zenject.Tests.Bindings
 {
     [TestFixture]
-    public class TestFactoryTo1 : TestWithContainer
+    public class TestFactoryTo1 : ZenjectUnitTestFixture
     {
         [Test]
         public void TestSelf()

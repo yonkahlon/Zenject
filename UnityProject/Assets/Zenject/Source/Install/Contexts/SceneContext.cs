@@ -16,7 +16,7 @@ using UnityEditor;
 
 namespace Zenject
 {
-    public class SceneCompositionRoot : CompositionRoot
+    public class SceneContext : Context
     {
         public static readonly List<Scene> DecoratedScenes = new List<Scene>();
 
@@ -26,7 +26,7 @@ namespace Zenject
         public static DiContainer ParentContainer;
 
         [FormerlySerializedAs("ParentNewObjectsUnderRoot")]
-        [Tooltip("When true, objects that are created at runtime will be parented to the SceneCompositionRoot")]
+        [Tooltip("When true, objects that are created at runtime will be parented to the SceneContext")]
         [SerializeField]
         bool _parentNewObjectsUnderRoot = false;
 
@@ -91,11 +91,11 @@ namespace Zenject
 
         public void Awake()
         {
-            // We always want to initialize ProjectCompositionRoot as early as possible
-            ProjectCompositionRoot.Instance.EnsureIsInitialized();
+            // We always want to initialize ProjectContext as early as possible
+            ProjectContext.Instance.EnsureIsInitialized();
 
 #if UNITY_EDITOR
-            IsValidating = ProjectCompositionRoot.Instance.Container.IsValidating;
+            IsValidating = ProjectContext.Instance.Container.IsValidating;
 #endif
 
             if (_autoRun)
@@ -148,7 +148,7 @@ namespace Zenject
 
             Assert.IsNull(_container);
 
-            var parentContainer = ParentContainer ?? ProjectCompositionRoot.Instance.Container;
+            var parentContainer = ParentContainer ?? ProjectContext.Instance.Container;
 
             // ParentContainer is optionally set temporarily before calling ZenUtil.LoadScene
             ParentContainer = null;
@@ -163,10 +163,10 @@ namespace Zenject
             foreach (var decoratedScene in DecoratedScenes)
             {
                 Assert.That(decoratedScene.isLoaded,
-                    "Unexpected state in SceneCompositionRoot - found unloaded decorated scene");
+                    "Unexpected state in SceneContext - found unloaded decorated scene");
             }
 
-            Log.Debug("SceneCompositionRoot: Running installers...");
+            Log.Debug("SceneContext: Running installers...");
 
             _container.IsInstalling = true;
 
@@ -179,18 +179,18 @@ namespace Zenject
                 _container.IsInstalling = false;
             }
 
-            Log.Debug("SceneCompositionRoot: Injecting components in the scene...");
+            Log.Debug("SceneContext: Injecting components in the scene...");
 
             InjectComponents();
 
-            Log.Debug("SceneCompositionRoot: Resolving dependency roots...");
+            Log.Debug("SceneContext: Resolving dependency roots...");
 
             Assert.That(_dependencyRoots.IsEmpty());
             _dependencyRoots.AddRange(_container.ResolveDependencyRoots());
 
             DecoratedScenes.Clear();
 
-            Log.Debug("SceneCompositionRoot: Initialized successfully");
+            Log.Debug("SceneContext: Initialized successfully");
         }
 
         void InstallBindings()
@@ -205,8 +205,8 @@ namespace Zenject
                 _container.DefaultParent = null;
             }
 
-            _container.Bind<CompositionRoot>().FromInstance(this);
-            _container.Bind<SceneCompositionRoot>().FromInstance(this);
+            _container.Bind<Context>().FromInstance(this);
+            _container.Bind<SceneContext>().FromInstance(this);
 
             InstallSceneBindings();
 
@@ -217,7 +217,7 @@ namespace Zenject
                 BeforeInstallHooks = null;
             }
 
-            _container.Bind<SceneFacade>().FromComponent(this.gameObject).AsSingle().NonLazy();
+            _container.Bind<SceneKernel>().FromComponent(this.gameObject).AsSingle().NonLazy();
 
             _container.Bind<ZenjectSceneLoader>().AsSingle();
 
@@ -246,7 +246,8 @@ namespace Zenject
 
         void InjectComponents()
         {
-            // Use ToList in case they do something weird in post inject
+            // Use ToList to avoid detecting new objects that have been created
+            // dynamically for injecting, and then injecting them twice
             foreach (var component in GetInjectableComponents().ToList())
             {
                 Assert.That(!component.GetType().DerivesFrom<MonoInstaller>());
@@ -271,27 +272,27 @@ namespace Zenject
             // Also, even with older Unity versions, if there is an object that is marked with DontDestroyOnLoad, then it will
             // be injected multiple times when another scene is loaded
             //
-            // We also make sure not to inject into the project root objects which are injected by ProjectCompositionRoot.
+            // We also make sure not to inject into the project root objects which are injected by ProjectContext.
             return Resources.FindObjectsOfTypeAll<GameObject>()
                 .Where(x => x.transform.parent == null
-                    && x.GetComponent<ProjectCompositionRoot>() == null
+                    && x.GetComponent<ProjectContext>() == null
                     && (x.scene == scene || DecoratedScenes.Contains(x.scene)));
         }
 
-        // These methods can be used for cases where you need to create the SceneCompositionRoot entirely in code
+        // These methods can be used for cases where you need to create the SceneContext entirely in code
         // Note that if you use these methods that you have to call Run() yourself
-        // This is useful because it allows you to create a SceneCompositionRoot and configure it how you want
+        // This is useful because it allows you to create a SceneContext and configure it how you want
         // and add what installers you want before kicking off the Install/Resolve
-        public static SceneCompositionRoot Create()
+        public static SceneContext Create()
         {
             return CreateComponent(
-                new GameObject("SceneCompositionRoot"));
+                new GameObject("SceneContext"));
         }
 
-        public static SceneCompositionRoot CreateComponent(GameObject gameObject)
+        public static SceneContext CreateComponent(GameObject gameObject)
         {
             _autoRun = false;
-            var result = gameObject.AddComponent<SceneCompositionRoot>();
+            var result = gameObject.AddComponent<SceneContext>();
             Assert.That(_autoRun); // Should be reset
             return result;
         }
@@ -299,4 +300,3 @@ namespace Zenject
 }
 
 #endif
-

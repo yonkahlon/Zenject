@@ -8,7 +8,7 @@ using Assert=ModestTree.Assert;
 namespace Zenject.Tests.BindFeatures
 {
     [TestFixture]
-    public class TestMultipleContractTypes2 : TestWithContainer
+    public class TestMultipleContractTypes2 : ZenjectUnitTestFixture
     {
         public class Bar
         {

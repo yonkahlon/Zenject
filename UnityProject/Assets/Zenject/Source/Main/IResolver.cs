@@ -24,7 +24,7 @@ namespace Zenject
     {
         // When you call any of these Inject methods
         //    Any fields marked [Inject] will be set using the bindings on the container
-        //    Any methods marked with a [PostInject] will be called
+        //    Any methods marked with a [Inject] will be called
         //    Any constructor parameters will be filled in with values from the container
         void Inject(object injectable);
         void Inject(object injectable, IEnumerable<object> extraArgs);

@@ -71,16 +71,40 @@ namespace Zenject
         {
         }
 
-        // Use the CreateSubContainer method instead of this
-        DiContainer(DiContainer parentContainer, bool isValidating)
+        public DiContainer(DiContainer parentContainer, bool isValidating)
             : this(isValidating)
         {
             _parentContainer = parentContainer;
+
+            if (parentContainer != null)
+            {
+                parentContainer.FlushBindings();
+
+#if !NOT_UNITY3D
+                DefaultParent = parentContainer.DefaultParent;
+#endif
+                foreach (var binding in parentContainer._processedBindings
+                        .Where(x => x.InheritInSubContainers))
+                {
+                    _currentBindings.Enqueue(binding);
+                }
+
+                FlushBindings();
+            }
         }
 
-        DiContainer(DiContainer parentContainer)
+        public DiContainer(DiContainer parentContainer)
             : this(parentContainer, false)
         {
+        }
+
+        // When true, this will throw exceptions whenever we create new game objects
+        // This is helpful when used in places like EditorWindowKernel where we can't
+        // assume that there is a "scene" to place objects
+        public bool AssertOnNewGameObjects
+        {
+            get;
+            set;
         }
 
         public SingletonMarkRegistry SingletonMarkRegistry
@@ -222,6 +246,9 @@ namespace Zenject
                     this.ParentContainer.CloneForValidate(), true);
             }
 
+            // Validating shouldn't have side effects, so assert if this occurs
+            container.AssertOnNewGameObjects = true;
+
             foreach (var binding in _processedBindings)
             {
                 container._currentBindings.Enqueue(binding);
@@ -273,19 +300,7 @@ namespace Zenject
 
         public DiContainer CreateSubContainer(bool isValidating)
         {
-            FlushBindings();
-
-            var container = new DiContainer(this, isValidating);
-#if !NOT_UNITY3D
-            container.DefaultParent = this.DefaultParent;
-#endif
-            foreach (var binding in _processedBindings.Where(x => x.InheritInSubContainers))
-            {
-                container._currentBindings.Enqueue(binding);
-            }
-
-            container.FlushBindings();
-            return container;
+            return new DiContainer(this, isValidating);
         }
 
         public void RegisterProvider(
@@ -522,13 +537,13 @@ namespace Zenject
 
         // See comment in IBinder.cs for description for this method
         public void Install<T>()
-            where T : IInstaller
+            where T : Installer
         {
             Install<T>(new object[0]);
         }
 
         public void Install<T>(IEnumerable<object> extraArgs)
-            where T : IInstaller
+            where T : Installer
         {
             Install(typeof(T), extraArgs);
         }
@@ -547,27 +562,89 @@ namespace Zenject
         // See comment in IBinder.cs for description of this method
         public void InstallExplicit(Type installerType, List<TypeValuePair> extraArgs)
         {
-            Assert.That(installerType.DerivesFrom<IInstaller>());
+            Assert.That(installerType.DerivesFrom<Installer>());
 
             FlushBindings();
 
-#if !NOT_UNITY3D
-            if (installerType.DerivesFrom<MonoInstaller>())
-            {
-                var gameObj = CreateAndParentPrefabResource("Installers/" + installerType.Name());
-
-                var installer = gameObj.GetComponentInChildren<MonoInstaller>();
-
-                InjectExplicit(installer, extraArgs);
-                InstallInstallerInternal(installer);
-            }
-            else
-#endif
-            {
-                var installer = (IInstaller)InstantiateExplicit(installerType, extraArgs);
-                InstallInstallerInternal(installer);
-            }
+            var installer = (IInstaller)InstantiateExplicit(installerType, extraArgs);
+            InstallInstallerInternal(installer);
         }
+
+#if !NOT_UNITY3D
+
+        // See comment in IBinder.cs for description for this method
+        public void InstallPrefab<T>()
+            where T : MonoInstaller
+        {
+            InstallPrefab<T>(new object[0]);
+        }
+
+        public void InstallPrefab<T>(IEnumerable<object> extraArgs)
+            where T : MonoInstaller
+        {
+            InstallPrefab(typeof(T), extraArgs);
+        }
+
+        // See comment in IBinder.cs for description of this method
+        public void InstallPrefab(Type installerType)
+        {
+            InstallPrefab(installerType, new object[0]);
+        }
+
+        public void InstallPrefab(Type installerType, IEnumerable<object> extraArgs)
+        {
+            InstallPrefabExplicit(installerType, InjectUtil.CreateArgList(extraArgs));
+        }
+
+        public void InstallPrefabExplicit(Type installerType, List<TypeValuePair> extraArgs)
+        {
+            Assert.That(installerType.DerivesFrom<MonoInstaller>());
+
+            var gameObj = CreateAndParentPrefabResource("Installers/" + installerType.Name());
+
+            var installer = gameObj.GetComponentInChildren<MonoInstaller>();
+
+            InjectExplicit(installer, extraArgs);
+            InstallInstallerInternal(installer);
+        }
+
+        // See comment in IBinder.cs for description for this method
+        public void InstallScriptableObject<T>()
+            where T : ScriptableObjectInstaller
+        {
+            InstallScriptableObject<T>(new object[0]);
+        }
+
+        public void InstallScriptableObject<T>(IEnumerable<object> extraArgs)
+            where T : ScriptableObjectInstaller
+        {
+            InstallScriptableObject(typeof(T), extraArgs);
+        }
+
+        // See comment in IBinder.cs for description of this method
+        public void InstallScriptableObject(Type installerType)
+        {
+            InstallScriptableObject(installerType, new object[0]);
+        }
+
+        public void InstallScriptableObject(Type installerType, IEnumerable<object> extraArgs)
+        {
+            InstallScriptableObjectExplicit(installerType, InjectUtil.CreateArgList(extraArgs));
+        }
+
+        public void InstallScriptableObjectExplicit(Type installerType, List<TypeValuePair> extraArgs)
+        {
+            Assert.That(installerType.DerivesFrom<ScriptableObjectInstaller>());
+
+            var resourcePath = "Installers/" + installerType.Name();
+            var installer = (ScriptableObjectInstaller)Resources.Load(resourcePath);
+
+            Assert.IsNotNull(installer, "Expected to find Scriptable Object Installer at resource path '{0}'", resourcePath);
+
+            InjectExplicit(installer, extraArgs);
+            InstallInstallerInternal(installer);
+        }
+#endif
 
         // See comment in IBinder.cs for description of this method
         public bool HasInstalled<T>()
@@ -825,7 +902,7 @@ namespace Zenject
             return type.DerivesFrom<IInstaller>()
                 || type.DerivesFrom<IValidatable>()
 #if !NOT_UNITY3D
-                || type.DerivesFrom<CompositionRoot>()
+                || type.DerivesFrom<Context>()
                 || type.DerivesFrom<DecoratorInstaller>()
 #endif
                 || type.HasAttribute<ZenjectAllowDuringValidationAttribute>();
@@ -1131,6 +1208,9 @@ namespace Zenject
         // This one will only create the prefab and will not inject into it
         public GameObject CreateAndParentPrefab(GameObject prefab, string groupName)
         {
+            Assert.That(!AssertOnNewGameObjects,
+                "Given DiContainer does not support creating new game objects");
+
             FlushBindings();
 
             GameObject gameObj;
@@ -1169,6 +1249,9 @@ namespace Zenject
 
         public GameObject CreateEmptyGameObject(string name, string groupName)
         {
+            Assert.That(!AssertOnNewGameObjects,
+                "Given DiContainer does not support creating new game objects");
+
             FlushBindings();
 
             var gameObj = new GameObject(name);
@@ -1211,6 +1294,9 @@ namespace Zenject
         public object InstantiatePrefabForComponentExplicit(
             GameObject prefab, string groupName, InjectArgs args)
         {
+            Assert.That(!AssertOnNewGameObjects,
+                "Given DiContainer does not support creating new game objects");
+
             FlushBindings();
 
             Assert.That(prefab != null, "Null prefab found when instantiating game object");
@@ -1231,6 +1317,9 @@ namespace Zenject
 
         Transform GetTransformGroup(string groupName)
         {
+            Assert.That(!AssertOnNewGameObjects,
+                "Given DiContainer does not support creating new game objects");
+
             if (DefaultParent == null)
             {
                 if (groupName == null)
@@ -1891,7 +1980,7 @@ namespace Zenject
         public ConcreteBinderNonGeneric BindAllInterfaces(string identifier, Type type)
         {
             // We must only have one dependency root per container
-            // We need this when calling this with a GameObjectCompositionRoot
+            // We need this when calling this with a GameObjectContext
             return Bind(identifier, type.Interfaces().ToArray());
         }
 
@@ -1913,7 +2002,7 @@ namespace Zenject
         public ConcreteBinderNonGeneric BindAllInterfacesAndSelf(string identifier, Type type)
         {
             // We must only have one dependency root per container
-            // We need this when calling this with a GameObjectCompositionRoot
+            // We need this when calling this with a GameObjectContext
             return Bind(
                 identifier,
                 type.Interfaces().Append(type).ToArray());

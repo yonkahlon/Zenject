@@ -9,7 +9,7 @@ using Assert=ModestTree.Assert;
 namespace Zenject.Tests.Injection
 {
     [TestFixture]
-    public class TestCircularDependencies : TestWithContainer
+    public class TestCircularDependencies : ZenjectUnitTestFixture
     {
         class Test1
         {
@@ -69,7 +69,7 @@ namespace Zenject.Tests.Injection
                 CreateCount++;
             }
 
-            [PostInject]
+            [Inject]
             public void Initialize(Test4 other)
             {
                 this.Other = other;
@@ -87,7 +87,7 @@ namespace Zenject.Tests.Injection
                 CreateCount++;
             }
 
-            [PostInject]
+            [Inject]
             public void Initialize(Test3 other)
             {
                 this.Other = other;

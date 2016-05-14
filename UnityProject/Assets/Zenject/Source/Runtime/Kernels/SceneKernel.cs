@@ -4,7 +4,7 @@ using System;
 
 namespace Zenject
 {
-    public class SceneFacade : MonoFacade
+    public class SceneKernel : MonoKernel
     {
         // Only needed to set "script execution order" in unity project settings
     }

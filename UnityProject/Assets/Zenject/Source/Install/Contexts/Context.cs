@@ -14,7 +14,7 @@ using UnityEditor;
 
 namespace Zenject
 {
-    public abstract class CompositionRoot : MonoBehaviour
+    public abstract class Context : MonoBehaviour
     {
         [FormerlySerializedAs("Installers")]
         [SerializeField]
@@ -90,21 +90,21 @@ namespace Zenject
         {
             foreach (var installer in _installers)
             {
-                Assert.IsNotNull(installer, "Found null installer in CompositionRoot '{0}'", this.name);
+                Assert.IsNotNull(installer, "Found null installer in Context '{0}'", this.name);
 
 #if UNITY_EDITOR
                 Assert.That(PrefabUtility.GetPrefabType(installer.gameObject) != PrefabType.Prefab,
-                    "Found prefab with name '{0}' in the Installer property of CompositionRoot '{1}'.  You should use the property 'InstallerPrefabs' for this instead.", installer.name, this.name);
+                    "Found prefab with name '{0}' in the Installer property of Context '{1}'.  You should use the property 'InstallerPrefabs' for this instead.", installer.name, this.name);
 #endif
             }
 
             foreach (var installerPrefab in _installerPrefabs)
             {
-                Assert.IsNotNull(installerPrefab, "Found null prefab in CompositionRoot");
+                Assert.IsNotNull(installerPrefab, "Found null prefab in Context");
 
 #if UNITY_EDITOR
                 Assert.That(PrefabUtility.GetPrefabType(installerPrefab.gameObject) == PrefabType.Prefab,
-                    "Found non-prefab with name '{0}' in the InstallerPrefabs property of CompositionRoot '{1}'.  You should use the property 'Installer' for this instead",
+                    "Found non-prefab with name '{0}' in the InstallerPrefabs property of Context '{1}'.  You should use the property 'Installer' for this instead",
                     installerPrefab.name, this.name);
 #endif
                 Assert.That(installerPrefab.GetComponent<MonoInstaller>() != null,
@@ -169,7 +169,7 @@ namespace Zenject
                     continue;
                 }
 
-                if (binding.CompositionRoot == null)
+                if (binding.Context == null)
                 {
                     InstallZenjectBinding(binding);
                 }
@@ -184,7 +184,7 @@ namespace Zenject
                     continue;
                 }
 
-                if (binding.CompositionRoot == this)
+                if (binding.Context == this)
                 {
                     InstallZenjectBinding(binding);
                 }

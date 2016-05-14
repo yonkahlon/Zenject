@@ -10,7 +10,7 @@ using Assert=ModestTree.Assert;
 namespace Zenject.Tests.Other
 {
     [TestFixture]
-    public class TestValidateInstaller : TestWithContainer
+    public class TestValidateInstaller : ZenjectUnitTestFixture
     {
         [Test]
         public void TestBasicSuccess()

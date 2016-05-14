@@ -105,7 +105,7 @@ namespace Zenject
             // otherwise a base class method marked with [Inject] would cause all overridden
             // derived methods to be added as well
             var methods = type.GetAllInstanceMethods()
-                .Where(x => x.GetCustomAttributes(typeof(PostInjectAttribute), false).Any()).ToList();
+                .Where(x => x.GetCustomAttributes(typeof(InjectAttribute), false).Any()).ToList();
 
             var heirarchyList = type.Yield().Concat(type.GetParentTypes()).Reverse().ToList();
 

@@ -13,8 +13,8 @@ using ModestTree;
 
 namespace Zenject
 {
-    [CustomEditor(typeof(SceneDecoratorCompositionRoot))]
-    public class SceneDecoratorCompositionRootEditor : UnityEditor.Editor
+    [CustomEditor(typeof(SceneDecoratorContext))]
+    public class SceneDecoratorContextEditor : UnityEditor.Editor
     {
         List<ReorderableList> _propLists;
 
@@ -65,34 +65,29 @@ namespace Zenject
             }
         }
 
-        SceneDecoratorCompositionRoot TryGetSceneDecoratorCompositionRoot()
+        SceneContext TryGetSceneContext()
         {
-            return GameObject.FindObjectsOfType<SceneDecoratorCompositionRoot>().OnlyOrDefault();
+            return GameObject.FindObjectsOfType<SceneContext>().OnlyOrDefault();
         }
 
-        SceneCompositionRoot TryGetSceneCompositionRoot()
-        {
-            return GameObject.FindObjectsOfType<SceneCompositionRoot>().OnlyOrDefault();
-        }
-
-        void SelectCompositionRoot(Scene scene)
+        void SelectContext(Scene scene)
         {
             var rootObjects = scene.GetRootGameObjects();
-            var sceneCompRoot = rootObjects
-                .SelectMany(x => x.GetComponentsInChildren<SceneCompositionRoot>()).FirstOrDefault();
+            var sceneContexts = rootObjects
+                .SelectMany(x => x.GetComponentsInChildren<SceneContext>()).FirstOrDefault();
 
-            if (sceneCompRoot != null)
+            if (sceneContexts != null)
             {
-                Selection.activeGameObject = sceneCompRoot.gameObject;
+                Selection.activeGameObject = sceneContexts.gameObject;
             }
             else
             {
-                var decoratorCompRoot = rootObjects
-                    .SelectMany(x => x.GetComponentsInChildren<SceneDecoratorCompositionRoot>()).FirstOrDefault();
+                var decoratorContexts = rootObjects
+                    .SelectMany(x => x.GetComponentsInChildren<SceneDecoratorContext>()).FirstOrDefault();
 
-                if (decoratorCompRoot != null)
+                if (decoratorContexts != null)
                 {
-                    Selection.activeGameObject = decoratorCompRoot.gameObject;
+                    Selection.activeGameObject = decoratorContexts.gameObject;
                 }
             }
         }
@@ -105,7 +100,7 @@ namespace Zenject
 
         void OpenNextScene(OpenSceneMode openMode)
         {
-            var binder = target as SceneDecoratorCompositionRoot;
+            var binder = target as SceneDecoratorContext;
             var scenePath = TryGetScenePath(binder.SceneName);
 
             if (scenePath == null)
@@ -124,7 +119,7 @@ namespace Zenject
                 }
 
                 var scene = EditorSceneManager.OpenScene(scenePath, openMode);
-                SelectCompositionRoot(scene);
+                SelectContext(scene);
             }
         }
 
@@ -139,7 +134,7 @@ namespace Zenject
 
             GUILayout.Space(5);
 
-            var binder = target as SceneDecoratorCompositionRoot;
+            var binder = target as SceneDecoratorContext;
 
             EditorGUILayout.BeginHorizontal();
             {

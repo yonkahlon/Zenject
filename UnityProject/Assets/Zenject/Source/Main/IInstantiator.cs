@@ -13,7 +13,7 @@ namespace Zenject
     {
         // Use this method to create any non-monobehaviour
         // Any fields marked [Inject] will be set using the bindings on the container
-        // Any methods marked with a [PostInject] will be called
+        // Any methods marked with a [Inject] will be called
         // Any constructor parameters will be filled in with values from the container
         T Instantiate<T>();
         T Instantiate<T>(IEnumerable<object> extraArgs);
@@ -90,11 +90,11 @@ namespace Zenject
             GameObject prefab, List<TypeValuePair> extraArgs);
 
         GameObject InstantiatePrefabExplicit(
-            GameObject prefab, List<TypeValuePair> extraArgs, 
+            GameObject prefab, List<TypeValuePair> extraArgs,
             string groupName);
 
         GameObject InstantiatePrefabExplicit(
-            GameObject prefab, List<TypeValuePair> extraArgs, 
+            GameObject prefab, List<TypeValuePair> extraArgs,
             string groupName, bool useAllArgs);
 
         ////
@@ -145,7 +145,7 @@ namespace Zenject
             string resourcePath, string groupName, InjectArgs args);
 
         // This is the same as GameObject.Instantiate(name) except that it will use
-        // the default parent, which can sometimes be set to the CompositionRoot
+        // the default parent, which can sometimes be set to the Context
         GameObject CreateEmptyGameObject(string name);
         GameObject CreateEmptyGameObject(string name, string groupName);
 #endif

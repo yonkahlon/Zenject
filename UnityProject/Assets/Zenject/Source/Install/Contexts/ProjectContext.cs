@@ -16,15 +16,16 @@ using Zenject.Internal;
 
 namespace Zenject
 {
-    public class ProjectCompositionRoot : CompositionRoot
+    public class ProjectContext : Context
     {
 #if UNITY_EDITOR
         public const string IsValidatingEditorPrefsKey = "Zenject.IsValidating";
 #endif
 
-        public const string ProjectCompRootResourcePath = "ProjectCompositionRoot";
+        public const string ProjectContextResourcePath = "ProjectContext";
+        public const string ProjectContextResourcePathOld = "ProjectCompositionRoot";
 
-        static ProjectCompositionRoot _instance;
+        static ProjectContext _instance;
 
         DiContainer _container;
 
@@ -38,7 +39,7 @@ namespace Zenject
             }
         }
 
-        public static ProjectCompositionRoot Instance
+        public static ProjectContext Instance
         {
             get
             {
@@ -47,17 +48,17 @@ namespace Zenject
                     _instance = InstantiateNewRoot();
 
                     // Note: We use Initialize instead of awake here in case someone calls
-                    // ProjectCompositionRoot.Instance while ProjectCompositionRoot is initializing
+                    // ProjectContext.Instance while ProjectContext is initializing
                     _instance.Initialize();
                 }
 
 #if UNITY_EDITOR
                 if (_instance.Container.IsValidating)
                 {
-                    // ProjectCompositionRoot.Instance is called as the first thing in every
+                    // ProjectContext.Instance is called as the first thing in every
                     // Zenject scene (including decorator scenes)
                     // During validation, we want to ensure that no Awake() gets called except
-                    // for SceneCompositionRoot.Awake
+                    // for SceneContext.Awake
                     // Need to call DisableEverything() again here for any new scenes that may
                     // have been loaded
                     ValidationSceneDisabler.Instance.DisableEverything();
@@ -86,29 +87,36 @@ namespace Zenject
 
         public static GameObject TryGetPrefab()
         {
-            return (GameObject)Resources.Load(ProjectCompRootResourcePath);
+            var prefab = (GameObject)Resources.Load(ProjectContextResourcePath);
+
+            if (prefab == null)
+            {
+                prefab = (GameObject)Resources.Load(ProjectContextResourcePathOld);
+            }
+
+            return prefab;
         }
 
-        public static ProjectCompositionRoot InstantiateNewRoot()
+        public static ProjectContext InstantiateNewRoot()
         {
-            Assert.That(GameObject.FindObjectsOfType<ProjectCompositionRoot>().IsEmpty(),
-                "Tried to create multiple instances of ProjectCompositionRoot!");
+            Assert.That(GameObject.FindObjectsOfType<ProjectContext>().IsEmpty(),
+                "Tried to create multiple instances of ProjectContext!");
 
-            ProjectCompositionRoot instance;
+            ProjectContext instance;
 
             var prefab = TryGetPrefab();
 
             if (prefab == null)
             {
-                instance = new GameObject("ProjectCompositionRoot")
-                    .AddComponent<ProjectCompositionRoot>();
+                instance = new GameObject("ProjectContext")
+                    .AddComponent<ProjectContext>();
             }
             else
             {
-                instance = GameObject.Instantiate(prefab).GetComponent<ProjectCompositionRoot>();
+                instance = GameObject.Instantiate(prefab).GetComponent<ProjectContext>();
 
                 Assert.IsNotNull(instance,
-                    "Could not find ProjectCompositionRoot component on prefab 'Resources/{0}.prefab'", ProjectCompRootResourcePath);
+                    "Could not find ProjectContext component on prefab 'Resources/{0}.prefab'", ProjectContextResourcePath);
             }
 
             return instance;
@@ -121,7 +129,7 @@ namespace Zenject
 
         void Initialize()
         {
-            Log.Debug("Initializing ProjectCompositionRoot");
+            Log.Debug("Initializing ProjectContext");
 
             Assert.IsNull(_container);
 
@@ -141,7 +149,8 @@ namespace Zenject
             PersistentIsValidating = false;
 #endif
 
-            _container = new DiContainer(isValidating);
+            _container = new DiContainer(
+                StaticContext.Container, isValidating);
 
             _container.IsInstalling = true;
 
@@ -184,9 +193,9 @@ namespace Zenject
             _container.Bind(typeof(TickableManager), typeof(InitializableManager), typeof(DisposableManager))
                 .ToSelf().AsSingle().InheritInSubContainers();
 
-            _container.Bind<CompositionRoot>().FromInstance(this);
+            _container.Bind<Context>().FromInstance(this);
 
-            _container.Bind<ProjectFacade>().FromComponent(this.gameObject).AsSingle().NonLazy();
+            _container.Bind<ProjectKernel>().FromComponent(this.gameObject).AsSingle().NonLazy();
 
             InstallSceneBindings();
 
