@@ -166,13 +166,21 @@ namespace Zenject
                     "Unexpected state in SceneContext - found unloaded decorated scene");
             }
 
+            // Record all the injectable components in the scene BEFORE installing the installers
+            // This is nice for cases where the user calls InstantiatePrefab<>, etc. in their installer
+            // so that it doesn't inject on the game object twice
+            // InitialComponentsInjecter will also guarantee that any component that is injected into
+            // another component has itself been injected
+            var componentInjecter = new InitialComponentsInjecter(
+                _container, GetInjectableComponents().ToList());
+
             Log.Debug("SceneContext: Running installers...");
 
             _container.IsInstalling = true;
 
             try
             {
-                InstallBindings();
+                InstallBindings(componentInjecter);
             }
             finally
             {
@@ -181,7 +189,7 @@ namespace Zenject
 
             Log.Debug("SceneContext: Injecting components in the scene...");
 
-            InjectComponents();
+            componentInjecter.LazyInjectComponents();
 
             Log.Debug("SceneContext: Resolving dependency roots...");
 
@@ -193,7 +201,7 @@ namespace Zenject
             Log.Debug("SceneContext: Initialized successfully");
         }
 
-        void InstallBindings()
+        void InstallBindings(InitialComponentsInjecter componentInjecter)
         {
             if (_parentNewObjectsUnderRoot)
             {
@@ -208,7 +216,7 @@ namespace Zenject
             _container.Bind<Context>().FromInstance(this);
             _container.Bind<SceneContext>().FromInstance(this);
 
-            InstallSceneBindings();
+            InstallSceneBindings(componentInjecter);
 
             if (BeforeInstallHooks != null)
             {
@@ -242,18 +250,6 @@ namespace Zenject
             }
 
             yield break;
-        }
-
-        void InjectComponents()
-        {
-            // Use ToList to avoid detecting new objects that have been created
-            // dynamically for injecting, and then injecting them twice
-            foreach (var component in GetInjectableComponents().ToList())
-            {
-                Assert.That(!component.GetType().DerivesFrom<MonoInstaller>());
-
-                _container.Inject(component);
-            }
         }
 
         public IEnumerable<GameObject> GetRootGameObjects()
