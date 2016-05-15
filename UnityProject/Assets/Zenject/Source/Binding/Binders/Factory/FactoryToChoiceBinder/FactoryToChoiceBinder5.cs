@@ -12,7 +12,7 @@ namespace Zenject
     public class FactoryToChoiceBinder<TParam1, TParam2, TParam3, TParam4, TParam5, TContract> : FactoryFromBinder<TParam1, TParam2, TParam3, TParam4, TParam5, TContract>
     {
         public FactoryToChoiceBinder(
-            BindInfo bindInfo, Type factoryType, 
+            BindInfo bindInfo, Type factoryType,
             BindFinalizerWrapper finalizerWrapper)
             : base(bindInfo, factoryType, finalizerWrapper)
         {
@@ -38,8 +38,20 @@ namespace Zenject
                 BindInfo, FactoryType, FinalizerWrapper);
         }
     }
+
+    public class FactoryToChoiceIdBinder<TParam1, TParam2, TParam3, TParam4, TParam5, TContract> : FactoryToChoiceBinder<TParam1, TParam2, TParam3, TParam4, TParam5, TContract>
+    {
+        public FactoryToChoiceIdBinder(
+            BindInfo bindInfo, Type factoryType,
+            BindFinalizerWrapper finalizerWrapper)
+            : base(bindInfo, factoryType, finalizerWrapper)
+        {
+        }
+
+        public FactoryToChoiceBinder<TParam1, TParam2, TParam3, TParam4, TParam5, TContract> WithId(object identifier)
+        {
+            BindInfo.Identifier = identifier;
+            return this;
+        }
+    }
 }
-
-
-
-

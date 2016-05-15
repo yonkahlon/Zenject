@@ -225,17 +225,17 @@ namespace Zenject
                 {
                     case ZenjectBinding.BindTypes.Self:
                     {
-                        Container.Bind(identifier, component.GetType()).FromInstance(component);
+                        Container.Bind(component.GetType()).WithId(identifier).FromInstance(component);
                         break;
                     }
                     case ZenjectBinding.BindTypes.AllInterfaces:
                     {
-                        Container.BindAllInterfaces(identifier, component.GetType()).FromInstance(component);
+                        Container.BindAllInterfaces(component.GetType()).WithId(identifier).FromInstance(component);
                         break;
                     }
                     case ZenjectBinding.BindTypes.AllInterfacesAndSelf:
                     {
-                        Container.BindAllInterfacesAndSelf(identifier, component.GetType()).FromInstance(component);
+                        Container.BindAllInterfacesAndSelf(component.GetType()).WithId(identifier).FromInstance(component);
                         break;
                     }
                     default:

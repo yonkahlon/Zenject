@@ -20,7 +20,7 @@ namespace Zenject.Tests.Injection
             public Test0 val;
 
             public Test1(
-                [Inject(InjectSources.Local)]
+                [InjectLocal]
                 Test0 val)
             {
                 this.val = val;
@@ -32,7 +32,7 @@ namespace Zenject.Tests.Injection
             public Test0 val;
 
             public Test2(
-                [Inject(InjectSources.Parent)]
+                [Inject(Source = InjectSources.Parent)]
                 Test0 val)
             {
                 this.val = val;
@@ -44,7 +44,7 @@ namespace Zenject.Tests.Injection
             public Test0 val;
 
             public Test3(
-                [Inject(InjectSources.AnyParent)]
+                [Inject(Source = InjectSources.AnyParent)]
                 Test0 val)
             {
                 this.val = val;
@@ -56,7 +56,7 @@ namespace Zenject.Tests.Injection
             public Test0 val;
 
             public Test4(
-                [Inject(InjectSources.Any)]
+                [Inject(Source = InjectSources.Any)]
                 Test0 val)
             {
                 this.val = val;

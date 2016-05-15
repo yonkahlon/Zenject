@@ -47,39 +47,39 @@ namespace Zenject
         // If a single unique value for the given type cannot be found, an exception is thrown.
         //
         TContract Resolve<TContract>();
-        TContract Resolve<TContract>(string identifier);
+        TContract Resolve<TContract>(object identifier);
         // InjectContext can be used to add more constraints to the object that you want to retrieve
         TContract Resolve<TContract>(InjectContext context);
 
         // Non-generic versions
         object Resolve(Type contractType);
-        object Resolve(Type contractType, string identifier);
+        object Resolve(Type contractType, object identifier);
         object Resolve(InjectContext context);
 
         // Same as Resolve<> except it will return null if a value for the given type cannot
         // be found.
         TContract TryResolve<TContract>()
             where TContract : class;
-        TContract TryResolve<TContract>(string identifier)
+        TContract TryResolve<TContract>(object identifier)
             where TContract : class;
 
         object TryResolve(Type contractType);
-        object TryResolve(Type contractType, string identifier);
+        object TryResolve(Type contractType, object identifier);
 
         // Same as Resolve<> except it will return all bindings that are associated with the given type
         List<TContract> ResolveAll<TContract>();
         List<TContract> ResolveAll<TContract>(bool optional);
-        List<TContract> ResolveAll<TContract>(string identifier);
-        List<TContract> ResolveAll<TContract>(string identifier, bool optional);
+        List<TContract> ResolveAll<TContract>(object identifier);
+        List<TContract> ResolveAll<TContract>(object identifier, bool optional);
         List<TContract> ResolveAll<TContract>(InjectContext context);
 
         // Untyped versions
         IList ResolveAll(InjectContext context);
 
         IList ResolveAll(Type contractType);
-        IList ResolveAll(Type contractType, string identifier);
+        IList ResolveAll(Type contractType, object identifier);
         IList ResolveAll(Type contractType, bool optional);
-        IList ResolveAll(Type contractType, string identifier, bool optional);
+        IList ResolveAll(Type contractType, object identifier, bool optional);
 
         // Returns all the types that would be returned if ResolveAll was called with the given values
         List<Type> ResolveTypeAll(InjectContext context);

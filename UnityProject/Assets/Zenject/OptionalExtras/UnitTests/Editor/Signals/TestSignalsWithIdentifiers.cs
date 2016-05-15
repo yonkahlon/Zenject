@@ -114,7 +114,7 @@ namespace Zenject.Tests
             readonly SomethingHappenedSignal.Trigger _trigger;
 
             public FooSpecial(
-                [Inject("special")]
+                [Inject(Id = "special")]
                 SomethingHappenedSignal.Trigger trigger)
             {
                 _trigger = trigger;
@@ -131,7 +131,7 @@ namespace Zenject.Tests
             readonly SomethingHappenedSignal _signal;
 
             public BarSpecial(
-                [Inject("special")]
+                [Inject(Id = "special")]
                 SomethingHappenedSignal signal)
             {
                 _signal = signal;

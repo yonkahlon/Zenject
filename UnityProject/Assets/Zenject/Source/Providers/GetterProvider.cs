@@ -9,11 +9,11 @@ namespace Zenject
     public class GetterProvider<TObj, TResult> : IProvider
     {
         readonly DiContainer _container;
-        readonly string _identifier;
+        readonly object _identifier;
         readonly Func<TObj, TResult> _method;
 
         public GetterProvider(
-            string identifier, Func<TObj, TResult> method,
+            object identifier, Func<TObj, TResult> method,
             DiContainer container)
         {
             _container = container;

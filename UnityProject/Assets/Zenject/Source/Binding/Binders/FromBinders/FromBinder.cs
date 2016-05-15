@@ -71,7 +71,7 @@ namespace Zenject
             return FromResolve(null);
         }
 
-        public ScopeBinder FromResolve(string subIdentifier)
+        public ScopeBinder FromResolve(object subIdentifier)
         {
             SubFinalizer = new ScopableBindingFinalizer(
                 BindInfo,
@@ -86,7 +86,7 @@ namespace Zenject
             return FromSubContainerResolve(null);
         }
 
-        public SubContainerBinder FromSubContainerResolve(string subIdentifier)
+        public SubContainerBinder FromSubContainerResolve(object subIdentifier)
         {
             return new SubContainerBinder(
                 BindInfo, FinalizerWrapper, subIdentifier);
@@ -212,7 +212,7 @@ namespace Zenject
         }
 
         protected ScopeBinder FromGetterBase<TObj, TResult>(
-            string identifier, Func<TObj, TResult> method)
+            object identifier, Func<TObj, TResult> method)
         {
             BindingUtil.AssertIsDerivedFromTypes(typeof(TResult), AllParentTypes);
 

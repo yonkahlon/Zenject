@@ -2,6 +2,8 @@
 using System.Collections;
 using Zenject;
 
+#pragma warning disable 649
+
 namespace Zenject.Tests.ToSubContainerPrefabResource
 {
     public class FooInstaller : MonoInstaller
@@ -12,7 +14,7 @@ namespace Zenject.Tests.ToSubContainerPrefabResource
         public override void InstallBindings()
         {
             Container.BindInstance(_bar);
-            Container.Bind<Gorp>("gorp").AsSingle();
+            Container.Bind<Gorp>().WithId("gorp").AsSingle();
         }
     }
 }

@@ -9,9 +9,9 @@ namespace Zenject
     public class BindingId : IEquatable<BindingId>
     {
         public readonly Type Type;
-        public readonly string Identifier;
+        public readonly object Identifier;
 
-        public BindingId(Type type, string identifier)
+        public BindingId(Type type, object identifier)
         {
             Type = type;
             Identifier = identifier;

@@ -10,13 +10,13 @@ namespace Zenject
 {
     public abstract class MonoKernel : MonoBehaviour
     {
-        [Inject(InjectSources.Local)]
+        [InjectLocal]
         TickableManager _tickableManager = null;
 
-        [Inject(InjectSources.Local)]
+        [InjectLocal]
         InitializableManager _initializableManager = null;
 
-        [Inject(InjectSources.Local)]
+        [InjectLocal]
         DisposableManager _disposablesManager = null;
 
         bool _isDisposed;

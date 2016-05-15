@@ -716,7 +716,7 @@ namespace Zenject
 
                 // First try picking the most 'local' dependencies
                 // This will bias towards bindings for the lower level specific containers rather than the global high level container
-                // This will, for example, allow you to just ask for a DiContainer dependency without needing to specify [Inject(InjectSources.Local)]
+                // This will, for example, allow you to just ask for a DiContainer dependency without needing to specify [Inject(Source = InjectSources.Local)]
                 // (otherwise it would always match for a list of DiContainer's for all parent containers)
                 var sortedProviders = providers.Select(x => new { Pair = x, Distance = GetContainerHeirarchyDistance(x.Container) }).OrderBy(x => x.Distance).ToList();
 
@@ -1696,7 +1696,7 @@ namespace Zenject
         }
 
         // See comment in IResolver.cs for description of this method
-        public TContract Resolve<TContract>(string identifier)
+        public TContract Resolve<TContract>(object identifier)
         {
             return Resolve<TContract>(new InjectContext(this, typeof(TContract), identifier));
         }
@@ -1709,7 +1709,7 @@ namespace Zenject
         }
 
         // See comment in IResolver.cs for description of this method
-        public TContract TryResolve<TContract>(string identifier)
+        public TContract TryResolve<TContract>(object identifier)
             where TContract : class
         {
             return (TContract)TryResolve(typeof(TContract), identifier);
@@ -1722,7 +1722,7 @@ namespace Zenject
         }
 
         // See comment in IResolver.cs for description of this method
-        public object TryResolve(Type contractType, string identifier)
+        public object TryResolve(Type contractType, object identifier)
         {
             return Resolve(new InjectContext(this, contractType, identifier, true));
         }
@@ -1734,7 +1734,7 @@ namespace Zenject
         }
 
         // See comment in IResolver.cs for description of this method
-        public object Resolve(Type contractType, string identifier)
+        public object Resolve(Type contractType, object identifier)
         {
             return Resolve(new InjectContext(this, contractType, identifier));
         }
@@ -1761,13 +1761,13 @@ namespace Zenject
         }
 
         // See comment in IResolver.cs for description of this method
-        public List<TContract> ResolveAll<TContract>(string identifier)
+        public List<TContract> ResolveAll<TContract>(object identifier)
         {
             return ResolveAll<TContract>(identifier, true);
         }
 
         // See comment in IResolver.cs for description of this method
-        public List<TContract> ResolveAll<TContract>(string identifier, bool optional)
+        public List<TContract> ResolveAll<TContract>(object identifier, bool optional)
         {
             var context = new InjectContext(this, typeof(TContract), identifier, optional);
             return ResolveAll<TContract>(context);
@@ -1788,7 +1788,7 @@ namespace Zenject
         }
 
         // See comment in IResolver.cs for description of this method
-        public IList ResolveAll(Type contractType, string identifier)
+        public IList ResolveAll(Type contractType, object identifier)
         {
             return ResolveAll(contractType, identifier, true);
         }
@@ -1800,7 +1800,7 @@ namespace Zenject
         }
 
         // See comment in IResolver.cs for description of this method
-        public IList ResolveAll(Type contractType, string identifier, bool optional)
+        public IList ResolveAll(Type contractType, object identifier, bool optional)
         {
             var context = new InjectContext(this, contractType, identifier, optional);
             return ResolveAll(context);
@@ -1819,7 +1819,7 @@ namespace Zenject
             return Unbind<TContract>(null);
         }
 
-        public bool Unbind<TContract>(string identifier)
+        public bool Unbind<TContract>(object identifier)
         {
             FlushBindings();
 
@@ -1852,7 +1852,7 @@ namespace Zenject
         }
 
         // See comment in IBinder.cs for description of this method
-        public bool HasBinding<TContract>(string identifier)
+        public bool HasBinding<TContract>(object identifier)
         {
             return HasBinding(
                 new InjectContext(this, typeof(TContract), identifier));
@@ -1885,54 +1885,39 @@ namespace Zenject
             return Rebind<TContract>(null);
         }
 
-        public ConcreteBinderGeneric<TContract> Rebind<TContract>(string identifier)
+        public ConcreteBinderGeneric<TContract> Rebind<TContract>(object identifier)
         {
             Unbind<TContract>(identifier);
-            return Bind<TContract>(identifier);
+            return Bind<TContract>().WithId(identifier);
         }
 
-        public ConcreteBinderGeneric<TContract> Bind<TContract>()
-        {
-            return Bind<TContract>(null);
-        }
-
-        public ConcreteBinderGeneric<TContract> Bind<TContract>(string identifier)
+        public ConcreteIdBinderGeneric<TContract> Bind<TContract>()
         {
             Assert.That(!typeof(TContract).DerivesFrom<IDynamicFactory>(),
                 "You should not use Container.Bind for factory classes.  Use Container.BindFactory instead.");
 
-            var bindInfo = new BindInfo(identifier, typeof(TContract));
+            var bindInfo = new BindInfo(typeof(TContract));
 
-            return new ConcreteBinderGeneric<TContract>(
+            return new ConcreteIdBinderGeneric<TContract>(
                 bindInfo, StartBinding());
         }
 
-        public ConcreteBinderNonGeneric Bind(params Type[] contractTypes)
+        public ConcreteIdBinderNonGeneric Bind(params Type[] contractTypes)
         {
             return Bind((IEnumerable<Type>)contractTypes);
         }
 
-        public ConcreteBinderNonGeneric Bind(IEnumerable<Type> contractTypes)
-        {
-            return Bind((string)null, contractTypes);
-        }
-
-        public ConcreteBinderNonGeneric Bind(string identifier, params Type[] contractTypes)
-        {
-            return Bind(identifier, (IEnumerable<Type>)contractTypes);
-        }
-
-        public ConcreteBinderNonGeneric Bind(string identifier, IEnumerable<Type> contractTypes)
+        public ConcreteIdBinderNonGeneric Bind(IEnumerable<Type> contractTypes)
         {
             var contractTypesList = contractTypes.ToList();
             Assert.That(contractTypesList.All(x => !x.DerivesFrom<IDynamicFactory>()),
                 "You should not use Container.Bind for factory classes.  Use Container.BindFactory instead.");
 
-            var bindInfo = new BindInfo(identifier, contractTypesList);
-            return new ConcreteBinderNonGeneric(bindInfo, StartBinding());
+            var bindInfo = new BindInfo(contractTypesList);
+            return new ConcreteIdBinderNonGeneric(bindInfo, StartBinding());
         }
 
-        public ConcreteBinderNonGeneric Bind(
+        public ConcreteIdBinderNonGeneric Bind(
             Action<ConventionSelectTypesBinder> generator)
         {
             var bindInfo = new ConventionBindInfo();
@@ -1947,230 +1932,145 @@ namespace Zenject
             BindRootResolve<TContract>(null);
         }
 
-        public void BindRootResolve<TContract>(string identifier)
+        public void BindRootResolve<TContract>(object identifier)
         {
-            BindRootResolve(identifier, typeof(TContract));
+            BindRootResolve(identifier, new Type[] { typeof(TContract) });
         }
 
-        public void BindRootResolve(params Type[] rootTypes)
+        public void BindRootResolve(IEnumerable<Type> rootTypes)
         {
             BindRootResolve(null, rootTypes);
         }
 
-        public void BindRootResolve(string identifier, params Type[] rootTypes)
+        public void BindRootResolve(object identifier, IEnumerable<Type> rootTypes)
         {
-            Bind<object>(DependencyRootIdentifier).To(rootTypes).FromResolve(identifier);
+            Bind<object>().WithId(DependencyRootIdentifier).To(rootTypes).FromResolve(identifier);
         }
 
-        public ConcreteBinderNonGeneric BindAllInterfaces<T>()
+        public ConcreteIdBinderNonGeneric BindAllInterfaces<T>()
         {
-            return BindAllInterfaces<T>(null);
+            return BindAllInterfaces(typeof(T));
         }
 
-        public ConcreteBinderNonGeneric BindAllInterfaces<T>(string identifier)
-        {
-            return BindAllInterfaces(identifier, typeof(T));
-        }
-
-        public ConcreteBinderNonGeneric BindAllInterfaces(Type type)
-        {
-            return BindAllInterfaces(null, type);
-        }
-
-        public ConcreteBinderNonGeneric BindAllInterfaces(string identifier, Type type)
+        public ConcreteIdBinderNonGeneric BindAllInterfaces(Type type)
         {
             // We must only have one dependency root per container
             // We need this when calling this with a GameObjectContext
-            return Bind(identifier, type.Interfaces().ToArray());
+            return Bind(type.Interfaces().ToArray());
         }
 
-        public ConcreteBinderNonGeneric BindAllInterfacesAndSelf<T>()
+        public ConcreteIdBinderNonGeneric BindAllInterfacesAndSelf<T>()
         {
-            return BindAllInterfacesAndSelf<T>(null);
+            return BindAllInterfacesAndSelf(typeof(T));
         }
 
-        public ConcreteBinderNonGeneric BindAllInterfacesAndSelf<T>(string identifier)
-        {
-            return BindAllInterfacesAndSelf(identifier, typeof(T));
-        }
-
-        public ConcreteBinderNonGeneric BindAllInterfacesAndSelf(Type type)
-        {
-            return BindAllInterfacesAndSelf(null, type);
-        }
-
-        public ConcreteBinderNonGeneric BindAllInterfacesAndSelf(string identifier, Type type)
+        public ConcreteIdBinderNonGeneric BindAllInterfacesAndSelf(Type type)
         {
             // We must only have one dependency root per container
             // We need this when calling this with a GameObjectContext
             return Bind(
-                identifier,
                 type.Interfaces().Append(type).ToArray());
         }
 
-        public ScopeBinder BindInstance<TContract>(string identifier, TContract obj)
+        public IdScopeBinder BindInstance<TContract>(TContract instance)
         {
-            return Bind<TContract>(identifier).FromInstance(obj);
+            var bindInfo = new BindInfo(typeof(TContract));
+            var binding = StartBinding();
+
+            binding.SubFinalizer = new ScopableBindingFinalizer(
+                bindInfo, SingletonTypes.ToInstance, instance,
+                (_, type) => new InstanceProvider(type, instance));
+
+            return new IdScopeBinder(bindInfo);
         }
 
-        public ScopeBinder BindInstance<TContract>(TContract obj)
+        public FactoryToChoiceIdBinder<TContract> BindIFactory<TContract>()
         {
-            return Bind<TContract>().FromInstance(obj);
-        }
-
-        public FactoryToChoiceBinder<TContract> BindIFactory<TContract>()
-        {
-            return BindIFactory<TContract>(null);
-        }
-
-        public FactoryToChoiceBinder<TContract> BindIFactory<TContract>(string identifier)
-        {
-            var bindInfo = new BindInfo(identifier, typeof(IFactory<TContract>));
-            return new FactoryToChoiceBinder<TContract>(
+            var bindInfo = new BindInfo(typeof(IFactory<TContract>));
+            return new FactoryToChoiceIdBinder<TContract>(
                 bindInfo, typeof(Factory<TContract>), StartBinding());
         }
 
         public FactoryToChoiceBinder<TContract> BindFactory<TContract, TFactory>()
             where TFactory : Factory<TContract>
         {
-            return BindFactory<TContract, TFactory>(null);
-        }
-
-        public FactoryToChoiceBinder<TContract> BindFactory<TContract, TFactory>(string identifier)
-            where TFactory : Factory<TContract>
-        {
-            var bindInfo = new BindInfo(identifier, typeof(TFactory));
-            return new FactoryToChoiceBinder<TContract>(
+            var bindInfo = new BindInfo(typeof(TFactory));
+            return new FactoryToChoiceIdBinder<TContract>(
                 bindInfo, typeof(TFactory), StartBinding());
         }
 
         public FactoryToChoiceBinder<TParam1, TContract> BindIFactory<TParam1, TContract>()
         {
-            return BindIFactory<TParam1, TContract>(null);
-        }
-
-        public FactoryToChoiceBinder<TParam1, TContract> BindIFactory<TParam1, TContract>(string identifier)
-        {
-            var bindInfo = new BindInfo(identifier, typeof(IFactory<TParam1, TContract>));
-            return new FactoryToChoiceBinder<TParam1, TContract>(
+            var bindInfo = new BindInfo(typeof(IFactory<TParam1, TContract>));
+            return new FactoryToChoiceIdBinder<TParam1, TContract>(
                 bindInfo, typeof(Factory<TParam1, TContract>), StartBinding());
         }
 
         public FactoryToChoiceBinder<TParam1, TContract> BindFactory<TParam1, TContract, TFactory>()
             where TFactory : Factory<TParam1, TContract>
         {
-            return BindFactory<TParam1, TContract, TFactory>(null);
-        }
-
-        public FactoryToChoiceBinder<TParam1, TContract> BindFactory<TParam1, TContract, TFactory>(string identifier)
-            where TFactory : Factory<TParam1, TContract>
-        {
-            var bindInfo = new BindInfo(identifier, typeof(TFactory));
-            return new FactoryToChoiceBinder<TParam1, TContract>(
+            var bindInfo = new BindInfo(typeof(TFactory));
+            return new FactoryToChoiceIdBinder<TParam1, TContract>(
                 bindInfo, typeof(TFactory), StartBinding());
         }
 
         public FactoryToChoiceBinder<TParam1, TParam2, TContract> BindIFactory<TParam1, TParam2, TContract>()
         {
-            return BindIFactory<TParam1, TParam2, TContract>(null);
-        }
-
-        public FactoryToChoiceBinder<TParam1, TParam2, TContract> BindIFactory<TParam1, TParam2, TContract>(string identifier)
-        {
-            var bindInfo = new BindInfo(identifier, typeof(IFactory<TParam1, TParam2, TContract>));
-            return new FactoryToChoiceBinder<TParam1, TParam2, TContract>(
+            var bindInfo = new BindInfo(typeof(IFactory<TParam1, TParam2, TContract>));
+            return new FactoryToChoiceIdBinder<TParam1, TParam2, TContract>(
                 bindInfo, typeof(Factory<TParam1, TParam2, TContract>), StartBinding());
         }
 
         public FactoryToChoiceBinder<TParam1, TParam2, TContract> BindFactory<TParam1, TParam2, TContract, TFactory>()
             where TFactory : Factory<TParam1, TParam2, TContract>
         {
-            return BindFactory<TParam1, TParam2, TContract, TFactory>(null);
-        }
-
-        public FactoryToChoiceBinder<TParam1, TParam2, TContract> BindFactory<TParam1, TParam2, TContract, TFactory>(string identifier)
-            where TFactory : Factory<TParam1, TParam2, TContract>
-        {
-            var bindInfo = new BindInfo(identifier, typeof(TFactory));
-            return new FactoryToChoiceBinder<TParam1, TParam2, TContract>(
+            var bindInfo = new BindInfo(typeof(TFactory));
+            return new FactoryToChoiceIdBinder<TParam1, TParam2, TContract>(
                 bindInfo, typeof(TFactory), StartBinding());
         }
 
         public FactoryToChoiceBinder<TParam1, TParam2, TParam3, TContract> BindIFactory<TParam1, TParam2, TParam3, TContract>()
         {
-            return BindIFactory<TParam1, TParam2, TParam3, TContract>(null);
-        }
-
-        public FactoryToChoiceBinder<TParam1, TParam2, TParam3, TContract> BindIFactory<TParam1, TParam2, TParam3, TContract>(string identifier)
-        {
-            var bindInfo = new BindInfo(identifier, typeof(IFactory<TParam1, TParam2, TParam3, TContract>));
-            return new FactoryToChoiceBinder<TParam1, TParam2, TParam3, TContract>(
+            var bindInfo = new BindInfo(typeof(IFactory<TParam1, TParam2, TParam3, TContract>));
+            return new FactoryToChoiceIdBinder<TParam1, TParam2, TParam3, TContract>(
                 bindInfo, typeof(Factory<TParam1, TParam2, TParam3, TContract>), StartBinding());
         }
 
         public FactoryToChoiceBinder<TParam1, TParam2, TParam3, TContract> BindFactory<TParam1, TParam2, TParam3, TContract, TFactory>()
             where TFactory : Factory<TParam1, TParam2, TParam3, TContract>
         {
-            return BindFactory<TParam1, TParam2, TParam3, TContract, TFactory>(null);
-        }
-
-        public FactoryToChoiceBinder<TParam1, TParam2, TParam3, TContract> BindFactory<TParam1, TParam2, TParam3, TContract, TFactory>(string identifier)
-            where TFactory : Factory<TParam1, TParam2, TParam3, TContract>
-        {
-            var bindInfo = new BindInfo(identifier, typeof(TFactory));
-            return new FactoryToChoiceBinder<TParam1, TParam2, TParam3, TContract>(
+            var bindInfo = new BindInfo(typeof(TFactory));
+            return new FactoryToChoiceIdBinder<TParam1, TParam2, TParam3, TContract>(
                 bindInfo, typeof(TFactory), StartBinding());
         }
 
         public FactoryToChoiceBinder<TParam1, TParam2, TParam3, TParam4, TContract> BindIFactory<TParam1, TParam2, TParam3, TParam4, TContract>()
         {
-            return BindIFactory<TParam1, TParam2, TParam3, TParam4, TContract>(null);
-        }
-
-        public FactoryToChoiceBinder<TParam1, TParam2, TParam3, TParam4, TContract> BindIFactory<TParam1, TParam2, TParam3, TParam4, TContract>(string identifier)
-        {
-            var bindInfo = new BindInfo(identifier, typeof(IFactory<TParam1, TParam2, TParam3, TParam4, TContract>));
-            return new FactoryToChoiceBinder<TParam1, TParam2, TParam3, TParam4, TContract>(
+            var bindInfo = new BindInfo(typeof(IFactory<TParam1, TParam2, TParam3, TParam4, TContract>));
+            return new FactoryToChoiceIdBinder<TParam1, TParam2, TParam3, TParam4, TContract>(
                 bindInfo, typeof(Factory<TParam1, TParam2, TParam3, TParam4, TContract>), StartBinding());
         }
 
         public FactoryToChoiceBinder<TParam1, TParam2, TParam3, TParam4, TContract> BindFactory<TParam1, TParam2, TParam3, TParam4, TContract, TFactory>()
             where TFactory : Factory<TParam1, TParam2, TParam3, TParam4, TContract>
         {
-            return BindFactory<TParam1, TParam2, TParam3, TParam4, TContract, TFactory>(null);
-        }
-
-        public FactoryToChoiceBinder<TParam1, TParam2, TParam3, TParam4, TContract> BindFactory<TParam1, TParam2, TParam3, TParam4, TContract, TFactory>(string identifier)
-            where TFactory : Factory<TParam1, TParam2, TParam3, TParam4, TContract>
-        {
-            var bindInfo = new BindInfo(identifier, typeof(TFactory));
-            return new FactoryToChoiceBinder<TParam1, TParam2, TParam3, TParam4, TContract>(
+            var bindInfo = new BindInfo(typeof(TFactory));
+            return new FactoryToChoiceIdBinder<TParam1, TParam2, TParam3, TParam4, TContract>(
                 bindInfo, typeof(TFactory), StartBinding());
         }
 
         public FactoryToChoiceBinder<TParam1, TParam2, TParam3, TParam4, TParam5, TContract> BindIFactory<TParam1, TParam2, TParam3, TParam4, TParam5, TContract>()
         {
-            return BindIFactory<TParam1, TParam2, TParam3, TParam4, TParam5, TContract>(null);
-        }
-
-        public FactoryToChoiceBinder<TParam1, TParam2, TParam3, TParam4, TParam5, TContract> BindIFactory<TParam1, TParam2, TParam3, TParam4, TParam5, TContract>(string identifier)
-        {
-            var bindInfo = new BindInfo(identifier, typeof(IFactory<TParam1, TParam2, TParam3, TParam4, TParam5, TContract>));
-            return new FactoryToChoiceBinder<TParam1, TParam2, TParam3, TParam4, TParam5, TContract>(
+            var bindInfo = new BindInfo(typeof(IFactory<TParam1, TParam2, TParam3, TParam4, TParam5, TContract>));
+            return new FactoryToChoiceIdBinder<TParam1, TParam2, TParam3, TParam4, TParam5, TContract>(
                 bindInfo, typeof(Factory<TParam1, TParam2, TParam3, TParam4, TParam5, TContract>), StartBinding());
         }
 
         public FactoryToChoiceBinder<TParam1, TParam2, TParam3, TParam4, TParam5, TContract> BindFactory<TParam1, TParam2, TParam3, TParam4, TParam5, TContract, TFactory>()
             where TFactory : Factory<TParam1, TParam2, TParam3, TParam4, TParam5, TContract>
         {
-            return BindFactory<TParam1, TParam2, TParam3, TParam4, TParam5, TContract, TFactory>(null);
-        }
-
-        public FactoryToChoiceBinder<TParam1, TParam2, TParam3, TParam4, TParam5, TContract> BindFactory<TParam1, TParam2, TParam3, TParam4, TParam5, TContract, TFactory>(string identifier)
-            where TFactory : Factory<TParam1, TParam2, TParam3, TParam4, TParam5, TContract>
-        {
-            var bindInfo = new BindInfo(identifier, typeof(TFactory));
-            return new FactoryToChoiceBinder<TParam1, TParam2, TParam3, TParam4, TParam5, TContract>(
+            var bindInfo = new BindInfo(typeof(TFactory));
+            return new FactoryToChoiceIdBinder<TParam1, TParam2, TParam3, TParam4, TParam5, TContract>(
                 bindInfo, typeof(TFactory), StartBinding());
         }
 

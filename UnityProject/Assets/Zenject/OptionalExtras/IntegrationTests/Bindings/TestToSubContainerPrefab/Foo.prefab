@@ -74,7 +74,7 @@ MonoBehaviour:
   _components:
   - {fileID: 11426760}
   _identifier: 
-  _compositionRoot: {fileID: 0}
+  _context: {fileID: 0}
   _bindType: 0
 --- !u!114 &11426760
 MonoBehaviour:

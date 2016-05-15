@@ -3,25 +3,24 @@ using System;
 
 namespace Zenject
 {
-    [AttributeUsage(AttributeTargets.Parameter | AttributeTargets.Property | AttributeTargets.Field, AllowMultiple = false)]
     public abstract class InjectAttributeBase : PreserveAttribute
     {
-        public bool IsOptional
+        public bool Optional
         {
             get;
-            protected set;
+            set;
         }
 
-        public string Identifier
+        public object Id
         {
             get;
-            protected set;
+            set;
         }
 
-        public InjectSources SourceType
+        public InjectSources Source
         {
             get;
-            protected set;
+            set;
         }
     }
 }

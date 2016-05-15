@@ -44,7 +44,7 @@ namespace Zenject.Tests.Bindings
         {
             var foo = new Foo();
 
-            Container.BindInstance("foo", foo).NonLazy();
+            Container.BindInstance(foo).WithId("foo").NonLazy();
 
             Container.BindFactory<Foo, Foo.Factory>().FromResolve("foo").NonLazy();
 
@@ -58,7 +58,7 @@ namespace Zenject.Tests.Bindings
         {
             var foo = new Foo();
 
-            Container.BindInstance("foo", foo).NonLazy();
+            Container.BindInstance(foo).WithId("foo").NonLazy();
 
             Container.BindFactory<IFoo, IFooFactory>().To<Foo>().FromResolve("foo").NonLazy();
 

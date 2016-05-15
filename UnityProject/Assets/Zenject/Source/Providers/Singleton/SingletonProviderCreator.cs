@@ -45,7 +45,7 @@ namespace Zenject
 
         public IProvider CreateProviderForSubContainerMethod(
             Type resultType, string concreteIdentifier,
-            Action<DiContainer> installMethod, string identifier)
+            Action<DiContainer> installMethod, object identifier)
         {
             return _subContainerMethodProviderCreator.CreateProvider(
                 resultType, concreteIdentifier, installMethod, identifier);
@@ -53,7 +53,7 @@ namespace Zenject
 
         public IProvider CreateProviderForSubContainerInstaller(
             Type resultType, string concreteIdentifier,
-            Type installerType, string identifier)
+            Type installerType, object identifier)
         {
             return _subContainerInstallerProviderCreator.CreateProvider(
                 resultType, concreteIdentifier, installerType, identifier);
@@ -80,7 +80,7 @@ namespace Zenject
 
         public IProvider CreateProviderForSubContainerPrefab(
             Type resultType, string concreteIdentifier, string gameObjectName, string gameObjectGroupName,
-            GameObject prefab, string identifier)
+            GameObject prefab, object identifier)
         {
             return _subContainerPrefabProviderCreator.CreateProvider(
                 resultType, concreteIdentifier, prefab, identifier, gameObjectName, gameObjectGroupName);
@@ -88,7 +88,7 @@ namespace Zenject
 
         public IProvider CreateProviderForSubContainerPrefabResource(
             Type resultType, string concreteIdentifier, string gameObjectName, string gameObjectGroupName,
-            string resourcePath, string identifier)
+            string resourcePath, object identifier)
         {
             return _subContainerPrefabResourceProviderCreator.CreateProvider(
                 resultType, concreteIdentifier, resourcePath, identifier, gameObjectName, gameObjectGroupName);

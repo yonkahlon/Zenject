@@ -38,7 +38,20 @@ namespace Zenject
                 BindInfo, FactoryType, FinalizerWrapper);
         }
     }
+
+    public class FactoryToChoiceIdBinder<TParam1, TParam2, TParam3, TParam4, TContract> : FactoryToChoiceBinder<TParam1, TParam2, TParam3, TParam4, TContract>
+    {
+        public FactoryToChoiceIdBinder(
+            BindInfo bindInfo, Type factoryType, 
+            BindFinalizerWrapper finalizerWrapper)
+            : base(bindInfo, factoryType, finalizerWrapper)
+        {
+        }
+
+        public FactoryToChoiceBinder<TParam1, TParam2, TParam3, TParam4, TContract> WithId(object identifier)
+        {
+            BindInfo.Identifier = identifier;
+            return this;
+        }
+    }
 }
-
-
-

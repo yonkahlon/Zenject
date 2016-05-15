@@ -17,7 +17,7 @@ namespace Zenject.Asteroids
 
         public ShipStateMoving(
             Settings settings, Ship ship,
-            [Inject("Main")]
+            [Inject(Id = "Main")]
             Camera mainCamera)
         {
             _ship = ship;

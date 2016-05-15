@@ -27,7 +27,7 @@ namespace Zenject.SpaceFighter
         Material _enemyMaterial = null;
 
         // Since we are a MonoBehaviour, we can't use a constructor
-        // So use Inject instead
+        // So use PostInject instead
         [Inject]
         public void Construct(float speed, float lifeTime, BulletTypes type)
         {

@@ -18,7 +18,7 @@ namespace Zenject
         public static ConditionBinder BindSignal<TSignal>(this DiContainer container, string identifier)
             where TSignal : ISignal
         {
-            return container.Bind<TSignal>(identifier).AsSingle(identifier);
+            return container.Bind<TSignal>().WithId(identifier).AsSingle(identifier);
         }
 
         public static ConditionBinder BindTrigger<TTrigger>(this DiContainer container)
@@ -40,7 +40,7 @@ namespace Zenject
                 .AsSingle(identifier)
                 .When(ctx => ctx.ObjectType != null && ctx.ObjectType.DerivesFromOrEqual<TTrigger>() && ctx.ConcreteIdentifier == identifier);
 
-            return container.Bind<TTrigger>(identifier).AsSingle(identifier);
+            return container.Bind<TTrigger>().WithId(identifier).AsSingle(identifier);
         }
     }
 }

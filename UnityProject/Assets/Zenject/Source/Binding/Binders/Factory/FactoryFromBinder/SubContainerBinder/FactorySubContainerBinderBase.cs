@@ -10,7 +10,7 @@ namespace Zenject
 
         public FactorySubContainerBinderBase(
             BindInfo bindInfo, Type factoryType,
-            BindFinalizerWrapper finalizerWrapper, string subIdentifier)
+            BindFinalizerWrapper finalizerWrapper, object subIdentifier)
         {
             SubIdentifier = subIdentifier;
             BindInfo = bindInfo;
@@ -34,7 +34,7 @@ namespace Zenject
             private set;
         }
 
-        protected string SubIdentifier
+        protected object SubIdentifier
         {
             get;
             private set;

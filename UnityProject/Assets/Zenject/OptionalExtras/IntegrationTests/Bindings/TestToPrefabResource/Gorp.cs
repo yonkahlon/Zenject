@@ -2,6 +2,8 @@
 using UnityEngine;
 using Zenject;
 
+#pragma warning disable 649
+
 namespace Zenject.Tests.ToPrefabResource
 {
     public class Gorp : MonoBehaviour

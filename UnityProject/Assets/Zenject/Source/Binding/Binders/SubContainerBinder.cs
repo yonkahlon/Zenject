@@ -15,12 +15,12 @@ namespace Zenject
     {
         readonly BindInfo _bindInfo;
         readonly BindFinalizerWrapper _finalizerWrapper;
-        readonly string _subIdentifier;
+        readonly object _subIdentifier;
 
         public SubContainerBinder(
             BindInfo bindInfo,
             BindFinalizerWrapper finalizerWrapper,
-            string subIdentifier)
+            object subIdentifier)
         {
             _bindInfo = bindInfo;
             _finalizerWrapper = finalizerWrapper;

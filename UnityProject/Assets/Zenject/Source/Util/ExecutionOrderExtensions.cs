@@ -107,8 +107,8 @@ namespace Zenject
             Assert.That(type.DerivesFrom<IFixedTickable>(),
                 "Expected type '{0}' to derive from IFixedTickable", type.Name());
 
-            container.BindInstance(
-                "Fixed", ModestTree.Util.Tuple.New(type, order)).WhenInjectedInto<TickableManager>();
+            container.Bind<ModestTree.Util.Tuple<Type, int>>().WithId("Fixed")
+                .FromInstance(ModestTree.Util.Tuple.New(type, order)).WhenInjectedInto<TickableManager>();
         }
 
         public static void BindLateTickableExecutionOrder<T>(
@@ -124,8 +124,8 @@ namespace Zenject
             Assert.That(type.DerivesFrom<ILateTickable>(),
                 "Expected type '{0}' to derive from ILateTickable", type.Name());
 
-            container.BindInstance(
-                "Late", ModestTree.Util.Tuple.New(type, order)).WhenInjectedInto<TickableManager>();
+            container.Bind<ModestTree.Util.Tuple<Type, int>>().WithId("Late")
+                .FromInstance(ModestTree.Util.Tuple.New(type, order)).WhenInjectedInto<TickableManager>();
         }
     }
 }

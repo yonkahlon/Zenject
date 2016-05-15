@@ -132,7 +132,7 @@ namespace Zenject.Tests.Bindings
                 Container.Bind<Qux>();
                 Container.Bind<Qux>().FromInstance(new Qux());
 
-                Container.Bind<Gorp>("gorp");
+                Container.Bind<Gorp>().WithId("gorp");
             }
         }
     }
