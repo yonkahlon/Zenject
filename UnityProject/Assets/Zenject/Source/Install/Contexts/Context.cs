@@ -160,7 +160,7 @@ namespace Zenject
             }
         }
 
-        protected void InstallSceneBindings()
+        protected void InstallSceneBindings(InitialComponentsInjecter componentInjecter)
         {
             foreach (var binding in GetInjectableComponents().OfType<ZenjectBinding>())
             {
@@ -171,7 +171,7 @@ namespace Zenject
 
                 if (binding.Context == null)
                 {
-                    InstallZenjectBinding(binding);
+                    componentInjecter.InstallBinding(binding);
                 }
             }
 
@@ -186,62 +186,7 @@ namespace Zenject
 
                 if (binding.Context == this)
                 {
-                    InstallZenjectBinding(binding);
-                }
-            }
-        }
-
-        protected void InstallZenjectBinding(ZenjectBinding binding)
-        {
-            if (!binding.enabled)
-            {
-                return;
-            }
-
-            if (binding.Components == null || binding.Components.IsEmpty())
-            {
-                Log.Warn("Found empty list of components on ZenjectBinding on object '{0}'", binding.name);
-                return;
-            }
-
-            string identifier = null;
-
-            if (binding.Identifier.Trim().Length > 0)
-            {
-                identifier = binding.Identifier;
-            }
-
-            foreach (var component in binding.Components)
-            {
-                var bindType = binding.BindType;
-
-                if (component == null)
-                {
-                    Log.Warn("Found null component in ZenjectBinding on object '{0}'", binding.name);
-                    continue;
-                }
-
-                switch (bindType)
-                {
-                    case ZenjectBinding.BindTypes.Self:
-                    {
-                        Container.Bind(component.GetType()).WithId(identifier).FromInstance(component);
-                        break;
-                    }
-                    case ZenjectBinding.BindTypes.AllInterfaces:
-                    {
-                        Container.BindAllInterfaces(component.GetType()).WithId(identifier).FromInstance(component);
-                        break;
-                    }
-                    case ZenjectBinding.BindTypes.AllInterfacesAndSelf:
-                    {
-                        Container.BindAllInterfacesAndSelf(component.GetType()).WithId(identifier).FromInstance(component);
-                        break;
-                    }
-                    default:
-                    {
-                        throw Assert.CreateException();
-                    }
+                    componentInjecter.InstallBinding(binding);
                 }
             }
         }

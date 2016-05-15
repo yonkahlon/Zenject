@@ -152,18 +152,21 @@ namespace Zenject
             _container = new DiContainer(
                 StaticContext.Container, isValidating);
 
+            var componentInjecter = new InitialComponentsInjecter(
+                _container, GetInjectableComponents().ToList());
+
             _container.IsInstalling = true;
 
             try
             {
-                InstallBindings();
+                InstallBindings(componentInjecter);
             }
             finally
             {
                 _container.IsInstalling = false;
             }
 
-            InjectComponents();
+            componentInjecter.LazyInjectComponents();
 
             Assert.That(_dependencyRoots.IsEmpty());
 
@@ -175,18 +178,7 @@ namespace Zenject
             return GetInjectableComponents(this.gameObject);
         }
 
-        void InjectComponents()
-        {
-            // Use ToList in case they do something weird in post inject
-            foreach (var component in GetInjectableComponents().ToList())
-            {
-                Assert.That(!component.GetType().DerivesFrom<MonoInstaller>());
-
-                _container.Inject(component);
-            }
-        }
-
-        void InstallBindings()
+        void InstallBindings(InitialComponentsInjecter componentInjecter)
         {
             _container.DefaultParent = this.transform;
 
@@ -197,7 +189,7 @@ namespace Zenject
 
             _container.Bind<ProjectKernel>().FromComponent(this.gameObject).AsSingle().NonLazy();
 
-            InstallSceneBindings();
+            InstallSceneBindings(componentInjecter);
 
             InstallInstallers();
         }

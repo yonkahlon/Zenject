@@ -42,11 +42,23 @@ namespace Zenject
 
             _container = parentContainer.CreateSubContainer();
 
+            var componentInjecter = new InitialComponentsInjecter(
+                _container, GetInjectableComponents().ToList());
+
+            foreach (var component in componentInjecter.Components)
+            {
+                if (component is MonoKernel)
+                {
+                    Assert.That(component == _kernel,
+                        "Found MonoKernel derived class that is not hooked up to GameObjectContext.  If you use MonoKernel, you must indicate this to GameObjectContext by dragging and dropping it to the Kernel field in the inspector");
+                }
+            }
+
             _container.IsInstalling = true;
 
             try
             {
-                InstallBindings(installerExtraArgs);
+                InstallBindings(installerExtraArgs, componentInjecter);
             }
             finally
             {
@@ -55,29 +67,12 @@ namespace Zenject
 
             Log.Debug("GameObjectContext: Injecting into child components...");
 
-            InjectComponents();
+            componentInjecter.LazyInjectComponents();
 
             Assert.That(_dependencyRoots.IsEmpty());
             _dependencyRoots.AddRange(_container.ResolveDependencyRoots());
 
             Log.Debug("GameObjectContext: Initialized successfully");
-        }
-
-        void InjectComponents()
-        {
-            // Use ToList in case they do something weird in post inject
-            foreach (var component in GetInjectableComponents().ToList())
-            {
-                Assert.That(!component.GetType().DerivesFrom<MonoInstaller>());
-
-                if (component is MonoKernel)
-                {
-                    Assert.That(component == _kernel,
-                        "Found MonoKernel derived class that is not hooked up to GameObjectContext.  If you use MonoKernel, you must indicate this to GameObjectContext by dragging and dropping it to the Kernel field in the inspector");
-                }
-
-                _container.Inject(component);
-            }
         }
 
         protected override IEnumerable<Component> GetInjectableComponents()
@@ -114,7 +109,8 @@ namespace Zenject
             }
         }
 
-        void InstallBindings(InstallerExtraArgs installerExtraArgs)
+        void InstallBindings(
+            InstallerExtraArgs installerExtraArgs, InitialComponentsInjecter componentInjecter)
         {
             _container.DefaultParent = this.transform;
 
@@ -130,7 +126,7 @@ namespace Zenject
                 _container.Bind<MonoKernel>().FromInstance(_kernel).AsSingle().NonLazy();
             }
 
-            InstallSceneBindings();
+            InstallSceneBindings(componentInjecter);
 
             var extraArgsMap = new Dictionary<Type, List<TypeValuePair>>();
 
