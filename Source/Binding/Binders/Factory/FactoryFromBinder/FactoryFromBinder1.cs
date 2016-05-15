@@ -36,7 +36,7 @@ namespace Zenject
             return FromSubContainerResolve(null);
         }
 
-        public FactorySubContainerBinder<TParam1, TContract> FromSubContainerResolve(string subIdentifier)
+        public FactorySubContainerBinder<TParam1, TContract> FromSubContainerResolve(object subIdentifier)
         {
             return new FactorySubContainerBinder<TParam1, TContract>(
                 BindInfo, FactoryType, FinalizerWrapper, subIdentifier);

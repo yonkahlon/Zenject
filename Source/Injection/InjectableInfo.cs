@@ -8,7 +8,7 @@ namespace Zenject
     public class InjectableInfo
     {
         public readonly bool Optional;
-        public readonly string Identifier;
+        public readonly object Identifier;
 
         public readonly InjectSources SourceType;
 
@@ -25,7 +25,7 @@ namespace Zenject
         public readonly object DefaultValue;
 
         public InjectableInfo(
-            bool optional, string identifier, string memberName,
+            bool optional, object identifier, string memberName,
             Type memberType, Type objectType, Action<object, object> setter, object defaultValue, InjectSources sourceType)
         {
             Optional = optional;

@@ -20,9 +20,9 @@ namespace Zenject
 
     public class BindInfo
     {
-        public BindInfo(string identifier, List<Type> contractTypes)
+        public BindInfo(List<Type> contractTypes)
         {
-            Identifier = identifier;
+            Identifier = null;
             ContractTypes = contractTypes;
             ToTypes = new List<Type>();
             Arguments = new List<TypeValuePair>();
@@ -32,17 +32,17 @@ namespace Zenject
             Scope = ScopeTypes.Transient;
         }
 
-        public BindInfo(string identifier, Type contractType)
-            : this(identifier, new List<Type>() { contractType } )
+        public BindInfo(Type contractType)
+            : this(new List<Type>() { contractType } )
         {
         }
 
         public BindInfo()
-            : this(null, new List<Type>())
+            : this(new List<Type>())
         {
         }
 
-        public string Identifier
+        public object Identifier
         {
             get;
             set;

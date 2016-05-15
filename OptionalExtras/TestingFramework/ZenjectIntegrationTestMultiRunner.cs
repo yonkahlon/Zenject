@@ -21,6 +21,8 @@ namespace Zenject.TestFramework
 
         public void Start()
         {
+            EditorPrefs.SetBool(EditorPrefsKeyIgnoreError, false);
+
             ListenOnAllErrors();
             StartCoroutine(RunTests());
         }
@@ -97,7 +99,6 @@ namespace Zenject.TestFramework
             }
 
             var waitTimeAttribute = methodInfo.AllAttributes<WaitTimeSecondsAttribute>().OnlyOrDefault();
-
             var waitSeconds = waitTimeAttribute == null ? DefaultWaitTime : waitTimeAttribute.Seconds;
 
             var testName = "{0}.{1}".Fmt(fixture.GetType().Name(), methodInfo.Name);

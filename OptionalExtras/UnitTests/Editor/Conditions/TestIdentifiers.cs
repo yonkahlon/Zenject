@@ -18,7 +18,7 @@ namespace Zenject.Tests.Conditions
         [Test]
         public void TestBasic()
         {
-            Container.Bind<Test0>("foo").AsTransient().NonLazy();
+            Container.Bind<Test0>().WithId("foo").AsTransient().NonLazy();
 
             Container.Validate();
 
@@ -31,7 +31,7 @@ namespace Zenject.Tests.Conditions
         [Test]
         public void TestBasic2()
         {
-            Container.Bind<Test0>("foo").AsSingle().NonLazy();
+            Container.Bind<Test0>().WithId("foo").AsSingle().NonLazy();
 
             Container.Validate();
 
@@ -44,7 +44,7 @@ namespace Zenject.Tests.Conditions
         [Test]
         public void TestBasic3()
         {
-            Container.Bind<Test0>("foo").FromMethod((ctx) => new Test0()).NonLazy();
+            Container.Bind<Test0>().WithId("foo").FromMethod((ctx) => new Test0()).NonLazy();
 
             Container.Validate();
 
@@ -57,8 +57,8 @@ namespace Zenject.Tests.Conditions
         [Test]
         public void TestBasic4()
         {
-            Container.Bind<Test0>("foo").AsTransient().NonLazy();
-            Container.Bind<Test0>("foo").AsTransient().NonLazy();
+            Container.Bind<Test0>().WithId("foo").AsTransient().NonLazy();
+            Container.Bind<Test0>().WithId("foo").AsTransient().NonLazy();
 
             Container.Validate();
 

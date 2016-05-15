@@ -10,14 +10,14 @@ namespace Zenject
     public class SubContainerPrefabBindingFinalizer : ProviderBindingFinalizer
     {
         readonly GameObject _prefab;
-        readonly string _subIdentifier;
+        readonly object _subIdentifier;
         readonly GameObjectBindInfo _gameObjectBindInfo;
 
         public SubContainerPrefabBindingFinalizer(
             BindInfo bindInfo,
             GameObjectBindInfo gameObjectBindInfo,
             GameObject prefab,
-            string subIdentifier)
+            object subIdentifier)
             : base(bindInfo)
         {
             _gameObjectBindInfo = gameObjectBindInfo;

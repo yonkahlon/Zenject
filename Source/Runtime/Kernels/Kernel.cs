@@ -8,13 +8,13 @@ namespace Zenject
     [System.Diagnostics.DebuggerStepThrough]
     public class Kernel : IInitializable, IDisposable, ITickable, ILateTickable, IFixedTickable
     {
-        [Inject(InjectSources.Local)]
+        [InjectLocal]
         TickableManager _tickableManager = null;
 
-        [Inject(InjectSources.Local)]
+        [InjectLocal]
         InitializableManager _initializableManager = null;
 
-        [Inject(InjectSources.Local)]
+        [InjectLocal]
         DisposableManager _disposablesManager = null;
 
         public virtual void Initialize()

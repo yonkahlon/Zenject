@@ -176,7 +176,7 @@ namespace Zenject.Tests.Bindings
             container.Bind<Foo>().AsSingle();
             container.Bind<Bar>().AsSingle();
 
-            container.Bind<Gorp>("gorp");
+            container.Bind<Gorp>().WithId("gorp");
         }
     }
 }

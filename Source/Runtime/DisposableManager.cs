@@ -12,9 +12,9 @@ namespace Zenject
         bool _disposed;
 
         public DisposableManager(
-            [InjectOptional(InjectSources.Local)]
+            [Inject(Optional = true, Source = InjectSources.Local)]
             List<IDisposable> disposables,
-            [InjectOptional(InjectSources.Local)]
+            [Inject(Optional = true, Source = InjectSources.Local)]
             List<ModestTree.Util.Tuple<Type, int>> priorities)
         {
             foreach (var disposable in disposables)

@@ -28,7 +28,7 @@ namespace Zenject.Tests.BindGameObject
         {
             Container.Bind<GameObject>().FromGameObject().WithGameObjectName(GameObjName).AsSingle();
             Container.Bind<GameObject>().FromGameObject().WithGameObjectName(GameObjName).AsSingle();
-            Container.Bind<GameObject>("asdf").FromGameObject().WithGameObjectName(GameObjName).AsSingle();
+            Container.Bind<GameObject>().WithId("asdf").FromGameObject().WithGameObjectName(GameObjName).AsSingle();
 
             Container.BindRootResolve<GameObject>();
             Container.BindRootResolve<GameObject>("asdf");

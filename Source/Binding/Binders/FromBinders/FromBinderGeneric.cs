@@ -44,7 +44,7 @@ namespace Zenject
             return FromGetter<TObj>(null, method);
         }
 
-        public ScopeBinder FromGetter<TObj>(string identifier, Func<TObj, TContract> method)
+        public ScopeBinder FromGetter<TObj>(object identifier, Func<TObj, TContract> method)
         {
             return FromGetterBase<TObj, TContract>(identifier, method);
         }

@@ -10,12 +10,12 @@ namespace Zenject
     {
         readonly ISubContainerCreator _subContainerCreator;
         readonly Type _dependencyType;
-        readonly string _identifier;
+        readonly object _identifier;
 
         // if concreteType is null we use the contract type from inject context
         public SubContainerDependencyProvider(
             Type dependencyType,
-            string identifier,
+            object identifier,
             ISubContainerCreator subContainerCreator)
         {
             _subContainerCreator = subContainerCreator;

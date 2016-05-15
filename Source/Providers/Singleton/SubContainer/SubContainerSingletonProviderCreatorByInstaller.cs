@@ -22,7 +22,7 @@ namespace Zenject
         }
 
         public IProvider CreateProvider(
-            Type resultType, string concreteIdentifier, Type installerType, string identifier)
+            Type resultType, string concreteIdentifier, Type installerType, object identifier)
         {
             _markRegistry.MarkSingleton(
                 resultType, concreteIdentifier,

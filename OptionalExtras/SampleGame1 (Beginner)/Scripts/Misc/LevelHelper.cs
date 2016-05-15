@@ -11,7 +11,7 @@ namespace Zenject.Asteroids
         readonly Camera _camera;
 
         public LevelHelper(
-            [Inject("Main")]
+            [Inject(Id = "Main")]
             Camera camera)
         {
             _camera = camera;

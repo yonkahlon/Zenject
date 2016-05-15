@@ -25,7 +25,7 @@ namespace Zenject
         }
 
         public IProvider CreateProvider(
-            Type resultType, string concreteIdentifier, GameObject prefab, string identifier,
+            Type resultType, string concreteIdentifier, GameObject prefab, object identifier,
             string gameObjectName, string gameObjectGroupName)
         {
             _markRegistry.MarkSingleton(

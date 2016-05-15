@@ -74,15 +74,15 @@ namespace Zenject
 
             var injectAttr = injectAttributes.SingleOrDefault();
 
-            string identifier = null;
+            object identifier = null;
             bool isOptional = false;
             InjectSources sourceType = InjectSources.Any;
 
             if (injectAttr != null)
             {
-                identifier = injectAttr.Identifier;
-                isOptional = injectAttr.IsOptional;
-                sourceType = injectAttr.SourceType;
+                identifier = injectAttr.Id;
+                isOptional = injectAttr.Optional;
+                sourceType = injectAttr.Source;
             }
 
             bool isOptionalWithADefaultValue = (paramInfo.Attributes & ParameterAttributes.HasDefault) == ParameterAttributes.HasDefault;
@@ -118,6 +118,10 @@ namespace Zenject
             foreach (var methodInfo in values)
             {
                 var paramsInfo = methodInfo.GetParameters();
+
+                var injectAttr = methodInfo.AllAttributes<InjectAttribute>().Single();
+                Assert.That(!injectAttr.Optional && injectAttr.Id == null && injectAttr.Source == InjectSources.Any,
+                    "Parameters of InjectAttribute do not apply to constructors and methods");
 
                 postInjectInfos.Add(
                     new PostInjectableInfo(
@@ -160,15 +164,15 @@ namespace Zenject
 
             var injectAttr = injectAttributes.SingleOrDefault();
 
-            string identifier = null;
+            object identifier = null;
             bool isOptional = false;
             InjectSources sourceType = InjectSources.Any;
 
             if (injectAttr != null)
             {
-                identifier = injectAttr.Identifier;
-                isOptional = injectAttr.IsOptional;
-                sourceType = injectAttr.SourceType;
+                identifier = injectAttr.Id;
+                isOptional = injectAttr.Optional;
+                sourceType = injectAttr.Source;
             }
 
             Type memberType;

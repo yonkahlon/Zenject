@@ -12,7 +12,7 @@ namespace Zenject
     {
         public FactorySubContainerBinderWithParams(
             BindInfo bindInfo, Type factoryType,
-            BindFinalizerWrapper finalizerWrapper, string subIdentifier)
+            BindFinalizerWrapper finalizerWrapper, object subIdentifier)
             : base(bindInfo, factoryType, finalizerWrapper, subIdentifier)
         {
         }

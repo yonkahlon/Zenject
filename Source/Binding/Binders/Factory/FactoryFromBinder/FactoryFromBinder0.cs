@@ -20,7 +20,7 @@ namespace Zenject
         }
 
         public ConditionBinder FromGetter<TObj>(
-            string subIdentifier, Func<TObj, TContract> method)
+            object subIdentifier, Func<TObj, TContract> method)
         {
             SubFinalizer = CreateFinalizer(
                 (container) => new GetterProvider<TObj, TContract>(subIdentifier, method, container));
@@ -60,7 +60,7 @@ namespace Zenject
             return FromSubContainerResolve(null);
         }
 
-        public FactorySubContainerBinder<TContract> FromSubContainerResolve(string subIdentifier)
+        public FactorySubContainerBinder<TContract> FromSubContainerResolve(object subIdentifier)
         {
             return new FactorySubContainerBinder<TContract>(
                 BindInfo, FactoryType, FinalizerWrapper, subIdentifier);

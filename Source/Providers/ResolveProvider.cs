@@ -7,13 +7,13 @@ namespace Zenject
 {
     public class ResolveProvider : IProvider
     {
-        readonly string _identifier;
+        readonly object _identifier;
         readonly DiContainer _container;
         readonly Type _contractType;
         readonly bool _isOptional;
 
         public ResolveProvider(
-            Type contractType, DiContainer container, string identifier, bool isOptional)
+            Type contractType, DiContainer container, object identifier, bool isOptional)
         {
             _contractType = contractType;
             _identifier = identifier;

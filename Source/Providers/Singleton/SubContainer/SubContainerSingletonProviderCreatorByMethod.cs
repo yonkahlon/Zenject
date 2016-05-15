@@ -23,7 +23,7 @@ namespace Zenject
 
         public IProvider CreateProvider(
             Type resultType, string concreteIdentifier,
-            Action<DiContainer> installMethod, string identifier)
+            Action<DiContainer> installMethod, object identifier)
         {
             _markRegistry.MarkSingleton(
                 new SingletonId(resultType, concreteIdentifier),

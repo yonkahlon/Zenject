@@ -6,11 +6,11 @@ namespace Zenject
 {
     public class SubContainerInstallerBindingFinalizer : ProviderBindingFinalizer
     {
-        readonly string _subIdentifier;
+        readonly object _subIdentifier;
         readonly Type _installerType;
 
         public SubContainerInstallerBindingFinalizer(
-            BindInfo bindInfo, Type installerType, string subIdentifier)
+            BindInfo bindInfo, Type installerType, object subIdentifier)
             : base(bindInfo)
         {
             _subIdentifier = subIdentifier;

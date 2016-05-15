@@ -5,12 +5,11 @@ namespace Zenject
 {
     [AttributeUsage(AttributeTargets.Parameter
         | AttributeTargets.Property | AttributeTargets.Field, AllowMultiple = false)]
-    public class InjectOptionalAttribute : InjectAttributeBase
+    public class InjectLocalAttribute : InjectAttributeBase
     {
-        public InjectOptionalAttribute()
+        public InjectLocalAttribute()
         {
-            Optional = true;
+            Source = InjectSources.Local;
         }
     }
 }
-

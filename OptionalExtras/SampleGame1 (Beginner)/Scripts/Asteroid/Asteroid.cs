@@ -14,7 +14,7 @@ namespace Zenject.Asteroids
         Settings _settings;
 
         // We could just add [Inject] to the field declarations but
-        // it's often better practice to use Inject methods
+        // it's often better practice to use PostInject methods
         // Note that we can't use Constructors here because this is
         // a MonoBehaviour
         [Inject]

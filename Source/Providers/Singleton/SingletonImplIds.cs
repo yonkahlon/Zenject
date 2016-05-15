@@ -40,9 +40,9 @@ namespace Zenject
         public class ToGetter
         {
             readonly Delegate _method;
-            readonly string _identifier;
+            readonly object _identifier;
 
-            public ToGetter(string identifier, Delegate method)
+            public ToGetter(object identifier, Delegate method)
             {
                 _method = method;
                 _identifier = identifier;
@@ -68,7 +68,7 @@ namespace Zenject
                     return false;
                 }
 
-                return _identifier == other._identifier 
+                return object.Equals(_identifier, other._identifier)
                     && _method.Target == other._method.Target 
                     && _method.Method() == other._method.Method();
             }

@@ -21,13 +21,13 @@ namespace Zenject
             MemberType = memberType;
         }
 
-        public InjectContext(DiContainer container, Type memberType, string identifier)
+        public InjectContext(DiContainer container, Type memberType, object identifier)
             : this(container, memberType)
         {
             Identifier = identifier;
         }
 
-        public InjectContext(DiContainer container, Type memberType, string identifier, bool optional)
+        public InjectContext(DiContainer container, Type memberType, object identifier, bool optional)
             : this(container, memberType, identifier)
         {
             Optional = optional;
@@ -65,8 +65,8 @@ namespace Zenject
         //          Container.Bind<Foo>("foo").ToSingle();
         //      ...
         //      ... In a constructor:
-        //          public Foo([Inject("foo") Foo foo)
-        public string Identifier
+        //          public Foo([Inject(Id = "foo") Foo foo)
+        public object Identifier
         {
             get;
             set;
@@ -188,7 +188,7 @@ namespace Zenject
             return CreateSubContext(memberType, null);
         }
 
-        public InjectContext CreateSubContext(Type memberType, string identifier)
+        public InjectContext CreateSubContext(Type memberType, object identifier)
         {
             var subContext = new InjectContext();
 

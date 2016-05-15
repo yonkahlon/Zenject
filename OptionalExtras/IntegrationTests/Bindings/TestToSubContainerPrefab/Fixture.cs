@@ -3,6 +3,8 @@ using UnityEngine;
 using Zenject.TestFramework;
 using Zenject;
 
+#pragma warning disable 649
+
 namespace Zenject.Tests.ToSubContainerPrefab
 {
     public class Fixture : ZenjectIntegrationTestFixture

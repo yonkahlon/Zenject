@@ -12,7 +12,7 @@ namespace Zenject.Tests.ToMonoBehaviour
         {
             var gameObject = Container.CreateEmptyGameObject("Foo");
 
-            Container.BindInstance("Foo", gameObject);
+            Container.BindInstance(gameObject).WithId("Foo");
 
             Container.Bind<Foo>().FromComponent(gameObject).AsSingle();
             Container.BindRootResolve<Foo>();
@@ -25,12 +25,12 @@ namespace Zenject.Tests.ToMonoBehaviour
         {
             var gameObject = Container.CreateEmptyGameObject("Foo");
 
-            Container.BindInstance("Foo", gameObject);
+            Container.BindInstance(gameObject).WithId("Foo");
 
             Container.Bind<Foo>().FromComponent(gameObject).AsTransient();
             Container.Bind<IFoo>().To<Foo>().FromComponent(gameObject).AsTransient();
 
-            Container.BindRootResolve(typeof(IFoo), typeof(Foo));
+            Container.BindRootResolve(new[] {typeof(IFoo), typeof(Foo)});
 
             FixtureUtil.AssertComponentCount<Foo>(Container, 2);
         }
@@ -40,7 +40,7 @@ namespace Zenject.Tests.ToMonoBehaviour
         {
             var gameObject = Container.CreateEmptyGameObject("Foo");
 
-            Container.BindInstance("Foo", gameObject);
+            Container.BindInstance(gameObject).WithId("Foo");
 
             Container.Bind<Foo>().FromComponent(gameObject).AsSingle();
             Container.Bind<IFoo>().To<Foo>().FromComponent(gameObject).AsSingle();
@@ -55,7 +55,7 @@ namespace Zenject.Tests.ToMonoBehaviour
         {
             var gameObject = Container.CreateEmptyGameObject("Foo");
 
-            Container.BindInstance("Foo", gameObject);
+            Container.BindInstance(gameObject).WithId("Foo");
 
             Container.Bind<Foo>().FromComponent(gameObject).AsCached();
             Container.Bind<IFoo>().To<Foo>().FromComponent(gameObject).AsCached();
@@ -70,7 +70,7 @@ namespace Zenject.Tests.ToMonoBehaviour
         {
             var gameObject = Container.CreateEmptyGameObject("Foo");
 
-            Container.BindInstance("Foo", gameObject);
+            Container.BindInstance(gameObject).WithId("Foo");
 
             Container.Bind(typeof(IFoo), typeof(Foo)).To<Foo>().FromComponent(gameObject).AsCached();
 
@@ -84,12 +84,12 @@ namespace Zenject.Tests.ToMonoBehaviour
         {
             var gameObject = Container.CreateEmptyGameObject("Foo");
 
-            Container.BindInstance("Foo", gameObject);
+            Container.BindInstance(gameObject).WithId("Foo");
 
             Container.Bind(typeof(IFoo), typeof(IBar))
                 .To(new List<Type>() { typeof(Foo), typeof(Bar) }).FromComponent(gameObject).AsCached();
 
-            Container.BindRootResolve(typeof(IFoo), typeof(IBar));
+            Container.BindRootResolve(new [] { typeof(IFoo), typeof(IBar) });
 
             FixtureUtil.AssertComponentCount<Foo>(Container, 1);
             FixtureUtil.AssertComponentCount<Bar>(Container, 1);
@@ -100,13 +100,13 @@ namespace Zenject.Tests.ToMonoBehaviour
         {
             var gameObject = Container.CreateEmptyGameObject("Foo");
 
-            Container.BindInstance("Foo", gameObject);
+            Container.BindInstance(gameObject).WithId("Foo");
 
             Container.Bind(typeof(IFoo), typeof(IBar)).To(new List<Type>() { typeof(Foo), typeof(Bar) })
                 .FromComponent(gameObject).AsSingle();
             Container.Bind<IFoo2>().To<Foo>().FromComponent(gameObject).AsSingle();
 
-            Container.BindRootResolve(typeof(IFoo), typeof(IFoo2), typeof(IBar));
+            Container.BindRootResolve(new [] { typeof(IFoo), typeof(IFoo2), typeof(IBar) });
 
             FixtureUtil.AssertComponentCount<Foo>(Container, 1);
             FixtureUtil.AssertComponentCount<Bar>(Container, 1);

@@ -90,7 +90,7 @@ namespace Zenject
             return FromResolve(null);
         }
 
-        public ConditionBinder FromResolve(string subIdentifier)
+        public ConditionBinder FromResolve(object subIdentifier)
         {
             SubFinalizer = CreateFinalizer(
                 (container) => new ResolveProvider(

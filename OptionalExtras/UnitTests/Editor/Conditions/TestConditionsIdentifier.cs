@@ -18,7 +18,7 @@ namespace Zenject.Tests.Conditions
         class Test1
         {
             public Test1(
-                [Inject("foo")]
+                [Inject(Id ="foo")]
                 Test0 name1)
             {
             }
@@ -26,7 +26,7 @@ namespace Zenject.Tests.Conditions
 
         class Test2
         {
-            [Inject("foo")]
+            [Inject(Id ="foo")]
             public Test0 name2 = null;
         }
 
@@ -63,7 +63,7 @@ namespace Zenject.Tests.Conditions
             Container.Bind<Test2>().AsTransient().NonLazy();
 
             Container.Bind<Test0>().FromInstance(new Test0()).NonLazy();
-            Container.Bind<Test0>("foo").FromInstance(new Test0()).NonLazy();
+            Container.Bind<Test0>().WithId("foo").FromInstance(new Test0()).NonLazy();
 
             Container.Validate();
 
@@ -80,7 +80,7 @@ namespace Zenject.Tests.Conditions
             Container.Bind<Test2>().AsTransient().NonLazy();
 
             Container.Bind<Test0>().FromInstance(new Test0()).NonLazy();
-            Container.Bind<Test0>("foo").FromInstance(new Test0()).NonLazy();
+            Container.Bind<Test0>().WithId("foo").FromInstance(new Test0()).NonLazy();
 
             Container.Validate();
 
@@ -90,7 +90,7 @@ namespace Zenject.Tests.Conditions
         class Test3
         {
             public Test3(
-                [Inject("TestValue2")]
+                [Inject(Id ="TestValue2")]
                 Test0 test0)
             {
             }
@@ -109,7 +109,7 @@ namespace Zenject.Tests.Conditions
             Container.Bind<Test3>().AsTransient().NonLazy();
 
             Container.Bind<Test0>().FromInstance(new Test0()).NonLazy();
-            Container.Bind<Test0>("TestValue1").FromInstance(new Test0()).NonLazy();
+            Container.Bind<Test0>().WithId("TestValue1").FromInstance(new Test0()).NonLazy();
 
             Assert.Throws(() => Container.Validate());
 
@@ -123,7 +123,7 @@ namespace Zenject.Tests.Conditions
             Container.Bind<Test3>().AsTransient().NonLazy();
 
             Container.Bind<Test0>().FromInstance(new Test0()).NonLazy();
-            Container.Bind<Test0>("TestValue2").FromInstance(new Test0()).NonLazy();
+            Container.Bind<Test0>().WithId("TestValue2").FromInstance(new Test0()).NonLazy();
 
             Container.Validate();
 
@@ -141,7 +141,7 @@ namespace Zenject.Tests.Conditions
             Container.Bind<Test3>().AsTransient().NonLazy();
 
             Container.Bind<Test0>().FromInstance(new Test0()).NonLazy();
-            Container.Bind<Test0>("TestValue1").FromInstance(new Test0()).NonLazy();
+            Container.Bind<Test0>().WithId("TestValue1").FromInstance(new Test0()).NonLazy();
 
             Assert.Throws(() => Container.Validate());
 
@@ -155,7 +155,7 @@ namespace Zenject.Tests.Conditions
             Container.Bind<Test4>().AsTransient().NonLazy();
 
             Container.Bind<Test0>().FromInstance(new Test0()).NonLazy();
-            Container.Bind<Test0>("TestValue3").FromInstance(new Test0()).NonLazy();
+            Container.Bind<Test0>().WithId("TestValue3").FromInstance(new Test0()).NonLazy();
 
             Container.Validate();
 

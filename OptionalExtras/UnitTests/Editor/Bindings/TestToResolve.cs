@@ -30,7 +30,7 @@ namespace Zenject.Tests.Bindings
         {
             var foo = new Foo();
 
-            Container.Bind<Foo>("foo").FromInstance(foo).NonLazy();
+            Container.Bind<Foo>().WithId("foo").FromInstance(foo).NonLazy();
             Container.Bind<IFoo>().To<Foo>().FromResolve("foo").NonLazy();
 
             Container.Validate();

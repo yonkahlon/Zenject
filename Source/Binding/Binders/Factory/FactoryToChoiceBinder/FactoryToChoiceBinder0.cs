@@ -38,4 +38,20 @@ namespace Zenject
                 BindInfo, FactoryType, FinalizerWrapper);
         }
     }
+
+    public class FactoryToChoiceIdBinder<TContract> : FactoryToChoiceBinder<TContract>
+    {
+        public FactoryToChoiceIdBinder(
+            BindInfo bindInfo, Type factoryType, 
+            BindFinalizerWrapper finalizerWrapper)
+            : base(bindInfo, factoryType, finalizerWrapper)
+        {
+        }
+
+        public FactoryToChoiceBinder<TContract> WithId(object identifier)
+        {
+            BindInfo.Identifier = identifier;
+            return this;
+        }
+    }
 }
