@@ -52,6 +52,7 @@ namespace Zenject
             return this;
         }
 
+#if !(UNITY_WSA && ENABLE_DOTNET)
         public FromBinderNonGeneric To(
             Action<ConventionSelectTypesBinder> generator)
         {
@@ -64,5 +65,6 @@ namespace Zenject
             generator(new ConventionSelectTypesBinder(bindInfo));
             return To(bindInfo.ResolveTypes());
         }
+#endif
     }
 }

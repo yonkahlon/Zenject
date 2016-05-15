@@ -1,3 +1,5 @@
+#if !(UNITY_WSA && ENABLE_DOTNET)
+
 using System;
 
 namespace Zenject.Tests.Convention.NamespaceTest
@@ -10,3 +12,5 @@ namespace Zenject.Tests.Convention.NamespaceTest
     {
     }
 }
+
+#endif

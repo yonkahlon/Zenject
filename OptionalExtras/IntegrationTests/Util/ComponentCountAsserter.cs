@@ -16,7 +16,7 @@ namespace ModestTree.Tests.Zenject
 
         public void Initialize()
         {
-            Assert.That(typeof(TComponent).DerivesFromOrEqual<Component>() || typeof(TComponent).IsAbstract);
+            Assert.That(typeof(TComponent).DerivesFromOrEqual<Component>() || typeof(TComponent).IsAbstract());
 
             var num = GameObject.FindObjectsOfType<Transform>()
                 .SelectMany(x => x.gameObject.GetComponents<TComponent>()).Count();
