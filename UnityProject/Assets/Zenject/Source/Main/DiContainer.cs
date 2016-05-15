@@ -905,7 +905,10 @@ namespace Zenject
                 || type.DerivesFrom<Context>()
                 || type.DerivesFrom<DecoratorInstaller>()
 #endif
-                || type.HasAttribute<ZenjectAllowDuringValidationAttribute>();
+#if !(UNITY_WSA && ENABLE_DOTNET)
+                || type.HasAttribute<ZenjectAllowDuringValidationAttribute>()
+#endif
+            ;
         }
 
         object InstantiateInternal(bool autoInject, InjectArgs args)
@@ -1917,6 +1920,7 @@ namespace Zenject
             return new ConcreteIdBinderNonGeneric(bindInfo, StartBinding());
         }
 
+#if !(UNITY_WSA && ENABLE_DOTNET)
         public ConcreteIdBinderNonGeneric Bind(
             Action<ConventionSelectTypesBinder> generator)
         {
@@ -1924,6 +1928,7 @@ namespace Zenject
             generator(new ConventionSelectTypesBinder(bindInfo));
             return Bind(bindInfo.ResolveTypes());
         }
+#endif
 
         // This is equivalent to calling NonLazy() at the end of your bind statement
         // It's only in rare cases where you need to call this instead of NonLazy()

@@ -1,3 +1,5 @@
+#if !(UNITY_WSA && ENABLE_DOTNET)
+
 using System;
 
 namespace Zenject.Tests.Convention
@@ -34,3 +36,5 @@ namespace Zenject.Tests.Convention
     {
     }
 }
+
+#endif

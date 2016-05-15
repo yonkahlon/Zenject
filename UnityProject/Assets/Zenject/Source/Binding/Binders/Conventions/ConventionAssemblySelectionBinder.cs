@@ -1,3 +1,5 @@
+#if !(UNITY_WSA && ENABLE_DOTNET)
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -67,3 +69,4 @@ namespace Zenject
     }
 }
 
+#endif
