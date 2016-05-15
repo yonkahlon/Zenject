@@ -79,6 +79,8 @@
     <Compile Include="Conditions\TestConditionsTarget.cs" />
     <Compile Include="Conditions\TestConditionsTargetInstance.cs" />
     <Compile Include="Conditions\TestIdentifiers.cs" />
+    <Compile Include="Conventions\Foo.cs" />
+    <Compile Include="Conventions\TestConvention.cs" />
     <Compile Include="Factories\Bindings\TestFactoryTo0.cs" />
     <Compile Include="Factories\Bindings\TestFactoryToGetter0.cs" />
     <Compile Include="Factories\Bindings\TestFactoryToInstance0.cs" />
@@ -114,7 +116,6 @@
     <Compile Include="Other\TestValidateInstaller.cs" />
     <Compile Include="Other\ZenjectProfileTest.cs" />
     <Compile Include="Util\TestListComparer.cs" />
-    <Compile Include="Util\TestWithContainer.cs" />
     <Compile Include="Other\TestInheritInSubContainers.cs" />
     <Compile Include="Other\TestCircularDependencies.cs" />
     <Compile Include="Other\TestConflictingToSingletonUses.cs" />
@@ -130,6 +131,9 @@
     <Compile Include="Validation\TestValidate1.cs" />
     <Compile Include="Validation\TestValidateFactories.cs" />
     <Compile Include="BindFeatures\TestNonLazy.cs" />
+    <Compile Include="Factories\IFactory\TestIFactory.cs" />
+    <Compile Include="Conventions\FooMore.cs" />
+    <Compile Include="..\..\TestingFramework\Editor\ZenjectUnitTestFixture.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.

@@ -40,6 +40,7 @@ namespace Zenject.Tests.Convention
             Assert.IsEqual(Container.ResolveAll<IFoo>().Count(), 4);
         }
 
+#if !NOT_UNITY3D
         [Test]
         public void TestDerivingFromFail()
         {
@@ -48,6 +49,7 @@ namespace Zenject.Tests.Convention
 
             Assert.That(Container.ResolveAll<IFoo>().IsEmpty());
         }
+#endif
 
         [Test]
         public void TestAttributeFilter()
