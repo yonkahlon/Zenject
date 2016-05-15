@@ -20,7 +20,7 @@
     <IntermediateOutputPath>..\..\..\..\..\AssemblyBuild\Temp\Debug\</IntermediateOutputPath>
     <BaseIntermediateOutputPath>..\..\..\..\..\AssemblyBuild\Temp\Debug\</BaseIntermediateOutputPath>
     <OutputPath>..\..\..\..\..\AssemblyBuild\Bin\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;UNITY_5_3</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;UNITY_5_3_OR_NEWER</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -30,7 +30,7 @@
     <IntermediateOutputPath>..\..\..\..\..\AssemblyBuild\Temp\Release\</IntermediateOutputPath>
     <BaseIntermediateOutputPath>..\..\..\..\..\AssemblyBuild\Temp\Release\</BaseIntermediateOutputPath>
     <OutputPath>..\..\..\..\..\AssemblyBuild\Bin\Release\</OutputPath>
-    <DefineConstants>TRACE;UNITY_5_3</DefineConstants>
+    <DefineConstants>TRACE;UNITY_5_3_OR_NEWER</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
