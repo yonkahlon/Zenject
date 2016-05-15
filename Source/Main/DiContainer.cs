@@ -923,57 +923,76 @@ namespace Zenject
             FlushBindings();
             CheckForInstallWarning(args.Context);
 
-            Assert.IsNotNull(args.TypeInfo.InjectConstructor,
-                "More than one (or zero) constructors found for type '{0}' when creating dependencies.  Use one [Inject] attribute to specify which to use.", concreteType);
+            object newObj;
 
-            // Make a copy since we remove from it below
-            var paramValues = new List<object>();
-
-            foreach (var injectInfo in args.TypeInfo.ConstructorInjectables)
+#if !NOT_UNITY3D
+            if (concreteType.DerivesFrom<ScriptableObject>())
             {
-                object value;
+                Assert.That( args.TypeInfo.ConstructorInjectables.IsEmpty(),
+                    "Found constructor parameters on ScriptableObject type '{0}'.  This is not allowed.  Use an [Inject] method or fields instead.");
 
-                if (!InjectUtil.PopValueWithType(
-                    args.ExtraArgs, injectInfo.MemberType, out value))
+                if (!IsValidating || CanCreateOrInjectDuringValidation(concreteType))
                 {
-                    value = Resolve(injectInfo.CreateInjectContext(
-                        this, args.Context, null, args.ConcreteIdentifier));
-                }
-
-                if (value is ValidationMarker)
-                {
-                    Assert.That(IsValidating);
-                    paramValues.Add(injectInfo.MemberType.GetDefaultValue());
+                    newObj = ScriptableObject.CreateInstance(concreteType);
                 }
                 else
                 {
-                    paramValues.Add(value);
-                }
-            }
-
-            object newObj;
-
-            if (!IsValidating || CanCreateOrInjectDuringValidation(args.TypeInfo.Type))
-            {
-                //Log.Debug("Zenject: Instantiating type '{0}'", concreteType.Name());
-                try
-                {
-#if PROFILING_ENABLED
-                    using (ProfileBlock.Start("{0}.{0}()", concreteType))
-#endif
-                    {
-                        newObj = args.TypeInfo.InjectConstructor.Invoke(paramValues.ToArray());
-                    }
-                }
-                catch (Exception e)
-                {
-                    throw Assert.CreateException(
-                        e, "Error occurred while instantiating object with type '{0}'", concreteType.Name());
+                    newObj = new ValidationMarker(concreteType);
                 }
             }
             else
+#endif
             {
-                newObj = new ValidationMarker(args.TypeInfo.Type);
+                Assert.IsNotNull(args.TypeInfo.InjectConstructor,
+                    "More than one (or zero) constructors found for type '{0}' when creating dependencies.  Use one [Inject] attribute to specify which to use.", concreteType);
+
+                // Make a copy since we remove from it below
+                var paramValues = new List<object>();
+
+                foreach (var injectInfo in args.TypeInfo.ConstructorInjectables)
+                {
+                    object value;
+
+                    if (!InjectUtil.PopValueWithType(
+                        args.ExtraArgs, injectInfo.MemberType, out value))
+                    {
+                        value = Resolve(injectInfo.CreateInjectContext(
+                            this, args.Context, null, args.ConcreteIdentifier));
+                    }
+
+                    if (value is ValidationMarker)
+                    {
+                        Assert.That(IsValidating);
+                        paramValues.Add(injectInfo.MemberType.GetDefaultValue());
+                    }
+                    else
+                    {
+                        paramValues.Add(value);
+                    }
+                }
+
+                if (!IsValidating || CanCreateOrInjectDuringValidation(concreteType))
+                {
+                    //Log.Debug("Zenject: Instantiating type '{0}'", concreteType.Name());
+                    try
+                    {
+#if PROFILING_ENABLED
+                        using (ProfileBlock.Start("{0}.{0}()", concreteType))
+#endif
+                        {
+                            newObj = args.TypeInfo.InjectConstructor.Invoke(paramValues.ToArray());
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        throw Assert.CreateException(
+                            e, "Error occurred while instantiating object with type '{0}'", concreteType.Name());
+                    }
+                }
+                else
+                {
+                    newObj = new ValidationMarker(concreteType);
+                }
             }
 
             if (autoInject)
