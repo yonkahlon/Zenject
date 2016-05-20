@@ -14,7 +14,7 @@ namespace Zenject.Tests.Bindings
         public void TestSelf()
         {
             Container.Bind<Foo>().AsSingle().NonLazy();
-            Container.BindFactory<Bar, Bar.Factory>().FromGetter<Foo>(x => x.Bar).NonLazy();
+            Container.BindFactory<Bar, Bar.Factory>().FromGetterResolve<Foo>(x => x.Bar).NonLazy();
 
             Container.Validate();
 
