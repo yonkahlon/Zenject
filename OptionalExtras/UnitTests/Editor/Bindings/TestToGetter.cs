@@ -14,7 +14,7 @@ namespace Zenject.Tests.Bindings
         public void TestTransient()
         {
             Container.Bind<Foo>().AsSingle().NonLazy();
-            Container.Bind<Bar>().FromGetter<Foo>(x => x.Bar).AsTransient().NonLazy();
+            Container.Bind<Bar>().FromGetterResolve<Foo>(x => x.Bar).AsTransient().NonLazy();
 
             Container.Validate();
 
@@ -34,7 +34,7 @@ namespace Zenject.Tests.Bindings
         public void TestCached()
         {
             Container.Bind<Foo>().AsSingle().NonLazy();
-            Container.Bind<Bar>().FromGetter<Foo>(x => x.Bar).AsCached().NonLazy();
+            Container.Bind<Bar>().FromGetterResolve<Foo>(x => x.Bar).AsCached().NonLazy();
 
             Container.Validate();
 
@@ -52,10 +52,10 @@ namespace Zenject.Tests.Bindings
         {
             Container.Bind<Foo>().AsSingle().NonLazy();
 
-            Container.Bind<Bar>().FromGetter<Foo>(BarGetter).AsSingle().NonLazy();
+            Container.Bind<Bar>().FromGetterResolve<Foo>(BarGetter).AsSingle().NonLazy();
 
             // Not sure why I need to specify the "<Bar,"
-            Container.Bind<IBar>().To<Bar>().FromGetter<Foo>(BarGetter).AsSingle().NonLazy();
+            Container.Bind<IBar>().To<Bar>().FromGetterResolve<Foo>(BarGetter).AsSingle().NonLazy();
 
             Container.Validate();
 
