@@ -37,9 +37,9 @@ __Quick Start__:  If you are already familiar with dependency injection and are 
 * Zenject API
     * <a href="#overview-of-the-zenject-api">Overview of the Zenject API</a>
         * <a href="#hello-world-example">Hello World Example</a>
-        * <a href="#binding">Binding</a>
         * <a href="#inject-methods">Inject Methods</a>
-        * <a href="#bind-methods">Bind Methods</a>
+        * <a href="#binding">Binding</a>
+        * <a href="#construction-methods">Construction Methods</a>
         * <a href="#list-bindings">List Bindings</a>
         * <a href="#optional-binding">Optional Binding</a>
         * <a href="#identifiers">Identifiers</a>
@@ -236,7 +236,7 @@ As shown in the above example, DI can be used to easily swap different implement
 
 More important than that is the fact that using a dependency injection framework like Zenject allows you to more easily follow the '[Single Responsibility Principle](http://en.wikipedia.org/wiki/Single_responsibility_principle)'.  By letting Zenject worry about wiring up the classes, the classes themselves can just focus on fulfilling their specific responsibilities.
 
-<a id="overusinginterfaces"></a>Another common mistake that people new to DI make is that they extract interfaces from every class, and use those interfaces everywhere instead of using the class directly.  The goal is to make code more loosely coupled, so it's reasonable to think that being bound to an interface is better than being bound to a concrete class.  However, in most cases the various responsibilities of an application have single, specific classes implementing them, so using an interfaces in these cases just adds unnecessary maintenance overhead.  Also, concrete classes already have an interface defined by their public members.  A good rule of thumb instead is to only create interfaces when the class has more than one implementation.  This is known, by the way, as the [Reused Abstraction Principle](http://codemanship.co.uk/parlezuml/blog/?postid=934))
+<a id="overusinginterfaces"></a>Another common mistake that people new to DI make is that they extract interfaces from every class, and use those interfaces everywhere instead of using the class directly.  The goal is to make code more loosely coupled, so it's reasonable to think that being bound to an interface is better than being bound to a concrete class.  However, in most cases the various responsibilities of an application have single, specific classes implementing them, so using interfaces in these cases just adds unnecessary maintenance overhead.  Also, concrete classes already have an interface defined by their public members.  A good rule of thumb instead is to only create interfaces when the class has more than one implementation.  This is known, by the way, as the [Reused Abstraction Principle](http://codemanship.co.uk/parlezuml/blog/?postid=934))
 
 Other benefits include:
 
@@ -265,7 +265,7 @@ public class TestInstaller : MonoInstaller
 {
     public override void InstallBindings()
     {
-        Container.BindInstance("Hello World!");
+        Container.Bind<string>().FromInstance("Hello World!");
         Container.Bind<TestRunner>().NonLazy();
     }
 }
@@ -293,40 +293,9 @@ You can run this example by doing the following:
 
 The SceneContext MonoBehaviour is the entry point of the application, where Zenject sets up all the various dependencies before kicking off your scene.  To add content to your Zenject scene, you need to write what is referred to in Zenject as an 'Installer', which declares all the dependencies used in your scene and their relationships with each other.  All dependencies that are marked as "NonLazy" are automatically created at this point, as well as any dependencies that implement the standard Zenject interfaces such as IInitializable, ITickable, etc.  If the above doesn't make sense to you yet, keep reading!
 
-## <a id="binding"></a>Binding
-
-Every dependency injection framework is ultimately just a framework to bind types to instances.
-
-In Zenject, dependency mapping is done by adding bindings to something called a container.  The container should then 'know' how to create all the object instances in your application, by recursively resolving all dependencies for a given object.
-
-When the container is asked to construct an instance of a given type, it uses C# reflection to find the list of constructor arguments, and all fields/properties that are marked with an [Inject] attribute.  It then attempts to resolve each of these required dependencies, which it uses to call the constructor and create the new instance.
-
-Each Zenject application therefore must tell the container how to resolve each of these dependencies, which is done via Bind commands.  For example, given the following class:
-
-```csharp
-public class Foo
-{
-    IBar _bar;
-
-    public Foo(IBar bar)
-    {
-        _bar = bar;
-    }
-}
-```
-
-You can wire up the dependencies for this class with the following bindings:
-
-```csharp
-Container.Bind<Foo>().AsSingle();
-Container.Bind<IBar>().To<Bar>().AsSingle();
-```
-
-This tells Zenject that every class that requires a dependency of type Foo should use the same instance, which it will automatically create when needed.  And similarly, any class that requires the IBar interface (like Foo) will be given the same instance of type Bar.
-
 ## <a id="inject-methods"></a>Inject Methods
 
-There are many different ways of binding types on the container, which are documented in the <a href="#bind-methods">next section</a>.  There are also several ways of having these dependencies injected into your classes. These are:
+There are many different ways of binding types on the container, which are documented in the <a href="#binding">next section</a>.  There are also several ways of having these dependencies injected into your classes. These are:
 
 1 - **Constructor Injection**
 
@@ -341,8 +310,6 @@ public class Foo
     }
 }
 ```
-
-Here, the IBar dependency is injected via the constructor.
 
 2 - **Field Injection**
 
@@ -378,40 +345,263 @@ Property injection works the same as field injection except is applied to C# pro
 public class Foo
 {
     IBar _bar;
+    Qux _qux;
 
     [Inject]
-    public Init(IBar bar)
+    public Init(IBar bar, Qux qux)
     {
         _bar = bar;
+        _qux = qux;
     }
 }
 ```
 
-Method Inject injection works very similar to constructor injection.  The methods marked with [Inject] are called after all other dependencies have been resolved, and can be used to execute initialization logic.  Unlike constructor injection, Inject methods can make use of any fields that are marked as [Inject] because all other injection methods are guaranteed to have completed before the Inject methods are called.
-
-You may also pass dependencies in as parameters to the inject method similar to how constructor injection works.
+Method Inject injection works very similar to constructor injection.  The methods marked with [Inject] are called after all other dependencies have been resolved. Because they are the last injection type triggered, they can be used to execute initialization logic.  You can also leave the parameter list empty if you just want to do some initialization logic only.
 
 Note that there can be any number of inject methods.  In this case, they are called in the order of Base class to Derived class.  This can be useful to avoid the need to forward many dependencies from derived classes to the base class via constructor parameters, while also guaranteeing that the base class inject methods complete first, just like how constructors work.
 
-You can also generally assume that the dependencies that you receive via inject methods have themselves been injected.  This can be important if you use inject methods to perform some basic initialization, so that the objects have been properly initialized for use in any methods they are injected into.
+Note that the dependencies that you receive via inject methods should themselves have already been injected.  This can be important if you use inject methods to perform some basic initialization, since you may need the given dependencies to themselves be initialized.
 
 Using [Inject] methods to inject dependencies is the recommended approach for MonoBehaviours, since MonoBehaviours cannot have constructors.
 
 **Recommendations**
 
 * Best practice is to prefer constructor injection or method injection to field or property injection.
-    * Constructor/Method injection forces the dependency to only be resolved once, at class creation, which is usually what you want.  In most cases you don't want to expose a public property for your initial dependencies because this suggests that it's open to changing.
+    * Constructor injection forces the dependency to only be resolved once, at class creation, which is usually what you want.  In most cases you don't want to expose a public property for your initial dependencies because this suggests that it's open to changing.
     * Constructor injection guarantees no circular dependencies between classes, which is generally a bad thing to do.  You can do this however using method injection or field injection if necessary.
     * Constructor/Method injection is more portable for cases where you decide to re-use the code without a DI framework such as Zenject.  You can do the same with public properties but it's more error prone (it's easier to forget to initialize one field and leave the object in an invalid state)
     * Finally, Constructor/Method injection makes it clear what all the dependencies of a class are when another programmer is reading the code.  They can simply look at the parameter list of the method.
 
-## <a id="bind-methods"></a>Bind Methods
+## <a id="binding"></a>Binding
 
-See the <a href="#binding">binding section</a> above for a general overview of binding.  The format for the bind command can be any of the following:
+Every dependency injection framework is ultimately just a framework to bind types to instances.
 
-Note that you can find more examples in the <a href="#cheatsheet">cheatsheet</a> section below.
+In Zenject, dependency mapping is done by adding bindings to something called a container.  The container should then 'know' how to create all the object instances in your application, by recursively resolving all dependencies for a given object.
 
-Note also that all of these methods are also documented in the source code itself, which you can find by opening `ITypeBinder.cs`
+When the container is asked to construct an instance of a given type, it uses C# reflection to find the list of constructor arguments, and all fields/properties that are marked with an [Inject] attribute.  It then attempts to resolve each of these required dependencies, which it uses to call the constructor and create the new instance.
+
+Each Zenject application therefore must tell the container how to resolve each of these dependencies, which is done via Bind commands.  For example, given the following class:
+
+```csharp
+public class Foo
+{
+    IBar _bar;
+
+    public Foo(IBar bar)
+    {
+        _bar = bar;
+    }
+}
+```
+
+You can wire up the dependencies for this class with the following bindings:
+
+```csharp
+Container.Bind<Foo>().AsSingle();
+Container.Bind<IBar>().To<Bar>().AsSingle();
+```
+
+This tells Zenject that every class that requires a dependency of type Foo should use the same instance, which it will automatically create when needed.  And similarly, any class that requires the IBar interface (like Foo) will be given the same instance of type Bar.
+
+The full format for the bind command is the following.  Note that in most cases you will not use all of these methods and that they all have logical defaults when unspecified
+
+<pre>
+Container.Bind&lt;<b>ContractType</b>&gt;()
+    .To&lt;<b>ResultType</b>&gt;()
+    .From<b>ConstructionMethod</b>()
+    .As<b>Scope</b>()
+    .WithArguments(<b>Arguments</b>)
+    .When(<b>Condition</b>)
+    .InheritInSubContainers()
+    .NonLazy();
+</pre>
+
+Where:
+
+* **ContractType** = The type that you are creating a binding for.
+
+    * This value will correspond to the type of the field/parameter that is being injected.
+
+* **ResultType** = The type to bind to.
+
+    * Default: **ContractType**
+    * This type must either to equal to **ContractType** or derive from **ContractType**.  If unspecified, it assumes ToSelf(), which means that the **ResultType** will be the same as the **ContractType**.  This value will be used by whatever is given as the **ConstructionMethod** to retrieve an instance of this type
+
+* **ConstructionMethod** = The method by which an instance of **ResultType** is created/retrieved.  See <a href="#binding">this section</a> for more details on the various construction methods.
+
+    * Default: FromNew()
+    * Examples: eg. FromGetter, FromMethod, FromPrefab, FromResolve, FromSubContainerResolve, FromInstance, etc.
+
+* **Scope** = This value determines how often (or if at all) the generated instance is re-used across multiple injections.
+
+    * Default: AsTransient
+    * It can be one of the following:
+        1. AsTransient - Will not re-use the instance at all.  Every time **ContractType** is requested, the DiContainer will return a brand new instance of type **ResultType**
+        2. AsCached - Will re-use the same instance of **ResultType** every time **ContractType** is requested, which it will lazily generate upon first use
+        3. AsSingle - Will re-use the same instance of **ResultType** across the entire DiContainer, which it will lazily generate upon first use.  It can be thought of as a stronger version of AsCached, because it allows you to bind to the same instance across multiple bind commands.  It will also ensure that there is only ever exactly one instance of **ResultType** in the DiContainer (ie. it will enforce **ResultType** to be a 'Singleton' hence the name).
+
+    * In most cases, you will likely want to just use AsSingle, however AsTransient and AsCached have their uses too.
+    * To illustrate the difference between the different scope types, see the following example:
+        ```
+        public interface IBar
+        {
+        }
+
+        public class Bar : IBar
+        {
+        }
+
+        public class Foo()
+        {
+            public Foo(Bar bar)
+            {
+            }
+        }
+        ```
+
+        ```
+        // This will cause every instance of Foo to be given a brand new instance of Bar
+        Container.Bind<Bar>().AsTransient();
+        ```
+
+        ```
+        // This will cause every instance of Foo to be given the same instance of Bar
+        Container.Bind<Bar>().AsCached();
+        ```
+
+        ```
+        public class Qux()
+        {
+            public Qux(IBar bar)
+            {
+            }
+        }
+        ```
+
+        ```
+        // This will cause both Foo and Qux to get different instances of type Bar
+        // However, every instance of Foo will be given the the same instance of type Bar
+        // and similarly for Qux
+        Container.Bind<Bar>().AsCached();
+        Container.Bind<IBar>().To<Bar>().AsCached();
+        ```
+
+        ```
+        // This will cause both Foo and Qux to get the same instance of type Bar
+        Container.Bind<Bar>().AsSingle();
+        Container.Bind<IBar>().To<Bar>().AsSingle();
+        ```
+
+## <a id="construction-methods"></a>Construction Methods
+
+1. **FromNew** - Create via the C# new operator. This is the default if no construction method is specified.
+
+    ```csharp
+    // These are both the same
+    Container.Bind<Foo>();
+    Container.Bind<Foo>().FromNew();
+    ```
+
+1. **FromInstance** - Use a given instance
+
+    ```csharp
+    Container.Bind<Foo>().FromInstance(new Foo());
+
+    // You can also use this short hand which just takes ContractType from the parameter type
+    Container.BindInstance(new Foo());
+
+    // This is also what you would typically use for primitive types
+    Container.BindInstance(5.13f);
+    Container.BindInstance("foo");
+    ```
+
+1. **FromMethod** - Create via a custom method
+
+    ```csharp
+    Container.Bind<Foo>().FromMethod(SomeMethod);
+
+    Foo SomeMethod(InjectContext context)
+    {
+        ...
+        return new Foo();
+    }
+    ```
+
+1. **FromComponent** - Create as a new component on an existing game object.  **ResultType** must derive from UnityEngine.MonoBehaviour / UnityEngine.Component in this case
+
+    ```csharp
+    Container.Bind<Foo>().FromComponent(someGameObject);
+    ```
+
+1. **FromGameObject** - Create as a new component on new game object.  **ResultType** must derive from UnityEngine.MonoBehaviour / UnityEngine.Component in this case
+
+    ```csharp
+    Container.Bind<Foo>().FromGameObject();
+    ```
+
+1. **FromPrefab** - Create by instantiating the given prefab and then searching it for type **ResultType**
+
+    ```csharp
+    Container.Bind<Foo>().FromPrefab(somePrefab);
+    ```
+
+1. **FromPrefabResource** - Create by instantiating the prefab at the given resource path and then searching it for type **ResultType**
+
+    ```csharp
+    Container.Bind<Foo>().FromPrefabResource("Some/Path/Foo");
+    ```
+
+1. **FromResource** - Create by calling the Unity3d function `Resources.Load` for **ResultType**.  This can be used to load any type that `Resources.Load` can load, such as textures, sounds, prefabs, custom classes deriving from ScriptableObject, etc.
+
+    ```csharp
+    public class Foo : ScriptableObject
+    {
+    }
+
+    Container.Bind<Foo>().FromResource("Some/Path/Foo");
+    ```
+
+1. **FromResolve** - Get instance by calling the `DiContainer.Resolve<ResultType>()`.  Note that for this to work, **ResultType** must be bound in a separate statement.  This construction method can be especially useful when you want to bind an interface to another interface, as shown in the below example
+
+    ```csharp
+    public interface IFoo
+    {
+    }
+
+    public interface IBar : IFoo
+    {
+    }
+
+    public class Foo : IBar
+    {
+    }
+
+    Container.Bind<IFoo>().To<IBar>().FromResolve();
+    Container.Bind<IBar>().To<Foo>();
+    ```
+
+1. **FromFactory** - Create instance using a custom factory class.  This construction method is similar to `FromMethod` except can be cleaner in cases where the logic is more complicated or requires dependencies (the factory itself can have dependencies injected)
+
+    ```csharp
+    class FooFactory : IFactory<Foo>
+    {
+        public Foo Create()
+        {
+            // ...
+            return new Foo();
+        }
+    }
+
+    Container.Bind<Foo>().FromFactory<FooFactory>()
+    ```
+
+1. **FromGetterResolve** - Get instance from the property of another dependency.  It is assumed 
+
+1. **FromSubContainerResolve** - Get instance from a subcontainer.  In many cases 
+
+
+
+
 
 1 - **ToSingle** - Inject as singleton
 
@@ -541,9 +731,7 @@ This binding allows you to customize creation logic yourself by defining a metho
 
 ```csharp
 Container.Bind<IFoo>().ToMethod(SomeMethod);
-```
 
-```csharp
 public IFoo SomeMethod(InjectContext context)
 {
     ...
