@@ -41,6 +41,7 @@ __Quick Start__:  If you are already familiar with dependency injection and are 
         * <a href="#binding">Binding</a>
         * <a href="#construction-methods">Construction Methods</a>
         * <a href="#list-bindings">List Bindings</a>
+        * <a href="#list-bindings">List Bindings</a>
         * <a href="#optional-binding">Optional Binding</a>
         * <a href="#identifiers">Identifiers</a>
         * <a href="#singleton-identifiers">Singleton Identifiers</a>
@@ -561,7 +562,7 @@ Where:
     Container.Bind<Foo>().FromResource("Some/Path/Foo");
     ```
 
-1. **FromResolve** - Get instance by calling the `DiContainer.Resolve<ResultType>()`.  Note that for this to work, **ResultType** must be bound in a separate statement.  This construction method can be especially useful when you want to bind an interface to another interface, as shown in the below example
+1. **FromResolve** - Get instance by doing another lookup on the container (in other words, calling `DiContainer.Resolve<ResultType>()`).  Note that for this to work, **ResultType** must be bound in a separate bind statement.  This construction method can be especially useful when you want to bind an interface to another interface, as shown in the below example
 
     ```csharp
     public interface IFoo
@@ -595,352 +596,73 @@ Where:
     Container.Bind<Foo>().FromFactory<FooFactory>()
     ```
 
-1. **FromGetterResolve** - Get instance from the property of another dependency.  It is assumed 
+1. **FromResolveGetter<ObjectType>** - Get instance from the property of another dependency which is obtained by doing another lookup on the container (in other words, calling `DiContainer.Resolve<ObjectType>()` and then accessing a value on the returned instance of type **ResultType**).  Note that for this to work, **ObjectType** must be bound in a separate bind statement.
 
-1. **FromSubContainerResolve** - Get instance from a subcontainer.  In many cases 
-
-
-
-
-
-1 - **ToSingle** - Inject as singleton
-
-```csharp
-Container.Bind<Foo>().ToSingle();
-```
-
-When a type is bound using ToSingle this will construct one and only one instance of Foo and use that everywhere that has Foo as a dependency
-
-You may also bind the singleton instance to one or more interfaces:
-
-```csharp
-Container.Bind<IFoo>().To<Foo>().AsSingle();
-Container.Bind<IBar>().To<Foo>().AsSingle();
-```
-
-This will cause any dependencies of type IFoo or IBar to use the same instance of Foo.  Of course, Foo must implement both IFoo and IBar for this to compile.  You may also wish to bind Foo to itself like this:
-
-```csharp
-Container.Bind<Foo>().AsSingle();
-Container.Bind<IFoo>().To<Foo>().AsSingle();
-Container.Bind<IBar>().To<Foo>().AsSingle();
-```
-
-Note again that the same instance will be used for all dependencies that take Foo, IFoo, or IBar.
-
-2 - **ToInstance** - Inject as a specific instance
-
-```csharp
-Container.Bind<Foo>().ToInstance(new Foo());
-Container.Bind<string>().ToInstance("foo");
-Container.Bind<int>().ToInstance(42);
-
-// Or with shortcut:
-Container.BindInstance(new Bar());
-```
-
-In this case the given instance will be used for every dependency with the given type
-
-3 - **ToTransient** - Inject as newly created object
-
-```csharp
-Container.Bind<Foo>().ToTransient();
-```
-
-In this case a new instance of Foo will be generated each time it is injected. Similar to ToSingle, you can bind via an interface as well:
-
-```csharp
-Container.Bind<IFoo>().ToTransient<Foo>();
-```
-
-4 - **ToSinglePrefab** - Inject by instantiating a unity prefab once and using that everywhere
-
-```csharp
-Container.Bind<FooMonoBehaviour>().ToSinglePrefab(PrefabGameObject);
-```
-
-This will instantiate a new instance of the given prefab, and then search the newly created game object for the given component (in this case FooMonoBehaviour).
-
-Also, because it is ToSingle it will only instantiate the prefab once, and otherwise use the same instance of FooMonoBehaviour.
-
-You can also bind multiple singletons to the same prefab.  For example:
-
-```csharp
-Container.Bind<FooMonoBehaviour>().ToSinglePrefab(PrefabGameObject);
-Container.Bind<BarMonoBehaviour>().ToSinglePrefab(PrefabGameObject);
-```
-
-This will result in the prefab `PrefabGameObject` being instantiated once, and then searched for monobehaviour's `FooMonoBehaviour` and `BarMonoBehaviour`
-
-5 - **ToSinglePrefabResource** - Load prefab via resources folder
-
-Same as ToSinglePrefab except loads the prefab using a path in Resources folder
-
-```csharp
-Container.Bind<FooMonoBehaviour>().ToSinglePrefabResource("MyDirectory/MyPrefab");
-```
-
-In this example, I've placed my prefab at Assets/Resources/MyDirectory/MyPrefab.prefab.  By doing this I don't have to pass in a GameObject and can refer to it by the path within the resources folder.
-
-Note that you can re-use the same singleton instance for multiple monobehaviours that exist on the prefab.
-
-```csharp
-Container.Bind<FooMonoBehaviour>().ToSinglePrefabResource("MyDirectory/MyPrefab");
-Container.Bind<BarMonoBehaviour>().ToSinglePrefabResource("MyDirectory/MyPrefab");
-```
-
-In the above example, the prefab will only be instantiated once.
-
-6 - **ToTransientPrefab** - Inject by instantiating a unity prefab each time
-
-```csharp
-Container.Bind<FooMonoBehaviour>().ToTransientPrefab(PrefabGameObject);
-```
-
-This works similar to ToSinglePrefab except it will instantiate a new instance of the given prefab every time the dependency is injected.
-
-7 - **ToTransientPrefabResource** - Load prefab via resources folder
-
-Same as ToTransientPrefab except loads the prefab using a path in Resources folder
-
-```csharp
-Container.Bind<FooMonoBehaviour>().ToTransientPrefabResource("MyDirectory/MyPrefab");
-```
-
-In the above example, I've placed my prefab at Assets/Resources/MyDirectory/MyPrefab.prefab.  By doing this I don't have to pass in a GameObject and can refer to it by the path within the resources folder.
-
-8 - **ToSingleGameObject** - Inject by instantiating a new game object and using that everywhere
-
-```csharp
-Container.Bind<FooMonoBehaviour>().ToSingleGameObject();
-```
-
-This binding will create a new game object and attach the given FooMonoBehaviour.  Also note that since it is ToSingle that it will use the same instance everywhere that has FooMonoBehaviour as a dependency
-
-9 - **ToTransientGameObject** - Inject by instantiating a new game object
-
-```csharp
-Container.Bind<FooMonoBehaviour>().ToTransientGameObject();
-```
-
-This binding will create a new game object and attach the given FooMonoBehaviour.  Note that since this is transient, a unique game object will be created every time it is injected.
-
-10 - **ToMethod** - Inject using a custom method
-
-This binding allows you to customize creation logic yourself by defining a method:
-
-```csharp
-Container.Bind<IFoo>().ToMethod(SomeMethod);
-
-public IFoo SomeMethod(InjectContext context)
-{
-    ...
-    return new Foo();
-}
-```
-
-11 - **ToSingleMethod** - Inject using a custom method but only call that method once
-
-This binding works similar to `ToMethod` except that the given method will only be called once.  The value returned from the method will then be used for every subsequent request for the given dependency.
-
-```csharp
-Container.Bind<IFoo>().ToSingleMethod(SomeMethod);
-```
-
-```csharp
-public IFoo SomeMethod(InjectContext context)
-{
-    ...
-    return new Foo();
-}
-```
-
-12 - **ToGetter** - Inject by getter.
-
-This method can be useful if you want to bind to a property of another object.
-
-```csharp
-Container.Bind<IFoo>().To<Foo>().AsSingle()
-Container.Bind<Bar>().ToGetter<IFoo>(x => x.GetBar())
-```
-
-13 - **ToSingleFactory** - Define a custom factory for a singleton
-
-```csharp
-Container.Bind<IFoo>().ToSingleFactory<MyCustomFactory>();
-
-class MyCustomFactory : IFactory<IFoo>
-{
-    Bar _bar;
-
-    public MyCustomFactory(Bar bar)
-    {
-        _bar = bar;
-    }
-
-    public IFoo Create()
-    {
-        ...
-    }
-}
-```
-
-The `ToSingleFactory` binding can be useful when you want to define a singleton, but it has complex construction logic that you want to define yourself.  You could use `ToSingleMethod`, but this can get ugly if your construction logic itself has its own dependencies that it needs.  Using `ToSingleFactory` for this case it is nice because any dependencies that you require for construction can be simply added to the factory constructor
-
-14 - **ToResource** - Inject using Resources.Load
-
-```csharp
-Container.Bind<Texture>().ToResource("TestTexture")
-```
-
-This binding simply calls Resources.Load with the given resource path and type.  See unity docs for details on how to use Resources.Load(path, type)
-
-Note that it calls Resources.Load each time it is used.  There is no single and transient versions because in most cases Unity returns the same instance already
-
-15 - **ToResolve** - Inject by recursive resolve.
-
-```csharp
-Container.Bind<IFoo>().ToResolve<IBar>()
-Container.Bind<IBar>().ToResolve<Foo>()
-```
-
-In some cases it is useful to be able to bind an interface to another interface.  However, you cannot use ToSingle or ToTransient because they both require concrete types.
-
-In the example code above we assume that Foo inherits from IBar, which inherits from IFoo.  The result here will be that all dependencies for IFoo will be bound to whatever IBar is bound to (in this case, Foo).
-
-You can also supply an identifier to the ToResolve() method.  See <a href="#identifiers">here</a> section for details on identifiers.
-
-16 - **Rebind** - Override existing binding
-
-```csharp
-Container.Rebind<IFoo>().To<Foo>();
-```
-
-The Rebind function can be used to override any existing bindings that were added previously.  It will first clear all previous bindings and then add the new binding.  This method is especially useful for tests, where you often want to use almost all the same bindings used in production, except override a few specific bindings.
-
-17 - **BindAllInterfaces**
-
-This function can be used to automatically bind any interfaces that it finds on the given type.
-
-```csharp
-public class Foo : ITickable, IInitializable
-{
-    ...
-}
-
-...
-
-Container.Bind<Foo>().AsSingle();
-Container.BindAllInterfaces<Foo>().To<Foo>().AsSingle();
-```
-
-The above is equivalent to the following:
-
-```csharp
-Container.Bind<Foo>().AsSingle();
-Container.Bind<ITickable>().To<Foo>().AsSingle();
-Container.Bind<IInitializable>().To<Foo>().AsSingle();
-```
-
-Note that you can also bind all interfaces `ToTransient`, `ToInstance`, etc.
-
-18 - **ToSingleInstance** - Use the given instance as a singleton.
-
-This is the same as `ToInstance` except it will ensure that there is only ever one instance for the given type.
-
-When using `ToInstance` you can do the following:
-
-    Container.Bind<Foo>().ToInstance(new Foo());
-    Container.Bind<Foo>().ToInstance(new Foo());
-    Container.Bind<Foo>().ToInstance(new Foo());
-
-Or, equivalently:
-
-    Container.BindInstance(new Foo());
-    Container.BindInstance(new Foo());
-    Container.BindInstance(new Foo());
-
-And then have a class that takes all of them as a list like this:
-
+    ```csharp
     public class Bar
     {
-        public Bar(List<Foo> foos)
+    }
+
+    public class Foo
+    {
+        public Bar GetBar()
         {
+            return new Bar();
         }
     }
 
-Whereas, if you use ToSingleInstance this would trigger an error.
+    Container.Bind<Foo>();
+    Container.Bind<Bar>().FromResolveGetter<Foo>(x => x.GetBar());
+    ```
 
-19 - **Untyped Bindings**
+1. **FromSubContainerResolve** - Get **ResultType** by doing a lookup on a subcontainer.  Note that for this to work, the sub-container must have a binding for **ResultType**.  This approach can be very powerful, because it allows you to group related dependencies together inside a mini-container, and then expose only certain classes (aka <a href="https://en.wikipedia.org/wiki/Facade_pattern">"Facades"</a>) to operate on this group of dependencies at a higher level.  For more details on using sub-containers, see <a href="">this section</a>.  There are 4 different ways to define the subcontainer:
 
-```csharp
-Container.Bind(typeof(IFoo)).AsSingle(typeof(Foo));
-```
+    1. **ByMethod** - Initialize the subcontainer by using a method.
 
-In some cases it is not possible to use the generic versions of the Bind<> functions.  In these cases a non-generic version is provided, which works by taking in a Type value as a parameter.
+        ```
+        Container.Bind<Foo>().FromSubContainerResolve().ByMethod(InstallFooFacade);
 
-Note that you can also pass in multiple type values to `Bind()`.  For example:
+        void InstallFooFacade(DiContainer subContainer)
+        {
+            subContainer.Bind<Foo>();
+        }
+        ```
 
-```csharp
-Container.Bind(typeof(Foo), typeof(Bar), typeof(Qux)).AsSingle();
-```
+    1. **ByInstaller** - Initialize the subcontainer by using a class derived from `Installer`.  This can be a cleaner alternative than using `ByMethod`, especially if you need to inject data into the installer itself.
 
-In this case, instance of Foo, Bar, and Qux will all be bound as singletons.
+        ```
+        Container.Bind<Foo>().FromSubContainerResolve().ByInstaller<FooFacadeInstaller>();
 
-20 - **BindIFactory** - Bind type `IFactory<>` to a construction method
+        class FooFacadeInstaller : Installer
+        {
+            public override void InstallBindings()
+            {
+                Container.Bind<Foo>();
+            }
+        }
+        ```
 
-```csharp
-Container.BindIFactory<IFoo>().ToFactory<Foo>();
-```
+    1. **ByPrefab** - Initialize subcontainer using a prefab.  Note that the prefab must contain a `GameObjectContext` component attached to the root game object.
 
-This bind method is used to create abstract factories.
+        ```
+        Container.Bind<Foo>().FromSubContainerResolve().ByPrefab(MyPrefab);
 
-The above line results in all dependencies of type `IFactory<IFoo>` being bound to an object that returns type `Foo` when its Create() method is called.
+        // Assuming here that this installer is added to the GameObjectContext at the root
+        // of the prefab
+        class FooFacadeInstaller : MonoInstaller
+        {
+            public override void InstallBindings()
+            {
+                Container.Bind<Foo>();
+            }
+        }
+        ```
 
-See the <a href="#abstract-factories">abstract factories section</a> for more information on abstract factories.
+    1. **ByPrefabResource** - Initialize subcontainer using a prefab obtained via `Resources.Load`.  Note that the prefab must contain a `GameObjectContext` component attached to the root game object.
 
-21 - **ToSingleMonoBehaviour** - Inject by instantiating a new component on an existing GameObject
-
-```csharp
-Container.Bind<FooMonoBehaviour>().ToSingleMonoBehaviour(MyGameObject);
-```
-
-This line will lazily add the `FooMonoBehaviour` MonoBehaviour to the given game object, and then re-use that same MonoBehaviour every time `FooMonoBehaviour` is asked for
-
-22 - **ToSingleFacadeMethod** - Initialize a new sub container using the given method and use the given class as the facade for it
-
-```csharp
-Container.Bind<FooFacade>().ToSingleFacadeMethod(InstallFooFacade)
-
-void InstallFooFacade(DiContainer container)
-{
-     container.Bind<FooFacade>().AsSingle();
-     ...
-}
-```
-
-This binding can be useful if you have a sub-system with a related set of dependencies which don't need to be in the main container, and which can be interacted with entirely through a given "facade" class (see <a href="https://en.wikipedia.org/wiki/Facade_pattern">Facade Pattern</a>) For more information on what a Facade is and how it works see <a href="#sub-containers-and-facades">here</a>.
-
-Note that the installer method provided here *must* bind the given facade class to something.  In the example above, FooFacade is bound ToSingle.
-
-23 - **ToSingleFacadeInstaller** - Initialize a new sub container using the given installer type and use the given class as the facade for it
-
-```csharp
-Container.Bind<FooFacade>().ToSingleFacadeInstaller<FooInstaller>()
-
-class FooInstaller : Installer
-{
-    public override void InstallBindings()
-    {
-        Container.Bind<FooFacade>().AsSingle();
-        ...
-    }
-}
-```
-
-This binding can be useful if you have a sub-system with a related set of dependencies which don't need to be in the main container, and which can be interacted with entirely through a given "facade" class (see <a href="https://en.wikipedia.org/wiki/Facade_pattern">Facade Pattern</a>) For more information on what a Facade is and how it works see <a href="#sub-containers-and-facades">here</a>.
-
-Note that the given installer provided here *must* bind the given facade class to something.  In the example above, FooFacade is bound ToSingle.
+        ```
+        Container.Bind<Foo>().FromSubContainerResolve().ByPrefabResource("Path/To/MyPrefab");
+        ```
 
 ## <a id="list-bindings"></a>List Bindings
 
@@ -991,13 +713,15 @@ public class Bar
 }
 ...
 
-// Can leave this commented or not and it will still work
-// Container.Bind<IFoo>().AsSingle();
+// You can comment this out and it will still work
+Container.Bind<IFoo>().AsSingle();
 ```
 
-In this case, if IFoo is not bound in any installers, then it will be passed as null.
+If an optional dependency is not bound in any installers, then it will be injected as null.
 
-Note that when declaring dependencies with primitive types as optional, they will be given their default value (eg. 0 for ints).  You may also assign an explicit default using the standard C# way such as:
+If the dependency is a primitive type (eg. int, float, struct) then it will be injected with its default value (eg. 0 for ints).
+
+You may also assign an explicit default using the standard C# way such as:
 
 ```csharp
 public class Bar
@@ -1009,11 +733,11 @@ public class Bar
 }
 ...
 
-// Can leave this commented or not and it will still work
-// Container.Bind<int>().ToInstance(1);
+// Can comment this out and 5 will be used instead
+Container.BindInstance(1);
 ```
 
-Note also that the [InjectOptional] is not necessary in this case, since it's already implied by the default value.
+Note also that the `[InjectOptional]` is not necessary in this case, since it's already implied by the default value.
 
 Alternatively, you can define the primitive parameter as nullable, and perform logic depending on whether it is supplied or not, such as:
 
@@ -1040,23 +764,23 @@ public class Bar
 
 ...
 
-// Can leave this commented or not and it will still work
-// Container.Bind<int>().ToInstance(1);
+// Can comment this out and it will use 5 instead
+Container.BindInstance(1);
 ```
 
 ## <a id="identifiers"></a>Identifiers
 
-You can also give a name to your binding by supplying it as a parameter to the Bind() method.  For example:
+You can also give an ID to your binding if you need to have distinct bindings for the same type, and you don't want it to just result in a `List<>`.  For example:
 
 ```csharp
-Container.Bind<IFoo>("foo").To<Foo1>().AsSingle();
+Container.Bind<IFoo>().WithId("foo").To<Foo1>().AsSingle();
 Container.Bind<IFoo>().To<Foo2>().AsSingle();
 
 ...
 
 public class Bar1
 {
-    [Inject("foo")]
+    [Inject(Id = "foo")]
     IFoo _foo;
 }
 
@@ -1067,9 +791,9 @@ public class Bar2
 }
 ```
 
-In this example, the Bar1 class will be given an instance of Foo1, and the Bar2 class will use the default version of IFoo which is bound to Foo2.
+In this example, the `Bar1` class will be given an instance of `Foo1`, and the `Bar2` class will use the default version of `IFoo` which is bound to `Foo2`.
 
-Note also that you can add a name to constructor arguments as well, for example:
+Note also that you can do the same thing for constructor/inject-method arguments as well:
 
 ```csharp
 public class Bar
@@ -1077,30 +801,80 @@ public class Bar
     Foo _foo;
 
     public Bar(
-        [Inject("foo")] Foo foo)
+        [Inject("foo")] 
+        Foo foo)
     {
     }
 }
 ```
 
-You can also do the same with [Inject] method parameters:
+In many cases, the ID is created as a string, however you can actually use any type you like for this.  For example, it's sometimes useful to use an enum instead:
 
 ```csharp
-public class Bar
-{
-    Foo _foo;
-
-    public Bar()
-    {
-    }
-
-    [Inject]
-    public Init(
-        [Inject("foo")] Foo foo)
-    {
-    }
-}
+Container.Bind<Camera>().WithId(Cameras.Main).FromInstance(MyMainCamera);
+Container.Bind<Camera>().WithId(Cameras.Player).FromInstance(MyPlayerCamera);
 ```
+
+You can also use custom types, as long as they implement the `Equals` operator.
+
+## <a id="untyped-bindings"></a>Untyped bindings
+
+In addition to the standard binding described above, you should also know about the following:
+
+In some cases you may not know the exact type you want to bind at compile time.  In these cases you can use the overload of the `Bind` method which takes a `System.Type` value instead of a generic parameter.
+
+```
+// These two lines will result in the same behaviour
+Container.Bind(typeof(Foo));
+Container.Bind<Foo>();
+```
+
+* Note also that when using untyped bindings, you can pass multiple arguments:
+
+```
+Container.Bind(typeof(Foo), typeof(Bar), typeof(Qux)).AsSingle();
+
+// The above line is equivalent to these three:
+Container.Bind<Foo>().AsSingle();
+Container.Bind<Bar>().AsSingle();
+Container.Bind<Qux>().AsSingle();
+```
+
+* The same goes for the To method:
+
+```
+Container.Bind<IFoo>().To(typeof(Foo), typeof(Bar)).AsSingle();
+
+// The above line is equivalent to these two:
+Container.Bind<IFoo>().To<Foo>().AsSingle();
+Container.Bind<IFoo>().To<Bar>().AsSingle();
+```
+
+* You can also do both:
+
+1. BindAllInterfaces - 
+
+## <a id="unbind-rebind"></a>Unbind / Rebind
+
+1. Unbind - Remove binding from container.
+
+    ```csharp
+    Container.Bind<IFoo>().To<Foo>();
+
+    // This will nullify the above statement
+    Container.Unbind<IFoo>();
+    ```
+
+1. Rebind - Override an existing binding with a new one.  This is equivalent to calling unbind with the given type and then immediately calling bind afterwards.
+
+    ```csharp
+    Container.Bind<IFoo>().To<Foo>();
+
+    // 
+    Container.Rebind<IFoo>().To<Bar>();
+    ```
+
+## <a id="convention-based-bindings"></a>Convention Based Binding
 
 ## <a id="singleton-identifiers"></a>Singleton Identifiers
 
@@ -3925,3 +3699,4 @@ For general troubleshooting / support, please use the [zenject subreddit](http:/
     LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
     SOFTWARE.
+
