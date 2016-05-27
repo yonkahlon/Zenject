@@ -1,16 +1,8 @@
 #if !ZEN_NOT_UNITY3D
 
 #pragma warning disable 414
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using ModestTree;
-using ModestTree.Util;
 using UnityEngine;
-
-#if UNITY_5_3_OR_NEWER
-using UnityEngine.SceneManagement;
-#endif
 
 namespace Zenject
 {
