@@ -1,6 +1,5 @@
 using System;
 using ModestTree;
-using ModestTree.Util;
 
 #if !ZEN_NOT_UNITY3D
 using UnityEngine;

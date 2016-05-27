@@ -4,11 +4,9 @@ using System.Linq;
 using UnityEditor.SceneManagement;
 #endif
 using ModestTree.Util;
-using Zenject;
 using UnityEditor;
 using UnityEditorInternal;
 using UnityEngine;
-using Object = UnityEngine.Object;
 using ModestTree;
 
 namespace Zenject

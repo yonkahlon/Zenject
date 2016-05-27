@@ -4,10 +4,6 @@ using System.Reflection;
 using System.Linq;
 using ModestTree;
 
-#if !ZEN_NOT_UNITY3D
-using UnityEngine;
-#endif
-
 namespace Zenject
 {
     internal static class TypeAnalyzer

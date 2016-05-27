@@ -1,6 +1,3 @@
-using System;
-using System.Linq;
-
 namespace Zenject
 {
     public class StandardInstaller<TRoot> : Installer

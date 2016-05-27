@@ -1,5 +1,3 @@
-using System;
-
 namespace Zenject.Commands
 {
     public interface ICommandHandlerBase

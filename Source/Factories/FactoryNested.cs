@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-
 namespace Zenject
 {
     // We don't bother implementing IValidatable here because it is assumed that the nested
