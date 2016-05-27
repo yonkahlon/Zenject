@@ -15,7 +15,6 @@ namespace Zenject
     {
         public List<TypeValuePair> ExtraArgs;
         public bool UseAllArgs;
-        public ZenjectTypeInfo TypeInfo;
         public InjectContext Context;
         public string ConcreteIdentifier;
     }
@@ -37,7 +36,7 @@ namespace Zenject
 
         // NOTE: Any arguments taken from extraArgs will be removed from the given list
         void InjectExplicit(
-            object injectable, InjectArgs args);
+            object injectable, Type injectableType, InjectArgs args);
 
         // Resolve<> - Lookup a value in the container.
         //
@@ -94,15 +93,15 @@ namespace Zenject
             GameObject gameObject, bool recursive);
 
         void InjectGameObject(
-            GameObject gameObject, bool recursive, 
+            GameObject gameObject, bool recursive,
             IEnumerable<object> extraArgs);
 
         void InjectGameObjectExplicit(
-            GameObject gameObject, bool recursive, 
+            GameObject gameObject, bool recursive,
             List<TypeValuePair> extraArgs);
 
         void InjectGameObjectExplicit(
-            GameObject gameObject, bool recursive, 
+            GameObject gameObject, bool recursive,
             List<TypeValuePair> extraArgs, bool useAllArgs);
 #endif
     }

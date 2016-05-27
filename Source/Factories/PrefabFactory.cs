@@ -14,7 +14,7 @@ namespace Zenject
 
     //No parameters
     public class PrefabFactory<T> : IValidatable
-        where T : Component
+        //where T : Component
     {
         [Inject]
         protected readonly DiContainer _container;
@@ -37,14 +37,17 @@ namespace Zenject
 
         public void Validate()
         {
-            _container.InjectExplicit(
-                new ValidationMarker(typeof(T)), ValidationUtil.CreateDefaultArgs());
+            if (!typeof(T).IsAbstract)
+            {
+                _container.InjectExplicit(
+                    new ValidationMarker(typeof(T)), ValidationUtil.CreateDefaultArgs());
+            }
         }
     }
 
     // One parameter
     public class PrefabFactory<P1, T> : IValidatable
-        where T : Component
+        //where T : Component
     {
         [Inject]
         protected readonly DiContainer _container;
@@ -68,14 +71,18 @@ namespace Zenject
 
         public void Validate()
         {
-            _container.InjectExplicit(
-                new ValidationMarker(typeof(T)), ValidationUtil.CreateDefaultArgs(typeof(P1)));
+            // If it's abstract, we can't check that the params are used
+            if (!typeof(T).IsAbstract)
+            {
+                _container.InjectExplicit(
+                    new ValidationMarker(typeof(T)), ValidationUtil.CreateDefaultArgs(typeof(P1)));
+            }
         }
     }
 
     // Two parameters
     public class PrefabFactory<P1, P2, T> : IValidatable
-        where T : Component
+        //where T : Component
     {
         [Inject]
         protected readonly DiContainer _container;
@@ -99,14 +106,18 @@ namespace Zenject
 
         public void Validate()
         {
-            _container.InjectExplicit(
-                new ValidationMarker(typeof(T)), ValidationUtil.CreateDefaultArgs(typeof(P1), typeof(P2)));
+            // If it's abstract, we can't check that the params are used
+            if (!typeof(T).IsAbstract)
+            {
+                _container.InjectExplicit(
+                    new ValidationMarker(typeof(T)), ValidationUtil.CreateDefaultArgs(typeof(P1), typeof(P2)));
+            }
         }
     }
 
     // Three parameters
     public class PrefabFactory<P1, P2, P3, T> : IValidatable
-        where T : Component
+        //where T : Component
     {
         [Inject]
         protected readonly DiContainer _container;
@@ -130,15 +141,19 @@ namespace Zenject
 
         public void Validate()
         {
-            _container.InjectExplicit(
-                new ValidationMarker(typeof(T)),
+            // If it's abstract, we can't check that the params are used
+            if (!typeof(T).IsAbstract)
+            {
+                _container.InjectExplicit(
+                    new ValidationMarker(typeof(T)),
                     ValidationUtil.CreateDefaultArgs(typeof(P1), typeof(P2), typeof(P3)));
+            }
         }
     }
 
     // Four parameters
     public class PrefabFactory<P1, P2, P3, P4, T> : IValidatable
-        where T : Component
+        //where T : Component
     {
         [Inject]
         protected readonly DiContainer _container;
@@ -162,9 +177,13 @@ namespace Zenject
 
         public void Validate()
         {
-            _container.InjectExplicit(
-                new ValidationMarker(typeof(T)),
-                ValidationUtil.CreateDefaultArgs(typeof(P1), typeof(P2), typeof(P3), typeof(P4)));
+            // If it's abstract, we can't check that the params are used
+            if (!typeof(T).IsAbstract)
+            {
+                _container.InjectExplicit(
+                    new ValidationMarker(typeof(T)),
+                    ValidationUtil.CreateDefaultArgs(typeof(P1), typeof(P2), typeof(P3), typeof(P4)));
+            }
         }
     }
 }

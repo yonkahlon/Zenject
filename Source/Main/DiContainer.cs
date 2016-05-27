@@ -871,10 +871,10 @@ namespace Zenject
             bool autoInject = true;
 
             return InstantiateExplicit(
+                concreteType,
                 autoInject,
                 new InjectArgs()
                 {
-                    TypeInfo = TypeAnalyzer.GetInfo(concreteType),
                     ExtraArgs = extraArgs,
                     Context = new InjectContext(this, concreteType, null),
                     ConcreteIdentifier = null,
@@ -883,13 +883,13 @@ namespace Zenject
         }
 
         // See comment in IInstantiator.cs for description of this method
-        public object InstantiateExplicit(bool autoInject, InjectArgs args)
+        public object InstantiateExplicit(Type concreteType, bool autoInject, InjectArgs args)
         {
 #if PROFILING_ENABLED
-            using (ProfileBlock.Start("Zenject.Instantiate({0})", args.TypeInfo.Type))
+            using (ProfileBlock.Start("Zenject.Instantiate({0})", concreteType))
 #endif
             {
-                return InstantiateInternal(autoInject, args);
+                return InstantiateInternal(concreteType, autoInject, args);
             }
         }
 
@@ -911,24 +911,26 @@ namespace Zenject
             ;
         }
 
-        object InstantiateInternal(bool autoInject, InjectArgs args)
+        object InstantiateInternal(Type concreteType, bool autoInject, InjectArgs args)
         {
-            Type concreteType = args.TypeInfo.Type;
-
 #if !NOT_UNITY3D
             Assert.That(!concreteType.DerivesFrom<UnityEngine.Component>(),
                 "Error occurred while instantiating object of type '{0}'. Instantiator should not be used to create new mono behaviours.  Must use InstantiatePrefabForComponent, InstantiatePrefab, or InstantiateComponent.", concreteType.Name());
 #endif
 
+            Assert.That(!concreteType.IsAbstract, "Expected type 'type' to be non-abstract", concreteType);
+
             FlushBindings();
             CheckForInstallWarning(args.Context);
+
+            var typeInfo = TypeAnalyzer.GetInfo(concreteType);
 
             object newObj;
 
 #if !NOT_UNITY3D
             if (concreteType.DerivesFrom<ScriptableObject>())
             {
-                Assert.That( args.TypeInfo.ConstructorInjectables.IsEmpty(),
+                Assert.That( typeInfo.ConstructorInjectables.IsEmpty(),
                     "Found constructor parameters on ScriptableObject type '{0}'.  This is not allowed.  Use an [Inject] method or fields instead.");
 
                 if (!IsValidating || CanCreateOrInjectDuringValidation(concreteType))
@@ -943,13 +945,13 @@ namespace Zenject
             else
 #endif
             {
-                Assert.IsNotNull(args.TypeInfo.InjectConstructor,
+                Assert.IsNotNull(typeInfo.InjectConstructor,
                     "More than one (or zero) constructors found for type '{0}' when creating dependencies.  Use one [Inject] attribute to specify which to use.", concreteType);
 
                 // Make a copy since we remove from it below
                 var paramValues = new List<object>();
 
-                foreach (var injectInfo in args.TypeInfo.ConstructorInjectables)
+                foreach (var injectInfo in typeInfo.ConstructorInjectables)
                 {
                     object value;
 
@@ -980,7 +982,7 @@ namespace Zenject
                         using (ProfileBlock.Start("{0}.{0}()", concreteType))
 #endif
                         {
-                            newObj = args.TypeInfo.InjectConstructor.Invoke(paramValues.ToArray());
+                            newObj = typeInfo.InjectConstructor.Invoke(paramValues.ToArray());
                         }
                     }
                     catch (Exception e)
@@ -997,7 +999,7 @@ namespace Zenject
 
             if (autoInject)
             {
-                InjectExplicit(newObj, args);
+                InjectExplicit(newObj, concreteType, args);
             }
             else if (args.UseAllArgs && !args.ExtraArgs.IsEmpty())
             {
@@ -1024,11 +1026,11 @@ namespace Zenject
 
             InjectExplicit(
                 injectable,
+                injectableType,
                 new InjectArgs()
                 {
                     ExtraArgs = extraArgs,
                     UseAllArgs = true,
-                    TypeInfo = TypeAnalyzer.GetInfo(injectableType),
                     Context = new InjectContext(this, injectableType, null),
                     ConcreteIdentifier = null,
                 });
@@ -1036,14 +1038,12 @@ namespace Zenject
 
         // See comment in IResolver.cs for description of this method
         public void InjectExplicit(
-            object injectable, InjectArgs args)
+            object injectable, Type injectableType, InjectArgs args)
         {
             Assert.That(injectable != null);
 
-            Type injectableType = args.TypeInfo.Type;
-
             // Installers are the only things that we instantiate/inject on during validation
-            bool isDryRun = IsValidating && !CanCreateOrInjectDuringValidation(args.TypeInfo.Type);
+            bool isDryRun = IsValidating && !CanCreateOrInjectDuringValidation(injectableType);
 
             if (!isDryRun)
             {
@@ -1058,8 +1058,10 @@ namespace Zenject
             FlushBindings();
             CheckForInstallWarning(args.Context);
 
-            foreach (var injectInfo in args.TypeInfo.FieldInjectables.Concat(
-                args.TypeInfo.PropertyInjectables))
+            var typeInfo = TypeAnalyzer.GetInfo(injectableType);
+
+            foreach (var injectInfo in typeInfo.FieldInjectables.Concat(
+                typeInfo.PropertyInjectables))
             {
                 object value;
 
@@ -1104,7 +1106,7 @@ namespace Zenject
                 }
             }
 
-            foreach (var method in args.TypeInfo.PostInjectMethods)
+            foreach (var method in typeInfo.PostInjectMethods)
             {
 #if PROFILING_ENABLED
                 using (ProfileBlock.Start("{0}.{1}()", injectableType, method.MethodInfo.Name))
@@ -1301,10 +1303,9 @@ namespace Zenject
             string groupName)
         {
             return InstantiatePrefabForComponentExplicit(
-                prefab, groupName,
+                componentType, prefab, groupName,
                 new InjectArgs()
                 {
-                    TypeInfo = TypeAnalyzer.GetInfo(componentType),
                     ExtraArgs = extraArgs,
                     Context = new InjectContext(this, componentType, null),
                     ConcreteIdentifier = null,
@@ -1314,7 +1315,7 @@ namespace Zenject
 
         // Note: Any arguments that are used will be removed from extraArgs
         public object InstantiatePrefabForComponentExplicit(
-            GameObject prefab, string groupName, InjectArgs args)
+            Type componentType, GameObject prefab, string groupName, InjectArgs args)
         {
             Assert.That(!AssertOnNewGameObjects,
                 "Given DiContainer does not support creating new game objects");
@@ -1322,8 +1323,6 @@ namespace Zenject
             FlushBindings();
 
             Assert.That(prefab != null, "Null prefab found when instantiating game object");
-
-            var componentType = args.TypeInfo.Type;
 
             Assert.That(componentType.IsInterface() || componentType.DerivesFrom<Component>(),
                 "Expected type '{0}' to derive from UnityEngine.Component", componentType.Name());
@@ -1544,10 +1543,9 @@ namespace Zenject
             Type componentType, string resourcePath, List<TypeValuePair> extraArgs)
         {
             return InstantiatePrefabResourceForComponentExplicit(
-                resourcePath, null,
+                componentType, resourcePath, null,
                 new InjectArgs()
                 {
-                    TypeInfo = TypeAnalyzer.GetInfo(componentType),
                     ExtraArgs = extraArgs,
                     Context = new InjectContext(this, componentType, null),
                     ConcreteIdentifier = null,
@@ -1557,13 +1555,13 @@ namespace Zenject
 
         // Note: Any arguments that are used will be removed from extraArgs
         public object InstantiatePrefabResourceForComponentExplicit(
-            string resourcePath, string groupName, InjectArgs args)
+            Type componentType, string resourcePath, string groupName, InjectArgs args)
         {
             var prefab = (GameObject)Resources.Load(resourcePath);
             Assert.IsNotNull(prefab,
                 "Could not find prefab at resource location '{0}'".Fmt(resourcePath));
             return InstantiatePrefabForComponentExplicit(
-                prefab, groupName, args);
+                componentType, prefab, groupName, args);
         }
 
 #endif
@@ -1627,10 +1625,9 @@ namespace Zenject
                     continue;
                 }
 
-                InjectExplicit(component,
+                InjectExplicit(component, component.GetType(),
                     new InjectArgs()
                     {
-                        TypeInfo = TypeAnalyzer.GetInfo(component.GetType()),
                         ExtraArgs = extraArgs,
                         Context = new InjectContext(this, component.GetType()),
                         ConcreteIdentifier = null,
@@ -1674,7 +1671,7 @@ namespace Zenject
                         "Found multiple matches with type '{0}' when injecting into game object '{1}'", componentType, gameObject.name);
                     requestedScript = component;
 
-                    InjectExplicit(component, args);
+                    InjectExplicit(component, component.GetType(), args);
                 }
                 else
                 {
