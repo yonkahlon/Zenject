@@ -17,12 +17,13 @@ namespace Zenject
         // Any constructor parameters will be filled in with values from the container
         T Instantiate<T>();
         T Instantiate<T>(IEnumerable<object> extraArgs);
+
         object Instantiate(Type concreteType);
         object Instantiate(Type concreteType, IEnumerable<object> extraArgs);
 
         T InstantiateExplicit<T>(List<TypeValuePair> extraArgs);
         object InstantiateExplicit(Type concreteType, List<TypeValuePair> extraArgs);
-        object InstantiateExplicit(bool autoInject, InjectArgs extraArgs);
+        object InstantiateExplicit(Type concreteType, bool autoInject, InjectArgs extraArgs);
 
 #if !NOT_UNITY3D
 
@@ -129,7 +130,7 @@ namespace Zenject
 
         // Note: Any arguments that are used will be removed from extraArgs
         object InstantiatePrefabForComponentExplicit(
-            GameObject prefab, string groupName, InjectArgs args);
+            Type componentType, GameObject prefab, string groupName, InjectArgs args);
 
         // This is used instead of Instantiate to support specifying null values
         // Note: Any arguments that are used will be removed from extraArgs
@@ -142,7 +143,7 @@ namespace Zenject
 
         // Note: Any arguments that are used will be removed from extraArgs
         object InstantiatePrefabResourceForComponentExplicit(
-            string resourcePath, string groupName, InjectArgs args);
+            Type concreteType, string resourcePath, string groupName, InjectArgs args);
 
         // This is the same as GameObject.Instantiate(name) except that it will use
         // the default parent, which can sometimes be set to the Context

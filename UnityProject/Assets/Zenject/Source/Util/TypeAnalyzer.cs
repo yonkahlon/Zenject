@@ -22,7 +22,7 @@ namespace Zenject
         public static ZenjectTypeInfo GetInfo(Type type)
         {
             Assert.That(!type.IsAbstract(),
-                "Tried to analyze abstract type '{0}'", type.Name());
+                "Tried to analyze abstract type '{0}'.  This is not currently allowed.", type.Name());
 
             ZenjectTypeInfo info;
 

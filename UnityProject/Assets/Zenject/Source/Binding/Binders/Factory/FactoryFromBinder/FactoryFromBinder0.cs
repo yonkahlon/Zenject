@@ -14,12 +14,12 @@ namespace Zenject
         {
         }
 
-        public ConditionBinder FromGetterResolve<TObj>(Func<TObj, TContract> method)
+        public ConditionBinder FromResolveGetter<TObj>(Func<TObj, TContract> method)
         {
-            return FromGetterResolve<TObj>(null, method);
+            return FromResolveGetter<TObj>(null, method);
         }
 
-        public ConditionBinder FromGetterResolve<TObj>(
+        public ConditionBinder FromResolveGetter<TObj>(
             object subIdentifier, Func<TObj, TContract> method)
         {
             SubFinalizer = CreateFinalizer(

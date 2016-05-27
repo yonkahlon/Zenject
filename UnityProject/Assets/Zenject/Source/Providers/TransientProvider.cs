@@ -47,9 +47,10 @@ namespace Zenject
 
             bool autoInject = false;
 
+            var instanceType = GetTypeToCreate(context.MemberType);
+
             var injectArgs = new InjectArgs()
             {
-                TypeInfo = TypeAnalyzer.GetInfo(GetTypeToCreate(context.MemberType)),
                 ExtraArgs = _extraArguments.Concat(args).ToList(),
                 Context = context,
                 ConcreteIdentifier = _concreteIdentifier,
@@ -57,14 +58,14 @@ namespace Zenject
             };
 
             var instance = _container.InstantiateExplicit(
-                autoInject, injectArgs);
+                instanceType, autoInject, injectArgs);
 
             // Return before property/field/method injection to allow circular dependencies
             yield return new List<object>() { instance };
 
             injectArgs.UseAllArgs = true;
 
-            _container.InjectExplicit(instance, injectArgs);
+            _container.InjectExplicit(instance, instanceType, injectArgs);
         }
 
         Type GetTypeToCreate(Type contractType)

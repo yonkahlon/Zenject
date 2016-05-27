@@ -209,6 +209,17 @@ namespace Zenject.Tests.Injection
             Assert.IsEqual(Container.Resolve<Test8_2>().Val1, 5);
         }
 
+        [Test]
+        public void TestPrimitiveParamOptionalUsesExplicitDefault3()
+        {
+            Container.Bind<Test8_2>().AsSingle().NonLazy();
+            Container.BindInstance(2);
+
+            Container.Validate();
+
+            Assert.IsEqual(Container.Resolve<Test8_2>().Val1, 2);
+        }
+
         class Test9
         {
             public int? Val1;
