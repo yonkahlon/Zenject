@@ -55,7 +55,7 @@ __Quick Start__:  If you are already familiar with dependency injection and are 
         * <a href="#global-bindings">Global Bindings</a>
         * <a href="#update--initialization-order">Update Order And Initialization Order</a>
         * <a href="#object-graph-validation">Object Graph Validation</a>
-        * <a href="#creating-objects-dynamically">Creating Objects Dynamically</a>
+        * <a href="#creating-objects-dynamically">Creating Objects Dynamically Using Factories</a>
         * <a href="#using-the-unity-inspector-to-configure-settings">Using the Unity Inspector To Configure Settings</a>
         * <a href="#game-object-factories">Game Object Factories</a>
         * <a href="#abstract-factories">Abstract Factories</a>
@@ -1428,7 +1428,7 @@ Note that if you follow this method, you will have to make sure to always includ
 
 To see this in action, start the asteroids scene and try adjusting `Ship -> State Moving -> Move Speed` setting and watch live as your ship changes speed.
 
-## <a id="creating-objects-dynamically"></a>Creating Objects Dynamically
+## <a id="creating-objects-dynamically"></a>Creating Objects Dynamically Using Factories
 
 One of the things that often confuses people new to dependency injection is the question of how to create new objects dynamically, after the app/game has fully started up and all the `IInitializable` objects have had their Initialize() method called.  For example, if you are writing a game in which you are spawning new enemies throughout the game, then you will want to construct a new object for the 'enemy' class, and you will want to ensure that this object gets injected with dependencies just like all the objects that are part of the initial object graph.  How to do this?  The answer: Factories.
 
@@ -1503,68 +1503,66 @@ This will not work however, since in our case the Enemy class requires a referen
 The recommended way to do this in Zenject is the following:
 
 ```csharp
+public class Player
+{
+}
+
 public class Enemy
 {
-    Player _player;
+    readonly Player _player;
 
     public Enemy(Player player)
     {
         _player = player;
     }
 
-    ...
-
     public class Factory : Factory<Enemy>
     {
     }
 }
 
-public class EnemySpawner
+public class EnemySpawner : ITickable
 {
-    Enemy.Factory _enemyFactory;
-    List<Enemy> _enemies = new List<Enemy>();
+    readonly Enemy.Factory _enemyFactory;
 
     public EnemySpawner(Enemy.Factory enemyFactory)
     {
         _enemyFactory = enemyFactory;
     }
 
-    public void Update()
+    public void Tick()
     {
         if (ShouldSpawnNewEnemy())
         {
             var enemy = _enemyFactory.Create();
-            _enemies.Add(enemy);
+            // ...
         }
+    }
+}
+
+public class TestInstaller : MonoInstaller
+{
+    public override void InstallBindings()
+    {
+        Container.BindAllInterfaces<EnemySpawner>().To<EnemySpawner>().AsSingle();
+        Container.Bind<Player>().AsSingle();
+        Container.BindFactory<Enemy, Enemy.Factory>();
     }
 }
 ```
 
-Then in your installer, you would include something like:
-
-```csharp
-Container.Bind<Enemy.Factory>().AsSingle();
-Container.Bind<EnemySpawner>().AsSingle();
-```
-
-By using Enemy.Factory above, all the dependencies for the Enemy class (such as the Player) will be automatically filled in.
-
-There is no requirement that the Enemy.Factory class be a nested class within Enemy, however we have found this to be a very useful convention.  Enemy.Factory is empty and simply derives from the built-in Zenject Factory<> class, which handles the work of using the DiContainer to construct a new instance of Enemy.
-
-Also note that by using the built-in Zenject Factory<> class, the Enemy class will be automatically validated as well.  So if the constructor of the Enemy class includes a type that is missing a binding, this error can be caught before running your app, by simply running validation.  Validation can be especially useful for dynamically created objects, because otherwise you may not catch the error until the factory is invoked at some point during runtime.  See <a href="#object-graph-validation">this section</a> for more details on Validation.
-
-However, in more complex examples, the EnemySpawner class may wish to pass in custom constructor arguments as well. For example, let's say we want to randomize the speed of each Enemy to add some interesting variation to our game.  Our enemy class becomes:
+By using `Enemy.Factory` above instead of `new Enemy`, all the dependencies for the Enemy class (such as the Player) will be automatically filled in.  We can also add runtime parameters to our factory.  For example, let's say we want to randomize the speed of each Enemy to add some interesting variation to our game.  Our enemy class becomes:
 
 ```csharp
 public class Enemy
 {
-    Player _player;
-    float _runSpeed;
+    readonly Player _player;
+    readonly float _speed;
 
-    public Enemy(Player player, float runSpeed)
+    public Enemy(float speed, Player player)
     {
         _player = player;
-        _runSpeed = runSpeed;
+        _speed = speed;
     }
 
     public class Factory : Factory<float, Enemy>
@@ -1572,91 +1570,87 @@ public class Enemy
     }
 }
 
-public class EnemySpawner
+public class EnemySpawner : ITickable
 {
-    Enemy.Factory _enemyFactory;
-    List<Enemy> _enemies = new List<Enemy>();
+    readonly Enemy.Factory _enemyFactory;
 
     public EnemySpawner(Enemy.Factory enemyFactory)
     {
         _enemyFactory = enemyFactory;
     }
 
-    public void Update()
+    public void Tick()
     {
         if (ShouldSpawnNewEnemy())
         {
             var newSpeed = Random.Range(MIN_ENEMY_SPEED, MAX_ENEMY_SPEED);
             var enemy = _enemyFactory.Create(newSpeed);
-            _enemies.Add(enemy);
+            // ...
         }
     }
 }
-```
 
-The dynamic parameters that are provided to the Enemy constructor are declared by using generic arguments to the Factory<> base class of Enemy.Factory.  This will add a method to Enemy.Factory that takes the parameters with the given types.
-
-Finally, if you find that your dynamically created object has a lot of its own dependencies, you might also consider making it a Facade instead.  See <a href="#sub-containers-and-facades">here</a> for details on nested containers / facades.
-
-## <a id="game-object-factories"></a>Game Object Factories
-
-You can also use the same approach as described <a href="#creating-objects-dynamically">above</a> to create factories that construct game objects.  If your class is a MonoBehaviour, this is necessary since in Unity you cannot simply create new MonoBehaviour objects - they must come from a prefab or a new game object.
-
-For example:
-
-```csharp
-public class FooMonoBehaviour : MonoBehaviour
+public class TestInstaller : MonoInstaller
 {
-    ...
-
-    public class Factory : MonoBehaviourFactory<FooMonoBehaviour>
+    public override void InstallBindings()
     {
+        Container.BindAllInterfaces<EnemySpawner>().To<EnemySpawner>().AsSingle();
+        Container.Bind<Player>().AsSingle();
+        Container.BindFactory<float, Enemy, Enemy.Factory>();
     }
 }
 ```
 
-MonoBehaviourFactory objects are similar to Factory objects except that they require a prefab to be installed on it.  There is a convenience method that you can use to handle both installing the prefab and also declaring FooMonoBehaviour.Factory as a singleton:
+The dynamic parameters that are provided to the Enemy constructor are declared by using generic arguments to the Factory<> base class of Enemy.Factory.  This will add a method to Enemy.Factory that takes the parameters with the given types, which is called by EnemySpawner.
+
+There is no requirement that the `Enemy.Factory` class be a nested class within Enemy, however we have found this to be a very useful convention.  `Enemy.Factory` is always intentionally left empty and simply derives from the built-in Zenject `Factory<>` class, which handles the work of using the DiContainer to construct a new instance of Enemy.
+
+The reason that we don't use the `Factory<Enemy>` class directly is because this can become error prone when adding/removing parameters and also can get verbose since the parameter types must be declared whenever you refer to this class.  This is error prone because if for example you add a parameter to enemy and change the factory from `Factory<Enemy>` to `Factory<float, Enemy>`, any references to `Factory<Enemy>` will not be resolved.  And this will not be caught at compile time and instead will only be seen during validation or runtime.  So we recommend always using an empty class that derives from `Factory<>` instead.
+
+Also note that by using the built-in Zenject `Factory<>` class, the Enemy class will be automatically validated as well.  So if the constructor of the Enemy class includes a type that is not bound to the container, this error can be caught before running your app, by simply running validation.  Validation can be especially useful for dynamically created objects, because otherwise you may not catch the error until the factory is invoked at some point during runtime.  See <a href="#object-graph-validation">this section</a> for more details on Validation.
+
+This is all well and good for simple cases like this, but what if the Enemy class derives from MonoBehaviour and is instantiated via a prefab?  Or what if I want to create Enemy using a custom method or a custom factory class?
+
+These cases are handled very similar to how they are handled when not using a factory.  When you bind the factory to the container using `BindFactory`, you have access to the same bind methods that are given by the Bind method and described above.  For example, if we wanted to instantiate the `Enemy` class from a prefab, our code would become:
 
 ```csharp
-public override void InstallBindings()
+public class Enemy : MonoBehaviour
 {
-    ...
+    Player _player;
 
-    Container.BindMonoBehaviourFactory<FooMonoBehaviour.Factory>(_prefab);
+    // Note that we can't use a constructor anymore since we are a MonoBehaviour now
+    [Inject]
+    public void Construct(Player player)
+    {
+        _player = player;
+    }
 
-    ...
-}
-```
-
-Now classes can simply declare a constructor parameter of type FooMonoBehaviour.Factory and by calling the Create() method, construct new instances of a given prefab.
-
-Also note that there is an optional string parameter on the `BindMonoBehaviourFactory` method.  This can be used to automatically group dynamically created objects underneath an empty transform with this name.  For example, in the sample game we pass "Asteroids" here since otherwise every time a new asteroid spawns it will clutter our scene heirarchy with many new game objects at the root.
-
-But what if you want to instantiate a prefab but you do not have a dedicated MonoBehaviour for it?  In this case, you can use GameObjectFactory instead.
-
-```csharp
-public class MyPrefabFactory : GameObjectFactory
-{
+    public class Factory : Factory<float, Enemy>
+    {
+    }
 }
 
-public class GameInstaller : MonoInstaller
+public class TestInstaller : MonoInstaller
 {
-    GameObject MyPrefab;
+    public GameObject EnemyPrefab;
 
     public override void InstallBindings()
     {
-        ...
-        Container.BindGameObjectFactory<MyPrefabFactory>(MyPrefab);
-        ...
+        Container.BindAllInterfaces<EnemySpawner>().To<EnemySpawner>().AsSingle();
+        Container.Bind<Player>().AsSingle();
+        Container.BindFactory<Enemy, Enemy.Factory>().FromPrefab(EnemyPrefab);
     }
 }
+
 ```
 
-You could of course just use GameObject.Instantiate directly here, but some people prefer this approach with GameObjectFactory instead, since it decouples classes that call Create() from needing to have a reference to the prefab, and also will ensure that any MonoBehaviour objects that are on the prefab get their [Inject] fields/properties and [Inject] methods called.
+And similarly for FromInstance, FromMethod, FromSubContainerResolve, or any of the other <a href="#construction-methods">construction methods</a>.
+
+Using FromSubContainerResolve can be particularly useful if your dynamically created object has a lot of its own dependencies.  You can have it behave like a Facade.  See <a href="#sub-containers-and-facades">here</a> for details on nested containers / facades.
 
 ## <a id="abstract-factories"></a>Abstract Factories
 
-The above description of factories is great for most cases, however, there are times you do not want to depend directly on a concrete class and instead want your factory to return an interface instead.  This kind of factory is called an Abstract Factory, and it works a bit differently in Zenject from the standard factory as described above.
+The above description of factories is great for most cases, however, there are times you do not want to depend directly on a concrete class and instead want your factory to return an interface instead.  This kind of factory is called an Abstract Factory.
 
 Let's create an example scenario, where we have multiple different implementations of a given interface:
 
@@ -1676,197 +1670,59 @@ public class RandomPathFindingStrategy : IPathFindingStrategy
 {
     ...
 }
-
-public class GameController
-{
-    IFactory<IPathFindingStrategy> _strategyFactory;
-    IPathFindingStrategy _pathFindingStrategy;
-
-    public GameController(IFactory<IPathFindingStrategy> strategyFactory)
-    {
-        _strategyFactory = strategyFactory;
-    }
-
-    public void InitPathFinding()
-    {
-        _pathFindingStrategy = _strategyFactory.Create();
-
-        ...
-    }
-}
-
 ```
 
 For the sake of this example, let's also assume that we have to create the instance of IPathFindingStrategy at runtime.  Otherwise it would be as simple as executing `Container.Bind<IPathFindingStrategy>().To<TheImplementationWeWant>().AsSingle();` in one of our installers.
 
-So instead, what we want to create is a dependency of type `IFactory<IPathFindingStrategy>` that creates an instance of the implementation that we want to use when its Create() method is called, for use in the `GameController` class above.
-
-Let's say we want to use the `AStarPathFindingStrategy` implementation. The installer here looks like this:
+This is done in a very similar way that non-Abstract factories work.  One difference is that we can't include the factory as a nested class inside the interface (not allowed in C#) but otherwise it's no different:
 
 ```csharp
-
-public class GameInstaller : Installer
+public class PathFindingStrategyFactory : Factory<IPathFindingStrategy>
 {
-    public void InstallBindings()
+}
+
+public class GameController : IInitializable
+{
+    PathFindingStrategyFactory _strategyFactory;
+    IPathFindingStrategy _strategy;
+
+    public GameController(PathFindingStrategyFactory strategyFactory)
     {
-        ...
+        _strategyFactory = strategyFactory;
+    }
 
-        Container.BindIFactory<IPathFindingStrategy>().ToFactory<AStarPathFindingStrategy>();
-
-        ...
+    public void Initialize()
+    {
+        _strategy = _strategyFactory.Create();
+        // ...
     }
 }
 
-```
-
-Because of the fact that there are a number of different ways to define what is returned by a given `IFactory<>`, it has its own bind method called `BindIFactory<>`.  This method takes one generic parameter that defines the generic parameter that you want to use for `IFactory<>`, and then provides a number of different methods that you can choose from to define what is returned by the `IFactory<>` that you're creating.
-
-In the example installer above, our bind command maps our abstract factory `IFactory<IPathFindingStrategy>` to a concrete factory that returns a new instance of type `AStarPathFindingStrategy`.
-
-Note that you can also pass runtime parameters by supplying extra generic arguments to the `BindIFactory<>` method.  For example, if our implementations of `IPathFindingStrategy` both required a constructor parameter of type `string`, our binding would look like this instead:
-
-```csharp
-Container.BindIFactory<string, IPathFindingStrategy>().ToFactory<AStarPathFindingStrategy>();
-```
-
-This would result in a dependency of type `IFactory<string, IPathFindingStrategy>` with a Create() method that takes a string parameter.
-
-Included below are the other methods that you can choose from when using the `BindIFactory<>` method:
-
-Note that these descriptions are also included in the source code itself in the `IIFactoryBinderBase.cs` file.
-
-1 - **ToMethod([method])** - Create dynamic dependency from a method
-
-Results in a dependency of type `IFactory<TContract>` that invokes the given method.  Method must return a new instance of type `TContract`.
-
-```csharp
-// Examples
-Container.BindIFactory<IFoo>().ToMethod(MyMethod);
-
-// Using a lambda:
-Container.BindIFactory<IFoo>().ToMethod(c => new Foo());
-
-// With a parameter:
-Container.BindIFactory<string, IFoo>().ToMethod((text, c) => new Foo(text));
-```
-
-2 - **ToInstance&lt;TContract&gt;** - Create dynamic dependency from an existing instance
-
-Results in a dependency of type `IFactory<TContract>` that just returns the given instance
-
-```csharp
-// Example:
-Container.BindIFactory<IFoo>().ToInstance(new Foo());
-```
-
-3 - **ToFactory** - Create dynamic dependency for a concrete type
-
-Results in a dependency of type `IFactory<TContract>` that will create a new instance of type `TContract`.  `TContract` must be a concrete class in this case.
-
-```csharp
-// Example:
-Container.BindIFactory<Foo>().ToFactory();
-
-// With some parameters:
-Container.BindIFactory<string, int, int, Foo>().ToFactory();
-```
-
-In this example, any calls to `IFactory<Foo>.Create()` will return a new instance of type `Foo`.  Again, this of course requires that the generic argument to `BindIFactory<>` be non-abstract.
-
-4 - **ToFactory&lt;TConcrete&gt;** - Create dynamic dependency for an abstract type
-
-Results in a dependency of type `IFactory<TContract>` that will create a new instance of type `TConcrete`.  `TConcrete` must derive from `TContract` in this case.
-
-```csharp
-// Example:
-Container.BindIFactory<IFoo>().ToFactory<Foo>();
-
-// With some parameters
-Container.BindIFactory<string, int, IFoo>().ToFactory<Foo>();
-```
-
-5 - **ToIFactory&lt;TConcrete&gt;** - Create dynamic dependency via lookup on another factory
-
-Results in a dependency of type `IFactory<TContract>` that will return an instance of type `TConcrete`.  It does this by looking up `IFactory<TConcrete>` and calling `Create()` to create an instance of type `TConcrete`.  `TConcrete` must derive from `TContract` for this binding.  Also, it is assumed that `IFactory<TConcrete>` is declared in a separate binding.
-
-```csharp
-// First create a simple binding for IFactory<Foo>
-Container.BindIFactory<Foo>().ToFactory();
-
-// Now create a binding for IFactory<IFoo> that uses the above binding
-Container.BindIFactory<IFoo>().ToIFactory<Foo>();
-```
-
-6 - **ToCustomFactory&lt;TConcrete, TFactory&gt;** - Create dynamic dependency using user created factory class
-
-Results in a dependency of type `IFactory<TContract>` that will return an instance of type `TConcrete` using the given factory of type `TFactory`.  It is assumed that `TFactory` is declared in another binding.  `TFactory` must also derive from `IFactory<TConcrete>` for this to work.
-
-```csharp
-// Map IFoo to our custom factory Foo.Factory
-Container.BindIFactory<IFoo>().ToCustomFactory<Foo, MyCustomFooFactory>();
-
-public class MyCustomFooFactory : IFactory<IFoo>
+public class GameInstaller : MonoInstaller
 {
-    ...
-}
-```
+    public bool UseAStar;
 
-7 - **ToPrefab(prefab)** - Create dynamic MonoBehaviour using given prefab
-
-Results in a dependency of type `IFactory<TContract>` that can be used to create instances of the given prefab.  After instantiating the given prefab, the factory will search it for a component of type `TContract` and then will return that from the `Create()` method.  In this case, the `TContract` class must either be an interface or derive from `Component` / `MonoBehaviour`.
-
-```csharp
-Container.BindIFactory<IFoo>().ToPrefab(prefab);
-```
-
-8 - **ToFacadeFactoryMethod(prefab)** - Bind IFactory to a facade factory and initialize facade subcontainer using a method
-
-This binding can be useful if you have a sub-system with a related set of dependencies which don't need to be in the main container, and which can be interacted with entirely through a given "facade" class (see <a href="https://en.wikipedia.org/wiki/Facade_pattern">Facade Pattern</a>) For more information on what a Facade is and how it works see <a href="#sub-containers-and-facades">here</a>.
-
-The result is a dependency of type `IFactory<TContract>` that will return an instance of type `TConcrete` where `TConcrete` is inside a subcontainer, that is initialized using the given method.  
-
-```csharp
-Container.BindIFactory<FooFacade>().ToFacadeFactoryMethod<FooFacade.Factory>(InstallFooFacade);
-
-void InstallFooFacade(DiContainer subContainer)
-{
-    subContainer.Bind<FooFacade>().AsSingle();
-}
-```
-
-NOTE: It is assumed that TContract is actually bound to something within the given method..  In the example above, the Facade class is bound ToSingle
-
-9 - **ToFacadeFactoryInstaller(prefab)** - Bind IFactory to a facade factory and initialize facade subcontainer using an installer
-
-This binding can be useful if you have a sub-system with a related set of dependencies which don't need to be in the main container, and which can be interacted with entirely through a given "facade" class (see <a href="https://en.wikipedia.org/wiki/Facade_pattern">Facade Pattern</a>) For more information on what a Facade is and how it works see <a href="#sub-containers-and-facades">here</a>.
-
-Results in a dependency of type IFactory<TContract> that will return an instance of type TConcrete where TConcrete is "inside" a subcontainer, with the subcontainer initialized using the given installer.
-
-```csharp
-Container.BindIFactory<FooFacade>().ToFacadeFactoryInstaller<FooFacade.Factory, FooInstaller>()
-
-public class FooFacade
-{
-    public class Factory : FacadeFactory<FooFacade>
-    {
-    }
-}
-
-public class FooInstaller : Installer
-{
     public override void InstallBindings()
     {
-        Container.Bind<FooFacade>().AsSingle();
-        ...
+        Container.BindAllInterfaces<GameController>().To<GameController>().AsSingle();
+
+        if (UseAStar)
+        {
+            Container.BindFactory<IPathFindingStrategy, PathFindingStrategyFactory>().To<AStarPathFindingStrategy>();
+        }
+        else
+        {
+            Container.BindFactory<IPathFindingStrategy, PathFindingStrategyFactory>().To<RandomPathFindingStrategy>();
+        }
     }
 }
 ```
-
-NOTE: It is assumed that TContract is bound to something within the given installer.  In the example above, the Facade class is bound ToSingle
 
 ## <a id="custom-factories"></a>Custom Factories
 
-If you do not want to use the abstract factory method as described above, or if you want to have 100% control of how your object is instantiated, you could also just create a custom factory.  For example:
+*Ok, but what if I don't know what type I want to create until after the application has started?  Or what if I have special requirements for constructing instances of the Enemy class that are not covered by any of the construction methods?* 
+
+In these cases you can create a custom factory, and directly call `new Enemy` or directly use the `DiContainer` class to create your object.  For example, continuing the previous factory example, let's say that you wanted to be able to change a runtime value (difficulty) that determines what kinds of enemies get created.
 
 ```csharp
 public enum Difficulties
@@ -1877,107 +1733,115 @@ public enum Difficulties
 
 public interface IEnemy
 {
-    ...
+}
+
+public class EnemyFactory : Factory<IEnemy>
+{
 }
 
 public class Demon : IEnemy
 {
-    ...
 }
 
 public class Dog : IEnemy
 {
-    ...
 }
 
-public class EnemyFactory
+public class DifficultyManager
+{
+    public Difficulties Difficulty
+    {
+        get;
+        set;
+    }
+}
+
+public class CustomEnemyFactory : IFactory<IEnemy>
 {
     DiContainer _container;
-    Difficulties _difficulty;
+    DifficultyManager _difficultyManager;
 
-    public EnemyFactory(DiContainer container, Difficulties difficulty)
+    public CustomEnemyFactory(DiContainer container, DifficultyManager difficultyManager)
     {
         _container = container;
-        _difficulty = difficulty;
+        _difficultyManager = difficultyManager;
     }
 
-    public IEnemy Create(float speed)
+    public IEnemy Create()
     {
-        if (_difficulty == Difficulties.Hard)
+        if (_difficultyManager.Difficulty == Difficulties.Hard)
         {
-            return _container.Instantiate<Demon>(speed);
+            return _container.Instantiate<Demon>();
         }
 
-        return _container.Instantiate<Dog>(speed);
+        return _container.Instantiate<Dog>();
+    }
+}
+
+public class GameController : IInitializable
+{
+    readonly EnemyFactory _enemyFactory;
+
+    public GameController(EnemyFactory enemyFactory)
+    {
+        _enemyFactory = enemyFactory;
+    }
+
+    public void Initialize()
+    {
+        var enemy = _enemyFactory.Create();
+        // ...
+    }
+}
+
+public class TestInstaller : MonoInstaller
+{
+    public override void InstallBindings()
+    {
+        Container.BindAllInterfaces<GameController>().To<GameController>().AsSingle();
+        Container.Bind<DifficultyManager>().AsSingle();
+        Container.BindFactory<IEnemy, EnemyFactory>().FromFactory<CustomEnemyFactory>();
     }
 }
 ```
 
-And then in our installer we would include:
+You could also directly call `new Dog()` and `new Demon()` here instead of using the DiContainer (though in that case `Dog` and `Demon` would not have their members injected).
+
+One important issue to be aware of with using custom factories, is that the dynamically created classes will not be validated properly.  So in this example, if the `Demon` or `Dog` classes have a constructor parameter that is not bound to the DiContainer, that will not become obvious until runtime.  Whereas, if using a normal factory, that would be caught during validation.
+
+If you want to properly validate your custom factories, you can do that by just making a small modification to it:
 
 ```csharp
-Container.Bind<EnemyFactory>().AsSingle();
-Container.Bind<Difficulties>().ToInstance(Difficulties.Easy);
-```
-
-This way we can change the type of enemy we spawn by simply changing the difficulty bound in the installer.
-
-Or, if you do not want your code to depend on `EnemyFactory` directly, you could change it to this instead:
-
-```csharp
-public class EnemyFactory : IFactory<IEnemy>
-{
-    ...
-}
-
-...
-
-Container.BindIFactory<IEnemy>().ToCustomFactory<EnemyFactory>();
-```
-
-Note also that this is equivalent to the following:
-
-```csharp
-Container.Bind<IFactory<IEnemy>>().ToTransient<EnemyFactory>();
-```
-
-One issue with the above implementations is that they will not be validated properly.  Any constructor parameters added to the Dog or Demon classes that cannot be resolved will not be detected until runtime.  If you wish to address this you can implement it the following way:
-
-```csharp
-public class EnemyFactory : IValidatable
+public class CustomEnemyFactory : IFactory<IEnemy>, IValidatable
 {
     DiContainer _container;
-    Difficulties _difficulty;
+    DifficultyManager _difficultyManager;
 
-    public EnemyFactory(DiContainer container, Difficulties difficulty)
+    public CustomEnemyFactory(DiContainer container, DifficultyManager difficultyManager)
     {
         _container = container;
-        _difficulty = difficulty;
+        _difficultyManager = difficultyManager;
     }
 
-    public IEnemy Create(float speed)
+    public IEnemy Create()
     {
-        if (_difficulty == Difficulties.Hard)
+        if (_difficultyManager.Difficulty == Difficulties.Hard)
         {
-            return _container.Instantiate<Demon>(speed);
+            return _container.Instantiate<Demon>();
         }
 
-        return _container.Instantiate<Dog>(speed);
+        return _container.Instantiate<Dog>();
     }
 
-    public IEnumerable<ZenjectResolveException> Validate()
+    public void Validate()
     {
-        return _container.ValidateObjectGraph<Dog>(typeof(float))
-            .Concat(_container.ValidateObjectGraph<Demon>(typeof(float)));
+        _container.Instantiate<Dog>();
+        _container.Instantiate<Demon>();
     }
 }
 ```
 
-This is optional but can be nice if you are fan of validation.  The parameters provided to the ValidateObjectGraph method indicate the dependencies that can be skipped for validation.  This should include any runtime parameters.
-
-Note that we are injecting the DiContainer directly into the EnemyFactory class, which is generally a bad thing to do but ok in this case because it is a factory (and therefore part of the "composition root layer")
-
-For another real world example on factories, see [this reddit thread](https://www.reddit.com/r/Zenject/comments/3brroe/questionsimple_ftg_with_mvc_pattern/)
+This is done by implementing the interface `IValidatable` and then adding a `Validate()` method.  Then, to manually validate objects, you simply instantiate them.  Note that this will not actually instantiate these objects (these calls actually return null here).  The point is to do a "dry run" without actually instantiating anything, to prove out the full object graph.  For more details on validation see <a href="#object-graph-validation">here</a>.
 
 ## <a id="injecting-data-across-scenes"></a>Injecting data across scenes
 
