@@ -2290,53 +2290,6 @@ In most cases you can leave this as its default "Local".  However, if you are us
 
 "Container Type" will determine what container the component gets added to.  If set to 'Scene', it will be as if the given component was bound inside an installer on the SceneContext.  If set to 'Local', it will be as if it is bound inside an installer on whatever Context it is in.  In most cases that will be the SceneContext, but if it's inside a GameObjectContext it will be bound into that instead.  Typically you would only need to use the 'Scene' value when you want to bind something to the SceneContext that is inside a GameObjectContext (eg. typically this would be the MonoFacade derived class)
 
-## <a id="advanced-factory-construction-using-subcontainers"></a>Advanced Factory Construction Using SubContainers
-
-In the real world there can sometimes be complex construction that needs to occur in your custom factory classes.  One way to deal with this is to use a temporary sub-container.
-
-For example, suppose one day we decide to add further runtime constructor arguments to the `Enemy` class:
-
-```csharp
-public class Enemy
-{
-    public Enemy(EnemyWeapon weapon)
-    {
-        ...
-    }
-}
-
-public class EnemyWeapon
-{
-    public EnemyWeapon(float damage)
-    {
-        ...
-    }
-}
-```
-
-And let's say we want the damage of the `EnemyWeapon` class to be specified by the `EnemySpawner` class.  How do we pass that argument down to `EnemyWeapon`?  In this case it might be easiest to create the `EnemyWeapon` class first and then pass it to the factory.  However, for the sake of this example let's pretend we want to create the `Enemy` class in one call to `Instantiate()`.
-
-```csharp
-public class EnemyFactory
-{
-    DiContainer _container;
-
-    public EnemyFactory(DiContainer container)
-    {
-        _container = container;
-    }
-
-    public Enemy Create(float weaponDamage)
-    {
-        DiContainer subContainer = Container.CreateSubContainer();
-        subContainer.BindInstance(weaponDamage).WhenInjectedInto<EnemyWeapon>();
-        return subContainer.Instantiate<Enemy>();
-    }
-}
-```
-
-We can use Sub-Containers here to achieve this.  Sub-containers can be used in factories to add complex bindings to the object graph that you are instantiating.  The `Container.Instantiate` method does allow passing in a list of constructor arguments, but it is limited to just that.  Using Sub-Containers in this way can be thought of a more powerful version of that.  Though of course, Sub-Containers have a lot more uses than simply factory construction, as explained in the <a href="#sub-containers-and-facades">next section</a>
-
 ## <a id="sub-containers-and-facades"></a>Sub-Containers And Facades
 
 In some cases it can be very useful to use multiple containers in the same application.  For example, if you are creating a word processor it may be useful to have a sub-container for each tab that represents a separate document.  This way, you could bind a bunch of classes `AsSingle()` within the sub-container and they could all easily reference each other as if they were all singletons.  Then you could instantiate multiple sub-containers to be used for each document, with each sub-container having unique instances of all the classes that handle each specific document.
@@ -2347,279 +2300,304 @@ This is actually how global bindings work.  There is one global container for th
 
 A common design pattern that we like to use in relation to sub-containers is the <a href="https://en.wikipedia.org/wiki/Facade_pattern">Facade pattern</a>.  This pattern is used to abstract away a related group of dependencies so that it can be used at a higher level when used by other modules in the code base.  This is relevant here because often when you are defining sub-containers in your application it is very useful to also define a Facade class that is used to interact with this sub-container as a whole.  So, to apply it to the spaceship example above, you might have a SpaceshipFacade class that represents very high-level operations on a spaceship such as "Start Engine", "Take Damage", "Fly to destination", etc.  And then internally, the SpaceshipFacade class can delegate the specific handling of all the parts of these requests to the relevant single-responsibility dependencies that exist within the sub-container.
 
-<a id="simplefacadeexample"></a>
-Let's see how we would actually do this for this spaceship example:
+Let's do some examples in the following sections.
 
-* Create a new scene
-* Right Click inside the Hierarchy tab and select `Zenject -> Scene Context`
-* Right Click inside the Hierarchy tab again and select `Zenject -> Game Object Context`
-* Rename the object GameObjectContext to just "Ship"
-* Create a new MonoBehaviour named `Ship.cs` with the following contents:
+## <a id="hello-world-for-facades"></a>Hello World Example For Sub-Containers/Facade
 
 ```csharp
-using Zenject;
-
-public class Ship : MonoFacade
+public class Greeter
 {
-}
-```
+    readonly string _message;
 
-* This class will be used as a Facade for our ship (as in the <a href="https://en.wikipedia.org/wiki/Facade_pattern">Facade pattern</a>) and will be used by other systems to interact with the ship at a high level
-* Drag the `Ship.cs` script from the Project tab and drop it on to the `Ship` game object next to the `GameObjectContext` component.
-* Drag the newly added `Ship` component into the Facade property of `GameObjectContext`
-* Create a new MonoBehaviour named `ShipMoveHandler.cs` with the following contents:
-
-```csharp
-using Zenject;
-using UnityEngine;
-using System;
-
-public class ShipMoveHandler : ITickable
-{
-    readonly Settings _settings;
-
-    Transform _rootTransform;
-
-    public ShipMoveHandler(
-        Transform rootTransform, Settings settings)
+    public Greeter(string message)
     {
-        _settings = settings;
-        _rootTransform = rootTransform;
+        _message = message;
     }
 
-    public void Tick()
+    public void DisplayGreeting()
     {
-        _rootTransform.position += Vector3.forward * _settings.Speed * Time.deltaTime;
-    }
-
-    [Serializable]
-    public class Settings
-    {
-        public float Speed;
+        Debug.Log(_message);
     }
 }
-```
 
-* We will add this class to the sub-container associated with the ship.  It will be responsibile for propelling the ship forward
-* Create a new MonoBehaviour named `ShipInstaller.cs` with the following contents:
-
-```csharp
-using Zenject;
-using UnityEngine;
-using System;
-
-public class ShipInstaller : MonoInstaller
+public class GameController : IInitializable
 {
-    [SerializeField]
-    Settings _settings;
+    readonly Greeter _greeter;
 
-    public override void InstallBindings()
+    public GameController(Greeter greeter)
     {
-        Container.BindAllInterfacesAndSelf<ShipMoveHandler>().To<ShipMoveHandler>().AsSingle();
-        Container.BindInstance(this.transform).WhenInjectedInto<ShipMoveHandler>();
-        Container.BindInstance(_settings.ShipMoveHandler);
+        _greeter = greeter;
     }
 
-    [Serializable]
-    public class Settings
+    public void Initialize()
     {
-        public ShipMoveHandler.Settings ShipMoveHandler;
+        _greeter.DisplayGreeting();
     }
 }
-```
 
-* Drag the `ShipInstaller.cs` script from the Project tab and drop it on to the `Ship` game object next to the `GameObjectContext` component.
-* Drag the newly added `ShipInstaller` component into the Installers property of `GameObjectContext`
-* Validate your scene by pressing `CTRL+SHIFT+V`.  This should pass successfully.
-* Add a cube underneath the 'Ship' GameObject so we have something to represent the ship
-* Set the value for `Settings -> Ship Move Handler -> Speed` on the ShipInstaller component to `1`.
-* Run the scene.
-* You should observe the cube moving forward.
-* Duplicate the entire Ship game object by selecting it and pressing `CTRL+D`
-* Move it over slightly so we can see it is separate from the original ship
-* Change the value of `Settings -> Ship Move Handler -> Speed` to `0.5`
-* Run the scene.
-* You should observe both ships moving now at different speeds.
-
-This is an extremely simple example, but as you can see, both Ship objects are now operating entirely within their own custom sub-container.  They will both have their own instances of all the dependencies declared in the ShipInstaller such as `ShipMoveHandler`.  And furthermore, all of these objects can treat each other as singletons.  This is very nice, because just like in other examples above, when writing new classes to handle the ship, we don't need to think about where our dependencies come from - we just need to worry about fulfilling our own single responsibilities and then ask for whatever other dependencies we need in our constructor.
-
-Finally, we can also operate on each individual ship from the main game code by interacting with the Ship facade class, which abstracts away the low level functionality from within the ship.  For example, we might change the `Ship` class to the following:
-
-```csharp
-using Zenject;
-
-public class Ship : MonoFacade
+public class TestInstaller : MonoInstaller
 {
-    readonly ShipMoveHandler _moveHandler;
-
-    public Ship(ShipMoveHandler moveHandler)
-    {
-        _moveHandler = moveHandler;
-    }
-
-    public float Speed
-    {
-        get
-        {
-            return _moveHandler.Speed;
-        }
-        set
-        {
-            _moveHandler.Speed = value;
-        }
-    }
-}
-```
-
-This way, classes that are added at the scene-level do not need to even know that ShipMoveHandler exists - they can instead operate on the ship via the Ship facade class, which can that delegate those requests to the appropriate single-responsibility class within the subcontainer.
-
-For a description on how to create these facade classes dynamically, see the <a href="#dynamic-facades">next section</a>.
-
-For a much more interesting example of using facades and sub-containers, be sure to take a look at the included sample game (not the Asteroids game, the other one, underneath the "Sample2" folder)
-
-A more in-depth explanation of what's going on here:  The facade class, in addition to being used by scene-level classes to interact with the sub-container, is also the "root" of the object graph for the sub-container.  If you look inside the `MonoFacade` base class, you will find dependencies on `TickableManager`, `DisposableManager`, and `InitializableManager`.  This is why when we bind ShipMoveHandler to `ITickable`, it automatically gets created - because it is part of this object graph since `TickableManager` depends on all `ITickables`.
-
-## <a id="dynamic-facades"></a>Creating Facade's Dynamically
-
-Continuing with the facade example <a href="#simplefacadeexample">above</a>, let's pretend that we now want to create ships dynamically, after the game has started.
-
-* First, create a prefab for the entire `Ship` GameObject that we created above
-* Change `Ship.cs` to the following
-
-```csharp
-using Zenject;
-
-public class Ship : MonoFacade
-{
-    public class Factory : MonoFacadeFactory<Ship>
-    {
-    }
-}
-```
-
-* Then create a new MonoBehaviour named `GameController.cs` with the following contents:
-
-```csharp
-using UnityEngine;
-using Zenject;
-
-public class GameController : ITickable
-{
-    readonly Ship.Factory _shipFactory;
-
-    public GameController(Ship.Factory shipFactory)
-    {
-        _shipFactory = shipFactory;
-    }
-
-    public void Tick()
-    {
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            _shipFactory.Create();
-        }
-    }
-}
-```
-
-* This class will create a new ship every time the user presses the space bar.
-* Now let's wire these up in an installer.  Create a new MonoBehaviour named `GameInstaller.cs` with the following contents:
-
-```csharp
-using System;
-using UnityEngine;
-using System.Collections;
-using Zenject;
-
-public class GameInstaller : MonoInstaller
-{
-    [SerializeField]
-    Settings _settings;
-
     public override void InstallBindings()
     {
         Container.BindAllInterfaces<GameController>().To<GameController>().AsSingle();
-        Container.BindMonoFacadeFactory<Ship.Factory>(_settings.ShipPrefab);
+        Container.Bind<Greeter>().FromSubContainerResolve().ByMethod(InstallGreeter);
     }
 
-    [Serializable]
-    public class Settings
+    void InstallGreeter(DiContainer subContainer)
     {
-        public GameObject ShipPrefab;
+        subContainer.Bind<Greeter>().AsSingle();
+        subContainer.BindInstance("Hello world!");
     }
 }
 ```
 
-* As you can see, installing a MonoFacadeFactory is very similar to how MonoBehaviourFactories are installed.  You simply provide the prefab that contains the `GameObjectContext` and associated installers  as a parameter to the BindMonoFacadeFactory method
-* Now drag the `GameInstaller.cs` file from the Project tab and drop it on to the `SceneContext` game object
-* Drag the newly added GameInstaller component into the Installers property of the `SceneContext`
-* Drag the Ship prefab from the Project tab into the inspector for the GameInstaller component
-* Hit `CTRL+SHIFT+V` to validate the scene.  This should pass successfully.
-* Run the scene.
-* You should see that the Ship object that we left in the scene starts moving away.  And now, if we hit the space bar we can create new ship objects.
+The important thing to understand here is that any bindings that we add inside the `InstallGreeter` method will only be visible to objects within this sub-container.  The only exception is the Facade class (in this case, Greeter) since it is bound to the parent container using the FromSubContainerResolve binding.  In other words, in this example, the string "Hello World" is only visible by the Greeter class.
 
-Let's make this a bit more interesting by passing a parameter into our ship facade.  Let's make the speed of the ship configurable from within the GameController class.
+Note that you should always add a bind statement for whatever class is given to FromSubContainerResolve, otherwise this will fail.
 
-* Change the Ship class to the following:
+Note also that it is often better to use `ByInstaller` instead of `ByMethod`.  This is because when you use `ByMethod` it is easy to accidentally reference the Container instead of the subContainer.  Also, by using `ByInstaller` you can pass arguments into the Installer itself.
+
+## <a id="using-tickables-within-sub-containers"></a>Using IInitializable / ITickable / IDisposable within Sub-Containers
+
+One issue with the Hello World example above is that if I wanted to add some ITickable's or IInitializable's or IDisposable's to my sub-container it would not work.  For example, I might try doing this:
+
+```csharp
+public class GoodbyeHandler : IDisposable
+{
+    public void Dispose()
+    {
+        Log.Trace("Goodbye World!");
+    }
+}
+
+public class HelloHandler : IInitializable
+{
+    public void Initialize()
+    {
+        Log.Trace("Hello world!");
+    }
+}
+
+public class Greeter
+{
+    public Greeter()
+    {
+        Debug.Log("Created Greeter!");
+    }
+}
+
+public class TestInstaller : MonoInstaller
+{
+    public override void InstallBindings()
+    {
+        Container.Bind<Greeter>().FromSubContainerResolve().ByMethod(InstallGreeter).NonLazy();
+    }
+
+    void InstallGreeter(DiContainer subContainer)
+    {
+        subContainer.Bind<Greeter>().AsSingle();
+
+        subContainer.BindAllInterfaces<GoodbyeHandler>().To<GoodbyeHandler>().AsSingle();
+        subContainer.BindAllInterfaces<HelloHandler>().To<HelloHandler>().AsSingle();
+    }
+}
+```
+
+However, while we will find that our `Greeter` class is created (due to the fact we're using `NonLazy`) and the text "Created Greeter!" is printed to the console, the Hello and Goodbye messages are not.  To get this working we need to change it to the following:
+
+```csharp
+public class GoodbyeHandler : IDisposable
+{
+    public void Dispose()
+    {
+        Debug.Log("Goodbye World!");
+    }
+}
+
+public class HelloHandler : IInitializable
+{
+    public void Initialize()
+    {
+        Debug.Log("Hello world!");
+    }
+}
+
+public class Greeter : Kernel
+{
+}
+
+public class TestInstaller : MonoInstaller
+{
+    public override void InstallBindings()
+    {
+        Container.BindAllInterfacesAndSelf<Greeter>().To<Greeter>().FromSubContainerResolve().ByMethod(InstallGreeter).NonLazy();
+    }
+
+    void InstallGreeter(DiContainer subContainer)
+    {
+        subContainer.Bind<Greeter>().AsSingle();
+
+        subContainer.BindAllInterfaces<GoodbyeHandler>().To<GoodbyeHandler>().AsSingle();
+        subContainer.BindAllInterfaces<HelloHandler>().To<HelloHandler>().AsSingle();
+    }
+}
+```
+
+Now if we run it, we should see the Hello message, then if we stop playing we should see the Goodbye message.
+
+The reason this works is because we are now binding IInitializable, IDisposable, and ITickable on the root container to the Greeter class given by `Container.BindAllInterfacesAndSelf<Greeter>().To<Greeter>()`.  Greeter now inherits from Kernel, which inherits from all these interfaces and also handles forwarding these calls to the IInitializable's / ITickable's / IDisposable's in our sub container.
+
+## <a id="using-game-object-contexts"></a>Creating Sub-Containers on GameObject's by using Game Object Context
+
+Another issue with the <a href="#hello-world-for-facades">sub-container hello world example</a> above is that it does not work very well for MonoBehaviour classes.  There is nothing preventing us from adding MonoBehaviour bindings such as FromPrefab, FromGameObject, etc. to our sub-container, however these will cause these new game objects to be added to the root of the scene heirarchy, so we'll have to manually track the lifetime of these objects ourselves by calling GameObject.Destroy on them when the Facade is destroyed.  Also, there is no way to have GameObject's that exist in our scene at the start but also exist within our sub-container.  These problems can be solved by using Game Object Context.
+
+For this example, let's try to actually implement something similar to the open world space ship game described in <a href="#sub-containers-and-facades">the sub-container introduction</a>:
+
+* Create a new scene
+* Add the following files to your project:
 
 ```csharp
 using Zenject;
+using UnityEngine;
 
-public class Ship : MonoFacade
+public class Ship : MonoBehaviour
 {
-    public class Factory : MonoFacadeFactory<float, Ship>
+    ShipHealthHandler _healthHandler;
+
+    [Inject]
+    public void Construct(ShipHealthHandler healthHandler)
     {
+        _healthHandler = healthHandler;
+    }
+
+    public void TakeDamage(float damage)
+    {
+        _healthHandler.TakeDamage(damage);
     }
 }
 ```
 
-Just like with other factory types, to add a parameter to the factory we just need to add an extra generic parameter to the base class for our factory.
+```csharp
+using UnityEngine;
+using Zenject;
 
-However, you'll notice that in this case, unlike with other factory types, we have not added the float as a constructor parameter to the Ship class.  This is because parameters for Facades are treated a bit differently.  Instead of injecting the parameter into the facade class, the parameter gets injected into an Installer instead.  This is better for cases where we want to add the given parameter to the initial container (which happens often).
+public class GameRunner : ITickable
+{
+    readonly Ship _ship;
 
-* Now change the GameInstaller class to the following:
+    public GameRunner(Ship ship)
+    {
+        _ship = ship;
+    }
+
+    public void Tick()
+    {
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            _ship.TakeDamage(10);
+        }
+    }
+}
+```
 
 ```csharp
-using System;
+public class GameInstaller : MonoInstaller
+{
+    public override void InstallBindings()
+    {
+        Container.BindAllInterfaces<GameRunner>().To<GameRunner>().AsSingle();
+    }
+}
+```
+
+```csharp
+using Zenject;
+using UnityEngine;
+
+public class ShipHealthHandler : MonoBehaviour
+{
+    float _health = 100;
+
+    public void OnGUI()
+    {
+        GUI.Label(new Rect(Screen.width / 2, Screen.height / 2, 200, 100), "Health: " + _health);
+    }
+
+    public void TakeDamage(float damage)
+    {
+        _health -= damage;
+    }
+}
+```
+
+```csharp
 using UnityEngine;
 using System.Collections;
-using Zenject;
 
-namespace ModestTree
+public class ShipInputHandler : MonoBehaviour
 {
-    public class GameInstaller : MonoInstaller
-    {
-        [SerializeField]
-        Settings _settings;
+    [SerializeField]
+    float _speed = 2;
 
-        public override void InstallBindings()
+    public void Update()
+    {
+        if (Input.GetKey(KeyCode.UpArrow))
         {
-            Container.BindAllInterfaces<GameController>().To<GameController>().AsSingle();
-            Container.BindMonoFacadeFactory<ShipInstaller, Ship.Factory>(_settings.ShipPrefab);
+            this.transform.position += Vector3.forward * _speed * Time.deltaTime;
         }
 
-        [Serializable]
-        public class Settings
+        if (Input.GetKey(KeyCode.DownArrow))
         {
-            public GameObject ShipPrefab;
+            this.transform.position -= Vector3.forward * _speed * Time.deltaTime;
         }
     }
 }
 ```
 
-The only change we've made here is that the line BindMonoFacadeFactory now includes an extra generic argument `ShipInstaller`.  The installer type is provided here so that Zenject knows where to inject the parameters given to the MonoFacadeFactory.  In the previous example, it was not necessary to provide the installer type because there were no parameters.
+* Right Click inside the Hierarchy tab and select `Zenject -> Scene Context`
+* Drag the GameInstaller class to the SceneContext game object
+* Add a new row to the Installers property of the SceneContext
+* Drag the GameInstaller component to the new row under Installers
+* Right Click again inside the Hierarchy tab and select `Zenject -> Game Object Context`
+* Rename the new game object GameObjectContext to Ship
+* Drag the Ship MonoBehaviour to the Ship GameObject in our Scene. The Ship class will be used as a <a href="https://en.wikipedia.org/wiki/Facade_pattern">Facade</a> for our ship and will be used by other systems to interact with the ship at a high level
+* Also add the `ShipInputHandler` component to the Ship game object
+* Right click on the Ship GameObject and select 3D Object -> Cube.  This will serve as the placeholder model for our ship.
+* Add new game object under ship called HealthHandler, and add the `ShipHealthHandler` component to it
+* Your scene should look like this:
 
-* Change GameController to the following:
+<img src="UnityProject/Assets/Zenject/Documentation/ReadMe_files/ShipFacadeExample1.png?raw=true" alt="Ship Facade Example"/>
+
+* The idea here is that everything at or underneath the Ship game object should be considered inside it's own sub-container.  When we're done, we should be able to add multiple ships to our scene, each with their own components ShipHealthHandler, ShipInputHandler, etc. that can treat each other as singletons.
+* Try to validate your scene by pressing CTRL+SHIFT+V.  You should get an error that looks like this: `Unable to resolve type 'ShipHealthHandler' while building object with type 'Ship'.`
+* This is because the ShipHealthHandler component has not been added to our sub-container.  To address this:
+    * Click on the HealthHandler game object and then click Add Component and type Zenject Binding (if you don't know what that is read <a href="#scene-bindings">this</a>)
+    * Drag the Ship Health Handler Component to the Components field of Zenject Binding
+* Validate again by pressing CTRL+SHIFT+V.  You should now get this error instead: `Unable to resolve type 'Ship' while building object with type 'GameRunner'.` 
+* Our Ship component also needs to be added to the container.  To address this, once again:
+    * Click on the Ship game object and then click Add Component and type Zenject Binding
+    * Drag the Ship Component to the Components field of Zenject Binding
+* If we attempt to validate again you should notice the same error occurs.  This is because by default, ZenjectBinding only adds its components to the nearest container - in this case Ship.  This is not what we want though.  We want Ship to be added to the scene container because we want to use it as the Facade for our sub-container.  To address this we can explicitly tell ZenjectBinding which context to apply the binding to by dragging the SceneContext game object and dropping it on to the Context property of the Zenject binding
+* Validation should now pass succesfully.
+* If you run the scene now, you should see a health display in the middle of the screen, and you should be able to press Space bar to apply damage, and the up/down arrows to move the ship
+
+Also note that we can add installers to our ship sub-container in the same way that we add installers to our Scene Context - just by dropping them into the Installers property of GameObjectContext.  In this example we used MonoBehaviour's for everything but we can also add however many plain C# classes we want here and have those classes available everywhere in the sub-container just like we do here for MonoBehaviour's by using ZenjectBinding.
+
+## <a id="dynamic-game-object-contexts"></a>Creating Game Object Context's Dynamically
+
+Continuing with the ship example <a href="#using-game-object-contexts">above</a>, let's pretend that we now want to create ships dynamically, after the game has started.
+
+* First, create a prefab for the entire `Ship` GameObject that we created above and then delete it from the Scene.
+* Then just change 
 
 ```csharp
-using UnityEngine;
-using Zenject;
-
-public class GameController : ITickable
+public class GameRunner : ITickable
 {
     readonly Ship.Factory _shipFactory;
 
-    public GameController(Ship.Factory shipFactory)
+    Vector3 lastShipPosition;
+
+    public GameRunner(Ship.Factory shipFactory)
     {
         _shipFactory = shipFactory;
     }
@@ -2628,346 +2606,180 @@ public class GameController : ITickable
     {
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            var speed = UnityEngine.Random.RandomRange(1.0f, 5.0f);
-            _shipFactory.Create(speed);
+            var ship = _shipFactory.Create();
+            ship.transform.position = lastShipPosition;
+
+            lastShipPosition += Vector3.forward * 2;
         }
     }
 }
 ```
 
-* Change ShipInstaller to the following:
+```csharp
+public class GameInstaller : MonoInstaller
+{
+    [SerializeField]
+    GameObject ShipPrefab;
+
+    public override void InstallBindings()
+    {
+        Container.BindAllInterfaces<GameRunner>().To<GameRunner>().AsSingle();
+
+        Container.BindFactory<Ship, Ship.Factory>().FromSubContainerResolve().ByPrefab(ShipPrefab);
+    }
+}
+```
+
+* After doing this, make sure to drag and drop the newly created Ship prefab into the ShipPrefab property of GameInstaller in the inspector
+* Now if we run our scene, we can hit Space to add multiple Ship's to our scene.
+
+## <a id="dynamic-game-object-contexts"></a>Creating Game Object Context's Dynamically With Parameters
+
+Let's make this even more interesting by passing a parameter into our ship facade.  Let's make the speed of the ship configurable from within the GameController class.
+
+* Change our classes to the following:
+
+```csharp
+public class GameRunner : ITickable
+{
+    readonly Ship.Factory _shipFactory;
+
+    Vector3 lastShipPosition;
+
+    public GameRunner(Ship.Factory shipFactory)
+    {
+        _shipFactory = shipFactory;
+    }
+
+    public void Tick()
+    {
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            var ship = _shipFactory.Create(Random.RandomRange(2, 20));
+            ship.transform.position = lastShipPosition;
+
+            lastShipPosition += Vector3.forward * 2;
+        }
+    }
+}
+```
+
+```csharp
+public class GameInstaller : MonoInstaller
+{
+    [SerializeField]
+    GameObject ShipPrefab;
+
+    public override void InstallBindings()
+    {
+        Container.BindAllInterfaces<GameRunner>().To<GameRunner>().AsSingle();
+
+        Container.BindFactory<float, Ship, Ship.Factory>().FromSubContainerResolve().ByPrefab<ShipInstaller>(ShipPrefab);
+    }
+}
+```
 
 ```csharp
 using Zenject;
 using UnityEngine;
+
+public class Ship : MonoBehaviour
+{
+    ShipHealthHandler _healthHandler;
+
+    [Inject]
+    public void Construct(ShipHealthHandler healthHandler)
+    {
+        _healthHandler = healthHandler;
+    }
+
+    public void TakeDamage(float damage)
+    {
+        _healthHandler.TakeDamage(damage);
+    }
+
+    public class Factory : Factory<float, Ship>
+    {
+    }
+}
+```
+
+```csharp
+using UnityEngine;
+using System.Collections;
+using Zenject;
+
+public class ShipInputHandler : MonoBehaviour
+{
+    [Inject]
+    float _speed;
+
+    public void Update()
+    {
+        if (Input.GetKey(KeyCode.UpArrow))
+        {
+            this.transform.position += Vector3.forward * _speed * Time.deltaTime;
+        }
+
+        if (Input.GetKey(KeyCode.DownArrow))
+        {
+            this.transform.position -= Vector3.forward * _speed * Time.deltaTime;
+        }
+    }
+}
+```
+
+Also, add this new file:
+
+```csharp
 using System;
+using Zenject;
 
 public class ShipInstaller : MonoInstaller
 {
-    [InjectOptional]
-    float _speed = 1;
-
-    public override void InstallBindings()
-    {
-        Container.BindInstance(_speed).WhenInjectedInto<ShipMoveHandler>();
-        Container.BindAllInterfacesAndSelf<ShipMoveHandler>().To<ShipMoveHandler>().AsSingle();
-
-        Container.BindInstance(this.transform).WhenInjectedInto<ShipMoveHandler>();
-    }
-}
-```
-
-* Note that we've made the injected speed parameter optional here so that we can still drop the Ship prefab directly into the scene at edit-time
-* Finally, also change ShipMoveHandler to the following:
-
-```csharp
-using Zenject;
-using UnityEngine;
-using System;
-
-public class ShipMoveHandler : ITickable
-{
-    Transform _rootTransform;
+    [Inject]
     float _speed;
 
-    public ShipMoveHandler(
-        Transform rootTransform, float speed)
-    {
-        _speed = speed;
-        _rootTransform = rootTransform;
-    }
-
-    public void Tick()
-    {
-        _rootTransform.position += Vector3.forward * _speed * Time.deltaTime;
-    }
-}
-```
-
-* Now if we run the scene we should find that whenever we hit Space bar the ship gets created with a different speed
-
-For a more real-world example see the "Sample2" demo project which makes heavy use of MonoFacades.
-
-## <a id="non-monoBehaviour-facades-method"></a>Non-MonoBehaviour Facades (by method)
-
-The examples above show how to create a facade/sub-container using Unity GameObject's to represent the facade/sub-container.  However, it is also possible to do this entirely using plain old C# classes.
-
-For example, given the following classes:
-
-```csharp
-public class CarEngine
-{
-    public void StartEngine()
-    {
-        ...
-    }
-}
-
-public class CarTrunk
-{
-    public void Open()
-    {
-        ...
-    }
-}
-
-public class Car
-{
-    readonly CarTrunk _trunk;
-    readonly CarEngine _engine;
-
-    public Car(
-        CarEngine engine,
-        CarTrunk trunk)
-    {
-        _trunk = trunk;
-        _engine = engine;
-    }
-
-    public void StartEngine()
-    {
-        _engine.StartEngine();
-    }
-
-    public void OpenTrunk()
-    {
-        _trunk.Open();
-    }
-}
-```
-
-We could simply install these classes like this:
-
-```csharp
-public override void InstallBindings()
-{
-    Container.Bind<Car>().AsSingle();
-    Container.Bind<CarTrunk>().AsSingle();
-    Container.Bind<CarEngine>().AsSingle();
-}
-```
-
-However, if the functionality of the `Car` object gets complicated enough, or if we want to add support for multiple `Car` objects, we might want to use a sub-container/facade for this.
-
-We can do this very easily by changing our installer to the following instead:
-
-```csharp
-public override void InstallBindings()
-{
-    Container.Bind<Car>().ToSingleFacadeMethod(InstallCarFacade);
-}
-
-void InstallCarFacade(DiContainer subContainer)
-{
-    subContainer.Bind<Car>().AsSingle();
-    subContainer.Bind<CarTrunk>().AsSingle();
-    subContainer.Bind<CarEngine>().AsSingle();
-}
-```
-
-Now, the `CarEngine` and `CarTrunk` cannot be referenced anymore within the main container.  Any objects in the main container that want to interact with these objects have to do so entirely through the Car class.
-
-Just like with other Facade types, we always *must* bind the facade class ourselves (here we do that with this line: `subContainer.Bind<Car>().AsSingle()`)
-
-If we wanted to create our Car facade dynamically using a factory, this is pretty straightforward:
-
-```csharp
-public class Car
-{
-    ...
-
-    public class Factory : FacadeFactory<Car>
-    {
-    }
-}
-```
-
-* First add a factory to our Car class deriving from FacadeFactory
-
-```csharp
-public override void InstallBindings()
-{
-    Container.BindFacadeFactoryMethod<Car.Factory>(InstallCarFacade);
-}
-```
-
-* Then change the line in our installer to the above line instead.  The InstallCarFacade method can remain the same.
-* That's it.  Now you can add references to Car.Factory in any classes within the main container and create as many Car facades as you like.
-
-We can also add parameters to our Car factory by changing it to the following:
-
-```csharp
-public class CarEngine
-{
-    int _horsePower;
-
-    public CarEngine(int horsePower)
-    {
-        _horsePower = horsePower;
-    }
-
-    public void Start()
-    {
-        ...
-    }
-}
-
-
-public class Car
-{
-    ...
-
-    public class Factory : FacadeFactory<int, Car>
-    {
-    }
-}
-
-public override void InstallBindings()
-{
-    Container.BindFacadeFactoryMethod<int, Car.Factory>(InstallCarFacade);
-}
-
-void InstallCarFacade(DiContainer subContainer, int horsePower)
-{
-    subContainer.Bind<Car>().AsSingle();
-    subContainer.Bind<CarTrunk>().AsSingle();
-
-    subContainer.Bind<CarEngine>().AsSingle();
-    subContainer.BindInstance(horsePower).WhenInjectedInto<CarEngine>();
-}
-```
-
-* Here, we've changed it so that any class that wants a new Car facade must provide an integer parameter representing the horsepower of the engine.  This integer is then forwarded as a parameter to the installer method for Car.
-
-Note that when using the `ToSingleFacadeMethod`, you should be careful to always use the `subContainer` parameter in your installer method, and not the Container member variable.  
-
-Using `ToSingleFacadeMethod` is often the quickest and simplest way to add sub-containers, but it is often better practice to use `ToSingleFacadeInstaller` instead, as described in the <a href="non-monoBehaviour-facades-installer">next section</a>.
-
-Also, note here that we cannot currently make use of `ITickable`, `IInitializable`, or `IDisposable` interfaces within our subcontainer.  See <a href="#non-monoBehaviour-facade-interfaces">here</a> for why and how to address this.
-
-## <a id="non-monoBehaviour-facades-installer"></a>Non-MonoBehaviour Facades (by installer)
-
-Let's change the example outlined above so that it uses an Installer instead of a method:
-
-```csharp
-public override void InstallBindings()
-{
-    Container.Bind<Car>().ToSingleFacadeInstaller<CarInstaller>();
-}
-
-public class CarInstaller : Installer
-{
     public override void InstallBindings()
     {
-        Container.Bind<Car>().AsSingle();
-        Container.Bind<CarTrunk>().AsSingle();
-        Container.Bind<CarEngine>().AsSingle();
+        Container.BindInstance(_speed).WhenInjectedInto<ShipInputHandler>();
     }
 }
 ```
 
-This can be cleaner than using methods since it is consistent with the way other installers work and doesn't have the possibility that you will accidentally use Container instead of subContainer as is the case when using `ToSingleFacadeMethod`.
+After that compiles, add ShipInstaller to the Ship prefab and also drag it to the Installers field of the GameObjectContext.
 
-We can also add parameters to our facade by doing the following:
+Note the changes that we made here:
+- ShipInputHandler now has the speed injected instead of using Unity's SerializeField.
+- The nested Factory class in Ship has a float parameter added to it
+- In GameInstaller, the binding for the factory is different
+- In GameRunner, we now need to pass a float parameter to the factory's create method
+
+One important difference with creating a Sub-Container using a factory, is that the parameters you supply to the factory are not necessarily forwarded to the facade class.  In this example, the parameter is a float value for speed, which we want to forward to the ShipInputHandler class instead.  That is why these parameters are always forwarded to an installer for the sub-container, so that you can decide for yourself at install time what to do with the parameter.  Another reason for this is that in some cases the parameter might be used to choose different bindings.
+
+You might also want to be able to drop Ship prefabs into the scene at design time.  This way, you can have some Ships that start in the scene, but you can also create them dynamically.  One way to do that would be to change ShipInstaller to the following:
 
 ```csharp
+using System;
+using Zenject;
+using UnityEngine;
 
-public class CarEngine
+public class ShipInstaller : MonoInstaller
 {
-    int _horsePower;
-    public CarEngine(int horsePower)
-    {
-        _horsePower = horsePower;
-    }
-
-    public void Start()
-    {
-        ...
-    }
-}
-
-public class Car
-{
-    ...
-    public class Factory : FacadeFactory<int, Car>
-    {
-    }
-}
-
-public class CarInstaller : Installer
-{
-    int _horsePower;
-
-    public CarInstaller(int horsePower)
-    {
-        _horsePower = horsePower;
-    }
+    [SerializeField]
+    [InjectOptional]
+    float _speed;
 
     public override void InstallBindings()
     {
-        Container.Bind<Car>().AsSingle();
-        Container.Bind<CarTrunk>().AsSingle();
-
-        Container.Bind<CarEngine>().AsSingle();
-        Container.BindInstance(_horsePower).WhenInjectedInto<CarEngine>();
+        Container.BindInstance(_speed).WhenInjectedInto<ShipInputHandler>();
     }
 }
 ```
 
-* Note that unlike when using `ToSingleFacadeMethod`, we don't have to change the `Container.BindFacadeFactory` line when changing the parameter list.
+This way, you can drop the Ship prefab into the scene and control the speed in the inspector, but you can also create them dynamically and pass the speed into the factory as a parameter.
 
-## <a id="non-monoBehaviour-facade-interfaces"></a>Using ITickable / `IInitializable` / `IDisposable` with Non-MonoBehaviour Facades
-
-One important thing to understand about the above Car example is that you cannot add the standard interfaces such as `ITickable`, `IInitializable`, and `IDisposable` to the Car facade sub-container.  For example, if you needed to add per-frame behaviour to the `CarEngine` class, you might try changing it to this:
-
-```csharp
-public class CarEngine : ITickable
-{
-    public void StartEngine()
-    {
-        ...
-    }
-
-    public void Tick()
-    {
-        ...
-    }
-}
-```
-
-```csharp
-public class CarInstaller : Installer
-{
-    public override void InstallBindings()
-    {
-        Container.Bind<Car>().AsSingle();
-        Container.Bind<CarTrunk>().AsSingle();
-
-        Container.Bind<CarEngine>().AsSingle();
-        Container.Bind<ITickable>().To<CarEngine>().AsSingle();
-    }
-}
-```
-
-However, in this case, the `Tick` method of `CarEngine` will never be called.  To fix this, we need to make these additional changes:
-
-```csharp
-public class Car : Facade
-{
-    ...
-}
-```
-
-* Our Car facade needs to now derive from the Zenject.Facade class.  The Zenject.Facade implements `ITickable` and also has its own TickableManager which will handle forwarding the Tick event to the `ITickable`'s that are inside our sub-container
-
-```csharp
-public override void InstallBindings()
-{
-    Container.BindAllInterfacesAndSelf<Car>().ToSingleFacadeInstaller<Car, CarInstaller>();
-}
-```
-
-* Here, we are binding all the interfaces that Car has to the Car singleton.  Since Car inherits from Facade, which implements `ITickable`, `IInitializable`, etc., then the Tick method of Car will now be called and all the `ITickable`'s defined in the subcontainer will also now have their Tick's called, including the CarEngine class.
+For a more real-world example see the "Sample2" demo project which makes heavy use of Game Object Contexts.
 
 ## <a id="zenject-order-of-operations"></a>Zenject Order Of Operations
 
