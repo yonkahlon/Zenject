@@ -1,5 +1,5 @@
 
-## <a id="commands-and-signals"></a>Commands And Signals
+## <a id="signals-and-commands"></a>Signals And Commands
 
 Zenject also includes an optional extension that allows you to define "Commands" and "Signals".
 
@@ -11,6 +11,8 @@ The advantage of using Signals and Commands is that the result will often be mor
 2. Inverse the dependency by having B observe an event on A.  In this case, B is strongly coupled with A.
 
 Both cases result in the classes being coupled in some way.  Now if instead you create a command object, which is called by A and which invokes a method on B, then the result is less coupling.  Granted, A is still coupled to the command class, but in some cases that is better than being directly coupled to B.  Using signals works similarly, in that you can remove the coupling by having A trigger a signal, which is observed by B.
+
+## <a id="signals"></a>Signals
 
 Signals are defined like this:
 
@@ -27,8 +29,6 @@ public class GameLoadedSignalWithParameter : Signal<string>
 ```
 
 The trigger class is used to invoke the signal event.  We make the trigger a separate class so that we can control which classes can trigger the signal and which classes can listen on the signal separately.
-
-Note that the Signal base class is defined within the Zenject.Commands namespace.
 
 Signals are declared in an installer like this:
 
@@ -115,6 +115,8 @@ public class Foo
 }
 ```
 
+## <a id="commands"></a>Commands
+
 Commands are defined like this
 
 ```csharp
@@ -123,30 +125,28 @@ public class ResetSceneCommand : Command { }
 public class ResetSceneCommandWithParameter : Command<string> { }
 ```
 
-Note again that the Command base class is defined within the Zenject.Commands namespace here.
-
 Unlike with signals, there are several different ways of declaring a command in an installer.  Perhaps the simplest way would be the following:
 
 ```csharp
 public override void InstallBindings()
 {
     ...
-    Container.BindCommand<ResetSceneCommand>().To<ResetSceneHandler>().AsSingle();
+    Container.BindCommand<ResetSceneCommand>().To<ResetSceneHandler>(x => x.Reset).AsSingle();
     ...
-    Container.BindCommand<ResetSceneCommandWithParameter, string>().To<ResetSceneHandler>().AsSingle();
+    Container.BindCommand<ResetSceneCommandWithParameter, string>().To<ResetSceneHandler>(x => x.Reset).AsSingle();
     ...
 }
 
-public class ResetSceneHandler : ICommandHandler
+public class ResetSceneHandler
 {
-    public void Execute()
+    public void Reset()
     {
         ... [reset scene] ...
     }
 }
 ```
 
-This bind statement will result in an object of type `ResetSceneCommand` being added to the container.  Any time a class calls Execute on `ResetSceneCommand`, it will trigger the Execute method on the `ResetSceneHandler` class as well.  For example:
+This bind statement will result in an object of type `ResetSceneCommand` being added to the container.  Any time a class calls Execute on `ResetSceneCommand`, it will trigger the Reset method on the `ResetSceneHandler` class.  For example:
 
 ```csharp
 public class Foo : ITickable
@@ -173,40 +173,16 @@ We might also want to restrict usage of our command to the Foo class only, which
 public override void InstallBindings()
 {
     ...
-    Container.BindCommand<ResetSceneCommand>().To<ResetSceneHandler>().AsSingle().WhenInjectedInto<Foo>();
+    Container.BindCommand<ResetSceneCommand>().To<ResetSceneHandler>(x => x.Reset).AsSingle().WhenInjectedInto<Foo>();
     ...
 }
 ```
 
-Note that in this case we are using `AsSingle` - this means that the same instance of `ResetSceneHandler` will be used every time the command is executed.  Alternatively, you could declare it using `ToTransient<>` which would instantiate a new instance of `ResetSceneHandler` every time Execute() is called.  For example:
+Note that in this case we are using `AsSingle` - this means that the same instance of `ResetSceneHandler` will be used every time the command is executed.  Alternatively, you could declare it using `AsTransient<>` which would instantiate a new instance of `ResetSceneHandler` every time Execute() is called.  For example:
 
 ```csharp
-Container.BindCommand<ResetSceneCommand>().ToTransient<ResetSceneHandler>();
+Container.BindCommand<ResetSceneCommand>().To<ResetSceneHandler>(x => x.Reset).AsTransient();
 ```
 
 This might be useful if the `ResetSceneCommand` class involves some long-running operations that require unique sets of member variables/dependencies.
 
-You can also bind commands directly to methods instead of classes by doing the following:
-
-```csharp
-public override void InstallBindings()
-{
-    ...
-    Container.BindCommand<ResetSceneCommand>().ToSingle<MyOtherHandler>(x => x.ResetScene);
-    ...
-}
-
-public class ResetSceneHandler
-{
-    public void ResetScene()
-    {
-        ... [reset scene] ...
-    }
-}
-```
-
-This approach does not require that you derive from `ICommandHandler` at all.  There is also a `ToTransient` version of this which works similarly (instantiates a new instance of MyOtherHandler).
-
-```csharp
-Container.BindCommand<ResetSceneCommand>().ToTransient<MyOtherHandler>(x => x.ResetScene);
-```

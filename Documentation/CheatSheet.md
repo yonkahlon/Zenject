@@ -7,17 +7,17 @@ For more examples, you may also be interested in reading some of the Unit tests 
 
 ```csharp
 
-///////////// ToTransient
+///////////// AsTransient
 
 // Create a new instance of Foo for every class that asks for it
-Container.Bind<Foo>().ToTransient();
+Container.Bind<Foo>().AsTransient();
 
 // Create a new instance of Foo for every class that asks for an IFoo
-Container.Bind<IFoo>().ToTransient<Foo>();
+Container.Bind<IFoo>().To<Foo>().AsTransient();
 
 // Non generic versions
-Container.Bind(typeof(IFoo)).ToTransient();
-Container.Bind(typeof(IFoo)).ToTransient(typeof(Foo));
+Container.Bind(typeof(IFoo)).AsTransient();
+Container.Bind(typeof(IFoo)).To(typeof(Foo)).AsTransient();
 
 ///////////// ToSingle
 
@@ -119,7 +119,7 @@ IFoo GetFoo(InjectContext ctx)
 // Using lambda syntax
 Container.Bind<Foo>().ToMethod((ctx) => new Foo());
 
-// This is equivalent to ToTransient
+// This is equivalent to AsTransient
 Container.Bind<Foo>().ToMethod((ctx) => ctx.Container.Instantiate<Foo>());
 
 ///////////// ToGetter
@@ -235,7 +235,7 @@ Container.BindInstance(5.0f).When(ctx =>
 // So if Bar has a constructor parameter of type Qux, and Qux has
 // a constructor parameter of type IFoo, a new Foo will be created
 // for that case
-Container.Bind<IFoo>().ToTransient<Foo>().When(
+Container.Bind<IFoo>().To<Foo>().AsTransient().When(
     ctx => ctx.AllObjectTypes.Contains(typeof(Bar)));
 
 ///////////// Complex conditions example
@@ -243,8 +243,8 @@ Container.Bind<IFoo>().ToTransient<Foo>().When(
 var foo1 = new Foo();
 var foo2 = new Foo();
 
-Container.Bind<Bar>("Bar1").ToTransient();
-Container.Bind<Bar>("Bar2").ToTransient();
+Container.Bind<Bar>("Bar1").AsTransient();
+Container.Bind<Bar>("Bar2").AsTransient();
 
 // Here we use the 'ParentContexts' property of inject context to sync multiple corresponding identifiers
 Container.BindInstance(foo1).When(c => c.ParentContexts.Where(x => x.MemberType == typeof(Bar) && x.Identifier == "Bar1").Any());
