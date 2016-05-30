@@ -104,12 +104,31 @@ namespace Zenject
             {
                 foreach (var concreteType in concreteTypes)
                 {
-                    Assert.DerivesFromOrEqual(concreteType, contractType);
-
-                    RegisterProvider(
-                        container, contractType, providerFunc(contractType, concreteType));
+                    if (ValidateBindTypes(concreteType, contractType))
+                    {
+                        RegisterProvider(
+                            container, contractType, providerFunc(contractType, concreteType));
+                    }
                 }
             }
+        }
+
+        // Returns true if the bind should continue, false to skip
+        bool ValidateBindTypes(Type concreteType, Type contractType)
+        {
+            if (concreteType.DerivesFromOrEqual(contractType))
+            {
+                return true;
+            }
+
+            if (BindInfo.InvalidBindResponse == InvalidBindResponses.Assert)
+            {
+                throw Assert.CreateException(
+                    "Expected type '{0}' to derive from or be equal to '{1}'", concreteType, contractType);
+            }
+
+            Assert.IsEqual(BindInfo.InvalidBindResponse, InvalidBindResponses.Skip);
+            return false;
         }
 
         // Note that if multiple contract types are provided per concrete type,
@@ -129,9 +148,10 @@ namespace Zenject
             {
                 foreach (var concreteType in concreteTypes)
                 {
-                    Assert.DerivesFromOrEqual(concreteType, contractType);
-
-                    RegisterProvider(container, contractType, providerMap[concreteType]);
+                    if (ValidateBindTypes(concreteType, contractType))
+                    {
+                        RegisterProvider(container, contractType, providerMap[concreteType]);
+                    }
                 }
             }
         }

@@ -110,18 +110,27 @@ namespace Zenject
         void InstallExplicit(Type installerType, List<TypeValuePair> extraArgs);
 
 #if !NOT_UNITY3D
-        // _____ InstallPrefab _____
-        void InstallPrefab<T>()
+        // _____ InstallPrefabResource _____
+        void InstallPrefabResource(Type installerType, string resourcePath, IEnumerable<object> extraArgs);
+        void InstallPrefabResource(Type installerType, IEnumerable<object> extraArgs);
+        void InstallPrefabResource(Type installerType, string resourcePath);
+        void InstallPrefabResource(Type installerType);
+
+        void InstallPrefabResource<T>(string resourcePath, IEnumerable<object> extraArgs)
             where T : MonoInstaller;
 
-        void InstallPrefab<T>(IEnumerable<object> extraArgs)
+        void InstallPrefabResource<T>(IEnumerable<object> extraArgs)
             where T : MonoInstaller;
 
-        void InstallPrefab(Type installerType);
-        void InstallPrefab(Type installerType, IEnumerable<object> extraArgs);
+        void InstallPrefabResource<T>(string resourcePath)
+            where T : MonoInstaller;
+
+        void InstallPrefabResource<T>()
+            where T : MonoInstaller;
 
         // This is only necessary if you have to pass in null values as parameters to the installer
-        void InstallPrefabExplicit(Type installerType, List<TypeValuePair> extraArgs);
+        void InstallPrefabResourceExplicit(
+            Type installerType, string resourcePath, List<TypeValuePair> extraArgs);
 
         // _____ InstallScriptableObject _____
 

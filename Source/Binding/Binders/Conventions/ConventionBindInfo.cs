@@ -13,6 +13,8 @@ namespace Zenject
         readonly List<Func<Type, bool>> _typeFilters = new List<Func<Type, bool>>();
         readonly List<Func<Assembly, bool>> _assemblyFilters = new List<Func<Assembly, bool>>();
 
+        static Dictionary<Assembly, Type[]> _assemblyTypeCache = new Dictionary<Assembly, Type[]>();
+
         public void AddAssemblyFilter(Func<Assembly, bool> predicate)
         {
             _assemblyFilters.Add(predicate);
@@ -25,6 +27,8 @@ namespace Zenject
 
         IEnumerable<Assembly> GetAllAssemblies()
         {
+            // This seems fast enough that it's not worth caching
+            // We also want to allow dynamically loading assemblies
             return AppDomain.CurrentDomain.GetAssemblies();
         }
 
@@ -38,11 +42,25 @@ namespace Zenject
             return _typeFilters.All(predicate => predicate(type));
         }
 
+        Type[] GetTypes(Assembly assembly)
+        {
+            Type[] types;
+
+            // This is much faster than calling assembly.GetTypes() every time
+            if (!_assemblyTypeCache.TryGetValue(assembly, out types))
+            {
+                types = assembly.GetTypes();
+                _assemblyTypeCache[assembly] = types;
+            }
+
+            return types;
+        }
+
         public List<Type> ResolveTypes()
         {
             return GetAllAssemblies()
                 .Where(ShouldIncludeAssembly)
-                .SelectMany(assembly => assembly.GetTypes())
+                .SelectMany(assembly => GetTypes(assembly))
                 .Where(ShouldIncludeType).ToList();
         }
     }
