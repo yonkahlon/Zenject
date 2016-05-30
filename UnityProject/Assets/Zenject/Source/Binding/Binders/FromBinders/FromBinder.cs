@@ -211,7 +211,7 @@ namespace Zenject
             return new ScopeBinder(BindInfo);
         }
 
-        protected ScopeBinder FromResolveGetter<TObj, TResult>(
+        protected ScopeBinder FromResolveGetterBase<TObj, TResult>(
             object identifier, Func<TObj, TResult> method)
         {
             BindingUtil.AssertIsDerivedFromTypes(typeof(TResult), AllParentTypes);
