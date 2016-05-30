@@ -2,46 +2,35 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using ModestTree;
+using Zenject;
 
 namespace Zenject
 {
-    [System.Diagnostics.DebuggerStepThrough]
-    public class InstanceProvider : ProviderBase
+    public class InstanceProvider : IProvider
     {
         readonly object _instance;
         readonly Type _instanceType;
 
-        public InstanceProvider(Type instanceType, object instance, DiContainer container)
+        public InstanceProvider(
+            Type instanceType, object instance)
         {
-            Assert.That(instance == null || instance.GetType().DerivesFromOrEqual(instanceType));
-
-            _instance = instance;
             _instanceType = instanceType;
-
-            var singletonMark = container.SingletonRegistry.TryGetSingletonType(instanceType);
-
-            if (singletonMark.HasValue)
-            {
-                throw new ZenjectBindException(
-                    "Attempted to use 'ToInstance' with the same type ('{0}') that is already marked with '{1}'".Fmt(instanceType.Name(), singletonMark.Value));
-            }
+            _instance = instance;
         }
 
-        public override Type GetInstanceType()
+        public Type GetInstanceType(InjectContext context)
         {
             return _instanceType;
         }
 
-        public override object GetInstance(InjectContext context)
+        public IEnumerator<List<object>> GetAllInstancesWithInjectSplit(InjectContext context, List<TypeValuePair> args)
         {
-            // _instance == null during validation sometimes
-            Assert.That(_instance == null || _instance.GetType().DerivesFromOrEqual(context.MemberType));
-            return _instance;
-        }
+            Assert.IsEmpty(args);
+            Assert.IsNotNull(context);
 
-        public override IEnumerable<ZenjectResolveException> ValidateBinding(InjectContext context)
-        {
-            return Enumerable.Empty<ZenjectResolveException>();
+            Assert.That(_instanceType.DerivesFromOrEqual(context.MemberType));
+
+            yield return new List<object>() { _instance };
         }
     }
 }

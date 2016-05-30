@@ -17,52 +17,30 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <IntermediateOutputPath>..\..\..\..\..\..\AssemblyBuild\Temp\Debug\</IntermediateOutputPath>
-    <BaseIntermediateOutputPath>..\..\..\..\..\..\AssemblyBuild\Temp\Debug\</BaseIntermediateOutputPath>
-    <OutputPath>..\..\..\..\..\..\AssemblyBuild\Bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <IntermediateOutputPath>..\..\..\..\..\..\NonUnityBuild\Temp\Debug\</IntermediateOutputPath>
+    <BaseIntermediateOutputPath>..\..\..\..\..\..\NonUnityBuild\Temp\Debug\</BaseIntermediateOutputPath>
+    <OutputPath>..\..\..\..\..\..\NonUnityBuild\Bin\Debug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;NOT_UNITY3D</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <IntermediateOutputPath>..\..\..\..\..\..\AssemblyBuild\Temp\Release\</IntermediateOutputPath>
-    <BaseIntermediateOutputPath>..\..\..\..\..\..\AssemblyBuild\Temp\Release\</BaseIntermediateOutputPath>
-    <OutputPath>..\..\..\..\..\..\AssemblyBuild\Bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
+    <IntermediateOutputPath>..\..\..\..\..\..\NonUnityBuild\Temp\Release\</IntermediateOutputPath>
+    <BaseIntermediateOutputPath>..\..\..\..\..\..\NonUnityBuild\Temp\Release\</BaseIntermediateOutputPath>
+    <OutputPath>..\..\..\..\..\..\NonUnityBuild\Bin\Release\</OutputPath>
+    <DefineConstants>TRACE;NOT_UNITY3D</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Not Unity Debug|AnyCPU'">
-    <DebugSymbols>true</DebugSymbols>
-    <OutputPath>..\..\..\..\..\..\AssemblyBuild\Bin\Not Unity Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;ZEN_NOT_UNITY3D</DefineConstants>
-    <IntermediateOutputPath>..\..\..\..\..\..\AssemblyBuild\Temp\Debug\</IntermediateOutputPath>
-    <BaseIntermediateOutputPath>..\..\..\..\..\..\AssemblyBuild\Temp\Debug\</BaseIntermediateOutputPath>
-    <DebugType>full</DebugType>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Not Unity Release|AnyCPU'">
-    <OutputPath>..\..\..\..\..\..\AssemblyBuild\Bin\Not Unity Release\</OutputPath>
-    <DefineConstants>TRACE;ZEN_NOT_UNITY3D</DefineConstants>
-    <IntermediateOutputPath>..\..\..\..\..\..\AssemblyBuild\Temp\Debug\</IntermediateOutputPath>
-    <BaseIntermediateOutputPath>..\..\..\..\..\..\AssemblyBuild\Temp\Debug\</BaseIntermediateOutputPath>
-    <Optimize>true</Optimize>
-    <DebugType>pdbonly</DebugType>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-  </PropertyGroup>
   <ItemGroup>
     <Reference Include="nunit.core">
-      <HintPath>..\..\..\..\..\..\AssemblyBuild\Libraries\NUnit\nunit.core.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\NonUnityBuild\Libraries\NUnit\nunit.core.dll</HintPath>
     </Reference>
     <Reference Include="nunit.framework, Version=2.6.0.12051, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\..\AssemblyBuild\Libraries\NUnit\nunit.framework.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\NonUnityBuild\Libraries\NUnit\nunit.framework.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -70,12 +48,6 @@
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
-    <Reference Include="UnityEngine" Condition="'$(Configuration)'=='Release'">
-      <HintPath>..\..\..\..\..\AssemblyBuild\Libraries\Unity\UnityEngine.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine">
-      <HintPath>..\..\..\..\..\..\AssemblyBuild\Libraries\Unity\UnityEngine.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\Source\Zenject.csproj">
@@ -88,19 +60,17 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Bindings\TestMultiBind.cs" />
-    <Compile Include="Bindings\TestMultiBindAgain.cs" />
-    <Compile Include="Bindings\TestRebind.cs" />
+    <Compile Include="Bindings\TestTo.cs" />
+    <Compile Include="BindFeatures\TestMultipleContractTypes.cs" />
+    <Compile Include="BindFeatures\TestMultipleContractTypes2.cs" />
+    <Compile Include="BindFeatures\TestMultipleContractTypes3.cs" />
+    <Compile Include="BindFeatures\TestWithArguments.cs" />
+    <Compile Include="Bindings\TestToFactory.cs" />
     <Compile Include="Bindings\TestToGetter.cs" />
-    <Compile Include="Bindings\TestToLookup.cs" />
-    <Compile Include="Bindings\TestUnbind.cs" />
-    <Compile Include="CommandsAndSignals\TestCommands.cs" />
-    <Compile Include="CommandsAndSignals\TestCommandsOneParam.cs" />
-    <Compile Include="CommandsAndSignals\TestCommandsSixParams.cs" />
-    <Compile Include="CommandsAndSignals\TestSignals.cs" />
-    <Compile Include="CommandsAndSignals\TestSignalsOneParam.cs" />
-    <Compile Include="CommandsAndSignals\TestSignalsSixParams.cs" />
-    <Compile Include="CommandsAndSignals\TestSignalsWithIdentifiers.cs" />
+    <Compile Include="Bindings\TestToInstance.cs" />
+    <Compile Include="Bindings\TestToResolve.cs" />
+    <Compile Include="Bindings\TestToSubContainerInstaller.cs" />
+    <Compile Include="Bindings\TestToSubContainerMethod.cs" />
     <Compile Include="Conditions\TestConditionsBasic.cs" />
     <Compile Include="Conditions\TestConditionsComplex.cs" />
     <Compile Include="Conditions\TestConditionsFieldName.cs" />
@@ -109,10 +79,16 @@
     <Compile Include="Conditions\TestConditionsTarget.cs" />
     <Compile Include="Conditions\TestConditionsTargetInstance.cs" />
     <Compile Include="Conditions\TestIdentifiers.cs" />
+    <Compile Include="Conventions\Foo.cs" />
+    <Compile Include="Conventions\TestConvention.cs" />
+    <Compile Include="Factories\Bindings\TestFactoryTo0.cs" />
+    <Compile Include="Factories\Bindings\TestFactoryToGetter0.cs" />
+    <Compile Include="Factories\Bindings\TestFactoryToInstance0.cs" />
+    <Compile Include="Factories\Bindings\TestFactoryToMethod0.cs" />
+    <Compile Include="Factories\Bindings\TestFactoryToResolve0.cs" />
+    <Compile Include="Factories\Bindings\TestFactoryToSubContainerInstaller0.cs" />
+    <Compile Include="Factories\Bindings\TestFactoryToSubContainerMethod0.cs" />
     <Compile Include="Factories\TestFactory.cs" />
-    <Compile Include="Factories\TestFactoryNullArgs.cs" />
-    <Compile Include="Factories\TestIFactory.cs" />
-    <Compile Include="Factories\TestIFactoryUntyped.cs" />
     <Compile Include="Injection\TestAllInjectionTypes.cs" />
     <Compile Include="Injection\TestBaseClassPropertyInjection.cs" />
     <Compile Include="Injection\TestCircularDependencies.cs" />
@@ -126,37 +102,38 @@
     <Compile Include="Injection\TestPostInjectCall.cs" />
     <Compile Include="Injection\TestPostInjectParameters.cs" />
     <Compile Include="Injection\TestPropertyInjection.cs" />
-    <Compile Include="Injection\TestSameConstructorArgumentType.cs" />
     <Compile Include="Injection\TestStructInjection.cs" />
     <Compile Include="Injection\TestTestOptional.cs" />
-    <Compile Include="Injection\TestTransientInjection.cs" />
-    <Compile Include="Other\TestDiContainer.cs" />
     <Compile Include="Other\TestGenericContract.cs" />
     <Compile Include="Other\TestMoq.cs" />
+    <Compile Include="Other\TestNestedContainer.cs" />
     <Compile Include="Other\TestResolveMany.cs" />
+    <Compile Include="Other\TestSubContainers.cs" />
+    <Compile Include="Other\TestSubContainers4.cs" />
     <Compile Include="Other\TestTaskUpdater.cs" />
+    <Compile Include="Other\TestTestUtil.cs" />
     <Compile Include="Other\TestTransientMockProvider.cs" />
     <Compile Include="Other\TestValidateInstaller.cs" />
     <Compile Include="Other\ZenjectProfileTest.cs" />
-    <Compile Include="Singletons\TestBothInterfaceAndConcreteBoundToSameSingleton.cs" />
-    <Compile Include="Singletons\TestConflictingToSingletonUses.cs" />
-    <Compile Include="Singletons\TestMultipleInterfaceSameSingle.cs" />
-    <Compile Include="Singletons\TestSingletonIdentifiers.cs" />
-    <Compile Include="Singletons\TestToInstance.cs" />
-    <Compile Include="Singletons\TestToSingle.cs" />
-    <Compile Include="Singletons\TestToSingleFactory.cs" />
-    <Compile Include="Singletons\TestToSingleInstance.cs" />
-    <Compile Include="Singletons\TestToSingleMethod.cs" />
-    <Compile Include="Singletons\TestToSingleWrongMonoBehaviour.cs" />
-    <Compile Include="SubContainers\TestFacades.cs" />
-    <Compile Include="SubContainers\TestNestedContainer.cs" />
-    <Compile Include="SubContainers\TestSubContainer2.cs" />
-    <Compile Include="SubContainers\TestSubContainer3.cs" />
-    <Compile Include="SubContainers\TestSubContainers.cs" />
-    <Compile Include="SubContainers\TestSubContainers4.cs" />
     <Compile Include="Util\TestListComparer.cs" />
-    <Compile Include="Util\TestTestUtil.cs" />
-    <Compile Include="Util\TestWithContainer.cs" />
+    <Compile Include="Other\TestInheritInSubContainers.cs" />
+    <Compile Include="Other\TestCircularDependencies.cs" />
+    <Compile Include="Other\TestConflictingToSingletonUses.cs" />
+    <Compile Include="Factories\Bindings\TestFactoryTo1.cs" />
+    <Compile Include="Factories\Bindings\TestFactoryToMethod1.cs" />
+    <Compile Include="Factories\Bindings\TestFactoryToSubContainerInstaller1.cs" />
+    <Compile Include="Factories\Bindings\TestFactoryToSubContainerMethod1.cs" />
+    <Compile Include="Factories\Bindings\TestFactoryToFactory0.cs" />
+    <Compile Include="Factories\Bindings\TestFactoryToFactory1.cs" />
+    <Compile Include="Factories\Bindings\TestFactoryTo5.cs" />
+    <Compile Include="Bindings\TestToMethod.cs" />
+    <Compile Include="Other\TestFacadeSubContainer.cs" />
+    <Compile Include="Validation\TestValidate1.cs" />
+    <Compile Include="Validation\TestValidateFactories.cs" />
+    <Compile Include="BindFeatures\TestNonLazy.cs" />
+    <Compile Include="Factories\IFactory\TestIFactory.cs" />
+    <Compile Include="Conventions\FooMore.cs" />
+    <Compile Include="..\..\TestingFramework\Editor\ZenjectUnitTestFixture.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.

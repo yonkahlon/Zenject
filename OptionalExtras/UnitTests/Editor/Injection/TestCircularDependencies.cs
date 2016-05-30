@@ -6,10 +6,10 @@ using System.Linq;
 using ModestTree;
 using Assert=ModestTree.Assert;
 
-namespace Zenject.Tests
+namespace Zenject.Tests.Injection
 {
     [TestFixture]
-    public class TestCircularDependencies : TestWithContainer
+    public class TestCircularDependencies : ZenjectUnitTestFixture
     {
         class Test1
         {
@@ -43,8 +43,11 @@ namespace Zenject.Tests
             Test2.CreateCount = 0;
             Test1.CreateCount = 0;
 
-            Container.Bind<Test1>().ToSingle();
-            Container.Bind<Test2>().ToSingle();
+            Container.Bind<Test1>().AsSingle();
+            Container.Bind<Test2>().AsSingle();
+
+            // TODO: Validation does not support circular dependencies
+            Container.Validate();
 
             var test1 = Container.Resolve<Test1>();
             var test2 = Container.Resolve<Test2>();
@@ -66,7 +69,7 @@ namespace Zenject.Tests
                 CreateCount++;
             }
 
-            [PostInject]
+            [Inject]
             public void Initialize(Test4 other)
             {
                 this.Other = other;
@@ -84,7 +87,7 @@ namespace Zenject.Tests
                 CreateCount++;
             }
 
-            [PostInject]
+            [Inject]
             public void Initialize(Test3 other)
             {
                 this.Other = other;
@@ -97,8 +100,12 @@ namespace Zenject.Tests
             Test4.CreateCount = 0;
             Test3.CreateCount = 0;
 
-            Container.Bind<Test3>().ToSingle();
-            Container.Bind<Test4>().ToSingle();
+            Container.Bind<Test3>().AsSingle();
+            Container.Bind<Test4>().AsSingle();
+
+            // TODO - validation does not support circular dependencies
+            // which is valid for properties
+            Container.Validate();
 
             var test1 = Container.Resolve<Test3>();
             var test2 = Container.Resolve<Test4>();
@@ -130,13 +137,13 @@ namespace Zenject.Tests
         {
             if (Container.ChecksForCircularDependencies)
             {
-                Container.Bind<Test5>().ToSingle();
-                Container.Bind<Test6>().ToSingle();
+                Container.Bind<Test5>().AsSingle().NonLazy();
+                Container.Bind<Test6>().AsSingle().NonLazy();
+
+                Assert.Throws(() => Container.Validate());
 
                 Assert.Throws(() => Container.Resolve<Test5>());
                 Assert.Throws(() => Container.Resolve<Test6>());
-
-                Assert.That(!Container.ValidateResolve<Test6>().IsEmpty());
             }
         }
 
@@ -152,7 +159,7 @@ namespace Zenject.Tests
         {
             if (Container.ChecksForCircularDependencies)
             {
-                Container.Bind<Test7>().ToSingle();
+                Container.Bind<Test7>().AsSingle();
                 Assert.Throws(() => Container.Instantiate<Test7>());
             }
         }

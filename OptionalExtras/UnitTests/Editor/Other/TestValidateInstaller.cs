@@ -7,114 +7,71 @@ using System.Linq;
 using ModestTree;
 using Assert=ModestTree.Assert;
 
-namespace Zenject.Tests
+namespace Zenject.Tests.Other
 {
     [TestFixture]
-    public class TestValidateInstaller
+    public class TestValidateInstaller : ZenjectUnitTestFixture
     {
         [Test]
         public void TestBasicSuccess()
         {
-            var container = new DiContainer();
+            Container.Bind<IFoo>().To<Foo>().AsSingle().NonLazy();
+            Container.Bind<Bar>().AsSingle().NonLazy();
 
-            container.Bind<IFoo>().ToSingle<Foo>();
-            container.Bind<Bar>().ToSingle();
-
-            Assert.That(container.ValidateResolve<IFoo>().IsEmpty());
+            Container.Validate();
         }
 
         [Test]
         public void TestBasicFailure()
         {
-            var container = new DiContainer();
+            Container.Bind<IFoo>().To<Foo>().AsSingle().NonLazy();
 
-            container.Bind<IFoo>().ToSingle<Foo>();
-            //container.Bind<Bar>().ToSingle();
-
-            Assert.That(!container.ValidateResolve<IFoo>().IsEmpty());
+            Assert.Throws(() => Container.Validate());
         }
 
         [Test]
         public void TestList()
         {
-            var container = new DiContainer();
+            Container.Bind<IFoo>().To<Foo>().AsSingle().NonLazy();
+            Container.Bind<IFoo>().To<Foo2>().AsSingle().NonLazy();
 
-            container.Bind<IFoo>().ToSingle<Foo>();
-            container.Bind<IFoo>().ToSingle<Foo2>();
+            Container.Bind<Bar>().AsSingle().NonLazy();
 
-            container.Bind<Bar>().ToSingle();
+            Container.Bind<Qux>().AsSingle().NonLazy();
 
-            container.Bind<Qux>().ToSingle();
-
-            Assert.That(container.ValidateResolve<Qux>().IsEmpty());
-        }
-
-        [Test]
-        public void TestValidateDynamicSuccess()
-        {
-            var container = new DiContainer();
-
-            container.Bind<Foo>().ToSingle();
-
-            Assert.That(container.ValidateObjectGraph<Foo>(typeof(Bar)).IsEmpty());
-        }
-
-        [Test]
-        public void TestValidateDynamicFailure()
-        {
-            var container = new DiContainer();
-
-            container.Bind<Foo>().ToSingle();
-
-            Assert.That(!container.ValidateObjectGraph<Foo>().IsEmpty());
-        }
-
-        [Test]
-        public void TestValidateDynamicFailure2()
-        {
-            var container = new DiContainer();
-
-            container.Bind<Foo>().ToSingle();
-
-            Assert.That(!container.ValidateObjectGraph<Foo>(typeof(Bar), typeof(string)).IsEmpty());
+            Container.Validate();
         }
 
         [Test]
         public void TestValidateNestedContainerSuccess()
         {
-            var container = new DiContainer();
+            var nestedContainer = Container.CreateSubContainer();
 
-            var nestedContainer = new DiContainer(container);
+            nestedContainer.Bind<Foo>().AsSingle().NonLazy();
 
             // Should fail without Bar<> bound
-            Assert.That(!nestedContainer.ValidateObjectGraph<Foo>().IsEmpty());
+            Assert.Throws(() => nestedContainer.Validate());
 
-            container.Bind<Bar>().ToSingle();
+            Container.Bind<Bar>().AsSingle().NonLazy();
 
-            Assert.That(nestedContainer.ValidateObjectGraph<Foo>().IsEmpty());
+            Container.Validate();
+            nestedContainer.Validate();
         }
 
         [Test]
         public void TestValidateNestedContainerList()
         {
-            var container = new DiContainer();
+            var nestedContainer = Container.CreateSubContainer();
 
-            var nestedContainer = new DiContainer(container);
+            Container.Bind<IFoo>().To<Foo>().AsSingle().NonLazy();
+            Container.Bind<IFoo>().To<Foo2>().AsSingle().NonLazy();
 
-            container.Bind<IFoo>().ToSingle<Foo>();
-            container.Bind<IFoo>().ToSingle<Foo2>();
+            Container.Bind<Bar>().AsSingle().NonLazy();
 
-            Assert.That(!container.ValidateResolve<List<IFoo>>().IsEmpty());
-            Assert.That(!nestedContainer.ValidateResolve<List<IFoo>>().IsEmpty());
-
-            container.Bind<Bar>().ToSingle();
-
-            Assert.That(container.ValidateResolve<List<IFoo>>().IsEmpty());
+            Container.Validate();
 
             // Should not throw
             nestedContainer.Resolve<List<IFoo>>();
-
-            Assert.That(nestedContainer.ValidateResolve<List<IFoo>>().IsEmpty());
         }
 
         interface IFoo

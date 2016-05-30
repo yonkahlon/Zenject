@@ -5,16 +5,28 @@ using NUnit.Framework;
 using ModestTree;
 using Assert=ModestTree.Assert;
 
-namespace Zenject.Tests
+namespace Zenject.Tests.Injection
 {
     [TestFixture]
-    public class TestNullableValues : TestWithContainer
+    public class TestNullableValues : ZenjectUnitTestFixture
     {
+        class Test1
+        {
+            public int? val;
+
+            public Test1(int? val)
+            {
+                this.val = val;
+            }
+        }
+
         class Test2
         {
             public int? val;
 
-            public Test2(int? val)
+            public Test2(
+                [InjectOptional]
+                int? val)
             {
                 this.val = val;
             }
@@ -23,12 +35,22 @@ namespace Zenject.Tests
         [Test]
         public void RunTest1()
         {
-            Container.Bind<Test2>().ToSingle();
-            Container.Bind<int>().ToInstance(1);
+            Container.Bind<Test1>().AsSingle().NonLazy();
+            Container.Bind<int>().FromInstance(1).NonLazy();
 
-            Assert.That(Container.ValidateResolve<Test2>().IsEmpty());
-            var test1 = Container.Resolve<Test2>();
-            Assert.IsEqual(test1.val, 1);
+            Container.Validate();
+
+            Assert.IsEqual(Container.Resolve<Test1>().val, 1);
+        }
+
+        [Test]
+        public void RunTest2()
+        {
+            Container.Bind<Test2>().AsSingle().NonLazy();
+
+            Container.Validate();
+
+            Assert.IsEqual(Container.Resolve<Test2>().val, null);
         }
     }
 }

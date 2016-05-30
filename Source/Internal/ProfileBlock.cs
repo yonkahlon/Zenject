@@ -1,12 +1,19 @@
 //#define PROFILING_ENABLED
 
 using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Text.RegularExpressions;
+
+#if !NOT_UNITY3D
+using UnityEngine;
+#endif
 
 namespace ModestTree.Util.Debugging
 {
     public class ProfileBlock : IDisposable
     {
-#if PROFILING_ENABLED && !ZEN_NOT_UNITY3D
+#if PROFILING_ENABLED && !NOT_UNITY3D
         public ProfileBlock(string sampleName)
         {
             Profiler.BeginSample(sampleName);

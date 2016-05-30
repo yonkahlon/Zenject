@@ -22,8 +22,9 @@ namespace Zenject.Tests
         [Test]
         public void Test1()
         {
-            _container.Bind<IFoo>().ToMock();
-            _container.Bind<Bar>().ToSingle();
+            _container.Bind<IFoo>().FromMock();
+
+            _container.Bind<Bar>().AsSingle();
 
             _container.Resolve<Bar>().Run();
         }

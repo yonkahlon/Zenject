@@ -17,44 +17,22 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <IntermediateOutputPath>..\..\..\..\..\AssemblyBuild\Temp\Debug\</IntermediateOutputPath>
-    <BaseIntermediateOutputPath>..\..\..\..\..\AssemblyBuild\Temp\Debug\</BaseIntermediateOutputPath>
-    <OutputPath>..\..\..\..\..\AssemblyBuild\Bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <IntermediateOutputPath>..\..\..\..\..\NonUnityBuild\Temp\Debug\</IntermediateOutputPath>
+    <BaseIntermediateOutputPath>..\..\..\..\..\NonUnityBuild\Temp\Debug\</BaseIntermediateOutputPath>
+    <OutputPath>..\..\..\..\..\NonUnityBuild\Bin\Debug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;NOT_UNITY3D</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <IntermediateOutputPath>..\..\..\..\..\AssemblyBuild\Temp\Release\</IntermediateOutputPath>
-    <BaseIntermediateOutputPath>..\..\..\..\..\AssemblyBuild\Temp\Release\</BaseIntermediateOutputPath>
-    <OutputPath>..\..\..\..\..\AssemblyBuild\Bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
+    <IntermediateOutputPath>..\..\..\..\..\NonUnityBuild\Temp\Release\</IntermediateOutputPath>
+    <BaseIntermediateOutputPath>..\..\..\..\..\NonUnityBuild\Temp\Release\</BaseIntermediateOutputPath>
+    <OutputPath>..\..\..\..\..\NonUnityBuild\Bin\Release\</OutputPath>
+    <DefineConstants>TRACE;NOT_UNITY3D</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Not Unity Debug|AnyCPU'">
-    <DebugSymbols>true</DebugSymbols>
-    <OutputPath>..\..\..\..\..\AssemblyBuild\Bin\Not Unity Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;ZEN_NOT_UNITY3D</DefineConstants>
-    <DebugType>full</DebugType>
-    <IntermediateOutputPath>..\..\..\..\..\AssemblyBuild\Temp\Not Unity Debug\</IntermediateOutputPath>
-    <BaseIntermediateOutputPath>..\..\..\..\..\AssemblyBuild\Temp\Not Unity Debug\</BaseIntermediateOutputPath>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Not Unity Release|AnyCPU'">
-    <OutputPath>..\..\..\..\..\AssemblyBuild\Bin\Not Unity Release\</OutputPath>
-    <DefineConstants>TRACE;ZEN_NOT_UNITY3D;ZEN_MULTITHREADING</DefineConstants>
-    <Optimize>true</Optimize>
-    <IntermediateOutputPath>..\..\..\..\..\AssemblyBuild\Temp\Not Unity Release\</IntermediateOutputPath>
-    <BaseIntermediateOutputPath>..\..\..\..\..\AssemblyBuild\Temp\Not Unity Release\</BaseIntermediateOutputPath>
-    <DebugType>pdbonly</DebugType>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -63,26 +41,21 @@
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
-    <Reference Include="UnityEngine, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\AssemblyBuild\Libraries\Unity\UnityEngine.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Binders\CommandBinder.cs" />
+    <Compile Include="Command\Binders\CommandExtensions.cs" />
+    <Compile Include="Command\Binders\Finalizers\CommandBindingFinalizerBase.cs" />
     <Compile Include="Command\Command.cs" />
-    <Compile Include="Command\CommandExtensions.cs" />
-    <Compile Include="Command\ICommandHandler.cs" />
-    <Compile Include="Providers\CommandProviderBase.cs" />
-    <Compile Include="Providers\CommandProviderHandlerSingle.cs" />
-    <Compile Include="Providers\CommandProviderHandlerTransient.cs" />
-    <Compile Include="Providers\CommandProviderMethodSingle.cs" />
-    <Compile Include="Providers\CommandProviderMethodTransient.cs" />
-    <Compile Include="Providers\CommandProviderSingle.cs" />
-    <Compile Include="Providers\CommandProviderStatic.cs" />
-    <Compile Include="Providers\CommandProviderTransient.cs" />
     <Compile Include="Signal\Signal.cs" />
     <Compile Include="Signal\SignalExtensions.cs" />
+    <Compile Include="Command\Binders\CommandBinderBase.cs" />
+    <Compile Include="Command\Binders\CommandBinder0.cs" />
+    <Compile Include="Command\Binders\CommandBinder1.cs" />
+    <Compile Include="Command\Binders\CommandBinder2.cs" />
+    <Compile Include="Command\Binders\CommandBinder3.cs" />
+    <Compile Include="Command\Binders\CommandBinder4.cs" />
+    <Compile Include="Command\Binders\Finalizers\CommandBindingFinalizer.cs" />
+    <Compile Include="Command\Binders\CommandBinder5.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Source\Zenject.csproj">
