@@ -6,10 +6,10 @@ using System.Linq;
 using ModestTree;
 using Assert=ModestTree.Assert;
 
-namespace Zenject.Tests
+namespace Zenject.Tests.Conditions
 {
     [TestFixture]
-    public class TestConditionsBasic : TestWithContainer
+    public class TestConditionsBasic : ZenjectUnitTestFixture
     {
         public interface IFoo
         {
@@ -46,10 +46,12 @@ namespace Zenject.Tests
         [Test]
         public void Test1()
         {
-            Container.Bind<Bar1>().ToSingle();
-            Container.Bind<Bar2>().ToSingle();
-            Container.Bind<IFoo>().ToSingle<Foo1>();
-            Container.Bind<IFoo>().ToSingle<Foo2>().WhenInjectedInto<Bar2>();
+            Container.Bind<Bar1>().AsSingle().NonLazy();
+            Container.Bind<Bar2>().AsSingle().NonLazy();
+            Container.Bind<IFoo>().To<Foo1>().AsSingle().NonLazy();
+            Container.Bind<IFoo>().To<Foo2>().AsSingle().WhenInjectedInto<Bar2>().NonLazy();
+
+            Container.Validate();
 
             Assert.IsNotEqual(
                 Container.Resolve<Bar1>().Foo, Container.Resolve<Bar2>().Foo);

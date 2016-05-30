@@ -5,10 +5,10 @@ using NUnit.Framework;
 using ModestTree;
 using Assert=ModestTree.Assert;
 
-namespace Zenject.Tests
+namespace Zenject.Tests.Injection
 {
     [TestFixture]
-    public class TestBaseClassPropertyInjection : TestWithContainer
+    public class TestBaseClassPropertyInjection : ZenjectUnitTestFixture
     {
         class Test0
         {
@@ -35,10 +35,11 @@ namespace Zenject.Tests
         [Test]
         public void TestCaseBaseClassPropertyInjection()
         {
-            Container.Bind<Test0>().ToSingle();
-            Container.Bind<Test2>().ToSingle();
+            Container.Bind<Test0>().AsSingle().NonLazy();
+            Container.Bind<Test2>().AsSingle().NonLazy();
 
-            Assert.That(Container.ValidateResolve<Test2>().IsEmpty());
+            Container.Validate();
+
             var test1 = Container.Resolve<Test2>();
 
             Assert.That(test1.GetVal() != null);

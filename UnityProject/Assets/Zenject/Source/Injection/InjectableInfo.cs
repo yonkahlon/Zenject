@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 
 namespace Zenject
 {
@@ -7,7 +8,7 @@ namespace Zenject
     public class InjectableInfo
     {
         public readonly bool Optional;
-        public readonly string Identifier;
+        public readonly object Identifier;
 
         public readonly InjectSources SourceType;
 
@@ -24,7 +25,7 @@ namespace Zenject
         public readonly object DefaultValue;
 
         public InjectableInfo(
-            bool optional, string identifier, string memberName,
+            bool optional, object identifier, string memberName,
             Type memberType, Type objectType, Action<object, object> setter, object defaultValue, InjectSources sourceType)
         {
             Optional = optional;
@@ -40,9 +41,21 @@ namespace Zenject
         public InjectContext CreateInjectContext(
             DiContainer container, InjectContext currentContext, object targetInstance, string concreteIdentifier)
         {
-            return new InjectContext(
-                container, MemberType, Identifier, Optional,
-                ObjectType, targetInstance, MemberName, currentContext, concreteIdentifier, DefaultValue, SourceType);
+            var context = new InjectContext();
+
+            context.MemberType = MemberType;
+            context.Container = container;
+            context.ObjectType = ObjectType;
+            context.ParentContext = currentContext;
+            context.ObjectInstance = targetInstance;
+            context.Identifier = Identifier;
+            context.ConcreteIdentifier = concreteIdentifier;
+            context.MemberName = MemberName;
+            context.Optional = Optional;
+            context.SourceType = SourceType;
+            context.FallBackValue = DefaultValue;
+
+            return context;
         }
     }
 }

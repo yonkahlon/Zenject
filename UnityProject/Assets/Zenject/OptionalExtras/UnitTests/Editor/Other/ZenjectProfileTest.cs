@@ -6,7 +6,7 @@ using NUnit.Framework;
 using ModestTree;
 using Assert=ModestTree.Assert;
 
-namespace Zenject.Tests
+namespace Zenject.Tests.Other
 {
     [TestFixture]
     public class ZenjectProfileTest
@@ -76,9 +76,9 @@ namespace Zenject.Tests
         public void Test()
         {
             //var container = new DiContainer();
-            //container.Bind<Test0>().ToTransient();
-            //container.Bind<Test1>().ToTransient();
-            //container.Bind<Test2>().ToTransient();
+            //container.Bind<Test0>().AsTransient();
+            //container.Bind<Test1>().AsTransient();
+            //container.Bind<Test2>().AsTransient();
 
             //var stopwatch = new Stopwatch();
 

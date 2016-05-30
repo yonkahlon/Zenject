@@ -6,10 +6,10 @@ using System.Linq;
 using ModestTree;
 using Assert=ModestTree.Assert;
 
-namespace Zenject.Tests
+namespace Zenject.Tests.Conditions
 {
     [TestFixture]
-    public class TestConditionsFieldName : TestWithContainer
+    public class TestConditionsFieldName : ZenjectUnitTestFixture
     {
         class Test0
         {
@@ -33,26 +33,27 @@ namespace Zenject.Tests
         public override void Setup()
         {
             base.Setup();
-            Container.Bind<Test0>().ToSingle().When(r => r.MemberName == "name1");
+            Container.Bind<Test0>().AsSingle().When(r => r.MemberName == "name1");
         }
 
         [Test]
         public void TestNameConditionError()
         {
-            Container.Bind<Test2>().ToSingle();
+            Container.Bind<Test2>().AsSingle().NonLazy();
 
-            Assert.Throws<ZenjectResolveException>(
+            Assert.Throws(
                 delegate { Container.Resolve<Test2>(); });
 
-            Assert.That(Container.ValidateResolve<Test2>().Any());
+            Assert.Throws(() => Container.Validate());
         }
 
         [Test]
         public void TestNameConditionSuccess()
         {
-            Container.Bind<Test1>().ToSingle();
+            Container.Bind<Test1>().AsSingle().NonLazy();
 
-            Assert.That(Container.ValidateResolve<Test1>().IsEmpty());
+            Container.Validate();
+
             var test1 = Container.Resolve<Test1>();
 
             Assert.That(test1 != null);

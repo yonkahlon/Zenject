@@ -6,10 +6,10 @@ using System.Linq;
 using ModestTree;
 using Assert=ModestTree.Assert;
 
-namespace Zenject.Tests
+namespace Zenject.Tests.Conditions
 {
     [TestFixture]
-    public class TestConditionsIdentifier : TestWithContainer
+    public class TestConditionsIdentifier : ZenjectUnitTestFixture
     {
         class Test0
         {
@@ -18,7 +18,7 @@ namespace Zenject.Tests
         class Test1
         {
             public Test1(
-                [Inject("foo")]
+                [Inject(Id ="foo")]
                 Test0 name1)
             {
             }
@@ -26,47 +26,46 @@ namespace Zenject.Tests
 
         class Test2
         {
-            [Inject("foo")]
+            [Inject(Id ="foo")]
             public Test0 name2 = null;
-        }
-
-        public override void Setup()
-        {
-            base.Setup();
-
-            Container.Bind<Test1>().ToTransient();
-            Container.Bind<Test2>().ToTransient();
-            Container.Bind<Test3>().ToTransient();
-            Container.Bind<Test4>().ToTransient();
         }
 
         [Test]
         public void TestUnspecifiedNameConstructorInjection()
         {
-            Container.Bind<Test0>().ToTransient();
+            Container.Bind<Test1>().AsTransient().NonLazy();
+            Container.Bind<Test0>().AsTransient().NonLazy();
 
-            Assert.Throws<ZenjectResolveException>(
+            Assert.Throws(() => Container.Validate());
+
+            Assert.Throws(
                 delegate { Container.Resolve<Test1>(); });
-
-            Assert.That(Container.ValidateResolve<Test1>().Any());
         }
 
         [Test]
         public void TestUnspecifiedNameFieldInjection()
         {
-            Container.Bind<Test0>().ToTransient();
+            Container.Bind<Test1>().AsTransient().NonLazy();
+            Container.Bind<Test2>().AsTransient().NonLazy();
 
-            Assert.Throws<ZenjectResolveException>(
+            Container.Bind<Test0>().AsTransient().NonLazy();
+
+            Assert.Throws(() => Container.Validate());
+
+            Assert.Throws(
                 delegate { Container.Resolve<Test2>(); });
-
-            Assert.That(Container.ValidateResolve<Test2>().Any());
         }
 
         [Test]
         public void TestSuccessConstructorInjectionString()
         {
-            Container.Bind<Test0>().ToInstance(new Test0());
-            Container.Bind<Test0>("foo").ToInstance(new Test0());
+            Container.Bind<Test1>().AsTransient().NonLazy();
+            Container.Bind<Test2>().AsTransient().NonLazy();
+
+            Container.Bind<Test0>().FromInstance(new Test0()).NonLazy();
+            Container.Bind<Test0>().WithId("foo").FromInstance(new Test0()).NonLazy();
+
+            Container.Validate();
 
             // Should not throw exceptions
             Container.Resolve<Test1>();
@@ -77,17 +76,21 @@ namespace Zenject.Tests
         [Test]
         public void TestSuccessFieldInjectionString()
         {
-            Container.Bind<Test0>().ToInstance(new Test0());
-            Container.Bind<Test0>("foo").ToInstance(new Test0());
+            Container.Bind<Test1>().AsTransient().NonLazy();
+            Container.Bind<Test2>().AsTransient().NonLazy();
 
-            Assert.That(Container.ValidateResolve<Test2>().IsEmpty());
+            Container.Bind<Test0>().FromInstance(new Test0()).NonLazy();
+            Container.Bind<Test0>().WithId("foo").FromInstance(new Test0()).NonLazy();
+
+            Container.Validate();
+
             Assert.IsNotNull(Container.Resolve<Test2>());
         }
 
         class Test3
         {
             public Test3(
-                [Inject("TestValue2")]
+                [Inject(Id ="TestValue2")]
                 Test0 test0)
             {
             }
@@ -101,20 +104,28 @@ namespace Zenject.Tests
         [Test]
         public void TestFailConstructorInjectionEnum()
         {
-            Container.Bind<Test0>().ToInstance(new Test0());
-            Container.Bind<Test0>("TestValue1").ToInstance(new Test0());
+            Container.Bind<Test1>().AsTransient().NonLazy();
+            Container.Bind<Test2>().AsTransient().NonLazy();
+            Container.Bind<Test3>().AsTransient().NonLazy();
 
-            Assert.Throws<ZenjectResolveException>(
+            Container.Bind<Test0>().FromInstance(new Test0()).NonLazy();
+            Container.Bind<Test0>().WithId("TestValue1").FromInstance(new Test0()).NonLazy();
+
+            Assert.Throws(() => Container.Validate());
+
+            Assert.Throws(
                 delegate { Container.Resolve<Test3>(); });
-
-            Assert.That(Container.ValidateResolve<Test1>().Any());
         }
 
         [Test]
         public void TestSuccessConstructorInjectionEnum()
         {
-            Container.Bind<Test0>().ToInstance(new Test0());
-            Container.Bind<Test0>("TestValue2").ToInstance(new Test0());
+            Container.Bind<Test3>().AsTransient().NonLazy();
+
+            Container.Bind<Test0>().FromInstance(new Test0()).NonLazy();
+            Container.Bind<Test0>().WithId("TestValue2").FromInstance(new Test0()).NonLazy();
+
+            Container.Validate();
 
             // No exceptions
             Container.Resolve<Test3>();
@@ -125,22 +136,29 @@ namespace Zenject.Tests
         [Test]
         public void TestFailFieldInjectionEnum()
         {
-            Container.Bind<Test0>().ToInstance(new Test0());
-            Container.Bind<Test0>("TestValue1").ToInstance(new Test0());
+            Container.Bind<Test1>().AsTransient().NonLazy();
+            Container.Bind<Test2>().AsTransient().NonLazy();
+            Container.Bind<Test3>().AsTransient().NonLazy();
 
-            Assert.Throws<ZenjectResolveException>(
+            Container.Bind<Test0>().FromInstance(new Test0()).NonLazy();
+            Container.Bind<Test0>().WithId("TestValue1").FromInstance(new Test0()).NonLazy();
+
+            Assert.Throws(() => Container.Validate());
+
+            Assert.Throws(
                 delegate { Container.Resolve<Test3>(); });
-
-            Assert.That(Container.ValidateResolve<Test3>().Any());
         }
 
         [Test]
         public void TestSuccessFieldInjectionEnum()
         {
-            Container.Bind<Test0>().ToInstance(new Test0());
-            Container.Bind<Test0>("TestValue3").ToInstance(new Test0());
+            Container.Bind<Test4>().AsTransient().NonLazy();
 
-            Assert.That(Container.ValidateResolve<Test4>().IsEmpty());
+            Container.Bind<Test0>().FromInstance(new Test0()).NonLazy();
+            Container.Bind<Test0>().WithId("TestValue3").FromInstance(new Test0()).NonLazy();
+
+            Container.Validate();
+
             Assert.IsNotNull(Container.Resolve<Test4>());
         }
     }

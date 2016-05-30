@@ -8,7 +8,7 @@ using ModestTree;
 using Assert=ModestTree.Assert;
 using ModestTree.Util;
 
-namespace Zenject.Tests
+namespace Zenject.Tests.Other
 {
     [TestFixture]
     public class TestTaskUpdater
@@ -20,19 +20,18 @@ namespace Zenject.Tests
         {
             _container = new DiContainer();
 
-            _container.Bind<TaskUpdater<ITickable>>().ToSingleInstance(new TickablesTaskUpdater());
+            _container.Bind<TaskUpdater<ITickable>>().FromInstance(new TickablesTaskUpdater());
         }
 
         public void BindTickable<TTickable>(int priority) where TTickable : ITickable
         {
-            _container.Bind<ITickable>().ToSingle<TTickable>();
-            _container.Bind<ModestTree.Util.Tuple<Type, int>>().ToInstance(ModestTree.Util.Tuple.New(typeof(TTickable), priority));
+            _container.Bind<ITickable>().To<TTickable>().AsSingle();
+            _container.Bind<ModestTree.Util.Tuple<Type, int>>().FromInstance(ModestTree.Util.Tuple.New(typeof(TTickable), priority));
         }
 
         [Test]
         public void TestTickablesAreOptional()
         {
-            Assert.That(_container.ValidateResolve<TaskUpdater<ITickable>>().IsEmpty());
             Assert.IsNotNull(_container.Resolve<TaskUpdater<ITickable>>());
         }
 
@@ -40,22 +39,18 @@ namespace Zenject.Tests
         // Test that tickables get called in the correct order
         public void TestOrder()
         {
-            _container.Bind<Tickable1>().ToSingle();
-            _container.Bind<Tickable2>().ToSingle();
-            _container.Bind<Tickable3>().ToSingle();
+            _container.Bind<Tickable1>().AsSingle();
+            _container.Bind<Tickable2>().AsSingle();
+            _container.Bind<Tickable3>().AsSingle();
 
             BindTickable<Tickable3>(2);
             BindTickable<Tickable1>(0);
             BindTickable<Tickable2>(1);
 
-            Assert.That(_container.ValidateResolve<TaskUpdater<ITickable>>().IsEmpty());
-            var kernel = _container.Resolve<TaskUpdater<ITickable>>();
+            var taskUpdater = _container.Resolve<TaskUpdater<ITickable>>();
 
-            Assert.That(_container.ValidateResolve<Tickable1>().IsEmpty());
             var tick1 = _container.Resolve<Tickable1>();
-            Assert.That(_container.ValidateResolve<Tickable2>().IsEmpty());
             var tick2 = _container.Resolve<Tickable2>();
-            Assert.That(_container.ValidateResolve<Tickable3>().IsEmpty());
             var tick3 = _container.Resolve<Tickable3>();
 
             int tickCount = 0;
@@ -78,7 +73,7 @@ namespace Zenject.Tests
                 tickCount++;
             };
 
-            kernel.UpdateAll();
+            taskUpdater.UpdateAll();
         }
 
         class Tickable1 : ITickable

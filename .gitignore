@@ -12,3 +12,5 @@
 project_root_marker
 
 *.pyc
+
+*.csproj.user

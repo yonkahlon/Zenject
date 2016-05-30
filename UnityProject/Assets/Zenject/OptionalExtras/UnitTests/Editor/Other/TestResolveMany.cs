@@ -5,10 +5,10 @@ using NUnit.Framework;
 using ModestTree;
 using Assert=ModestTree.Assert;
 
-namespace Zenject.Tests
+namespace Zenject.Tests.Other
 {
     [TestFixture]
-    public class TestResolveMany : TestWithContainer
+    public class TestResolveMany : ZenjectUnitTestFixture
     {
         class Test0
         {
@@ -25,8 +25,8 @@ namespace Zenject.Tests
         [Test]
         public void TestCase1()
         {
-            Container.Bind<Test0>().ToSingle<Test1>();
-            Container.Bind<Test0>().ToSingle<Test2>();
+            Container.Bind<Test0>().To<Test1>().AsSingle();
+            Container.Bind<Test0>().To<Test2>().AsSingle();
 
             List<Test0> many = Container.ResolveAll<Test0>();
 
@@ -36,7 +36,7 @@ namespace Zenject.Tests
         [Test]
         public void TestOptional()
         {
-            List<Test0> many = Container.ResolveAll<Test0>(true);
+            List<Test0> many = Container.ResolveAll<Test0>();
             Assert.That(many.Count == 0);
         }
     }

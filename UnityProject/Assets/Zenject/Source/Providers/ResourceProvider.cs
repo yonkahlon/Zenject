@@ -1,49 +1,50 @@
-#if !ZEN_NOT_UNITY3D
+#if !NOT_UNITY3D
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using ModestTree;
 using UnityEngine;
+using Zenject;
 
 namespace Zenject
 {
-    public class ResourceProvider : ProviderBase
+    public class ResourceProvider : IProvider
     {
-        readonly Type _concreteType;
+        readonly Type _resourceType;
         readonly string _resourcePath;
 
-        public ResourceProvider(Type concreteType, string resourcePath)
+        public ResourceProvider(
+            string resourcePath, Type resourceType)
         {
-            _concreteType = concreteType;
+            _resourceType = resourceType;
             _resourcePath = resourcePath;
         }
 
-        public override Type GetInstanceType()
+        public Type GetInstanceType(InjectContext context)
         {
-            return _concreteType;
+            return _resourceType;
         }
 
-        public override object GetInstance(InjectContext context)
+        public IEnumerator<List<object>> GetAllInstancesWithInjectSplit(InjectContext context, List<TypeValuePair> args)
         {
-            var obj = Resources.Load(_resourcePath, _concreteType);
+            Assert.IsEmpty(args);
+
+            Assert.IsNotNull(context);
+
+            var obj = Resources.Load(_resourcePath, _resourceType);
 
             Assert.IsNotNull(obj,
-                "Could not find resource at path '{0}' with type '{1}'", _resourcePath, _concreteType);
+                "Could not find resource at path '{0}' with type '{1}'", _resourcePath, _resourceType);
 
-            return obj;
-        }
+            yield return new List<object>() { obj };
 
-        Type GetTypeToInstantiate(Type contractType)
-        {
-            Assert.That(_concreteType.DerivesFromOrEqual(contractType));
-            return _concreteType;
-        }
-
-        public override IEnumerable<ZenjectResolveException> ValidateBinding(InjectContext context)
-        {
-            yield break;
+            // Are there any resource types which can be injected?
         }
     }
 }
 
 #endif
+
+
+

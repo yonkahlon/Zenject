@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
 using Zenject;
 
 namespace ModestTree
@@ -40,6 +43,31 @@ namespace ModestTree
             if (!type.DerivesFromOrEqual<T>())
             {
                 Throw("Expected type '{0}' to derive from or be equal to '{1}'", type.Name, typeof(T).Name);
+            }
+        }
+
+        public static void DerivesFromOrEqual(Type childType, Type parentType)
+        {
+            if (!childType.DerivesFromOrEqual(parentType))
+            {
+                Throw("Expected type '{0}' to derive from or be equal to '{1}'", childType.Name, parentType.Name);
+            }
+        }
+
+        public static void IsEmpty<T>(IEnumerable<T> sequence)
+        {
+            if (!sequence.IsEmpty())
+            {
+                Throw("Expected collection to be empty but instead found '{0}' elements",
+                    sequence.Count());
+            }
+        }
+
+        public static void IsNotEmpty<T>(IEnumerable<T> val, string message = "")
+        {
+            if (!val.Any())
+            {
+                Throw("Assert Hit! Expected empty collection but found {0} values. {1}", val.Count(), message);
             }
         }
 
@@ -208,6 +236,11 @@ namespace ModestTree
         }
 
         //[Conditional("UNITY_EDITOR")]
+        public static void Throw()
+        {
+            Throw("Assert hit!");
+        }
+
         public static void Throw(string message)
         {
             throw new ZenjectException(message);
@@ -219,7 +252,7 @@ namespace ModestTree
                 FormatString(message, parameters));
         }
 
-        static string FormatString(string format, params object[] parameters)
+        public static string FormatString(string format, params object[] parameters)
         {
             // doin this funky loop to ensure nulls are replaced with "NULL"
             // and that the original parameters array will not be modified
@@ -246,6 +279,26 @@ namespace ModestTree
             }
 
             return format;
+        }
+
+        public static ZenjectException CreateException()
+        {
+            return new ZenjectException("Assert hit!");
+        }
+
+        public static ZenjectException CreateException(string message)
+        {
+            return new ZenjectException(message);
+        }
+
+        public static ZenjectException CreateException(string message, params object[] parameters)
+        {
+            return new ZenjectException(FormatString(message, parameters));
+        }
+
+        public static ZenjectException CreateException(Exception innerException, string message, params object[] parameters)
+        {
+            return new ZenjectException(FormatString(message, parameters), innerException);
         }
     }
 }

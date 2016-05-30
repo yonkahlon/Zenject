@@ -1,6 +1,7 @@
 using System;
+using ModestTree.Util;
 
-namespace Zenject.Commands
+namespace Zenject
 {
     public interface ITrigger
     {
@@ -20,11 +21,15 @@ namespace Zenject.Commands
             [Inject]
             Signal _signal = null;
 
-            public Signal Signal
+            public event Action Event
             {
-                get
+                add
                 {
-                    return _signal;
+                    _signal.Event += value;
+                }
+                remove
+                {
+                    _signal.Event -= value;
                 }
             }
 
@@ -45,11 +50,15 @@ namespace Zenject.Commands
             [Inject]
             Signal<TParam1> _signal = null;
 
-            public Signal<TParam1> Signal
+            public event Action<TParam1> Event
             {
-                get
+                add
                 {
-                    return _signal;
+                    _signal.Event += value;
+                }
+                remove
+                {
+                    _signal.Event -= value;
                 }
             }
 
@@ -70,11 +79,15 @@ namespace Zenject.Commands
             [Inject]
             Signal<TParam1, TParam2> _signal = null;
 
-            public Signal<TParam1, TParam2> Signal
+            public event Action<TParam1, TParam2> Event
             {
-                get
+                add
                 {
-                    return _signal;
+                    _signal.Event += value;
+                }
+                remove
+                {
+                    _signal.Event -= value;
                 }
             }
 
@@ -95,11 +108,15 @@ namespace Zenject.Commands
             [Inject]
             Signal<TParam1, TParam2, TParam3> _signal = null;
 
-            public Signal<TParam1, TParam2, TParam3> Signal
+            public event Action<TParam1, TParam2, TParam3> Event
             {
-                get
+                add
                 {
-                    return _signal;
+                    _signal.Event += value;
+                }
+                remove
+                {
+                    _signal.Event -= value;
                 }
             }
 
@@ -120,11 +137,15 @@ namespace Zenject.Commands
             [Inject]
             Signal<TParam1, TParam2, TParam3, TParam4> _signal = null;
 
-            public Signal<TParam1, TParam2, TParam3, TParam4> Signal
+            public event Action<TParam1, TParam2, TParam3, TParam4> Event
             {
-                get
+                add
                 {
-                    return _signal;
+                    _signal.Event += value;
+                }
+                remove
+                {
+                    _signal.Event -= value;
                 }
             }
 
@@ -145,11 +166,15 @@ namespace Zenject.Commands
             [Inject]
             Signal<TParam1, TParam2, TParam3, TParam4, TParam5> _signal = null;
 
-            public Signal<TParam1, TParam2, TParam3, TParam4, TParam5> Signal
+            public event ModestTree.Util.Action<TParam1, TParam2, TParam3, TParam4, TParam5> Event
             {
-                get
+                add
                 {
-                    return _signal;
+                    _signal.Event += value;
+                }
+                remove
+                {
+                    _signal.Event -= value;
                 }
             }
 
@@ -170,11 +195,15 @@ namespace Zenject.Commands
             [Inject]
             Signal<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6> _signal = null;
 
-            public Signal<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6> Signal
+            public event ModestTree.Util.Action<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6> Event
             {
-                get
+                add
                 {
-                    return _signal;
+                    _signal.Event += value;
+                }
+                remove
+                {
+                    _signal.Event -= value;
                 }
             }
 

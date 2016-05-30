@@ -6,46 +6,30 @@ using System.Linq;
 using ModestTree;
 using Assert=ModestTree.Assert;
 
-namespace Zenject.Tests
+namespace Zenject.Tests.AbstractFactory
 {
     [TestFixture]
-    public class TestFactory : TestWithContainer
+    public class TestFactory : ZenjectUnitTestFixture
     {
-        class Test0
+        [Test]
+        public void TestToSelf()
+        {
+            Container.BindFactory<Foo, Foo.Factory>().NonLazy();
+
+            Container.Validate();
+
+            Assert.IsNotNull(Container.Resolve<Foo.Factory>().Create());
+        }
+
+        public interface IFoo
         {
         }
 
-        class Test1
+        public class Foo : IFoo
         {
-        }
-
-        class Test2
-        {
-            [Inject]
-            public Test1 test1 = null;
-
-            [Inject]
-            public Test0 test0 = null;
-
-            [Inject]
-            public int value = 0;
-
-            // Test1 should be provided from container
-            public class Factory : Factory<int, Test1, Test2>
+            public class Factory : Factory<Foo>
             {
             }
-        }
-
-        [Test]
-        public void Test()
-        {
-            Container.Bind<Test0>().ToSingle();
-            Container.Bind<Test2.Factory>().ToSingle();
-
-            var factory = Container.Resolve<Test2.Factory>();
-            var test = factory.Create(5, new Test1());
-
-            Assert.That(test.value == 5);
         }
     }
 }

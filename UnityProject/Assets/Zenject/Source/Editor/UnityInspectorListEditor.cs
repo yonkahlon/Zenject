@@ -1,8 +1,10 @@
 using System.Collections.Generic;
 using System.Linq;
+using Zenject;
 using UnityEditor;
 using UnityEditorInternal;
 using UnityEngine;
+using Object = UnityEngine.Object;
 using ModestTree;
 
 namespace Zenject
@@ -11,6 +13,11 @@ namespace Zenject
     {
         List<ReorderableList> _installersLists;
         List<SerializedProperty> _installersProperties;
+
+        protected abstract string[] PropertyDisplayNames
+        {
+            get;
+        }
 
         protected abstract string[] PropertyNames
         {
@@ -22,14 +29,6 @@ namespace Zenject
             get;
         }
 
-        protected virtual bool DisplayAllProperties
-        {
-            get
-            {
-                return true;
-            }
-        }
-
         public virtual void OnEnable()
         {
             _installersProperties = new List<SerializedProperty>();
@@ -37,10 +36,11 @@ namespace Zenject
 
             var descriptions = PropertyDescriptions;
             var names = PropertyNames;
+            var displayNames = PropertyDisplayNames;
 
             Assert.IsEqual(descriptions.Length, names.Length);
 
-            var infos = Enumerable.Range(0, names.Length).Select(i => new { Name = names[i], Description = descriptions[i] }).ToList();
+            var infos = Enumerable.Range(0, names.Length).Select(i => new { Name = names[i], DisplayName = displayNames[i], Description = descriptions[i] }).ToList();
 
             foreach (var info in infos)
             {
@@ -50,7 +50,7 @@ namespace Zenject
                 ReorderableList installersList = new ReorderableList(serializedObject, installersProperty, true, true, true, true);
                 _installersLists.Add(installersList);
 
-                var closedName = info.Name;
+                var closedName = info.DisplayName;
                 var closedDesc = info.Description;
 
                 installersList.drawHeaderCallback += rect =>
@@ -67,15 +67,17 @@ namespace Zenject
             }
         }
 
-        public override void OnInspectorGUI()
+        public sealed override void OnInspectorGUI()
         {
-            if (DisplayAllProperties)
-            {
-                base.OnInspectorGUI();
-            }
-
             serializedObject.Update();
 
+            OnGui();
+
+            serializedObject.ApplyModifiedProperties();
+        }
+
+        protected virtual void OnGui()
+        {
             if (Application.isPlaying)
             {
                 GUI.enabled = false;
@@ -87,7 +89,6 @@ namespace Zenject
             }
 
             GUI.enabled = true;
-            serializedObject.ApplyModifiedProperties();
         }
     }
 }

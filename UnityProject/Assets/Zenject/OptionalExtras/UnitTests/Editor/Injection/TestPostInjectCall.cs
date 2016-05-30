@@ -5,10 +5,10 @@ using NUnit.Framework;
 using ModestTree;
 using Assert=ModestTree.Assert;
 
-namespace Zenject.Tests
+namespace Zenject.Tests.Injection
 {
     [TestFixture]
-    public class TestPostInjectCall : TestWithContainer
+    public class TestPostInjectCall : ZenjectUnitTestFixture
     {
         class Test0
         {
@@ -40,7 +40,7 @@ namespace Zenject.Tests
                 _test2 = test2;
             }
 
-            [PostInject]
+            [Inject]
             public void Init()
             {
                 Assert.That(!HasInitialized);
@@ -50,7 +50,7 @@ namespace Zenject.Tests
                 HasInitialized = true;
             }
 
-            [PostInject]
+            [Inject]
             void TestPrivatePostInject()
             {
                 HasInitialized2 = true;
@@ -60,12 +60,13 @@ namespace Zenject.Tests
         [Test]
         public void Test()
         {
-            Container.Bind<Test0>().ToSingle();
-            Container.Bind<Test1>().ToSingle();
-            Container.Bind<Test2>().ToSingle();
-            Container.Bind<Test3>().ToSingle();
+            Container.Bind<Test0>().AsSingle().NonLazy();
+            Container.Bind<Test1>().AsSingle().NonLazy();
+            Container.Bind<Test2>().AsSingle().NonLazy();
+            Container.Bind<Test3>().AsSingle().NonLazy();
 
-            Assert.That(Container.ValidateResolve<Test3>().IsEmpty());
+            Container.Validate();
+
             var test3 = Container.Resolve<Test3>();
             Assert.That(test3.HasInitialized);
             Assert.That(test3.HasInitialized2);
@@ -75,7 +76,7 @@ namespace Zenject.Tests
         {
             public bool WasCalled = false;
 
-            [PostInject]
+            [Inject]
             void Init()
             {
                 WasCalled = true;
@@ -89,7 +90,9 @@ namespace Zenject.Tests
         [Test]
         public void TestPrivateBaseClassPostInject()
         {
-            Container.Bind<SimpleBase>().ToSingle<SimpleDerived>();
+            Container.Bind<SimpleBase>().To<SimpleDerived>().AsSingle().NonLazy();
+
+            Container.Validate();
 
             var simple = Container.Resolve<SimpleBase>();
 
@@ -99,9 +102,10 @@ namespace Zenject.Tests
         [Test]
         public void TestInheritance()
         {
-            Container.Bind<IFoo>().ToSingle<FooDerived>();
+            Container.Bind<IFoo>().To<FooDerived>().AsSingle().NonLazy();
 
-            Assert.That(Container.ValidateResolve<IFoo>().IsEmpty());
+            Container.Validate();
+
             var foo = Container.Resolve<IFoo>();
 
             Assert.That(((FooDerived)foo).WasDerivedCalled);
@@ -113,13 +117,15 @@ namespace Zenject.Tests
         [Test]
         public void TestInheritanceOrder()
         {
-            Container.Bind<IFoo>().ToSingle<FooDerived2>();
+            Container.Bind<IFoo>().To<FooDerived2>().AsSingle().NonLazy();
 
             // base post inject methods should be called first
             _initOrder = 0;
             FooBase.BaseCallOrder = 0;
             FooDerived.DerivedCallOrder = 0;
             FooDerived2.Derived2CallOrder = 0;
+
+            Container.Validate();
 
             Container.Resolve<IFoo>();
 
@@ -143,7 +149,7 @@ namespace Zenject.Tests
             public bool WasBaseCalled2;
             public static int BaseCallOrder;
 
-            [PostInject]
+            [Inject]
             void TestBase()
             {
                 Assert.That(!WasBaseCalled);
@@ -151,7 +157,7 @@ namespace Zenject.Tests
                 BaseCallOrder = _initOrder++;
             }
 
-            [PostInject]
+            [Inject]
             public virtual void TestVirtual1()
             {
                 Assert.That(!WasBaseCalled2);
@@ -165,7 +171,7 @@ namespace Zenject.Tests
             public bool WasDerivedCalled2;
             public static int DerivedCallOrder;
 
-            [PostInject]
+            [Inject]
             void TestDerived()
             {
                 Assert.That(!WasDerivedCalled);
@@ -186,7 +192,7 @@ namespace Zenject.Tests
             public bool WasDerived2Called;
             public static int Derived2CallOrder;
 
-            [PostInject]
+            [Inject]
             public void TestVirtual2()
             {
                 Assert.That(!WasDerived2Called);
