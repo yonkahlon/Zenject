@@ -238,6 +238,19 @@ namespace Zenject
                 "Invalid installer type given during bind command.  Expected type '{0}' to derive from 'Installer'", installerType.Name());
         }
 
+        public static void AssertIsDerivedFromTypes(
+            IEnumerable<Type> concreteTypes, IEnumerable<Type> parentTypes, InvalidBindResponses invalidBindResponse)
+        {
+            if (invalidBindResponse == InvalidBindResponses.Assert)
+            {
+                AssertIsDerivedFromTypes(concreteTypes, parentTypes);
+            }
+            else
+            {
+                Assert.IsEqual(invalidBindResponse, InvalidBindResponses.Skip);
+            }
+        }
+
         public static void AssertIsDerivedFromTypes(IEnumerable<Type> concreteTypes, IEnumerable<Type> parentTypes)
         {
             foreach (var concreteType in concreteTypes)

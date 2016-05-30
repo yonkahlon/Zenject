@@ -573,34 +573,73 @@ namespace Zenject
 #if !NOT_UNITY3D
 
         // See comment in IBinder.cs for description for this method
-        public void InstallPrefab<T>()
+        public void InstallPrefabResource<T>()
             where T : MonoInstaller
         {
-            InstallPrefab<T>(new object[0]);
+            InstallPrefabResource<T>(GetDefaultInstallerPrefabResourcePath<T>());
         }
 
-        public void InstallPrefab<T>(IEnumerable<object> extraArgs)
+        // See comment in IBinder.cs for description for this method
+        public void InstallPrefabResource<T>(string resourcePath)
             where T : MonoInstaller
         {
-            InstallPrefab(typeof(T), extraArgs);
+            InstallPrefabResource<T>(resourcePath, new object[0]);
+        }
+
+        public void InstallPrefabResource<T>(IEnumerable<object> extraArgs)
+            where T : MonoInstaller
+        {
+            InstallPrefabResource<T>(GetDefaultInstallerPrefabResourcePath<T>(), extraArgs);
+        }
+
+        public void InstallPrefabResource<T>(string resourcePath, IEnumerable<object> extraArgs)
+            where T : MonoInstaller
+        {
+            InstallPrefabResource(typeof(T), resourcePath, extraArgs);
         }
 
         // See comment in IBinder.cs for description of this method
-        public void InstallPrefab(Type installerType)
+        public void InstallPrefabResource(Type installerType)
         {
-            InstallPrefab(installerType, new object[0]);
+            InstallPrefabResource(
+                installerType, GetDefaultInstallerPrefabResourcePath(installerType));
         }
 
-        public void InstallPrefab(Type installerType, IEnumerable<object> extraArgs)
+        // See comment in IBinder.cs for description of this method
+        public void InstallPrefabResource(Type installerType, string resourcePath)
         {
-            InstallPrefabExplicit(installerType, InjectUtil.CreateArgList(extraArgs));
+            InstallPrefabResource(installerType, resourcePath, new object[0]);
         }
 
-        public void InstallPrefabExplicit(Type installerType, List<TypeValuePair> extraArgs)
+        public void InstallPrefabResource(Type installerType, IEnumerable<object> extraArgs)
+        {
+            InstallPrefabResource(
+                installerType, GetDefaultInstallerPrefabResourcePath(installerType), extraArgs);
+        }
+
+        public void InstallPrefabResource(Type installerType, string resourcePath, IEnumerable<object> extraArgs)
+        {
+            InstallPrefabResourceExplicit(installerType, resourcePath, InjectUtil.CreateArgList(extraArgs));
+        }
+
+        string GetDefaultInstallerPrefabResourcePath<T>()
+            where T : MonoInstaller
+        {
+            return GetDefaultInstallerPrefabResourcePath(typeof(T));
+        }
+
+        string GetDefaultInstallerPrefabResourcePath(Type installerType)
+        {
+            Assert.That(installerType.DerivesFrom<MonoInstaller>());
+            return "Installers/" + installerType.Name();
+        }
+
+        public void InstallPrefabResourceExplicit(
+            Type installerType, string resourcePath, List<TypeValuePair> extraArgs)
         {
             Assert.That(installerType.DerivesFrom<MonoInstaller>());
 
-            var gameObj = CreateAndParentPrefabResource("Installers/" + installerType.Name());
+            var gameObj = CreateAndParentPrefabResource(resourcePath);
 
             var installer = gameObj.GetComponentInChildren<MonoInstaller>();
 
@@ -1379,7 +1418,15 @@ namespace Zenject
         // See comment in IInstantiator.cs for description of this method
         public T Instantiate<T>(IEnumerable<object> extraArgs)
         {
-            return (T)Instantiate(typeof(T), extraArgs);
+            var result = Instantiate(typeof(T), extraArgs);
+
+            if (IsValidating && !(result is T))
+            {
+                Assert.That(result is ValidationMarker);
+                return default(T);
+            }
+
+            return (T)result;
         }
 
         public object Instantiate(Type concreteType)
@@ -1940,9 +1987,21 @@ namespace Zenject
         public ConcreteIdBinderNonGeneric Bind(
             Action<ConventionSelectTypesBinder> generator)
         {
-            var bindInfo = new ConventionBindInfo();
-            generator(new ConventionSelectTypesBinder(bindInfo));
-            return Bind(bindInfo.ResolveTypes());
+            var conventionBindInfo = new ConventionBindInfo();
+            generator(new ConventionSelectTypesBinder(conventionBindInfo));
+
+            var contractTypesList = conventionBindInfo.ResolveTypes();
+
+            Assert.That(contractTypesList.All(x => !x.DerivesFrom<IDynamicFactory>()),
+                "You should not use Container.Bind for factory classes.  Use Container.BindFactory instead.");
+
+            var bindInfo = new BindInfo(contractTypesList);
+
+            // This is nice because it allows us to do things like Bind(all interfaces).To<Foo>()
+            // (though of course it would be more efficient to use BindAllInterfaces in this case)
+            bindInfo.InvalidBindResponse = InvalidBindResponses.Skip;
+
+            return new ConcreteIdBinderNonGeneric(bindInfo, StartBinding());
         }
 #endif
 
