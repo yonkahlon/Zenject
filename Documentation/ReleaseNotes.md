@@ -1,6 +1,70 @@
 
 ## <a id="release-notes"></a>Release Notes
 
+4.2 (May 30, 2016)
+- Finally updated the documentation
+- Renamed FromGetter to FromGetterResolve
+- Added some optimizations to convention binding
+- Renamed InstallPrefab to InstallPrefabResource
+- (bug) Fixed PrefabFactory to work with abstract types
+- (bug) Fixed some bugs related to convention binding
+- (bug) Fixed bug with Unity 5.3.5 where the list of installers would not serialize properly
+- (but) Fixed minor bug with validation
+
+4.1 (May 15, 2016)
+- Changed ResolveAll method to be optional by default, so it can return the empty list
+- Removed Zenject.Commands namespace in favour of just Zenject
+- Added convention based binding (eg. Container.Bind().To(x => x.AllTypes().DerivingFrom()))
+- Fixed GameObjectCompositionRoot to expose an optional facade property in its inspector
+- Renamed CompositionRoot to Context.
+- Changed to just re-use the InjectAttribute instead of PostInjectAttribute
+- Better support for making custom Unity EditorWindow implementations that use Zenject
+- Added right click Menu items in project pane to create templates of common zenject C# files
+- Renamed TestWithContainer to ZenjectUnitTestFixture
+- Added simple test framework for both unit tests and integration tests
+- Changed Identifier to be type object so it can be used with enums (or other types)
+- Added InjectLocal attribute
+- Changed to guarantee that any component that is injected into another component has itself been injected already
+- Fixed an issue where calling Resolve<> or Instantiate<> inside an installer would cause objects to be injected twice
+- Fixes to WSA platform
+- Changed to automatically call ScriptableObject.CreateInstance when creating types that derive from ScriptableObject
+- Fix to non-unity build
+
+4.0 (April 30, 2016)
+- Added another property to CompositionRoot to specify installers as prefabs re #96
+- Changed global composition root to be a prefab instead of assembling together a bunch of ScriptableObject assets re #98
+- Changed to lookup Zenject Auto Binding components by default, without the need for AutoBindInstaller. Also added new properties such as CompositionRoot, identifier, and made Component a list. Also works now when put underneath GameObjectCompositionRoot's.
+- Added ability to pass in multiple types to the Bind() method. This opens up a lot of possibilities including convention-based binding. This also deprecated the use of BindAllInterfacesToSingle in favour of just BindAllInterfaces<>
+- Added "WithArguments" bind method, to allow passing arguments directly to the type instead of always using WhenInjectedInto
+- Added concept of EditorWindowCompositionRoot to make it easier to use Zenject with editor plugins
+- Added "InheritInSubContainers" bind method, to allow having bindings automatically forwarded to sub containers
+- Removed the different Exception classes in favour of just one (ZenjectException)
+- Added 'AsCached' method as an alternative to 'AsSingle' and 'AsTransient'. AsCached will function like AsTransient except it will only create the object once and thereafter return that value
+- Changed some methods that previously used 'params' to explicitly take a list, to avoid common errors
+- Cleaned up InjectContext to be easier to work with
+- Made significant change to how Factories work. Now there is just one definitive Factory class, and you can change how that factory constructs the object in your installers
+- Changed the fluent interface to specify whether the binding is single or transient as a separate method, to avoid the explosion of ToSinglePrefab, ToTransientPrefab, etc. (now it's just ToPrefab)
+- Renamed GlobalCompositionRoot to ProjectCompositionRoot and FacadeCompositionRoot to GameObjectCompositionRoot.
+- Added more intuitive bindings for creating subcontainers. eg: Container.Bind().ToSubContainerResolve().ByPrefab()
+- Added WithGameObjectName and WithGroupName bind methods to prefab or game object related bindings
+- Made another big chagne to the fluent interface to avoid having duplicate methods for with Self and Concrete. Now you choose between Container.Bind().ToSelf() and Container.Bind().To(). ToSelf is assumed if unspecified
+- Changed Triggers to directly expose the signal event so they can be used as if they are signals
+- Added concept of ScriptableObjectInstaller - especially useful for use with settings
+- Added ZenjectSceneLoader class to allow additively loading other scenes as children or siblings of existing scene
+- Changed scene decorators to work more intuitively with the multi-scene editting features of Unity 5.3+. You can now drag in multiple scenes together, and as long as you use DecoratorCompositionRoot in scenes above a main scene, they will be loaded together.
+- Removed IncludeInactive flag. Now always injects into inactive game objects. This was kinda necessary because validation needs to control the active flag
+- Removed the concept of one single DependencyRoot in favour of having any number of them, using binding with identifier. Also added NonLazy() bind method to make this very easy
+- Added new attribute ZenjectAllowDuringValidation for use with installer setting objects that you need during validation
+- Changed validation to occur at runtime to be more robust and less hacky. Now works by adding dummy values to mark which dependencies have successfully been found
+- Renamed BindPriority to BindExecutionOrder
+- Removed support for binary version of Zenject. This was necessary since Zenject now needs to use some unity defines (eg. UNITY_EDITOR) which doesn't work in DLLs
+
+3.11 (May 15, 2016)
+- Bug fix - Calling Resolve<> or Instantiate<> inside an installer was causing the object to be injected twice
+- Added StaticCompositionRoot as an even higher level container than ProjectCompositionRoot, for cases where you want to add dependencies directly to the Zenject assembly before Unity even starts up
+- Bug fix - loading the same scene multiple times with LoadSceneAdditive was not working
+- Fixed compiler errors with Unity 5.4
+
 3.10 (March 26, 2016)
 - Fixed to actually support Windows Store platform
 - Added pause/resume methods to TickableManager
