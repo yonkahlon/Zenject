@@ -1026,7 +1026,7 @@ The final property you will notice on the ZenjectBinding component is the "Conte
 * **Lazily instantiated objects and the object graph**
     * Zenject does not immediately instantiate every object defined by the bindings that you've set up in your installers.  Instead, Zenject will construct some number of root-level objects, and then lazily instantiate the rest based on usage.  Root-level objects are any classes that are bound to IInitializable / ITickable / IDisposable, and any class that is declared in a binding that is marked `NonLazy()`.
 
-* **The order that things occur in is wrong, like injection is occurring too late, or Initialize() event is not called at the right time, etc.**
+* <a id="bad-execution-order"></a>**The order that things occur in is wrong, like injection is occurring too late, or Initialize() event is not called at the right time, etc.**
     * It may be because the 'script execution order' of the Zenject classes 'ProjectContext', 'SceneContext', or 'SceneDecoratorContext' are incorrect.  These classes should always have the earliest or near earliest execution order.  This should already be set by default (since this setting is included in the `cs.meta` files for these classes).  However if you are compiling Zenject yourself or have a unique configuration, you may want to make sure, which you can do by going to "Edit -> Project Settings -> Script Execution Order" and confirming that these classes are at the top, before the default time.
 
 Please feel free to submit any other sources of confusion to sfvermeulen@gmail.com and I will add it here.
@@ -1519,35 +1519,33 @@ Any ITickables, IInitializables, or `IDisposable`'s that are not assigned a prio
 
 ## <a id="zenject-order-of-operations"></a>Zenject Order Of Operations
 
-Warning: This section gets fairly in depth so if you're not interested in peering under the hood of Zenject, you might want to skip it!
-
 A Zenject driven application is executed by the following steps:
 
-1. Unity Awake() phase begins
-1. SceneContext.Awake() method is called.  *NOTE:* This should always be the first thing executed in your scene.  By default it should work this way out of the box, because the executionOrder property should be set to -9999 for the SceneContext class.  You can verify that this is the case by selecting `Edit -> Project Settings -> Script Execution Order` and making sure that ProjectContext is at the top (which should then be followed by SceneContext and SceneDecoratorContext as well)
-1. If this is the first scene to be loaded during this play session, SceneContext will create the ProjectContext prefab.  If ProjectContext has already been created by a previous scene, we skip to step 10 to directly initialize the SceneContext
-1. ProjectContext creates a new DiContainer object to be used to contain all instances meant to persist across scenes
-1. ProjectContext iterates through all the Installers that have been added to its prefab via the Unity Inspector, and updates them to point to the new DiContainer.  It then calls InstallBindings() on each installer.
-1. Each Installer registers different sets of dependencies directly on to the given DiContainer by calling one of the Bind<> methods.  Note that the order that this binding occurs should not generally matter, because nothing should be instantiated using the DiContainer until all the installers are fully completed.  Each installer can also call other installers by executing Container.Install<> (Note that you can pass arguments to this method as well)
-1. The ProjectContext then injects all MonoBehaviours that have been added to its prefab with their dependencies. All [Inject] methods within the ProjectContext prefab are called at this time as well.  Note that since MonoBehaviours are instantiated by Unity we cannot use constructor injection and therefore [Inject] injection, field injection or property injection must be used instead.
-1. After filling in the dependencies for each game object on its prefab, the ProjectContext then constructs all the non-lazy root objects, which includes any classes that derive from ITickable / IInitializable or IDisposable, as well as those classes that are added with a `NonLazy()` binding.
-1. If any required dependencies cannot be resolved, a ZenjectResolveException is thrown
-1. Steps 4-9 are repeated except this time with the SceneContext.  All objects in the scene (except those objects that are parented to the ProjectContext) are injected using the bindings that have been installed in the SceneContext's installers.  Also note that because the DiContainer used by SceneContext is a sub-container of the DiContainer for the ProjectContext, objects in the scene will also be injected using bindings declared in a ProjectContext installer as well.
-1. Once again, if any required dependencies in the scene cannot be resolved, a ZenjectResolveException is thrown
-1. All other MonoBehaviour's in the scene have their Awake() method called
-1. Unity Start() phase begins
-1. ProjectContext.Start() method is called.  This will trigger the Initialize() method on all `IInitializable` objects in the order specified in the ProjectContext installers.
-1. SceneContext.Start() method is called.  This will trigger the Initialize() method on all `IInitializable` objects in the order specified in the SceneContext installers.
-1. All other MonoBehaviour's in your scene has their Start() method called
-1. Unity Update() phase begins
-1. ProjectContext.Update() is called, which results in Tick() being called for all `ITickable` objects (in the order specified in the ProjectContext installers)
-1. SceneContext.Update() is called, which results in Tick() being called for all `ITickable` objects (in the order specified in the SceneContext installers)
-1. All other MonoBehaviour's in your scene has their Update() method called
-1. Steps 18 - 19 are repeated for LateUpdate
-1. At the same time, Steps 18 - 19 are repeated for FixedUpdate according to the physics timestep
-1. App is exited
-1. Dispose() is called on all objects mapped to `IDisposable` within the SceneContext installers (see <a href="#implementing-idisposable">here</a> for details)
-1. Dispose() is called on all objects mapped to `IDisposable` within the ProjectContext installers (see <a href="#implementing-idisposable">here</a> for details)
+* Unity Awake() phase begins
+    * SceneContext.Awake() method is called.  This should always be the first thing executed in your scene.  It should work this way by default (see <a href="#bad-execution-order">here</a> if you are noticing otherwise).
+    * If this is the first scene to be loaded during this play session, SceneContext will create the ProjectContext prefab.  If ProjectContext has already been created by a previous scene, we skip to step 10 to directly initialize the SceneContext
+    * ProjectContext iterates through all the Installers that have been added to its prefab via the Unity Inspector, updates them to point to its DiContainer, then calls InstallBindings() on each.  Each Installer calls some number of Bind<> methods on the DiContainer.
+    * ProjectContext then injects all MonoBehaviours attached to its game object as well as its children
+    * ProjectContext then constructs all the non-lazy root objects, which includes any classes that derive from ITickable / IInitializable or IDisposable, as well as those classes that are added with a `NonLazy()` binding.
+    * SceneContext iterates through all the Installers that have been added to it via the Unity Inspector, updates them to point to its DiContainer, then calls InstallBindings() on each.  Each Installer calls some number of Bind<> methods on the DiContainer.
+    * SceneContext then injects all objects in the scene (except those objects that are parented to the ProjectContext)
+    * SceneContext then constructs all the non-lazy root objects, which includes any classes that derive from ITickable / IInitializable or IDisposable, as well as those classes that are added with a `NonLazy()` binding.
+    * If any required dependencies cannot be resolved, a ZenjectResolveException is thrown
+    * All other MonoBehaviour's in the scene have their Awake() method called
+* Unity Start() phase begins
+    * ProjectContext.Start() method is called.  This will trigger the Initialize() method on all `IInitializable` objects in the order specified in the ProjectContext installers.
+    * SceneContext.Start() method is called.  This will trigger the Initialize() method on all `IInitializable` objects in the order specified in the SceneContext installers.
+    * All other MonoBehaviour's in your scene has their Start() method called
+* Unity Update() phase begins
+    * ProjectContext.Update() is called, which results in Tick() being called for all `ITickable` objects (in the order specified in the ProjectContext installers)
+    * SceneContext.Update() is called, which results in Tick() being called for all `ITickable` objects (in the order specified in the SceneContext installers)
+    * All other MonoBehaviour's in your scene has their Update() method called
+* These same steps repeated for LateUpdate and ILateTickable
+* At the same time, These same steps are repeated for FixedUpdate according to the physics timestep
+* Unity scene is unloaded
+    * Dispose() is called on all objects mapped to `IDisposable` within the SceneContext installers (see <a href="#implementing-idisposable">here</a> for details)
+* App is exitted
+    * Dispose() is called on all objects mapped to `IDisposable` within the ProjectContext installers (see <a href="#implementing-idisposable">here</a> for details)
 
 ## <a id="injecting-data-across-scenes"></a>Injecting data across scenes
 
