@@ -1453,7 +1453,7 @@ Container.Bind<Bar>().FromPrefab(MyPrefab).AsSingle("bar");
 
 Now two instances of the prefab will be created.
 
-* <a href="#scriptableobject-installer">Scriptable Object Installer</a>
+## <a id="scriptableobject-installer"></a>Scriptable Object Installer
 
 TBD
 
