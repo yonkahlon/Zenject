@@ -49,7 +49,7 @@ public class TestInstaller : MonoInstaller
     public override void InstallBindings()
     {
         Container.BindAllInterfaces<GameController>().To<GameController>().AsSingle();
-        Container.Bind<Greeter>().FromSubContainerResolve().ByMethod(InstallGreeter);
+        Container.Bind<Greeter>().FromSubContainerResolve().ByMethod(InstallGreeter).AsSingle();
     }
 
     void InstallGreeter(DiContainer subContainer)
@@ -99,7 +99,7 @@ public class TestInstaller : MonoInstaller
 {
     public override void InstallBindings()
     {
-        Container.Bind<Greeter>().FromSubContainerResolve().ByMethod(InstallGreeter).NonLazy();
+        Container.Bind<Greeter>().FromSubContainerResolve().ByMethod(InstallGreeter).AsSingle().NonLazy();
     }
 
     void InstallGreeter(DiContainer subContainer)
@@ -133,13 +133,18 @@ public class HelloHandler : IInitializable
 
 public class Greeter : Kernel
 {
+    public Greeter()
+    {
+        Debug.Log("Created Greeter");
+    }
 }
 
 public class TestInstaller : MonoInstaller
 {
     public override void InstallBindings()
     {
-        Container.BindAllInterfacesAndSelf<Greeter>().To<Greeter>().FromSubContainerResolve().ByMethod(InstallGreeter).NonLazy();
+        Container.BindAllInterfacesAndSelf<Greeter>()
+            .To<Greeter>().FromSubContainerResolve().ByMethod(InstallGreeter).AsSingle().NonLazy();
     }
 
     void InstallGreeter(DiContainer subContainer)
@@ -150,11 +155,12 @@ public class TestInstaller : MonoInstaller
         subContainer.BindAllInterfaces<HelloHandler>().To<HelloHandler>().AsSingle();
     }
 }
+
 ```
 
 Now if we run it, we should see the Hello message, then if we stop playing we should see the Goodbye message.
 
-The reason this works is because we are now binding IInitializable, IDisposable, and ITickable on the root container to the Greeter class given by `Container.BindAllInterfacesAndSelf<Greeter>().To<Greeter>()`.  Greeter now inherits from Kernel, which inherits from all these interfaces and also handles forwarding these calls to the IInitializable's / ITickable's / IDisposable's in our sub container.
+The reason this works is because we are now binding IInitializable, IDisposable, and ITickable on the root container to the Greeter class given by `Container.BindAllInterfacesAndSelf<Greeter>().To<Greeter>()`.  Greeter now inherits from Kernel, which inherits from all these interfaces and also handles forwarding these calls to the IInitializable's / ITickable's / IDisposable's in our sub container.  Note that we use AsSingle() here, which is important otherwise it will create a new sub-container for every interface which is not what we want.
 
 ## <a id="using-game-object-contexts"></a>Creating Sub-Containers on GameObject's by using Game Object Context
 
