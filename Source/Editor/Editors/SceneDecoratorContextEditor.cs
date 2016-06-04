@@ -16,11 +16,15 @@ namespace Zenject
     [CustomEditor(typeof(SceneDecoratorContext))]
     public class SceneDecoratorContextEditor : UnityEditor.Editor
     {
+        SerializedProperty _decoratedSceneProperty;
+
         List<ReorderableList> _propLists;
 
         public virtual void OnEnable()
         {
             _propLists = new List<ReorderableList>();
+
+            _decoratedSceneProperty = serializedObject.FindProperty("SceneName");
 
             var names = new string[]
             {
@@ -100,13 +104,12 @@ namespace Zenject
 
         void OpenNextScene(OpenSceneMode openMode)
         {
-            var binder = target as SceneDecoratorContext;
-            var scenePath = TryGetScenePath(binder.SceneName);
+            var scenePath = TryGetScenePath(_decoratedSceneProperty.stringValue);
 
             if (scenePath == null)
             {
                 EditorUtility.DisplayDialog("Error",
-                    "Could not find scene with name '{0}'.  Is it added to your build settings?".Fmt(binder.SceneName), "Ok");
+                    "Could not find scene with name '{0}'.  Is it added to your build settings?".Fmt(_decoratedSceneProperty.stringValue), "Ok");
             }
             else
             {
@@ -134,11 +137,9 @@ namespace Zenject
 
             GUILayout.Space(5);
 
-            var binder = target as SceneDecoratorContext;
-
             EditorGUILayout.BeginHorizontal();
             {
-                binder.SceneName = EditorGUILayout.TextField("Decorated Scene", binder.SceneName);
+                EditorGUILayout.PropertyField(_decoratedSceneProperty);
 
                 GUILayout.Space(10);
 

@@ -37,7 +37,7 @@ namespace Zenject
 
         public void Validate()
         {
-            if (!typeof(T).IsAbstract)
+            if (!typeof(T).IsAbstract())
             {
                 _container.InjectExplicit(
                     new ValidationMarker(typeof(T)), ValidationUtil.CreateDefaultArgs());
@@ -72,7 +72,7 @@ namespace Zenject
         public void Validate()
         {
             // If it's abstract, we can't check that the params are used
-            if (!typeof(T).IsAbstract)
+            if (!typeof(T).IsAbstract())
             {
                 _container.InjectExplicit(
                     new ValidationMarker(typeof(T)), ValidationUtil.CreateDefaultArgs(typeof(P1)));
@@ -107,7 +107,7 @@ namespace Zenject
         public void Validate()
         {
             // If it's abstract, we can't check that the params are used
-            if (!typeof(T).IsAbstract)
+            if (!typeof(T).IsAbstract())
             {
                 _container.InjectExplicit(
                     new ValidationMarker(typeof(T)), ValidationUtil.CreateDefaultArgs(typeof(P1), typeof(P2)));
@@ -142,7 +142,7 @@ namespace Zenject
         public void Validate()
         {
             // If it's abstract, we can't check that the params are used
-            if (!typeof(T).IsAbstract)
+            if (!typeof(T).IsAbstract())
             {
                 _container.InjectExplicit(
                     new ValidationMarker(typeof(T)),
@@ -178,7 +178,7 @@ namespace Zenject
         public void Validate()
         {
             // If it's abstract, we can't check that the params are used
-            if (!typeof(T).IsAbstract)
+            if (!typeof(T).IsAbstract())
             {
                 _container.InjectExplicit(
                     new ValidationMarker(typeof(T)),
