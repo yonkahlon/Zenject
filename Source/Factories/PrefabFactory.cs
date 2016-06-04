@@ -19,7 +19,7 @@ namespace Zenject
         [Inject]
         protected readonly DiContainer _container;
 
-        public T Create(GameObject prefab)
+        public T Create(UnityEngine.Object prefab)
         {
             Assert.That(prefab != null,
                "Null prefab given to factory create method when instantiating object with type '{0}'.", typeof(T));
@@ -52,7 +52,7 @@ namespace Zenject
         [Inject]
         protected readonly DiContainer _container;
 
-        public virtual T Create(GameObject prefab, P1 param)
+        public virtual T Create(UnityEngine.Object prefab, P1 param)
         {
             Assert.That(prefab != null,
                "Null prefab given to factory create method when instantiating object with type '{0}'.", typeof(T));
@@ -87,7 +87,7 @@ namespace Zenject
         [Inject]
         protected readonly DiContainer _container;
 
-        public virtual T Create(GameObject prefab, P1 param, P2 param2)
+        public virtual T Create(UnityEngine.Object prefab, P1 param, P2 param2)
         {
             Assert.That(prefab != null,
                "Null prefab given to factory create method when instantiating object with type '{0}'.", typeof(T));
@@ -122,7 +122,7 @@ namespace Zenject
         [Inject]
         protected readonly DiContainer _container;
 
-        public virtual T Create(GameObject prefab, P1 param, P2 param2, P3 param3)
+        public virtual T Create(UnityEngine.Object prefab, P1 param, P2 param2, P3 param3)
         {
             Assert.That(prefab != null,
                "Null prefab given to factory create method when instantiating object with type '{0}'.", typeof(T));
@@ -158,7 +158,7 @@ namespace Zenject
         [Inject]
         protected readonly DiContainer _container;
 
-        public virtual T Create(GameObject prefab, P1 param, P2 param2, P3 param3, P4 param4)
+        public virtual T Create(UnityEngine.Object prefab, P1 param, P2 param2, P3 param3, P4 param4)
         {
             Assert.That(prefab != null,
                "Null prefab given to factory create method when instantiating object with type '{0}'.", typeof(T));

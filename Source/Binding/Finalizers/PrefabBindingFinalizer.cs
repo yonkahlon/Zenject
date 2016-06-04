@@ -10,12 +10,12 @@ namespace Zenject
     public class PrefabBindingFinalizer : ProviderBindingFinalizer
     {
         readonly GameObjectBindInfo _gameObjectBindInfo;
-        readonly GameObject _prefab;
+        readonly UnityEngine.Object _prefab;
 
         public PrefabBindingFinalizer(
             BindInfo bindInfo,
             GameObjectBindInfo gameObjectBindInfo,
-            GameObject prefab)
+            UnityEngine.Object prefab)
             : base(bindInfo)
         {
             _gameObjectBindInfo = gameObjectBindInfo;

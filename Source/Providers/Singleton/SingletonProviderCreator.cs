@@ -61,7 +61,7 @@ namespace Zenject
 
 #if !NOT_UNITY3D
         public IProvider CreateProviderForPrefab(
-            GameObject prefab, Type resultType, string gameObjectName, string gameObjectGroupName,
+            UnityEngine.Object prefab, Type resultType, string gameObjectName, string gameObjectGroupName,
             List<TypeValuePair> extraArguments, string concreteIdentifier)
         {
             return _prefabProviderCreator.CreateProvider(
@@ -80,7 +80,7 @@ namespace Zenject
 
         public IProvider CreateProviderForSubContainerPrefab(
             Type resultType, string concreteIdentifier, string gameObjectName, string gameObjectGroupName,
-            GameObject prefab, object identifier)
+            UnityEngine.Object prefab, object identifier)
         {
             return _subContainerPrefabProviderCreator.CreateProvider(
                 resultType, concreteIdentifier, prefab, identifier, gameObjectName, gameObjectGroupName);

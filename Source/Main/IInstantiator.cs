@@ -46,12 +46,12 @@ namespace Zenject
             Type componentType, GameObject gameObject, List<TypeValuePair> extraArgs);
 
         // Create a new game object from a prefab and fill in dependencies for all children
-        GameObject InstantiatePrefab(GameObject prefab);
+        GameObject InstantiatePrefab(UnityEngine.Object prefab);
         GameObject InstantiatePrefab(
-            GameObject prefab, IEnumerable<object> extraArgs);
+            UnityEngine.Object prefab, IEnumerable<object> extraArgs);
 
         GameObject InstantiatePrefab(
-            GameObject prefab, IEnumerable<object> extraArgs, string groupName);
+            UnityEngine.Object prefab, IEnumerable<object> extraArgs, string groupName);
 
         // Create a new game object from a resource path and fill in dependencies for all children
         GameObject InstantiatePrefabResource(string resourcePath);
@@ -66,13 +66,13 @@ namespace Zenject
 
         // Same as InstantiatePrefab but returns a component after it's initialized
 
-        T InstantiatePrefabForComponent<T>(GameObject prefab);
+        T InstantiatePrefabForComponent<T>(UnityEngine.Object prefab);
 
         T InstantiatePrefabForComponent<T>(
-            GameObject prefab, IEnumerable<object> extraArgs);
+            UnityEngine.Object prefab, IEnumerable<object> extraArgs);
 
         object InstantiatePrefabForComponent(
-            Type concreteType, GameObject prefab, IEnumerable<object> extraArgs);
+            Type concreteType, UnityEngine.Object prefab, IEnumerable<object> extraArgs);
 
         /////////////// InstantiatePrefabResourceForComponent
 
@@ -88,14 +88,14 @@ namespace Zenject
         // Without returning any particular component
         // If you want to retrieve a specific component use InstantiatePrefabForComponent
         GameObject InstantiatePrefabExplicit(
-            GameObject prefab, List<TypeValuePair> extraArgs);
+            UnityEngine.Object prefab, List<TypeValuePair> extraArgs);
 
         GameObject InstantiatePrefabExplicit(
-            GameObject prefab, List<TypeValuePair> extraArgs,
+            UnityEngine.Object prefab, List<TypeValuePair> extraArgs,
             string groupName);
 
         GameObject InstantiatePrefabExplicit(
-            GameObject prefab, List<TypeValuePair> extraArgs,
+            UnityEngine.Object prefab, List<TypeValuePair> extraArgs,
             string groupName, bool useAllArgs);
 
         ////
@@ -117,20 +117,20 @@ namespace Zenject
         // This is used instead of Instantiate to support specifying null values
         // Note: Any arguments that are used will be removed from extraArgs
         T InstantiatePrefabForComponentExplicit<T>(
-            GameObject prefab, List<TypeValuePair> extraArgs);
+            UnityEngine.Object prefab, List<TypeValuePair> extraArgs);
 
         // Note: Any arguments that are used will be removed from extraArgs
         object InstantiatePrefabForComponentExplicit(
-            Type componentType, GameObject prefab, List<TypeValuePair> extraArgs);
+            Type componentType, UnityEngine.Object prefab, List<TypeValuePair> extraArgs);
 
         // Note: Any arguments that are used will be removed from extraArgs
         object InstantiatePrefabForComponentExplicit(
-            Type componentType, GameObject prefab, List<TypeValuePair> extraArgs,
+            Type componentType, UnityEngine.Object prefab, List<TypeValuePair> extraArgs,
             string groupName);
 
         // Note: Any arguments that are used will be removed from extraArgs
         object InstantiatePrefabForComponentExplicit(
-            Type componentType, GameObject prefab, string groupName, InjectArgs args);
+            Type componentType, UnityEngine.Object prefab, string groupName, InjectArgs args);
 
         // This is used instead of Instantiate to support specifying null values
         // Note: Any arguments that are used will be removed from extraArgs
