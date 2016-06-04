@@ -145,7 +145,7 @@ namespace Zenject
             return new GameObjectNameGroupNameScopeArgBinder(BindInfo, gameObjectInfo);
         }
 
-        public GameObjectNameGroupNameScopeArgBinder FromPrefab(GameObject prefab)
+        public GameObjectNameGroupNameScopeArgBinder FromPrefab(UnityEngine.Object prefab)
         {
             BindingUtil.AssertIsValidPrefab(prefab);
             BindingUtil.AssertIsAbstractOrComponentOrGameObject(AllParentTypes);

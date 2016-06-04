@@ -19,7 +19,7 @@ namespace Zenject
     {
 #if !NOT_UNITY3D
 
-        public static void AssertIsValidPrefab(GameObject prefab)
+        public static void AssertIsValidPrefab(UnityEngine.Object prefab)
         {
             Assert.That(!ZenUtilInternal.IsNull(prefab), "Received null prefab during bind command");
 

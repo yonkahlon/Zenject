@@ -64,7 +64,7 @@ namespace Zenject
 
 #if !NOT_UNITY3D
 
-        public GameObjectNameGroupNameScopeBinder ByPrefab(GameObject prefab)
+        public GameObjectNameGroupNameScopeBinder ByPrefab(UnityEngine.Object prefab)
         {
             BindingUtil.AssertIsValidPrefab(prefab);
 
