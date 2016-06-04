@@ -2054,6 +2054,17 @@ namespace Zenject
 
         public IdScopeBinder BindInstance<TContract>(TContract instance)
         {
+            return BindInstance<TContract>(instance, false);
+        }
+
+        public IdScopeBinder BindInstance<TContract>(TContract instance, bool allowNull)
+        {
+            if (!allowNull)
+            {
+                Assert.That(!ZenUtilInternal.IsNull(instance),
+                    "Found null instance with type '{0}' in BindInstance method", typeof(TContract).Name());
+            }
+
             var bindInfo = new BindInfo(typeof(TContract));
             var binding = StartBinding();
 

@@ -51,7 +51,12 @@ namespace Zenject
 
         public ScopeBinder FromInstance(TContract instance)
         {
-            return FromInstanceBase(instance);
+            return FromInstance(instance, false);
+        }
+
+        public ScopeBinder FromInstance(TContract instance, bool allowNull)
+        {
+            return FromInstanceBase(instance, allowNull);
         }
     }
 }
