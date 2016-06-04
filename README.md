@@ -1817,7 +1817,7 @@ For general troubleshooting / support, please use the [zenject subreddit](http:/
 
 ## <a id="release-notes"></a>Release Notes
 
-See <a href="Documentation/ReleaseNoets.md">here</a>.
+See <a href="Documentation/ReleaseNotes.md">here</a>.
 
 ## <a id="license"></a>License
 

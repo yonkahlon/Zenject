@@ -43,7 +43,12 @@ namespace Zenject
 
         public ScopeBinder FromInstance(object instance)
         {
-            return FromInstanceBase(instance);
+            return FromInstance(instance, false);
+        }
+
+        public ScopeBinder FromInstance(object instance, bool allowNull)
+        {
+            return FromInstanceBase(instance, allowNull);
         }
     }
 }
