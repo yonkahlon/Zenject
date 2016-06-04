@@ -128,6 +128,10 @@ class Runner:
             self._sys.deleteDirectory('[ZenTempDir]/OptionalExtras/AutoMocking')
             self._sys.removeFile('[ZenTempDir]/OptionalExtras/AutoMocking.meta')
 
+            self._zipHelper.createZipFile('[ZenTempDir]/OptionalExtras/TestingFramework', '[ZenTempDir]/OptionalExtras/TestingFramework.zip')
+            self._sys.deleteDirectory('[ZenTempDir]/OptionalExtras/TestingFramework')
+            self._sys.removeFile('[ZenTempDir]/OptionalExtras/TestingFramework.meta')
+
             self._sys.removeFile('[ZenTempDir]/Source/Zenject.csproj')
             self._sys.removeFile('[ZenTempDir]/OptionalExtras/CommandsAndSignals/Zenject.Commands.csproj')
 
