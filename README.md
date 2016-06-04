@@ -1736,7 +1736,7 @@ For example, let's say we want to add some special keyboard shortcuts to our mai
 
 * Create a new scene
 * Right Click inside the Hierarchy tab and select `Zenject -> Decorator Context`
-* Type in the scene you want to 'decorate' in the 'Scene Name' field of SceneDecoratorContext.  Note that as a shortcut, you can click the Open button next to this name to jump to the decorated scene.
+* Type in the scene you want to 'decorate' in the 'Scene Name' field of SceneDecoratorContext.  Note that as a shortcut, you can click the Open button next to this name to jump to the decorated scene.  Alternatively, you can click the Add button which will use Unity 5.3 Multi-Scene Editting to load both levels at once.  You can also just drag the decorated scene from the Project tab to the Scene heirarchy - this will have the same effect as clicking the Add button.
 * Create a new C# script with the following contents, then add this MonoBehaviour to your scene as a gameObject, then drag it to the `PreInstallers` property of `SceneDecoratorContext`
 
 ```csharp
