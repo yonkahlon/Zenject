@@ -3,7 +3,11 @@
 
 ## Dependency Injection Framework for Unity3D
 
-#### ----- NEW ----- If you like Zenject, you may also be interested in [Projeny](https://github.com/modesttree/projeny) (our other open source project)
+Many hours have gone into the creation of this framework and many more will go to continue maintaining it.  If you or your team have found it useful, consider <a href="http://svermeulen.github.io/DonateToZenject.html">buying me a coffee</a>!  Every donation makes me significantly more likely to find time for it.
+
+<a href="http://svermeulen.github.io/DonateToZenject.html"><img src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif" alt="Buy me a coffee!"/></a>
+
+Also, if you like Zenject, you may also be interested in [Projeny](https://github.com/modesttree/projeny) (our other open source project)
 
 ## <a id="introduction"></a>Introduction
 
