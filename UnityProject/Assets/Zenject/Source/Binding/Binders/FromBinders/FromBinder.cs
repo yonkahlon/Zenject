@@ -206,7 +206,7 @@ namespace Zenject
             SubFinalizer = new ScopableBindingFinalizer(
                 BindInfo,
                 SingletonTypes.ToFactory, typeof(TFactory),
-                (container, type) => new FactoryProvider<TConcrete, TFactory>(container));
+                (container, type) => new FactoryProvider<TConcrete, TFactory>(container, new List<TypeValuePair>()));
 
             return new ScopeBinder(BindInfo);
         }
