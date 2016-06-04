@@ -92,6 +92,7 @@ The tests may also be helpful to show usage for each specific feature (which you
         * Binding
             * <a href="#binding">Binding</a>
             * <a href="#construction-methods">Construction Methods</a>
+        * <a href="#installers">Installers</a>
         * Using Non-MonoBehaviour Classes
             * <a href="#itickable">ITickable</a>
             * <a href="#iinitializable-and-postinject">IInitializable</a>
@@ -1455,7 +1456,59 @@ Now two instances of the prefab will be created.
 
 ## <a id="scriptableobject-installer"></a>Scriptable Object Installer
 
-TBD
+Another alternative to <a href="#installers">deriving from MonoInstaller or Installer</a> when implementing your own installers, is to derive from the ScriptableObjectInstaller class.  This is most commonly used to store game settings.  This approach has the following advantages:
+
+* Any changes you make to the properties of the installer will persist after you stop play mode.  This can be very useful when tweaking runtime parameters.  For other installer types as well as any MonoBehaviour's in your scene, any changes to the inspector properties at runtime will be undone when play mode is stopped.
+* You can very easily swap out multiple instances of the same installer.  For example, using the below example, you might have an instance of `GameSettingsInstaller` called `GameSettingsEasy`, and another one called `GameSettingsHard`, etc.
+
+Example:
+
+* Open Unity
+* Right click somewhere in the Project tab and select `Create -> Zenject -> ScriptableObjectInstaller`
+* Name it GameSettingsInstaller
+* Right click again in the same location
+* Select the newly added menu item `Create -> Installers -> GameSettingsInstaller`
+* Following the approach to settings outlined <a href="#using-the-unity-inspector-to-configure-settings">here</a>, you might then replace it with the following:
+
+```csharp
+public class GameSettings : ScriptableObjectInstaller
+{
+    public Player.Settings Player;
+    public SomethingElse.Settings SomethingElse;
+    // ... etc.
+
+    public override void InstallBindings()
+    {
+        Container.BindInstance(Player);
+        Container.BindInstance(SomethingElse);
+        // ... etc.
+    }
+}
+
+public class Player : ITickable
+{
+    readonly Settings _settings;
+    Vector3 _position;
+
+    public Player(Settings settings)
+    {
+        _settings = settings;
+    }
+
+    public void Tick()
+    {
+        _position += Vector3.forward * _settings.Speed;
+    }
+
+    [Serializable]
+    public class Settings
+    {
+        public float Speed;
+    }
+}
+```
+
+* Now, you should be able to run your game and adjust the Speed value that is on the GameSettingsInstaller asset at runtime, and have that change saved permanently
 
 ## <a id="commands-and-signals"></a>Commands And Signals
 
