@@ -3,6 +3,8 @@
 
 ## Dependency Injection Framework for Unity3D
 
+If you are looking for the older documentation for Zenject 3.X click <a href="https://github.com/modesttree/Zenject/tree/f0dd30ad451dcbc3eb17e636455a6c89b14ad537">here</a>.
+
 Many hours have gone into the creation of this framework and many more will go to continue maintaining it.  If you or your team have found it useful, consider <a href="http://svermeulen.github.io/DonateToZenject.html">buying me a coffee</a>!  Every donation makes me significantly more likely to find time for it.
 
 <a href="http://svermeulen.github.io/DonateToZenject.html"><img src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif" alt="Buy me a coffee!"/></a>
