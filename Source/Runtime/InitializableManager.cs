@@ -44,19 +44,11 @@ namespace Zenject
             {
                 Log.Debug("Initializing '" + initializable.Initializable.GetType() + "'");
 
-                try
-                {
 #if PROFILING_ENABLED
-                    using (ProfileBlock.Start("{0}.Initialize()", initializable.Initializable.GetType().Name()))
+                using (ProfileBlock.Start("{0}.Initialize()", initializable.Initializable.GetType().Name()))
 #endif
-                    {
-                        initializable.Initializable.Initialize();
-                    }
-                }
-                catch (Exception e)
                 {
-                    throw Assert.CreateException(
-                        e, "Error occurred while initializing IInitializable with type '{0}'", initializable.Initializable.GetType().Name());
+                    initializable.Initializable.Initialize();
                 }
             }
         }
