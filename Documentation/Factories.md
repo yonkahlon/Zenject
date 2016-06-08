@@ -196,7 +196,7 @@ public class Enemy : MonoBehaviour
         _player = player;
     }
 
-    public class Factory : Factory<float, Enemy>
+    public class Factory : Factory<Enemy>
     {
     }
 }
