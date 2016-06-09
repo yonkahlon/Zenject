@@ -186,6 +186,16 @@ namespace Zenject
 
 #endif
 
+        public ScopeArgBinder FromMethod(Func<InjectContext, object> method)
+        {
+            SubFinalizer = new ScopableBindingFinalizer(
+                BindInfo,
+                SingletonTypes.ToMethod, new SingletonImplIds.ToMethod(method),
+                (container, type) => new MethodProviderUntyped(method, container));
+
+            return this;
+        }
+
         protected ScopeArgBinder FromMethodBase<TConcrete>(Func<InjectContext, TConcrete> method)
         {
             BindingUtil.AssertIsDerivedFromTypes(typeof(TConcrete), AllParentTypes);
