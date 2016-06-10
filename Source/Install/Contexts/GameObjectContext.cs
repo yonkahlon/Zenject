@@ -7,7 +7,6 @@ using ModestTree;
 using ModestTree.Util;
 using UnityEngine;
 using UnityEngine.Serialization;
-using Zenject.Internal;
 
 #pragma warning disable 649
 
