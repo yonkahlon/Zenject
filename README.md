@@ -119,6 +119,7 @@ The tests may also be helpful to show usage for each specific feature (which you
         * <a href="#unbind-rebind">Unbind / Rebind</a>
         * <a href="#singleton-identifiers">Singleton Identifiers</a>
     * <a href="#scriptableobject-installer">Scriptable Object Installer</a>
+    * <a href="#runtime-parameters-for-installers">Runtime Parameters For Installers</a>
     * <a href="#commands-and-signals">Commands And Signals</a>
     * <a href="#creating-objects-dynamically">Creating Objects Dynamically Using Factories</a>
     * <a href="#update--initialization-order">Update / Initialization Order</a>
@@ -680,7 +681,7 @@ Where:
 
 ## <a id="installers"></a>Installers
 
-Often, there is some collections of related bindings for each sub-system and so it makes sense to group those bindings into a re-usable object.  In Zenject this re-usable object is called an Installer.  You can define a new installer as follows:
+Often, there is some collections of related bindings for each sub-system and so it makes sense to group those bindings into a re-usable object.  In Zenject this re-usable object is called an 'installer'.  You can define a new installer as follows:
 
 ```csharp
 public class FooInstaller : MonoInstaller
@@ -688,20 +689,22 @@ public class FooInstaller : MonoInstaller
     public override void InstallBindings()
     {
         Container.BindAllInterfaces<Foo>().To<Foo>().AsSingle();
+        Container.Bind<Bar>().AsSingle();
+        // etc...
     }
 }
 ```
 
 You add bindings by overriding the InstallBindings method, which is called by whatever `Context` the installer has been added to (usually this is `SceneContext`).  MonoInstaller is a MonoBehaviour so you can add FooInstaller by attaching it to a GameObject.  Since it is a GameObject you can also add public members to it to configure your installer from the Unity inspector.  This allows you to add references within the scene, references to assets, or simply tuning data (see <a href="#using-the-unity-inspector-to-configure-settings">here</a> for more information on tuning data).
 
-Note that in order for your installer to be triggered it must be attached to the Installers property of the `SceneContext` object.  This is necessary to be able to control the order that installers are called in (which you can do by dragging rows around in the Installers property).  The order should not usually matter (since nothing should be instantiated during the install process) however it can matter in some cases, such as when you configure an Installer from an existing installer (eg: `Container.BindInstance("mysetting").WhenInjectedInto<MyOtherInstaller>()`).
+Note that in order for your installer to be triggered it must be attached to the Installers property of the `SceneContext` object.  The installers are executed in the order given to `SceneContext` however this order should not usually matter (since nothing should be instantiated during the install process)
 
 In many cases you want to have your installer derive from MonoInstaller, so that you can have inspector settings.  There is also another base class called simply `Installer` which you can use in cases where you do not need it to be a MonoBehaviour.
 
-You can also call other installers from an existing installer.  For example:
+You can also call an installer from another installer.  For example:
 
 ```csharp
-public class BarInstaller : Installer
+public class BarInstaller : Installer<BarInstaller>
 {
     public override void InstallBindings()
     {
@@ -713,49 +716,26 @@ public class FooInstaller : MonoInstaller
 {
     public override void InstallBindings()
     {
-        Container.Install<BarInstaller>();
+        BarInstaller.Install(Container);
     }
 }
 ```
 
-Note that in this case BarInstaller is of type Installer and not MonoInstaller, which is why we can simply call `Container.Install<BarInstaller>`.  By using Installer for BarInstaller instead of MonoInstaller, we don't need an instance of BarInstaller in our scene to use it.  Any calls to Container.Install will immediately create the given installer type and then call InstallBindings on it.  This will repeat for any installers that this installer installs.
+Note that in this case BarInstaller is of type Installer and not MonoInstaller, which is why we can simply call `BarInstaller.Install(Container)` and don't require that BarInstaller be added to our scene alread.  Any calls to BarInstaller.Install will immediately create a temporary instance of BarInstaller and then call InstallBindings on it.  This will repeat for any installers that this installer installs.  Note also that when using the Installer base class, we always must pass in ourself as the generic argument to Installer<>.  This is necessary so that the Installer<> base class can define the static method `BarInstaller.Install`.  It is also designed this way to support runtime parameters (described below).
 
-One of the main reasons we use installers as opposed to just having all our bindings declared all at once for each scene, is to make them re-usable.  This is not a problem for installers of type `Installer` because you can simply call `Container.Install` as described above for every scene you wish to use it in, but then how would we re-use a MonoInstaller in multiple scenes?
+One of the main reasons we use installers as opposed to just having all our bindings declared all at once for each scene, is to make them re-usable.  This is not a problem for installers of type `Installer` because you can simply call `FooInstaller.Install` as described above for every scene you wish to use it in, but then how would we re-use a MonoInstaller in multiple scenes?
 
-There are two ways to do this.
+There are three ways to do this.
 
-1. **Prefabs within the scene**.  After attaching your MonoInstaller to a gameobject in your scene, you can then create a prefab out of it.  This is nice because it allows you to share any configuration that you've done in the inspector on the MonoInstaller across scenes (and also have per-scene overrides if you want).  After adding it in your scene you can then drag and drop it on to the InstallerPrefabs property of a `Context`
+1. **Prefab instances within the scene**.  After attaching your MonoInstaller to a gameobject in your scene, you can then create a prefab out of it.  This is nice because it allows you to share any configuration that you've done in the inspector on the MonoInstaller across scenes (and also have per-scene overrides if you want).  After adding it in your scene you can then drag and drop it on to the Installers property of a `Context`
 
-2. **Prefabs within Resources folder**.  You can also call `Container.InstallPrefabResource`, which will load a prefab that is assumed to container a MonoInstaller on it from the resources folder.  If you do not supply a resource path, it will be assumed to exist at "Resources/Installers/NameOfMonoInstallerType".  For example:
+1. **Prefabs**.  You can also directly drag your installer prefab from the Project tab into the InstallerPrefabs property of SceneContext.  Note that in this case you cannot have per-scene overrides like you can when having the prefab in your scene, but can be nice to avoid clutter in the scene.
 
-```csharp
-// Note that this is a MonoInstaller and has inspector settings
-public class QuxInstaller : MonoInstaller
-{
-    public string MyConfigurationSetting;
+1. **Prefabs within Resources folder**.  You can also place your installer prefabs underneath a Resoures folder and install them directly from code by using the Resources path.  For details on usage see <a href="#runtime-parameters-for-installers">here</a>.
 
-    public override void InstallBindings()
-    {
-        ...
-    }
-}
+Another option in addition to MonoInstaller and Installer is to use ScriptableObjectInstaller which has some advantages (especially for settings) - for details see <a href="#scriptableobject-installer">here</a>.
 
-public class FooInstaller : MonoInstaller
-{
-    public override void InstallBindings()
-    {
-        // When this is called, Zenject will look for a prefab at `Resources/Installers/QuxInstaller.prefab` and load that
-        Container.InstallPrefabResource<QuxInstaller>();
-
-        // You can also explicitly give a custom resource path
-        Container.InstallPrefabResource<QuxInstaller>("Stuff/Qux");
-    }
-}
-```
-
-Using InstallPrefabResource is sometimes a useful alternative to adding installer prefabs to every scene because it allows you to keep the objects in your scenes extremely light.
-
-Another option is to use ScriptableObjectInstaller - for details see <a href="#scriptableobject-installer">here</a>.
+When calling installers from other installers it is common to want to pass parameters into it.  See <a href="#runtime-parameters-for-installers">here</a> for details on how that is done.
 
 ## <a id="itickable"></a>ITickable
 
@@ -1513,6 +1493,110 @@ public class Player : ITickable
 ```
 
 * Now, you should be able to run your game and adjust the Speed value that is on the GameSettingsInstaller asset at runtime, and have that change saved permanently
+
+## <a id="runtime-parameters-for-installers"></a>Runtime Parameters For Installers
+
+Often when calling installers from other installers it is desirable to be able to pass parameters.  You can do this by adding generic arguments to whichever installer base class you are using with the types for the runtime parameters. For example, when using a non-MonoBehaviour Installer:
+
+```csharp
+public class FooInstaller : Installer<string, FooInstaller>
+{
+    string _value;
+
+    public FooInstaller(string value)
+    {
+        _value = value;
+    }
+
+    public override void InstallBindings()
+    {
+        ...
+
+        Container.BindInstance(_value).WhenInjectedInto<Foo>();
+    }
+}
+
+public class MainInstaller : MonoInstaller
+{
+    public ovverride void InstallBindings()
+    {
+        FooInstaller.Install(Container, "asdf");
+    }
+}
+
+```
+
+Or when using a MonoInstaller prefab:
+
+```csharp
+public class FooInstaller : MonoInstaller<string, FooInstaller>
+{
+    string _value;
+
+    // Note that in this case we can't use a constructor
+    [Inject]
+    public void Construct(string value)
+    {
+        _value = value;
+    }
+
+    public override void InstallBindings()
+    {
+        ...
+
+        Container.BindInstance(_value).WhenInjectedInto<Foo>();
+    }
+}
+
+public class MainInstaller : MonoInstaller
+{
+    public ovverride void InstallBindings()
+    {
+        // For this to work, there must be a prefab with FooInstaller attached to it at
+        // Resources/My/Custom/ResourcePath.prefab
+        FooInstaller.InstallFromResource("My/Custom/ResourcePath", Container, "asdf");
+
+        // In this case the prefab will be assumed to exist at 'Resources/Installers/FooInstaller'
+        // FooInstaller.InstallFromResource(Container, "asdf");
+    }
+}
+```
+
+Or, by using a ScriptableObjectInstaller:
+
+```csharp
+public class FooInstaller : ScriptableObjectInstaller<string, FooInstaller>
+{
+    string _value;
+
+    // Note that in this case we can't use a constructor
+    [Inject]
+    public void Construct(string value)
+    {
+        _value = value;
+    }
+
+    public override void InstallBindings()
+    {
+        ...
+
+        Container.BindInstance(_value).WhenInjectedInto<Foo>();
+    }
+}
+
+public class MainInstaller : MonoInstaller
+{
+    public ovverride void InstallBindings()
+    {
+        // For this to work, there must be an instance of FooInstaller added at
+        // Resources/My/Custom/ResourcePath.asset
+        FooInstaller.InstallFromResource("My/Custom/ResourcePath", Container, "asdf");
+
+        // In this case the FooInstaller asset will be assumed to exist at 'Resources/Installers/FooInstaller'
+        // FooInstaller.InstallFromResource(Container, "asdf");
+    }
+}
+```
 
 ## <a id="commands-and-signals"></a>Commands And Signals
 
