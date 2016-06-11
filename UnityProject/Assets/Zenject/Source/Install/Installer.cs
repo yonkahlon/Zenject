@@ -18,7 +18,8 @@ namespace Zenject
         }
     }
 
-    // Use this version to pass parameters to your installer
+    // Use these versions to pass parameters to your installer
+
     public abstract class Installer<TParam1, TDerived> : InstallerBase, IInstallerOneParams
         where TDerived : Installer<TParam1, TDerived>
     {
@@ -26,6 +27,46 @@ namespace Zenject
         {
             container.InstantiateExplicit<TDerived>(
                 InjectUtil.CreateArgListExplicit(p1)).InstallBindings();
+        }
+    }
+
+    public abstract class Installer<TParam1, TParam2, TDerived> : InstallerBase, IInstallerOneParams
+        where TDerived : Installer<TParam1, TParam2, TDerived>
+    {
+        public static void Install(DiContainer container, TParam1 p1, TParam2 p2)
+        {
+            container.InstantiateExplicit<TDerived>(
+                InjectUtil.CreateArgListExplicit(p1, p2)).InstallBindings();
+        }
+    }
+
+    public abstract class Installer<TParam1, TParam2, TParam3, TDerived> : InstallerBase, IInstallerOneParams
+        where TDerived : Installer<TParam1, TParam2, TParam3, TDerived>
+    {
+        public static void Install(DiContainer container, TParam1 p1, TParam2 p2, TParam3 p3)
+        {
+            container.InstantiateExplicit<TDerived>(
+                InjectUtil.CreateArgListExplicit(p1, p2, p3)).InstallBindings();
+        }
+    }
+
+    public abstract class Installer<TParam1, TParam2, TParam3, TParam4, TDerived> : InstallerBase, IInstallerOneParams
+        where TDerived : Installer<TParam1, TParam2, TParam3, TParam4, TDerived>
+    {
+        public static void Install(DiContainer container, TParam1 p1, TParam2 p2, TParam3 p3, TParam4 p4)
+        {
+            container.InstantiateExplicit<TDerived>(
+                InjectUtil.CreateArgListExplicit(p1, p2, p3, p4)).InstallBindings();
+        }
+    }
+
+    public abstract class Installer<TParam1, TParam2, TParam3, TParam4, TParam5, TDerived> : InstallerBase, IInstallerOneParams
+        where TDerived : Installer<TParam1, TParam2, TParam3, TParam4, TParam5, TDerived>
+    {
+        public static void Install(DiContainer container, TParam1 p1, TParam2 p2, TParam3 p3, TParam4 p4, TParam5 p5)
+        {
+            container.InstantiateExplicit<TDerived>(
+                InjectUtil.CreateArgListExplicit(p1, p2, p3, p4, p5)).InstallBindings();
         }
     }
 }
