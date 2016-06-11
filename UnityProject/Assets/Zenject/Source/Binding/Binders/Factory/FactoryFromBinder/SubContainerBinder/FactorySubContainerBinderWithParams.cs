@@ -1,10 +1,5 @@
 using System;
 using ModestTree;
-using System.Linq;
-
-#if !NOT_UNITY3D
-using UnityEngine;
-#endif
 
 namespace Zenject
 {
