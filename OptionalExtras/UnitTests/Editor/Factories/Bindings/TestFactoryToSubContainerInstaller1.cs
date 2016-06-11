@@ -33,7 +33,7 @@ namespace Zenject.Tests.Bindings
             Assert.IsEqual(Container.Resolve<IFooFactory>().Create("asdf").Value, "asdf");
         }
 
-        class FooInstaller : Installer
+        class FooInstaller : Installer<string, FooInstaller>
         {
             readonly string _value;
 

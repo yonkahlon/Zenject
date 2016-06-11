@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace Zenject
 {
-    public class FactoryFromBinder<TParam1, TParam2, TParam3, TParam4, TParam5, TContract> : FactoryFromBinderWithParams<TContract>
+    public class FactoryFromBinder<TParam1, TParam2, TParam3, TParam4, TParam5, TContract> : FactoryFromBinderBase<TContract>
     {
         public FactoryFromBinder(BindInfo bindInfo, Type factoryType, BindFinalizerWrapper finalizerWrapper)
             : base(bindInfo, factoryType, finalizerWrapper)

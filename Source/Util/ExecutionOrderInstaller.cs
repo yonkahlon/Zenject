@@ -6,7 +6,7 @@ using ModestTree.Util;
 
 namespace Zenject
 {
-    public class ExecutionOrderInstaller : Installer
+    public class ExecutionOrderInstaller : Installer<List<Type>, ExecutionOrderInstaller>
     {
         List<Type> _typeOrder;
 

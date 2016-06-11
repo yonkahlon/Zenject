@@ -63,14 +63,15 @@ namespace Zenject
         }
 
         public ConditionBinder ByInstaller<TInstaller>()
-            where TInstaller : Installer
+            where TInstaller : InstallerBase
         {
             return ByInstaller(typeof(TInstaller));
         }
 
         public ConditionBinder ByInstaller(Type installerType)
         {
-            BindingUtil.AssertIsIInstallerType(installerType);
+            Assert.That(installerType.DerivesFrom<InstallerBase>(),
+                "Invalid installer type given during bind command.  Expected type '{0}' to derive from 'Installer<>'", installerType.Name());
 
             SubFinalizer = CreateFinalizer(
                 (container) => new SubContainerDependencyProvider(

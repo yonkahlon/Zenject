@@ -26,7 +26,7 @@ namespace Zenject
         [SerializeField]
         List<ScriptableObjectInstaller> _scriptableObjectInstallers = new List<ScriptableObjectInstaller>();
 
-        List<Installer> _normalInstallers = new List<Installer>();
+        List<InstallerBase> _normalInstallers = new List<InstallerBase>();
 
         public IEnumerable<MonoInstaller> Installers
         {
@@ -68,7 +68,7 @@ namespace Zenject
         }
 
         // Unlike other installer types this has to be set through code
-        public IEnumerable<Installer> NormalInstallers
+        public IEnumerable<InstallerBase> NormalInstallers
         {
             get
             {
@@ -114,11 +114,6 @@ namespace Zenject
 
         protected void InstallInstallers()
         {
-            InstallInstallers(new Dictionary<Type, List<TypeValuePair>>());
-        }
-
-        protected void InstallInstallers(Dictionary<Type, List<TypeValuePair>> extraArgsMap)
-        {
             CheckInstallerPrefabTypes();
 
             var newGameObjects = new List<GameObject>();
@@ -143,20 +138,11 @@ namespace Zenject
 
             foreach (var installer in allInstallers)
             {
-                List<TypeValuePair> extraArgs;
-
                 Assert.IsNotNull(installer,
                     "Found null installer in '{0}'", this.GetType().Name());
 
-                if (extraArgsMap.TryGetValue(installer.GetType(), out extraArgs))
-                {
-                    extraArgsMap.Remove(installer.GetType());
-                    Container.InstallExplicit(installer, extraArgs);
-                }
-                else
-                {
-                    Container.Install(installer);
-                }
+                Container.Inject(installer);
+                installer.InstallBindings();
             }
         }
 
