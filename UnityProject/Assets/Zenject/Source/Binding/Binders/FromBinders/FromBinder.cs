@@ -108,6 +108,18 @@ namespace Zenject
             return new ScopeArgBinder(BindInfo);
         }
 
+        public ArgumentsBinder FromSiblingComponent()
+        {
+            BindingUtil.AssertIsComponent(ConcreteTypes);
+            BindingUtil.AssertTypesAreNotAbstract(ConcreteTypes);
+
+            SubFinalizer = new SingleProviderBindingFinalizer(
+                BindInfo, (container, type) => new AddToCurrentGameObjectComponentProvider(
+                    container, type, BindInfo.ConcreteIdentifier, BindInfo.Arguments));
+
+            return new ArgumentsBinder(BindInfo);
+        }
+
         public GameObjectNameGroupNameScopeArgBinder FromGameObject()
         {
             BindingUtil.AssertIsAbstractOrComponentOrGameObject(BindInfo.ContractTypes);

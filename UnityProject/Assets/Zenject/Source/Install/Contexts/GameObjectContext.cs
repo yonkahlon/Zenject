@@ -136,7 +136,7 @@ namespace Zenject
                     installerExtraArgs.InstallerType, installerExtraArgs.ExtraArgs);
             }
 
-            InstallInstallers(extraArgsMap);
+            InstallInstallers();
         }
 
         public class InstallerExtraArgs

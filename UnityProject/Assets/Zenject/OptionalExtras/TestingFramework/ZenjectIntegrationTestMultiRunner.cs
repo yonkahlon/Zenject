@@ -79,7 +79,7 @@ namespace Zenject.TestFramework
                 Log.Info("Integration tests passed successfully");
             }
 
-            EditorApplication.isPlaying = false;
+            gameObject.AddComponent<EditorPlayModeStopper>();
         }
 
         IEnumerator RunTest(ZenjectIntegrationTestFixture fixture, MethodInfo methodInfo, bool validateOnly)
@@ -120,7 +120,7 @@ namespace Zenject.TestFramework
             context.IsValidating = validateOnly;
             context.ValidateShutDownAfterwards = false;
 
-            context.NormalInstallers = new Installer[]
+            context.NormalInstallers = new InstallerBase[]
             {
                 new ActionInstaller((container) =>
                     {
@@ -177,7 +177,21 @@ namespace Zenject.TestFramework
             }
         }
 
-        class ActionInstaller : Installer
+        class EditorPlayModeStopper : MonoBehaviour
+        {
+            public void Awake()
+            {
+                EditorApplication.isPlaying = false;
+            }
+
+            public void Update()
+            {
+                // Continually set this until it actually works
+                EditorApplication.isPlaying = false;
+            }
+        }
+
+        class ActionInstaller : Installer<ActionInstaller>
         {
             readonly Action<DiContainer> _installMethod;
 

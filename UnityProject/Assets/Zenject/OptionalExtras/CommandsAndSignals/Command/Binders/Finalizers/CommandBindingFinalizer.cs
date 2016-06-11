@@ -15,7 +15,7 @@ namespace Zenject
 
         public CommandBindingFinalizer(
             BindInfo bindInfo,
-            Func<THandler, Action> methodGetter, Func<IProvider> handlerProviderFactory)
+            Func<THandler, Action> methodGetter, Func<DiContainer, IProvider> handlerProviderFactory)
             : base(bindInfo, handlerProviderFactory)
         {
             _methodGetter = methodGetter;
@@ -52,7 +52,7 @@ namespace Zenject
         public CommandBindingFinalizer(
             BindInfo bindInfo,
             Func<THandler, Action<TParam1>> methodGetter,
-            Func<IProvider> handlerProviderFactory)
+            Func<DiContainer, IProvider> handlerProviderFactory)
             : base(bindInfo, handlerProviderFactory)
         {
             _methodGetter = methodGetter;
@@ -89,7 +89,7 @@ namespace Zenject
         public CommandBindingFinalizer(
             BindInfo bindInfo,
             Func<THandler, Action<TParam1, TParam2>> methodGetter,
-            Func<IProvider> handlerProviderFactory)
+            Func<DiContainer, IProvider> handlerProviderFactory)
             : base(bindInfo, handlerProviderFactory)
         {
             _methodGetter = methodGetter;
@@ -126,7 +126,7 @@ namespace Zenject
         public CommandBindingFinalizer(
             BindInfo bindInfo,
             Func<THandler, Action<TParam1, TParam2, TParam3>> methodGetter,
-            Func<IProvider> handlerProviderFactory)
+            Func<DiContainer, IProvider> handlerProviderFactory)
             : base(bindInfo, handlerProviderFactory)
         {
             _methodGetter = methodGetter;
@@ -163,7 +163,7 @@ namespace Zenject
         public CommandBindingFinalizer(
             BindInfo bindInfo,
             Func<THandler, Action<TParam1, TParam2, TParam3, TParam4>> methodGetter,
-            Func<IProvider> handlerProviderFactory)
+            Func<DiContainer, IProvider> handlerProviderFactory)
             : base(bindInfo, handlerProviderFactory)
         {
             _methodGetter = methodGetter;
@@ -200,7 +200,7 @@ namespace Zenject
         public CommandBindingFinalizer(
             BindInfo bindInfo,
             Func<THandler, ModestTree.Util.Action<TParam1, TParam2, TParam3, TParam4, TParam5>> methodGetter,
-            Func<IProvider> handlerProviderFactory)
+            Func<DiContainer, IProvider> handlerProviderFactory)
             : base(bindInfo, handlerProviderFactory)
         {
             _methodGetter = methodGetter;

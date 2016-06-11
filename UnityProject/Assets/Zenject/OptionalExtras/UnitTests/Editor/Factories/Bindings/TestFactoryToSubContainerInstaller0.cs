@@ -33,7 +33,7 @@ namespace Zenject.Tests.Bindings
             Assert.IsEqual(Container.Resolve<IFooFactory>().Create(), FooInstaller.Foo);
         }
 
-        class FooInstaller : Installer
+        class FooInstaller : Installer<FooInstaller>
         {
             public static Foo Foo = new Foo();
 

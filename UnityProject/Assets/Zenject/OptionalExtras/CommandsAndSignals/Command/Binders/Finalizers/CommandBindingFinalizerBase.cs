@@ -11,11 +11,11 @@ namespace Zenject
         : ProviderBindingFinalizer
         where TCommand : ICommand
     {
-        readonly Func<IProvider> _handlerProviderFactory;
+        readonly Func<DiContainer, IProvider> _handlerProviderFactory;
 
         public CommandBindingFinalizerBase(
             BindInfo bindInfo,
-            Func<IProvider> handlerProviderFactory)
+            Func<DiContainer, IProvider> handlerProviderFactory)
             : base(bindInfo)
         {
             _handlerProviderFactory = handlerProviderFactory;
@@ -58,16 +58,16 @@ namespace Zenject
                             BindInfo.Arguments,
                             SingletonTypes.To,
                             null),
-                        (_, type) => _handlerProviderFactory());
+                        (_, type) => _handlerProviderFactory(container));
                 }
                 case ScopeTypes.Transient:
                 {
-                    return _handlerProviderFactory();
+                    return _handlerProviderFactory(container);
                 }
                 case ScopeTypes.Cached:
                 {
                     return new CachedProvider(
-                        _handlerProviderFactory());
+                        _handlerProviderFactory(container));
                 }
             }
 

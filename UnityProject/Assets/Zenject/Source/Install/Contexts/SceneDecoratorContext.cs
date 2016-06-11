@@ -62,14 +62,22 @@ namespace Zenject
 
         public void AddPreBindings(DiContainer container)
         {
-            container.Install(PreInstallers);
+            foreach (var installer in PreInstallers)
+            {
+                container.Inject(installer);
+                installer.InstallBindings();
+            }
 
             ProcessDecoratorInstallers(container, true);
         }
 
         public void AddPostBindings(DiContainer container)
         {
-            container.Install(PostInstallers);
+            foreach (var installer in PostInstallers)
+            {
+                container.Inject(installer);
+                installer.InstallBindings();
+            }
 
             ProcessDecoratorInstallers(container, false);
         }

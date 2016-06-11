@@ -122,7 +122,7 @@ namespace Zenject.Tests.Bindings
             }
         }
 
-        class FooInstaller : Installer
+        class FooInstaller : Installer<FooInstaller>
         {
             public override void InstallBindings()
             {
