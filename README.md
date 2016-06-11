@@ -1014,6 +1014,13 @@ The final property you will notice on the ZenjectBinding component is the "Conte
 * <a id="bad-execution-order"></a>**The order that things occur in is wrong, like injection is occurring too late, or Initialize() event is not called at the right time, etc.**
     * It may be because the 'script execution order' of the Zenject classes 'ProjectContext', 'SceneContext', or 'SceneDecoratorContext' are incorrect.  These classes should always have the earliest or near earliest execution order.  This should already be set by default (since this setting is included in the `cs.meta` files for these classes).  However if you are compiling Zenject yourself or have a unique configuration, you may want to make sure, which you can do by going to "Edit -> Project Settings -> Script Execution Order" and confirming that these classes are at the top, before the default time.
 
+* **Transient is the default scope**
+    * Another common mistake is to leave out the call which defines the scope (eg. `AsSingle`, `AsTransient`, or `AsCached`) and therefore unintentionally use the default (`AsTransient`).  For example:
+
+    ``` Container.BindAllInterfacesAndSelf<Foo>().To<Foo>(); ```
+
+    * The above binding is almost certainly not what you want to do, because it will create an instance of Foo for every interface that Foo has.  Instead, you almost certainly want to use either `AsCached` or `AsSingle` in this case
+
 Please feel free to submit any other sources of confusion to sfvermeulen@gmail.com and I will add it here.
 
 ## <a id="optional-binding"></a>Optional Binding
