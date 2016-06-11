@@ -57,26 +57,19 @@ namespace Zenject
             return _componentType;
         }
 
-        GameObject GetGameObject(InjectContext context)
-        {
-            var component = context.ObjectInstance as Component;
-
-            Assert.IsNotNull(component,
-                "Object '{0}' can only be injected into MonoBehaviour's since it was bound with 'FromSiblingComponent'. Attempted to inject into non-MonoBehaviour '{1}'",
-                context.MemberType, context.ObjectType);
-
-            return component.gameObject;
-        }
-
         public IEnumerator<List<object>> GetAllInstancesWithInjectSplit(InjectContext context, List<TypeValuePair> args)
         {
             Assert.IsNotNull(context);
+
+            Assert.That(context.ObjectType.DerivesFrom<Component>(),
+                "Object '{0}' can only be injected into MonoBehaviour's since it was bound with 'FromSiblingComponent'. Attempted to inject into non-MonoBehaviour '{1}'",
+                context.MemberType, context.ObjectType);
 
             object instance;
 
             if (!_container.IsValidating || DiContainer.CanCreateOrInjectDuringValidation(_componentType))
             {
-                var gameObj = GetGameObject(context);
+                var gameObj = ((Component)context.ObjectInstance).gameObject;
 
                 instance = gameObj.GetComponent(_componentType);
 
