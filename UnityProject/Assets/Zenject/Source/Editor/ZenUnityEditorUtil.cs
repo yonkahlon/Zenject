@@ -1,15 +1,11 @@
 #if !NOT_UNITY3D
 
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using ModestTree.Util;
 using UnityEditor;
 using UnityEngine;
 using ModestTree;
-using Zenject.Internal;
-using UnityEditor.SceneManagement;
 
 namespace Zenject
 {

@@ -1,9 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.Linq.Expressions;
-using ModestTree;
-using ModestTree.Util;
-using System.Linq;
 
 namespace Zenject
 {
@@ -20,7 +15,7 @@ namespace Zenject
         public ScopeArgBinder To<THandler>(Func<THandler, Action<TParam1, TParam2>> methodGetter)
         {
             Finalizer = new CommandBindingFinalizer<TCommand, THandler, TParam1, TParam2>(
-                BindInfo, methodGetter, 
+                BindInfo, methodGetter,
                 (container) => new TransientProvider(
                     typeof(THandler), container, BindInfo.Arguments, BindInfo.ConcreteIdentifier));
 
