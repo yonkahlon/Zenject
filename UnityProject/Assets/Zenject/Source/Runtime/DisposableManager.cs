@@ -63,7 +63,15 @@ namespace Zenject
             {
                 Log.Debug("Disposing '" + disposable.Disposable.GetType() + "'");
 
-                disposable.Disposable.Dispose();
+                try
+                {
+                    disposable.Disposable.Dispose();
+                }
+                catch (Exception e)
+                {
+                    throw Assert.CreateException(
+                        e, "Error occurred while disposing IDisposable with type '{0}'", disposable.Disposable.GetType().Name());
+                }
             }
 
             Log.Debug("Disposed of {0} disposables in DisposablesHandler", disposablesOrdered.Count());
