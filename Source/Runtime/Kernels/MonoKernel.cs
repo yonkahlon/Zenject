@@ -67,8 +67,8 @@ namespace Zenject
                 // changes.  So to address this case, dispose before the OnDestroy event below (OnApplicationQuit
                 // is always called before OnDestroy) and then don't call dispose in OnDestroy
                 Assert.That(!_isDisposed);
+                _isDisposed = true; // Do this before in case there's exceptions, so we don't call it again below
                 _disposablesManager.Dispose();
-                _isDisposed = true;
             }
         }
 
