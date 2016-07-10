@@ -37,8 +37,10 @@ namespace Zenject
 
                 if (result == null)
                 {
-                    Assert.That(context.MemberType.IsPrimitive,
+#if !UNITY_WSA
+                    Assert.That(context.MemberType.IsPrimitive(),
                         "Invalid value returned from FromMethod.  Expected non-null.");
+#endif
                 }
                 else
                 {
