@@ -27,6 +27,8 @@ namespace Zenject
 
             _installMethod(subContainer);
 
+            subContainer.ResolveDependencyRoots();
+
             return subContainer;
         }
     }
@@ -54,6 +56,8 @@ namespace Zenject
             var subContainer = _container.CreateSubContainer();
 
             _installMethod(subContainer, (TParam1)args[0].Value);
+
+            subContainer.ResolveDependencyRoots();
 
             return subContainer;
         }
@@ -86,6 +90,8 @@ namespace Zenject
                 subContainer,
                 (TParam1)args[0].Value,
                 (TParam2)args[1].Value);
+
+            subContainer.ResolveDependencyRoots();
 
             return subContainer;
         }
@@ -120,6 +126,8 @@ namespace Zenject
                 (TParam1)args[0].Value,
                 (TParam2)args[1].Value,
                 (TParam3)args[2].Value);
+
+            subContainer.ResolveDependencyRoots();
 
             return subContainer;
         }
@@ -156,6 +164,8 @@ namespace Zenject
                 (TParam2)args[1].Value,
                 (TParam3)args[2].Value,
                 (TParam4)args[3].Value);
+
+            subContainer.ResolveDependencyRoots();
 
             return subContainer;
         }
@@ -194,6 +204,8 @@ namespace Zenject
                 (TParam3)args[2].Value,
                 (TParam4)args[3].Value,
                 (TParam5)args[4].Value);
+
+            subContainer.ResolveDependencyRoots();
 
             return subContainer;
         }

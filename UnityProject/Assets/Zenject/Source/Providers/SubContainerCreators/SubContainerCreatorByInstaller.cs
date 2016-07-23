@@ -27,6 +27,8 @@ namespace Zenject
                 _installerType, args);
             installer.InstallBindings();
 
+            subContainer.ResolveDependencyRoots();
+
             return subContainer;
         }
     }
