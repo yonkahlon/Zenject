@@ -75,6 +75,19 @@ namespace Zenject.Tests.BindFeatures
             Assert.IsNotNull(Container.Resolve<IFoo>());
             Assert.IsNotNull(Container.Resolve<IQux>());
         }
+
+        [Test]
+        [ExpectedException]
+        public void TestAllInterfacesMistake()
+        {
+            Container.BindAllInterfaces<Foo>().AsSingle().NonLazy();
+            Container.FlushBindings();
+
+            Container.Validate();
+
+            Assert.IsNotNull(Container.Resolve<IFoo>());
+            Assert.IsNotNull(Container.Resolve<IQux>());
+        }
     }
 }
 
