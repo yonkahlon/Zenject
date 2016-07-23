@@ -43,6 +43,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Install\InstallerBase.cs" />
     <Compile Include="Internal\Assert.cs" />
     <Compile Include="Internal\Func.cs" />
     <Compile Include="Internal\LinqExtensions.cs" />
@@ -94,6 +95,7 @@
     <Compile Include="Install\Contexts\StaticContext.cs" />
     <Compile Include="Install\InitialComponentsInjecter.cs" />
     <Compile Include="Providers\ComponentProviders\GetFromPrefabComponentProvider.cs" />
+    <Compile Include="Providers\MethodProviderUntyped.cs" />
     <Compile Include="Providers\PrefabProviders\PrefabProvider.cs" />
     <Compile Include="Providers\PrefabProviders\PrefabProviderResource.cs" />
     <Compile Include="Runtime\Kernels\DefaultGameObjectKernel.cs" />
@@ -201,7 +203,6 @@
     <Compile Include="Binding\Finalizers\SubContainerPrefabBindingFinalizer.cs" />
     <Compile Include="Binding\Finalizers\SubContainerPrefabResourceBindingFinalizer.cs" />
     <Compile Include="Binding\Finalizers\SubContainerMethodBindingFinalizer.cs" />
-    <Compile Include="Binding\Binders\Factory\FactoryFromBinderWithParams.cs" />
     <Compile Include="Binding\Binders\Factory\FactoryFromBinderBase.cs" />
     <Compile Include="Binding\Binders\Factory\FactoryFromBinder\SubContainerBinder\FactorySubContainerBinder0.cs" />
     <Compile Include="Binding\Binders\Factory\FactoryFromBinder\SubContainerBinder\FactorySubContainerBinderBase.cs" />
