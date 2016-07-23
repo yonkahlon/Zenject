@@ -92,6 +92,19 @@ namespace Zenject
                 BindInfo, FinalizerWrapper, subIdentifier);
         }
 
+        public ScopeBinder FromFactory(Type factoryType)
+        {
+            Assert.That(factoryType.DerivesFrom<IFactory>());
+
+            SubFinalizer = new ScopableBindingFinalizer(
+                BindInfo,
+                SingletonTypes.ToFactory, factoryType,
+                (container, type) => new UntypedFactoryProvider(
+                    factoryType, container, new List<TypeValuePair>()));
+
+            return new ScopeBinder(BindInfo);
+        }
+
 #if !NOT_UNITY3D
 
         public ScopeArgBinder FromComponent(GameObject gameObject)
