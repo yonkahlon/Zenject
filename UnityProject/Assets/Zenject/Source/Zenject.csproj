@@ -98,6 +98,7 @@
     <Compile Include="Providers\MethodProviderUntyped.cs" />
     <Compile Include="Providers\PrefabProviders\PrefabProvider.cs" />
     <Compile Include="Providers\PrefabProviders\PrefabProviderResource.cs" />
+    <Compile Include="Providers\UntypedFactoryProvider.cs" />
     <Compile Include="Runtime\Kernels\DefaultGameObjectKernel.cs" />
     <Compile Include="Runtime\Kernels\Kernel.cs" />
     <Compile Include="Runtime\Kernels\MonoKernel.cs" />
