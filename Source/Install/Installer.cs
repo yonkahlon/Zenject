@@ -1,6 +1,16 @@
 namespace Zenject
 {
     //
+    // I'd recommmend using Installer<> instead, and then always use the approach
+    // of calling `MyInstaller.Install(Container)`
+    // This way, if you want to add strongly typed parameters later you can do this
+    // by deriving from a different Installer<> base class
+    //
+    public abstract class Installer : InstallerBase, IInstallerZeroParams
+    {
+    }
+
+    //
     // Derive from this class then install like this:
     //     FooInstaller.Install(Container);
     //
