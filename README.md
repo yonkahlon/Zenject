@@ -1949,7 +1949,7 @@ See <a href="Documentation/AutoMocking.md">here</a>.
             }
         }
 
-    If you need more control than this, another option is to use a coroutine library that implements similar functionality to what Unity provides.  This is what we do.  See [here](https://github.com/svermeulen/UnityCoroutinesWithoutMonoBehaviours) for the library that we use for this.
+    If you need more control than this, another option is to use a coroutine library that implements similar functionality to what Unity provides.  You might consider [UniRx](https://github.com/neuecc/UniRx) for this.  At ModestTree we rolled our own coroutine manager which you can find [here](https://github.com/svermeulen/UnityCoroutinesWithoutMonoBehaviours).
 
 * **<a id="memorypools"></a>How do I use Zenject with pools to minimize memory allocations?**
 
