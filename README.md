@@ -1945,7 +1945,7 @@ See <a href="Documentation/AutoMocking.md">here</a>.
             public override void InstallBindings()
             {
                 Container.Bind<IInitializable>().To<Foo>().AsSingle();
-                Container.Bind<AsyncProcessor>().ToSingleGameObject();
+                Container.Bind<AsyncProcessor>().FromGameObject().AsSingle();
             }
         }
 
