@@ -465,12 +465,11 @@ namespace Zenject
             FlushBindings();
             CheckForInstallWarning(context);
 
-            var bindingId = context.GetBindingId();
-
-            if (_providers.ContainsKey(bindingId))
-            {
-                return _providers[bindingId].Select(x => x.Provider.GetInstanceType(context)).Where(x => x != null).ToList();
-            }
+			var providers = GetProviderMatchesInternal(context).ToList();
+			if (providers.Count > 0 )
+			{
+				return providers.Select(x => x.ProviderInfo.Provider.GetInstanceType(context)).Where(x => x != null).ToList();
+			}
 
             return new List<Type> {};
         }
