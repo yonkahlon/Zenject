@@ -51,7 +51,7 @@ namespace Zenject
         public DiContainer CreateSubContainer(List<TypeValuePair> args)
         {
             Assert.IsEqual(args.Count, 1);
-            Assert.IsEqual(args[0].Type, typeof(TParam1));
+            Assert.That(args[0].Type.DerivesFromOrEqual<TParam1>());
 
             var subContainer = _container.CreateSubContainer();
 
@@ -81,8 +81,8 @@ namespace Zenject
         public DiContainer CreateSubContainer(List<TypeValuePair> args)
         {
             Assert.IsEqual(args.Count, 2);
-            Assert.IsEqual(args[0].Type, typeof(TParam1));
-            Assert.IsEqual(args[1].Type, typeof(TParam2));
+            Assert.That(args[0].Type.DerivesFromOrEqual<TParam1>());
+            Assert.That(args[1].Type.DerivesFromOrEqual<TParam2>());
 
             var subContainer = _container.CreateSubContainer();
 
@@ -115,9 +115,9 @@ namespace Zenject
         public DiContainer CreateSubContainer(List<TypeValuePair> args)
         {
             Assert.IsEqual(args.Count, 3);
-            Assert.IsEqual(args[0].Type, typeof(TParam1));
-            Assert.IsEqual(args[1].Type, typeof(TParam2));
-            Assert.IsEqual(args[2].Type, typeof(TParam3));
+            Assert.That(args[0].Type.DerivesFromOrEqual<TParam1>());
+            Assert.That(args[1].Type.DerivesFromOrEqual<TParam2>());
+            Assert.That(args[2].Type.DerivesFromOrEqual<TParam3>());
 
             var subContainer = _container.CreateSubContainer();
 
@@ -151,10 +151,10 @@ namespace Zenject
         public DiContainer CreateSubContainer(List<TypeValuePair> args)
         {
             Assert.IsEqual(args.Count, 4);
-            Assert.IsEqual(args[0].Type, typeof(TParam1));
-            Assert.IsEqual(args[1].Type, typeof(TParam2));
-            Assert.IsEqual(args[2].Type, typeof(TParam3));
-            Assert.IsEqual(args[3].Type, typeof(TParam4));
+            Assert.That(args[0].Type.DerivesFromOrEqual<TParam1>());
+            Assert.That(args[1].Type.DerivesFromOrEqual<TParam2>());
+            Assert.That(args[2].Type.DerivesFromOrEqual<TParam3>());
+            Assert.That(args[3].Type.DerivesFromOrEqual<TParam4>());
 
             var subContainer = _container.CreateSubContainer();
 
@@ -189,11 +189,11 @@ namespace Zenject
         public DiContainer CreateSubContainer(List<TypeValuePair> args)
         {
             Assert.IsEqual(args.Count, 5);
-            Assert.IsEqual(args[0].Type, typeof(TParam1));
-            Assert.IsEqual(args[1].Type, typeof(TParam2));
-            Assert.IsEqual(args[2].Type, typeof(TParam3));
-            Assert.IsEqual(args[3].Type, typeof(TParam4));
-            Assert.IsEqual(args[4].Type, typeof(TParam5));
+            Assert.That(args[0].Type.DerivesFromOrEqual<TParam1>());
+            Assert.That(args[1].Type.DerivesFromOrEqual<TParam2>());
+            Assert.That(args[2].Type.DerivesFromOrEqual<TParam3>());
+            Assert.That(args[3].Type.DerivesFromOrEqual<TParam4>());
+            Assert.That(args[4].Type.DerivesFromOrEqual<TParam5>());
 
             var subContainer = _container.CreateSubContainer();
 
