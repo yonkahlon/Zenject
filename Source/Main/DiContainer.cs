@@ -468,7 +468,7 @@ namespace Zenject
             var providers = GetProviderMatchesInternal(context).ToList();
             if (providers.Count > 0 )
             {
-            	return providers.Select(x => x.ProviderInfo.Provider.GetInstanceType(context)).Where(x => x != null).ToList();
+                return providers.Select(x => x.ProviderInfo.Provider.GetInstanceType(context)).Where(x => x != null).ToList();
             }
 
             return new List<Type> {};
