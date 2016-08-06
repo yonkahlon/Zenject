@@ -45,7 +45,7 @@ namespace Zenject
         //    {
         //    }
         //
-        //    Container.BindAllInterfacesToSingle<Foo>();
+        //    Container.BindAllInterfaces<Foo>().To<Foo>().AsSingle();
         //
         //  This line above is equivalent to the following:
         //
