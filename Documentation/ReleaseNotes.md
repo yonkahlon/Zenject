@@ -1,6 +1,21 @@
 
 ## <a id="release-notes"></a>Release Notes
 
+4.4 (July 23, 2016)
+- Changed the way installers are called from other installers, to allow strongly typed parameter passing
+- Added untyped version of FromMethod
+- Added FromSiblingComponent bind method
+- Added non-generic FromFactory bind method
+- Minor bug fix to command binding to work with InheritInSubcontainers() method
+- Bug fix - NonLazy method was not working properly when used with ByInstaller or ByMethod
+
+4.3 (June 4, 2016)
+- Changed to disallow using null with BindInstance by default, to catch these errors earlier
+- Changed to use UnityEngine.Object when referring to prefabs to allow people to get some stronger type checking of prefabs at edit time
+- (bug fix) for Hololens with Unity 5.4
+- (bug fix) Scene decorator property was not being serialized correctly
+- (bug fix) Custom factories were not validating in some cases
+
 4.2 (May 30, 2016)
 - Finally updated the documentation
 - Renamed FromGetter to FromGetterResolve
