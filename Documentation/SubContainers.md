@@ -286,7 +286,7 @@ public class ShipInputHandler : MonoBehaviour
 * The idea here is that everything at or underneath the Ship game object should be considered inside it's own sub-container.  When we're done, we should be able to add multiple ships to our scene, each with their own components ShipHealthHandler, ShipInputHandler, etc. that can treat each other as singletons.
 * Try to validate your scene by pressing CTRL+SHIFT+V.  You should get an error that looks like this: `Unable to resolve type 'ShipHealthHandler' while building object with type 'Ship'.`
 * This is because the ShipHealthHandler component has not been added to our sub-container.  To address this:
-    * Click on the HealthHandler game object and then click Add Component and type Zenject Binding (if you don't know what that is read <a href="#scene-bindings">this</a>)
+    * Click on the HealthHandler game object and then click Add Component and type Zenject Binding (if you don't know what that is read the scene bindings section on the main page)
     * Drag the Ship Health Handler Component to the Components field of Zenject Binding
 * Validate again by pressing CTRL+SHIFT+V.  You should now get this error instead: `Unable to resolve type 'Ship' while building object with type 'GameRunner'.` 
 * Our Ship component also needs to be added to the container.  To address this, once again:
