@@ -22,9 +22,11 @@ namespace Zenject
 
         protected TValue CreateInternal<TValue>(List<TypeValuePair> argList)
         {
+            var includeInactive = _container.Resolve<SceneCompositionRoot>().AllowInjectInactive;
+
             return (TValue)_container.InstantiatePrefabForComponentExplicit(
                 typeof(TValue), _prefab, argList,
-                new InjectContext(_container, typeof(TValue), null), false, _groupName);
+                new InjectContext(_container, typeof(TValue), null), includeInactive, _groupName);
         }
     }
 
