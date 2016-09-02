@@ -62,7 +62,10 @@ namespace Zenject
                 {
                     int hash = 17;
                     hash = hash * 29 + (this.ConcreteIdentifier == null ? 0 : this.ConcreteIdentifier.GetHashCode());
-                    hash = hash * 29 + this.InstallerDelegate.Target.GetHashCode();
+
+                    var delegateTarget = this.InstallerDelegate.Target;
+
+                    hash = hash * 29 + (delegateTarget == null ? 0 : delegateTarget.GetHashCode());
                     hash = hash * 29 + this.InstallerDelegate.Method().GetHashCode();
                     return hash;
                 }
