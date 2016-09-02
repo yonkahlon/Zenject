@@ -1,6 +1,12 @@
 
 ## <a id="release-notes"></a>Release Notes
 
+4.5 (September 1, 2016)
+- Fixed DiContainer.ResolveTypeAll() method to properly search in parent containers
+- Fixed exception that was occuring with Factories when using derived parameter types
+- Fixed FromResolve to properly search in parent containers
+- Fixed exception that was occuring with FromMethod when using derived parameter types
+
 4.4 (July 23, 2016)
 - Changed the way installers are called from other installers, to allow strongly typed parameter passing
 - Added untyped version of FromMethod
