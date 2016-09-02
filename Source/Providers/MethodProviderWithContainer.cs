@@ -53,7 +53,7 @@ namespace Zenject
             Assert.IsNotNull(context);
 
             Assert.That(typeof(TValue).DerivesFromOrEqual(context.MemberType));
-            Assert.IsEqual(args[0].Type, typeof(TParam1));
+            Assert.That(args[0].Type.DerivesFromOrEqual(typeof(TParam1)));
 
             yield return new List<object>()
             {
@@ -86,8 +86,8 @@ namespace Zenject
             Assert.IsNotNull(context);
 
             Assert.That(typeof(TValue).DerivesFromOrEqual(context.MemberType));
-            Assert.IsEqual(args[0].Type, typeof(TParam1));
-            Assert.IsEqual(args[1].Type, typeof(TParam2));
+            Assert.That(args[0].Type.DerivesFromOrEqual(typeof(TParam1)));
+            Assert.That(args[1].Type.DerivesFromOrEqual(typeof(TParam2)));
 
             yield return new List<object>()
             {
@@ -121,9 +121,9 @@ namespace Zenject
             Assert.IsNotNull(context);
 
             Assert.That(typeof(TValue).DerivesFromOrEqual(context.MemberType));
-            Assert.IsEqual(args[0].Type, typeof(TParam1));
-            Assert.IsEqual(args[1].Type, typeof(TParam2));
-            Assert.IsEqual(args[2].Type, typeof(TParam3));
+            Assert.That(args[0].Type.DerivesFromOrEqual(typeof(TParam1)));
+            Assert.That(args[1].Type.DerivesFromOrEqual(typeof(TParam2)));
+            Assert.That(args[2].Type.DerivesFromOrEqual(typeof(TParam3)));
 
             yield return new List<object>()
             {
@@ -158,10 +158,10 @@ namespace Zenject
             Assert.IsNotNull(context);
 
             Assert.That(typeof(TValue).DerivesFromOrEqual(context.MemberType));
-            Assert.IsEqual(args[0].Type, typeof(TParam1));
-            Assert.IsEqual(args[1].Type, typeof(TParam2));
-            Assert.IsEqual(args[2].Type, typeof(TParam3));
-            Assert.IsEqual(args[3].Type, typeof(TParam4));
+            Assert.That(args[0].Type.DerivesFromOrEqual(typeof(TParam1)));
+            Assert.That(args[1].Type.DerivesFromOrEqual(typeof(TParam2)));
+            Assert.That(args[2].Type.DerivesFromOrEqual(typeof(TParam3)));
+            Assert.That(args[3].Type.DerivesFromOrEqual(typeof(TParam4)));
 
             yield return new List<object>()
             {
@@ -197,11 +197,11 @@ namespace Zenject
             Assert.IsNotNull(context);
 
             Assert.That(typeof(TValue).DerivesFromOrEqual(context.MemberType));
-            Assert.IsEqual(args[0].Type, typeof(TParam1));
-            Assert.IsEqual(args[1].Type, typeof(TParam2));
-            Assert.IsEqual(args[2].Type, typeof(TParam3));
-            Assert.IsEqual(args[3].Type, typeof(TParam4));
-            Assert.IsEqual(args[4].Type, typeof(TParam5));
+            Assert.That(args[0].Type.DerivesFromOrEqual(typeof(TParam1)));
+            Assert.That(args[1].Type.DerivesFromOrEqual(typeof(TParam2)));
+            Assert.That(args[2].Type.DerivesFromOrEqual(typeof(TParam3)));
+            Assert.That(args[3].Type.DerivesFromOrEqual(typeof(TParam4)));
+            Assert.That(args[4].Type.DerivesFromOrEqual(typeof(TParam5)));
 
             yield return new List<object>()
             {
