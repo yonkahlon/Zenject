@@ -137,6 +137,7 @@ The tests may also be helpful to show usage for each specific feature (which you
     * <a href="#net-framework">Can I use .NET framework 4.0 and above?</a>
     * <a href="#howtousecoroutines">How do I use Unity style Coroutines in normal C# classes?</a>
     * <a href="#memorypools">How do I use Zenject with pools to minimize memory allocations?</a>
+    * <a href="#what-games-are-using-zenject">What games/tools/libraries are using Zenject</a>
 * <a href="#cheatsheet">Cheat Sheet</a>
 * <a href="#further-help">Further Help</a>
 * <a href="#release-notes">Release Notes</a>
@@ -1951,11 +1952,26 @@ See <a href="Documentation/AutoMocking.md">here</a>.
             }
         }
 
-    If you need more control than this, another option is to use a coroutine library that implements similar functionality to what Unity provides.  You might consider [UniRx](https://github.com/neuecc/UniRx) for this.  At ModestTree we rolled our own coroutine manager which you can find [here](https://github.com/svermeulen/UnityCoroutinesWithoutMonoBehaviours).
+    Another solution to this problem which I highly recommend is [UniRx](https://github.com/neuecc/UniRx).
+
+    Yet another option is to use a coroutine library that implements similar functionality to what Unity provides.  See [here](https://github.com/svermeulen/UnityCoroutinesWithoutMonoBehaviours) for one example that we've used in the past at Modest Tree
 
 * **<a id="memorypools"></a>How do I use Zenject with pools to minimize memory allocations?**
 
     Currently, Zenject does not support memory pooling.  When you bind something to transient or use a factory, Zenject will always create a brand new instance from scratch.  We realize that this can be inefficient in cases where you are creating many objects (especially on mobile) so it is something we want to address in future versions.
+
+* **<a id="what-games-are-using-zenject"></a>What games/tools/libraries are using Zenject?**
+
+    If your project is using Zenject, please add a comment [here](https://github.com/modesttree/Zenject/issues/153) so that I can add it to this list.
+
+    Games
+
+        * Pokemon Go App (both iOS / Android)
+
+    Tools
+
+        * [Modest 3D](https://www.modest3d.com/editor)
+        * [Modest 3D Explorer](https://www.modest3d.com/explorer)
 
 ## <a id="cheatsheet"></a>Cheat Sheet
 
