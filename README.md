@@ -1968,10 +1968,15 @@ See <a href="Documentation/AutoMocking.md">here</a>.
 
       * Pokemon Go App (both iOS / Android)
 
+    Libraries
+
+      * [EcsRx](https://github.com/grofit/ecsrx) - A framework for Unity using the ECS pattern
+      * [Karma](https://github.com/cgarciae/karma) - An MVC framework for Unity
+
     Tools
 
-      * [Modest 3D](https://www.modest3d.com/editor)
-      * [Modest 3D Explorer](https://www.modest3d.com/explorer)
+      * [Modest 3D](https://www.modest3d.com/editor) - An IDE to allow users to quickly and easily create procedural training content
+      * [Modest 3D Explorer](https://www.modest3d.com/explorer) - A simple editor to quickly create a 3D presentation with some number of slides
 
 ## <a id="cheatsheet"></a>Cheat Sheet
 
