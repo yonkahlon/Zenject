@@ -1966,12 +1966,12 @@ See <a href="Documentation/AutoMocking.md">here</a>.
 
     Games
 
-        * Pokemon Go App (both iOS / Android)
+      * Pokemon Go App (both iOS / Android)
 
     Tools
 
-        * [Modest 3D](https://www.modest3d.com/editor)
-        * [Modest 3D Explorer](https://www.modest3d.com/explorer)
+      * [Modest 3D](https://www.modest3d.com/editor)
+      * [Modest 3D Explorer](https://www.modest3d.com/explorer)
 
 ## <a id="cheatsheet"></a>Cheat Sheet
 
