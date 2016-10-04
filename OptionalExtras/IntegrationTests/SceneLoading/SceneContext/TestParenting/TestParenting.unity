@@ -143,7 +143,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 57e9f8d61f46990469aa69332fed4a02, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  TestMethod: Fixture/Test
+  TestMethod: Fixture/TestChildWithParent
 --- !u!114 &1160129584
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -159,5 +159,5 @@ MonoBehaviour:
   _installerPrefabs: []
   _scriptableObjectInstallers: []
   _parentNewObjectsUnderRoot: 0
-  _name: TheParentName
+  _name: Parent
   _parentSceneContextName: 

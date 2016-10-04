@@ -7,6 +7,14 @@ namespace ModestTree
 {
     public static class LinqExtensions
     {
+        public static void ForEach<T>(this IEnumerable<T> first, Action<T> action)
+        {
+            foreach(T t in first)
+            {
+                action(t);
+            }
+        }
+
         public static IEnumerable<T> Append<T>(this IEnumerable<T> first, T item)
         {
             foreach (T t in first)
