@@ -15,7 +15,9 @@ namespace Zenject.Tests.TestBindFactoryOne
 
         public override void InstallBindings()
         {
-            Container.BindInstance(_param1).WhenInjectedInto<Foo>();
+            // Allow passing null for validation to work
+            Container.BindInstance(_param1, true).WhenInjectedInto<Foo>();
+
             Container.Bind<Foo>().FromGameObject();
         }
     }

@@ -23,11 +23,13 @@ namespace Zenject.Tests.TestBindFactoryFive
 
         public override void InstallBindings()
         {
-            Container.BindInstance(_param1).WhenInjectedInto<Foo>();
-            Container.BindInstance(_param2).WhenInjectedInto<Foo>();
-            Container.BindInstance(_param3).WhenInjectedInto<Foo>();
-            Container.BindInstance(_param4).WhenInjectedInto<Foo>();
-            Container.BindInstance(_param5).WhenInjectedInto<Foo>();
+            // Allow null since during validation the params are passed as default values
+            // (so string will be null)
+            Container.BindInstance(_param1, true).WhenInjectedInto<Foo>();
+            Container.BindInstance(_param2, true).WhenInjectedInto<Foo>();
+            Container.BindInstance(_param3, true).WhenInjectedInto<Foo>();
+            Container.BindInstance(_param4, true).WhenInjectedInto<Foo>();
+            Container.BindInstance(_param5, true).WhenInjectedInto<Foo>();
 
             Container.Bind<Foo>().FromGameObject();
         }
