@@ -1,7 +1,5 @@
-﻿using System;
-using UnityEngine;
-using Zenject.TestFramework;
-using Zenject;
+﻿using Zenject.TestFramework;
+
 
 namespace Zenject.Tests.TestParenting
 {
@@ -10,19 +8,32 @@ namespace Zenject.Tests.TestParenting
         [Test]
         public void TestChildWithParent()
         {
-            throw new NotImplementedException();
+			UnloadOtherScenes();
+            LoadSceneAdditive("TestParenting_Child");
         }
 
+		[Test]
+		[ExpectedException]
+		public void TestChildWithTooManyParents()
+		{
+			UnloadOtherScenes();
+			LoadSceneAdditive("TestParenting");
+			LoadSceneAdditive("TestParenting_Child");
+		}
+
         [Test]
+		[ExpectedException]
         public void TestChildWithMissingParent()
         {
-            throw new NotImplementedException();
+			UnloadOtherScenes();
+			LoadSceneAdditive("TestParenting_Orphan");
         }
 
         [Test]
         public void TestIndependentScene()
         {
-            throw new NotImplementedException();
+			UnloadOtherScenes();
+			LoadSceneAdditive("TestParenting_Independent");
         }
     }
 }

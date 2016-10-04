@@ -122,7 +122,7 @@ MonoBehaviour:
   _scriptableObjectInstallers: []
   _parentNewObjectsUnderRoot: 0
   _name: 
-  _parentSceneContextName: TheParentName
+  _parentSceneContextName: NonExistingParent
 --- !u!4 &438862385
 Transform:
   m_ObjectHideFlags: 0

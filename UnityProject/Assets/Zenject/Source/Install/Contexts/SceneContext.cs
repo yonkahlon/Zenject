@@ -181,13 +181,27 @@ namespace Zenject
                 return ProjectContext.Instance.Container;
             }
 
-            return LoadedScenes
-                .Where(scene => scene != gameObject.scene)
-                .SelectMany(scene => scene.GetRootGameObjects())
-                .SelectMany(root => root.GetComponentsInChildren<SceneContext>())
-                .Where(sceneContext => sceneContext.Name == _parentSceneContextName)
-                .Single()
-                .Container;
+			var sceneContexts = LoadedScenes
+				.Where(scene => scene.isLoaded)
+				.Except(gameObject.scene)
+				.SelectMany(scene => scene.GetRootGameObjects())
+				.SelectMany(root => root.GetComponentsInChildren<SceneContext>())
+				.Where(sceneContext => sceneContext.Name == _parentSceneContextName)
+				.ToList();
+
+			Assert.That(sceneContexts.Any(), () => string.Format(
+				"SceneContext on object {0} of scene {1} requires contract {2}, but none of the loaded SceneContexts implements that contract.",
+				gameObject.name,
+				gameObject.scene.name,
+				_parentSceneContextName));
+			
+			Assert.That(sceneContexts.Count == 1, () => string.Format(
+				"SceneContext on object {0} of scene {1} requires a single implementation of contract {2}, but multiple were found.",
+				gameObject.name,
+				gameObject.scene.name,
+				_parentSceneContextName));
+
+            return sceneContexts.Single().Container;
         }
 
         public void RunInternal()
