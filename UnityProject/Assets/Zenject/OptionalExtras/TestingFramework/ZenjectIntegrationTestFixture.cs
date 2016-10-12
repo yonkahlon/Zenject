@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -20,7 +19,11 @@ namespace Zenject.TestFramework
             get
             {
                 for (int i = 0; i < SceneManager.sceneCount; i++)
-                    yield return SceneManager.GetSceneAt(i);
+                {
+                    var scene = SceneManager.GetSceneAt(i);
+                    if (scene.isLoaded)
+                        yield return scene;
+                }
             }
         }
 
@@ -28,14 +31,18 @@ namespace Zenject.TestFramework
         {
             LoadedScenes
                 .Except(gameObject.scene)
-				.Where(x => x.isLoaded)
                 .ForEach(x => SceneManager.UnloadScene(x));
         }
 
-        protected void LoadSceneAdditive(string name)
+        protected Scene GetScene(string sceneName)
+        {
+            return LoadedScenes.Single(x => x.name == sceneName);
+        }
+
+        protected void LoadSceneAdditive(string sceneName)
         {
             var loader = new ZenjectSceneLoader();
-            loader.LoadSceneAdditive(name);
+            loader.LoadSceneAdditive(sceneName);
         }
     }
 }
