@@ -539,6 +539,7 @@ GameObject:
   - 4: {fileID: 1160129581}
   - 114: {fileID: 1160129582}
   - 114: {fileID: 1160129584}
+  - 114: {fileID: 1160129583}
   m_Layer: 0
   m_Name: CompositionRoot
   m_TagString: Untagged
@@ -571,6 +572,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 88bcc27e546f64e6d8754b91b6e4c617, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &1160129583
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1160129580}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 57e9f8d61f46990469aa69332fed4a02, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  TestMethod: Fixture/TestChildWithParent_Manual
 --- !u!114 &1160129584
 MonoBehaviour:
   m_ObjectHideFlags: 0
