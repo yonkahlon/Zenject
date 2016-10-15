@@ -27,12 +27,12 @@ namespace Zenject
             // If using AsTransient this will create a new instance
             return () =>
             {
-                var handler = (THandler)handlerProvider.TryGetInstance(handlerInjectContext);
+                var handler = handlerProvider.TryGetInstance(handlerInjectContext);
 
                 // Null check is necessary when using ToOptionalResolve
-                if (handler != null)
+                if (handler != null && !(handler is ValidationMarker))
                 {
-                    _methodGetter(handler)();
+                    _methodGetter((THandler)handler)();
                 }
             };
         }
@@ -64,12 +64,12 @@ namespace Zenject
             // If using AsTransient this will create a new instance
             return (p1) =>
             {
-                var handler = (THandler)handlerProvider.TryGetInstance(handlerInjectContext);
+                var handler = handlerProvider.TryGetInstance(handlerInjectContext);
 
                 // Null check is necessary when using ToOptionalResolve
-                if (handler != null)
+                if (handler != null && !(handler is ValidationMarker))
                 {
-                    _methodGetter(handler)(p1);
+                    _methodGetter((THandler)handler)(p1);
                 }
             };
         }
@@ -101,12 +101,12 @@ namespace Zenject
             // If using AsTransient this will create a new instance
             return (p1, p2) =>
             {
-                var handler = (THandler)handlerProvider.TryGetInstance(handlerInjectContext);
+                var handler = handlerProvider.TryGetInstance(handlerInjectContext);
 
                 // Null check is necessary when using ToOptionalResolve
-                if (handler != null)
+                if (handler != null && !(handler is ValidationMarker))
                 {
-                    _methodGetter(handler)(p1, p2);
+                    _methodGetter((THandler)handler)(p1, p2);
                 }
             };
         }
@@ -138,12 +138,12 @@ namespace Zenject
             // If using AsTransient this will create a new instance
             return (p1, p2, p3) =>
             {
-                var handler = (THandler)handlerProvider.TryGetInstance(handlerInjectContext);
+                var handler = handlerProvider.TryGetInstance(handlerInjectContext);
 
                 // Null check is necessary when using ToOptionalResolve
-                if (handler != null)
+                if (handler != null && !(handler is ValidationMarker))
                 {
-                    _methodGetter(handler)(p1, p2, p3);
+                    _methodGetter((THandler)handler)(p1, p2, p3);
                 }
             };
         }
@@ -175,12 +175,12 @@ namespace Zenject
             // If using AsTransient this will create a new instance
             return (p1, p2, p3, p4) =>
             {
-                var handler = (THandler)handlerProvider.TryGetInstance(handlerInjectContext);
+                var handler = handlerProvider.TryGetInstance(handlerInjectContext);
 
                 // Null check is necessary when using ToOptionalResolve
-                if (handler != null)
+                if (handler != null && !(handler is ValidationMarker))
                 {
-                    _methodGetter(handler)(p1, p2, p3, p4);
+                    _methodGetter((THandler)handler)(p1, p2, p3, p4);
                 }
             };
         }
@@ -212,12 +212,12 @@ namespace Zenject
             // If using AsTransient this will create a new instance
             return (p1, p2, p3, p4, p5) =>
             {
-                var handler = (THandler)handlerProvider.TryGetInstance(handlerInjectContext);
+                var handler = handlerProvider.TryGetInstance(handlerInjectContext);
 
                 // Null check is necessary when using ToOptionalResolve
-                if (handler != null)
+                if (handler != null && !(handler is ValidationMarker))
                 {
-                    _methodGetter(handler)(p1, p2, p3, p4, p5);
+                    _methodGetter((THandler)handler)(p1, p2, p3, p4, p5);
                 }
             };
         }
