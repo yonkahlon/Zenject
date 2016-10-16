@@ -288,7 +288,7 @@ namespace Zenject
             return CreateSubContainer(_isValidating);
         }
 
-        public DiContainer CreateSubContainer(bool isValidating)
+        DiContainer CreateSubContainer(bool isValidating)
         {
             return new DiContainer(this, isValidating);
         }
