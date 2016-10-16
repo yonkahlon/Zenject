@@ -27,8 +27,6 @@ namespace Zenject
         DiContainer _container;
         readonly List<object> _dependencyRoots = new List<object>();
 
-        InitialComponentsInjecter _componentInjecter;
-
         bool _hasInstalled;
         bool _hasResolved;
 
@@ -156,9 +154,8 @@ namespace Zenject
             // so that it doesn't inject on the game object twice
             // InitialComponentsInjecter will also guarantee that any component that is injected into
             // another component has itself been injected
-            Assert.IsNull(_componentInjecter);
-            _componentInjecter = new InitialComponentsInjecter(
-                _container, GetInjectableComponents().ToList());
+            _container.LazyInstanceInjector
+                .AddInstances(GetInjectableComponents().Cast<object>());
 
             Log.Debug("SceneContext: Running installers...");
 
@@ -184,8 +181,7 @@ namespace Zenject
             Assert.That(!_hasResolved);
             _hasResolved = true;
 
-            Assert.IsNotNull(_componentInjecter);
-            _componentInjecter.LazyInjectComponents();
+            _container.LazyInstanceInjector.LazyInjectAll();
 
             Log.Debug("SceneContext: Resolving dependency roots...");
 
@@ -210,7 +206,7 @@ namespace Zenject
             _container.Bind<Context>().FromInstance(this);
             _container.Bind<SceneContext>().FromInstance(this);
 
-            InstallSceneBindings(_componentInjecter);
+            InstallSceneBindings();
 
             if (BeforeInstallHooks != null)
             {
