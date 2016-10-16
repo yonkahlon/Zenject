@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using Zenject;
 
-namespace Zenject.Tests.TestBindFactory
+namespace Zenject.Tests.Factories.BindFactory
 {
     public interface IFoo
     {

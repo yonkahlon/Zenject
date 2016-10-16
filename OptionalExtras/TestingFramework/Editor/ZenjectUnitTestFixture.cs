@@ -8,9 +8,13 @@ using NUnit.Framework;
 using ModestTree;
 using Assert=ModestTree.Assert;
 
-namespace Zenject.Tests
+namespace Zenject
 {
     // Inherit from this and mark you class with [TestFixture] attribute to do some unit tests
+    // For anything more complicated than this, such as tests involving interaction between
+    // several classes, or if you want to use interfaces such as IInitializable or IDisposable,
+    // then I recommend using ZenjectIntegrationUnitTestFixture instead
+    // See documentation for details
     public abstract class ZenjectUnitTestFixture
     {
         DiContainer _container;
@@ -26,32 +30,13 @@ namespace Zenject.Tests
         [SetUp]
         public virtual void Setup()
         {
-            _container = new DiContainer(false);
-            InstallBindings();
-
-            _container.Validate();
-            _container.Inject(this);
-
-            foreach (var initializable in Container.ResolveAll<IInitializable>(true))
-            {
-                initializable.Initialize();
-            }
+            _container = new DiContainer();
         }
 
         [TearDown]
         public virtual void Destroy()
         {
-            foreach (var disposable in Container.ResolveAll<IDisposable>(true))
-            {
-                disposable.Dispose();
-            }
-
             _container = null;
-        }
-
-        public virtual void InstallBindings()
-        {
-            // Optional
         }
     }
 }

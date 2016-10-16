@@ -2,7 +2,7 @@ using System;
 using Zenject;
 using UnityEngine;
 
-namespace Zenject.Tests.TestPrefabFactory
+namespace Zenject.Tests.Factories.PrefabFactory
 {
     public class Foo : MonoBehaviour
     {

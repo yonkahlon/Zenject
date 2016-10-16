@@ -1,7 +1,7 @@
 using System;
 using Zenject;
 
-namespace Zenject.Tests.TestBindFactoryFive
+namespace Zenject.Tests.Factories.BindFactoryFive
 {
     public class FooInstaller : MonoInstaller
     {
@@ -23,8 +23,6 @@ namespace Zenject.Tests.TestBindFactoryFive
 
         public override void InstallBindings()
         {
-            // Allow null since during validation the params are passed as default values
-            // (so string will be null)
             Container.BindInstance(_param1, true).WhenInjectedInto<Foo>();
             Container.BindInstance(_param2, true).WhenInjectedInto<Foo>();
             Container.BindInstance(_param3, true).WhenInjectedInto<Foo>();
