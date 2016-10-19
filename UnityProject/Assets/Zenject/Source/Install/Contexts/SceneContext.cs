@@ -17,12 +17,18 @@ namespace Zenject
         public static Action<DiContainer> BeforeInstallHooks;
         public static Action<DiContainer> AfterInstallHooks;
 
-        public static DiContainer ParentContainer;
-
         [FormerlySerializedAs("ParentNewObjectsUnderRoot")]
         [Tooltip("When true, objects that are created at runtime will be parented to the SceneContext")]
         [SerializeField]
         bool _parentNewObjectsUnderRoot = false;
+
+        [Tooltip("Optional name of this SceneContext, allowing contexts in subsequently loaded scenes to depend on it and be parented to it")]
+        [SerializeField]
+        string _name;
+
+        [Tooltip("Optional name of a SceneContext in a previously loaded scene that this context depends on and to which it must be parented")]
+        [SerializeField]
+        string _parentSceneContextName;
 
         DiContainer _container;
         readonly List<object> _dependencyRoots = new List<object>();
@@ -57,6 +63,30 @@ namespace Zenject
             }
         }
 #endif
+
+        public string Name
+        {
+            get
+            {
+                return _name;
+            }
+            set
+            {
+                _name = value;
+            }
+        }
+
+        public string ParentSceneContextName
+        {
+            get
+            {
+                return _parentSceneContextName;
+            }
+            set
+            {
+                _parentSceneContextName = value;
+            }
+        }
 
         public bool ParentNewObjectsUnderRoot
         {
@@ -124,6 +154,45 @@ namespace Zenject
             Resolve();
         }
 
+        IEnumerable<Scene> LoadedScenes
+        {
+            get
+            {
+                for (int i = 0; i < SceneManager.sceneCount; i++)
+                    yield return SceneManager.GetSceneAt(i);
+            }
+        }
+
+        DiContainer GetParentContainer()
+        {
+            if (string.IsNullOrEmpty(_parentSceneContextName))
+            {
+                return ProjectContext.Instance.Container;
+            }
+
+            var sceneContexts = LoadedScenes
+                .Where(scene => scene.isLoaded)
+                .Except(gameObject.scene)
+                .SelectMany(scene => scene.GetRootGameObjects())
+                .SelectMany(root => root.GetComponentsInChildren<SceneContext>())
+                .Where(sceneContext => sceneContext.Name == _parentSceneContextName)
+                .ToList();
+
+            Assert.That(sceneContexts.Any(), () => string.Format(
+                "SceneContext on object {0} of scene {1} requires contract {2}, but none of the loaded SceneContexts implements that contract.",
+                gameObject.name,
+                gameObject.scene.name,
+                _parentSceneContextName));
+
+            Assert.That(sceneContexts.Count == 1, () => string.Format(
+                "SceneContext on object {0} of scene {1} requires a single implementation of contract {2}, but multiple were found.",
+                gameObject.name,
+                gameObject.scene.name,
+                _parentSceneContextName));
+
+            return sceneContexts.Single().Container;
+        }
+
         public void Install()
         {
 #if !UNITY_EDITOR
@@ -135,12 +204,7 @@ namespace Zenject
 
             Assert.IsNull(_container);
 
-            var parentContainer = ParentContainer ?? ProjectContext.Instance.Container;
-
-            // ParentContainer is optionally set temporarily before calling ZenUtil.LoadScene
-            ParentContainer = null;
-
-            _container = parentContainer.CreateSubContainer();
+            _container = GetParentContainer().CreateSubContainer();
 
             // This can happen if you run a decorated scene with immediately running a normal scene afterwards
             foreach (var decoratedScene in DecoratedScenes)
