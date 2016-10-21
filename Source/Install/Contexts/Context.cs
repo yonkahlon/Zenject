@@ -86,6 +86,11 @@ namespace Zenject
             get;
         }
 
+        public void AddNormalInstaller(InstallerBase installer)
+        {
+            _normalInstallers.Add(installer);
+        }
+
         void CheckInstallerPrefabTypes()
         {
             foreach (var installer in _installers)
@@ -254,31 +259,6 @@ namespace Zenject
         }
 
         protected abstract IEnumerable<Component> GetInjectableComponents();
-
-        protected static IEnumerable<Component> GetInjectableComponents(GameObject gameObject)
-        {
-            foreach (var component in ZenUtilInternal.GetInjectableComponentsBottomUp(gameObject, true))
-            {
-                if (component == null)
-                {
-                    // This warning about fiBackupSceneStorage appears in normal cases so just ignore
-                    // Not sure what it is
-                    if (gameObject.name != "fiBackupSceneStorage")
-                    {
-                        Log.Warn("Zenject: Found null component on game object '{0}'.  Possible missing script.", gameObject.name);
-                    }
-                    continue;
-                }
-
-                if (component.GetType().DerivesFrom<MonoInstaller>())
-                {
-                    // Do not inject on installers since these are always injected before they are installed
-                    continue;
-                }
-
-                yield return component;
-            }
-        }
     }
 }
 

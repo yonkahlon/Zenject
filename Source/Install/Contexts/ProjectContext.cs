@@ -32,6 +32,14 @@ namespace Zenject
             }
         }
 
+        public static bool HasInstance
+        {
+            get
+            {
+                return _instance != null;
+            }
+        }
+
         public static ProjectContext Instance
         {
             get
@@ -149,7 +157,7 @@ namespace Zenject
 
         protected override IEnumerable<Component> GetInjectableComponents()
         {
-            return GetInjectableComponents(this.gameObject);
+            return ContextUtil.GetInjectableComponents(this.gameObject);
         }
 
         void InstallBindings()

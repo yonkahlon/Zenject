@@ -18,34 +18,7 @@ namespace Zenject
             if (EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo())
             {
                 var originalSceneSetup = EditorSceneManager.GetSceneManagerSetup();
-
-                ProjectContext.ValidateOnNextRun = true;
-
-                var allScenes = EditorSceneManager.GetAllScenes();
-
-                foreach (var scene in allScenes)
-                {
-                    var roots = scene.GetRootGameObjects();
-
-                    var decoratorContexts = roots.SelectMany(x => x.GetComponents<SceneDecoratorContext>()).ToList();
-                    var sceneContexts = roots.SelectMany(x => x.GetComponents<SceneContext>()).ToList();
-
-                    if (!decoratorContexts.IsEmpty())
-                    {
-                        Assert.That(decoratorContexts.IsLength(1));
-                        Assert.That(sceneContexts.IsEmpty());
-
-                        decoratorContexts.First().Awake();
-                        continue;
-                    }
-
-                    if (!sceneContexts.IsEmpty())
-                    {
-                        Assert.That(sceneContexts.IsLength(1));
-                        sceneContexts.First().Awake();
-                    }
-                }
-
+                ZenUnityEditorUtil.ValidateCurrentSceneSetup();
                 EditorSceneManager.RestoreSceneManagerSetup(originalSceneSetup);
             }
             else
