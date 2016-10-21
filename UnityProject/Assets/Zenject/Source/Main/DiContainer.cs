@@ -14,10 +14,18 @@ namespace Zenject
 {
     public delegate bool BindingCondition(InjectContext c);
 
+    public class InjectArgs
+    {
+        public List<TypeValuePair> ExtraArgs;
+        public bool UseAllArgs;
+        public InjectContext Context;
+        public object ConcreteIdentifier;
+    }
+
     // Responsibilities:
     // - Expose methods to configure object graph via Bind() methods
     // - Build object graphs via Resolve() method
-    public class DiContainer : IInstantiator, IResolver, IBinder
+    public class DiContainer : IInstantiator
     {
         public const string DependencyRootIdentifier = "DependencyRoot";
 
@@ -48,12 +56,8 @@ namespace Zenject
             // we don't want these bindings to be included in the Clone() below
             // So just directly add to the provider map instead
             var thisProvider = new InstanceProvider(this, typeof(DiContainer), this);
-            var thisContracts = new Type[]
-            {
-                typeof(DiContainer), typeof(IBinder), typeof(IResolver), typeof(IInstantiator)
-            };
 
-            foreach (var contractType in thisContracts)
+            foreach (var contractType in new Type[] { typeof(DiContainer), typeof(IInstantiator) })
             {
                 var infoList = new List<ProviderInfo>()
                 {
@@ -162,7 +166,6 @@ namespace Zenject
             }
         }
 
-        // See comment in IBinder.cs for description
         public bool IsValidating
         {
             get
@@ -397,7 +400,6 @@ namespace Zenject
             return new List<ProviderInfo>();
         }
 
-        // See comment in IResolver.cs for description of this method
         public IList ResolveAll(InjectContext context)
         {
             Assert.IsNotNull(context);
@@ -460,7 +462,7 @@ namespace Zenject
 #endif
         }
 
-        // See comment in IResolver.cs for description of this method
+        // Returns all the types that would be returned if ResolveAll was called with the given values
         public List<Type> ResolveTypeAll(InjectContext context)
         {
             Assert.IsNotNull(context);
@@ -532,7 +534,6 @@ namespace Zenject
             return ProviderLookupResult.Success;
         }
 
-        // See comment in IResolver.cs for description of this method
         public object Resolve(InjectContext context)
         {
             Assert.IsNotNull(context);
@@ -794,6 +795,9 @@ namespace Zenject
             return newObj;
         }
 
+        // InjectExplicit is only necessary when you want to inject null values into your object
+        // otherwise you can just use Inject()
+        // Note: Any arguments that are used will be removed from extraArgMap
         public void InjectExplicit(object injectable, List<TypeValuePair> extraArgs)
         {
             Type injectableType;
@@ -819,7 +823,6 @@ namespace Zenject
                 });
         }
 
-        // See comment in IResolver.cs for description of this method
         public void InjectExplicit(
             object injectable, Type injectableType, InjectArgs args)
         {
@@ -1389,24 +1392,20 @@ namespace Zenject
 
 #endif
 
-        ////////////// Convenience methods for IResolver ////////////////
-
 #if !NOT_UNITY3D
-        // See comment in IResolver.cs for description of this method
+        // Inject dependencies into any and all child components on the given game object
         public void InjectGameObject(
             GameObject gameObject)
         {
             InjectGameObject(gameObject, true);
         }
 
-        // See comment in IResolver.cs for description of this method
         public void InjectGameObject(
             GameObject gameObject, bool recursive)
         {
             InjectGameObject(gameObject, recursive, new object[0]);
         }
 
-        // See comment in IResolver.cs for description of this method
         public void InjectGameObject(
             GameObject gameObject, bool recursive, IEnumerable<object> extraArgs)
         {
@@ -1425,7 +1424,6 @@ namespace Zenject
                 gameObject, recursive, extraArgs, true);
         }
 
-        // See comment in IResolver.cs for description of this method
         public void InjectGameObjectExplicit(
             GameObject gameObject, bool recursive,
             List<TypeValuePair> extraArgs, bool useAllArgs)
@@ -1512,76 +1510,78 @@ namespace Zenject
         }
 #endif
 
-        // See comment in IResolver.cs for description of this method
+        // When you call any of these Inject methods
+        //    Any fields marked [Inject] will be set using the bindings on the container
+        //    Any methods marked with a [Inject] will be called
+        //    Any constructor parameters will be filled in with values from the container
         public void Inject(object injectable)
         {
             Inject(injectable, new object[0]);
         }
 
-        // See comment in IResolver.cs for description of this method
         public void Inject(object injectable, IEnumerable<object> extraArgs)
         {
             InjectExplicit(
                 injectable, InjectUtil.CreateArgList(extraArgs));
         }
 
-        // See comment in IResolver.cs for description of this method
         public List<Type> ResolveTypeAll(Type type)
         {
             return ResolveTypeAll(new InjectContext(this, type, null));
         }
 
-        // See comment in IResolver.cs for description of this method
+        // Resolve<> - Lookup a value in the container.
+        //
+        // Note that this may result in a new object being created (for transient bindings) or it
+        // may return an already created object (for FromInstance or ToSingle, etc. bindings)
+        //
+        // If a single unique value for the given type cannot be found, an exception is thrown.
+        //
         public TContract Resolve<TContract>()
         {
             return Resolve<TContract>((string)null);
         }
 
-        // See comment in IResolver.cs for description of this method
         public TContract Resolve<TContract>(object identifier)
         {
             return Resolve<TContract>(new InjectContext(this, typeof(TContract), identifier));
         }
 
-        // See comment in IResolver.cs for description of this method
+        // Same as Resolve<> except it will return null if a value for the given type cannot
+        // be found.
         public TContract TryResolve<TContract>()
             where TContract : class
         {
             return TryResolve<TContract>((string)null);
         }
 
-        // See comment in IResolver.cs for description of this method
         public TContract TryResolve<TContract>(object identifier)
             where TContract : class
         {
             return (TContract)TryResolve(typeof(TContract), identifier);
         }
 
-        // See comment in IResolver.cs for description of this method
         public object TryResolve(Type contractType)
         {
             return TryResolve(contractType, null);
         }
 
-        // See comment in IResolver.cs for description of this method
         public object TryResolve(Type contractType, object identifier)
         {
             return Resolve(new InjectContext(this, contractType, identifier, true));
         }
 
-        // See comment in IResolver.cs for description of this method
         public object Resolve(Type contractType)
         {
             return Resolve(new InjectContext(this, contractType, null));
         }
 
-        // See comment in IResolver.cs for description of this method
         public object Resolve(Type contractType, object identifier)
         {
             return Resolve(new InjectContext(this, contractType, identifier));
         }
 
-        // See comment in IResolver.cs for description of this method
+        // InjectContext can be used to add more constraints to the object that you want to retrieve
         public TContract Resolve<TContract>(InjectContext context)
         {
             Assert.IsNotNull(context);
@@ -1590,32 +1590,28 @@ namespace Zenject
             return (TContract) Resolve(context);
         }
 
-        // See comment in IResolver.cs for description of this method
+        // Same as Resolve<> except it will return all bindings that are associated with the given type
         public List<TContract> ResolveAll<TContract>()
         {
             return ResolveAll<TContract>((string)null);
         }
 
-        // See comment in IResolver.cs for description of this method
         public List<TContract> ResolveAll<TContract>(bool optional)
         {
             return ResolveAll<TContract>(null, optional);
         }
 
-        // See comment in IResolver.cs for description of this method
         public List<TContract> ResolveAll<TContract>(object identifier)
         {
             return ResolveAll<TContract>(identifier, true);
         }
 
-        // See comment in IResolver.cs for description of this method
         public List<TContract> ResolveAll<TContract>(object identifier, bool optional)
         {
             var context = new InjectContext(this, typeof(TContract), identifier, optional);
             return ResolveAll<TContract>(context);
         }
 
-        // See comment in IResolver.cs for description of this method
         public List<TContract> ResolveAll<TContract>(InjectContext context)
         {
             Assert.IsNotNull(context);
@@ -1623,32 +1619,26 @@ namespace Zenject
             return (List<TContract>) ResolveAll(context);
         }
 
-        // See comment in IResolver.cs for description of this method
         public IList ResolveAll(Type contractType)
         {
             return ResolveAll(contractType, null);
         }
 
-        // See comment in IResolver.cs for description of this method
         public IList ResolveAll(Type contractType, object identifier)
         {
             return ResolveAll(contractType, identifier, true);
         }
 
-        // See comment in IResolver.cs for description of this method
         public IList ResolveAll(Type contractType, bool optional)
         {
             return ResolveAll(contractType, null, optional);
         }
 
-        // See comment in IResolver.cs for description of this method
         public IList ResolveAll(Type contractType, object identifier, bool optional)
         {
             var context = new InjectContext(this, contractType, identifier, optional);
             return ResolveAll(context);
         }
-
-        ////////////// IBinder ////////////////
 
         public void UnbindAll()
         {
@@ -1670,7 +1660,7 @@ namespace Zenject
             return _providers.Remove(bindingId);
         }
 
-        // See comment in IBinder.cs for description of this method
+        // Returns true if the given type is bound to something in the container
         public bool HasBinding(InjectContext context)
         {
             Assert.IsNotNull(context);
@@ -1687,13 +1677,11 @@ namespace Zenject
             return providers.Where(x => x.Condition == null || x.Condition(context)).HasAtLeast(1);
         }
 
-        // See comment in IBinder.cs for description of this method
         public bool HasBinding<TContract>()
         {
             return HasBinding<TContract>(null);
         }
 
-        // See comment in IBinder.cs for description of this method
         public bool HasBinding<TContract>(object identifier)
         {
             return HasBinding(
@@ -1733,6 +1721,8 @@ namespace Zenject
             return Bind<TContract>().WithId(identifier);
         }
 
+        // Map the given type to a way of obtaining it
+        // Note that this can include open generic types as well such as List<>
         public ConcreteIdBinderGeneric<TContract> Bind<TContract>()
         {
             Assert.That(!typeof(TContract).DerivesFrom<IDynamicFactory>(),
@@ -1744,6 +1734,8 @@ namespace Zenject
                 bindInfo, StartBinding());
         }
 
+        // Non-generic version of Bind<> for cases where you only have the runtime type
+        // Note that this can include open generic types as well such as List<>
         public ConcreteIdBinderNonGeneric Bind(params Type[] contractTypes)
         {
             return Bind((IEnumerable<Type>)contractTypes);
@@ -1803,6 +1795,22 @@ namespace Zenject
             Bind<object>().WithId(DependencyRootIdentifier).To(rootTypes).FromResolve(identifier);
         }
 
+        // Bind all the interfaces for the given type to the same thing.
+        //
+        // Example:
+        //
+        //    public class Foo : ITickable, IInitializable
+        //    {
+        //    }
+        //
+        //    Container.BindAllInterfaces<Foo>().To<Foo>().AsSingle();
+        //
+        //  This line above is equivalent to the following:
+        //
+        //    Container.Bind<ITickable>().ToSingle<Foo>();
+        //    Container.Bind<IInitializable>().ToSingle<Foo>();
+        //
+        // Note here that we do not bind Foo to itself.  For that, use BindAllInterfacesAndSelf
         public ConcreteIdBinderNonGeneric BindAllInterfaces<T>()
         {
             return BindAllInterfaces(typeof(T));
@@ -1815,6 +1823,7 @@ namespace Zenject
             return Bind(type.Interfaces().ToArray());
         }
 
+        // Same as BindAllInterfaces except also binds to self
         public ConcreteIdBinderNonGeneric BindAllInterfacesAndSelf<T>()
         {
             return BindAllInterfacesAndSelf(typeof(T));
@@ -1828,6 +1837,15 @@ namespace Zenject
                 type.Interfaces().Append(type).ToArray());
         }
 
+        //  This is simply a shortcut to using the FromInstance method.
+        //
+        //  Example:
+        //      Container.BindInstance(new Foo());
+        //
+        //  This line above is equivalent to the following:
+        //
+        //      Container.Bind<Foo>().FromInstance(new Foo());
+        //
         public IdScopeBinder BindInstance<TContract>(TContract instance)
         {
             return BindInstance<TContract>(instance, false);

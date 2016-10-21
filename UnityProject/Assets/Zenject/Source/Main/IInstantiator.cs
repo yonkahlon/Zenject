@@ -7,6 +7,8 @@ using UnityEngine;
 
 namespace Zenject
 {
+    // You can optionally inject this interface into your classes/factories
+    // rather than using DiContainer which contains many methods you might not need
     public interface IInstantiator
     {
         // Use this method to create any non-monobehaviour
@@ -21,7 +23,7 @@ namespace Zenject
 
         T InstantiateExplicit<T>(List<TypeValuePair> extraArgs);
         object InstantiateExplicit(Type concreteType, List<TypeValuePair> extraArgs);
-        object InstantiateExplicit(Type concreteType, bool autoInject, InjectArgs extraArgs);
+        object InstantiateExplicit(Type concreteType, bool autoInject, InjectArgs args);
 
 #if !NOT_UNITY3D
 
@@ -148,6 +150,11 @@ namespace Zenject
         // Note: Any arguments that are used will be removed from extraArgs
         object InstantiatePrefabResourceForComponentExplicit(
             Type concreteType, string resourcePath, string groupName, InjectArgs args);
+
+        GameObject CreateAndParentPrefabResource(string resourcePath);
+        GameObject CreateAndParentPrefabResource(string resourcePath, string groupName);
+
+        GameObject CreateAndParentPrefab(UnityEngine.Object prefab, string groupName);
 
         // This is the same as GameObject.Instantiate(name) except that it will use
         // the default parent, which can sometimes be set to the Context

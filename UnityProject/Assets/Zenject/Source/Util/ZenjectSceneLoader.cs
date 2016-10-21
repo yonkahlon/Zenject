@@ -1,13 +1,14 @@
 #if !NOT_UNITY3D
 
 using System;
+using System.Collections;
 using UnityEngine.SceneManagement;
 using UnityEngine;
 using ModestTree;
 
 namespace Zenject
 {
-    public enum LoadSceneContainerMode
+    public enum LoadSceneRelationship
     {
         // This will use the ProjectContext container as parent for the new scene
         // This is similar to just running the new scene normally
@@ -31,65 +32,27 @@ namespace Zenject
 
         public void LoadScene(string sceneName)
         {
-            LoadScene(sceneName, null);
+            LoadScene(sceneName, LoadSceneMode.Single);
         }
 
-        public void LoadScene(string sceneName, Action<DiContainer> extraBindings)
+        public void LoadScene(string sceneName, LoadSceneMode loadMode)
         {
-            LoadSceneInternal(
-                sceneName, LoadSceneMode.Single, extraBindings, LoadSceneContainerMode.None);
+            LoadScene(sceneName, loadMode, null);
         }
 
-        public void LoadSceneAdditive(string sceneName)
+        public void LoadScene(
+            string sceneName, LoadSceneMode loadMode, Action<DiContainer> extraBindings)
         {
-            LoadSceneAdditive(sceneName, null, LoadSceneContainerMode.None);
+            LoadScene(sceneName, loadMode, extraBindings, LoadSceneRelationship.None);
         }
 
-        public void LoadSceneAdditive(
-            string sceneName, LoadSceneContainerMode containerMode)
-        {
-            LoadSceneAdditive(sceneName, null, containerMode);
-        }
-
-        public void LoadSceneAdditive(
-            string sceneName, Action<DiContainer> extraBindings)
-        {
-            LoadSceneAdditive(sceneName, extraBindings, LoadSceneContainerMode.None);
-        }
-
-        public void LoadSceneAdditive(
-            string sceneName, Action<DiContainer> extraBindings, LoadSceneContainerMode containerMode)
-        {
-            LoadSceneInternal(
-                sceneName, LoadSceneMode.Additive, extraBindings, containerMode);
-        }
-
-        void LoadSceneInternal(
+        public void LoadScene(
             string sceneName,
             LoadSceneMode loadMode,
             Action<DiContainer> extraBindings,
-            LoadSceneContainerMode containerMode)
+            LoadSceneRelationship containerMode)
         {
-            if (loadMode == LoadSceneMode.Single)
-            {
-                Assert.IsEqual(containerMode, LoadSceneContainerMode.None);
-            }
-
-            if (containerMode == LoadSceneContainerMode.None)
-            {
-                SceneContext.ParentContainer = null;
-            }
-            else if (containerMode == LoadSceneContainerMode.Child)
-            {
-                SceneContext.ParentContainer = _sceneContainer;
-            }
-            else
-            {
-                Assert.IsEqual(containerMode, LoadSceneContainerMode.Sibling);
-                SceneContext.ParentContainer = _sceneContainer.ParentContainer;
-            }
-
-            SceneContext.ExtraBindingsInstallMethod = extraBindings;
+            PrepareForLoadScene(loadMode, extraBindings, containerMode);
 
             Assert.That(Application.CanStreamedLevelBeLoaded(sceneName),
                 "Unable to load scene '{0}'", sceneName);
@@ -97,11 +60,67 @@ namespace Zenject
             SceneManager.LoadScene(sceneName, loadMode);
 
             // It would be nice here to actually verify that the new scene has a SceneContext
-            // if we have extra binding hooks, or LoadSceneContainerMode != None, but
-            // it doesn't seem like we can do that immediately after calling SceneManager.LoadScene
+            // if we have extra binding hooks, or LoadSceneRelationship != None, but
+            // we can't do that in this case since the scene isn't loaded until the next frame
+        }
+
+        public AsyncOperation LoadSceneAsync(string sceneName)
+        {
+            return LoadSceneAsync(sceneName, LoadSceneMode.Single);
+        }
+
+        public AsyncOperation LoadSceneAsync(string sceneName, LoadSceneMode loadMode)
+        {
+            return LoadSceneAsync(sceneName, loadMode, null);
+        }
+
+        public AsyncOperation LoadSceneAsync(
+            string sceneName, LoadSceneMode loadMode, Action<DiContainer> extraBindings)
+        {
+            return LoadSceneAsync(sceneName, loadMode, extraBindings, LoadSceneRelationship.None);
+        }
+
+        public AsyncOperation LoadSceneAsync(
+            string sceneName,
+            LoadSceneMode loadMode,
+            Action<DiContainer> extraBindings,
+            LoadSceneRelationship containerMode)
+        {
+            PrepareForLoadScene(loadMode, extraBindings, containerMode);
+
+            Assert.That(Application.CanStreamedLevelBeLoaded(sceneName),
+                "Unable to load scene '{0}'", sceneName);
+
+            return SceneManager.LoadSceneAsync(sceneName, loadMode);
+        }
+
+        void PrepareForLoadScene(
+            LoadSceneMode loadMode,
+            Action<DiContainer> extraBindings,
+            LoadSceneRelationship containerMode)
+        {
+            if (loadMode == LoadSceneMode.Single)
+            {
+                Assert.IsEqual(containerMode, LoadSceneRelationship.None);
+            }
+
+            if (containerMode == LoadSceneRelationship.None)
+            {
+                SceneContext.ParentContainer = null;
+            }
+            else if (containerMode == LoadSceneRelationship.Child)
+            {
+                SceneContext.ParentContainer = _sceneContainer;
+            }
+            else
+            {
+                Assert.IsEqual(containerMode, LoadSceneRelationship.Sibling);
+                SceneContext.ParentContainer = _sceneContainer.ParentContainer;
+            }
+
+            SceneContext.ExtraBindingsInstallMethod = extraBindings;
         }
     }
 }
 
 #endif
-

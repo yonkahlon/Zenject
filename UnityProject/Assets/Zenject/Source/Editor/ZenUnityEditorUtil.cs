@@ -7,6 +7,7 @@ using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using ModestTree;
+using UnityEngine.SceneManagement;
 
 namespace Zenject
 {
@@ -37,10 +38,18 @@ namespace Zenject
 
         static List<SceneContext> GetAllSceneContexts()
         {
-            return EditorSceneManager.GetAllScenes().SelectMany(scene =>
+            return GetAllScenes().SelectMany(scene =>
                 scene
                 .GetRootGameObjects()
                 .SelectMany(x => x.GetComponentsInChildren<SceneContext>())).ToList();
+        }
+
+        static IEnumerable<Scene> GetAllScenes()
+        {
+            for (int i = 0; i < EditorSceneManager.sceneCount; i++)
+            {
+                yield return EditorSceneManager.GetSceneAt(i);
+            }
         }
 
         public static string ConvertFullAbsolutePathToAssetPath(string fullPath)
