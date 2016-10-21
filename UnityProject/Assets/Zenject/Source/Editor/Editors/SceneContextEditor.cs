@@ -5,29 +5,30 @@ namespace Zenject
     [CustomEditor(typeof(SceneContext))]
     public class SceneContextEditor : ContextEditor
     {
-        SerializedProperty _nameProperty;
-        SerializedProperty _parentSceneContextNameProperty;
+        SerializedProperty _contractNameProperty;
+        SerializedProperty _parentContractNameProperty;
         SerializedProperty _parentNewObjectsUnderRootProperty;
+        SerializedProperty _autoRun;
 
         public override void OnEnable()
         {
             base.OnEnable();
 
-            _nameProperty = serializedObject.FindProperty("_name");
-            _parentSceneContextNameProperty = serializedObject.FindProperty("_parentSceneContextName");
+            _contractNameProperty = serializedObject.FindProperty("_contractName");
+            _parentContractNameProperty = serializedObject.FindProperty("_parentContractName");
             _parentNewObjectsUnderRootProperty = serializedObject.FindProperty("_parentNewObjectsUnderRoot");
+            _autoRun = serializedObject.FindProperty("_autoRun");
         }
 
         protected override void OnGui()
         {
             base.OnGui();
 
-            EditorGUILayout.PropertyField(_nameProperty);
-            EditorGUILayout.PropertyField(_parentSceneContextNameProperty);
+            EditorGUILayout.PropertyField(_contractNameProperty);
+            EditorGUILayout.PropertyField(_parentContractNameProperty);
             EditorGUILayout.PropertyField(_parentNewObjectsUnderRootProperty);
+            EditorGUILayout.PropertyField(_autoRun);
         }
     }
 }
-
-
 

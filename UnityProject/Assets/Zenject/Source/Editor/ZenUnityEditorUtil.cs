@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using UnityEditor;
+using UnityEditor.SceneManagement;
 using UnityEngine;
 using ModestTree;
 
@@ -11,10 +12,41 @@ namespace Zenject
 {
     public static class ZenUnityEditorUtil
     {
+        // Don't use this
+        public static void ValidateCurrentSceneSetup()
+        {
+            Assert.That(!ProjectContext.HasInstance);
+            ProjectContext.ValidateOnNextRun = true;
+
+            foreach (var sceneContext in GetAllSceneContexts())
+            {
+                sceneContext.Validate();
+            }
+        }
+
+        // Don't use this
+        public static void RunCurrentSceneSetup()
+        {
+            Assert.That(!ProjectContext.HasInstance);
+
+            foreach (var sceneContext in GetAllSceneContexts())
+            {
+                sceneContext.Run();
+            }
+        }
+
+        static List<SceneContext> GetAllSceneContexts()
+        {
+            return EditorSceneManager.GetAllScenes().SelectMany(scene =>
+                scene
+                .GetRootGameObjects()
+                .SelectMany(x => x.GetComponentsInChildren<SceneContext>())).ToList();
+        }
+
         public static string ConvertFullAbsolutePathToAssetPath(string fullPath)
         {
             return "Assets/" + Path.GetFullPath(fullPath)
-                .Remove(0, Path.GetFullPath(Application.dataPath).Length)
+                .Remove(0, Path.GetFullPath(Application.dataPath).Length + 1)
                 .Replace("\\", "/");
         }
 

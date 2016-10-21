@@ -101,7 +101,7 @@ namespace Zenject
 
             foreach (var gameObject in UnityUtil.GetDirectChildren(this.gameObject))
             {
-                foreach (var component in GetInjectableComponents(gameObject))
+                foreach (var component in ContextUtil.GetInjectableComponents(gameObject))
                 {
                     yield return component;
                 }

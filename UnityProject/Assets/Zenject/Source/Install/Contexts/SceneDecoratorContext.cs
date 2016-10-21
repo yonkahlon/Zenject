@@ -1,108 +1,62 @@
 #if !NOT_UNITY3D
 
+using System.Collections.Generic;
+using System.Linq;
 using ModestTree;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.Serialization;
 
 namespace Zenject
 {
-    [System.Diagnostics.DebuggerStepThrough]
-    public class SceneDecoratorContext : MonoBehaviour
+    public class SceneDecoratorContext : Context
     {
-        public string SceneName;
-
+        [FormerlySerializedAs("SceneName")]
         [SerializeField]
-        public DecoratorInstaller[] DecoratorInstallers;
+        string _decoratedContractName;
 
-        [SerializeField]
-        public MonoInstaller[] PreInstallers;
+        DiContainer _container;
 
-        [SerializeField]
-        public MonoInstaller[] PostInstallers;
-
-        public void Awake()
+        public string DecoratedContractName
         {
-            // We always want to initialize ProjectContext as early as possible
-            ProjectContext.Instance.EnsureIsInitialized();
-
-            SceneContext.BeforeInstallHooks += AddPreBindings;
-            SceneContext.AfterInstallHooks += AddPostBindings;
-
-            SceneContext.DecoratedScenes.Add(this.gameObject.scene);
-
-            if (ShouldLoadNextScene())
+            get
             {
-                SceneManager.LoadScene(SceneName, LoadSceneMode.Additive);
+                return _decoratedContractName;
             }
         }
 
-        bool ShouldLoadNextScene()
+        public override DiContainer Container
         {
-            // This is the only way I can figure out to do this
-            // We can't use GetSceneByName(SceneName).isLoaded since that doesn't work in Awake
-            return GetSceneIndex(this.gameObject.scene) == SceneManager.sceneCount - 1;
+            get
+            {
+                Assert.IsNotNull(_container);
+                return _container;
+            }
         }
 
-        int GetSceneIndex(Scene scene)
+        public void Initialize(DiContainer container)
         {
-            for (int i = 0; i < SceneManager.sceneCount; i++)
-            {
-                if (SceneManager.GetSceneAt(i) == scene)
-                {
-                    return i;
-                }
-            }
+            Assert.IsNull(_container);
+            _container = container;
 
-            throw Assert.CreateException();
+            container.LazyInstanceInjector
+                .AddInstances(GetInjectableComponents().Cast<object>());
         }
 
-        public void AddPreBindings(DiContainer container)
+        public void InstallDecoratorSceneBindings()
         {
-            foreach (var installer in PreInstallers)
-            {
-                container.Inject(installer);
-                installer.InstallBindings();
-            }
-
-            ProcessDecoratorInstallers(container, true);
+            _container.Bind<SceneDecoratorContext>().FromInstance(this);
+            InstallSceneBindings();
         }
 
-        public void AddPostBindings(DiContainer container)
+        public void InstallDecoratorInstallers()
         {
-            foreach (var installer in PostInstallers)
-            {
-                container.Inject(installer);
-                installer.InstallBindings();
-            }
-
-            ProcessDecoratorInstallers(container, false);
+            InstallInstallers();
         }
 
-        void ProcessDecoratorInstallers(DiContainer container, bool isBefore)
+        protected override IEnumerable<Component> GetInjectableComponents()
         {
-            if (DecoratorInstallers == null)
-            {
-                return;
-            }
-
-            foreach (var installer in DecoratorInstallers)
-            {
-                Assert.IsNotNull(installer, "Found null installer in SceneDecoratorContext");
-
-                if (installer.enabled)
-                {
-                    container.Inject(installer);
-
-                    if (isBefore)
-                    {
-                        installer.PreInstallBindings();
-                    }
-                    else
-                    {
-                        installer.PostInstallBindings();
-                    }
-                }
-            }
+            return ContextUtil.GetInjectableComponents(this.gameObject.scene);
         }
     }
 }
