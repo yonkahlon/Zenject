@@ -15,7 +15,7 @@ Also, if you like Zenject, you may also be interested in [Projeny](https://githu
 
 ## <a id="introduction"></a>Introduction
 
-Zenject is a lightweight dependency injection framework built specifically to target Unity 3D.  It can be used to turn your Unity 3D application into a collection of loosely-coupled parts with highly segmented responsibilities.  Zenject can then glue the parts together in many different configurations to allow you to easily write, re-use, refactor and test your code in a scalable and extremely flexible way.
+Zenject is a lightweight dependency injection framework built specifically to target Unity 3D (however it can be used outside of Unity as well).  It can be used to turn your application into a collection of loosely-coupled parts with highly segmented responsibilities.  Zenject can then glue the parts together in many different configurations to allow you to easily write, re-use, refactor and test your code in a scalable and extremely flexible way.
 
 Tested in Unity 3D on the following platforms: 
 * PC/Mac/Linux
@@ -898,7 +898,9 @@ The usual workflow when setting up bindings using a DI framework is something li
 
 This works ok for small projects, but as the complexity of your project grows it is often a tedious process.  The problem gets worse if the startup time of your application is particularly bad, or when the exceptions only occur from factories at various points at runtime.  What would be great is some tool to analyze your object graph and tell you exactly where all the missing bindings are, without requiring the cost of firing up your whole app.
 
-You can do this in Zenject out-of-the-box by executing the menu item `Edit -> Zenject -> Validate Current Scene` or simply hitting CTRL+SHIFT+V with the scene open that you want to validate.  This will execute all installers for the current scene, with the result being a fully bound container.   It will then iterate through the object graphs and verify that all bindings can be found (without actually instantiating any of them).  Under the hood, this works by storing dummy objects in the container in place of actually instantiating your classes
+You can do this in Zenject out-of-the-box by executing the menu item `Edit -> Zenject -> Validate Current Scene` or simply hitting CTRL+SHIFT+V with the scenes open that you want to validate.  This will execute all installers for the current scene, with the result being a fully bound container.   It will then iterate through the object graphs and verify that all bindings can be found (without actually instantiating any of them).  Under the hood, this works by storing dummy objects in the container in place of actually instantiating your classes
+
+Alternatively, you can execute the menu item `Edit -> Zenject -> Validate Then Run` or simply hitting CTRL+SHIFT+R.  This will validate the scenes you have open and then if validation succeeds, it will start play mode.  Validation is usually pretty fast so this can be a good alternative to always just hitting play, especially if your game has a costly startup time.
 
 ## <a id="scene-bindings"></a>Scene Bindings
 
@@ -912,12 +914,11 @@ The usual way this is done is to add public references to these objects within y
 
     public class GameInstaller : MonoInstaller
     {
-        [SerializeField]
-        Foo _foo;
+        public Foo Foo;
 
         public override void InstallBindings()
         {
-            Container.BindInstance(_foo);
+            Container.BindInstance(Foo);
             Container.Bind<IInitializable>().To<GameRunner>().AsSingle();
         }
     }
@@ -937,8 +938,6 @@ The usual way this is done is to add public references to these objects within y
         }
     }
 
-(Note that you could also just make `Foo` public here - my personal convention is just to always use `SerializeField` instead to avoid breaking encapsulation)
-
 This works fine however in some cases this can get cumbersome.  For example, if you want to allow an artist to add any number of `Enemy` objects to the scene, and you also want all those `Enemy` objects added to the Zenject Container.  In this case, you would have to manually drag each one to the inspector of one of your installers.  This is very error prone since its easy to forget one, or to delete the `Enemy` game object but forget to delete the null reference in the inspector for your installer, etc.
 
 So another way to do this is to use the `ZenjectBinding` component.  You can do this by adding a `ZenjectBinding` MonoBehaviour to the same game object that you want to be automatically added to the Zenject container.
@@ -957,37 +956,49 @@ Then our installer becomes:
         }
     }
 
-When using `ZenjectBinding` this way, by default it will bind `Foo` using the `Self` method, so it is equivalent to the first example where we did this:
+The `ZenjectBinding` component has the following properties:
 
-    Container.Bind<Foo>().ToInstance(_foo);
+* **Bind Type** - This will determine what '<a href="#binding">contract type</a>' to use.  It can be set to any of the following values:
 
-Which is also the same as this:
+    1 - `Self`
 
-    Container.BindInstance(_foo);
+    This is equivalent to the first example where we did this:
 
-So if we duplicate this game object to have multiple game objects with `Foo` on them (and its `ZenjectBinding`), they will all be bound to the Container this way.  So after doing this, we would have to change `GameRunner` above to take a `List<Foo>` otherwise we would get Zenject exceptions (see <a href="#list-bindings">here</a> for info on list bindings).
+        Container.Bind<Foo>().FromInstance(_foo);
 
-Also note that the `ZenjectBinding` component contains a `Bind Type` property in its inspector.  By default this simply binds the instance as shown above but it can also be set to the following:
+    Which is also the same as this:
 
-1 - `AllInterfaces`
+        Container.BindInstance(_foo);
 
-This bind type is equivalent to the following:
+    So if we duplicate this game object to have multiple game objects with `Foo` on them (and its `ZenjectBinding`), they will all be bound to the Container this way.  So after doing this, we would have to change `GameRunner` above to take a `List<Foo>` otherwise we would get Zenject exceptions (see <a href="#list-bindings">here</a> for info on list bindings).
 
-    Container.BindAllInterfaces(_foo.GetType()).ToInstance(_foo);
+    2 - `AllInterfaces`
 
-Note however, in this case, that `GameRunner` must ask for type `IFoo` in its constructor.  If we left `GameRunner` asking for type `Foo` then Zenject would throw exceptions, since the `BindAllInterfaces` method only binds the interfaces, not the concrete type.  If you want the concrete type as well then you can use:
+    This bind type is equivalent to the following:
 
-2 - `AllInterfacesAndSelf`
+        Container.BindAllInterfaces(_foo.GetType()).FromInstance(_foo);
 
-This bind type is equivalent to the following:
+    Note however, in this case, that `GameRunner` must ask for type `IFoo` in its constructor.  If we left `GameRunner` asking for type `Foo` then Zenject would throw exceptions, since the `BindAllInterfaces` method only binds the interfaces, not the concrete type.  If you want the concrete type as well then you can use:
 
-    Container.BindAllInterfacesAndSelf(_foo.GetType()).ToInstance(_foo);
+    3 - `AllInterfacesAndSelf`
 
-This is the same as AllInterfaces except we can directly access Foo using type Foo instead of needing an interface.
+    This bind type is equivalent to the following:
 
-The final property you will notice on the ZenjectBinding component is the "Context".  This is completely optional and in most cases should be left unset.  However, if you are using GameObjectContext in places, then the other value might be useful to you (see <a href="#sub-containers-and-facades">section on sub-containers</a> for details)
+        Container.BindAllInterfacesAndSelf(_foo.GetType()).FromInstance(_foo);
 
-"Context" will determine what container the component gets added to.  If left unset, it will use whatever context the GameObject is in.  In most cases this will be SceneContext, but if it's inside a GameObjectContext it will be bound into that container instead.  One important use case here is to drag the SceneContext into this field for one of the MonoBehaviour's inside a GameObjectContext.  This allows you to treat this MonoBehaviour as a <a href="https://en.wikipedia.org/wiki/Facade_pattern">Facade</a> for the entire sub-container given by the GameObjectContext.
+    This is the same as AllInterfaces except we can directly access Foo using type Foo instead of needing an interface.
+
+    4 - `BaseType`
+
+    This bind type is equivalent to the following:
+
+        Container.BindAllInterfacesAndSelf(_foo.GetType().BaseType()).FromInstance(_foo);
+
+* Identifier - This value can be left empty most of the time.  It will determine what is used as the <a href="#binding">identifier</a> for the binding.   For example, when set to "Foo1", it is equivalent to doing the following:
+
+    Container.BindInstance(_foo).WithId("Foo1");
+
+* Context - This is completely optional and in most cases should be left unset.  This will determine which Context to apply the binding to.  If left unset, it will use whatever context the GameObject is in.  In most cases this will be SceneContext, but if it's inside a GameObjectContext it will be bound into that container instead.  One important use case for this field is to allow dragging the SceneContext into this field, for cases where the component is inside a GameObjectContext.  This allows you to treat this MonoBehaviour as a <a href="https://en.wikipedia.org/wiki/Facade_pattern">Facade</a> for the entire sub-container given by the GameObjectContext.
 
 ## <a id="di-guidelines--recommendations"></a>General Guidelines / Recommendations / Gotchas / Tips and Tricks
 
@@ -1015,7 +1026,7 @@ The final property you will notice on the ZenjectBinding component is the "Conte
     * Zenject does not immediately instantiate every object defined by the bindings that you've set up in your installers.  Instead, Zenject will construct some number of root-level objects, and then lazily instantiate the rest based on usage.  Root-level objects are any classes that are bound to IInitializable / ITickable / IDisposable, and any class that is declared in a binding that is marked `NonLazy()`.
 
 * <a id="bad-execution-order"></a>**The order that things occur in is wrong, like injection is occurring too late, or Initialize() event is not called at the right time, etc.**
-    * It may be because the 'script execution order' of the Zenject classes 'ProjectContext', 'SceneContext', or 'SceneDecoratorContext' are incorrect.  These classes should always have the earliest or near earliest execution order.  This should already be set by default (since this setting is included in the `cs.meta` files for these classes).  However if you are compiling Zenject yourself or have a unique configuration, you may want to make sure, which you can do by going to "Edit -> Project Settings -> Script Execution Order" and confirming that these classes are at the top, before the default time.
+    * It may be because the 'script execution order' of the Zenject classes 'ProjectContext' or 'SceneContext' is incorrect.  These classes should always have the earliest or near earliest execution order.  This should already be set by default (since this setting is included in the `cs.meta` files for these classes).  However if you are compiling Zenject yourself or have a unique configuration, you may want to make sure, which you can do by going to "Edit -> Project Settings -> Script Execution Order" and confirming that these classes are at the top, before the default time.
 
 * **Transient is the default scope**
     * Another common mistake is to leave out the call which defines the scope (eg. `AsSingle`, `AsTransient`, or `AsCached`) and therefore unintentionally use the default (`AsTransient`).  For example:
@@ -1144,7 +1155,7 @@ The InjectContext class (which is passed as the `context` parameter above) conta
 * `Type ObjectType` - The type of the newly instantiated object, which we are injecting dependencies into.  Note that this is null for root calls to `Resolve<>` or `Instantiate<>`
 * `object ObjectInstance` - The newly instantiated instance that is having its dependencies filled.  Note that this is only available when injecting fields or into `[Inject]` methods and null for constructor parameters
 * `string Identifier` - This will be null in most cases and set to whatever is given as a parameter to the `[Inject]` attribute.  For example, `[Inject(Id = "foo")] _foo` will result in `Identifier` being equal to the string "foo".
-* `string ConcreteIdentifier` - This will be null in most cases and set to whatever is given as the string identifier to the `AsSingle` method.
+* `object ConcreteIdentifier` - This will be null in most cases and set to whatever is given as the identifier to the `AsSingle` method.
 * `string MemberName` - The name of the field or parameter that we are injecting into.  This can be used, for example, in the case where you have multiple constructor parameters that are strings.  However, using the parameter or field name can be error prone since other programmers may refactor it to use a different name.  In many cases it's better to use an explicit identifier
 * `Type MemberType` - The type of the field or parameter that we are injecting into.
 * `InjectContext ParentContext` - This contains information on the entire object graph that precedes the current class being created.  For example, dependency A might be created, which requires an instance of B, which requires an instance of C.  You could use this field to inject different values into C, based on some condition about A.  This can be used to create very complex conditions using any combination of parent context information.  Note also that `ParentContext.MemberType` is not necessarily the same as ObjectType, since the ObjectType could be a derived type from `ParentContext.MemberType`

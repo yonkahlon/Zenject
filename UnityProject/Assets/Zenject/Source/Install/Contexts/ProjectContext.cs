@@ -165,7 +165,7 @@ namespace Zenject
             _container.DefaultParent = this.transform;
 
             _container.Bind(typeof(TickableManager), typeof(InitializableManager), typeof(DisposableManager))
-                .ToSelf().AsSingle().InheritInSubContainers();
+                .ToSelf().AsSingle().CopyIntoAllSubContainers();
 
             _container.Bind<Context>().FromInstance(this);
 

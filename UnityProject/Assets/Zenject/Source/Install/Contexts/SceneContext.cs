@@ -21,9 +21,9 @@ namespace Zenject
         [SerializeField]
         bool _parentNewObjectsUnderRoot = false;
 
-        [Tooltip("Optional contract name of this SceneContext, allowing contexts in subsequently loaded scenes to depend on it and be parented to it")]
+        [Tooltip("Optional contract names for this SceneContext, allowing contexts in subsequently loaded scenes to depend on it and be parented to it, and also for previously loaded decorators to be included")]
         [SerializeField]
-        string _contractName;
+        readonly List<string> _contractNames = new List<string>();
 
         [Tooltip("Optional contract name of a SceneContext in a previously loaded scene that this context depends on and to which it must be parented")]
         [SerializeField]
@@ -63,15 +63,16 @@ namespace Zenject
             }
         }
 
-        public string ContractName
+        public IEnumerable<string> ContractNames
         {
             get
             {
-                return _contractName;
+                return _contractNames;
             }
             set
             {
-                _contractName = value;
+                _contractNames.Clear();
+                _contractNames.AddRange(value);
             }
         }
 
@@ -173,7 +174,7 @@ namespace Zenject
                 .Except(gameObject.scene)
                 .SelectMany(scene => scene.GetRootGameObjects())
                 .SelectMany(root => root.GetComponentsInChildren<SceneContext>())
-                .Where(sceneContext => sceneContext.ContractName == _parentContractName)
+                .Where(sceneContext => sceneContext.ContractNames.Contains(_parentContractName))
                 .ToList();
 
             Assert.That(sceneContexts.Any(), () => string.Format(
@@ -193,7 +194,7 @@ namespace Zenject
 
         List<SceneDecoratorContext> LookupDecoratorContexts()
         {
-            if (string.IsNullOrEmpty(_contractName))
+            if (_contractNames.IsEmpty())
             {
                 return new List<SceneDecoratorContext>();
             }
@@ -203,7 +204,7 @@ namespace Zenject
                 .Except(gameObject.scene)
                 .SelectMany(scene => scene.GetRootGameObjects())
                 .SelectMany(root => root.GetComponentsInChildren<SceneDecoratorContext>())
-                .Where(decoratorContext => decoratorContext.DecoratedContractName == _contractName)
+                .Where(decoratorContext => _contractNames.Contains(decoratorContext.DecoratedContractName))
                 .ToList();
         }
 

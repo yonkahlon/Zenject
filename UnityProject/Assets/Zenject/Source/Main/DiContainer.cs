@@ -88,7 +88,7 @@ namespace Zenject
                 DefaultParent = parentContainer.DefaultParent;
 #endif
                 foreach (var binding in parentContainer._processedBindings
-                        .Where(x => x.InheritInSubContainers))
+                        .Where(x => x.CopyIntoAllSubContainers))
                 {
                     _currentBindings.Enqueue(binding);
                 }
