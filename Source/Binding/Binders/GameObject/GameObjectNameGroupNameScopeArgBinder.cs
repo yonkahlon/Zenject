@@ -1,10 +1,12 @@
+#if !NOT_UNITY3D
+
 namespace Zenject
 {
     public class GameObjectNameGroupNameScopeArgBinder : GameObjectGroupNameScopeArgBinder
     {
         public GameObjectNameGroupNameScopeArgBinder(
             BindInfo bindInfo,
-            GameObjectBindInfo gameObjectInfo)
+            GameObjectCreationParameters gameObjectInfo)
             : base(bindInfo, gameObjectInfo)
         {
         }
@@ -16,3 +18,5 @@ namespace Zenject
         }
     }
 }
+
+#endif

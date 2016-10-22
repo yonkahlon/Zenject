@@ -29,7 +29,7 @@ namespace Zenject
         {
             BindingUtil.AssertIsValidPrefab(prefab);
 
-            var gameObjectInfo = new GameObjectBindInfo();
+            var gameObjectInfo = new GameObjectCreationParameters();
 
             SubFinalizer = CreateFinalizer(
                 (container) => new SubContainerDependencyProvider(
@@ -37,8 +37,7 @@ namespace Zenject
                     new SubContainerCreatorByPrefab(
                         container,
                         new PrefabProvider(prefab),
-                        gameObjectInfo.Name,
-                        gameObjectInfo.GroupName)));
+                        gameObjectInfo)));
 
             return new GameObjectNameGroupNameBinder(BindInfo, gameObjectInfo);
         }
@@ -47,7 +46,7 @@ namespace Zenject
         {
             BindingUtil.AssertIsValidResourcePath(resourcePath);
 
-            var gameObjectInfo = new GameObjectBindInfo();
+            var gameObjectInfo = new GameObjectCreationParameters();
 
             SubFinalizer = CreateFinalizer(
                 (container) => new SubContainerDependencyProvider(
@@ -55,8 +54,7 @@ namespace Zenject
                     new SubContainerCreatorByPrefab(
                         container,
                         new PrefabProviderResource(resourcePath),
-                        gameObjectInfo.Name,
-                        gameObjectInfo.GroupName)));
+                        gameObjectInfo)));
 
             return new GameObjectNameGroupNameBinder(BindInfo, gameObjectInfo);
         }

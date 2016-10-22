@@ -138,7 +138,7 @@ namespace Zenject
             BindingUtil.AssertIsAbstractOrComponentOrGameObject(BindInfo.ContractTypes);
             BindingUtil.AssertIsComponentOrGameObject(ConcreteTypes);
 
-            var gameObjectInfo = new GameObjectBindInfo();
+            var gameObjectInfo = new GameObjectCreationParameters();
 
             if (ConcreteTypes.All(x => x == typeof(GameObject)))
             {
@@ -148,7 +148,7 @@ namespace Zenject
                     {
                         Assert.That(BindInfo.Arguments.IsEmpty(), "Cannot inject arguments into empty game object");
                         return new EmptyGameObjectProvider(
-                            container, gameObjectInfo.Name, gameObjectInfo.GroupName);
+                            container, gameObjectInfo);
                     });
             }
             else
@@ -163,8 +163,7 @@ namespace Zenject
                         type,
                         BindInfo.ConcreteIdentifier,
                         BindInfo.Arguments,
-                        gameObjectInfo.Name,
-                        gameObjectInfo.GroupName));
+                        gameObjectInfo));
             }
 
             return new GameObjectNameGroupNameScopeArgBinder(BindInfo, gameObjectInfo);
@@ -175,7 +174,7 @@ namespace Zenject
             BindingUtil.AssertIsValidPrefab(prefab);
             BindingUtil.AssertIsAbstractOrComponentOrGameObject(AllParentTypes);
 
-            var gameObjectInfo = new GameObjectBindInfo();
+            var gameObjectInfo = new GameObjectCreationParameters();
 
             SubFinalizer = new PrefabBindingFinalizer(
                 BindInfo, gameObjectInfo, prefab);
@@ -188,7 +187,7 @@ namespace Zenject
             BindingUtil.AssertIsValidResourcePath(resourcePath);
             BindingUtil.AssertIsAbstractOrComponentOrGameObject(AllParentTypes);
 
-            var gameObjectInfo = new GameObjectBindInfo();
+            var gameObjectInfo = new GameObjectCreationParameters();
 
             SubFinalizer = new PrefabResourceBindingFinalizer(
                 BindInfo, gameObjectInfo, resourcePath);

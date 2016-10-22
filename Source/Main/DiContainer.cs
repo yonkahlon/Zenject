@@ -986,9 +986,18 @@ namespace Zenject
             UnityEngine.Object prefab, List<TypeValuePair> extraArgs,
             string groupName, bool useAllArgs)
         {
+            return InstantiatePrefabExplicit(
+                prefab, extraArgs, new GameObjectCreationParameters() { GroupName = groupName }, useAllArgs);
+        }
+
+        // Note: extraArgs must be non null
+        public GameObject InstantiatePrefabExplicit(
+            UnityEngine.Object prefab, List<TypeValuePair> extraArgs,
+            GameObjectCreationParameters gameObjectBindInfo, bool useAllArgs)
+        {
             FlushBindings();
 
-            var gameObj = CreateAndParentPrefab(prefab, groupName);
+            var gameObj = CreateAndParentPrefab(prefab, gameObjectBindInfo);
 
             InjectGameObjectExplicit(
                 gameObj, true, extraArgs, useAllArgs);
@@ -999,22 +1008,14 @@ namespace Zenject
         // Don't use this unless you know what you're doing
         // You probably want to use InstantiatePrefab instead
         // This one will only create the prefab and will not inject into it
-        public GameObject CreateAndParentPrefabResource(string resourcePath)
-        {
-            return CreateAndParentPrefabResource(resourcePath, null);
-        }
-
-        // Don't use this unless you know what you're doing
-        // You probably want to use InstantiatePrefab instead
-        // This one will only create the prefab and will not inject into it
-        public GameObject CreateAndParentPrefabResource(string resourcePath, string groupName)
+        public GameObject CreateAndParentPrefabResource(string resourcePath, GameObjectCreationParameters gameObjectBindInfo)
         {
             var prefab = (GameObject)Resources.Load(resourcePath);
 
             Assert.IsNotNull(prefab,
                 "Could not find prefab at resource location '{0}'".Fmt(resourcePath));
 
-            return CreateAndParentPrefab(prefab, groupName);
+            return CreateAndParentPrefab(prefab, gameObjectBindInfo);
         }
 
         GameObject GetPrefabAsGameObject(UnityEngine.Object prefab)
@@ -1031,7 +1032,8 @@ namespace Zenject
         // Don't use this unless you know what you're doing
         // You probably want to use InstantiatePrefab instead
         // This one will only create the prefab and will not inject into it
-        public GameObject CreateAndParentPrefab(UnityEngine.Object prefab, string groupName)
+        public GameObject CreateAndParentPrefab(
+            UnityEngine.Object prefab, GameObjectCreationParameters gameObjectBindInfo)
         {
             Assert.That(!AssertOnNewGameObjects,
                 "Given DiContainer does not support creating new game objects");
@@ -1065,24 +1067,31 @@ namespace Zenject
                 gameObj = (GameObject)GameObject.Instantiate(prefabAsGameObject);
             }
 
-            gameObj.transform.SetParent(GetTransformGroup(groupName), false);
+            gameObj.transform.SetParent(
+                GetTransformGroup(gameObjectBindInfo), false);
+
+            if (gameObjectBindInfo.Name != null)
+            {
+                gameObj.name = gameObjectBindInfo.Name;
+            }
+
             return gameObj;
         }
 
         public GameObject CreateEmptyGameObject(string name)
         {
-            return CreateEmptyGameObject(name, null);
+            return CreateEmptyGameObject(new GameObjectCreationParameters() { Name = name });
         }
 
-        public GameObject CreateEmptyGameObject(string name, string groupName)
+        public GameObject CreateEmptyGameObject(GameObjectCreationParameters gameObjectBindInfo)
         {
             Assert.That(!AssertOnNewGameObjects,
                 "Given DiContainer does not support creating new game objects");
 
             FlushBindings();
 
-            var gameObj = new GameObject(name);
-            gameObj.transform.SetParent(GetTransformGroup(groupName), false);
+            var gameObj = new GameObject(gameObjectBindInfo.Name ?? "GameObject");
+            gameObj.transform.SetParent(GetTransformGroup(gameObjectBindInfo), false);
             return gameObj;
         }
 
@@ -1120,6 +1129,15 @@ namespace Zenject
         public object InstantiatePrefabForComponentExplicit(
             Type componentType, UnityEngine.Object prefab, string groupName, InjectArgs args)
         {
+            return InstantiatePrefabForComponentExplicit(
+                componentType, prefab, new GameObjectCreationParameters() { GroupName = groupName }, args);
+        }
+
+        // Note: Any arguments that are used will be removed from extraArgs
+        public object InstantiatePrefabForComponentExplicit(
+            Type componentType, UnityEngine.Object prefab,
+            GameObjectCreationParameters gameObjectBindInfo, InjectArgs args)
+        {
             Assert.That(!AssertOnNewGameObjects,
                 "Given DiContainer does not support creating new game objects");
 
@@ -1132,17 +1150,36 @@ namespace Zenject
 
             var gameObj = (GameObject)GameObject.Instantiate(GetPrefabAsGameObject(prefab));
 
-            gameObj.transform.SetParent(GetTransformGroup(groupName), false);
+            gameObj.transform.SetParent(GetTransformGroup(gameObjectBindInfo), false);
             gameObj.SetActive(true);
 
             return InjectGameObjectForComponentExplicit(
                 gameObj, componentType, args);
         }
 
-        Transform GetTransformGroup(string groupName)
+        Transform GetTransformGroup(GameObjectCreationParameters gameObjectBindInfo)
         {
             Assert.That(!AssertOnNewGameObjects,
                 "Given DiContainer does not support creating new game objects");
+
+            if (gameObjectBindInfo.ParentTransform != null)
+            {
+                Assert.IsNull(gameObjectBindInfo.GroupName);
+                Assert.IsNull(gameObjectBindInfo.ParentTransformGetter);
+
+                return gameObjectBindInfo.ParentTransform;
+            }
+
+            if (gameObjectBindInfo.ParentTransformGetter != null)
+            {
+                Assert.IsNull(gameObjectBindInfo.GroupName);
+
+                // TODO: Pass in InjectContext instead of container here
+                // NOTE: Null is fine here, will just be a root game object in that case
+                return gameObjectBindInfo.ParentTransformGetter(this);
+            }
+
+            var groupName = gameObjectBindInfo.GroupName;
 
             if (DefaultParent == null)
             {
@@ -1261,17 +1298,24 @@ namespace Zenject
         public GameObject InstantiatePrefab(
             UnityEngine.Object prefab, IEnumerable<object> extraArgs)
         {
-            return InstantiatePrefab(
-                prefab, extraArgs, null);
+            return InstantiatePrefab(prefab, extraArgs, (string)null);
         }
 
         // Note: extraArgs must be non null
         public GameObject InstantiatePrefab(
             UnityEngine.Object prefab, IEnumerable<object> extraArgs, string groupName)
         {
+            return InstantiatePrefab(prefab, extraArgs,
+                new GameObjectCreationParameters() { GroupName = groupName });
+        }
+
+        // Note: extraArgs must be non null
+        internal GameObject InstantiatePrefab(
+            UnityEngine.Object prefab, IEnumerable<object> extraArgs,
+            GameObjectCreationParameters gameObjectBindInfo)
+        {
             return InstantiatePrefabExplicit(
-                prefab, InjectUtil.CreateArgList(extraArgs),
-                groupName);
+                prefab, InjectUtil.CreateArgList(extraArgs), gameObjectBindInfo, true);
         }
 
         // See comment in IInstantiator.cs for description of this method
@@ -1308,7 +1352,8 @@ namespace Zenject
         public T InstantiateComponentOnNewGameObject<T>(string gameObjectName)
             where T : Component
         {
-            return InstantiateComponent<T>(CreateEmptyGameObject(gameObjectName));
+            return InstantiateComponent<T>(
+                CreateEmptyGameObject(new GameObjectCreationParameters() { Name = gameObjectName }));
         }
 
         public T InstantiatePrefabForComponent<T>(UnityEngine.Object prefab)

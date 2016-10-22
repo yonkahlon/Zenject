@@ -32,8 +32,18 @@ namespace Zenject
 
         public static void InstallFromResource(string resourcePath, DiContainer container)
         {
+            InstallFromResource(resourcePath, container, new object[0]);
+        }
+
+        public static void InstallFromResource(DiContainer container, object[] extraArgs)
+        {
+            InstallFromResource(MonoInstallerUtil.GetDefaultResourcePath<TDerived>(), container, extraArgs);
+        }
+
+        public static void InstallFromResource(string resourcePath, DiContainer container, object[] extraArgs)
+        {
             var installer = MonoInstallerUtil.CreateInstaller<TDerived>(resourcePath, container);
-            container.Inject(installer);
+            container.Inject(installer, extraArgs);
             installer.InstallBindings();
         }
     }
@@ -130,7 +140,7 @@ namespace Zenject
             string resourcePath, DiContainer container)
             where TInstaller : MonoInstallerBase
         {
-            var gameObj = container.CreateAndParentPrefabResource(resourcePath);
+            var gameObj = container.CreateAndParentPrefabResource(resourcePath, new GameObjectCreationParameters());
 
             var installers = gameObj.GetComponentsInChildren<TInstaller>();
 

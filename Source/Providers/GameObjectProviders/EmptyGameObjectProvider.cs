@@ -10,14 +10,12 @@ namespace Zenject
     public class EmptyGameObjectProvider : IProvider
     {
         readonly DiContainer _container;
-        readonly string _gameObjectName;
-        readonly string _groupName;
+        readonly GameObjectCreationParameters _gameObjectBindInfo;
 
         public EmptyGameObjectProvider(
-            DiContainer container, string gameObjectName, string groupName)
+            DiContainer container, GameObjectCreationParameters gameObjectBindInfo)
         {
-            _gameObjectName = gameObjectName;
-            _groupName = groupName;
+            _gameObjectBindInfo = gameObjectBindInfo;
             _container = container;
         }
 
@@ -33,7 +31,7 @@ namespace Zenject
 
             yield return new List<object>()
             {
-                _container.CreateEmptyGameObject(_gameObjectName, _groupName)
+                _container.CreateEmptyGameObject(_gameObjectBindInfo)
             };
         }
     }

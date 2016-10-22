@@ -151,15 +151,7 @@ namespace Zenject
         object InstantiatePrefabResourceForComponentExplicit(
             Type concreteType, string resourcePath, string groupName, InjectArgs args);
 
-        GameObject CreateAndParentPrefabResource(string resourcePath);
-        GameObject CreateAndParentPrefabResource(string resourcePath, string groupName);
-
-        GameObject CreateAndParentPrefab(UnityEngine.Object prefab, string groupName);
-
-        // This is the same as GameObject.Instantiate(name) except that it will use
-        // the default parent, which can sometimes be set to the Context
         GameObject CreateEmptyGameObject(string name);
-        GameObject CreateEmptyGameObject(string name, string groupName);
 #endif
     }
 }

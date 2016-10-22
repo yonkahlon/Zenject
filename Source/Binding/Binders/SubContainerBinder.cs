@@ -61,7 +61,7 @@ namespace Zenject
         {
             BindingUtil.AssertIsValidPrefab(prefab);
 
-            var gameObjectInfo = new GameObjectBindInfo();
+            var gameObjectInfo = new GameObjectCreationParameters();
 
             SubFinalizer = new SubContainerPrefabBindingFinalizer(
                 _bindInfo, gameObjectInfo, prefab, _subIdentifier);
@@ -73,7 +73,7 @@ namespace Zenject
         {
             BindingUtil.AssertIsValidResourcePath(resourcePath);
 
-            var gameObjectInfo = new GameObjectBindInfo();
+            var gameObjectInfo = new GameObjectCreationParameters();
 
             SubFinalizer = new SubContainerPrefabResourceBindingFinalizer(
                 _bindInfo, gameObjectInfo, resourcePath, _subIdentifier);
