@@ -1,5 +1,6 @@
 #if !NOT_UNITY3D
 
+using System;
 using System.IO;
 using UnityEditor;
 using UnityEngine;
@@ -12,18 +13,18 @@ namespace Zenject
 {
     public static class ZenMenuItems
     {
-        [MenuItem("Edit/Zenject/Validate Current Scene #%v")]
+        [MenuItem("Edit/Zenject/Validate Current Scenes #%v")]
         public static void ValidateCurrentScene()
         {
-            if (EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo())
+            ValidateInternal();
+        }
+
+        [MenuItem("Edit/Zenject/Validate Then Run #%r")]
+        public static void ValidateCurrentSceneThenRun()
+        {
+            if (ValidateInternal())
             {
-                var originalSceneSetup = EditorSceneManager.GetSceneManagerSetup();
-                ZenUnityEditorUtil.ValidateCurrentSceneSetup();
-                EditorSceneManager.RestoreSceneManagerSetup(originalSceneSetup);
-            }
-            else
-            {
-                Debug.Log("Validation cancelled - All scenes must be saved first for validation to take place");
+                EditorApplication.isPlaying = true;
             }
         }
 
@@ -246,6 +247,35 @@ namespace Zenject
 
             EditorUtility.FocusProjectWindow();
             Selection.activeObject = AssetDatabase.LoadAssetAtPath<UnityEngine.Object>(assetPath);
+        }
+
+        static bool ValidateInternal()
+        {
+            if (EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo())
+            {
+                var originalSceneSetup = EditorSceneManager.GetSceneManagerSetup();
+
+                try
+                {
+                    ZenUnityEditorUtil.ValidateCurrentSceneSetup();
+                    Log.Info("All scenes validated successfully");
+                    return true;
+                }
+                catch (Exception e)
+                {
+                    Log.ErrorException(e);
+                    return false;
+                }
+                finally
+                {
+                    EditorSceneManager.RestoreSceneManagerSetup(originalSceneSetup);
+                }
+            }
+            else
+            {
+                Debug.Log("Validation cancelled - All scenes must be saved first for validation to take place");
+                return false;
+            }
         }
     }
 }
