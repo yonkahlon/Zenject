@@ -12,12 +12,7 @@ namespace Zenject
             get;
         }
 
-        string GameObjectName
-        {
-            get;
-        }
-
-        string GameObjectGroupName
+        GameObjectCreationParameters GameObjectCreationParameters
         {
             get;
         }

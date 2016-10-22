@@ -22,7 +22,7 @@ namespace Zenject
         }
 
         public IProvider CreateProvider(
-            Type resultType, object concreteIdentifier, string resourcePath, object identifier, string gameObjectName, string gameObjectGroupName)
+            Type resultType, object concreteIdentifier, string resourcePath, object identifier, GameObjectCreationParameters gameObjectBindInfo)
         {
             _markRegistry.MarkSingleton(
                 resultType, concreteIdentifier,
@@ -35,20 +35,17 @@ namespace Zenject
 
             if (_subContainerCreators.TryGetValue(customSingletonId, out creatorInfo))
             {
-                Assert.IsEqual(creatorInfo.GameObjectName, gameObjectName,
-                    "Ambiguous creation parameters (gameObjectName) when using ToSubContainerPrefab with AsSingle");
-
-                Assert.IsEqual(creatorInfo.GameObjectGroupName, gameObjectGroupName,
-                    "Ambiguous creation parameters (gameObjectGroupName) when using ToSubContainerPrefab with AsSingle");
+                Assert.IsEqual(creatorInfo.GameObjectCreationParameters, gameObjectBindInfo,
+                    "Ambiguous creation parameters (game object name / parent info) when using ToSubContainerPrefab with AsSingle");
             }
             else
             {
                 var creator = new SubContainerCreatorCached(
                     new SubContainerCreatorByPrefab(
-                        _container, new PrefabProviderResource(resourcePath), gameObjectName, gameObjectGroupName));
+                        _container, new PrefabProviderResource(resourcePath), gameObjectBindInfo));
 
                 creatorInfo = new CreatorInfo(
-                    gameObjectName, gameObjectGroupName, creator);
+                    gameObjectBindInfo, creator);
 
                 _subContainerCreators.Add(customSingletonId, creatorInfo);
             }
@@ -114,20 +111,13 @@ namespace Zenject
         class CreatorInfo
         {
             public CreatorInfo(
-                string gameObjectName, string gameObjectGroupName, ISubContainerCreator creator)
+                GameObjectCreationParameters creationParameters, ISubContainerCreator creator)
             {
-                GameObjectName = gameObjectName;
-                GameObjectGroupName = gameObjectGroupName;
+                GameObjectCreationParameters = creationParameters;
                 Creator = creator;
             }
 
-            public string GameObjectName
-            {
-                get;
-                private set;
-            }
-
-            public string GameObjectGroupName
+            public GameObjectCreationParameters GameObjectCreationParameters
             {
                 get;
                 private set;

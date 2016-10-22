@@ -7,17 +7,16 @@ namespace Zenject
 {
     public class SubContainerCreatorByPrefab : ISubContainerCreator
     {
-        readonly string _groupName;
-        readonly string _gameObjectName;
+        readonly GameObjectCreationParameters _gameObjectBindInfo;
         readonly IPrefabProvider _prefabProvider;
         readonly DiContainer _container;
 
         public SubContainerCreatorByPrefab(
-            DiContainer container, IPrefabProvider prefabProvider, string gameObjectName, string groupName)
+            DiContainer container, IPrefabProvider prefabProvider,
+            GameObjectCreationParameters gameObjectBindInfo)
         {
+            _gameObjectBindInfo = gameObjectBindInfo;
             _prefabProvider = prefabProvider;
-            _groupName = groupName;
-            _gameObjectName = gameObjectName;
             _container = container;
         }
 
@@ -27,12 +26,7 @@ namespace Zenject
 
             var prefab = _prefabProvider.GetPrefab();
             var gameObject = _container.InstantiatePrefab(
-                prefab, new object[0], _groupName);
-
-            if (_gameObjectName != null)
-            {
-                gameObject.name = _gameObjectName;
-            }
+                prefab, new object[0], _gameObjectBindInfo);
 
             var context = gameObject.GetComponent<GameObjectContext>();
 

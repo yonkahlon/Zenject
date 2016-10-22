@@ -66,7 +66,7 @@ namespace Zenject.Asteroids
                 .WithGameObjectName("Asteroid")
                 // GameObjectGroup's are just game objects used for organization
                 // This is nice so that it doesn't clutter up our scene hierarchy
-                .UnderGameObjectGroup("Asteroids");
+                .UnderTransformGroup("Asteroids");
         }
 
         void InstallMisc()

@@ -25,19 +25,11 @@ namespace Zenject
             }
         }
 
-        public string GameObjectGroupName
+        public GameObjectCreationParameters GameObjectCreationParameters
         {
             get
             {
-                return _subInstantiator.GameObjectGroupName;
-            }
-        }
-
-        public string GameObjectName
-        {
-            get
-            {
-                return _subInstantiator.GameObjectName;
+                return _subInstantiator.GameObjectCreationParameters;
             }
         }
 

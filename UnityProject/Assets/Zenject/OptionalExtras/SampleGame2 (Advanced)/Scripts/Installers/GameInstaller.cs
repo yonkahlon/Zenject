@@ -26,7 +26,7 @@ namespace Zenject.SpaceFighter
             Container.BindFactory<EnemyTunables, EnemyFacade, EnemyFacade.Factory>()
                 .FromSubContainerResolve()
                 .ByPrefab<EnemyInstaller>(_settings.EnemyFacadePrefab)
-                .UnderGameObjectGroup("Enemies");
+                .UnderTransformGroup("Enemies");
 
             Container.BindAllInterfaces<GameDifficultyHandler>().To<GameDifficultyHandler>().AsSingle();
 
@@ -34,11 +34,11 @@ namespace Zenject.SpaceFighter
 
             Container.BindFactory<float, float, BulletTypes, Bullet, Bullet.Factory>()
                 .FromPrefab(_settings.BulletPrefab)
-                .UnderGameObjectGroup("Bullets");
+                .UnderTransformGroup("Bullets");
 
             Container.BindFactory<Explosion, Explosion.Factory>()
                 .FromPrefab(_settings.ExplosionPrefab)
-                .UnderGameObjectGroup("Explosions");
+                .UnderTransformGroup("Explosions");
 
             Container.Bind<AudioPlayer>().AsSingle();
 

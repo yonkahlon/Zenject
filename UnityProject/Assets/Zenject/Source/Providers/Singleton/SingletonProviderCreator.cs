@@ -57,37 +57,37 @@ namespace Zenject
 
 #if !NOT_UNITY3D
         public IProvider CreateProviderForPrefab(
-            UnityEngine.Object prefab, Type resultType, string gameObjectName, string gameObjectGroupName,
+            UnityEngine.Object prefab, Type resultType, GameObjectCreationParameters gameObjectBindInfo,
             List<TypeValuePair> extraArguments, object concreteIdentifier)
         {
             return _prefabProviderCreator.CreateProvider(
-                prefab, resultType, gameObjectName, gameObjectGroupName,
+                prefab, resultType, gameObjectBindInfo,
                 extraArguments, concreteIdentifier);
         }
 
         public IProvider CreateProviderForPrefabResource(
-            string resourcePath, Type resultType, string gameObjectName, string gameObjectGroupName,
+            string resourcePath, Type resultType, GameObjectCreationParameters gameObjectBindInfo,
             List<TypeValuePair> extraArguments, object concreteIdentifier)
         {
             return _prefabResourceProviderCreator.CreateProvider(
-                resourcePath, resultType, gameObjectName, gameObjectGroupName,
+                resourcePath, resultType, gameObjectBindInfo,
                 extraArguments, concreteIdentifier);
         }
 
         public IProvider CreateProviderForSubContainerPrefab(
-            Type resultType, object concreteIdentifier, string gameObjectName, string gameObjectGroupName,
+            Type resultType, object concreteIdentifier, GameObjectCreationParameters gameObjectBindInfo,
             UnityEngine.Object prefab, object identifier)
         {
             return _subContainerPrefabProviderCreator.CreateProvider(
-                resultType, concreteIdentifier, prefab, identifier, gameObjectName, gameObjectGroupName);
+                resultType, concreteIdentifier, prefab, identifier, gameObjectBindInfo);
         }
 
         public IProvider CreateProviderForSubContainerPrefabResource(
-            Type resultType, object concreteIdentifier, string gameObjectName, string gameObjectGroupName,
+            Type resultType, object concreteIdentifier, GameObjectCreationParameters gameObjectBindInfo,
             string resourcePath, object identifier)
         {
             return _subContainerPrefabResourceProviderCreator.CreateProvider(
-                resultType, concreteIdentifier, resourcePath, identifier, gameObjectName, gameObjectGroupName);
+                resultType, concreteIdentifier, resourcePath, identifier, gameObjectBindInfo);
         }
 #endif
     }

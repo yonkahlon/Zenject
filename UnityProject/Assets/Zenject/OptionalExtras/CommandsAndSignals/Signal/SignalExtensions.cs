@@ -11,7 +11,7 @@ namespace Zenject
             return container.BindSignal<TSignal>(null);
         }
 
-        public static ConditionBinder BindSignal<TSignal>(this DiContainer container, string identifier)
+        public static ConditionBinder BindSignal<TSignal>(this DiContainer container, object identifier)
             where TSignal : ISignal
         {
             return container.Bind<TSignal>().WithId(identifier).AsSingle(identifier);
@@ -23,7 +23,7 @@ namespace Zenject
             return container.BindTrigger<TTrigger>(null);
         }
 
-        public static ConditionBinder BindTrigger<TTrigger>(this DiContainer container, string identifier)
+        public static ConditionBinder BindTrigger<TTrigger>(this DiContainer container, object identifier)
             where TTrigger : ITrigger
         {
             Type concreteSignalType = typeof(TTrigger).DeclaringType;

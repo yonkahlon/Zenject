@@ -552,6 +552,12 @@ Where:
     Container.Bind<Foo>().FromComponent(someGameObject);
     ```
 
+1. **FromSiblingComponent** - Create as a new component on the same game object where the component is being injected into.  **ResultType** must derive from UnityEngine.MonoBehaviour / UnityEngine.Component in this case
+
+    ```csharp
+    Container.Bind<Foo>().FromSiblingComponent(someGameObject);
+    ```
+
 1. **FromGameObject** - Create as a new component on a new game object.  **ResultType** must derive from UnityEngine.MonoBehaviour / UnityEngine.Component in this case
 
     ```csharp
