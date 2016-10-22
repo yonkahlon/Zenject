@@ -155,7 +155,7 @@ def installBindings():
 
     config = {
         'PathVars': {
-            'UnityExePath': 'C:/Program Files/Unity/Editor/Unity.exe',
+            'UnityExePath': 'C:/Utils/Unity/Unity5.4.1f1/Editor/Unity.exe',
             'LogPath': os.path.join(BuildDir, 'Log.txt'),
             'MsBuildExePath': 'C:/Windows/Microsoft.NET/Framework/v4.0.30319/msbuild.exe'
         },

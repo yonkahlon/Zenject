@@ -41,15 +41,15 @@ For general troubleshooting / support, please use the [zenject subreddit](http:/
     * Method injection
 * Conditional binding (eg. by type, by name, etc.)
 * Optional dependencies
-* Support for building dynamic object graphs at runtime using factories
-* Injection across different Unity scenes
-* Convention based binding, based on class name, namespace, or any other criteria
-* Support for global, project-wide bindings to add dependencies for all scenes
-* Ability to validate object graphs at editor time including dynamic object graphs created via factories
-* "Scene Decorators" which allow adding functionality to a different scene without changing it directly
+* Support for creating objects after initialization using factories
 * Nested Containers aka Sub-Containers
+* Injection across different Unity scenes to pass information from one scene to the next
+* Scene parenting, to allow one scene to inherit the bindings from another
+* Support for global, project-wide bindings to add dependencies for all scenes
+* Convention based binding, based on class name, namespace, or any other criteria
+* Ability to validate object graphs at editor time (including dynamic object graphs created via factories)
 * Commands and Signals
-* Automatic binding on components using the `ZenjectBinding` component
+* Automatic binding on components in the scene using the `ZenjectBinding` component
 * Auto-Mocking using the Moq library
 
 ## <a id="installation"></a>Installation
@@ -111,6 +111,7 @@ The tests may also be helpful to show usage for each specific feature (which you
         * <a href="#di-guidelines--recommendations">General Guidelines / Recommendations / Gotchas / Tips and Tricks</a>
 * Advanced
     * Binding
+        * <a href="#game-object-bind-methods">Game Object Bind Methods</a>
         * <a href="#optional-binding">Optional Binding</a>
         * <a href="#conditional-bindings">Conditional Bindings</a>
         * <a href="#list-bindings">List Bindings</a>
@@ -122,14 +123,16 @@ The tests may also be helpful to show usage for each specific feature (which you
         * <a href="#singleton-identifiers">Singleton Identifiers</a>
     * <a href="#scriptableobject-installer">Scriptable Object Installer</a>
     * <a href="#runtime-parameters-for-installers">Runtime Parameters For Installers</a>
-    * <a href="#commands-and-signals">Commands And Signals</a>
     * <a href="#creating-objects-dynamically">Creating Objects Dynamically Using Factories</a>
     * <a href="#update--initialization-order">Update / Initialization Order</a>
     * <a href="#zenject-order-of-operations">Zenject Order Of Operations</a>
     * <a href="#injecting-data-across-scenes">Injecting data across scenes</a>
     * <a href="#scenes-decorator">Scene Decorators</a>
     * <a href="#sub-containers-and-facades">Sub-Containers And Facades</a>
+    * <a href="#writing-tests">Writing Unit Tests / Integration Tests</a>
+    * <a href="#commands-and-signals">Commands And Signals</a>
     * <a href="#auto-mocking-using-moq">Auto-Mocking using Moq</a>
+    * <a href="#editor-windows">Creating Unity EditorWindow's with Zenject</a>
 * <a href="#questions">Frequently Asked Questions</a>
     * <a href="#isthisoverkill">Isn't this overkill?  I mean, is using statically accessible singletons really that bad?</a>
     * <a href="#aot-support">Does this work on AOT platforms such as iOS and WebGL?</a>
@@ -236,7 +239,7 @@ var bar = new Bar(foo);
 .. etc.
 ```
 
-DI frameworks such as Zenject simply help automate this process of creating and handing out all these concrete dependencies, so that you don't need to explicitly do it like in the above code.
+DI frameworks such as Zenject simply help automate this process of creating and handing out all these concrete dependencies, so that you don't need to explicitly do so yourself like in the above code.
 
 ## <a id="misconceptions"></a>Misconceptions
 
@@ -246,13 +249,13 @@ As shown in the above example, DI can be used to easily swap different implement
 
 More important than that is the fact that using a dependency injection framework like Zenject allows you to more easily follow the '[Single Responsibility Principle](http://en.wikipedia.org/wiki/Single_responsibility_principle)'.  By letting Zenject worry about wiring up the classes, the classes themselves can just focus on fulfilling their specific responsibilities.
 
-<a id="overusinginterfaces"></a>Another common mistake that people new to DI make is that they extract interfaces from every class, and use those interfaces everywhere instead of using the class directly.  The goal is to make code more loosely coupled, so it's reasonable to think that being bound to an interface is better than being bound to a concrete class.  However, in most cases the various responsibilities of an application have single, specific classes implementing them, so using interfaces in these cases just adds unnecessary maintenance overhead.  Also, concrete classes already have an interface defined by their public members.  A good rule of thumb instead is to only create interfaces when the class has more than one implementation.  This is known, by the way, as the [Reused Abstraction Principle](http://codemanship.co.uk/parlezuml/blog/?postid=934))
+<a id="overusinginterfaces"></a>Another common mistake that people new to DI make is that they extract interfaces from every class, and use those interfaces everywhere instead of using the class directly.  The goal is to make code more loosely coupled, so it's reasonable to think that being bound to an interface is better than being bound to a concrete class.  However, in most cases the various responsibilities of an application have single, specific classes implementing them, so using interfaces in these cases just adds unnecessary maintenance overhead.  Also, concrete classes already have an interface defined by their public members.  A good rule of thumb instead is to only create interfaces when the class has more than one implementation  (this is known, by the way, as the [Reused Abstraction Principle](http://codemanship.co.uk/parlezuml/blog/?postid=934))
 
 Other benefits include:
 
-* Testability - Writing automated unit tests or user-driven tests becomes very easy, because it is just a matter of writing a different 'composition root' which wires up the dependencies in a different way.  Want to only test one subsystem?  Simply create a new composition root.  Zenject also has some support for avoiding code duplication in the composition root itself (using Installers - described below).
 * Refactorability - When code is loosely coupled, as is the case when using DI properly, the entire code base is much more resilient to changes.  You can completely change parts of the code base without having those changes wreak havoc on other parts.
 * Encourages modular code - When using a DI framework you will naturally follow better design practices, because it forces you to think about the interfaces between classes.
+* Testability - Writing automated unit tests or user-driven tests becomes very easy, because it is just a matter of writing a different 'composition root' which wires up the dependencies in a different way.  Want to only test one subsystem?  Simply create a new composition root.  Zenject also has some support for avoiding code duplication in the composition root itself (using Installers - described below).
 
 Also see <a href="#isthisoverkill">here</a> for further justification for using a DI framework.
 
@@ -287,10 +290,11 @@ You can run this example by doing the following:
 * Right Click inside the Hierarchy tab and select `Zenject -> Scene Context`
 * Right Click in a folder within the Scene Heirarchy and Choose `Create -> Zenject -> MonoInstaller`.  Name it TestInstaller.cs.  (Note that you can also just directly create this file too without using this template).
 * Add your TestInstaller script to the scene (as its own GameObject or on the same GameObject as the SceneContext, it doesn't matter)
-* Add a reference to your TestInstaller to the properties of the SceneContext by adding a new row in the inspector of the "Installers" property (Increase "Size" to 1) and then dragging the TestInstaller GameObject to it
+* Add a reference to your TestInstaller to the properties of the SceneContext by adding a new row in the inspector of the "Installers" property (press the + button) and then dragging the TestInstaller GameObject to it
 * Open up TestInstaller and paste the above code into it
 * Validate your scene by either selecting Edit -> Zenject -> Validate Current Scene or hitting CTRL+SHIFT+V.  (note that this step isn't necessary but good practice to get into)
 * Run
+* Note also, that you can use the shortcut CTRL+SHIFT+R to "validate then run".  Validation is usually fast enough that this does not add a noticeable overhead to running your game, and when it does detect errors it is much faster to iterate on since you avoid the startup time.
 * Observe unity console for output
 
 The SceneContext MonoBehaviour is the entry point of the application, where Zenject sets up all the various dependencies before kicking off your scene.  To add content to your Zenject scene, you need to write what is referred to in Zenject as an 'Installer', which declares all the dependencies used in your scene and their relationships with each other.  All dependencies that are marked as "NonLazy" are automatically created at this point, as well as any dependencies that implement the standard Zenject interfaces such as `IInitializable`, `ITickable`, etc.  If the above doesn't make sense to you yet, keep reading!
@@ -374,7 +378,7 @@ Using [Inject] methods to inject dependencies is the recommended approach for Mo
     * Constructor injection forces the dependency to only be resolved once, at class creation, which is usually what you want.  In most cases you don't want to expose a public property for your initial dependencies because this suggests that it's open to changing.
     * Constructor injection guarantees no circular dependencies between classes, which is generally a bad thing to do.  You can do this however using method injection or field injection if necessary.
     * Constructor/Method injection is more portable for cases where you decide to re-use the code without a DI framework such as Zenject.  You can do the same with public properties but it's more error prone (it's easier to forget to initialize one field and leave the object in an invalid state)
-    * Finally, Constructor/Method injection makes it clear what all the dependencies of a class are when another programmer is reading the code.  They can simply look at the parameter list of the method.
+    * Finally, Constructor/Method injection makes it clear what all the dependencies of a class are when another programmer is reading the code.  They can simply look at the parameter list of the method.  This is also good because it will be more obvious when a class has too many dependencies and should therefore be split up (since it's constructor parameter list will be too long)
 
 ## <a id="binding"></a>Binding
 
@@ -413,8 +417,6 @@ The full format for the bind command is the following.  Note that in most cases 
 Container.Bind&lt;<b>ContractType</b>&gt;()
     .To&lt;<b>ResultType</b>&gt;()
     .From<b>ConstructionMethod</b>()
-    .WithGameObjectName(<b>GameObjectName</b>)
-    .UnderGameObjectGroup(<b>GameObjectGroup</b>)
     .As<b>Scope</b>()
     .WithArguments(<b>Arguments</b>)
     .When(<b>Condition</b>)
@@ -438,21 +440,13 @@ Where:
     * Default: FromNew()
     * Examples: eg. FromGetter, FromMethod, FromPrefab, FromResolve, FromSubContainerResolve, FromInstance, etc.
 
-* **WithGameObjectName** = The name to give the new Game Object associated with this binding.
-
-    * Note that this method is only available for bindings that use construction methods that relate to MonoBehaviour's such as FromPrefab
-
-* **UnderGameObjectGroup** = The name of the game object group to place the new game object under.  This is especially useful for factories, which can be used to create many copies of a prefab for example.
-
-    * Note that this method is only available for bindings that use construction methods that relate to MonoBehaviour's such as FromPrefab
-
 * **Scope** = This value determines how often (or if at all) the generated instance is re-used across multiple injections.
 
     * Default: AsTransient
     * It can be one of the following:
-        1. AsTransient - Will not re-use the instance at all.  Every time **ContractType** is requested, the DiContainer will return a brand new instance of type **ResultType**
-        2. AsCached - Will re-use the same instance of **ResultType** every time **ContractType** is requested, which it will lazily generate upon first use
-        3. AsSingle - Will re-use the same instance of **ResultType** across the entire DiContainer, which it will lazily generate upon first use.  It can be thought of as a stronger version of AsCached, because it allows you to bind to the same instance across multiple bind commands.  It will also ensure that there is only ever exactly one instance of **ResultType** in the DiContainer (ie. it will enforce **ResultType** to be a 'Singleton' hence the name).
+        1. **AsTransient** - Will not re-use the instance at all.  Every time **ContractType** is requested, the DiContainer will return a brand new instance of type **ResultType**
+        2. **AsCached** - Will re-use the same instance of **ResultType** every time **ContractType** is requested, which it will lazily generate upon first use
+        3. **AsSingle** - Will re-use the same instance of **ResultType** across the entire DiContainer, which it will lazily generate upon first use.  It can be thought of as a stronger version of AsCached, because it allows you to bind to the same instance across multiple bind commands.  It will also ensure that there is only ever exactly one instance of **ResultType** in the DiContainer (ie. it will enforce **ResultType** to be a 'Singleton' hence the name).
 
     * In most cases, you will likely want to just use AsSingle, however AsTransient and AsCached have their uses too.
     * To illustrate the difference between the different scope types, see the following example:
@@ -1031,6 +1025,33 @@ The final property you will notice on the ZenjectBinding component is the "Conte
     * The above binding is almost certainly not what you want to do, because it will create an instance of Foo for every interface that Foo has.  Instead, you almost certainly want to use either `AsCached` or `AsSingle` in this case
 
 Please feel free to submit any other sources of confusion to sfvermeulen@gmail.com and I will add it here.
+
+## <a id="game-object-bind-methods"></a>Game Object Bind Methods
+
+For bindings that create new game objects (eg. FromPrefab or FromGameObject) there are also two extra bind methods
+
+* **WithGameObjectName** = The name to give the new Game Object associated with this binding.
+
+    ```csharp
+    Container.Bind<Foo>().FromPrefabResource("Some/Path/Foo").WithGameObjectName("Foo1");
+    Container.Bind<Foo>().FromGameObject().WithGameObjectName("Foo2");
+    ```
+
+* **UnderTransformGroup(string)** = The name of the transform group to place the new game object under.  This is especially useful for factories, which can be used to create many copies of a prefab, so it can be nice to have them automatically grouped together within the scene heirarchy.
+
+    ```csharp
+    Container.BindFactory<Bullet, Bullet.Factory>()
+        .FromPrefab(BulletPrefab)
+        .UnderTransformGroup("Bullets");
+    ```
+
+* **UnderTransform(Transform)** = The actual transform to place the new game object under.
+
+    ```csharp
+    Container.BindFactory<Bullet, Bullet.Factory>()
+        .FromPrefab(BulletPrefab)
+        .UnderTransform(BulletTransform);
+    ```
 
 ## <a id="optional-binding"></a>Optional Binding
 
@@ -1880,9 +1901,17 @@ Note also that you can add a decorator scene for another decorator scene, and th
 
 See <a href="Documentation/SubContainers.md">here</a>.
 
+## <a id="writing-tests"></a>Writing Unit Tests / Integration Tests
+
+See <a href="Documentation/WritingTests.md">here</a>.
+
 ## <a id="auto-mocking-using-moq"></a>Auto-Mocking using Moq
 
 See <a href="Documentation/AutoMocking.md">here</a>.
+
+## <a id="editor-windows"></a>Creating Unity EditorWindow's with Zenject
+
+TBD
 
 ## <a id="questions"></a>Frequently Asked Questions
 
