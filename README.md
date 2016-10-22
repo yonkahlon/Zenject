@@ -267,7 +267,7 @@ public class TestInstaller : MonoInstaller
 {
     public override void InstallBindings()
     {
-        Container.BindInstance("Hello World!");
+        Container.Bind<string>().FromInstance("Hello World!");
         Container.Bind<TestRunner>().NonLazy();
     }
 }

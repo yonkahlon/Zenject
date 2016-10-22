@@ -119,21 +119,13 @@ namespace Zenject
         public void Validate()
         {
             Assert.That(IsValidating);
-            try
-            {
-                Install();
-                Resolve();
 
-                Assert.That(_container.IsValidating);
+            Install();
+            Resolve();
 
-                _container.ValidateIValidatables();
+            Assert.That(_container.IsValidating);
 
-                Log.Info("Scene '{0}' Validated Successfully", this.gameObject.scene.name);
-            }
-            catch (Exception e)
-            {
-                Log.ErrorException("Scene '{0}' Failed Validation!".Fmt(this.gameObject.scene.name), e);
-            }
+            _container.ValidateIValidatables();
         }
 #endif
 

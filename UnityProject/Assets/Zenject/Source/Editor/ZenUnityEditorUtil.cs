@@ -1,5 +1,6 @@
 #if !NOT_UNITY3D
 
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -21,7 +22,16 @@ namespace Zenject
 
             foreach (var sceneContext in GetAllSceneContexts())
             {
-                sceneContext.Validate();
+                try
+                {
+                    sceneContext.Validate();
+                }
+                catch (Exception e)
+                {
+                    // Add a bit more context
+                    throw new ZenjectException(
+                        "Scene '{0}' Failed Validation!".Fmt(sceneContext.gameObject.scene.name), e);
+                }
             }
         }
 
@@ -32,7 +42,16 @@ namespace Zenject
 
             foreach (var sceneContext in GetAllSceneContexts())
             {
-                sceneContext.Run();
+                try
+                {
+                    sceneContext.Run();
+                }
+                catch (Exception e)
+                {
+                    // Add a bit more context
+                    throw new ZenjectException(
+                        "Scene '{0}' Failed To Start!".Fmt(sceneContext.gameObject.scene.name), e);
+                }
             }
         }
 
