@@ -5,7 +5,7 @@ using Assert=ModestTree.Assert;
 namespace Zenject.Tests.Other
 {
     [TestFixture]
-    public class TestInheritInSubContainers : ZenjectUnitTestFixture
+    public class TestCopyIntoAllSubContainers : ZenjectUnitTestFixture
     {
         [Test]
         public void TestFromNew1()
@@ -20,7 +20,7 @@ namespace Zenject.Tests.Other
         [Test]
         public void TestFromNew2()
         {
-            Container.Bind<Foo>().AsSingle().InheritInSubContainers();
+            Container.Bind<Foo>().AsSingle().CopyIntoAllSubContainers();
 
             var sub1 = Container.CreateSubContainer();
 
@@ -30,7 +30,7 @@ namespace Zenject.Tests.Other
         [Test]
         public void TestFromResolve()
         {
-            Container.Bind<IBar>().To<Bar>().FromResolve().InheritInSubContainers();
+            Container.Bind<IBar>().To<Bar>().FromResolve().CopyIntoAllSubContainers();
             Container.Bind<Bar>().AsSingle();
 
             var sub1 = Container.CreateSubContainer();

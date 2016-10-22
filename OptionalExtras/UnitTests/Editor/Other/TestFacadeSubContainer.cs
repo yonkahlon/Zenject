@@ -24,7 +24,7 @@ namespace Zenject.Tests.Other
             var container = new DiContainer();
 
             container.Bind(typeof(TickableManager), typeof(InitializableManager), typeof(DisposableManager))
-                .ToSelf().AsSingle().InheritInSubContainers();
+                .ToSelf().AsSingle().CopyIntoAllSubContainers();
 
             // This is how you add ITickables / etc. within sub containers
             container.BindAllInterfacesAndSelf<FooKernel>()

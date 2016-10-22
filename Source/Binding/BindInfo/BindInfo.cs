@@ -31,7 +31,7 @@ namespace Zenject
             ToTypes = new List<Type>();
             Arguments = new List<TypeValuePair>();
             ToChoice = ToChoices.Self;
-            InheritInSubContainers = false;
+            CopyIntoAllSubContainers = false;
             NonLazy = false;
             Scope = ScopeTypes.Transient;
             InvalidBindResponse = InvalidBindResponses.Assert;
@@ -59,7 +59,7 @@ namespace Zenject
             set;
         }
 
-        public bool InheritInSubContainers
+        public bool CopyIntoAllSubContainers
         {
             get;
             set;
