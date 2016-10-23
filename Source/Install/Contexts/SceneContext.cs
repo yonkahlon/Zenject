@@ -23,7 +23,7 @@ namespace Zenject
 
         [Tooltip("Optional contract names for this SceneContext, allowing contexts in subsequently loaded scenes to depend on it and be parented to it, and also for previously loaded decorators to be included")]
         [SerializeField]
-        readonly List<string> _contractNames = new List<string>();
+        List<string> _contractNames = new List<string>();
 
         [Tooltip("Optional contract name of a SceneContext in a previously loaded scene that this context depends on and to which it must be parented")]
         [SerializeField]

@@ -43,6 +43,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Binding\Binders\CopyIntoSubContainersBinder.cs" />
     <Compile Include="Binding\BindInfo\GameObjectCreationParameters.cs" />
     <Compile Include="Install\Contexts\ContextUtil.cs" />
     <Compile Include="Install\InstallerBase.cs" />
@@ -148,7 +149,6 @@
     <Compile Include="Providers\Singleton\SingletonImplIds.cs" />
     <Compile Include="Providers\Singleton\Prefab\PrefabSingletonProviderCreator.cs" />
     <Compile Include="Providers\Singleton\SingletonId.cs" />
-    <Compile Include="Binding\Binders\InheritInSubContainersBinder.cs" />
     <Compile Include="Providers\Singleton\SingletonTypes.cs" />
     <Compile Include="Providers\Singleton\Standard\StandardSingletonProviderCreator.cs" />
     <Compile Include="Providers\ResourceProvider.cs" />
@@ -217,6 +217,9 @@
     <Compile Include="Util\ValidationUtil.cs" />
     <Compile Include="Validation\ValidationMarker.cs" />
     <Compile Include="Binding\Binders\NonLazyBinder.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Editor\Testing\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
