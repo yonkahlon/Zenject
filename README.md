@@ -1953,7 +1953,74 @@ See <a href="Documentation/AutoMocking.md">here</a>.
 
 ## <a id="editor-windows"></a>Creating Unity EditorWindow's with Zenject
 
-TBD
+If you need to add your own Unity plugin, and you want to create your own EditorWindow derived class, then you might consider using Zenject to help manage this code as well.  Let's go through an example of how you might do this:
+
+1. Right click underneath an Editor folder in your project view then select `Create -> Zenject -> Editor Window`.  Let's call it TimerWindow.
+2. Open your new editor window by selecting the menu item `Window -> TimerWindow`.
+3. Right now it is empty, so let's add some content to it.  Open it up and replace the contents with the following:
+
+```csharp
+public class TimerWindow : ZenjectEditorWindow
+{
+    TimerController.State _timerState = new TimerController.State();
+
+    [MenuItem("Window/TimerWindow")]
+    public static TimerWindow GetOrCreateWindow()
+    {
+        var window = EditorWindow.GetWindow<TimerWindow>();
+        window.titleContent = new GUIContent("TimerWindow");
+        return window;
+    }
+
+    public override void InstallBindings()
+    {
+        Container.BindInstance(_timerState);
+        Container.BindAllInterfaces<TimerController>().To<TimerController>().AsSingle();
+    }
+
+    class TimerController : IGuiRenderable, ITickable, IInitializable
+    {
+        readonly State _state;
+
+        public TimerController(State state)
+        {
+            _state = state;
+        }
+
+        public void Initialize()
+        {
+            Debug.Log("TimerController initialized");
+        }
+
+        public void GuiRender()
+        {
+            GUI.Label(new Rect(25, 25, 200, 200), "Tick Count: " + _state.TickCount);
+
+            if (GUI.Button(new Rect(25, 50, 200, 50), "Restart"))
+            {
+                _state.TickCount = 0;
+            }
+        }
+
+        public void Tick()
+        {
+            _state.TickCount++;
+        }
+
+        [Serializable]
+        public class State
+        {
+            public int TickCount;
+        }
+    }
+}
+```
+
+In the InstallBindings method for your ZenjectEditorWindow, you can add IInitializable, ITickable, and IDisposable bindings just like you do within your scenes.  There is also a new interface called `IGuiRenderable` that you can use to draw content to the window by using Unity's immediate mode gui.
+
+Note that every time your code is compiled again within Unity, your editor window is reloaded.  InstallBindings is called again and all your classes are created again from scratch.  This means that any state information you may have stored in member variables will be reset.  However, the member fields in EditorWindow derived class itself is serialized, so you can take advantage of this to have state persist across re-compiles.  In the example above, we are able to have the current tick count persist by wrapping it in a Serializable class and including this as a member inside our EditorWindow.
+
+Something else to note is that the rate at which the ITickable.Tick method gets fired can change depending on what you have on focus.  If you run our timer window, then select another window other than Unity, you can see what I mean.  (Tick Count increments much more slowly)
 
 ## <a id="questions"></a>Frequently Asked Questions
 
