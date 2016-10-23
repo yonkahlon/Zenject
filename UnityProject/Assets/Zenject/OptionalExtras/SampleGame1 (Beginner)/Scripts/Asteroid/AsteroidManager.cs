@@ -34,6 +34,14 @@ namespace Zenject.Asteroids
             _level = level;
         }
 
+        public IEnumerable<Asteroid> Asteroids
+        {
+            get
+            {
+                return _asteroids;
+            }
+        }
+
         public void Start()
         {
             Assert.That(!_started);

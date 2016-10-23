@@ -9,7 +9,7 @@ namespace Zenject.Asteroids
 {
     public class GameInstaller : MonoInstaller
     {
-        [SerializeField]
+        [Inject]
         Settings _settings = null;
 
         public override void InstallBindings()

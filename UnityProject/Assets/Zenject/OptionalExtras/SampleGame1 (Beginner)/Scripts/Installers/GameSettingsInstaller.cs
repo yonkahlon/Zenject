@@ -21,11 +21,12 @@ namespace Zenject.Asteroids
     //
     // Uncomment if you want to add alternative game settings
     //[CreateAssetMenu(menuName = "Asteroids/Game Settings")]
-    public class GameSettingsInstaller : ScriptableObjectInstaller
+    public class GameSettingsInstaller : ScriptableObjectInstaller<GameSettingsInstaller>
     {
         public ShipSettings Ship;
         public AsteroidSettings Asteroid;
         public AudioHandler.Settings AudioHandler;
+        public GameInstaller.Settings GameInstaller;
 
         // We use nested classes here to group related settings together
         [Serializable]
@@ -51,6 +52,7 @@ namespace Zenject.Asteroids
             Container.BindInstance(Asteroid.Spawner);
             Container.BindInstance(Asteroid.General);
             Container.BindInstance(AudioHandler);
+            Container.BindInstance(GameInstaller);
         }
     }
 }

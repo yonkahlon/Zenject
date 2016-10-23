@@ -1,4 +1,6 @@
 
+## Writing Automated Unit Tests and Integration Tests
+
 When writing properly loosely coupled code using dependency injection, it is much easier to isolate specific areas of your code base for the purposes of running tests on them without needing to fire up your entire project.  This can take the form of user-driven test-beds or fully automated tests using NUnit.  Automated tests are especially useful when used with a continuous integration server.  This allows you to automatically run the tests whenever new commits are pushed to source control.
 
 There are two very basic helper classes included with Zenject that can make it easier to write automated tests for your game.  One is for Unit tests and the other is for Integration tests.  Both approaches are run via Unity's built in Editor Test Runner (which also has a command line interface that you can hook up to a continuous integration server).  The main difference between the two is that Unit Tests are much smaller in scope and meant for testing a small subset of the classes in your application, whereas Integration Tests can be more expansive and can involve firing up many different systems.
@@ -241,7 +243,7 @@ Limitations:
 
 ### User Driven Test Beds
 
-A third common approach to testing worth mentioning is User Driven Test Beds.  This just involves creating a new scene with a SceneContext etc. just as you do for production scenes, except installing only a subset of the bindings that you would normally include in the production scenes, or possibly mocking out certain parts that you don't need to test.  Then, by iterating on the system you are working on using this test bed, it can be much faster to make progress rather than needing to fire up your normal production scene.
+A third common approach to testing worth mentioning is User Driven Test Beds.  This just involves creating a new scene with a SceneContext etc. just as you do for production scenes, except installing only a subset of the bindings that you would normally include in the production scenes, and possibly mocking out certain parts that you don't need to test.  Then, by iterating on the system you are working on using this test bed, it can be much faster to make progress rather than needing to fire up your normal production scene.
 
 This might also be necessary if the functionality you want to test is too complex for a unit test or an integration test.
 

@@ -8,7 +8,7 @@ namespace Zenject.SpaceFighter
     // Main installer for our game
     public class GameInstaller : MonoInstaller
     {
-        [SerializeField]
+        [Inject]
         Settings _settings = null;
 
         public override void InstallBindings()
