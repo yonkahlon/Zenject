@@ -115,7 +115,7 @@ The tests may also be helpful to show usage for each specific feature (which you
         * <a href="#optional-binding">Optional Binding</a>
         * <a href="#conditional-bindings">Conditional Bindings</a>
         * <a href="#list-bindings">List Bindings</a>
-        * <a href="#global-bindings">Global Bindings</a>
+        * <a href="#global-bindings">Global Bindings Using Project Context</a>
         * <a href="#identifiers">Identifiers</a>
         * <a href="#non-generic-bindings">Non Generic bindings</a>
         * <a href="#convention-based-bindings">Convention Based Binding</a>
@@ -127,6 +127,7 @@ The tests may also be helpful to show usage for each specific feature (which you
     * <a href="#update--initialization-order">Update / Initialization Order</a>
     * <a href="#zenject-order-of-operations">Zenject Order Of Operations</a>
     * <a href="#injecting-data-across-scenes">Injecting data across scenes</a>
+    * <a href="#scene-parenting">Scene Parenting Using Contract Names</a>
     * <a href="#scenes-decorator">Scene Decorators</a>
     * <a href="#sub-containers-and-facades">Sub-Containers And Facades</a>
     * <a href="#writing-tests">Writing Unit Tests / Integration Tests</a>
@@ -416,6 +417,7 @@ The full format for the bind command is the following.  Note that in most cases 
 <pre>
 Container.Bind&lt;<b>ContractType</b>&gt;()
     .To&lt;<b>ResultType</b>&gt;()
+    .WithId(<b>Identifier</b>)
     .From<b>ConstructionMethod</b>()
     .As<b>Scope</b>()
     .WithArguments(<b>Arguments</b>)
@@ -434,6 +436,8 @@ Where:
 
     * Default: **ContractType**
     * This type must either to equal to **ContractType** or derive from **ContractType**.  If unspecified, it assumes ToSelf(), which means that the **ResultType** will be the same as the **ContractType**.  This value will be used by whatever is given as the **ConstructionMethod** to retrieve an instance of this type
+
+* **Identifier** = The value to use to uniquely identify the binding.  This can be ignored in most cases, but can be quite useful in cases where you need to distinguish between multiple bindings with the same contract type.  See <a href="#identifiers">here</a> for details.
 
 * **ConstructionMethod** = The method by which an instance of **ResultType** is created/retrieved.  See <a href="#construction-methods">this section</a> for more details on the various construction methods.
 
@@ -1194,7 +1198,7 @@ public class Bar
 
 Also, if the empty list is valid, then you should mark your List constructor parameter (or [Inject] field) as optional (see <a href="#optional-binding">here</a> for details).
 
-## <a id="global-bindings"></a>Global Bindings
+## <a id="global-bindings"></a>Global Bindings Using Project Context
 
 This all works great for each individual scene, but what if you have dependencies that you wish to persist permanently across all scenes?  In Zenject you can do this by adding installers to a ProjectContext object.
 
@@ -1202,11 +1206,13 @@ To do this, first you need to create a prefab for the ProjectContext, and then y
 
 If you click on this it will appear nearly identically to the inspector for `SceneContext`.  The easiest way to configure this prefab is to temporarily add it to your scene, add Installers to it, then click "Apply" to save it back to the prefab before deleting it from your scene.  In addition to installers, you can also add your own custom MonoBehaviour classes to the ProjectContext object directly.
 
-Then, when you start any scene that contains a `SceneContext`, your `ProjectContext` object will always be initialized first.  All the installers you add here will be executed and the bindings that you add within them will be available for use in all scenes within your project.
+Then, when you start any scene that contains a `SceneContext`, your `ProjectContext` object will always be initialized first.  All the installers you add here will be executed and the bindings that you add within them will be available for use in all scenes within your project.  The `ProjectContext` game object is set as <a href="https://docs.unity3d.com/ScriptReference/Object.DontDestroyOnLoad.html">DontDestroyOnLoad</a> so it will not be destroyed when changing scenes.
 
 Note also that this only occurs once.  If you load another scene from the first scene, your ProjectContext will not be called again and the bindings that it added previously will persist into the new scene.  You can declare `ITickable` / `IInitializable` / `IDisposable` objects in your global installers in the same way you do for your scene installers with the result being that `IInitializable.Initialize` is called only once across each play session and `IDisposable.Dispose` is only called once the application is fully stopped.
 
-This works because the container defined for each scene is nested inside the global container that your global installers bind into.  For more information on nested containers see <a href="#sub-containers-and-facades">here</a>.
+The reason that all the bindings you add to a global installer are available for any classes within each individual scene, is because the Container in each scene uses the ProjectContext Container as it's "parent".  For more information on nested containers see <a href="#sub-containers-and-facades">here</a>.
+
+ProjectContext is a very convenient place to put objects that you want to persist across scenes.  However, the fact that it's completely global to every scene can lead to some unintended behaviour.  For example, this means that even if you write a simple test scene that uses Zenject, it will load the ProjectContext, which may not be what you want.  To address these problems it is sometimes better to use Scene Parenting instead, since that approach allows you to be selective in terms of which scenes inherit the same common bindings.  See <a href="#scene-parenting">here</a> for more details on that approach.
 
 ## <a id="identifiers"></a>Identifiers
 
@@ -1262,229 +1268,6 @@ Container.Bind<Camera>().WithId(Cameras.Player).FromInstance(MyPlayerCamera);
 ```
 
 You can also use custom types, as long as they implement the `Equals` operator.
-
-## <a id="non-generic-bindings"></a>Non Generic bindings
-
-In some cases you may not know the exact type you want to bind at compile time.  In these cases you can use the overload of the `Bind` method which takes a `System.Type` value instead of a generic parameter.
-
-```csharp
-// These two lines will result in the same behaviour
-Container.Bind(typeof(Foo));
-Container.Bind<Foo>();
-```
-
-Note also that when using non generic bindings, you can pass multiple arguments:
-
-```csharp
-Container.Bind(typeof(Foo), typeof(Bar), typeof(Qux)).AsSingle();
-
-// The above line is equivalent to these three:
-Container.Bind<Foo>().AsSingle();
-Container.Bind<Bar>().AsSingle();
-Container.Bind<Qux>().AsSingle();
-```
-
-The same goes for the To method:
-
-```csharp
-Container.Bind<IFoo>().To(typeof(Foo), typeof(Bar)).AsSingle();
-
-// The above line is equivalent to these two:
-Container.Bind<IFoo>().To<Foo>().AsSingle();
-Container.Bind<IFoo>().To<Bar>().AsSingle();
-```
-
-You can also do both:
-
-```csharp
-Container.Bind(typeof(IFoo), typeof(IBar)).To(typeof(Foo1), typeof(Foo2)).AsSingle();
-
-// The above line is equivalent to these:
-Container.Bind<IFoo>().To<Foo>().AsSingle();
-Container.Bind<IFoo>().To<Bar>().AsSingle();
-Container.Bind<IBar>().To<Foo>().AsSingle();
-Container.Bind<IBar>().To<Bar>().AsSingle();
-```
-
-This can be especially useful when you have a class that implements multiple interfaces:
-
-```csharp
-Container.Bind(typeof(ITickable), typeof(IInitializable), typeof(IDisposable)).To<Foo>().AsSingle();
-```
-
-Though in this particular example there is already a built-in shortcut method for this:
-
-```csharp
-Container.BindAllInterfaces<Foo>().To<Foo>().AsSingle();
-```
-
-## <a id="convention-based-bindings"></a>Convention Based Binding
-
-Convention based binding can come in handy in any of the following scenarios:
-
-- You want to define a naming convention that determines how classes are bound to the container (eg. using a prefix, suffix, or regex)
-- You want to use custom attributes to determine how classes are bound to the container
-- You want to automatically bind all classes that implement a given interface within a given namespace or assembly
-
-Using "convention over configuration" can allow you to define a framework that other programmers can use to quickly and easily get things done, instead of having to explicitly add every binding within installers.  This is the philosophy that is followed by frameworks like Ruby on Rails, ASP.NET MVC, etc.  Of course, there are both advantages and disadvantages to this approach.
-
-They are specified in a similar way to <a href="#non-generic-bindings">Non Generic bindings</a>, except instead of giving a list of types to the `Bind()` and `To()` methods, you describe the convention using a Fluent API.  For example, to bind `IFoo` to every class that implements it in the entire codebase:
-
-```csharp
-Container.Bind<IFoo>().To(x => x.AllTypes().DerivingFrom<IFoo>());
-```
-
-Note that you can use the same Fluent API in the `Bind()` method as well, and you can also use it in both `Bind()` and `To()` at the same time.
-
-For more examples see the <a href="#convention-binding-examples">examples</a> section below.  The full format is as follows:
-
-<pre>
-x.<b>InitialList</b>().<b>Conditional</b>().<b>AssemblySources</b>()
-</pre>
-
-###Where:
-
-* **InitialList** = The initial list of types to use for our binding.  This list will be filtered by the given **Conditional**s.  It can be one of the following (fairly self explanatory) methods:
-
-    1. **AllTypes**
-    1. **AllNonAbstractClasses**
-    1. **AllAbstractClasses**
-    1. **AllInterfaces**
-    1. **AllClasses**
-
-* **Conditional** = The filter to apply to the list of types given by **InitialList**.  Note that you can chain as many of these together as you want, and they will all be applied to the initial list in sequence.  It can be one of the following:
-
-    1. **DerivingFrom**<T> - Only match types deriving from `T`
-    1. **DerivingFromOrEqual**<T> - Only match types deriving from or equal to `T`
-    1. **WithPrefix**(value) - Only match types with names that start with `value`
-    1. **WithSuffix**(value) - Only match types with names that end with `value`
-    1. **WithAttribute**<T> - Only match types that have the attribute `[T]` above their class declaration
-    1. **WithoutAttribute**<T> - Only match types that do not have the attribute `[T]` above their class declaration
-    1. **WithAttributeWhere**<T>(predicate) - Only match types that have the attribute `[T]` above their class declaration AND in which the given predicate returns true when passed the attribute.  This is useful so you can use data given to the attribute to create bindings
-    1. **InNamespace**(value) - Only match types that are in the given namespace
-    1. **InNamespaces**(value1, value2, etc.) - Only match types that are in any of the given namespaces
-    1. **MatchingRegex**(pattern) - Only match types that match the given regular expression
-    1. **Where**(predicate) - Finally, you can also add any kind of conditional logic you want by passing in a predicate that takes a `Type` parameter
-
-* **AssemblySources** = The list of assemblies to search for types when populating **InitialList**.  It can be one of the following:
-
-    1. **FromAllAssemblies** - Look up types in all loaded assemblies.  This is the default when unspecified.
-    1. **FromAssemblyContaining**<T> - Look up types in whatever assembly the type `T` is in
-    1. **FromAssembliesContaining**(type1, type2, ..) - Look up types in all assemblies that contains any of the given types
-    1. **FromThisAssembly** - Look up types only in the assembly in which you are calling this method
-    1. **FromAssembly**(assembly) - Look up types only in the given assembly
-    1. **FromAssemblies**(assembly1, assembly2, ...) - Look up types only in the given assemblies
-    1. **FromAssembliesWhere**(predicate) - Look up types in all assemblies that match the given predicate
-
-###<a id="convention-binding-examples"></a>Examples:
-
-Note that you can chain together any combination of the below conditionals in the same binding.  Also note that since we aren't specifying an assembly here, Zenject will search within all loaded assemblies.
-
-1. Bind `IFoo` to every class that implements it in the entire codebase:
-
-    ```csharp
-    Container.Bind<IFoo>().To(x => x.AllTypes().DerivingFrom<IFoo>());
-    ```
-
-    Note that this will also have the same result:
-
-    ```csharp
-    Container.Bind<IFoo>().To(x => x.AllNonAbstractTypes());
-    ```
-
-    This is because Zenject will skip any bindings in which the concrete type does not actually derive from the base type.  Also note that in this case we have to make sure we use `AllNonAbstractTypes` instead of just `AllTypes`, to ensure that we don't bind `IFoo` to itself
-
-1. Bind an interface to all classes implementing it within a given namespace
-
-    ```csharp
-    Container.Bind<IFoo>().To(x => x.AllTypes().DerivingFrom<IFoo>().InNamespace("MyGame.Foos"));
-    ```
-
-1. Auto-bind `IController` every class that has the suffix "Controller" (as is done in ASP.NET MVC):
-
-    ```csharp
-    Container.Bind<IController>().To(x => x.AllNonAbstractTypes().WithSuffix("Controller"));
-    ```
-
-    You could also do this using `MatchingRegex`:
-
-    ```csharp
-    Container.Bind<IController>().To(x => x.AllNonAbstractTypes().MatchingRegex("Controller$"));
-    ```
-
-1. Bind all types with the prefix "Widget" and inject into Foo
-
-    ```csharp
-    Container.Bind<object>().To(x => x.AllNonAbstractTypes().WithPrefix("Widget")).WhenInjectedInto<Foo>();
-    ```
-
-1. Auto-bind the interfaces that are used by every type in a given namespace
-
-    ```csharp
-    Container.Bind(x => x.AllInterfaces())
-        .To(x => x.AllNonAbstractClasses().InNamespace("MyGame.Things"));
-    ```
-
-    This is equivalent to calling `Container.BindAllInterfaces<T>().To<T>()` for every type in the namespace "MyGame.Things".  This works because, as touched on above, Zenject will skip any bindings in which the concrete type does not actually derive from the base type.  So even though we are using `AllInterfaces` which matches every single interface in every single loaded assembly, this is ok because it will not try and bind an interface to a type that doesn't implement this interface.
-
-## <a id="unbind-rebind"></a>Unbind / Rebind
-
-It is also possible to remove or replace bindings that were added in another bind statement.  This is especially useful when used in combination with <a href="#scenes-decorator">Scene Decorators</a>
-
-1. Unbind - Remove binding from container.
-
-    ```csharp
-    Container.Bind<IFoo>().To<Foo>();
-
-    // This will nullify the above statement
-    Container.Unbind<IFoo>();
-    ```
-
-1. Rebind - Override an existing binding with a new one.  This is equivalent to calling unbind with the given type and then immediately calling bind afterwards.
-
-    ```csharp
-    Container.Bind<IFoo>().To<Foo>();
-
-    // 
-    Container.Rebind<IFoo>().To<Bar>();
-    ```
-
-## <a id="singleton-identifiers"></a>Singleton Identifiers
-
-In addition to <a href="#identifiers">normal identifiers</a>, you can also assign an identifer to a given singleton.
-
-This allows you to force Zenject to create multiple singletons instead of just one, since otherwise the singleton is uniquely identified based on the type given as generic argument to the `To<>` method.  So for example:
-
-```csharp
-Container.Bind<IFoo>().To<Foo>().AsSingle();
-Container.Bind<IBar>().To<Foo>().AsSingle();
-Container.Bind<IQux>().To<Qux>().AsSingle();
-```
-
-In the above code, both `IFoo` and `IBar` will be bound to the same instance.  Only one instance of Foo will be created.
-
-```csharp
-Container.Bind<IFoo>().To<Foo>().AsSingle("foo1");
-Container.Bind<IBar>().To<Foo>().AsSingle("foo2");
-```
-
-In this case however, two instances will be created.
-
-Another use case for this is to allow creating multiple singletons from the same prefab.  For example, Given the following:
-
-```csharp
-Container.Bind<Foo>().FromPrefab(MyPrefab).AsSingle();
-Container.Bind<Bar>().FromPrefab(MyPrefab).AsSingle();
-```
-
-It will only instantiate the prefab MyPrefab once, since the singleton is identified solely by the prefab when using `FromPrefab`.  The concrete type given can be interpreted as "Search the instantiated prefab for this component".  But, if instead you want Zenject to instantiate a new instance of the prefab for each `FromPrefab` binding, then you can do that as well by supplying an identifier to the `AsSingle` function like this:
-
-```csharp
-Container.Bind<Foo>().FromPrefab(MyPrefab).AsSingle("foo");
-Container.Bind<Bar>().FromPrefab(MyPrefab).AsSingle("bar");
-```
-
-Now two instances of the prefab will be created.
 
 ## <a id="scriptableobject-installer"></a>Scriptable Object Installer
 
@@ -1658,7 +1441,7 @@ See <a href="Documentation/Factories.md">here</a>.
 
 In many cases, especially for small projects, the order that classes update or initialize in does not matter.  However, in larger projects update or initialization order can become an issue.  This can especially be an issue in Unity, since it is often difficult to predict in what order the Start(), Awake(), or Update() methods will be called in.  Unfortunately, Unity does not have an easy way to control this (besides in `Edit -> Project Settings -> Script Execution Order`, though that can be awkward to use)
 
-In Zenject, by default, ITickables and IInitializables are updated in the order that they are added, however for cases where the update or initialization order does matter, there is a much better way:  By specifying their priorities explicitly in the installer.  For example, in the sample project you can find this code in the scene installer:
+In Zenject, by default, ITickables and IInitializables are called in the order that they are added, however for cases where the update or initialization order does matter, there is a much better way:  By specifying their priorities explicitly in the installer.  For example, in the sample project you can find this code in the scene installer:
 
 ```csharp
 public class AsteroidsInstaller : MonoInstaller
@@ -1712,7 +1495,7 @@ A Zenject driven application is executed by the following steps:
 
 * Unity Awake() phase begins
     * SceneContext.Awake() method is called.  This should always be the first thing executed in your scene.  It should work this way by default (see <a href="#bad-execution-order">here</a> if you are noticing otherwise).
-    * If this is the first scene to be loaded during this play session, SceneContext will create the ProjectContext prefab.  If ProjectContext has already been created by a previous scene, we skip to step 10 to directly initialize the SceneContext
+    * If this is the first scene to be loaded during this play session, SceneContext will create the ProjectContext prefab.  If ProjectContext has already been created by a previous scene, we skip this step and directly initialize the SceneContext
     * ProjectContext iterates through all the Installers that have been added to its prefab via the Unity Inspector, updates them to point to its DiContainer, then calls InstallBindings() on each.  Each Installer calls some number of Bind<> methods on the DiContainer.
     * ProjectContext then injects all MonoBehaviours attached to its game object as well as its children
     * ProjectContext then constructs all the non-lazy root objects, which includes any classes that derive from ITickable / IInitializable or IDisposable, as well as those classes that are added with a `NonLazy()` binding.
@@ -1724,11 +1507,11 @@ A Zenject driven application is executed by the following steps:
 * Unity Start() phase begins
     * ProjectContext.Start() method is called.  This will trigger the Initialize() method on all `IInitializable` objects in the order specified in the ProjectContext installers.
     * SceneContext.Start() method is called.  This will trigger the Initialize() method on all `IInitializable` objects in the order specified in the SceneContext installers.
-    * All other MonoBehaviour's in your scene has their Start() method called
+    * All other MonoBehaviour's in your scene have their Start() method called
 * Unity Update() phase begins
     * ProjectContext.Update() is called, which results in Tick() being called for all `ITickable` objects (in the order specified in the ProjectContext installers)
     * SceneContext.Update() is called, which results in Tick() being called for all `ITickable` objects (in the order specified in the SceneContext installers)
-    * All other MonoBehaviour's in your scene has their Update() method called
+    * All other MonoBehaviour's in your scene have their Update() method called
 * These same steps repeated for LateUpdate and ILateTickable
 * At the same time, These same steps are repeated for FixedUpdate according to the physics timestep
 * Unity scene is unloaded
@@ -1785,7 +1568,7 @@ public class Foo
 
     public void AdvanceScene()
     {
-        _sceneLoader.LoadScene("NameOfSceneToLoad", (container) =>
+        _sceneLoader.LoadScene("NameOfSceneToLoad", LoadSceneMode.Single, (container) =>
             {
                 container.BindInstance("custom_level").WhenInjectedInto<LevelHandler>();
             });
@@ -1860,20 +1643,41 @@ public class Foo
 }
 ```
 
-The `ZenjectSceneLoader` class also allows for more complex scenarios, such as loading a scene as a "child" of the current scene, which would cause the new scene to inherit all the dependencies in the current scene.
+The `ZenjectSceneLoader` class also allows for more complex scenarios, such as loading a scene as a "child" of the current scene, which would cause the new scene to inherit all the dependencies in the current scene.  However, it is often better to use 'Scene Contract Names' for this instead.  See <a href="#scene-parenting">here</a> for details.
+
+## <a id="scene-parenting"></a>Scene Parenting Using Contract Names
+
+Putting bindings inside ProjectContext is a fast and easy way to add common long-lasting dependencies that are shared across scenes.  However, in many cases you have bindings that you only want to be shared between specific scenes, so using ProjectContext doesn't work since in that case, the bindings we add there are global to every single scene in our entire project.
+
+As an example, let's pretend that we are working on a spaceship game, and we want to create one scene to serve as the environment (involving planets, asteroids, stars, etc.) and we want to create another scene to represent the ship that the player is in.  We also want all the classes in the ship scene to be able to reference bindings declared in the environment scene.  Also, we want to be able to define multiple different versions of both the ship scene and the environment scene.  To achieve all this, we will use a Zenject feature called 'Scene Contract Names'.
+
+We will start by using Unity's support for <a href="https://docs.unity3d.com/Manual/MultiSceneEditing.html">multi-scene editting</a>, and dragging both our environment scene and our ship scene into the Scene Heirarchy tab.  Then we will select the SceneContext in the environment scene and add a 'Contract Name'.  Let's call it 'Environment'.  Then all we have to do now is select the SceneContext inside the ship scene and set its 'Parent Contract Name' to the same value ('Environment').  Now if we press play, all the classes in the ship scene can access the declared bindings in the environment scene.
+
+The reason we use a name field here instead of explicitly using the scene name is to support swapping out the various environment scenes for different implementations.  In this example, we might define several different environments, all using the same Contract Name 'Environment', so that we can easily mix and match them with different ship scenes just by dragging the scenes we want into the scene heirarchy then hitting play.
+
+It is called 'Contract Name' because all the environment scenes will be expected to follow a certain 'contract' by the ship scenes.  For example, the ship scenes might require that regardless of which environment scene was loaded, there is a binding for 'AsteroidManager' containing the list of asteroids that the ship must avoid.
+
+Note that you do not need to load the environment scene and the ship scene at the same time for this to work.  For example, you might want to have a menu embedded inside the environment to allow the user to choose their ship before starting.  So you could create a menu scene and load that after the environment scene.   Then once the user chooses their ship, you could load the associated ship scene by calling the unity method `SceneManager.LoadScene` (making sure to use `LoadSceneMode.Additive`).
+
+Also note that the Validate command can be used to quickly verify the different multi-scene setups.
 
 ## <a id="scenes-decorator"></a>Scene Decorators
 
-Scene Decorators can be thought of a more advanced way doing the process described <a href="#injecting-data-across-scenes">above</a>.  That is, they can be used to add behaviour to another scene without actually changing the installers in that scene.
+Scene Decorators offer another approach to using multiple scenes together with zenject in addition to <a href="#scene-parenting">scene parenting</a> described above.  The difference is that with scene decorators, the multiple scenes in question will all share the same Container and therefore all scenes can access bindings in all other scenes (unlike with scene parenting where only the child can access the parent bindings and not vice versa).
+
+Another way to think about scene decorators is that it is a more advanced way doing the process described <a href="#injecting-data-across-scenes">for injecting data across scenes</a>.  That is, they can be used to add behaviour to another scene without actually changing the installers in that scene.
 
 Usually, when you want to customize different behaviour for a given scene depending on some conditions, you would use boolean or enum properties on MonoInstallers, which would then be used to add different bindings depending on the values set.  However, the scene decorator approach can be cleaner sometimes because it doesn't involve changing the main scene.
 
-For example, let's say we want to add some special keyboard shortcuts to our main production scene for testing purposes.  In order to do this using decorators, you can do the following:
+For example, let's say we want to add some special keyboard shortcuts to your main production scene for testing purposes.  In order to do this using decorators, you would do the following:
 
-* Create a new scene
-* Right Click inside the Hierarchy tab and select `Zenject -> Decorator Context`
-* Type in the scene you want to 'decorate' in the 'Scene Name' field of SceneDecoratorContext.  Note that as a shortcut, you can click the Open button next to this name to jump to the decorated scene.  Alternatively, you can click the Add button which will use Unity 5.3 Multi-Scene Editting to load both levels at once.  You can also just drag the decorated scene from the Project tab to the Scene heirarchy - this will have the same effect as clicking the Add button.
-* Create a new C# script with the following contents, then add this MonoBehaviour to your scene as a gameObject, then drag it to the `PreInstallers` property of `SceneDecoratorContext`
+* Open the main production scene
+* Right click on the far right menu beside the scene name within the scene heirarchy and select Add New Scene
+* Drag the scene so it's above the main scene
+* Right Click inside the new scene and select `Zenject -> Decorator Context`
+* Select the Decorator Context and set the 'Decorated Contract Name' field to 'Main'
+* Select the SceneContext in the main scene and add a contract name with the same value ('Main')
+* Create a new C# script with the following contents, then add this MonoBehaviour to your decorator scene as a gameObject, then drag it to the `Installers` property of `SceneDecoratorContext`
 
 ```csharp
 public class ExampleDecoratorInstaller : MonoInstaller
@@ -1896,17 +1700,9 @@ public class TestHotKeysAdder : ITickable
 }
 ```
 
-If you run your scene it should now behave exactly like the scene you entered in 'Scene Name' except with the added functionality in your decorator installer.
+If you run your scene it should now behave exactly like the main scene except with the added functionality in your decorator installer.  Also note that while not shown here, both scenes can access each other's bindings as if everything was in the same scene.
 
-NOTE: If the scene fails to load, it might be because the scene that you're decoratoring has not been added to the list of levels in build settings.
-
-Normally it is not that important whether you put your installers in `PreInstallers` or `PostInstallers`.  The one case where this matters is if you are configuring bindings for an installer within the new scene.  In this case you will want to make sure to put your installers in `PreInstallers`.
-
-For a full example see the asteroids project that comes with Zenject (open 'AsteroidsDecoratorExample' scene).  NOTE:  If installing from asset store version, you need to add the 'Asteroids' scene to your build settings so that the scene decorator can find it.
-
-Note also that Zenject validate (using CTRL+SHIFT+V or the menu item via Edit->Zenject->Validate Current Scene) also works with decorator scenes.
-
-Note also that you can add a decorator scene for another decorator scene, and this should work fine.
+Also note that the Validate command can be used to quickly verify the different multi-scene setups.
 
 ## <a id="sub-containers-and-facades"></a>Sub-Containers And Facades
 
@@ -1915,6 +1711,229 @@ See <a href="Documentation/SubContainers.md">here</a>.
 ## <a id="writing-tests"></a>Writing Unit Tests / Integration Tests
 
 See <a href="Documentation/WritingTests.md">here</a>.
+
+## <a id="non-generic-bindings"></a>Non Generic bindings
+
+In some cases you may not know the exact type you want to bind at compile time.  In these cases you can use the overload of the `Bind` method which takes a `System.Type` value instead of a generic parameter.
+
+```csharp
+// These two lines will result in the same behaviour
+Container.Bind(typeof(Foo));
+Container.Bind<Foo>();
+```
+
+Note also that when using non generic bindings, you can pass multiple arguments:
+
+```csharp
+Container.Bind(typeof(Foo), typeof(Bar), typeof(Qux)).AsSingle();
+
+// The above line is equivalent to these three:
+Container.Bind<Foo>().AsSingle();
+Container.Bind<Bar>().AsSingle();
+Container.Bind<Qux>().AsSingle();
+```
+
+The same goes for the To method:
+
+```csharp
+Container.Bind<IFoo>().To(typeof(Foo), typeof(Bar)).AsSingle();
+
+// The above line is equivalent to these two:
+Container.Bind<IFoo>().To<Foo>().AsSingle();
+Container.Bind<IFoo>().To<Bar>().AsSingle();
+```
+
+You can also do both:
+
+```csharp
+Container.Bind(typeof(IFoo), typeof(IBar)).To(typeof(Foo1), typeof(Foo2)).AsSingle();
+
+// The above line is equivalent to these:
+Container.Bind<IFoo>().To<Foo>().AsSingle();
+Container.Bind<IFoo>().To<Bar>().AsSingle();
+Container.Bind<IBar>().To<Foo>().AsSingle();
+Container.Bind<IBar>().To<Bar>().AsSingle();
+```
+
+This can be especially useful when you have a class that implements multiple interfaces:
+
+```csharp
+Container.Bind(typeof(ITickable), typeof(IInitializable), typeof(IDisposable)).To<Foo>().AsSingle();
+```
+
+Though in this particular example there is already a built-in shortcut method for this:
+
+```csharp
+Container.BindAllInterfaces<Foo>().To<Foo>().AsSingle();
+```
+
+## <a id="convention-based-bindings"></a>Convention Based Binding
+
+Convention based binding can come in handy in any of the following scenarios:
+
+- You want to define a naming convention that determines how classes are bound to the container (eg. using a prefix, suffix, or regex)
+- You want to use custom attributes to determine how classes are bound to the container
+- You want to automatically bind all classes that implement a given interface within a given namespace or assembly
+
+Using "convention over configuration" can allow you to define a framework that other programmers can use to quickly and easily get things done, instead of having to explicitly add every binding within installers.  This is the philosophy that is followed by frameworks like Ruby on Rails, ASP.NET MVC, etc.  Of course, there are both advantages and disadvantages to this approach.
+
+They are specified in a similar way to <a href="#non-generic-bindings">Non Generic bindings</a>, except instead of giving a list of types to the `Bind()` and `To()` methods, you describe the convention using a Fluent API.  For example, to bind `IFoo` to every class that implements it in the entire codebase:
+
+```csharp
+Container.Bind<IFoo>().To(x => x.AllTypes().DerivingFrom<IFoo>());
+```
+
+Note that you can use the same Fluent API in the `Bind()` method as well, and you can also use it in both `Bind()` and `To()` at the same time.
+
+For more examples see the <a href="#convention-binding-examples">examples</a> section below.  The full format is as follows:
+
+<pre>
+x.<b>InitialList</b>().<b>Conditional</b>().<b>AssemblySources</b>()
+</pre>
+
+###Where:
+
+* **InitialList** = The initial list of types to use for our binding.  This list will be filtered by the given **Conditional**s.  It can be one of the following (fairly self explanatory) methods:
+
+    1. **AllTypes**
+    1. **AllNonAbstractClasses**
+    1. **AllAbstractClasses**
+    1. **AllInterfaces**
+    1. **AllClasses**
+
+* **Conditional** = The filter to apply to the list of types given by **InitialList**.  Note that you can chain as many of these together as you want, and they will all be applied to the initial list in sequence.  It can be one of the following:
+
+    1. **DerivingFrom**<T> - Only match types deriving from `T`
+    1. **DerivingFromOrEqual**<T> - Only match types deriving from or equal to `T`
+    1. **WithPrefix**(value) - Only match types with names that start with `value`
+    1. **WithSuffix**(value) - Only match types with names that end with `value`
+    1. **WithAttribute**<T> - Only match types that have the attribute `[T]` above their class declaration
+    1. **WithoutAttribute**<T> - Only match types that do not have the attribute `[T]` above their class declaration
+    1. **WithAttributeWhere**<T>(predicate) - Only match types that have the attribute `[T]` above their class declaration AND in which the given predicate returns true when passed the attribute.  This is useful so you can use data given to the attribute to create bindings
+    1. **InNamespace**(value) - Only match types that are in the given namespace
+    1. **InNamespaces**(value1, value2, etc.) - Only match types that are in any of the given namespaces
+    1. **MatchingRegex**(pattern) - Only match types that match the given regular expression
+    1. **Where**(predicate) - Finally, you can also add any kind of conditional logic you want by passing in a predicate that takes a `Type` parameter
+
+* **AssemblySources** = The list of assemblies to search for types when populating **InitialList**.  It can be one of the following:
+
+    1. **FromAllAssemblies** - Look up types in all loaded assemblies.  This is the default when unspecified.
+    1. **FromAssemblyContaining**<T> - Look up types in whatever assembly the type `T` is in
+    1. **FromAssembliesContaining**(type1, type2, ..) - Look up types in all assemblies that contains any of the given types
+    1. **FromThisAssembly** - Look up types only in the assembly in which you are calling this method
+    1. **FromAssembly**(assembly) - Look up types only in the given assembly
+    1. **FromAssemblies**(assembly1, assembly2, ...) - Look up types only in the given assemblies
+    1. **FromAssembliesWhere**(predicate) - Look up types in all assemblies that match the given predicate
+
+###<a id="convention-binding-examples"></a>Examples:
+
+Note that you can chain together any combination of the below conditionals in the same binding.  Also note that since we aren't specifying an assembly here, Zenject will search within all loaded assemblies.
+
+1. Bind `IFoo` to every class that implements it in the entire codebase:
+
+    ```csharp
+    Container.Bind<IFoo>().To(x => x.AllTypes().DerivingFrom<IFoo>());
+    ```
+
+    Note that this will also have the same result:
+
+    ```csharp
+    Container.Bind<IFoo>().To(x => x.AllNonAbstractTypes());
+    ```
+
+    This is because Zenject will skip any bindings in which the concrete type does not actually derive from the base type.  Also note that in this case we have to make sure we use `AllNonAbstractTypes` instead of just `AllTypes`, to ensure that we don't bind `IFoo` to itself
+
+1. Bind an interface to all classes implementing it within a given namespace
+
+    ```csharp
+    Container.Bind<IFoo>().To(x => x.AllTypes().DerivingFrom<IFoo>().InNamespace("MyGame.Foos"));
+    ```
+
+1. Auto-bind `IController` every class that has the suffix "Controller" (as is done in ASP.NET MVC):
+
+    ```csharp
+    Container.Bind<IController>().To(x => x.AllNonAbstractTypes().WithSuffix("Controller"));
+    ```
+
+    You could also do this using `MatchingRegex`:
+
+    ```csharp
+    Container.Bind<IController>().To(x => x.AllNonAbstractTypes().MatchingRegex("Controller$"));
+    ```
+
+1. Bind all types with the prefix "Widget" and inject into Foo
+
+    ```csharp
+    Container.Bind<object>().To(x => x.AllNonAbstractTypes().WithPrefix("Widget")).WhenInjectedInto<Foo>();
+    ```
+
+1. Auto-bind the interfaces that are used by every type in a given namespace
+
+    ```csharp
+    Container.Bind(x => x.AllInterfaces())
+        .To(x => x.AllNonAbstractClasses().InNamespace("MyGame.Things"));
+    ```
+
+    This is equivalent to calling `Container.BindAllInterfaces<T>().To<T>()` for every type in the namespace "MyGame.Things".  This works because, as touched on above, Zenject will skip any bindings in which the concrete type does not actually derive from the base type.  So even though we are using `AllInterfaces` which matches every single interface in every single loaded assembly, this is ok because it will not try and bind an interface to a type that doesn't implement this interface.
+
+## <a id="unbind-rebind"></a>Unbind / Rebind
+
+It is also possible to remove or replace bindings that were added in another bind statement.
+
+1. Unbind - Remove binding from container.
+
+    ```csharp
+    Container.Bind<IFoo>().To<Foo>();
+
+    // This will nullify the above statement
+    Container.Unbind<IFoo>();
+    ```
+
+1. Rebind - Override an existing binding with a new one.  This is equivalent to calling unbind with the given type and then immediately calling bind afterwards.
+
+    ```csharp
+    Container.Bind<IFoo>().To<Foo>();
+
+    // 
+    Container.Rebind<IFoo>().To<Bar>();
+    ```
+
+## <a id="singleton-identifiers"></a>Singleton Identifiers
+
+In addition to <a href="#identifiers">normal identifiers</a>, you can also assign an identifer to a given singleton.
+
+This allows you to force Zenject to create multiple singletons instead of just one, since otherwise the singleton is uniquely identified based on the type given as generic argument to the `To<>` method.  So for example:
+
+```csharp
+Container.Bind<IFoo>().To<Foo>().AsSingle();
+Container.Bind<IBar>().To<Foo>().AsSingle();
+Container.Bind<IQux>().To<Qux>().AsSingle();
+```
+
+In the above code, both `IFoo` and `IBar` will be bound to the same instance.  Only one instance of Foo will be created.
+
+```csharp
+Container.Bind<IFoo>().To<Foo>().AsSingle("foo1");
+Container.Bind<IBar>().To<Foo>().AsSingle("foo2");
+```
+
+In this case however, two instances will be created.
+
+Another use case for this is to allow creating multiple singletons from the same prefab.  For example, Given the following:
+
+```csharp
+Container.Bind<Foo>().FromPrefab(MyPrefab).AsSingle();
+Container.Bind<Bar>().FromPrefab(MyPrefab).AsSingle();
+```
+
+It will only instantiate the prefab MyPrefab once, since the singleton is identified solely by the prefab when using `FromPrefab`.  The concrete type given can be interpreted as "Search the instantiated prefab for this component".  But, if instead you want Zenject to instantiate a new instance of the prefab for each `FromPrefab` binding, then you can do that as well by supplying an identifier to the `AsSingle` function like this:
+
+```csharp
+Container.Bind<Foo>().FromPrefab(MyPrefab).AsSingle("foo");
+Container.Bind<Bar>().FromPrefab(MyPrefab).AsSingle("bar");
+```
+
+Now two instances of the prefab will be created.
 
 ## <a id="auto-mocking-using-moq"></a>Auto-Mocking using Moq
 
