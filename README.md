@@ -1,5 +1,5 @@
 
-<img src="UnityProject/Assets/Zenject/Documentation/ReadMe_files/ZenjectLogo.png?raw=true" alt="Zenject" width="600px" height="134px"/>
+<img src="UnityProject/Assets/Zenject/Documentation/ZenjectLogo.png?raw=true" alt="Zenject" width="600px" height="134px"/>
 
 ## Dependency Injection Framework for Unity3D
 
@@ -948,7 +948,7 @@ So another way to do this is to use the `ZenjectBinding` component.  You can do 
 
 For example, if I have a MonoBehaviour of type `Foo` in my scene, I can just add `ZenjectBinding` alongside it, and then drag the Foo component into the Component property of the ZenjectBinding component.
 
-<img src="UnityProject/Assets/Zenject/Documentation/ReadMe_files/AutoBind1.png?raw=true" alt="ZenjectBinding"/>
+<img src="UnityProject/Assets/Zenject/Documentation/AutoBind1.png?raw=true" alt="ZenjectBinding"/>
 
 Then our installer becomes:
 

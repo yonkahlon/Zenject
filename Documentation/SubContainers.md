@@ -281,7 +281,7 @@ public class ShipInputHandler : MonoBehaviour
 * Add new game object under ship called HealthHandler, and add the `ShipHealthHandler` component to it
 * Your scene should look like this:
 
-<img src="../UnityProject/Assets/Zenject/Documentation/ReadMe_files/ShipFacadeExample1.png?raw=true" alt="Ship Facade Example"/>
+<img src="../UnityProject/Assets/Zenject/Documentation/ShipFacadeExample1.png?raw=true" alt="Ship Facade Example"/>
 
 * The idea here is that everything at or underneath the Ship game object should be considered inside it's own sub-container.  When we're done, we should be able to add multiple ships to our scene, each with their own components ShipHealthHandler, ShipInputHandler, etc. that can treat each other as singletons.
 * Try to validate your scene by pressing CTRL+SHIFT+V.  You should get an error that looks like this: `Unable to resolve type 'ShipHealthHandler' while building object with type 'Ship'.`
