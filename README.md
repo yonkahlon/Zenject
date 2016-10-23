@@ -1673,6 +1673,8 @@ Note that you do not need to load the environment scene and the ship scene at th
 
 Also note that the Validate command can be used to quickly verify the different multi-scene setups.
 
+Also, I should mention that Unity currently doesn't have a built-in way to save and restore multi-scene setups.  We use a simple editor script for this that you can find <a href="https://gist.github.com/svermeulen/8927b29b2bfab4e84c950b6788b0c677">here</a> if interested.
+
 ## <a id="scenes-decorator"></a>Scene Decorators
 
 Scene Decorators offer another approach to using multiple scenes together with zenject in addition to <a href="#scene-parenting">scene parenting</a> described above.  The difference is that with scene decorators, the multiple scenes in question will all share the same Container and therefore all scenes can access bindings in all other scenes (unlike with scene parenting where only the child can access the parent bindings and not vice versa).
@@ -1715,6 +1717,8 @@ public class TestHotKeysAdder : ITickable
 If you run your scene it should now behave exactly like the main scene except with the added functionality in your decorator installer.  Also note that while not shown here, both scenes can access each other's bindings as if everything was in the same scene.
 
 Also note that the Validate command can be used to quickly verify the different multi-scene setups.
+
+Also, I should mention that Unity currently doesn't have a built-in way to save and restore multi-scene setups.  We use a simple editor script for this that you can find <a href="https://gist.github.com/svermeulen/8927b29b2bfab4e84c950b6788b0c677">here</a> if interested.
 
 ## <a id="sub-containers-and-facades"></a>Sub-Containers And Facades
 
