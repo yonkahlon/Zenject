@@ -52,15 +52,15 @@ namespace Zenject
 
             _sceneContext.Resolve();
 
+            // This allows them to make very common bindings fields for use in any of the tests
+            Container.Inject(this);
+
             if (_isValidating)
             {
                 Container.ValidateIValidatables();
             }
             else
             {
-                // This allows them to make very common bindings fields for use in any of the tests
-                Container.Inject(this);
-
                 _sceneContext.gameObject.GetComponent<SceneKernel>().Start();
             }
         }

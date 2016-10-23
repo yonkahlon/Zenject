@@ -130,7 +130,7 @@ The tests may also be helpful to show usage for each specific feature (which you
     * <a href="#scene-parenting">Scene Parenting Using Contract Names</a>
     * <a href="#scenes-decorator">Scene Decorators</a>
     * <a href="#sub-containers-and-facades">Sub-Containers And Facades</a>
-    * <a href="#writing-tests">Writing Unit Tests / Integration Tests</a>
+    * <a href="#writing-tests">Writing Automated Unit Tests / Integration Tests</a>
     * <a href="#commands-and-signals">Commands And Signals</a>
     * <a href="#auto-mocking-using-moq">Auto-Mocking using Moq</a>
     * <a href="#editor-windows">Creating Unity EditorWindow's with Zenject</a>
@@ -1720,132 +1720,9 @@ Also note that the Validate command can be used to quickly verify the different 
 
 See <a href="Documentation/SubContainers.md">here</a>.
 
-## <a id="writing-tests"></a>Writing Unit Tests / Integration Tests
+## <a id="writing-tests"></a>Writing Automated Unit Tests / Integration Tests
 
-There are two very basic helper classes included with Zenject that can make it easier to test your code.  One is for Unit tests and the other is for Integration tests.  Both approaches are run via Unity's built in test runner.  The main difference between the two is that Unit Tests are much smaller in scope and meant for testing a small subset of the classes in your application, whereas Integration Tests can be more expansive and can involve firing up many different systems.
-
-This is best shown with some examples.
-
-### Unit Test Example
-
-As an example, let's add the following class to our Unity project:
-
-```csharp
-using System;
-
-public class Logger
-{
-    public Logger()
-    {
-        Log = "";
-    }
-
-    public string Log
-    {
-        get;
-        private set;
-    }
-
-    public void Write(string value)
-    {
-        if (value == null)
-        {
-            throw new ArgumentException();
-        }
-
-        Log += value;
-    }
-}
-```
-
-Now, to test this class, create a new folder named Editor, then add a new file named TestLogger.cs and copy and paste the following:
-
-```csharp
-using System;
-using Zenject;
-using NUnit.Framework;
-
-[TestFixture]
-public class TestLogger : ZenjectUnitTestFixture
-{
-    [Test]
-    public void TestInitialValues()
-    {
-        var logger = Container.Resolve<Logger>();
-
-        Assert.That(logger.Log == "");
-    }
-
-    [Test]
-    public void TestFirstEntry()
-    {
-        var logger = Container.Resolve<Logger>();
-
-        logger.Write("foo");
-        Assert.That(logger.Log == "foo");
-    }
-
-    [Test]
-    public void TestAppend()
-    {
-        var logger = Container.Resolve<Logger>();
-
-        logger.Write("foo");
-        logger.Write("bar");
-
-        Assert.That(logger.Log == "foobar");
-    }
-
-    [Test]
-    [ExpectedException]
-    public void TestNullValue()
-    {
-        var logger = Container.Resolve<Logger>();
-
-        logger.Write(null);
-    }
-
-    [SetUp]
-    public void CommonInstall()
-    {
-        Container.Bind<Logger>().AsSingle();
-    }
-}
-
-```
-
-To run the tests open up Unity's test runner by selecting `Window -> Editor Tests Runner`.  Then click Run All or right click on the specific test you want to run.
-
-As you can see above, this approach is very basic and just involves inheriting from the `ZenjectUnitTestFixture` class.  All this helper class does is ensure that a new Container is re-created before each test method is called.   That's it.  This is the entire code for it:
-
-```csharp
-public abstract class ZenjectUnitTestFixture
-{
-    DiContainer _container;
-
-    protected DiContainer Container
-    {
-        get
-        {
-            return _container;
-        }
-    }
-
-    [SetUp]
-    public virtual void Setup()
-    {
-        _container = new DiContainer();
-    }
-}
-```
-
-So typically you run installers from within `[SetUp]` methods and then directly call `Resolve<>` to retrieve instances of the classes you want to test.
-
-### Integration Test Example
-
-Integration tests, on the other hand, are executed in a very similar way to the scenes in your project.  A `SceneContext` and `ProjectContext` is created, so you can invoke MonoInstallers, ScriptableObjectInstallers, etc. as necessary.
-
-One important thing here is to understand how Unity's built-in Editor Test Runner works under the hood.
+See <a href="Documentation/WritingAutomatedTests.md">here</a>.
 
 ## <a id="non-generic-bindings"></a>Non Generic bindings
 
