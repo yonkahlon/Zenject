@@ -178,11 +178,11 @@ There is no requirement that the `Enemy.Factory` class be a nested class within 
 
 The reason that we don't use the `Factory<Enemy>` class directly is because this can become error prone when adding/removing parameters and also can get verbose since the parameter types must be declared whenever you refer to this class.  This is error prone because if for example you add a parameter to enemy and change the factory from `Factory<Enemy>` to `Factory<float, Enemy>`, any references to `Factory<Enemy>` will not be resolved.  And this will not be caught at compile time and instead will only be seen during validation or runtime.  So we recommend always using an empty class that derives from `Factory<>` instead.
 
-Also note that by using the built-in Zenject `Factory<>` class, the Enemy class will be automatically validated as well.  So if the constructor of the Enemy class includes a type that is not bound to the container, this error can be caught before running your app, by simply running validation.  Validation can be especially useful for dynamically created objects, because otherwise you may not catch the error until the factory is invoked at some point during runtime.  See <a href="#object-graph-validation">this section</a> for more details on Validation.
+Also note that by using the built-in Zenject `Factory<>` class, the Enemy class will be automatically validated as well.  So if the constructor of the Enemy class includes a type that is not bound to the container, this error can be caught before running your app, by simply running validation.  Validation can be especially useful for dynamically created objects, because otherwise you may not catch the error until the factory is invoked at some point during runtime.  See the validation section for more details on Validation.
 
 This is all well and good for simple cases like this, but what if the Enemy class derives from MonoBehaviour and is instantiated via a prefab?  Or what if I want to create Enemy using a custom method or a custom factory class?
 
-These cases are handled very similar to how they are handled when not using a factory.  When you bind the factory to the container using `BindFactory`, you have access to the same bind methods that are given by the Bind method and described above.  For example, if we wanted to instantiate the `Enemy` class from a prefab, our code would become:
+These cases are handled very similar to how they are handled when not using a factory.  When you bind the factory to the container using `BindFactory`, you have access to the same bind methods that are given by the Bind method (see binding section for full details).  For example, if we wanted to instantiate the `Enemy` class from a prefab, our code would become:
 
 ```csharp
 public class Enemy : MonoBehaviour
@@ -215,9 +215,9 @@ public class TestInstaller : MonoInstaller
 
 ```
 
-And similarly for FromInstance, FromMethod, FromSubContainerResolve, or any of the other <a href="#construction-methods">construction methods</a>.
+And similarly for FromInstance, FromMethod, FromSubContainerResolve, or any of the other construction methods.
 
-Using FromSubContainerResolve can be particularly useful if your dynamically created object has a lot of its own dependencies.  You can have it behave like a Facade.  See <a href="#sub-containers-and-facades">here</a> for details on nested containers / facades.
+Using FromSubContainerResolve can be particularly useful if your dynamically created object has a lot of its own dependencies.  You can have it behave like a Facade.  See the Subcontainers section for details on nested containers / facades.
 
 ## <a id="abstract-factories"></a>Abstract Factories
 
@@ -412,4 +412,4 @@ public class CustomEnemyFactory : IFactory<IEnemy>, IValidatable
 }
 ```
 
-This is done by implementing the interface `IValidatable` and then adding a `Validate()` method.  Then, to manually validate objects, you simply instantiate them.  Note that this will not actually instantiate these objects (these calls actually return null here).  The point is to do a "dry run" without actually instantiating anything, to prove out the full object graph.  For more details on validation see <a href="#object-graph-validation">here</a>.
+This is done by implementing the interface `IValidatable` and then adding a `Validate()` method.  Then, to manually validate objects, you simply instantiate them.  Note that this will not actually instantiate these objects (these calls actually return null here).  The point is to do a "dry run" without actually instantiating anything, to prove out the full object graph.  For more details on validation see the validation section.

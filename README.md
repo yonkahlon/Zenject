@@ -1977,41 +1977,41 @@ public class TimerWindow : ZenjectEditorWindow
         Container.BindInstance(_timerState);
         Container.BindAllInterfaces<TimerController>().To<TimerController>().AsSingle();
     }
+}
 
-    class TimerController : IGuiRenderable, ITickable, IInitializable
+class TimerController : IGuiRenderable, ITickable, IInitializable
+{
+    readonly State _state;
+
+    public TimerController(State state)
     {
-        readonly State _state;
+        _state = state;
+    }
 
-        public TimerController(State state)
+    public void Initialize()
+    {
+        Debug.Log("TimerController initialized");
+    }
+
+    public void GuiRender()
+    {
+        GUI.Label(new Rect(25, 25, 200, 200), "Tick Count: " + _state.TickCount);
+
+        if (GUI.Button(new Rect(25, 50, 200, 50), "Restart"))
         {
-            _state = state;
+            _state.TickCount = 0;
         }
+    }
 
-        public void Initialize()
-        {
-            Debug.Log("TimerController initialized");
-        }
+    public void Tick()
+    {
+        _state.TickCount++;
+    }
 
-        public void GuiRender()
-        {
-            GUI.Label(new Rect(25, 25, 200, 200), "Tick Count: " + _state.TickCount);
-
-            if (GUI.Button(new Rect(25, 50, 200, 50), "Restart"))
-            {
-                _state.TickCount = 0;
-            }
-        }
-
-        public void Tick()
-        {
-            _state.TickCount++;
-        }
-
-        [Serializable]
-        public class State
-        {
-            public int TickCount;
-        }
+    [Serializable]
+    public class State
+    {
+        public int TickCount;
     }
 }
 ```
