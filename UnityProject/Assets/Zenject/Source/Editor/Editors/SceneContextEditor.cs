@@ -14,7 +14,7 @@ namespace Zenject
         {
             base.OnEnable();
 
-            _contractNameProperty = serializedObject.FindProperty("_contractName");
+            _contractNameProperty = serializedObject.FindProperty("_contractNames");
             _parentContractNameProperty = serializedObject.FindProperty("_parentContractName");
             _parentNewObjectsUnderRootProperty = serializedObject.FindProperty("_parentNewObjectsUnderRoot");
             _autoRun = serializedObject.FindProperty("_autoRun");
@@ -24,7 +24,7 @@ namespace Zenject
         {
             base.OnGui();
 
-            EditorGUILayout.PropertyField(_contractNameProperty);
+            EditorGUILayout.PropertyField(_contractNameProperty, true);
             EditorGUILayout.PropertyField(_parentContractNameProperty);
             EditorGUILayout.PropertyField(_parentNewObjectsUnderRootProperty);
             EditorGUILayout.PropertyField(_autoRun);

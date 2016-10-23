@@ -32,11 +32,5 @@ namespace Zenject
         {
             _container = new DiContainer();
         }
-
-        [TearDown]
-        public virtual void Destroy()
-        {
-            _container = null;
-        }
     }
 }

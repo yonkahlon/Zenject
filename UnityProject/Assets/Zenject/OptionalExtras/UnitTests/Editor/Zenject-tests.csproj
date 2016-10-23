@@ -104,6 +104,7 @@
     <Compile Include="Injection\TestPropertyInjection.cs" />
     <Compile Include="Injection\TestStructInjection.cs" />
     <Compile Include="Injection\TestTestOptional.cs" />
+    <Compile Include="Other\TestCopyIntoAllSubContainers.cs" />
     <Compile Include="Other\TestGenericContract.cs" />
     <Compile Include="Other\TestMoq.cs" />
     <Compile Include="Other\TestNestedContainer.cs" />
@@ -116,7 +117,6 @@
     <Compile Include="Other\TestValidateInstaller.cs" />
     <Compile Include="Other\ZenjectProfileTest.cs" />
     <Compile Include="Util\TestListComparer.cs" />
-    <Compile Include="Other\TestInheritInSubContainers.cs" />
     <Compile Include="Other\TestCircularDependencies.cs" />
     <Compile Include="Other\TestConflictingToSingletonUses.cs" />
     <Compile Include="Factories\Bindings\TestFactoryTo1.cs" />
@@ -133,7 +133,7 @@
     <Compile Include="BindFeatures\TestNonLazy.cs" />
     <Compile Include="Factories\IFactory\TestIFactory.cs" />
     <Compile Include="Conventions\FooMore.cs" />
-    <Compile Include="..\..\TestingFramework\Editor\ZenjectUnitTestFixture.cs" />
+    <Compile Include="..\..\..\Source\Editor\Testing\ZenjectUnitTestFixture.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
