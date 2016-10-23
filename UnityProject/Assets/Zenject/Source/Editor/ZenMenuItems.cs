@@ -90,25 +90,6 @@ namespace Zenject
                 + "\n}");
         }
 
-        [MenuItem("Assets/Create/Zenject/Decorator Installer", false, 1)]
-        public static void CreateDecoratorInstaller()
-        {
-            AddCSharpClassTemplate("Decorator Installer", "UntitledInstaller", false,
-                  "using UnityEngine;"
-                + "\nusing Zenject;"
-                + "\n"
-                + "\npublic class CLASS_NAME : DecoratorInstaller"
-                + "\n{"
-                + "\n    public override void PreInstallBindings()"
-                + "\n    {"
-                + "\n    }"
-                + "\n"
-                + "\n    public override void PostInstallBindings()"
-                + "\n    {"
-                + "\n    }"
-                + "\n}");
-        }
-
         [MenuItem("Assets/Create/Zenject/Mono Installer", false, 1)]
         public static void CreateMonoInstaller()
         {

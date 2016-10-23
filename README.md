@@ -964,43 +964,55 @@ The `ZenjectBinding` component has the following properties:
 
 * **Bind Type** - This will determine what '<a href="#binding">contract type</a>' to use.  It can be set to any of the following values:
 
-    1 - `Self`
+    1. `Self`
 
     This is equivalent to the first example where we did this:
 
-        Container.Bind<Foo>().FromInstance(_foo);
+    ```csharp
+    Container.Bind<Foo>().FromInstance(_foo);
+    ```
 
     Which is also the same as this:
 
-        Container.BindInstance(_foo);
+    ```csharp
+    Container.BindInstance(_foo);
+    ```
 
     So if we duplicate this game object to have multiple game objects with `Foo` on them (and its `ZenjectBinding`), they will all be bound to the Container this way.  So after doing this, we would have to change `GameRunner` above to take a `List<Foo>` otherwise we would get Zenject exceptions (see <a href="#list-bindings">here</a> for info on list bindings).
 
-    2 - `AllInterfaces`
+    2. `AllInterfaces`
 
     This bind type is equivalent to the following:
 
-        Container.BindAllInterfaces(_foo.GetType()).FromInstance(_foo);
+    ```csharp
+    Container.BindAllInterfaces(_foo.GetType()).FromInstance(_foo);
+    ```
 
     Note however, in this case, that `GameRunner` must ask for type `IFoo` in its constructor.  If we left `GameRunner` asking for type `Foo` then Zenject would throw exceptions, since the `BindAllInterfaces` method only binds the interfaces, not the concrete type.  If you want the concrete type as well then you can use:
 
-    3 - `AllInterfacesAndSelf`
+    3. `AllInterfacesAndSelf`
 
     This bind type is equivalent to the following:
 
-        Container.BindAllInterfacesAndSelf(_foo.GetType()).FromInstance(_foo);
+    ```csharp
+    Container.BindAllInterfacesAndSelf(_foo.GetType()).FromInstance(_foo);
+    ```
 
     This is the same as AllInterfaces except we can directly access Foo using type Foo instead of needing an interface.
 
-    4 - `BaseType`
+    4. `BaseType`
 
     This bind type is equivalent to the following:
 
-        Container.BindAllInterfacesAndSelf(_foo.GetType().BaseType()).FromInstance(_foo);
+    ```csharp
+    Container.BindAllInterfacesAndSelf(_foo.GetType().BaseType()).FromInstance(_foo);
+    ```
 
 * Identifier - This value can be left empty most of the time.  It will determine what is used as the <a href="#binding">identifier</a> for the binding.   For example, when set to "Foo1", it is equivalent to doing the following:
 
+    ```csharp
     Container.BindInstance(_foo).WithId("Foo1");
+    ```
 
 * Context - This is completely optional and in most cases should be left unset.  This will determine which Context to apply the binding to.  If left unset, it will use whatever context the GameObject is in.  In most cases this will be SceneContext, but if it's inside a GameObjectContext it will be bound into that container instead.  One important use case for this field is to allow dragging the SceneContext into this field, for cases where the component is inside a GameObjectContext.  This allows you to treat this MonoBehaviour as a <a href="https://en.wikipedia.org/wiki/Facade_pattern">Facade</a> for the entire sub-container given by the GameObjectContext.
 
@@ -1710,7 +1722,7 @@ See <a href="Documentation/SubContainers.md">here</a>.
 
 ## <a id="writing-tests"></a>Writing Unit Tests / Integration Tests
 
-See <a href="Documentation/WritingTests.md">here</a>.
+There are two very basic help classes included with Zenject that can make it easier to write tests.
 
 ## <a id="non-generic-bindings"></a>Non Generic bindings
 
@@ -2031,17 +2043,19 @@ TBD
 
     Games
 
-      * Pokemon Go App (both iOS / Android)
+    * Pokemon Go (both [iOS](https://itunes.apple.com/us/app/pokemon-go/id1094591345?mt=8) and [Android](https://play.google.com/store/apps/details?id=com.nianticlabs.pokemongo&hl=en))
+    * [Spinball Carnival](https://play.google.com/store/apps/details?id=com.nerdcorps.pinballcritters&hl=en)
+    * [Slugterra: Guardian Force](https://play.google.com/store/apps/details?id=com.nerdcorps.slugthree&hl=en)
 
     Libraries
 
-      * [EcsRx](https://github.com/grofit/ecsrx) - A framework for Unity using the ECS pattern
-      * [Karma](https://github.com/cgarciae/karma) - An MVC framework for Unity
+    * [EcsRx](https://github.com/grofit/ecsrx) - A framework for Unity using the ECS pattern
+    * [Karma](https://github.com/cgarciae/karma) - An MVC framework for Unity
 
     Tools
 
-      * [Modest 3D](https://www.modest3d.com/editor) - An IDE to allow users to quickly and easily create procedural training content
-      * [Modest 3D Explorer](https://www.modest3d.com/explorer) - A simple editor to quickly create a 3D presentation with some number of slides
+    * [Modest 3D](https://www.modest3d.com/editor) - An IDE to allow users to quickly and easily create procedural training content
+    * [Modest 3D Explorer](https://www.modest3d.com/explorer) - A simple editor to quickly create a 3D presentation with some number of slides
 
 ## <a id="cheatsheet"></a>Cheat Sheet
 
