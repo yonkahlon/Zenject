@@ -145,6 +145,46 @@ namespace Zenject
                 + "\n}");
         }
 
+        [MenuItem("Assets/Create/Zenject/Unit Test", false, 60)]
+        public static void CreateUnitTest()
+        {
+            AddCSharpClassTemplate("Unit Test", "UntitledUnitTest", true,
+                  "using Zenject;"
+                + "\nusing NUnit.Framework;"
+                + "\n"
+                + "\n[TestFixture]"
+                + "\npublic class CLASS_NAME : ZenjectUnitTestFixture"
+                + "\n{"
+                + "\n    [Test]"
+                + "\n    public void RunTest1()"
+                + "\n    {"
+                + "\n        // TODO"
+                + "\n    }"
+                + "\n}");
+        }
+
+        [MenuItem("Assets/Create/Zenject/Integration Test", false, 60)]
+        public static void CreateIntegrationTest()
+        {
+            AddCSharpClassTemplate("Integration Test", "UntitledIntegrationTest", true,
+                  "using Zenject;"
+                + "\nusing NUnit.Framework;"
+                + "\n"
+                + "\n[TestFixture]"
+                + "\npublic class CLASS_NAME : ZenjectIntegrationTestFixture"
+                + "\n{"
+                + "\n    [Test]"
+                + "\n    public void RunTest1()"
+                + "\n    {"
+                + "\n        // TODO: Add bindings"
+                + "\n        "
+                + "\n        Initialize();"
+                + "\n        "
+                + "\n        // TODO"
+                + "\n    }"
+                + "\n}");
+        }
+
         [MenuItem("Assets/Create/Zenject/Project Context", false, 40)]
         public static void CreateProjectContext()
         {
