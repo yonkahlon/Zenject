@@ -2117,6 +2117,7 @@ Something else to note is that the rate at which the ITickable.Tick method gets 
     * Pokemon Go (both [iOS](https://itunes.apple.com/us/app/pokemon-go/id1094591345?mt=8) and [Android](https://play.google.com/store/apps/details?id=com.nianticlabs.pokemongo&hl=en))
     * [Spinball Carnival](https://play.google.com/store/apps/details?id=com.nerdcorps.pinballcritters&hl=en)
     * [Slugterra: Guardian Force](https://play.google.com/store/apps/details?id=com.nerdcorps.slugthree&hl=en)
+    * [Submarine](https://github.com/shiwano/submarine) - A mobile game that is made with Unity3D and RoR, WebSocket server written in Go.
 
     Libraries
 
