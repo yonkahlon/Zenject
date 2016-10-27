@@ -918,11 +918,11 @@ The usual way this is done is to add public references to these objects within y
 
     public class GameInstaller : MonoInstaller
     {
-        public Foo Foo;
+        public Foo foo;
 
         public override void InstallBindings()
         {
-            Container.BindInstance(Foo);
+            Container.BindInstance(foo);
             Container.Bind<IInitializable>().To<GameRunner>().AsSingle();
         }
     }
