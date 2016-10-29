@@ -2115,10 +2115,10 @@ Something else to note is that the rate at which the ITickable.Tick method gets 
     Games
 
     * Pokemon Go (both [iOS](https://itunes.apple.com/us/app/pokemon-go/id1094591345?mt=8) and [Android](https://play.google.com/store/apps/details?id=com.nianticlabs.pokemongo&hl=en))
-    * [Spinball Carnival](https://play.google.com/store/apps/details?id=com.nerdcorps.pinballcritters&hl=en)
-    * [Slugterra: Guardian Force](https://play.google.com/store/apps/details?id=com.nerdcorps.slugthree&hl=en)
-    * [Submarine](https://github.com/shiwano/submarine) - A mobile game that is made with Unity3D and RoR, WebSocket server written in Go.
-    * [NOVA Black Holes](https://itunes.apple.com/us/app/nova-black-holes/id1114574985?mt=8)
+    * [Spinball Carnival](https://play.google.com/store/apps/details?id=com.nerdcorps.pinballcritters&hl=en) (Android)
+    * [Slugterra: Guardian Force](https://play.google.com/store/apps/details?id=com.nerdcorps.slugthree&hl=en) (Android)
+    * [Submarine](https://github.com/shiwano/submarine) (iOS and Android)
+    * [NOVA Black Holes](https://itunes.apple.com/us/app/nova-black-holes/id1114574985?mt=8) (iOS)
 
     Libraries
 
@@ -2127,8 +2127,8 @@ Something else to note is that the rate at which the ITickable.Tick method gets 
 
     Tools
 
-    * [Modest 3D](https://www.modest3d.com/editor) - An IDE to allow users to quickly and easily create procedural training content
-    * [Modest 3D Explorer](https://www.modest3d.com/explorer) - A simple editor to quickly create a 3D presentation with some number of slides
+    * [Modest 3D](https://www.modest3d.com/editor) (WebGL, WebPlayer, PC) - An IDE to allow users to quickly and easily create procedural training content
+    * [Modest 3D Explorer](https://www.modest3d.com/explorer) (WebGL, WebPlayer, iOS, Android, PC, Windows Store) - A simple editor to quickly create a 3D presentation with some number of slides
 
 ## <a id="cheatsheet"></a>Cheat Sheet
 
