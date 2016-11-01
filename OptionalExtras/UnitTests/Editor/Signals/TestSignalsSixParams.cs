@@ -20,9 +20,6 @@ namespace Zenject.Tests
 
             Container.BindSignal<SomethingHappenedSignal>();
 
-            Container.BindTrigger<SomethingHappenedSignal.Trigger>()
-                .WhenInjectedInto<Foo>();
-
             var foo = Container.Resolve<Foo>();
             var bar = Container.Resolve<Bar>();
             bar.Initialize();
@@ -34,32 +31,28 @@ namespace Zenject.Tests
             bar.Dispose();
         }
 
-        public class SomethingHappenedSignal : Signal<string, int, float, string, int, float>
+        public class SomethingHappenedSignal : Signal<SomethingHappenedSignal, string, int, float, string, int, float>
         {
-            public class Trigger : TriggerBase
-            {
-            }
         }
 
         public class Foo
         {
-            readonly SomethingHappenedSignal.Trigger _trigger;
+            SomethingHappenedSignal _signal;
 
-            public Foo(SomethingHappenedSignal.Trigger trigger)
+            public Foo(SomethingHappenedSignal signal)
             {
-                _trigger = trigger;
+                _signal = signal;
             }
 
             public void DoSomething(string value1, int value2, float value3, string value4, int value5, float value6)
             {
-                _trigger.Fire(value1, value2, value3, value4, value5, value6);
+                _signal.Fire(value1, value2, value3, value4, value5, value6);
             }
         }
 
         public class Bar
         {
-            readonly SomethingHappenedSignal _signal;
-
+            SomethingHappenedSignal _signal;
             string _receivedValue;
 
             public Bar(SomethingHappenedSignal signal)
@@ -77,12 +70,12 @@ namespace Zenject.Tests
 
             public void Initialize()
             {
-                _signal.Event += OnStarted;
+                _signal += OnStarted;
             }
 
             public void Dispose()
             {
-                _signal.Event -= OnStarted;
+                _signal -= OnStarted;
             }
 
             void OnStarted(string value1, int value2, float value3, string value4, int value5, float value6)

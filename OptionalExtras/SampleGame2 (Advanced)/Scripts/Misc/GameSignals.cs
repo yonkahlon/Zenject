@@ -5,18 +5,12 @@ using Zenject;
 namespace Zenject.SpaceFighter
 {
     // Triggered when the player explodes
-    public class PlayerKilledSignal : Signal
+    public class PlayerKilledSignal : Signal<PlayerKilledSignal>
     {
-        public class Trigger : TriggerBase
-        {
-        }
     }
 
     // Triggered when the enemy explodes
-    public class EnemyKilledSignal : Signal
+    public class EnemyKilledSignal : Signal<EnemyKilledSignal>
     {
-        public class Trigger : TriggerBase
-        {
-        }
     }
 }

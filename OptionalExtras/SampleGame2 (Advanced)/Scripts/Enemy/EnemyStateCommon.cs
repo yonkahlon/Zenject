@@ -10,7 +10,8 @@ namespace Zenject.SpaceFighter
     {
         readonly EnemyModel _model;
         readonly EnemyStateManager _stateManager;
-        readonly EnemySignals.Hit _hitSignal;
+
+        EnemySignals.Hit _hitSignal;
 
         public EnemyStateCommon(
             EnemySignals.Hit hitSignal,
@@ -24,12 +25,12 @@ namespace Zenject.SpaceFighter
 
         public void Initialize()
         {
-            _hitSignal.Event += OnHit;
+            _hitSignal += OnHit;
         }
 
         public void Dispose()
         {
-            _hitSignal.Event -= OnHit;
+            _hitSignal -= OnHit;
         }
 
         public void Tick()

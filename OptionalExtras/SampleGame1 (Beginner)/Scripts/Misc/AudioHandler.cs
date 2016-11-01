@@ -8,7 +8,8 @@ namespace Zenject.Asteroids
     {
         readonly Settings _settings;
         readonly AudioSource _audioSource;
-        readonly Signals.ShipCrashed _shipCrashed;
+
+        Signals.ShipCrashed _shipCrashed;
 
         public AudioHandler(
             Signals.ShipCrashed shipCrashed,
@@ -22,12 +23,12 @@ namespace Zenject.Asteroids
 
         public void Initialize()
         {
-            _shipCrashed.Event += OnShipCrashed;
+            _shipCrashed += OnShipCrashed;
         }
 
         public void Dispose()
         {
-            _shipCrashed.Event -= OnShipCrashed;
+            _shipCrashed -= OnShipCrashed;
         }
 
         void OnShipCrashed()

@@ -2,12 +2,13 @@ using UnityEngine;
 using System.Collections;
 using Zenject;
 using ModestTree;
+using System;
 
 #pragma warning disable 649
 
 namespace Zenject.Asteroids
 {
-    public class GuiHandler : MonoBehaviour
+    public class GuiHandler : MonoBehaviour, IDisposable, IInitializable
     {
         Signals.ShipCrashed _shipCrashed;
         GameController _gameController;
@@ -203,14 +204,14 @@ namespace Zenject.Asteroids
             GUILayout.EndHorizontal();
         }
 
-        void Start()
+        public void Initialize()
         {
-            _shipCrashed.Event += OnShipCrashed;
+            _shipCrashed += OnShipCrashed;
         }
 
-        void OnDestroy()
+        public void Dispose()
         {
-            _shipCrashed.Event -= OnShipCrashed;
+            _shipCrashed -= OnShipCrashed;
         }
 
         void OnShipCrashed()
