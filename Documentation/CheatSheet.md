@@ -7,19 +7,23 @@ For more examples, you may also be interested in reading some of the Unit tests 
 
 ```csharp
 
-///////////// AsTransient
-
 // Create a new instance of Foo for every class that asks for it
 Container.Bind<Foo>().AsTransient();
 
+// This is equivalent since AsTransient is the default
+Container.Bind<Foo>();
+
 // Create a new instance of Foo for every class that asks for an IFoo
 Container.Bind<IFoo>().To<Foo>().AsTransient();
+
+// This is equivalent since Transient is the default
+Container.Bind<IFoo>().To<Foo>();
 
 // Non generic versions
 Container.Bind(typeof(IFoo)).AsTransient();
 Container.Bind(typeof(IFoo)).To(typeof(Foo)).AsTransient();
 
-///////////// ToSingle
+///////////// AsSingle
 
 // Create one definitive instance of Foo and re-use that for every class that asks for it
 Container.Bind<Foo>().AsSingle();
@@ -30,54 +34,44 @@ Container.Bind<IFoo>().To<Foo>().AsSingle();
 // In this example, the same instance of Foo will be used for all three cases
 Container.Bind<Foo>().AsSingle();
 Container.Bind<IFoo>().To<Foo>().AsSingle();
-Container.Bind<IBar>().To<Foo>().AsSingle();
+Container.Bind<IFoo2>().To<Foo>().AsSingle();
 
 // Non generic versions
 Container.Bind(typeof(Foo)).AsSingle();
-Container.Bind(typeof(IFoo)).ToSingle(typeof(Foo));
+Container.Bind(typeof(IFoo)).AsSingle(typeof(Foo));
 
 ///////////// BindAllInterfaces
 
 // Bind all interfaces that Foo implements to a new singleton of type Foo
 Container.BindAllInterfaces<Foo>().To<Foo>().AsSingle();
+
 // So for example if Foo implements ITickable and IInitializable then the above
 // line is equivalent to this:
 Container.Bind<ITickable>().To<Foo>().AsSingle();
 Container.Bind<IInitializable>().To<Foo>().AsSingle();
 
-///////////// ToInstance
+///////////// FromInstance
 
 // Use the given instance everywhere that Foo is used
-Container.Bind<Foo>().ToInstance(new Foo());
+Container.Bind<Foo>().FromInstance(new Foo());
 
 // This is simply a shortcut for the above binding
 // This can be a bit nicer since the type argument can be deduced from the parameter
 Container.BindInstance(new Foo());
 
-// Note that ToInstance is different from ToSingle because it does allow multiple bindings
-// and you can't re-use the same instance in multiple bindings like you can with ToSingle
+// Note that FromInstance is different from AsSingle because it does allow multiple bindings
+// and you can't re-use the same instance in multiple bindings like you can with AsSingle
 // For example, the following is allowed and will match any constructor parameters of type List<Foo>
 // (and throw an exception for parameters that ask for a single Foo)
-Container.Bind<Foo>().ToInstance(new Foo());
-Container.Bind<Foo>().ToInstance(new Foo());
-
-///////////// ToSingleInstance
-
-// Use the given instance everywhere Foo is requested and ensure that it is the only Foo that is created
-Container.Bind<Foo>().ToSingleInstance(new Foo());
-
-// We assume here that Foo implements both IFoo and IBar
-// This will result in the given instance of Foo used for all three cases
-Container.Bind<IFoo>().ToSingleInstance(new Foo());
-Container.Bind<IBar>().To<Foo>().AsSingle();
-Container.Bind<Foo>().AsSingle();
+Container.Bind<Foo>().FromInstance(new Foo());
+Container.Bind<Foo>().FromInstance(new Foo());
 
 ///////////// Binding primitive types
 
 // Use the number 10 every time an int is requested
 // You'd never really want to do this, you should almost always use a When condition for primitive values (see conditions section below)
-Container.Bind<int>().ToInstance(10);
-Container.Bind<bool>().ToInstance(false);
+Container.Bind<int>().FromInstance(10);
+Container.Bind<bool>().FromInstance(false);
 
 // These are the same as above
 // This can be a bit nicer though since the type argument can be deduced from the parameter
@@ -86,12 +80,12 @@ Container.Bind<bool>().ToInstance(false);
 Container.BindInstance(10);
 Container.BindInstance(false);
 
-///////////// ToMethod
+///////////// FromMethod
 
 // Create instance of Foo when requested, using the given method
 // Note that for more complex construction scenarios, you might consider using a factory
 // instead
-Container.Bind<Foo>().ToMethod(GetFoo);
+Container.Bind<Foo>().FromMethod(GetFoo);
 
 Foo GetFoo(InjectContext ctx)
 {
@@ -100,11 +94,11 @@ Foo GetFoo(InjectContext ctx)
 
 // Randomly return one of several different implementations of IFoo
 // We use Instantiate here instead of just new so that Foo1 gets its members injected
-Container.Bind<IFoo>().ToMethod(GetFoo);
+Container.Bind<IFoo>().FromMethod(GetFoo);
 
 IFoo GetFoo(InjectContext ctx)
 {
-    switch (Random.Range(0, 3))
+    switch (UnityEngine.Random.Range(0, 3))
     {
         case 0:
             return ctx.Container.Instantiate<Foo1>();
@@ -117,31 +111,34 @@ IFoo GetFoo(InjectContext ctx)
 }
 
 // Using lambda syntax
-Container.Bind<Foo>().ToMethod((ctx) => new Foo());
+Container.Bind<Foo>().FromMethod((ctx) => new Foo());
 
 // This is equivalent to AsTransient
-Container.Bind<Foo>().ToMethod((ctx) => ctx.Container.Instantiate<Foo>());
+Container.Bind<Foo>().FromMethod((ctx) => ctx.Container.Instantiate<Foo>());
 
-///////////// ToGetter
+///////////// FromResolveGetter
 
 // Bind to a property on another dependency
 // This can be helpful to reduce coupling between classes
 Container.Bind<Foo>().AsSingle();
 
-Container.Bind<Bar>().ToGetter<Foo>(foo => foo.GetBar());
+Container.Bind<Bar>().FromResolveGetter<Foo>(foo => foo.GetBar());
 
 // Another example using values
-Container.Bind<string>().ToGetter<Foo>(foo => foo.GetTitle());
+Container.Bind<string>().FromResolveGetter<Foo>(foo => foo.GetTitle());
 
-///////////// ToSingleGameObject
+///////////// FromGameObject (singleton)
 
 // Create a new game object at the root of the scene, add the Foo MonoBehaviour to it, and name it "Foo"
-Container.Bind<Foo>().ToSingleGameObject("Foo");
+Container.Bind<Foo>().FromGameObject().AsSingle();
+
+// You can also specify the game object name to use using WithGameObjectName
+Container.Bind<Foo>().FromGameObject().WithGameObjectName("Foo1").AsSingle();
 
 // Bind to an interface instead
-Container.Bind<IFoo>().ToSingleGameObject<Foo>("Foo");
+Container.Bind<IFoo>().To<Foo>().FromGameObject().AsSingle();
 
-///////////// ToSinglePrefab
+///////////// FromPrefab (singleton)
 
 // Create a new game object at the root of the scene using the given prefab
 // It is assumed that the Foo is a MonoBehaviour here and that Foo has been
@@ -149,59 +146,93 @@ Container.Bind<IFoo>().ToSingleGameObject<Foo>("Foo");
 // After zenject creates a new GameObject from the given prefab, it will
 // search the prefab for a component of type 'Foo' and return that
 GameObject fooPrefab;
-Container.Bind<Foo>().ToSinglePrefab(fooPrefab);
+Container.Bind<Foo>().FromPrefab(fooPrefab).AsSingle();
 
 // Bind to interface instead
-Container.Bind<IFoo>().ToSinglePrefab<Foo>(fooPrefab);
+Container.Bind<IFoo>().To<Foo>().FromPrefab(fooPrefab).AsSingle();
 
-// Note that in this case only one prefab will be instantiated and re-used
-// for all three bindings
-// (Prefab singletons are uniquely identified by their prefab)
-Container.Bind<Foo>().ToSinglePrefab(fooPrefab);
-Container.Bind<IInitializable>().ToSinglePrefab<Foo>(fooPrefab);
-Container.Bind<ITickable>().ToSinglePrefab<Foo>(fooPrefab);
+// In this example we use AsSingle but with different components
+// Note here that only one instance of the given prefab will be
+// created.  The AsSingle applies to the prefab itself and not to
+// the type that is being returned from the prefab.
+// For this to work, there must be both a Foo MonoBehaviour and
+// a Bar MonoBehaviour somewhere on the prefab
+GameObject prefab;
+Container.Bind<Foo>().FromPrefab(prefab).AsSingle();
+Container.Bind<Bar>().FromPrefab(prefab).AsSingle();
 
-///////////// ToTransientPrefab
+///////////// FromPrefab (Transient)
 
 // Instantiate a new copy of 'fooPrefab' every time an instance of Foo is
 // requested by a constructor parameter, injected field, etc.
-GameObject fooPrefab;
-Container.Bind<Foo>().ToTransientPrefab(fooPrefab);
+GameObject fooPrefab = null;
+Container.Bind<Foo>().FromPrefab(fooPrefab);
+
+// Again, this is equivalent since AsTransient is the default
+Container.Bind<Foo>().FromPrefab(fooPrefab).AsTransient();
 
 // Bind to interface instead
-Container.Bind<IFoo>().ToTransientPrefab<Foo>(fooPrefab);
+Container.Bind<IFoo>().To<Foo>().FromPrefab(fooPrefab);
 
 ///////////// Identifiers
 
-// By default this will use 'Qux' for every place that requires an instance of IFoo
-// But also allow for classes to use FooA or FooB by using identifiers
-Container.Bind<IFoo>().To<Qux>().AsSingle();
-Container.Bind<IFoo>("FooA").To<Bar>().AsSingle();
-Container.Bind<IFoo>("FooB").To<Baz>().AsSingle();
+// Bind a globally accessible string with the name 'PlayerName'
+// Note however that a better option might be to create a Settings object and bind
+// that instead
+Container.Bind<string>().WithId("PlayerName").FromInstance("name of the player");
 
+// This is the equivalent of the line above, and is a bit more readable
+Container.BindInstance("name of the player").WithId("PlayerName");
+
+// We can also use IDs to bind multiple instances of the same type:
+Container.Bind<string>().WithId("FooA").FromInstance("foo");
+Container.Bind<string>().WithId("FooB").FromInstance("asdf");
+
+// Then when we inject these dependencies we have to use the same ID:
 public class Norf
 {
-    // Uses Qux
-    [Inject]
-    IFoo _foo;
-
-    // Uses Bar
-    [Inject("FooA")]
-    IFoo _foo;
-
-    // Uses Baz if it exists, otherwise leaves it as null
-    [InjectOptional("FooB")]
-    IFoo _foo;
+    [Inject(Id = "FooA")]
+    string _foo;
 }
 
-// Bind a globally accessible string with the name 'PlayerName'
-// A better option might be to create a Settings object and bind that
-// instead however
-Container.Bind<string>("PlayerName").ToInstance("name of the player");
+public class Qux
+{
+    [Inject(Id = "FooB")]
+    string _foo;
+}
+
+// In this example, we bind three instances of Foo, including one without an ID
+Container.Bind<Foo>().AsCached();
+Container.Bind<Foo>().WithId("FooA").AsCached();
+Container.Bind<Foo>().WithId("FooA").AsCached();
+
+// When an ID is unspecified in an [Inject] field, it will use the first
+// instance
+// Bindings without IDs can therefore be used as a default and we can
+// specify IDs for specific versions of the same type
+public class Norf
+{
+    [Inject]
+    Foo _foo;
+}
+
+// Qux._foo will be the same instance as Norf._foo
+// This is because we are using AsCached rather than AsTransient
+// Note here that we don't want to use AsSingle since in that case
+// Qux._foo2 will also use the same instance
+public class Qux
+{
+    [Inject]
+    Foo _foo;
+
+    [Inject(Id = "FooA")]
+    Foo _foo2;
+}
 
 ///////////// Conditions
 
-// This will only allow dependencies on Foo by the Bar class
+// This will only allow Bar to depend on Foo
+// If we add Foo to the constructor of any other class it won't find it
 Container.Bind<Foo>().AsSingle().WhenInjectedInto<Bar>();
 
 // Use different implementations of IFoo dependending on which
@@ -218,7 +249,7 @@ Container.Bind<IFoo>().To<Foo2>().AsSingle().WhenInjectedInto<Qux>();
 Container.Bind<Foo>().AsSingle().WhenInjectedInto(typeof(Bar), typeof(Qux), typeof(Baz));
 
 // Supply "my game" for any strings that are injected into the Gui class with the identifier "Title"
-Container.BindInstance("Title", "my game").WhenInjectedInto<Gui>();
+Container.BindInstance("my game").WithId("Title").WhenInjectedInto<Gui>();
 
 // Supply 5 for all ints that are injected into the Gui class
 Container.BindInstance(5).WhenInjectedInto<Gui>();
@@ -243,8 +274,8 @@ Container.Bind<IFoo>().To<Foo>().AsTransient().When(
 var foo1 = new Foo();
 var foo2 = new Foo();
 
-Container.Bind<Bar>("Bar1").AsTransient();
-Container.Bind<Bar>("Bar2").AsTransient();
+Container.Bind<Bar>().WithId("Bar1").AsTransient();
+Container.Bind<Bar>().WithId("Bar2").AsTransient();
 
 // Here we use the 'ParentContexts' property of inject context to sync multiple corresponding identifiers
 Container.BindInstance(foo1).When(c => c.ParentContexts.Where(x => x.MemberType == typeof(Bar) && x.Identifier == "Bar1").Any());
@@ -254,20 +285,20 @@ Container.BindInstance(foo2).When(c => c.ParentContexts.Where(x => x.MemberType 
 // Container.Resolve<Bar>("Bar1").Foo == foo1
 // Container.Resolve<Bar>("Bar2").Foo == foo2
 
-///////////// ToResolve
+///////////// FromResolve
 
 // This will result in IBar, IFoo, and Foo, all being bound to the same instance of
 // Foo which is assume to exist somewhere on the given prefab
 GameObject fooPrefab;
-Container.Bind<Foo>().ToSinglePrefab(fooPrefab);
-Container.Bind<IBar>().ToResolve<Foo>()
-Container.Bind<IFoo>().ToResolve<IBar>()
+Container.Bind<Foo>().FromPrefab(fooPrefab).AsSingle();
+Container.Bind<IBar>().To<Foo>().FromResolve();
+Container.Bind<IFoo>().To<IBar>().FromResolve();
 
-// This is result in the same as the above
-GameObject fooPrefab;
-Container.Bind<Foo>().ToSinglePrefab(fooPrefab);
-Container.Bind<IBar>().ToSinglePrefab<Foo>(fooPrefab);
-Container.Bind<IFoo>().ToSinglePrefab<Foo>(fooPrefab);
+// This will result in the same behaviour as the above
+GameObject fooPrefab = null;
+Container.Bind<Foo>().FromPrefab(fooPrefab).AsSingle();
+Container.Bind<IBar>().To<Foo>().FromPrefab(fooPrefab).AsSingle();
+Container.Bind<IFoo>().To<Foo>().FromPrefab(fooPrefab).AsSingle();
 
 ///////////// Rebind
 
@@ -283,21 +314,25 @@ Container.Rebind<IFoo>().To<Bar>().AsSingle();
 ///////////// Installing Other Installers
 
 // Immediately call InstallBindings() on FooInstaller
-Container.Install<FooInstaller>();
+FooInstaller.Install(Container);
 
 // Before calling FooInstaller, configure a property of it
 Container.BindInstance("foo").WhenInjectedInto<FooInstaller>();
-Container.Install<FooInstaller>();
+FooInstaller.Install(Container);
+
+// We can also pass arguments directly
+// This line is equivalent to the above two lines
+FooInstaller.Install(Container, new object[] { "foo" });
 
 // After calling FooInstaller, override one of its bindings
 // We assume here that FooInstaller binds IFoo to something
-Container.Install<FooInstaller>();
+FooInstaller.Install(Container);
 Container.Rebind<IFoo>().To<Bar>().AsSingle();
 
 ///////////// Manual Use of Container
 
 // This will fill in any parameters marked as [Inject] and also call any [Inject] methods
-foo = new Foo();
+var foo = new Foo();
 Container.Inject(foo);
 
 // Return an instance for IFoo, using the bindings that have been added previously
@@ -313,17 +348,19 @@ Container.BindInstance(new Foo());
 Container.BindInstance(new Foo());
 var foos = Container.ResolveAll<IFoo>();
 
-// Instantiate a new instance of Foo and inject on any of its members
+// Create a new instance of Foo and inject on any of its members
+// And fill in any constructor parameters Foo might have
 Container.Instantiate<Foo>();
 
+GameObject prefab = null;
 // Instantiate a new prefab and have any injectables filled in on the prefab
 GameObject go = Container.InstantiatePrefab(prefab);
 
 // Instantiate a new prefab and return a specific monobehaviour
-Foo foo = Container.InstantiatePrefabForComponent<Foo>(prefab);
+Foo foo2 = Container.InstantiatePrefabForComponent<Foo>(prefab);
 
 // Add a new component to an existing game object
-Foo foo = Container.InstantiateComponent<Foo>(gameObject);
+Foo foo3 = Container.InstantiateComponent<Foo>(gameObject);
 
 ```
 
