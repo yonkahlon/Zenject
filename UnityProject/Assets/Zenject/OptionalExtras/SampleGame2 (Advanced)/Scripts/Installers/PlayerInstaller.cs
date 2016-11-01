@@ -26,7 +26,6 @@ namespace Zenject.SpaceFighter
             Container.BindAllInterfaces<PlayerHealthWatcher>().To<PlayerHealthWatcher>().AsSingle();
 
             Container.BindSignal<PlayerSignals.Hit>();
-            Container.BindTrigger<PlayerSignals.Hit.Trigger>();
 
             InstallSettings();
         }

@@ -5,10 +5,10 @@ namespace Zenject.SpaceFighter
 {
     public class PlayerCollisionDetector : MonoBehaviour
     {
-        PlayerSignals.Hit.Trigger _hitTrigger;
+        PlayerSignals.Hit _hitTrigger;
 
         [Inject]
-        public void Construct(PlayerSignals.Hit.Trigger hitTrigger)
+        public void Construct(PlayerSignals.Hit hitTrigger)
         {
             _hitTrigger = hitTrigger;
         }

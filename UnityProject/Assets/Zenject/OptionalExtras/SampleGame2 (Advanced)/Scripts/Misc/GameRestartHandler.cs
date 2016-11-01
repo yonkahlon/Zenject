@@ -7,9 +7,9 @@ namespace Zenject.SpaceFighter
 {
     public class GameRestartHandler : IInitializable, IDisposable, ITickable
     {
-        readonly PlayerKilledSignal _killedSignal;
         readonly Settings _settings;
 
+        PlayerKilledSignal _killedSignal;
         bool _isDelaying;
         float _delayStartTime;
 
@@ -23,12 +23,12 @@ namespace Zenject.SpaceFighter
 
         public void Initialize()
         {
-            _killedSignal.Event += OnPlayerKilled;
+            _killedSignal += OnPlayerKilled;
         }
 
         public void Dispose()
         {
-            _killedSignal.Event -= OnPlayerKilled;
+            _killedSignal -= OnPlayerKilled;
         }
 
         public void Tick()

@@ -1,12 +1,13 @@
 using ModestTree;
 using UnityEngine;
 using Zenject;
+using System;
 
 #pragma warning disable 649
 
 namespace Zenject.SpaceFighter
 {
-    public class PlayerHealthDisplay : MonoBehaviour
+    public class PlayerHealthDisplay : MonoBehaviour, IDisposable, IInitializable
     {
         [SerializeField]
         float _leftPadding;
@@ -40,15 +41,26 @@ namespace Zenject.SpaceFighter
         Texture2D _textureBackground;
         int _killCount;
 
+        EnemyKilledSignal _enemyKilledSignal;
+
         [Inject]
         public void Construct(PlayerModel model, EnemyKilledSignal enemyKilledSignal)
         {
             _model = model;
+            _enemyKilledSignal = enemyKilledSignal;
+        }
 
+        public void Initialize()
+        {
             _textureForeground = CreateColorTexture(_foregroundColor);
             _textureBackground = CreateColorTexture(_backgroundColor);
 
-            enemyKilledSignal.Event += OnEnemyKilled;
+            _enemyKilledSignal += OnEnemyKilled;
+        }
+
+        public void Dispose()
+        {
+            _enemyKilledSignal -= OnEnemyKilled;
         }
 
         void OnEnemyKilled()

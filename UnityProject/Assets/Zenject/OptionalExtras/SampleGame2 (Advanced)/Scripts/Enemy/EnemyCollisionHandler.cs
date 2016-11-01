@@ -6,10 +6,11 @@ namespace Zenject.SpaceFighter
 {
     public class EnemyCollisionHandler : IInitializable, IDisposable
     {
-        readonly EnemySignals.Hit _hitSignal;
         readonly AudioPlayer _audioPlayer;
         readonly Settings _settings;
         readonly EnemyModel _model;
+
+        EnemySignals.Hit _hitSignal;
 
         public EnemyCollisionHandler(
             EnemyModel model,
@@ -25,12 +26,12 @@ namespace Zenject.SpaceFighter
 
         public void Initialize()
         {
-            _hitSignal.Event += OnHit;
+            _hitSignal += OnHit;
         }
 
         public void Dispose()
         {
-            _hitSignal.Event -= OnHit;
+            _hitSignal -= OnHit;
         }
 
         void OnHit(Bullet bullet)
