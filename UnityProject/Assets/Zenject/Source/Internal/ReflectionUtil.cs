@@ -39,7 +39,7 @@ namespace ModestTree.Util
             {
                 if (obj != null)
                 {
-                    Assert.That(elementType.IsAssignableFrom(obj.GetType()),
+                    Assert.That(obj.GetType().DerivesFromOrEqual(elementType),
                         "Wrong type when creating generic list, expected something assignable from '"+ elementType +"', but found '" + obj.GetType() + "'");
                 }
 
