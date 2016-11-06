@@ -352,11 +352,11 @@ PlayerSettings:
   scriptingDefineSymbols: {}
   metroPackageName: Game1
   metroPackageVersion: 
-  metroCertificatePath: 
+  metroCertificatePath: C:\Projects\zenject\UnityProject\Assets\WSATestCertificate.pfx
   metroCertificatePassword: 
-  metroCertificateSubject: 
-  metroCertificateIssuer: 
-  metroCertificateNotAfter: 0000000000000000
+  metroCertificateSubject: ModestTree
+  metroCertificateIssuer: ModestTree
+  metroCertificateNotAfter: 80dfc9324f57d301
   metroApplicationDescription: Game1
   wsaImages: {}
   metroTileShortName: 
@@ -429,7 +429,7 @@ PlayerSettings:
   - iOS::EnableIncrementalBuildSupportForIl2cpp
   - iOS::ScriptingBackend
   Android::ScriptingBackend: 0
-  Metro::ScriptingBackend: 2
+  Metro::ScriptingBackend: 1
   Standalone::ScriptingBackend: 0
   WP8::ScriptingBackend: 2
   WebGL::ScriptingBackend: 1
