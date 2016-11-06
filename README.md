@@ -2132,7 +2132,7 @@ Something else to note is that the rate at which the ITickable.Tick method gets 
 
 ## <a id="cheatsheet"></a>Cheat Sheet
 
-See <a href="Documentation/Cheatsheet.md">here</a>.
+See <a href="Documentation/CheatSheet.md">here</a>.
 
 ## <a id="further-help"></a>Further Help
 
