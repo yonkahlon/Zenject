@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
@@ -36,18 +36,18 @@
   <div class="page">
     <div id="preview-page" class="preview-page" data-autorefresh-url="">
 
-    
+
 
       <div role="main" class="main-content">
         <div class="container new-discussion-timeline experiment-repo-nav">
           <div class="repository-content">
             <div id="readme" class="readme boxed-group clearfix announce instapaper_body md">
-              
+
                 <h3>
                   <span class="octicon octicon-book"></span>
                   README.md
                 </h3>
-              
+
               <article class="markdown-body entry-content" itemprop="text" id="grip-content">
                 <p><a href="ZenjectLogo.png?raw=true" target="_blank"><img src="ZenjectLogo.png?raw=true" alt="Zenject" width="600px" height="134px" style="max-width:100%;"></a></p>
 
@@ -1021,11 +1021,11 @@ Container.Bind&lt;IDisposable&gt;().To&lt;Logger&gt;().AsSingle();</pre></div>
 
 public class GameInstaller : MonoInstaller
 {
-    public Foo Foo;
+    public Foo foo;
 
     public override void InstallBindings()
     {
-        Container.BindInstance(Foo);
+        Container.BindInstance(foo);
         Container.Bind&lt;IInitializable&gt;().To&lt;GameRunner&gt;().AsSingle();
     }
 }
@@ -1881,7 +1881,9 @@ Container.BindTickableExecutionOrder&lt;Bar&gt;(-<span class="pl-c1">80</span>);
 
 <p>If you run your scene it should now behave exactly like the main scene except with the added functionality in your decorator installer.  Also note that while not shown here, both scenes can access each other's bindings as if everything was in the same scene.</p>
 
-<p>Also note that the Validate command can be used to quickly verify the different multi-scene setups.</p>
+<p>Also note that the Validate command (CTRL+SHIFT+V) can be used to quickly verify the different multi-scene setups.</p>
+
+<p>Also, note that decorator scenes must be loaded before the scenes that they are decorating.</p>
 
 <p>Also, I should mention that Unity currently doesn't have a built-in way to save and restore multi-scene setups.  We use a simple editor script for this that you can find <a href="https://gist.github.com/svermeulen/8927b29b2bfab4e84c950b6788b0c677">here</a> if interested.</p>
 
@@ -2310,8 +2312,14 @@ public class TestInstaller : MonoInstaller
 
 <ul>
 <li>Pokemon Go (both <a href="https://itunes.apple.com/us/app/pokemon-go/id1094591345?mt=8">iOS</a> and <a href="https://play.google.com/store/apps/details?id=com.nianticlabs.pokemongo&amp;hl=en">Android</a>)</li>
-<li><a href="https://play.google.com/store/apps/details?id=com.nerdcorps.pinballcritters&amp;hl=en">Spinball Carnival</a></li>
-<li><a href="https://play.google.com/store/apps/details?id=com.nerdcorps.slugthree&amp;hl=en">Slugterra: Guardian Force</a></li>
+<li>
+<a href="https://play.google.com/store/apps/details?id=com.nerdcorps.pinballcritters&amp;hl=en">Spinball Carnival</a> (Android)</li>
+<li>
+<a href="https://play.google.com/store/apps/details?id=com.nerdcorps.slugthree&amp;hl=en">Slugterra: Guardian Force</a> (Android)</li>
+<li>
+<a href="https://github.com/shiwano/submarine">Submarine</a> (iOS and Android)</li>
+<li>
+<a href="https://itunes.apple.com/us/app/nova-black-holes/id1114574985?mt=8">NOVA Black Holes</a> (iOS)</li>
 </ul>
 
 <p>Libraries</p>
@@ -2327,9 +2335,9 @@ public class TestInstaller : MonoInstaller
 
 <ul>
 <li>
-<a href="https://www.modest3d.com/editor">Modest 3D</a> - An IDE to allow users to quickly and easily create procedural training content</li>
+<a href="https://www.modest3d.com/editor">Modest 3D</a> (WebGL, WebPlayer, PC) - An IDE to allow users to quickly and easily create procedural training content</li>
 <li>
-<a href="https://www.modest3d.com/explorer">Modest 3D Explorer</a> - A simple editor to quickly create a 3D presentation with some number of slides</li>
+<a href="https://www.modest3d.com/explorer">Modest 3D Explorer</a> (WebGL, WebPlayer, iOS, Android, PC, Windows Store) - A simple editor to quickly create a 3D presentation with some number of slides</li>
 </ul>
 </li>
 </ul>
@@ -2337,7 +2345,7 @@ public class TestInstaller : MonoInstaller
 <h2>
 <a id="user-content-cheat-sheet" class="anchor" href="#cheat-sheet" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a><a id="user-content-cheatsheet"></a>Cheat Sheet</h2>
 
-<p>TBD</p>
+<p>See <a href="CheatSheet.html">here</a>.</p>
 
 <h2>
 <a id="user-content-further-help" class="anchor" href="#further-help" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a><a id="user-content-further-help"></a>Further Help</h2>
@@ -2381,7 +2389,7 @@ SOFTWARE.
         </div>
       </div>
 
-    
+
 
   </div>
   <div>&nbsp;</div>
