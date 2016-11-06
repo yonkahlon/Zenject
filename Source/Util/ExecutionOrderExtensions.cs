@@ -57,7 +57,7 @@ namespace Zenject
                 "Expected type '{0}' to derive from ITickable", type.Name());
 
             container.BindInstance(
-                ModestTree.Util.Tuple.New(type, order)).WhenInjectedInto<TickableManager>();
+                ModestTree.Util.ValuePair.New(type, order)).WhenInjectedInto<TickableManager>();
         }
 
         public static void BindInitializableExecutionOrder<T>(
@@ -74,7 +74,7 @@ namespace Zenject
                 "Expected type '{0}' to derive from IInitializable", type.Name());
 
             container.BindInstance(
-                ModestTree.Util.Tuple.New(type, order)).WhenInjectedInto<InitializableManager>();
+                ModestTree.Util.ValuePair.New(type, order)).WhenInjectedInto<InitializableManager>();
         }
 
         public static void BindDisposableExecutionOrder<T>(
@@ -91,7 +91,7 @@ namespace Zenject
                 "Expected type '{0}' to derive from IDisposable", type.Name());
 
             container.BindInstance(
-                ModestTree.Util.Tuple.New(type, order)).WhenInjectedInto<DisposableManager>();
+                ModestTree.Util.ValuePair.New(type, order)).WhenInjectedInto<DisposableManager>();
         }
 
         public static void BindFixedTickableExecutionOrder<T>(
@@ -107,8 +107,8 @@ namespace Zenject
             Assert.That(type.DerivesFrom<IFixedTickable>(),
                 "Expected type '{0}' to derive from IFixedTickable", type.Name());
 
-            container.Bind<ModestTree.Util.Tuple<Type, int>>().WithId("Fixed")
-                .FromInstance(ModestTree.Util.Tuple.New(type, order)).WhenInjectedInto<TickableManager>();
+            container.Bind<ModestTree.Util.ValuePair<Type, int>>().WithId("Fixed")
+                .FromInstance(ModestTree.Util.ValuePair.New(type, order)).WhenInjectedInto<TickableManager>();
         }
 
         public static void BindLateTickableExecutionOrder<T>(
@@ -124,8 +124,8 @@ namespace Zenject
             Assert.That(type.DerivesFrom<ILateTickable>(),
                 "Expected type '{0}' to derive from ILateTickable", type.Name());
 
-            container.Bind<ModestTree.Util.Tuple<Type, int>>().WithId("Late")
-                .FromInstance(ModestTree.Util.Tuple.New(type, order)).WhenInjectedInto<TickableManager>();
+            container.Bind<ModestTree.Util.ValuePair<Type, int>>().WithId("Late")
+                .FromInstance(ModestTree.Util.ValuePair.New(type, order)).WhenInjectedInto<TickableManager>();
         }
     }
 }

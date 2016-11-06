@@ -92,7 +92,7 @@ namespace Zenject
                 BindInfo, FinalizerWrapper, subIdentifier);
         }
 
-        public ScopeBinder FromFactory(Type factoryType)
+        public ScopeArgBinder FromFactory(Type factoryType)
         {
             Assert.That(factoryType.DerivesFrom<IFactory>());
 
@@ -100,9 +100,9 @@ namespace Zenject
                 BindInfo,
                 SingletonTypes.ToFactory, factoryType,
                 (container, type) => new UntypedFactoryProvider(
-                    factoryType, container, new List<TypeValuePair>()));
+                    factoryType, container, BindInfo.Arguments));
 
-            return new ScopeBinder(BindInfo);
+            return new ScopeArgBinder(BindInfo);
         }
 
 #if !NOT_UNITY3D
@@ -232,7 +232,7 @@ namespace Zenject
             return this;
         }
 
-        protected ScopeBinder FromFactoryBase<TConcrete, TFactory>()
+        protected ScopeArgBinder FromFactoryBase<TConcrete, TFactory>()
             where TFactory : IFactory<TConcrete>
         {
             BindingUtil.AssertIsDerivedFromTypes(typeof(TConcrete), AllParentTypes);
@@ -240,9 +240,9 @@ namespace Zenject
             SubFinalizer = new ScopableBindingFinalizer(
                 BindInfo,
                 SingletonTypes.ToFactory, typeof(TFactory),
-                (container, type) => new FactoryProvider<TConcrete, TFactory>(container, new List<TypeValuePair>()));
+                (container, type) => new FactoryProvider<TConcrete, TFactory>(container, BindInfo.Arguments));
 
-            return new ScopeBinder(BindInfo);
+            return new ScopeArgBinder(BindInfo);
         }
 
         protected ScopeBinder FromResolveGetterBase<TObj, TResult>(

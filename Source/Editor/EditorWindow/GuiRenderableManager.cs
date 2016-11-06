@@ -16,7 +16,7 @@ namespace Zenject
             [Inject(Optional = true, Source = InjectSources.Local)]
             List<IGuiRenderable> renderables,
             [Inject(Optional = true, Source = InjectSources.Local)]
-            List<ModestTree.Util.Tuple<Type, int>> priorities)
+            List<ModestTree.Util.ValuePair<Type, int>> priorities)
         {
             _renderables = new List<RenderableInfo>();
 
