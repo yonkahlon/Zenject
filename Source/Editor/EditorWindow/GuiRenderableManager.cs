@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using ModestTree;
+using ModestTree.Util;
 
 namespace Zenject
 {
@@ -16,7 +17,7 @@ namespace Zenject
             [Inject(Optional = true, Source = InjectSources.Local)]
             List<IGuiRenderable> renderables,
             [Inject(Optional = true, Source = InjectSources.Local)]
-            List<ModestTree.Util.ValuePair<Type, int>> priorities)
+            List<ValuePair<Type, int>> priorities)
         {
             _renderables = new List<RenderableInfo>();
 
