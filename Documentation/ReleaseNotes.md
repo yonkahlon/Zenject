@@ -1,6 +1,14 @@
 
 ## <a id="release-notes"></a>Release Notes
 
+4.7 (November 6, 2016)
+- Removed the concept of triggers in favour of just directly acting on the Signal to both subscribe and fire, since using Trigger was too much overhead for not enough gain
+- Fixed issue for Windows Store platform where zenject was not properly stripping out the WSA generated constructors
+- Changed to automatically choose the public constructor if faced with a choice between public and private
+- Fix to IL2CPP builds to work again
+- Added support for using the WithArguments bind method combined with FromFactory
+- Improved validation of multi-scene setups using Contract Names to output better error messages
+
 4.6 (October 23, 2016)
 - Changed Validation to run at edit time rather than requiring that we enter play mode.  This is significantly faster.  Also added a hotkey to "validate then run" since it's fast enough to use as a pre-run check
 - Added InstantiateComponentOnNewGameObject method

@@ -52,6 +52,17 @@
                 <h2>
 <a id="user-content-release-notes" class="anchor" href="#release-notes" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a><a id="user-content-release-notes"></a>Release Notes</h2>
 
+<p>4.7 (November 6, 2016)</p>
+
+<ul>
+<li>Removed the concept of triggers in favour of just directly acting on the Signal to both subscribe and fire, since using Trigger was too much overhead for not enough gain</li>
+<li>Fixed issue for Windows Store platform where zenject was not properly stripping out the WSA generated constructors</li>
+<li>Changed to automatically choose the public constructor if faced with a choice between public and private</li>
+<li>Fix to IL2CPP builds to work again</li>
+<li>Added support for using the WithArguments bind method combined with FromFactory</li>
+<li>Improved validation of multi-scene setups using Contract Names to output better error messages</li>
+</ul>
+
 <p>4.6 (October 23, 2016)</p>
 
 <ul>
