@@ -17,100 +17,122 @@ Both cases result in the classes being coupled in some way.  Now if instead you 
 Signals are defined like this:
 
 ```csharp
-public class GameLoadedSignal : Signal
+public class PressedButtonSignal : Signal<PressedButtonSignal>
 {
-    public class Trigger : TriggerBase { }
-}
-
-public class GameLoadedSignalWithParameter : Signal<string>
-{
-    public class Trigger : TriggerBase { }
 }
 ```
 
-The trigger class is used to invoke the signal event.  We make the trigger a separate class so that we can control which classes can trigger the signal and which classes can listen on the signal separately.
-
-Signals are declared in an installer like this:
+Then in an Installer:
 
 ```csharp
-
 public override void InstallBindings()
 {
-    ...
-    Container.BindSignal<GameLoadedSignal>();
-    ...
-    Container.BindSignal<GameLoadedSignalWithParameter>().WhenInjectedInto<Foo>();
+    Container.BindSignal<PressedButtonSignal>();
 }
-
 ```
 
-These statements will do the following:
-* Bind the class `GameLoadedSignal` using `AsSingle` without a condition.  This means that any class can declare `GameLoadedSignal` as a dependency.
-* Bind the class `GameLoadedSignalWithParameter` using `AsSingle` as well, except it will limit its usage strictly to class `Foo`.
-
-Once you have added the signal to your container by binding it within an installer, you can use it like this:
+Then in the firing class:
 
 ```csharp
+public class Bar
+{
+    readonly PressedButtonSignal _signal;
 
+    public Bar(PressedButtonSignal signal)
+    {
+        _signal = signal;
+    }
+
+    public void DoSomething()
+    {
+        _signal.Fire();
+    }
+}
+```
+
+And in the listening class:
+
+```csharp
 public class Foo : IInitializable, IDisposable
 {
-    readonly GameLoadedSignal _signal;
+    PressedButtonSignal _signal;
 
-    public Foo(GameLoadedSignal signal)
+    public Foo1(PressedButtonSignal signal)
     {
         _signal = signal;
     }
 
     public void Initialize()
     {
-        _signal.Event += OnGameLoaded;
+        _signal += OnPressed;
+
+        // You can also do this which is equivalent
+        // _signal.Listen(OnPressed);
     }
 
     public void Dispose()
     {
-        _signal.Event -= OnGameLoaded;
+        _signal -= OnPressed;
+
+        // You can also do this which is equivalent
+        // _signal.Unlisten(OnPressed);
     }
 
-    void OnGameLoaded()
+    void OnPressed()
     {
-        ...
+        Debug.Log("Received OnPressed event");
     }
 }
 ```
 
-Here we use the convention of prefixing event handlers with On, but of course you don't have to follow this convention.
+Signals can be especially useful for system-wide events that are not associated with any particular class.
 
-After binding the signal, you will almost always want to also bind a trigger, so that you can actually invoke the signal.  Signals and Triggers are bound as separate statements so that you can optionally add conditional binding on both the trigger and the signal separately.
+Something else worth noting is that signals will throw exceptions if all listeners have not properly removed themselves by the time the scene exits.  So for example, if we were to remove the line `_signal -= OnPressed` from above, we would see error messages in the log.  If this behaviour is too strict for your liking, you might consider commenting out the assert in the Signal.Dispose methods.
 
-Triggers are declared in an installer like this:
+Also note that you can add parameters to your signals by adding the parameter types to the generic arguments of the Signal base class.  For example:
 
 ```csharp
-
-public override void InstallBindings()
+public class PressedButtonSignal : Signal<PressedButtonSignal, string>
 {
-    ...
-    Container.BindTrigger<GameLoadedSignal.Trigger>();
-    ...
-    Container.BindTrigger<GameLoadedSignalWithParameter.Trigger>().WhenInjectedInto<Foo>();
 }
 
-```
-
-Once you have added the trigger to your container by binding it within an installer, you can use it like this:
-
-```csharp
-public class Foo
+public class Bar
 {
-    readonly GameLoadedSignal.Trigger _trigger;
+    readonly PressedButtonSignal _signal;
 
-    public Foo(GameLoadedSignal.Trigger trigger)
+    public Bar(PressedButtonSignal signal)
     {
-        _trigger = trigger;
+        _signal = signal;
     }
 
     public void DoSomething()
     {
-        _trigger.Fire();
+        _signal.Fire("some data");
+    }
+}
+
+public class Foo : IInitializable, IDisposable
+{
+    PressedButtonSignal _signal;
+
+    public Foo1(PressedButtonSignal signal)
+    {
+        _signal = signal;
+    }
+
+    public void Initialize()
+    {
+        _signal += OnPressed;
+    }
+
+    public void Dispose()
+    {
+        _signal -= OnPressed;
+    }
+
+    void OnPressed(string data)
+    {
+        Debug.Log("Received OnPressed event with data: " + data);
     }
 }
 ```
