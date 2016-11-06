@@ -14,7 +14,7 @@ namespace Zenject
             [Inject(Optional = true, Source = InjectSources.Local)]
             List<IDisposable> disposables,
             [Inject(Optional = true, Source = InjectSources.Local)]
-            List<ModestTree.Util.Tuple<Type, int>> priorities)
+            List<ModestTree.Util.ValuePair<Type, int>> priorities)
         {
             foreach (var disposable in disposables)
             {

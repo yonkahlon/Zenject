@@ -17,13 +17,13 @@ namespace Zenject
         readonly List<ILateTickable> _lateTickables = null;
 
         [Inject(Optional = true, Source = InjectSources.Local)]
-        readonly List<ModestTree.Util.Tuple<Type, int>> _priorities = null;
+        readonly List<ModestTree.Util.ValuePair<Type, int>> _priorities = null;
 
         [Inject(Optional = true, Id = "Fixed", Source = InjectSources.Local)]
-        readonly List<ModestTree.Util.Tuple<Type, int>> _fixedPriorities = null;
+        readonly List<ModestTree.Util.ValuePair<Type, int>> _fixedPriorities = null;
 
         [Inject(Optional = true, Id = "Late", Source = InjectSources.Local)]
-        readonly List<ModestTree.Util.Tuple<Type, int>> _latePriorities = null;
+        readonly List<ModestTree.Util.ValuePair<Type, int>> _latePriorities = null;
 
         readonly TickablesTaskUpdater _updater = new TickablesTaskUpdater();
         readonly FixedTickablesTaskUpdater _fixedUpdater = new FixedTickablesTaskUpdater();

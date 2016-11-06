@@ -15,11 +15,20 @@ namespace Zenject
 
         bool _hasDisposed;
 
+        static string MethodToString(Action action)
+        {
+#if UNITY_WSA && ENABLE_DOTNET && !UNITY_EDITOR
+            return action.ToString();
+#else
+            return "{0}.{1}".Fmt(action.Method.DeclaringType.Name(), action.Method.Name);
+#endif
+        }
+
         public void Listen(Action listener)
         {
             Assert.That(!_listeners.Contains(listener),
                 () => "Tried to add method '{0}' to signal '{1}' but it has already been added"
-                .Fmt(SignalInternalUtil.MethodToString(listener.Method), this.GetType().Name));
+                .Fmt(MethodToString(listener), this.GetType().Name));
             _listeners.Add(listener);
         }
 
@@ -29,7 +38,7 @@ namespace Zenject
 
             Assert.That(success,
                 () => "Tried to remove method '{0}' from signal '{1}' without adding it first"
-                .Fmt(SignalInternalUtil.MethodToString(listener.Method), this.GetType().Name));
+                .Fmt(MethodToString(listener), this.GetType().Name));
         }
 
         void IDisposable.Dispose()
@@ -40,7 +49,7 @@ namespace Zenject
             // If you don't want to verify that all event handlers have been removed feel free to comment out this assert or remove
             Assert.That(_listeners.IsEmpty(),
                 () => "Found {0} methods still added to signal '{1}'.  Methods: {2}"
-                .Fmt(_listeners.Count, this.GetType().Name, _listeners.Select(x => SignalInternalUtil.MethodToString(x.Method)).Join(", ")));
+                .Fmt(_listeners.Count, this.GetType().Name, _listeners.Select(x => MethodToString(x)).Join(", ")));
         }
 
         public static TDerived operator + (Signal<TDerived> signal, Action listener)

@@ -1716,7 +1716,9 @@ public class TestHotKeysAdder : ITickable
 
 If you run your scene it should now behave exactly like the main scene except with the added functionality in your decorator installer.  Also note that while not shown here, both scenes can access each other's bindings as if everything was in the same scene.
 
-Also note that the Validate command can be used to quickly verify the different multi-scene setups.
+Also note that the Validate command (CTRL+SHIFT+V) can be used to quickly verify the different multi-scene setups.
+
+Also, note that decorator scenes must be loaded before the scenes that they are decorating.
 
 Also, I should mention that Unity currently doesn't have a built-in way to save and restore multi-scene setups.  We use a simple editor script for this that you can find <a href="https://gist.github.com/svermeulen/8927b29b2bfab4e84c950b6788b0c677">here</a> if interested.
 
