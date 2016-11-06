@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using ModestTree;
+using ModestTree.Util;
 
 namespace Zenject
 {
@@ -14,7 +15,7 @@ namespace Zenject
             [Inject(Optional = true, Source = InjectSources.Local)]
             List<IDisposable> disposables,
             [Inject(Optional = true, Source = InjectSources.Local)]
-            List<ModestTree.Util.ValuePair<Type, int>> priorities)
+            List<ValuePair<Type, int>> priorities)
         {
             foreach (var disposable in disposables)
             {

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using ModestTree;
 using System.Linq;
+using ModestTree.Util;
 
 namespace Zenject
 {
@@ -11,7 +12,7 @@ namespace Zenject
         readonly DiContainer _container = null;
 
         [InjectOptional]
-        readonly List<ModestTree.Util.ValuePair<TKey, Type>> _typePairs = null;
+        readonly List<ValuePair<TKey, Type>> _typePairs = null;
 
         Dictionary<TKey, Type> _typeMap;
 
@@ -89,8 +90,8 @@ namespace Zenject
         protected static ConditionBinder AddBindingInternal<TDerived>(DiContainer container, TKey key)
             where TDerived : TBase
         {
-            return container.Bind<ModestTree.Util.ValuePair<TKey, Type>>()
-                .FromInstance(ModestTree.Util.ValuePair.New(key, typeof(TDerived)));
+            return container.Bind<ValuePair<TKey, Type>>()
+                .FromInstance(ValuePair.New(key, typeof(TDerived)));
         }
     }
 
