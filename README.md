@@ -235,7 +235,8 @@ So we find that it is useful to push the responsibility of deciding which specif
 ```csharp
 var service = new SomeService();
 var foo = new Foo(service);
-var bar = new Bar(foo);
+var bar = new Bar(service);
+var qux = new Qux(bar);
 
 .. etc.
 ```
@@ -2121,6 +2122,8 @@ Something else to note is that the rate at which the ITickable.Tick method gets 
     * [Slugterra: Guardian Force](https://play.google.com/store/apps/details?id=com.nerdcorps.slugthree&hl=en) (Android)
     * [Submarine](https://github.com/shiwano/submarine) (iOS and Android)
     * [NOVA Black Holes](https://itunes.apple.com/us/app/nova-black-holes/id1114574985?mt=8) (iOS)
+    * [Farm Away!](http://www.farmawaygame.com/) (iOS and Android)
+    * [Build Away!](http://www.buildawaygame.com/) (iOS and Android)
 
     Libraries
 
