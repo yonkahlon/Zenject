@@ -729,9 +729,9 @@ public class FooInstaller : MonoInstaller
 }
 ```
 
-Note that in this case BarInstaller is of type Installer and not MonoInstaller, which is why we can simply call `BarInstaller.Install(Container)` and don't require that BarInstaller be added to our scene already.  Any calls to BarInstaller.Install will immediately create a temporary instance of BarInstaller and then call InstallBindings on it.  This will repeat for any installers that this installer installs.  Note also that when using the Installer base class, we always must pass in ourself as the generic argument to Installer<>.  This is necessary so that the Installer<> base class can define the static method `BarInstaller.Install`.  It is also designed this way to support runtime parameters (described below).
+Note that in this case BarInstaller is of type `Installer<>` (note the generic arguments) and not MonoInstaller, which is why we can simply call `BarInstaller.Install(Container)` and don't require that BarInstaller be added to our scene already.  Any calls to BarInstaller.Install will immediately create a temporary instance of BarInstaller and then call InstallBindings on it.  This will repeat for any installers that this installer installs.  Note also that when using the `Installer<>` base class, we always must pass in ourself as the generic argument to `Installer<>`.  This is necessary so that the `Installer<>` base class can define the static method `BarInstaller.Install`.  It is also designed this way to support runtime parameters (described below).
 
-One of the main reasons we use installers as opposed to just having all our bindings declared all at once for each scene, is to make them re-usable.  This is not a problem for installers of type `Installer` because you can simply call `FooInstaller.Install` as described above for every scene you wish to use it in, but then how would we re-use a MonoInstaller in multiple scenes?
+One of the main reasons we use installers as opposed to just having all our bindings declared all at once for each scene, is to make them re-usable.  This is not a problem for installers of type `Installer<>` because you can simply call `FooInstaller.Install` as described above for every scene you wish to use it in, but then how would we re-use a MonoInstaller in multiple scenes?
 
 There are three ways to do this.
 
@@ -741,7 +741,7 @@ There are three ways to do this.
 
 1. **Prefabs within Resources folder**.  You can also place your installer prefabs underneath a Resoures folder and install them directly from code by using the Resources path.  For details on usage see <a href="#runtime-parameters-for-installers">here</a>.
 
-Another option in addition to MonoInstaller and Installer is to use ScriptableObjectInstaller which has some advantages (especially for settings) - for details see <a href="#scriptableobject-installer">here</a>.
+Another option in addition to MonoInstaller and `Installer<>` is to use ScriptableObjectInstaller which has some advantages (especially for settings) - for details see <a href="#scriptableobject-installer">here</a>.
 
 When calling installers from other installers it is common to want to pass parameters into it.  See <a href="#runtime-parameters-for-installers">here</a> for details on how that is done.
 
