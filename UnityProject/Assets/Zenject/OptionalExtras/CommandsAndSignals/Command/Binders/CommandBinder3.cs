@@ -17,7 +17,7 @@ namespace Zenject
             Finalizer = new CommandBindingFinalizer<TCommand, THandler, TParam1, TParam2, TParam3>(
                 BindInfo, methodGetter,
                 (container) => new TransientProvider(
-                    typeof(THandler), container, BindInfo.Arguments, BindInfo.ConcreteIdentifier));
+                    typeof(THandler), container, BindInfo.Arguments, BindInfo.ConcreteIdentifier, BindInfo.ContextInfo));
 
             return new ScopeArgBinder(BindInfo);
         }
@@ -58,7 +58,7 @@ namespace Zenject
                 (container, type) => new CachedProvider(
                     new TransientProvider(
                         typeof(TCommand), container,
-                        InjectUtil.CreateArgListExplicit(action), null)));
+                        InjectUtil.CreateArgListExplicit(action), null, BindInfo.ContextInfo)));
 
             return new ConditionBinder(BindInfo);
         }
