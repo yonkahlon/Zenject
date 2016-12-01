@@ -71,6 +71,14 @@ namespace Zenject
             Assert.That(_dependencyRoots.IsEmpty());
             _dependencyRoots.AddRange(_container.ResolveDependencyRoots());
 
+            if (_container.IsValidating)
+            {
+                // The root-level Container has its ValidateIValidatables method
+                // called explicitly - however, this is not so for sub-containers
+                // so call it here instead
+                _container.ValidateIValidatables();
+            }
+
             Log.Debug("GameObjectContext: Initialized successfully");
         }
 
@@ -114,6 +122,7 @@ namespace Zenject
             _container.DefaultParent = this.transform;
 
             _container.Bind<Context>().FromInstance(this);
+            _container.Bind<GameObjectContext>().FromInstance(this);
 
             if (_kernel == null)
             {

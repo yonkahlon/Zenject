@@ -33,6 +33,8 @@ namespace Zenject
             Assert.IsNotNull(context,
                 "Expected prefab with name '{0}' to container a component of type 'GameObjectContext'", prefab.name);
 
+            // Note: We don't need to call ValidateIValidatables here because GameObjectContext does this for us
+
             return context.Container;
         }
     }

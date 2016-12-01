@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace Zenject
 {
-    public class FactoryFromBinderBase<TContract> : ConditionBinder
+    public class FactoryFromBinderBase<TContract> : ArgumentsBinder
     {
         public FactoryFromBinderBase(
             BindInfo bindInfo,
@@ -25,7 +25,7 @@ namespace Zenject
 
             // Default to just creating it using new
             finalizerWrapper.SubFinalizer = CreateFinalizer(
-                (container) => new TransientProvider(ContractType, container));
+                (container) => new TransientProvider(ContractType, container, BindInfo.Arguments, null, BindInfo.ContextInfo));
         }
 
         protected Type FactoryType
@@ -149,7 +149,7 @@ namespace Zenject
                 SubFinalizer = CreateFinalizer(
                     (container) => new PrefabGameObjectProvider(
                         new PrefabInstantiator(
-                            container, gameObjectInfo, 
+                            container, gameObjectInfo,
                             new List<TypeValuePair>(), new PrefabProvider(prefab))));
             }
             else
@@ -160,7 +160,7 @@ namespace Zenject
                     (container) => new GetFromPrefabComponentProvider(
                         ContractType,
                         new PrefabInstantiator(
-                            container, gameObjectInfo, 
+                            container, gameObjectInfo,
                             new List<TypeValuePair>(), new PrefabProvider(prefab))));
             }
 
@@ -178,7 +178,7 @@ namespace Zenject
                 SubFinalizer = CreateFinalizer(
                     (container) => new PrefabGameObjectProvider(
                         new PrefabInstantiator(
-                            container, gameObjectInfo, 
+                            container, gameObjectInfo,
                             new List<TypeValuePair>(), new PrefabProviderResource(resourcePath))));
             }
             else
@@ -189,7 +189,7 @@ namespace Zenject
                     (container) => new GetFromPrefabComponentProvider(
                         ContractType,
                         new PrefabInstantiator(
-                            container, gameObjectInfo, 
+                            container, gameObjectInfo,
                             new List<TypeValuePair>(), new PrefabProviderResource(resourcePath))));
             }
 

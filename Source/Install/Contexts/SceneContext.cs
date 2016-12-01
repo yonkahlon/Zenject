@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using ModestTree;
+using ModestTree.Util;
 using UnityEngine;
 using UnityEngine.Serialization;
 using UnityEngine.SceneManagement;
@@ -137,17 +138,6 @@ namespace Zenject
             Resolve();
         }
 
-        IEnumerable<Scene> LoadedScenes
-        {
-            get
-            {
-                for (int i = 0; i < SceneManager.sceneCount; i++)
-                {
-                    yield return SceneManager.GetSceneAt(i);
-                }
-            }
-        }
-
         DiContainer GetParentContainer()
         {
             if (string.IsNullOrEmpty(_parentContractName))
@@ -169,8 +159,7 @@ namespace Zenject
             Assert.IsNull(ParentContainer,
                 "Scene cannot have both a parent scene context name set and also an explicit parent container given");
 
-            var sceneContexts = LoadedScenes
-                .Where(scene => scene.isLoaded)
+            var sceneContexts = UnityUtil.AllLoadedScenes
                 .Except(gameObject.scene)
                 .SelectMany(scene => scene.GetRootGameObjects())
                 .SelectMany(root => root.GetComponentsInChildren<SceneContext>())
@@ -199,8 +188,7 @@ namespace Zenject
                 return new List<SceneDecoratorContext>();
             }
 
-            return LoadedScenes
-                .Where(scene => scene.isLoaded)
+            return UnityUtil.AllLoadedScenes
                 .Except(gameObject.scene)
                 .SelectMany(scene => scene.GetRootGameObjects())
                 .SelectMany(root => root.GetComponentsInChildren<SceneDecoratorContext>())
@@ -280,8 +268,7 @@ namespace Zenject
 
         void InstallBindings()
         {
-            _container.Bind<Context>().FromInstance(this);
-            _container.Bind<SceneContext>().FromInstance(this);
+            _container.Bind(typeof(Context), typeof(SceneContext)).To<SceneContext>().FromInstance(this);
 
             foreach (var decoratorContext in _decoratorContexts)
             {
@@ -337,4 +324,3 @@ namespace Zenject
 }
 
 #endif
-
