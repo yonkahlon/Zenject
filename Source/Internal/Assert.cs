@@ -234,6 +234,22 @@ namespace ModestTree
             }
         }
 
+        public static void Warn(bool condition)
+        {
+            if (!condition)
+            {
+                Log.Warn("Warning!  See call stack");
+            }
+        }
+
+        public static void Warn(bool condition, Func<string> messageGenerator)
+        {
+            if (!condition)
+            {
+                Log.Warn("Warning Assert hit! " + messageGenerator());
+            }
+        }
+
         //[Conditional("UNITY_EDITOR")]
         public static void Throw()
         {

@@ -32,7 +32,7 @@ namespace Zenject
                 new CachedProvider(
                     new TransientProvider(
                         typeof(TCommand), container,
-                        InjectUtil.CreateArgListExplicit(GetCommandAction(container)), null)));
+                        InjectUtil.CreateArgListExplicit(GetCommandAction(container)), null, BindInfo.ContextInfo)));
         }
 
         // The returned delegate is executed every time the command is executed

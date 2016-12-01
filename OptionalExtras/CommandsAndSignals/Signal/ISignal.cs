@@ -6,7 +6,7 @@ using ModestTree;
 
 namespace Zenject
 {
-    public interface ISignal : IDisposable
+    public interface ISignal : ILateDisposable
     {
     }
 }
