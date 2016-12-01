@@ -40,8 +40,18 @@ namespace Zenject
 
             if (BindInfo.NonLazy)
             {
-                container.BindRootResolve(
-                    BindInfo.Identifier, BindInfo.ContractTypes.ToArray());
+                // Note that we can't simply use container.BindRootResolve here because
+                // binding finalizers must only use RegisterProvider to allow cloning / bind
+                // inheritance to work properly
+                var bindingId = new BindingId(
+                    typeof(object), DiContainer.DependencyRootIdentifier);
+
+                foreach (var contractType in BindInfo.ContractTypes)
+                {
+                    container.RegisterProvider(
+                        bindingId, null, new ResolveProvider(
+                            contractType, container, BindInfo.Identifier, false));
+                }
             }
         }
 

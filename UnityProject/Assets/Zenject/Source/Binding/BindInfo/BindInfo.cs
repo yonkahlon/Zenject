@@ -24,8 +24,9 @@ namespace Zenject
 
     public class BindInfo
     {
-        public BindInfo(List<Type> contractTypes)
+        public BindInfo(List<Type> contractTypes, string contextInfo)
         {
+            ContextInfo = contextInfo;
             Identifier = null;
             ContractTypes = contractTypes;
             ToTypes = new List<Type>();
@@ -37,6 +38,11 @@ namespace Zenject
             InvalidBindResponse = InvalidBindResponses.Assert;
         }
 
+        public BindInfo(List<Type> contractTypes)
+            : this(contractTypes, null)
+        {
+        }
+
         public BindInfo(Type contractType)
             : this(new List<Type>() { contractType } )
         {
@@ -45,6 +51,12 @@ namespace Zenject
         public BindInfo()
             : this(new List<Type>())
         {
+        }
+
+        public string ContextInfo
+        {
+            get;
+            private set;
         }
 
         public object Identifier

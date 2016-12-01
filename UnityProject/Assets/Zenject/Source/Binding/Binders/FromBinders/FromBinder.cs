@@ -210,7 +210,7 @@ namespace Zenject
 
 #endif
 
-        public ScopeArgBinder FromMethod(Func<InjectContext, object> method)
+        public ScopeArgBinder FromMethodUntyped(Func<InjectContext, object> method)
         {
             SubFinalizer = new ScopableBindingFinalizer(
                 BindInfo,

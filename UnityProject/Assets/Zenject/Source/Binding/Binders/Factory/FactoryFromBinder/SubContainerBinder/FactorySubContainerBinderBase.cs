@@ -61,13 +61,13 @@ namespace Zenject
                 BindInfo, FactoryType, providerFunc);
         }
 
-        public ConditionBinder ByInstaller<TInstaller>()
+        public ArgumentsBinder ByInstaller<TInstaller>()
             where TInstaller : InstallerBase
         {
             return ByInstaller(typeof(TInstaller));
         }
 
-        public ConditionBinder ByInstaller(Type installerType)
+        public ArgumentsBinder ByInstaller(Type installerType)
         {
             Assert.That(installerType.DerivesFrom<InstallerBase>(),
                 "Invalid installer type given during bind command.  Expected type '{0}' to derive from 'Installer<>'", installerType.Name());
@@ -76,9 +76,9 @@ namespace Zenject
                 (container) => new SubContainerDependencyProvider(
                     ContractType, SubIdentifier,
                     new SubContainerCreatorByInstaller(
-                        container, installerType)));
+                        container, installerType, BindInfo.Arguments)));
 
-            return new ConditionBinder(BindInfo);
+            return new ArgumentsBinder(BindInfo);
         }
     }
 }

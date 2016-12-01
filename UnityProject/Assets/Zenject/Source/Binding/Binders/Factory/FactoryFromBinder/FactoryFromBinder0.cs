@@ -45,13 +45,13 @@ namespace Zenject
             return this;
         }
 
-        public ConditionBinder FromFactory<TSubFactory>()
+        public ArgumentsBinder FromFactory<TSubFactory>()
             where TSubFactory : IFactory<TContract>
         {
             SubFinalizer = CreateFinalizer(
-                (container) => new FactoryProvider<TContract, TSubFactory>(container, new List<TypeValuePair>()));
+                (container) => new FactoryProvider<TContract, TSubFactory>(container, BindInfo.Arguments));
 
-            return this;
+            return new ArgumentsBinder(BindInfo);
         }
 
         public FactorySubContainerBinder<TContract> FromSubContainerResolve()
