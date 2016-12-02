@@ -2129,11 +2129,12 @@ Something else to note is that the rate at which the ITickable.Tick method gets 
 
     * [EcsRx](https://github.com/grofit/ecsrx) - A framework for Unity using the ECS pattern
     * [Karma](https://github.com/cgarciae/karma) - An MVC framework for Unity
+    * [View Controller](http://blog.jamjardavies.co.uk/index.php/2016/04/12/view-controller-with-zenject/) - A view controller system
 
     Tools
 
-    * [Modest 3D](https://www.modest3d.com/editor) (WebGL, WebPlayer, PC) - An IDE to allow users to quickly and easily create procedural training content
-    * [Modest 3D Explorer](https://www.modest3d.com/explorer) (WebGL, WebPlayer, iOS, Android, PC, Windows Store) - A simple editor to quickly create a 3D presentation with some number of slides
+    * [Modest 3D](http://www.modest3d.com/editor) (WebGL, WebPlayer, PC) - An IDE to allow users to quickly and easily create procedural training content
+    * [Modest 3D Explorer](http://www.modest3d.com/explorer) (WebGL, WebPlayer, iOS, Android, PC, Windows Store) - A simple editor to quickly create a 3D presentation with some number of slides
 
 ## <a id="cheatsheet"></a>Cheat Sheet
 
