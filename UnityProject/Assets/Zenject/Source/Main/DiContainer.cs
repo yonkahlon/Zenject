@@ -1205,10 +1205,15 @@ namespace Zenject
             Assert.That(componentType.IsInterface() || componentType.DerivesFrom<Component>(),
                 "Expected type '{0}' to derive from UnityEngine.Component", componentType.Name());
 
-            var gameObj = (GameObject)GameObject.Instantiate(GetPrefabAsGameObject(prefab));
+			GameObject prefabAsGameObject = GetPrefabAsGameObject(prefab);
+
+			var gameObj = (GameObject)GameObject.Instantiate(prefabAsGameObject);
 
             gameObj.transform.SetParent(GetTransformGroup(gameObjectBindInfo), false);
-            gameObj.SetActive(true);
+
+			if (prefabAsGameObject.activeSelf) {
+				gameObj.SetActive(true);
+			}
 
             return InjectGameObjectForComponentExplicit(
                 gameObj, componentType, args);
