@@ -19,7 +19,7 @@ namespace Zenject.Asteroids
         readonly BrokenShipFactory _brokenShipFactory;
         readonly ExplosionFactory _explosionFactory;
         readonly Settings _settings;
-        readonly Signals.ShipCrashed.Trigger _shipCrashed;
+        readonly Signals.ShipCrashed _shipCrashed;
         readonly Ship _ship;
 
         GameObject _shipBroken;
@@ -27,7 +27,7 @@ namespace Zenject.Asteroids
 
         public ShipStateDead(
             Settings settings, Ship ship,
-            Signals.ShipCrashed.Trigger shipCrashed,
+            Signals.ShipCrashed shipCrashed,
             ExplosionFactory explosionFactory,
             BrokenShipFactory brokenShipFactory)
         {

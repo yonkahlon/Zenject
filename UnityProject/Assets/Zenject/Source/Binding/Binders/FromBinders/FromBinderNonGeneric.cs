@@ -11,7 +11,7 @@ namespace Zenject
         {
         }
 
-        public ScopeBinder FromFactory<TConcrete, TFactory>()
+        public ScopeArgBinder FromFactory<TConcrete, TFactory>()
             where TFactory : IFactory<TConcrete>
         {
             return FromFactoryBase<TConcrete, TFactory>();

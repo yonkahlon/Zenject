@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using ModestTree;
+using ModestTree.Util;
 
 namespace Zenject
 {
@@ -15,7 +16,7 @@ namespace Zenject
             [Inject(Optional = true, Source = InjectSources.Local)]
             List<IInitializable> initializables,
             [Inject(Optional = true, Source = InjectSources.Local)]
-            List<ModestTree.Util.Tuple<Type, int>> priorities)
+            List<ModestTree.Util.ValuePair<Type, int>> priorities)
         {
             _initializables = new List<InitializableInfo>();
 
@@ -24,7 +25,7 @@ namespace Zenject
                 // Note that we use zero for unspecified priority
                 // This is nice because you can use negative or positive for before/after unspecified
                 var matches = priorities.Where(x => initializable.GetType().DerivesFromOrEqual(x.First)).Select(x => x.Second).ToList();
-                int priority = matches.IsEmpty() ? 0 : matches.Single();
+                int priority = matches.IsEmpty() ? 0 : matches.Distinct().Single();
 
                 _initializables.Add(new InitializableInfo(initializable, priority));
             }

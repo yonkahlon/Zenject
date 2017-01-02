@@ -16,26 +16,22 @@ namespace Zenject.Tests
         public void Test1()
         {
             Container.BindSignal<FooSignal>();
-            Container.BindTrigger<FooSignal.Trigger>();
 
-            var trigger = Container.Resolve<FooSignal.Trigger>();
+            var signal = Container.Resolve<FooSignal>();
 
             bool received = false;
-            trigger.Event += delegate { received = true; };
+            signal += delegate { received = true; };
 
             // This is a compiler error
-            //trigger.Event();
+            //signal.Event();
 
             Assert.That(!received);
-            trigger.Fire();
+            signal.Fire();
             Assert.That(received);
         }
 
-        public class FooSignal : Signal
+        public class FooSignal : Signal<FooSignal>
         {
-            public class Trigger : TriggerBase
-            {
-            }
         }
     }
 }

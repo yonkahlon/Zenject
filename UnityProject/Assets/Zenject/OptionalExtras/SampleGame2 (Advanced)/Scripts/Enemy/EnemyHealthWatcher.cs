@@ -5,7 +5,7 @@ namespace Zenject.SpaceFighter
 {
     public class EnemyHealthWatcher : ITickable
     {
-        readonly EnemyKilledSignal.Trigger _killedSignal;
+        readonly EnemyKilledSignal _killedSignal;
         readonly Explosion.Factory _explosionFactory;
         readonly Context _context;
         readonly EnemyModel _model;
@@ -14,7 +14,7 @@ namespace Zenject.SpaceFighter
             EnemyModel model,
             Context context,
             Explosion.Factory explosionFactory,
-            EnemyKilledSignal.Trigger killedSignal)
+            EnemyKilledSignal killedSignal)
         {
             _killedSignal = killedSignal;
             _explosionFactory = explosionFactory;

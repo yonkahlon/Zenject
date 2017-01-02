@@ -17,13 +17,13 @@ namespace Zenject
         readonly List<ILateTickable> _lateTickables = null;
 
         [Inject(Optional = true, Source = InjectSources.Local)]
-        readonly List<ModestTree.Util.Tuple<Type, int>> _priorities = null;
+        readonly List<ModestTree.Util.ValuePair<Type, int>> _priorities = null;
 
         [Inject(Optional = true, Id = "Fixed", Source = InjectSources.Local)]
-        readonly List<ModestTree.Util.Tuple<Type, int>> _fixedPriorities = null;
+        readonly List<ModestTree.Util.ValuePair<Type, int>> _fixedPriorities = null;
 
         [Inject(Optional = true, Id = "Late", Source = InjectSources.Local)]
-        readonly List<ModestTree.Util.Tuple<Type, int>> _latePriorities = null;
+        readonly List<ModestTree.Util.ValuePair<Type, int>> _latePriorities = null;
 
         readonly TickablesTaskUpdater _updater = new TickablesTaskUpdater();
         readonly FixedTickablesTaskUpdater _fixedUpdater = new FixedTickablesTaskUpdater();
@@ -60,7 +60,7 @@ namespace Zenject
                 // Note that we use zero for unspecified priority
                 // This is nice because you can use negative or positive for before/after unspecified
                 var matches = _fixedPriorities.Where(x => tickable.GetType().DerivesFromOrEqual(x.First)).Select(x => x.Second).ToList();
-                int priority = matches.IsEmpty() ? 0 : matches.Single();
+                int priority = matches.IsEmpty() ? 0 : matches.Distinct().Single();
 
                 _fixedUpdater.AddTask(tickable, priority);
             }
@@ -79,7 +79,7 @@ namespace Zenject
                 // Note that we use zero for unspecified priority
                 // This is nice because you can use negative or positive for before/after unspecified
                 var matches = _priorities.Where(x => tickable.GetType().DerivesFromOrEqual(x.First)).Select(x => x.Second).ToList();
-                int priority = matches.IsEmpty() ? 0 : matches.Single();
+                int priority = matches.IsEmpty() ? 0 : matches.Distinct().Single();
 
                 _updater.AddTask(tickable, priority);
             }
@@ -98,7 +98,7 @@ namespace Zenject
                 // Note that we use zero for unspecified priority
                 // This is nice because you can use negative or positive for before/after unspecified
                 var matches = _latePriorities.Where(x => tickable.GetType().DerivesFromOrEqual(x.First)).Select(x => x.Second).ToList();
-                int priority = matches.IsEmpty() ? 0 : matches.Single();
+                int priority = matches.IsEmpty() ? 0 : matches.Distinct().Single();
 
                 _lateUpdater.AddTask(tickable, priority);
             }

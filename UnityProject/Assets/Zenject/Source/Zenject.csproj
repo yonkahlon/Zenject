@@ -57,7 +57,6 @@
     <Compile Include="Internal\PreserveAttribute.cs" />
     <Compile Include="Internal\ProfileBlock.cs" />
     <Compile Include="Internal\ReflectionUtil.cs" />
-    <Compile Include="Internal\Tuple.cs" />
     <Compile Include="Internal\TypeExtensions.cs" />
     <Compile Include="Binding\Binders\ConcreteBinders\ConcreteIdBinderGeneric.cs" />
     <Compile Include="Binding\Binders\ConcreteBinders\ConcreteIdBinderNonGeneric.cs" />
@@ -98,6 +97,7 @@
     <Compile Include="Install\Contexts\SceneContext.cs" />
     <Compile Include="Install\Contexts\SceneDecoratorContext.cs" />
     <Compile Include="Install\Contexts\StaticContext.cs" />
+    <Compile Include="Internal\ValuePair.cs" />
     <Compile Include="Main\LazyInstanceInjector.cs" />
     <Compile Include="Providers\ComponentProviders\GetFromPrefabComponentProvider.cs" />
     <Compile Include="Providers\MethodProviderUntyped.cs" />

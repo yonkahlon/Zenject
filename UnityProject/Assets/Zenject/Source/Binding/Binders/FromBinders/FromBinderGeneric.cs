@@ -12,13 +12,13 @@ namespace Zenject
             BindingUtil.AssertIsDerivedFromTypes(typeof(TContract), BindInfo.ContractTypes);
         }
 
-        public ScopeBinder FromFactory<TFactory>()
+        public ScopeArgBinder FromFactory<TFactory>()
             where TFactory : IFactory<TContract>
         {
             return FromFactoryBase<TContract, TFactory>();
         }
 
-        public ScopeBinder FromFactory<TConcrete, TFactory>()
+        public ScopeArgBinder FromFactory<TConcrete, TFactory>()
             where TFactory : IFactory<TConcrete>
             where TConcrete : TContract
         {

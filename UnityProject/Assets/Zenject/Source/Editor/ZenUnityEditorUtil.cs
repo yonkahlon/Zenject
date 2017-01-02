@@ -55,20 +55,50 @@ namespace Zenject
             }
         }
 
-        static List<SceneContext> GetAllSceneContexts()
+        static IEnumerable<SceneContext> GetAllSceneContexts()
         {
-            return GetAllScenes().SelectMany(scene =>
-                scene
-                .GetRootGameObjects()
-                .SelectMany(x => x.GetComponentsInChildren<SceneContext>())).ToList();
-        }
+            var decoratedSceneNames = new List<string>();
 
-        static IEnumerable<Scene> GetAllScenes()
-        {
             for (int i = 0; i < EditorSceneManager.sceneCount; i++)
             {
-                yield return EditorSceneManager.GetSceneAt(i);
+                var scene = EditorSceneManager.GetSceneAt(i);
+
+                var sceneContexts = scene.GetRootGameObjects()
+                    .SelectMany(x => x.GetComponentsInChildren<SceneContext>()).ToList();
+
+                var decoratorContexts = scene.GetRootGameObjects()
+                    .SelectMany(x => x.GetComponentsInChildren<SceneDecoratorContext>()).ToList();
+
+                if (!sceneContexts.IsEmpty())
+                {
+                    Assert.That(decoratorContexts.IsEmpty(),
+                        "Found both SceneDecoratorContext and SceneContext in the same scene '{0}'.  This is not allowed", scene.name);
+
+                    Assert.That(sceneContexts.IsLength(1),
+                        "Found multiple SceneContexts in scene '{0}'.  Expected a maximum of one.", scene.name);
+
+                    var context = sceneContexts[0];
+
+                    decoratedSceneNames.RemoveAll(x => context.ContractNames.Contains(x));
+
+                    yield return context;
+                }
+                else if (!decoratorContexts.IsEmpty())
+                {
+                    Assert.That(decoratorContexts.IsLength(1),
+                        "Found multiple SceneDecoratorContexts in scene '{0}'.  Expected a maximum of one.", scene.name);
+
+                    var context = decoratorContexts[0];
+
+                    Assert.That(!string.IsNullOrEmpty(context.DecoratedContractName),
+                        "Missing Decorated Contract Name on SceneDecoratorContext in scene '{0}'", scene.name);
+
+                    decoratedSceneNames.Add(context.DecoratedContractName);
+                }
             }
+
+            Assert.That(decoratedSceneNames.IsEmpty(),
+                "Found decorator scenes without a corresponding scene to decorator.  Missing scene contracts: {0}", decoratedSceneNames.Join(", "));
         }
 
         public static string ConvertFullAbsolutePathToAssetPath(string fullPath)

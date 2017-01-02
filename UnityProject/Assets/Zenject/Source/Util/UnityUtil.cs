@@ -3,11 +3,31 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
+using UnityEngine.SceneManagement;
 
 namespace ModestTree.Util
 {
     public static class UnityUtil
     {
+        public static IEnumerable<Scene> AllScenes
+        {
+            get
+            {
+                for (int i = 0; i < SceneManager.sceneCount; i++)
+                {
+                    yield return SceneManager.GetSceneAt(i);
+                }
+            }
+        }
+
+        public static IEnumerable<Scene> AllLoadedScenes
+        {
+            get
+            {
+                return AllScenes.Where(scene => scene.isLoaded);
+            }
+        }
+
         public static bool IsAltKeyDown
         {
             get
@@ -123,14 +143,14 @@ namespace ModestTree.Util
             }
         }
 
-        public static IEnumerable<GameObject> GetAllGameObjectsInScene()
+        public static IEnumerable<GameObject> GetAllGameObjects()
         {
             return GameObject.FindObjectsOfType<Transform>().Select(x => x.gameObject);
         }
 
-        public static List<GameObject> GetRootGameObjects()
+        public static List<GameObject> GetAllRootGameObjects()
         {
-            return GetAllGameObjectsInScene().Where(x => x.transform.parent == null).ToList();
+            return GetAllGameObjects().Where(x => x.transform.parent == null).ToList();
         }
     }
 }

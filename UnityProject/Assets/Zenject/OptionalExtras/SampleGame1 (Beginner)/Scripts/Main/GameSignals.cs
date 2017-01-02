@@ -4,11 +4,8 @@ namespace Zenject.Asteroids
 {
     public static class Signals
     {
-        public class ShipCrashed : Signal
+        public class ShipCrashed : Signal<ShipCrashed>
         {
-            public class Trigger : TriggerBase
-            {
-            }
         }
     }
 }

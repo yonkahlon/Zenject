@@ -1,5 +1,5 @@
 
-<img src="UnityProject/Assets/Zenject/Documentation/ReadMe_files/ZenjectLogo.png?raw=true" alt="Zenject" width="600px" height="134px"/>
+<img src="UnityProject/Assets/Zenject/Documentation/ZenjectLogo.png?raw=true" alt="Zenject" width="600px" height="134px"/>
 
 ## Dependency Injection Framework for Unity3D
 
@@ -235,7 +235,8 @@ So we find that it is useful to push the responsibility of deciding which specif
 ```csharp
 var service = new SomeService();
 var foo = new Foo(service);
-var bar = new Bar(foo);
+var bar = new Bar(service);
+var qux = new Qux(bar);
 
 .. etc.
 ```
@@ -728,9 +729,9 @@ public class FooInstaller : MonoInstaller
 }
 ```
 
-Note that in this case BarInstaller is of type Installer and not MonoInstaller, which is why we can simply call `BarInstaller.Install(Container)` and don't require that BarInstaller be added to our scene already.  Any calls to BarInstaller.Install will immediately create a temporary instance of BarInstaller and then call InstallBindings on it.  This will repeat for any installers that this installer installs.  Note also that when using the Installer base class, we always must pass in ourself as the generic argument to Installer<>.  This is necessary so that the Installer<> base class can define the static method `BarInstaller.Install`.  It is also designed this way to support runtime parameters (described below).
+Note that in this case BarInstaller is of type `Installer<>` (note the generic arguments) and not MonoInstaller, which is why we can simply call `BarInstaller.Install(Container)` and don't require that BarInstaller be added to our scene already.  Any calls to BarInstaller.Install will immediately create a temporary instance of BarInstaller and then call InstallBindings on it.  This will repeat for any installers that this installer installs.  Note also that when using the `Installer<>` base class, we always must pass in ourself as the generic argument to `Installer<>`.  This is necessary so that the `Installer<>` base class can define the static method `BarInstaller.Install`.  It is also designed this way to support runtime parameters (described below).
 
-One of the main reasons we use installers as opposed to just having all our bindings declared all at once for each scene, is to make them re-usable.  This is not a problem for installers of type `Installer` because you can simply call `FooInstaller.Install` as described above for every scene you wish to use it in, but then how would we re-use a MonoInstaller in multiple scenes?
+One of the main reasons we use installers as opposed to just having all our bindings declared all at once for each scene, is to make them re-usable.  This is not a problem for installers of type `Installer<>` because you can simply call `FooInstaller.Install` as described above for every scene you wish to use it in, but then how would we re-use a MonoInstaller in multiple scenes?
 
 There are three ways to do this.
 
@@ -740,7 +741,7 @@ There are three ways to do this.
 
 1. **Prefabs within Resources folder**.  You can also place your installer prefabs underneath a Resoures folder and install them directly from code by using the Resources path.  For details on usage see <a href="#runtime-parameters-for-installers">here</a>.
 
-Another option in addition to MonoInstaller and Installer is to use ScriptableObjectInstaller which has some advantages (especially for settings) - for details see <a href="#scriptableobject-installer">here</a>.
+Another option in addition to MonoInstaller and `Installer<>` is to use ScriptableObjectInstaller which has some advantages (especially for settings) - for details see <a href="#scriptableobject-installer">here</a>.
 
 When calling installers from other installers it is common to want to pass parameters into it.  See <a href="#runtime-parameters-for-installers">here</a> for details on how that is done.
 
@@ -918,11 +919,11 @@ The usual way this is done is to add public references to these objects within y
 
     public class GameInstaller : MonoInstaller
     {
-        public Foo Foo;
+        public Foo foo;
 
         public override void InstallBindings()
         {
-            Container.BindInstance(Foo);
+            Container.BindInstance(foo);
             Container.Bind<IInitializable>().To<GameRunner>().AsSingle();
         }
     }
@@ -948,7 +949,7 @@ So another way to do this is to use the `ZenjectBinding` component.  You can do 
 
 For example, if I have a MonoBehaviour of type `Foo` in my scene, I can just add `ZenjectBinding` alongside it, and then drag the Foo component into the Component property of the ZenjectBinding component.
 
-<img src="UnityProject/Assets/Zenject/Documentation/ReadMe_files/AutoBind1.png?raw=true" alt="ZenjectBinding"/>
+<img src="UnityProject/Assets/Zenject/Documentation/AutoBind1.png?raw=true" alt="ZenjectBinding"/>
 
 Then our installer becomes:
 
@@ -1673,6 +1674,8 @@ Note that you do not need to load the environment scene and the ship scene at th
 
 Also note that the Validate command can be used to quickly verify the different multi-scene setups.
 
+Also, I should mention that Unity currently doesn't have a built-in way to save and restore multi-scene setups.  We use a simple editor script for this that you can find <a href="https://gist.github.com/svermeulen/8927b29b2bfab4e84c950b6788b0c677">here</a> if interested.
+
 ## <a id="scenes-decorator"></a>Scene Decorators
 
 Scene Decorators offer another approach to using multiple scenes together with zenject in addition to <a href="#scene-parenting">scene parenting</a> described above.  The difference is that with scene decorators, the multiple scenes in question will all share the same Container and therefore all scenes can access bindings in all other scenes (unlike with scene parenting where only the child can access the parent bindings and not vice versa).
@@ -1714,7 +1717,11 @@ public class TestHotKeysAdder : ITickable
 
 If you run your scene it should now behave exactly like the main scene except with the added functionality in your decorator installer.  Also note that while not shown here, both scenes can access each other's bindings as if everything was in the same scene.
 
-Also note that the Validate command can be used to quickly verify the different multi-scene setups.
+Also note that the Validate command (CTRL+SHIFT+V) can be used to quickly verify the different multi-scene setups.
+
+Also, note that decorator scenes must be loaded before the scenes that they are decorating.
+
+Also, I should mention that Unity currently doesn't have a built-in way to save and restore multi-scene setups.  We use a simple editor script for this that you can find <a href="https://gist.github.com/svermeulen/8927b29b2bfab4e84c950b6788b0c677">here</a> if interested.
 
 ## <a id="sub-containers-and-facades"></a>Sub-Containers And Facades
 
@@ -2111,22 +2118,28 @@ Something else to note is that the rate at which the ITickable.Tick method gets 
     Games
 
     * Pokemon Go (both [iOS](https://itunes.apple.com/us/app/pokemon-go/id1094591345?mt=8) and [Android](https://play.google.com/store/apps/details?id=com.nianticlabs.pokemongo&hl=en))
-    * [Spinball Carnival](https://play.google.com/store/apps/details?id=com.nerdcorps.pinballcritters&hl=en)
-    * [Slugterra: Guardian Force](https://play.google.com/store/apps/details?id=com.nerdcorps.slugthree&hl=en)
+    * [Spinball Carnival](https://play.google.com/store/apps/details?id=com.nerdcorps.pinballcritters&hl=en) (Android)
+    * [Slugterra: Guardian Force](https://play.google.com/store/apps/details?id=com.nerdcorps.slugthree&hl=en) (Android)
+    * [Submarine](https://github.com/shiwano/submarine) (iOS and Android)
+    * [NOVA Black Holes](https://itunes.apple.com/us/app/nova-black-holes/id1114574985?mt=8) (iOS)
+    * [Farm Away!](http://www.farmawaygame.com/) (iOS and Android)
+    * [Build Away!](http://www.buildawaygame.com/) (iOS and Android)
+    * Stick Soccer 2 ([iOS](https://itunes.apple.com/gb/app/stick-soccer-2/id1104214157?mt=8) and [Android](https://play.google.com/store/apps/details?id=com.sticksports.soccer2&hl=en_GB))
 
     Libraries
 
     * [EcsRx](https://github.com/grofit/ecsrx) - A framework for Unity using the ECS pattern
     * [Karma](https://github.com/cgarciae/karma) - An MVC framework for Unity
+    * [View Controller](http://blog.jamjardavies.co.uk/index.php/2016/04/12/view-controller-with-zenject/) - A view controller system
 
     Tools
 
-    * [Modest 3D](https://www.modest3d.com/editor) - An IDE to allow users to quickly and easily create procedural training content
-    * [Modest 3D Explorer](https://www.modest3d.com/explorer) - A simple editor to quickly create a 3D presentation with some number of slides
+    * [Modest 3D](http://www.modest3d.com/editor) (WebGL, WebPlayer, PC) - An IDE to allow users to quickly and easily create procedural training content
+    * [Modest 3D Explorer](http://www.modest3d.com/explorer) (WebGL, WebPlayer, iOS, Android, PC, Windows Store) - A simple editor to quickly create a 3D presentation with some number of slides
 
 ## <a id="cheatsheet"></a>Cheat Sheet
 
-TBD
+See <a href="Documentation/CheatSheet.md">here</a>.
 
 ## <a id="further-help"></a>Further Help
 

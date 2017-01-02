@@ -1,6 +1,31 @@
 
 ## <a id="release-notes"></a>Release Notes
 
+4.7 (November 6, 2016)
+- Removed the concept of triggers in favour of just directly acting on the Signal to both subscribe and fire, since using Trigger was too much overhead for not enough gain
+- Fixed issue for Windows Store platform where zenject was not properly stripping out the WSA generated constructors
+- Changed to automatically choose the public constructor if faced with a choice between public and private
+- Fix to IL2CPP builds to work again
+- Added support for using the WithArguments bind method combined with FromFactory
+- Improved validation of multi-scene setups using Contract Names to output better error messages
+
+4.6 (October 23, 2016)
+- Changed Validation to run at edit time rather than requiring that we enter play mode.  This is significantly faster.  Also added a hotkey to "validate then run" since it's fast enough to use as a pre-run check
+- Added InstantiateComponentOnNewGameObject method
+- Changed to install ScriptableObjectInstallers before MonoInstallers since it is common to include settings in ScriptableObjectInstallers (including settings for MonoInstallers)
+- Added new option to ZenjectBinding BindType parameter to bind from the base class
+- Changed to allow specifying singleton identifiers as object rather than just string
+- Added design-time support to Scene Parenting by using Contract Names (see docs for details)
+- Changed Scene Decorators to use Contract Names as well (see docs for details)
+- Fixed to ensure that the order that initial instances on the container are injected in follows their dependency order #161
+- Added LoadSceneAsync method to ZenjectSceneLoader class.  Also removed the option to pass in postBindings since nobody uses this and it's kind of bad practice anyway.  Also renamed LoadSceneContainerMode to LoadSceneRelationship
+- Added AutoRun field on SceneContext for cases where you want to start it manually
+- Removed the IBinder and IResolver interfaces since they weren't really used and were a maintenance headache
+- Renamed WithGameObjectGroup to UnderTransformGroupX and also added UnderTransform method
+- Added helper classes to make writing integration tests or unit tests with Unity's EditorTestRunner easier
+- Added documentation on ZenjectEditorWindow, Unit Testing, and Integration Testing
+- Misc. bug fixes
+
 4.5 (September 1, 2016)
 - Fixed DiContainer.ResolveTypeAll() method to properly search in parent containers
 - Fixed exception that was occuring with Factories when using derived parameter types

@@ -40,6 +40,7 @@ namespace Zenject
         readonly Queue<IBindingFinalizer> _currentBindings = new Queue<IBindingFinalizer>();
         readonly List<IBindingFinalizer> _processedBindings = new List<IBindingFinalizer>();
 
+        bool _isFinalizingBinding;
         bool _isValidating;
         bool _isInstalling;
         bool _hasDisplayedInstallWarning;
@@ -52,22 +53,26 @@ namespace Zenject
             _lazyInjector = new LazyInstanceInjector(this);
             _singletonProviderCreator = new SingletonProviderCreator(this, _singletonMarkRegistry);
 
-            // We can't simply call Bind<DiContainer>().FromInstance(this) here because
-            // we don't want these bindings to be included in the Clone() below
-            // So just directly add to the provider map instead
-            var thisProvider = new InstanceProvider(this, typeof(DiContainer), this);
+            InstallDefaultBindings();
+            FlushBindings();
+            Assert.That(_currentBindings.IsEmpty());
+            // Clear the default bindings from history to avoid duplicating them in Clone below
+            _processedBindings.Clear();
+        }
 
-            foreach (var contractType in new Type[] { typeof(DiContainer), typeof(IInstantiator) })
-            {
-                var infoList = new List<ProviderInfo>()
-                {
-                    new ProviderInfo(thisProvider, null)
-                };
+        void InstallDefaultBindings()
+        {
+            Bind(typeof(DiContainer), typeof(IInstantiator)).FromInstance(this);
+            Bind(typeof(Lazy<>)).FromMethodUntyped(CreateLazyBinding);
+        }
 
-                var bindingId = new BindingId(contractType, null);
-
-                _providers.Add(bindingId, infoList);
-            }
+        object CreateLazyBinding(InjectContext context)
+        {
+            // By cloning it this also means that Ids, optional, etc. are forwarded properly
+            var newContext = context.Clone();
+            newContext.MemberType = context.MemberType.GenericArguments().Single();
+            return Activator.CreateInstance(
+                typeof(Lazy<>).MakeGenericType(newContext.MemberType), new object[] { this, newContext });
         }
 
         public DiContainer()
@@ -261,16 +266,25 @@ namespace Zenject
             return container;
         }
 
+        // This will instantiate any binding that results in a type that derives from IValidatable
+        // Note that we are looking at both the contract type and the mapped derived type
+        // This means if you add the binding 'Container.Bind<IFoo>().To<Foo>()'
+        // and Foo derives from both IFoo and IValidatable, then Foo will be instantiated
+        // and then Validate() will be called on it.  Note that this will happen even if Foo is not
+        // referenced anywhere in the normally resolved object graph
         public void ValidateIValidatables()
         {
             Assert.That(IsValidating);
+
+#if !NOT_UNITY3D
+            Assert.That(Application.isEditor);
+#endif
 
             foreach (var pair in _providers.ToList())
             {
                 var bindingId = pair.Key;
                 var providers = pair.Value;
 
-                // Validate all IValidatable's
                 List<ProviderInfo> validatableProviders;
 
                 var injectContext = new InjectContext(
@@ -458,8 +472,61 @@ namespace Zenject
 
             _hasDisplayedInstallWarning = true;
             // Feel free to comment this out if you are comfortable with this practice
-            Log.Warn("Zenject Warning: It is bad practice to call Inject/Resolve/Instantiate before all the Installers have completed!  This is important to ensure that all bindings have properly been installed in case they are needed when injecting/instantiating/resolving.  Detected when operating on type '{0}'", rootContext.MemberType.Name());
+            Log.Warn("Zenject Warning: It is bad practice to call Inject/Resolve/Instantiate before all the Installers have completed!  This is important to ensure that all bindings have properly been installed in case they are needed when injecting/instantiating/resolving.  Detected when operating on type '{0}'.  If you don't care about this, you can just remove this warning.", rootContext.MemberType.Name());
 #endif
+        }
+
+        // Returns the concrete type that would be returned with Resolve<T>
+        // without actually instantiating it
+        // This is safe to use within installers
+        public Type ResolveType<T>()
+        {
+            return ResolveType(typeof(T));
+        }
+
+        // Returns the concrete type that would be returned with Resolve(type)
+        // without actually instantiating it
+        // This is safe to use within installers
+        public Type ResolveType(Type type)
+        {
+            return ResolveType(new InjectContext(this, type, null));
+        }
+
+        // Returns the concrete type that would be returned with Resolve(context)
+        // without actually instantiating it
+        // This is safe to use within installers
+        public Type ResolveType(InjectContext context)
+        {
+            Assert.IsNotNull(context);
+
+            IProvider provider;
+
+            FlushBindings();
+
+            var result = TryGetUniqueProvider(context, out provider);
+
+            Assert.That(result != ProviderLookupResult.Multiple,
+                "Found multiple matches when only one was expected for type '{0}'{1}. \nObject graph:\n {2}",
+                context.MemberType.Name(),
+                (context.ObjectType == null ? "" : " while building object with type '{0}'".Fmt(context.ObjectType.Name())),
+                context.GetObjectGraphString());
+
+            if (result != ProviderLookupResult.Success)
+            {
+                throw Assert.CreateException(
+                    "Unable to resolve type '{0}'{1}. \nObject graph:\n{2}",
+                    context.MemberType.Name() + (context.Identifier == null ? "" : " with ID '{0}'".Fmt(context.Identifier.ToString())),
+                    (context.ObjectType == null ? "" : " while building object with type '{0}'".Fmt(context.ObjectType.Name())),
+                    context.GetObjectGraphString());
+            }
+
+            Assert.IsNotNull(provider);
+            return provider.GetInstanceType(context);
+        }
+
+        public List<Type> ResolveTypeAll(Type type)
+        {
+            return ResolveTypeAll(new InjectContext(this, type, null));
         }
 
         // Returns all the types that would be returned if ResolveAll was called with the given values
@@ -468,12 +535,13 @@ namespace Zenject
             Assert.IsNotNull(context);
 
             FlushBindings();
-            CheckForInstallWarning(context);
 
             var providers = GetProviderMatchesInternal(context).ToList();
             if (providers.Count > 0 )
             {
-                return providers.Select(x => x.ProviderInfo.Provider.GetInstanceType(context)).Where(x => x != null).ToList();
+                return providers.Select(
+                    x => x.ProviderInfo.Provider.GetInstanceType(context))
+                    .Where(x => x != null).ToList();
             }
 
             return new List<Type> {};
@@ -702,7 +770,7 @@ namespace Zenject
                 "Error occurred while instantiating object of type '{0}'. Instantiator should not be used to create new mono behaviours.  Must use InstantiatePrefabForComponent, InstantiatePrefab, or InstantiateComponent.", concreteType.Name());
 #endif
 
-            Assert.That(!concreteType.IsAbstract(), "Expected type 'type' to be non-abstract", concreteType);
+            Assert.That(!concreteType.IsAbstract(), "Expected type '{0}' to be non-abstract", concreteType);
 
             FlushBindings();
             CheckForInstallWarning(args.Context);
@@ -1042,30 +1110,7 @@ namespace Zenject
 
             var prefabAsGameObject = GetPrefabAsGameObject(prefab);
 
-            GameObject gameObj;
-
-            if (IsValidating)
-            {
-                // We need to avoid triggering any Awake() method during validation
-                // so temporarily disable the prefab so that the object gets
-                // instantiated as disabled
-                bool wasActive = prefabAsGameObject.activeSelf;
-
-                prefabAsGameObject.SetActive(false);
-
-                try
-                {
-                    gameObj = (GameObject)GameObject.Instantiate(prefabAsGameObject);
-                }
-                finally
-                {
-                    prefabAsGameObject.SetActive(wasActive);
-                }
-            }
-            else
-            {
-                gameObj = (GameObject)GameObject.Instantiate(prefabAsGameObject);
-            }
+            var gameObj = (GameObject)GameObject.Instantiate(prefabAsGameObject);
 
             gameObj.transform.SetParent(
                 GetTransformGroup(gameObjectBindInfo), false);
@@ -1570,11 +1615,6 @@ namespace Zenject
                 injectable, InjectUtil.CreateArgList(extraArgs));
         }
 
-        public List<Type> ResolveTypeAll(Type type)
-        {
-            return ResolveTypeAll(new InjectContext(this, type, null));
-        }
-
         // Resolve<> - Lookup a value in the container.
         //
         // Note that this may result in a new object being created (for transient bindings) or it
@@ -1712,14 +1752,7 @@ namespace Zenject
 
             FlushBindings();
 
-            List<ProviderInfo> providers;
-
-            if (!_providers.TryGetValue(context.GetBindingId(), out providers))
-            {
-                return false;
-            }
-
-            return providers.Where(x => x.Condition == null || x.Condition(context)).HasAtLeast(1);
+            return GetProviderMatchesInternal(context).HasAtLeast(1);
         }
 
         public bool HasBinding<TContract>()
@@ -1740,7 +1773,16 @@ namespace Zenject
             {
                 var binding = _currentBindings.Dequeue();
 
-                binding.FinalizeBinding(this);
+                _isFinalizingBinding = true;
+
+                try
+                {
+                    binding.FinalizeBinding(this);
+                }
+                finally
+                {
+                    _isFinalizingBinding = false;
+                }
 
                 _processedBindings.Add(binding);
             }
@@ -1748,6 +1790,9 @@ namespace Zenject
 
         public BindFinalizerWrapper StartBinding()
         {
+            Assert.That(!_isFinalizingBinding,
+                "Attempted to start a binding during a binding finalizer.  This is not allowed, since binding finalizers should directly use AddProvider instead, to allow for bindings to be inherited properly without duplicates");
+
             FlushBindings();
 
             var bindingFinalizer = new BindFinalizerWrapper();
@@ -1770,10 +1815,14 @@ namespace Zenject
         // Note that this can include open generic types as well such as List<>
         public ConcreteIdBinderGeneric<TContract> Bind<TContract>()
         {
+            return Bind<TContract>(
+                new BindInfo(typeof(TContract)));
+        }
+
+        public ConcreteIdBinderGeneric<TContract> Bind<TContract>(BindInfo bindInfo)
+        {
             Assert.That(!typeof(TContract).DerivesFrom<IDynamicFactory>(),
                 "You should not use Container.Bind for factory classes.  Use Container.BindFactory instead.");
-
-            var bindInfo = new BindInfo(typeof(TContract));
 
             return new ConcreteIdBinderGeneric<TContract>(
                 bindInfo, StartBinding());
@@ -1788,11 +1837,17 @@ namespace Zenject
 
         public ConcreteIdBinderNonGeneric Bind(IEnumerable<Type> contractTypes)
         {
+            return BindInternal(contractTypes, null);
+        }
+
+        ConcreteIdBinderNonGeneric BindInternal(
+            IEnumerable<Type> contractTypes, string contextInfo)
+        {
             var contractTypesList = contractTypes.ToList();
             Assert.That(contractTypesList.All(x => !x.DerivesFrom<IDynamicFactory>()),
                 "You should not use Container.Bind for factory classes.  Use Container.BindFactory instead.");
 
-            var bindInfo = new BindInfo(contractTypesList);
+            var bindInfo = new BindInfo(contractTypesList, contextInfo);
             return new ConcreteIdBinderNonGeneric(bindInfo, StartBinding());
         }
 
@@ -1865,7 +1920,7 @@ namespace Zenject
         {
             // We must only have one dependency root per container
             // We need this when calling this with a GameObjectContext
-            return Bind(type.Interfaces().ToArray());
+            return BindInternal(type.Interfaces().ToArray(), "BindAllInterfaces({0})".Fmt(type.Name()));
         }
 
         // Same as BindAllInterfaces except also binds to self

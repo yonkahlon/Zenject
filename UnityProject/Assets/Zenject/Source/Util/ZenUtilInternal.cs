@@ -1,8 +1,11 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using ModestTree;
+using ModestTree.Util;
 
 #if !NOT_UNITY3D
+using UnityEngine.SceneManagement;
 using UnityEngine;
 #endif
 
@@ -26,6 +29,25 @@ namespace Zenject.Internal
         }
 
 #if !NOT_UNITY3D
+        public static IEnumerable<SceneContext> GetAllSceneContexts()
+        {
+            foreach (var scene in UnityUtil.AllLoadedScenes)
+            {
+                var contexts = scene.GetRootGameObjects()
+                    .SelectMany(root => root.GetComponentsInChildren<SceneContext>()).ToList();
+
+                if (contexts.IsEmpty())
+                {
+                    continue;
+                }
+
+                Assert.That(contexts.Count == 1,
+                    "Found multiple scene contexts in scene '{0}'", scene.name);
+
+                yield return contexts[0];
+            }
+        }
+
         // NOTE: This method will not return components that are within a GameObjectContext
         public static IEnumerable<Component> GetInjectableComponentsBottomUp(
             GameObject gameObject, bool recursive)
@@ -57,4 +79,3 @@ namespace Zenject.Internal
 #endif
     }
 }
-
