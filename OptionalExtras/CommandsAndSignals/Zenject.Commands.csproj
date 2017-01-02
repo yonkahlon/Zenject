@@ -46,7 +46,14 @@
     <Compile Include="Command\Binders\CommandExtensions.cs" />
     <Compile Include="Command\Binders\Finalizers\CommandBindingFinalizerBase.cs" />
     <Compile Include="Command\Command.cs" />
-    <Compile Include="Signal\Signal.cs" />
+    <Compile Include="Signal\ISignal.cs" />
+    <Compile Include="Signal\Signal0.cs" />
+    <Compile Include="Signal\Signal1.cs" />
+    <Compile Include="Signal\Signal2.cs" />
+    <Compile Include="Signal\Signal3.cs" />
+    <Compile Include="Signal\Signal4.cs" />
+    <Compile Include="Signal\Signal5.cs" />
+    <Compile Include="Signal\Signal6.cs" />
     <Compile Include="Signal\SignalExtensions.cs" />
     <Compile Include="Command\Binders\CommandBinderBase.cs" />
     <Compile Include="Command\Binders\CommandBinder0.cs" />

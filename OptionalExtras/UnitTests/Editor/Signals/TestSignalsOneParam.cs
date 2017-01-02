@@ -19,7 +19,6 @@ namespace Zenject.Tests
             Container.Bind<Bar>().AsSingle();
 
             Container.BindSignal<SomethingHappenedSignal>();
-            Container.BindTrigger<SomethingHappenedSignal.Trigger>();
 
             var foo = Container.Resolve<Foo>();
             var bar = Container.Resolve<Bar>();
@@ -32,18 +31,15 @@ namespace Zenject.Tests
             bar.Dispose();
         }
 
-        public class SomethingHappenedSignal : Signal<string>
+        public class SomethingHappenedSignal : Signal<SomethingHappenedSignal, string>
         {
-            public class Trigger : TriggerBase
-            {
-            }
         }
 
         public class Foo
         {
-            readonly SomethingHappenedSignal.Trigger _trigger;
+            SomethingHappenedSignal _trigger;
 
-            public Foo(SomethingHappenedSignal.Trigger trigger)
+            public Foo(SomethingHappenedSignal trigger)
             {
                 _trigger = trigger;
             }
@@ -56,7 +52,7 @@ namespace Zenject.Tests
 
         public class Bar
         {
-            readonly SomethingHappenedSignal _signal;
+            SomethingHappenedSignal _signal;
             string _receivedValue;
 
             public Bar(SomethingHappenedSignal signal)
@@ -74,12 +70,12 @@ namespace Zenject.Tests
 
             public void Initialize()
             {
-                _signal.Event += OnStarted;
+                _signal += OnStarted;
             }
 
             public void Dispose()
             {
-                _signal.Event -= OnStarted;
+                _signal -= OnStarted;
             }
 
             void OnStarted(string value)

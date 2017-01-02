@@ -15,10 +15,10 @@ namespace Zenject.Asteroids
 
     public class GameController : IInitializable, ITickable, IDisposable
     {
-        readonly Signals.ShipCrashed _shipCrashed;
         readonly Ship _ship;
         readonly AsteroidManager _asteroidSpawner;
 
+        Signals.ShipCrashed _shipCrashed;
         GameStates _state = GameStates.WaitingToStart;
         float _elapsedTime;
 
@@ -53,12 +53,12 @@ namespace Zenject.Asteroids
 
             Cursor.visible = false;
 
-            _shipCrashed.Event += OnShipCrashed;
+            _shipCrashed += OnShipCrashed;
         }
 
         public void Dispose()
         {
-            _shipCrashed.Event -= OnShipCrashed;
+            _shipCrashed -= OnShipCrashed;
         }
 
         public void Tick()

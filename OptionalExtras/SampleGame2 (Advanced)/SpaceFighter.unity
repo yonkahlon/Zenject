@@ -311,7 +311,7 @@ GameObject:
   - 114: {fileID: 534447710}
   - 114: {fileID: 534447709}
   m_Layer: 0
-  m_Name: SceneCompositionRoot
+  m_Name: SceneContext
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -612,6 +612,7 @@ GameObject:
   m_Component:
   - 4: {fileID: 1034220755}
   - 114: {fileID: 1034220756}
+  - 114: {fileID: 1034220757}
   m_Layer: 8
   m_Name: HealthDisplay
   m_TagString: Untagged
@@ -652,6 +653,22 @@ MonoBehaviour:
   _killCountOffset: 30
   _foregroundColor: {r: 1, g: 0.08823532, b: 0.08823532, a: 1}
   _backgroundColor: {r: 1, g: 1, b: 1, a: 1}
+--- !u!114 &1034220757
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1034220754}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0166d8ff8d905b048b2448179e1f5d11, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _components:
+  - {fileID: 1034220756}
+  _identifier: 
+  _context: {fileID: 0}
+  _bindType: 1
 --- !u!4 &1177745373 stripped
 Transform:
   m_PrefabParentObject: {fileID: 463158, guid: 55f63c48150ecbb469e095dbde67c6e9, type: 2}

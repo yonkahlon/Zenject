@@ -6,14 +6,14 @@ namespace Zenject.SpaceFighter
 {
     public class PlayerHealthWatcher : ITickable
     {
-        readonly PlayerKilledSignal.Trigger _killedSignal;
+        readonly PlayerKilledSignal _killedSignal;
         readonly Explosion.Factory _explosionFactory;
         readonly PlayerModel _model;
 
         public PlayerHealthWatcher(
             PlayerModel model,
             Explosion.Factory explosionFactory,
-            PlayerKilledSignal.Trigger killedSignal)
+            PlayerKilledSignal killedSignal)
         {
             _killedSignal = killedSignal;
             _explosionFactory = explosionFactory;

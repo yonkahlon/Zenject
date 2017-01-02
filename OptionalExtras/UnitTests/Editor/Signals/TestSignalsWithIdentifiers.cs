@@ -16,13 +16,11 @@ namespace Zenject.Tests
         public void RunTest()
         {
             Container.BindSignal<SomethingHappenedSignal>();
-            Container.BindTrigger<SomethingHappenedSignal.Trigger>();
 
             Container.Bind<Foo>().AsSingle();
             Container.Bind<Bar>().AsSingle();
 
             Container.BindSignal<SomethingHappenedSignal>("special");
-            Container.BindTrigger<SomethingHappenedSignal.Trigger>("special");
 
             Container.Bind<FooSpecial>().AsSingle();
             Container.Bind<BarSpecial>().AsSingle();
@@ -55,32 +53,29 @@ namespace Zenject.Tests
             barSpecial.Dispose();
         }
 
-        public class SomethingHappenedSignal : Signal<string>
+        public class SomethingHappenedSignal : Signal<SomethingHappenedSignal, string>
         {
-            public class Trigger : TriggerBase
-            {
-            }
         }
 
         public class Foo
         {
-            readonly SomethingHappenedSignal.Trigger _trigger;
+            SomethingHappenedSignal _signal;
 
             public Foo(
-                SomethingHappenedSignal.Trigger trigger)
+                SomethingHappenedSignal signal)
             {
-                _trigger = trigger;
+                _signal = signal;
             }
 
             public void DoSomething(string value)
             {
-                _trigger.Fire(value);
+                _signal.Fire(value);
             }
         }
 
         public class Bar
         {
-            readonly SomethingHappenedSignal _signal;
+            SomethingHappenedSignal _signal;
 
             public Bar(SomethingHappenedSignal signal)
             {
@@ -95,12 +90,12 @@ namespace Zenject.Tests
 
             public void Initialize()
             {
-                _signal.Event += OnStarted;
+                _signal += OnStarted;
             }
 
             public void Dispose()
             {
-                _signal.Event -= OnStarted;
+                _signal -= OnStarted;
             }
 
             void OnStarted(string value)
@@ -111,24 +106,24 @@ namespace Zenject.Tests
 
         public class FooSpecial
         {
-            readonly SomethingHappenedSignal.Trigger _trigger;
+            SomethingHappenedSignal _signal;
 
             public FooSpecial(
                 [Inject(Id = "special")]
-                SomethingHappenedSignal.Trigger trigger)
+                SomethingHappenedSignal signal)
             {
-                _trigger = trigger;
+                _signal = signal;
             }
 
             public void DoSomething(string value)
             {
-                _trigger.Fire(value);
+                _signal.Fire(value);
             }
         }
 
         public class BarSpecial
         {
-            readonly SomethingHappenedSignal _signal;
+            SomethingHappenedSignal _signal;
 
             public BarSpecial(
                 [Inject(Id = "special")]
@@ -145,12 +140,12 @@ namespace Zenject.Tests
 
             public void Initialize()
             {
-                _signal.Event += OnStarted;
+                _signal += OnStarted;
             }
 
             public void Dispose()
             {
-                _signal.Event -= OnStarted;
+                _signal -= OnStarted;
             }
 
             void OnStarted(string value)

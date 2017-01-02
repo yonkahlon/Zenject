@@ -1,42 +1,27 @@
 using System;
-using ModestTree;
 
 namespace Zenject
 {
     public static class SignalExtensions
     {
-        public static ConditionBinder BindSignal<TSignal>(this DiContainer container)
+        public static void BindSignal<TSignal>(this DiContainer container)
             where TSignal : ISignal
         {
-            return container.BindSignal<TSignal>(null);
+            container.Bind<TSignal>().AsSingle();
+
+            // Uncomment this if you want to see warnings when the signal is destroyed and
+            // there are still listeners on it
+            //container.Bind<ILateDisposable>().To<TSignal>().AsSingle();
         }
 
-        public static ConditionBinder BindSignal<TSignal>(this DiContainer container, object identifier)
+        public static void BindSignal<TSignal>(this DiContainer container, string identifier)
             where TSignal : ISignal
         {
-            return container.Bind<TSignal>().WithId(identifier).AsSingle(identifier);
-        }
+            container.Bind<TSignal>().WithId(identifier).AsSingle(identifier);
 
-        public static ConditionBinder BindTrigger<TTrigger>(this DiContainer container)
-            where TTrigger : ITrigger
-        {
-            return container.BindTrigger<TTrigger>(null);
-        }
-
-        public static ConditionBinder BindTrigger<TTrigger>(this DiContainer container, object identifier)
-            where TTrigger : ITrigger
-        {
-            Type concreteSignalType = typeof(TTrigger).DeclaringType;
-
-            Assert.IsNotNull(concreteSignalType);
-            Assert.That(concreteSignalType.DerivesFrom<ISignal>());
-
-            container.Bind(concreteSignalType.BaseType())
-                .To(concreteSignalType)
-                .AsSingle(identifier)
-                .When(ctx => ctx.ObjectType != null && ctx.ObjectType.DerivesFromOrEqual<TTrigger>() && ctx.ConcreteIdentifier == identifier);
-
-            return container.Bind<TTrigger>().WithId(identifier).AsSingle(identifier);
+            // Uncomment this if you want to see warnings when the signal is destroyed and
+            // there are still listeners on it
+            //container.Bind<ILateDisposable>().To<TSignal>().FromResolve(identifier);
         }
     }
 }
