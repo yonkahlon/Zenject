@@ -5,12 +5,12 @@ namespace Zenject.SpaceFighter
 {
     public class PlayerCollisionDetector : MonoBehaviour
     {
-        PlayerSignals.Hit _hitTrigger;
+        GameEvents _gameEvents;
 
         [Inject]
-        public void Construct(PlayerSignals.Hit hitTrigger)
+        public void Construct(GameEvents gameEvents)
         {
-            _hitTrigger = hitTrigger;
+            _gameEvents = gameEvents;
         }
 
         public void OnTriggerEnter(Collider other)
@@ -19,7 +19,7 @@ namespace Zenject.SpaceFighter
 
             if (bullet != null && bullet.Type != BulletTypes.FromPlayer)
             {
-                _hitTrigger.Fire(bullet);
+                _gameEvents.PlayerHit(bullet);
             }
         }
     }

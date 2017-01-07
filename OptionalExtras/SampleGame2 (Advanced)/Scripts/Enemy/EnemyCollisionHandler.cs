@@ -10,15 +10,15 @@ namespace Zenject.SpaceFighter
         readonly Settings _settings;
         readonly EnemyModel _model;
 
-        EnemySignals.Hit _hitSignal;
+        GameEvents _gameEvents;
 
         public EnemyCollisionHandler(
             EnemyModel model,
             Settings settings,
             AudioPlayer audioPlayer,
-            EnemySignals.Hit hitSignal)
+            GameEvents gameEvents)
         {
-            _hitSignal = hitSignal;
+            _gameEvents = gameEvents;
             _audioPlayer = audioPlayer;
             _settings = settings;
             _model = model;
@@ -26,16 +26,21 @@ namespace Zenject.SpaceFighter
 
         public void Initialize()
         {
-            _hitSignal += OnHit;
+            _gameEvents.EnemyHit += OnHit;
         }
 
         public void Dispose()
         {
-            _hitSignal -= OnHit;
+            _gameEvents.EnemyHit -= OnHit;
         }
 
-        void OnHit(Bullet bullet)
+        void OnHit(EnemyModel enemy, Bullet bullet)
         {
+            if (enemy != _model)
+            {
+                return;
+            }
+
             _audioPlayer.Play(_settings.HitSound);
             _model.AddForce(-bullet.MoveDirection * _settings.HitForce);
             _model.TakeDamage(_settings.HealthLoss);

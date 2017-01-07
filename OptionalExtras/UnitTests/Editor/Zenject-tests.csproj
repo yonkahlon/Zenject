@@ -54,10 +54,6 @@
       <Project>{46f25a62-2e29-48cb-95f3-bdbcb0976ddc}</Project>
       <Name>Zenject</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\CommandsAndSignals\Zenject.Commands.csproj">
-      <Project>{b543a0b8-2630-424e-b628-53457be4884b}</Project>
-      <Name>Zenject.Commands</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Bindings\TestTo.cs" />

@@ -82,7 +82,7 @@ namespace Zenject.Asteroids
 
         void InstallShip()
         {
-            Container.BindSignal<Signals.ShipCrashed>();
+            Container.Bind<GameEvents>().AsSingle();
 
             Container.Bind<ShipStateFactory>().AsSingle();
 
