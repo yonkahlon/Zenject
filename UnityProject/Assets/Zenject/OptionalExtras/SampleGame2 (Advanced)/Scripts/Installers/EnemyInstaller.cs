@@ -32,8 +32,6 @@ namespace Zenject.SpaceFighter
 
             Container.BindAllInterfaces<EnemyHealthWatcher>().To<EnemyHealthWatcher>().AsSingle();
 
-            Container.BindSignal<EnemySignals.Hit>();
-
             Container.BindAllInterfaces<EnemyStateCommon>().To<EnemyStateCommon>().AsSingle();
             Container.BindAllInterfaces<EnemyRotationHandler>().To<EnemyRotationHandler>().AsSingle();
 

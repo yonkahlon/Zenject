@@ -10,15 +10,15 @@ namespace Zenject.SpaceFighter
         readonly Settings _settings;
         readonly PlayerModel _model;
 
-        PlayerSignals.Hit _hitSignal;
+        GameEvents _gameEvents;
 
         public PlayerBulletHitHandler(
             PlayerModel model,
             Settings settings,
             AudioPlayer audioPlayer,
-            PlayerSignals.Hit hitSignal)
+            GameEvents gameEvents)
         {
-            _hitSignal = hitSignal;
+            _gameEvents = gameEvents;
             _audioPlayer = audioPlayer;
             _settings = settings;
             _model = model;
@@ -26,12 +26,12 @@ namespace Zenject.SpaceFighter
 
         public void Initialize()
         {
-            _hitSignal += OnHit;
+            _gameEvents.PlayerHit += OnHit;
         }
 
         public void Dispose()
         {
-            _hitSignal -= OnHit;
+            _gameEvents.PlayerHit -= OnHit;
         }
 
         void OnHit(Bullet bullet)

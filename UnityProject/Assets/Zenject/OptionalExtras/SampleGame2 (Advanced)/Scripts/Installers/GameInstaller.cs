@@ -15,8 +15,7 @@ namespace Zenject.SpaceFighter
         {
             Container.BindAllInterfaces<CameraHandler>().To<CameraHandler>().AsSingle();
 
-            Container.BindSignal<PlayerKilledSignal>();
-            Container.BindSignal<EnemyKilledSignal>();
+            Container.Bind<GameEvents>().AsSingle();
 
             Container.BindAllInterfaces<EnemySpawner>().To<EnemySpawner>().AsSingle();
 

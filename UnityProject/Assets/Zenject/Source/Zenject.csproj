@@ -45,6 +45,7 @@
   <ItemGroup>
     <Compile Include="Binding\Binders\CopyIntoSubContainersBinder.cs" />
     <Compile Include="Binding\BindInfo\GameObjectCreationParameters.cs" />
+    <Compile Include="Injection\Lazy.cs" />
     <Compile Include="Install\Contexts\ContextUtil.cs" />
     <Compile Include="Install\InstallerBase.cs" />
     <Compile Include="Install\MonoInstallerBase.cs" />
@@ -110,6 +111,7 @@
     <Compile Include="Runtime\Kernels\ProjectKernel.cs" />
     <Compile Include="Runtime\Kernels\SceneKernel.cs" />
     <Compile Include="Usage\IInitializable.cs" />
+    <Compile Include="Usage\ILateDisposable.cs" />
     <Compile Include="Usage\InjectAttribute.cs" />
     <Compile Include="Usage\InjectAttributeBase.cs" />
     <Compile Include="Usage\InjectLocalAttribute.cs" />
@@ -117,6 +119,7 @@
     <Compile Include="Usage\InjectSources.cs" />
     <Compile Include="Usage\ITickable.cs" />
     <Compile Include="Usage\ZenjectAllowDuringValidationAttribute.cs" />
+    <Compile Include="Util\ActionInstaller.cs" />
     <Compile Include="Validation\IValidatable.cs" />
     <Compile Include="Factories\KeyedFactory.cs" />
     <Compile Include="Injection\InjectableInfo.cs" />

@@ -11,26 +11,26 @@ namespace Zenject.SpaceFighter
         readonly EnemyModel _model;
         readonly EnemyStateManager _stateManager;
 
-        EnemySignals.Hit _hitSignal;
+        GameEvents _gameEvents;
 
         public EnemyStateCommon(
-            EnemySignals.Hit hitSignal,
+            GameEvents gameEvents,
             EnemyStateManager stateManager,
             EnemyModel model)
         {
             _model = model;
             _stateManager = stateManager;
-            _hitSignal = hitSignal;
+            _gameEvents = gameEvents;
         }
 
         public void Initialize()
         {
-            _hitSignal += OnHit;
+            _gameEvents.EnemyHit += OnHit;
         }
 
         public void Dispose()
         {
-            _hitSignal -= OnHit;
+            _gameEvents.EnemyHit -= OnHit;
         }
 
         public void Tick()
@@ -39,8 +39,13 @@ namespace Zenject.SpaceFighter
             _model.Position = new Vector3(_model.Position.x, _model.Position.y, 0);
         }
 
-        void OnHit(Bullet bullet)
+        void OnHit(EnemyModel model, Bullet bullet)
         {
+            if (model != _model)
+            {
+                return;
+            }
+
             // Run away to fight another day
             _stateManager.ChangeState(EnemyStates.RunAway);
         }
