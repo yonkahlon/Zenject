@@ -87,6 +87,14 @@ namespace Zenject
             var fullMethodName = TestContext.CurrentContext.Test.FullName;
             var name = fullMethodName.Substring(fullMethodName.LastIndexOf(".")+1);
 
+            // Remove all characters after the first open bracket if there is one
+            int openBracketIndex = name.IndexOf("(");
+
+            if (openBracketIndex != -1)
+            {
+                name = name.Substring(0, openBracketIndex);
+            }
+
             return this.GetType().GetMethod(name).GetCustomAttributes(true)
                 .Cast<Attribute>().OfType<T>().Any();
         }
