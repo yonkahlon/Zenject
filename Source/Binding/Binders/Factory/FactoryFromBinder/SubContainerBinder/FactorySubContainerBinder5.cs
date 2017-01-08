@@ -12,7 +12,7 @@ namespace Zenject
         {
         }
 
-        public ConditionBinder ByMethod(ModestTree.Util.Action<DiContainer, TParam1, TParam2, TParam3, TParam4, TParam5> installerMethod)
+        public ConditionCopyNonLazyBinder ByMethod(ModestTree.Util.Action<DiContainer, TParam1, TParam2, TParam3, TParam4, TParam5> installerMethod)
         {
             SubFinalizer = CreateFinalizer(
                 (container) => new SubContainerDependencyProvider(
@@ -20,7 +20,7 @@ namespace Zenject
                     new SubContainerCreatorByMethod<TParam1, TParam2, TParam3, TParam4, TParam5>(
                         container, installerMethod)));
 
-            return new ConditionBinder(BindInfo);
+            return new ConditionCopyNonLazyBinder(BindInfo);
         }
     }
 }

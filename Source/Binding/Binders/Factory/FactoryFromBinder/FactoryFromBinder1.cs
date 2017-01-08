@@ -13,7 +13,7 @@ namespace Zenject
         {
         }
 
-        public ConditionBinder FromMethod(Func<DiContainer, TParam1, TContract> method)
+        public ConditionCopyNonLazyBinder FromMethod(Func<DiContainer, TParam1, TContract> method)
         {
             SubFinalizer = CreateFinalizer(
                 (container) => new MethodProviderWithContainer<TParam1, TContract>(method));
@@ -21,7 +21,7 @@ namespace Zenject
             return this;
         }
 
-        public ConditionBinder FromFactory<TSubFactory>()
+        public ConditionCopyNonLazyBinder FromFactory<TSubFactory>()
             where TSubFactory : IFactory<TParam1, TContract>
         {
             SubFinalizer = CreateFinalizer(

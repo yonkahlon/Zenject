@@ -2,16 +2,16 @@
 
 namespace Zenject
 {
-    public class GameObjectNameGroupNameScopeArgBinder : GameObjectGroupNameScopeArgBinder
+    public class NameTransformScopeArgConditionCopyNonLazyBinder : TransformScopeArgConditionCopyNonLazyBinder
     {
-        public GameObjectNameGroupNameScopeArgBinder(
+        public NameTransformScopeArgConditionCopyNonLazyBinder(
             BindInfo bindInfo,
             GameObjectCreationParameters gameObjectInfo)
             : base(bindInfo, gameObjectInfo)
         {
         }
 
-        public GameObjectGroupNameScopeArgBinder WithGameObjectName(string gameObjectName)
+        public TransformScopeArgConditionCopyNonLazyBinder WithGameObjectName(string gameObjectName)
         {
             GameObjectInfo.Name = gameObjectName;
             return this;

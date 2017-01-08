@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace Zenject
 {
-    public class FactoryFromBinderBase<TContract> : ArgumentsBinder
+    public class FactoryFromBinderBase<TContract> : ArgConditionCopyNonLazyBinder
     {
         public FactoryFromBinderBase(
             BindInfo bindInfo,
@@ -76,7 +76,7 @@ namespace Zenject
         }
 
         // Note that this isn't necessary to call since it's the default
-        public ConditionBinder FromNew()
+        public ConditionCopyNonLazyBinder FromNew()
         {
             BindingUtil.AssertIsNotComponent(ContractType);
             BindingUtil.AssertIsNotAbstract(ContractType);
@@ -84,12 +84,12 @@ namespace Zenject
             return this;
         }
 
-        public ConditionBinder FromResolve()
+        public ConditionCopyNonLazyBinder FromResolve()
         {
             return FromResolve(null);
         }
 
-        public ConditionBinder FromResolve(object subIdentifier)
+        public ConditionCopyNonLazyBinder FromResolve(object subIdentifier)
         {
             SubFinalizer = CreateFinalizer(
                 (container) => new ResolveProvider(
@@ -100,7 +100,7 @@ namespace Zenject
 
 #if !NOT_UNITY3D
 
-        public GameObjectNameGroupNameBinder FromGameObject()
+        public NameTransformConditionCopyNonLazyBinder FromGameObject()
         {
             var gameObjectInfo = new GameObjectCreationParameters();
 
@@ -121,10 +121,10 @@ namespace Zenject
                         new List<TypeValuePair>(), gameObjectInfo));
             }
 
-            return new GameObjectNameGroupNameBinder(BindInfo, gameObjectInfo);
+            return new NameTransformConditionCopyNonLazyBinder(BindInfo, gameObjectInfo);
         }
 
-        public ConditionBinder FromComponent(GameObject gameObject)
+        public ConditionCopyNonLazyBinder FromComponent(GameObject gameObject)
         {
             BindingUtil.AssertIsValidGameObject(gameObject);
             BindingUtil.AssertIsComponent(ContractType);
@@ -138,7 +138,7 @@ namespace Zenject
             return this;
         }
 
-        public GameObjectNameGroupNameBinder FromPrefab(UnityEngine.Object prefab)
+        public NameTransformConditionCopyNonLazyBinder FromPrefab(UnityEngine.Object prefab)
         {
             BindingUtil.AssertIsValidPrefab(prefab);
 
@@ -164,10 +164,10 @@ namespace Zenject
                             new List<TypeValuePair>(), new PrefabProvider(prefab))));
             }
 
-            return new GameObjectNameGroupNameBinder(BindInfo, gameObjectInfo);
+            return new NameTransformConditionCopyNonLazyBinder(BindInfo, gameObjectInfo);
         }
 
-        public GameObjectNameGroupNameBinder FromPrefabResource(string resourcePath)
+        public NameTransformConditionCopyNonLazyBinder FromPrefabResource(string resourcePath)
         {
             BindingUtil.AssertIsValidResourcePath(resourcePath);
 
@@ -193,7 +193,7 @@ namespace Zenject
                             new List<TypeValuePair>(), new PrefabProviderResource(resourcePath))));
             }
 
-            return new GameObjectNameGroupNameBinder(BindInfo, gameObjectInfo);
+            return new NameTransformConditionCopyNonLazyBinder(BindInfo, gameObjectInfo);
         }
 #endif
     }

@@ -3,20 +3,20 @@ using System.Linq;
 
 namespace Zenject
 {
-    public class ArgumentsBinder : ConditionBinder
+    public class ArgConditionCopyNonLazyBinder : ConditionCopyNonLazyBinder
     {
-        public ArgumentsBinder(BindInfo bindInfo)
+        public ArgConditionCopyNonLazyBinder(BindInfo bindInfo)
             : base(bindInfo)
         {
         }
 
-        public ConditionBinder WithArguments(params object[] args)
+        public ConditionCopyNonLazyBinder WithArguments(params object[] args)
         {
             BindInfo.Arguments = InjectUtil.CreateArgList(args);
             return this;
         }
 
-        public ConditionBinder WithArgumentsExplicit(IEnumerable<TypeValuePair> extraArgs)
+        public ConditionCopyNonLazyBinder WithArgumentsExplicit(IEnumerable<TypeValuePair> extraArgs)
         {
             BindInfo.Arguments = extraArgs.ToList();
             return this;

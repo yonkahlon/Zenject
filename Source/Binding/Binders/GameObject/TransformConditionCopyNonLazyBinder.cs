@@ -4,14 +4,12 @@ using System;
 using UnityEngine;
 namespace Zenject
 {
-    public class GameObjectGroupNameScopeArgBinder : ScopeArgBinder
+    public class TransformConditionCopyNonLazyBinder : ConditionCopyNonLazyBinder
     {
-        public GameObjectGroupNameScopeArgBinder(
-            BindInfo bindInfo,
-            GameObjectCreationParameters gameObjectInfo)
+        public TransformConditionCopyNonLazyBinder(BindInfo bindInfo, GameObjectCreationParameters gameObjInfo)
             : base(bindInfo)
         {
-            GameObjectInfo = gameObjectInfo;
+            GameObjectInfo = gameObjInfo;
         }
 
         protected GameObjectCreationParameters GameObjectInfo
@@ -20,19 +18,19 @@ namespace Zenject
             private set;
         }
 
-        public ScopeArgBinder UnderTransform(Transform parent)
+        public ConditionCopyNonLazyBinder UnderTransform(Transform parent)
         {
             GameObjectInfo.ParentTransform = parent;
             return this;
         }
 
-        public ScopeArgBinder UnderTransform(Func<DiContainer, Transform> parentGetter)
+        public ConditionCopyNonLazyBinder UnderTransform(Func<DiContainer, Transform> parentGetter)
         {
             GameObjectInfo.ParentTransformGetter = parentGetter;
             return this;
         }
 
-        public ScopeArgBinder UnderTransformGroup(string transformGroupname)
+        public ConditionCopyNonLazyBinder UnderTransformGroup(string transformGroupname)
         {
             GameObjectInfo.GroupName = transformGroupname;
             return this;

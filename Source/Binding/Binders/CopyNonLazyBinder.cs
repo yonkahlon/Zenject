@@ -1,9 +1,9 @@
 using ModestTree;
 namespace Zenject
 {
-    public class CopyIntoSubContainersBinder : NonLazyBinder
+    public class CopyNonLazyBinder : NonLazyBinder
     {
-        public CopyIntoSubContainersBinder(BindInfo bindInfo)
+        public CopyNonLazyBinder(BindInfo bindInfo)
             : base(bindInfo)
         {
         }

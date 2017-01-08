@@ -14,13 +14,13 @@ namespace Zenject
 
 #if !NOT_UNITY3D
 
-        public GameObjectNameGroupNameBinder ByPrefab<TInstaller>(UnityEngine.Object prefab)
+        public NameTransformConditionCopyNonLazyBinder ByPrefab<TInstaller>(UnityEngine.Object prefab)
             where TInstaller : IInstaller
         {
             return ByPrefab(typeof(TInstaller), prefab);
         }
 
-        public GameObjectNameGroupNameBinder ByPrefab(Type installerType, UnityEngine.Object prefab)
+        public NameTransformConditionCopyNonLazyBinder ByPrefab(Type installerType, UnityEngine.Object prefab)
         {
             BindingUtil.AssertIsValidPrefab(prefab);
 
@@ -38,16 +38,16 @@ namespace Zenject
                         new PrefabProvider(prefab),
                         gameObjectInfo)));
 
-            return new GameObjectNameGroupNameBinder(BindInfo, gameObjectInfo);
+            return new NameTransformConditionCopyNonLazyBinder(BindInfo, gameObjectInfo);
         }
 
-        public GameObjectNameGroupNameBinder ByPrefabResource<TInstaller>(string resourcePath)
+        public NameTransformConditionCopyNonLazyBinder ByPrefabResource<TInstaller>(string resourcePath)
             where TInstaller : IInstaller
         {
             return ByPrefabResource(typeof(TInstaller), resourcePath);
         }
 
-        public GameObjectNameGroupNameBinder ByPrefabResource(
+        public NameTransformConditionCopyNonLazyBinder ByPrefabResource(
             Type installerType, string resourcePath)
         {
             BindingUtil.AssertIsValidResourcePath(resourcePath);
@@ -63,7 +63,7 @@ namespace Zenject
                         new PrefabProviderResource(resourcePath),
                         gameObjectInfo)));
 
-            return new GameObjectNameGroupNameBinder(BindInfo, gameObjectInfo);
+            return new NameTransformConditionCopyNonLazyBinder(BindInfo, gameObjectInfo);
         }
 #endif
     }

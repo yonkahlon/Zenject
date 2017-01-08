@@ -4,9 +4,9 @@ using System;
 using UnityEngine;
 namespace Zenject
 {
-    public class GameObjectGroupNameScopeBinder : ScopeBinder
+    public class TransformScopeConditionCopyNonLazyBinder : ScopeConditionCopyNonLazyBinder
     {
-        public GameObjectGroupNameScopeBinder(
+        public TransformScopeConditionCopyNonLazyBinder(
             BindInfo bindInfo,
             GameObjectCreationParameters gameObjectInfo)
             : base(bindInfo)
@@ -20,19 +20,19 @@ namespace Zenject
             private set;
         }
 
-        public ScopeBinder UnderTransform(Transform parent)
+        public ScopeConditionCopyNonLazyBinder UnderTransform(Transform parent)
         {
             GameObjectInfo.ParentTransform = parent;
             return this;
         }
 
-        public ScopeBinder UnderTransform(Func<DiContainer, Transform> parentGetter)
+        public ScopeConditionCopyNonLazyBinder UnderTransform(Func<DiContainer, Transform> parentGetter)
         {
             GameObjectInfo.ParentTransformGetter = parentGetter;
             return this;
         }
 
-        public ScopeBinder UnderTransformGroup(string transformGroupname)
+        public ScopeConditionCopyNonLazyBinder UnderTransformGroup(string transformGroupname)
         {
             GameObjectInfo.GroupName = transformGroupname;
             return this;

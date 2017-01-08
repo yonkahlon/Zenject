@@ -2,19 +2,19 @@ using ModestTree;
 
 namespace Zenject
 {
-    public class ScopeBinder : ConditionBinder
+    public class ScopeArgNonLazyBinder : ArgNonLazyBinder
     {
-        public ScopeBinder(BindInfo bindInfo)
+        public ScopeArgNonLazyBinder(BindInfo bindInfo)
             : base(bindInfo)
         {
         }
 
-        public ConditionBinder AsSingle()
+        public ArgNonLazyBinder AsSingle()
         {
             return AsSingle(null);
         }
 
-        public ConditionBinder AsSingle(object concreteIdentifier)
+        public ArgNonLazyBinder AsSingle(object concreteIdentifier)
         {
             Assert.IsNull(BindInfo.ConcreteIdentifier);
 
@@ -23,14 +23,14 @@ namespace Zenject
             return this;
         }
 
-        public ConditionBinder AsCached()
+        public ArgNonLazyBinder AsCached()
         {
             BindInfo.Scope = ScopeTypes.Cached;
             return this;
         }
 
         // Note that this is the default so it's not necessary to call this
-        public ConditionBinder AsTransient()
+        public ArgNonLazyBinder AsTransient()
         {
             BindInfo.Scope = ScopeTypes.Transient;
             return this;
