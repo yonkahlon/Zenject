@@ -12,7 +12,7 @@ namespace Zenject
         {
         }
 
-        public ConditionBinder ByMethod(Action<DiContainer, TParam1> installerMethod)
+        public ConditionCopyNonLazyBinder ByMethod(Action<DiContainer, TParam1> installerMethod)
         {
             SubFinalizer = CreateFinalizer(
                 (container) => new SubContainerDependencyProvider(
@@ -20,7 +20,7 @@ namespace Zenject
                     new SubContainerCreatorByMethod<TParam1>(
                         container, installerMethod)));
 
-            return new ConditionBinder(BindInfo);
+            return new ConditionCopyNonLazyBinder(BindInfo);
         }
     }
 }

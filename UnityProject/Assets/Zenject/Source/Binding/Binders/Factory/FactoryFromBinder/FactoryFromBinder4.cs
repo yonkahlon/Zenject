@@ -10,7 +10,7 @@ namespace Zenject
         {
         }
 
-        public ConditionBinder FromMethod(ModestTree.Util.Func<DiContainer, TParam1, TParam2, TParam3, TParam4, TContract> method)
+        public ConditionCopyNonLazyBinder FromMethod(ModestTree.Util.Func<DiContainer, TParam1, TParam2, TParam3, TParam4, TContract> method)
         {
             SubFinalizer = CreateFinalizer(
                 (container) => new MethodProviderWithContainer<TParam1, TParam2, TParam3, TParam4, TContract>(method));
@@ -18,7 +18,7 @@ namespace Zenject
             return this;
         }
 
-        public ConditionBinder FromFactory<TSubFactory>()
+        public ConditionCopyNonLazyBinder FromFactory<TSubFactory>()
             where TSubFactory : IFactory<TParam1, TParam2, TParam3, TParam4, TContract>
         {
             SubFinalizer = CreateFinalizer(

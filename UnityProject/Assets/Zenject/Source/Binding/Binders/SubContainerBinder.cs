@@ -30,13 +30,13 @@ namespace Zenject
             }
         }
 
-        public ScopeBinder ByInstaller<TInstaller>()
+        public ScopeConditionCopyNonLazyBinder ByInstaller<TInstaller>()
             where TInstaller : InstallerBase
         {
             return ByInstaller(typeof(TInstaller));
         }
 
-        public ScopeBinder ByInstaller(Type installerType)
+        public ScopeConditionCopyNonLazyBinder ByInstaller(Type installerType)
         {
             Assert.That(installerType.DerivesFrom<InstallerBase>(),
                 "Invalid installer type given during bind command.  Expected type '{0}' to derive from 'Installer<>'", installerType.Name());
@@ -44,20 +44,20 @@ namespace Zenject
             SubFinalizer = new SubContainerInstallerBindingFinalizer(
                 _bindInfo, installerType, _subIdentifier);
 
-            return new ScopeBinder(_bindInfo);
+            return new ScopeConditionCopyNonLazyBinder(_bindInfo);
         }
 
-        public ScopeBinder ByMethod(Action<DiContainer> installerMethod)
+        public ScopeConditionCopyNonLazyBinder ByMethod(Action<DiContainer> installerMethod)
         {
             SubFinalizer = new SubContainerMethodBindingFinalizer(
                 _bindInfo, installerMethod, _subIdentifier);
 
-            return new ScopeBinder(_bindInfo);
+            return new ScopeConditionCopyNonLazyBinder(_bindInfo);
         }
 
 #if !NOT_UNITY3D
 
-        public GameObjectNameGroupNameScopeBinder ByPrefab(UnityEngine.Object prefab)
+        public NameTransformScopeConditionCopyNonLazyBinder ByPrefab(UnityEngine.Object prefab)
         {
             BindingUtil.AssertIsValidPrefab(prefab);
 
@@ -66,10 +66,10 @@ namespace Zenject
             SubFinalizer = new SubContainerPrefabBindingFinalizer(
                 _bindInfo, gameObjectInfo, prefab, _subIdentifier);
 
-            return new GameObjectNameGroupNameScopeBinder(_bindInfo, gameObjectInfo);
+            return new NameTransformScopeConditionCopyNonLazyBinder(_bindInfo, gameObjectInfo);
         }
 
-        public GameObjectNameGroupNameScopeBinder ByPrefabResource(string resourcePath)
+        public NameTransformScopeConditionCopyNonLazyBinder ByPrefabResource(string resourcePath)
         {
             BindingUtil.AssertIsValidResourcePath(resourcePath);
 
@@ -78,7 +78,7 @@ namespace Zenject
             SubFinalizer = new SubContainerPrefabResourceBindingFinalizer(
                 _bindInfo, gameObjectInfo, resourcePath, _subIdentifier);
 
-            return new GameObjectNameGroupNameScopeBinder(_bindInfo, gameObjectInfo);
+            return new NameTransformScopeConditionCopyNonLazyBinder(_bindInfo, gameObjectInfo);
         }
 #endif
     }

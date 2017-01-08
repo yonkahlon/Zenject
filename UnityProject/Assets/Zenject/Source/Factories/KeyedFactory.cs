@@ -86,7 +86,7 @@ namespace Zenject
             }
         }
 
-        protected static ConditionBinder AddBindingInternal<TDerived>(DiContainer container, TKey key)
+        protected static ConditionCopyNonLazyBinder AddBindingInternal<TDerived>(DiContainer container, TKey key)
             where TDerived : TBase
         {
             return container.Bind<ModestTree.Util.ValuePair<TKey, Type>>()

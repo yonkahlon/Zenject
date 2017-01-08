@@ -13,12 +13,12 @@ namespace Zenject
         {
         }
 
-        public ConditionBinder FromResolveGetter<TObj>(Func<TObj, TContract> method)
+        public ConditionCopyNonLazyBinder FromResolveGetter<TObj>(Func<TObj, TContract> method)
         {
             return FromResolveGetter<TObj>(null, method);
         }
 
-        public ConditionBinder FromResolveGetter<TObj>(
+        public ConditionCopyNonLazyBinder FromResolveGetter<TObj>(
             object subIdentifier, Func<TObj, TContract> method)
         {
             SubFinalizer = CreateFinalizer(
@@ -27,7 +27,7 @@ namespace Zenject
             return this;
         }
 
-        public ConditionBinder FromMethod(Func<DiContainer, TContract> method)
+        public ConditionCopyNonLazyBinder FromMethod(Func<DiContainer, TContract> method)
         {
             SubFinalizer = CreateFinalizer(
                 (container) => new MethodProviderWithContainer<TContract>(method));
@@ -35,7 +35,7 @@ namespace Zenject
             return this;
         }
 
-        public ConditionBinder FromInstance(object instance)
+        public ConditionCopyNonLazyBinder FromInstance(object instance)
         {
             BindingUtil.AssertInstanceDerivesFromOrEqual(instance, AllParentTypes);
 
@@ -45,13 +45,13 @@ namespace Zenject
             return this;
         }
 
-        public ArgumentsBinder FromFactory<TSubFactory>()
+        public ArgConditionCopyNonLazyBinder FromFactory<TSubFactory>()
             where TSubFactory : IFactory<TContract>
         {
             SubFinalizer = CreateFinalizer(
                 (container) => new FactoryProvider<TContract, TSubFactory>(container, BindInfo.Arguments));
 
-            return new ArgumentsBinder(BindInfo);
+            return new ArgConditionCopyNonLazyBinder(BindInfo);
         }
 
         public FactorySubContainerBinder<TContract> FromSubContainerResolve()
@@ -67,7 +67,7 @@ namespace Zenject
 
 #if !NOT_UNITY3D
 
-        public ConditionBinder FromResource(string resourcePath)
+        public ConditionCopyNonLazyBinder FromResource(string resourcePath)
         {
             BindingUtil.AssertDerivesFromUnityObject(ContractType);
 

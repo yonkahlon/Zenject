@@ -11,7 +11,7 @@ using Zenject.Internal;
 
 namespace Zenject
 {
-    public abstract class FromBinder : ScopeArgBinder
+    public abstract class FromBinder : ScopeArgConditionCopyNonLazyBinder
     {
         public FromBinder(
             BindInfo bindInfo,
@@ -58,7 +58,7 @@ namespace Zenject
         }
 
         // This is the default if nothing else is called
-        public ScopeArgBinder FromNew()
+        public ScopeArgConditionCopyNonLazyBinder FromNew()
         {
             BindingUtil.AssertTypesAreNotComponents(ConcreteTypes);
             BindingUtil.AssertTypesAreNotAbstract(ConcreteTypes);
@@ -66,19 +66,19 @@ namespace Zenject
             return this;
         }
 
-        public ScopeBinder FromResolve()
+        public ScopeConditionCopyNonLazyBinder FromResolve()
         {
             return FromResolve(null);
         }
 
-        public ScopeBinder FromResolve(object subIdentifier)
+        public ScopeConditionCopyNonLazyBinder FromResolve(object subIdentifier)
         {
             SubFinalizer = new ScopableBindingFinalizer(
                 BindInfo,
                 SingletonTypes.ToResolve, subIdentifier,
                 (container, type) => new ResolveProvider(type, container, subIdentifier, false));
 
-            return new ScopeBinder(BindInfo);
+            return new ScopeConditionCopyNonLazyBinder(BindInfo);
         }
 
         public SubContainerBinder FromSubContainerResolve()
@@ -92,7 +92,7 @@ namespace Zenject
                 BindInfo, FinalizerWrapper, subIdentifier);
         }
 
-        public ScopeArgBinder FromFactory(Type factoryType)
+        public ScopeArgConditionCopyNonLazyBinder FromFactory(Type factoryType)
         {
             Assert.That(factoryType.DerivesFrom<IFactory>());
 
@@ -102,12 +102,12 @@ namespace Zenject
                 (container, type) => new UntypedFactoryProvider(
                     factoryType, container, BindInfo.Arguments));
 
-            return new ScopeArgBinder(BindInfo);
+            return new ScopeArgConditionCopyNonLazyBinder(BindInfo);
         }
 
 #if !NOT_UNITY3D
 
-        public ScopeArgBinder FromComponent(GameObject gameObject)
+        public ScopeArgConditionCopyNonLazyBinder FromComponent(GameObject gameObject)
         {
             BindingUtil.AssertIsValidGameObject(gameObject);
             BindingUtil.AssertIsComponent(ConcreteTypes);
@@ -118,10 +118,10 @@ namespace Zenject
                 (container, type) => new AddToExistingGameObjectComponentProvider(
                     gameObject, container, type, BindInfo.ConcreteIdentifier, BindInfo.Arguments));
 
-            return new ScopeArgBinder(BindInfo);
+            return new ScopeArgConditionCopyNonLazyBinder(BindInfo);
         }
 
-        public ArgumentsBinder FromSiblingComponent()
+        public ArgConditionCopyNonLazyBinder FromSiblingComponent()
         {
             BindingUtil.AssertIsComponent(ConcreteTypes);
             BindingUtil.AssertTypesAreNotAbstract(ConcreteTypes);
@@ -130,15 +130,19 @@ namespace Zenject
                 BindInfo, (container, type) => new AddToCurrentGameObjectComponentProvider(
                     container, type, BindInfo.ConcreteIdentifier, BindInfo.Arguments));
 
-            return new ArgumentsBinder(BindInfo);
+            return new ArgConditionCopyNonLazyBinder(BindInfo);
         }
 
-        public GameObjectNameGroupNameScopeArgBinder FromGameObject()
+        public NameTransformScopeArgConditionCopyNonLazyBinder FromGameObject()
+        {
+            return FromGameObject(new GameObjectCreationParameters());
+        }
+
+        public NameTransformScopeArgConditionCopyNonLazyBinder FromGameObject(
+            GameObjectCreationParameters gameObjectInfo)
         {
             BindingUtil.AssertIsAbstractOrComponentOrGameObject(BindInfo.ContractTypes);
             BindingUtil.AssertIsComponentOrGameObject(ConcreteTypes);
-
-            var gameObjectInfo = new GameObjectCreationParameters();
 
             if (ConcreteTypes.All(x => x == typeof(GameObject)))
             {
@@ -166,36 +170,45 @@ namespace Zenject
                         gameObjectInfo));
             }
 
-            return new GameObjectNameGroupNameScopeArgBinder(BindInfo, gameObjectInfo);
+            return new NameTransformScopeArgConditionCopyNonLazyBinder(BindInfo, gameObjectInfo);
         }
 
-        public GameObjectNameGroupNameScopeArgBinder FromPrefab(UnityEngine.Object prefab)
+        public NameTransformScopeArgConditionCopyNonLazyBinder FromPrefab(UnityEngine.Object prefab)
+        {
+            return FromPrefab(
+                prefab, new GameObjectCreationParameters());
+        }
+
+        public NameTransformScopeArgConditionCopyNonLazyBinder FromPrefab(
+            UnityEngine.Object prefab, GameObjectCreationParameters gameObjectInfo)
         {
             BindingUtil.AssertIsValidPrefab(prefab);
             BindingUtil.AssertIsAbstractOrComponentOrGameObject(AllParentTypes);
 
-            var gameObjectInfo = new GameObjectCreationParameters();
-
             SubFinalizer = new PrefabBindingFinalizer(
                 BindInfo, gameObjectInfo, prefab);
 
-            return new GameObjectNameGroupNameScopeArgBinder(BindInfo, gameObjectInfo);
+            return new NameTransformScopeArgConditionCopyNonLazyBinder(BindInfo, gameObjectInfo);
         }
 
-        public GameObjectNameGroupNameScopeArgBinder FromPrefabResource(string resourcePath)
+        public NameTransformScopeArgConditionCopyNonLazyBinder FromPrefabResource(string resourcePath)
+        {
+            return FromPrefabResource(resourcePath, new GameObjectCreationParameters());
+        }
+
+        public NameTransformScopeArgConditionCopyNonLazyBinder FromPrefabResource(
+            string resourcePath, GameObjectCreationParameters gameObjectInfo)
         {
             BindingUtil.AssertIsValidResourcePath(resourcePath);
             BindingUtil.AssertIsAbstractOrComponentOrGameObject(AllParentTypes);
 
-            var gameObjectInfo = new GameObjectCreationParameters();
-
             SubFinalizer = new PrefabResourceBindingFinalizer(
                 BindInfo, gameObjectInfo, resourcePath);
 
-            return new GameObjectNameGroupNameScopeArgBinder(BindInfo, gameObjectInfo);
+            return new NameTransformScopeArgConditionCopyNonLazyBinder(BindInfo, gameObjectInfo);
         }
 
-        public ScopeBinder FromResource(string resourcePath)
+        public ScopeConditionCopyNonLazyBinder FromResource(string resourcePath)
         {
             BindingUtil.AssertDerivesFromUnityObject(ConcreteTypes);
 
@@ -205,12 +218,12 @@ namespace Zenject
                 resourcePath.ToLower(),
                 (_, type) => new ResourceProvider(resourcePath, type));
 
-            return new ScopeBinder(BindInfo);
+            return new ScopeConditionCopyNonLazyBinder(BindInfo);
         }
 
 #endif
 
-        public ScopeArgBinder FromMethodUntyped(Func<InjectContext, object> method)
+        public ScopeArgConditionCopyNonLazyBinder FromMethodUntyped(Func<InjectContext, object> method)
         {
             SubFinalizer = new ScopableBindingFinalizer(
                 BindInfo,
@@ -220,7 +233,7 @@ namespace Zenject
             return this;
         }
 
-        protected ScopeArgBinder FromMethodBase<TConcrete>(Func<InjectContext, TConcrete> method)
+        protected ScopeArgConditionCopyNonLazyBinder FromMethodBase<TConcrete>(Func<InjectContext, TConcrete> method)
         {
             BindingUtil.AssertIsDerivedFromTypes(typeof(TConcrete), AllParentTypes);
 
@@ -232,7 +245,7 @@ namespace Zenject
             return this;
         }
 
-        protected ScopeArgBinder FromFactoryBase<TConcrete, TFactory>()
+        protected ScopeArgConditionCopyNonLazyBinder FromFactoryBase<TConcrete, TFactory>()
             where TFactory : IFactory<TConcrete>
         {
             BindingUtil.AssertIsDerivedFromTypes(typeof(TConcrete), AllParentTypes);
@@ -242,10 +255,10 @@ namespace Zenject
                 SingletonTypes.ToFactory, typeof(TFactory),
                 (container, type) => new FactoryProvider<TConcrete, TFactory>(container, BindInfo.Arguments));
 
-            return new ScopeArgBinder(BindInfo);
+            return new ScopeArgConditionCopyNonLazyBinder(BindInfo);
         }
 
-        protected ScopeBinder FromResolveGetterBase<TObj, TResult>(
+        protected ScopeConditionCopyNonLazyBinder FromResolveGetterBase<TObj, TResult>(
             object identifier, Func<TObj, TResult> method)
         {
             BindingUtil.AssertIsDerivedFromTypes(typeof(TResult), AllParentTypes);
@@ -256,10 +269,10 @@ namespace Zenject
                 new SingletonImplIds.ToGetter(identifier, method),
                 (container, type) => new GetterProvider<TObj, TResult>(identifier, method, container));
 
-            return new ScopeBinder(BindInfo);
+            return new ScopeConditionCopyNonLazyBinder(BindInfo);
         }
 
-        protected ScopeBinder FromInstanceBase(object instance, bool allowNull)
+        protected ScopeConditionCopyNonLazyBinder FromInstanceBase(object instance, bool allowNull)
         {
             if (!allowNull)
             {
@@ -274,7 +287,7 @@ namespace Zenject
                 BindInfo, SingletonTypes.ToInstance, instance,
                 (container, type) => new InstanceProvider(container, type, instance));
 
-            return new ScopeBinder(BindInfo);
+            return new ScopeConditionCopyNonLazyBinder(BindInfo);
         }
     }
 }

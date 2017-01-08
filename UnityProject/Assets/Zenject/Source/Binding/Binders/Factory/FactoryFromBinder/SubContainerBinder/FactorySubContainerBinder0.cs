@@ -12,7 +12,7 @@ namespace Zenject
         {
         }
 
-        public ConditionBinder ByMethod(Action<DiContainer> installerMethod)
+        public ConditionCopyNonLazyBinder ByMethod(Action<DiContainer> installerMethod)
         {
             SubFinalizer = CreateFinalizer(
                 (container) => new SubContainerDependencyProvider(
@@ -20,12 +20,12 @@ namespace Zenject
                     new SubContainerCreatorByMethod(
                         container, installerMethod)));
 
-            return new ConditionBinder(BindInfo);
+            return new ConditionCopyNonLazyBinder(BindInfo);
         }
 
 #if !NOT_UNITY3D
 
-        public GameObjectNameGroupNameBinder ByPrefab(UnityEngine.Object prefab)
+        public NameTransformConditionCopyNonLazyBinder ByPrefab(UnityEngine.Object prefab)
         {
             BindingUtil.AssertIsValidPrefab(prefab);
 
@@ -39,10 +39,10 @@ namespace Zenject
                         new PrefabProvider(prefab),
                         gameObjectInfo)));
 
-            return new GameObjectNameGroupNameBinder(BindInfo, gameObjectInfo);
+            return new NameTransformConditionCopyNonLazyBinder(BindInfo, gameObjectInfo);
         }
 
-        public GameObjectNameGroupNameBinder ByPrefabResource(string resourcePath)
+        public NameTransformConditionCopyNonLazyBinder ByPrefabResource(string resourcePath)
         {
             BindingUtil.AssertIsValidResourcePath(resourcePath);
 
@@ -56,7 +56,7 @@ namespace Zenject
                         new PrefabProviderResource(resourcePath),
                         gameObjectInfo)));
 
-            return new GameObjectNameGroupNameBinder(BindInfo, gameObjectInfo);
+            return new NameTransformConditionCopyNonLazyBinder(BindInfo, gameObjectInfo);
         }
 #endif
     }

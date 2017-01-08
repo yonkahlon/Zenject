@@ -1958,12 +1958,12 @@ namespace Zenject
         //
         //      Container.Bind<Foo>().FromInstance(new Foo());
         //
-        public IdScopeBinder BindInstance<TContract>(TContract instance)
+        public IdScopeConditionCopyNonLazyBinder BindInstance<TContract>(TContract instance)
         {
             return BindInstance<TContract>(instance, false);
         }
 
-        public IdScopeBinder BindInstance<TContract>(TContract instance, bool allowNull)
+        public IdScopeConditionCopyNonLazyBinder BindInstance<TContract>(TContract instance, bool allowNull)
         {
             if (!allowNull)
             {
@@ -1978,7 +1978,7 @@ namespace Zenject
                 bindInfo, SingletonTypes.ToInstance, instance,
                 (container, type) => new InstanceProvider(container, type, instance));
 
-            return new IdScopeBinder(bindInfo);
+            return new IdScopeConditionCopyNonLazyBinder(bindInfo);
         }
 
         public FactoryToChoiceIdBinder<TContract> BindIFactory<TContract>()

@@ -11,7 +11,7 @@ namespace Zenject
 {
     public static class ZenjectMoqExtensions
     {
-        public static ScopeBinder FromMock<TContract>(this FromBinderGeneric<TContract> binder)
+        public static ScopeConditionCopyNonLazyBinder FromMock<TContract>(this FromBinderGeneric<TContract> binder)
             where TContract : class
         {
 #if UNITY_EDITOR && !UNITY_WEBPLAYER
