@@ -1211,10 +1211,6 @@ namespace Zenject
 
             gameObj.transform.SetParent(GetTransformGroup(gameObjectBindInfo), false);
 
-            if (prefabAsGameObject.activeSelf) {
-                gameObj.SetActive(true);
-            }
-
             return InjectGameObjectForComponentExplicit(
                 gameObj, componentType, args);
         }
