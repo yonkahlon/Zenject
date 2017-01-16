@@ -11,27 +11,24 @@ namespace Zenject
     public class FactoryFromBinderBase<TContract> : ArgConditionCopyNonLazyBinder
     {
         public FactoryFromBinderBase(
-            BindInfo bindInfo,
-            Type factoryType,
-            BindFinalizerWrapper finalizerWrapper)
+            BindInfo bindInfo, FactoryBindInfo factoryBindInfo)
             : base(bindInfo)
         {
-            // Note that it doesn't derive from Factory<TContract>
-            // when used with To<>, so we can only check IDynamicFactory
-            Assert.That(factoryType.DerivesFrom<IDynamicFactory>());
+            FactoryBindInfo = factoryBindInfo;
 
-            FactoryType = factoryType;
-            FinalizerWrapper = finalizerWrapper;
-
-            // Default to just creating it using new
-            finalizerWrapper.SubFinalizer = CreateFinalizer(
-                (container) => new TransientProvider(ContractType, container, BindInfo.Arguments, null, BindInfo.ContextInfo));
+            factoryBindInfo.ProviderFunc =
+                (container) => new TransientProvider(ContractType, container, BindInfo.Arguments, null, BindInfo.ContextInfo);
         }
 
-        protected Type FactoryType
+        protected FactoryBindInfo FactoryBindInfo
         {
-            get;
-            private set;
+            get; private set;
+        }
+
+        protected Func<DiContainer, IProvider> ProviderFunc
+        {
+            get { return FactoryBindInfo.ProviderFunc; }
+            set { FactoryBindInfo.ProviderFunc = value; }
         }
 
         protected Type ContractType
@@ -39,20 +36,6 @@ namespace Zenject
             get
             {
                 return typeof(TContract);
-            }
-        }
-
-        protected BindFinalizerWrapper FinalizerWrapper
-        {
-            get;
-            private set;
-        }
-
-        protected IBindingFinalizer SubFinalizer
-        {
-            set
-            {
-                FinalizerWrapper.SubFinalizer = value;
             }
         }
 
@@ -67,12 +50,6 @@ namespace Zenject
                     yield return type;
                 }
             }
-        }
-
-        protected IBindingFinalizer CreateFinalizer(Func<DiContainer, IProvider> providerFunc)
-        {
-            return new DynamicFactoryBindingFinalizer<TContract>(
-                BindInfo, FactoryType, providerFunc);
         }
 
         // Note that this isn't necessary to call since it's the default
@@ -91,9 +68,9 @@ namespace Zenject
 
         public ConditionCopyNonLazyBinder FromResolve(object subIdentifier)
         {
-            SubFinalizer = CreateFinalizer(
+            ProviderFunc =
                 (container) => new ResolveProvider(
-                    ContractType, container, subIdentifier, false));
+                    ContractType, container, subIdentifier, false);
 
             return this;
         }
@@ -106,19 +83,19 @@ namespace Zenject
 
             if (ContractType == typeof(GameObject))
             {
-                SubFinalizer = CreateFinalizer(
+                ProviderFunc =
                     (container) => new EmptyGameObjectProvider(
-                        container, gameObjectInfo));
+                        container, gameObjectInfo);
             }
             else
             {
                 BindingUtil.AssertIsComponent(ContractType);
                 BindingUtil.AssertIsNotAbstract(ContractType);
 
-                SubFinalizer = CreateFinalizer(
+                ProviderFunc =
                     (container) => new AddToNewGameObjectComponentProvider(
                         container, ContractType, null,
-                        new List<TypeValuePair>(), gameObjectInfo));
+                        new List<TypeValuePair>(), gameObjectInfo);
             }
 
             return new NameTransformConditionCopyNonLazyBinder(BindInfo, gameObjectInfo);
@@ -130,10 +107,10 @@ namespace Zenject
             BindingUtil.AssertIsComponent(ContractType);
             BindingUtil.AssertIsNotAbstract(ContractType);
 
-            SubFinalizer = CreateFinalizer(
+            ProviderFunc =
                 (container) => new AddToExistingGameObjectComponentProvider(
                     gameObject, container, ContractType,
-                    null, new List<TypeValuePair>()));
+                    null, new List<TypeValuePair>());
 
             return this;
         }
@@ -146,22 +123,22 @@ namespace Zenject
 
             if (ContractType == typeof(GameObject))
             {
-                SubFinalizer = CreateFinalizer(
+                ProviderFunc =
                     (container) => new PrefabGameObjectProvider(
                         new PrefabInstantiator(
                             container, gameObjectInfo,
-                            new List<TypeValuePair>(), new PrefabProvider(prefab))));
+                            new List<TypeValuePair>(), new PrefabProvider(prefab)));
             }
             else
             {
                 BindingUtil.AssertIsAbstractOrComponent(ContractType);
 
-                SubFinalizer = CreateFinalizer(
+                ProviderFunc =
                     (container) => new GetFromPrefabComponentProvider(
                         ContractType,
                         new PrefabInstantiator(
                             container, gameObjectInfo,
-                            new List<TypeValuePair>(), new PrefabProvider(prefab))));
+                            new List<TypeValuePair>(), new PrefabProvider(prefab)));
             }
 
             return new NameTransformConditionCopyNonLazyBinder(BindInfo, gameObjectInfo);
@@ -175,22 +152,22 @@ namespace Zenject
 
             if (ContractType == typeof(GameObject))
             {
-                SubFinalizer = CreateFinalizer(
+                ProviderFunc =
                     (container) => new PrefabGameObjectProvider(
                         new PrefabInstantiator(
                             container, gameObjectInfo,
-                            new List<TypeValuePair>(), new PrefabProviderResource(resourcePath))));
+                            new List<TypeValuePair>(), new PrefabProviderResource(resourcePath)));
             }
             else
             {
                 BindingUtil.AssertIsAbstractOrComponent(ContractType);
 
-                SubFinalizer = CreateFinalizer(
+                ProviderFunc =
                     (container) => new GetFromPrefabComponentProvider(
                         ContractType,
                         new PrefabInstantiator(
                             container, gameObjectInfo,
-                            new List<TypeValuePair>(), new PrefabProviderResource(resourcePath))));
+                            new List<TypeValuePair>(), new PrefabProviderResource(resourcePath)));
             }
 
             return new NameTransformConditionCopyNonLazyBinder(BindInfo, gameObjectInfo);

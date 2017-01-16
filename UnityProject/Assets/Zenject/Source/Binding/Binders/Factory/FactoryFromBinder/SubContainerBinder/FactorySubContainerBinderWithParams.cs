@@ -6,9 +6,8 @@ namespace Zenject
     public class FactorySubContainerBinderWithParams<TContract> : FactorySubContainerBinderBase<TContract>
     {
         public FactorySubContainerBinderWithParams(
-            BindInfo bindInfo, Type factoryType,
-            BindFinalizerWrapper finalizerWrapper, object subIdentifier)
-            : base(bindInfo, factoryType, finalizerWrapper, subIdentifier)
+            BindInfo bindInfo, FactoryBindInfo factoryBindInfo, object subIdentifier)
+            : base(bindInfo, factoryBindInfo, subIdentifier)
         {
         }
 
@@ -29,14 +28,14 @@ namespace Zenject
 
             var gameObjectInfo = new GameObjectCreationParameters();
 
-            SubFinalizer = CreateFinalizer(
+            ProviderFunc = 
                 (container) => new SubContainerDependencyProvider(
                     ContractType, SubIdentifier,
                     new SubContainerCreatorByPrefabWithParams(
                         installerType,
                         container,
                         new PrefabProvider(prefab),
-                        gameObjectInfo)));
+                        gameObjectInfo));
 
             return new NameTransformConditionCopyNonLazyBinder(BindInfo, gameObjectInfo);
         }
@@ -54,14 +53,14 @@ namespace Zenject
 
             var gameObjectInfo = new GameObjectCreationParameters();
 
-            SubFinalizer = CreateFinalizer(
+            ProviderFunc = 
                 (container) => new SubContainerDependencyProvider(
                     ContractType, SubIdentifier,
                     new SubContainerCreatorByPrefabWithParams(
                         installerType,
                         container,
                         new PrefabProviderResource(resourcePath),
-                        gameObjectInfo)));
+                        gameObjectInfo));
 
             return new NameTransformConditionCopyNonLazyBinder(BindInfo, gameObjectInfo);
         }

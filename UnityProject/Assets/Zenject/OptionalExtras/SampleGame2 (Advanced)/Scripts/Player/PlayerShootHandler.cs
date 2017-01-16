@@ -41,7 +41,7 @@ namespace Zenject.SpaceFighter
 
         void Fire()
         {
-            var bullet = _bulletFactory.Create(
+            var bullet = _bulletFactory.Spawn(
                 _settings.BulletSpeed, _settings.BulletLifetime, BulletTypes.FromPlayer);
 
             bullet.transform.position = _player.Position + _player.LookDir * _settings.BulletOffsetDistance;

@@ -6,9 +6,8 @@ using ModestTree;
 
 namespace Zenject.Asteroids
 {
-    public class Asteroid : MonoBehaviour
+    public class Asteroid : MonoBehaviour, IPoolable
     {
-        bool _hasDisposed;
         LevelHelper _level;
         Rigidbody _rigidBody;
         Settings _settings;
@@ -23,6 +22,16 @@ namespace Zenject.Asteroids
             _level = level;
             _settings = settings;
             _rigidBody = GetComponent<Rigidbody>();
+        }
+
+        public void OnSpawned()
+        {
+            gameObject.SetActive(true);
+        }
+
+        public void OnDespawned()
+        {
+            gameObject.SetActive(false);
         }
 
         public Vector3 Position
@@ -95,13 +104,6 @@ namespace Zenject.Asteroids
             CheckForTeleport();
         }
 
-        public void Dispose()
-        {
-            Assert.That(!_hasDisposed);
-            _hasDisposed = true;
-            GameObject.Destroy(gameObject);
-        }
-
         void CheckForTeleport()
         {
             if (Position.x > _level.Right + Scale && IsMovingInDirection(Vector3.right))
@@ -136,7 +138,7 @@ namespace Zenject.Asteroids
             public float maxSpeed;
         }
 
-        public class Factory : Factory<Asteroid>
+        public class Factory : PooledFactory<Asteroid>
         {
         }
     }

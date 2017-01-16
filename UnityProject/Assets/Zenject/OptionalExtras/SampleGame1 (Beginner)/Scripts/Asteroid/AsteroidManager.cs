@@ -104,7 +104,7 @@ namespace Zenject.Asteroids
         {
             foreach (var asteroid in _asteroids)
             {
-                asteroid.Dispose();
+                _asteroidFactory.Despawn(asteroid);
             }
 
             _asteroids.Clear();
@@ -146,7 +146,7 @@ namespace Zenject.Asteroids
 
         public void SpawnNext()
         {
-            var asteroid = _asteroidFactory.Create();
+            var asteroid = _asteroidFactory.Spawn();
 
             var attributes = _cachedAttributes.Dequeue();
 

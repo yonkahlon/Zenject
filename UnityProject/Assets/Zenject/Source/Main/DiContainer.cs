@@ -1982,94 +1982,191 @@ namespace Zenject
             return new IdScopeConditionCopyNonLazyBinder(bindInfo);
         }
 
+        FactoryToChoiceIdBinder<TContract> BindFactoryInternal<TContract, TFactoryContract, TFactoryConcrete>()
+            where TFactoryConcrete : TFactoryContract, IFactory
+            where TFactoryContract : IFactory
+        {
+            var bindInfo = new BindInfo(typeof(TFactoryContract));
+            var factoryBindInfo = new FactoryBindInfo(typeof(TFactoryConcrete));
+
+            StartBinding().SubFinalizer = new DynamicFactoryBindingFinalizer<TContract>(
+                bindInfo, factoryBindInfo);
+
+            return new FactoryToChoiceIdBinder<TContract>(
+                bindInfo, factoryBindInfo);
+        }
+
         public FactoryToChoiceIdBinder<TContract> BindIFactory<TContract>()
         {
-            var bindInfo = new BindInfo(typeof(IFactory<TContract>));
-            return new FactoryToChoiceIdBinder<TContract>(
-                bindInfo, typeof(Factory<TContract>), StartBinding());
+            return BindFactoryInternal<TContract, IFactory<TContract>, Factory<TContract>>();
         }
 
         public FactoryToChoiceIdBinder<TContract> BindFactory<TContract, TFactory>()
             where TFactory : Factory<TContract>
         {
-            var bindInfo = new BindInfo(typeof(TFactory));
-            return new FactoryToChoiceIdBinder<TContract>(
-                bindInfo, typeof(TFactory), StartBinding());
+            return BindFactoryInternal<TContract, TFactory, TFactory>();
+        }
+
+        PooledFactoryInitialSizeBinder<TContract> BindPooledFactoryInternal<TContract, TFactoryContract, TFactoryConcrete>()
+            where TFactoryConcrete : TFactoryContract, IPooledFactory
+            where TFactoryContract : IPooledFactory
+        {
+            var bindInfo = new BindInfo(typeof(TFactoryContract));
+            var factoryBindInfo = new FactoryBindInfo(typeof(TFactoryConcrete));
+            var poolBindInfo = new PooledFactoryBindInfo();
+
+            StartBinding().SubFinalizer = new PooledFactoryBindingFinalizer<TContract>(
+                bindInfo, factoryBindInfo, poolBindInfo);
+
+            return new PooledFactoryInitialSizeBinder<TContract>(
+                bindInfo, factoryBindInfo, poolBindInfo);
+        }
+
+        public PooledFactoryInitialSizeBinder<TContract> BindPooledFactory<TContract, TFactory>()
+            where TFactory : IPooledFactory
+        {
+            return BindPooledFactoryInternal<TContract, TFactory, TFactory>();
+        }
+
+        public PooledFactoryInitialSizeBinder<TContract> BindIPooledFactory<TContract>()
+            where TContract : IPoolable
+        {
+            return BindPooledFactoryInternal<TContract, IPooledFactory<TContract>, PooledFactory<TContract>>();
+        }
+
+        FactoryToChoiceIdBinder<TParam1, TContract> BindFactoryInternal<TParam1, TContract, TFactoryContract, TFactoryConcrete>()
+            where TFactoryConcrete : TFactoryContract, IFactory
+            where TFactoryContract : IFactory
+        {
+            var bindInfo = new BindInfo(typeof(TFactoryContract));
+            var factoryBindInfo = new FactoryBindInfo(typeof(TFactoryConcrete));
+
+            StartBinding().SubFinalizer = new DynamicFactoryBindingFinalizer<TContract>(
+                bindInfo, factoryBindInfo);
+
+            return new FactoryToChoiceIdBinder<TParam1, TContract>(
+                bindInfo, factoryBindInfo);
         }
 
         public FactoryToChoiceIdBinder<TParam1, TContract> BindIFactory<TParam1, TContract>()
         {
-            var bindInfo = new BindInfo(typeof(IFactory<TParam1, TContract>));
-            return new FactoryToChoiceIdBinder<TParam1, TContract>(
-                bindInfo, typeof(Factory<TParam1, TContract>), StartBinding());
+            return BindFactoryInternal<
+                TParam1, TContract, IFactory<TParam1, TContract>, Factory<TParam1, TContract>>();
         }
 
         public FactoryToChoiceIdBinder<TParam1, TContract> BindFactory<TParam1, TContract, TFactory>()
             where TFactory : Factory<TParam1, TContract>
         {
-            var bindInfo = new BindInfo(typeof(TFactory));
-            return new FactoryToChoiceIdBinder<TParam1, TContract>(
-                bindInfo, typeof(TFactory), StartBinding());
+            return BindFactoryInternal<
+                TParam1, TContract, TFactory, TFactory>();
+        }
+
+        FactoryToChoiceIdBinder<TParam1, TParam2, TContract> BindFactoryInternal<TParam1, TParam2, TContract, TFactoryContract, TFactoryConcrete>()
+            where TFactoryConcrete : TFactoryContract, IFactory
+            where TFactoryContract : IFactory
+        {
+            var bindInfo = new BindInfo(typeof(TFactoryContract));
+            var factoryBindInfo = new FactoryBindInfo(typeof(TFactoryConcrete));
+
+            StartBinding().SubFinalizer = new DynamicFactoryBindingFinalizer<TContract>(
+                bindInfo, factoryBindInfo);
+
+            return new FactoryToChoiceIdBinder<TParam1, TParam2, TContract>(
+                bindInfo, factoryBindInfo);
         }
 
         public FactoryToChoiceIdBinder<TParam1, TParam2, TContract> BindIFactory<TParam1, TParam2, TContract>()
         {
-            var bindInfo = new BindInfo(typeof(IFactory<TParam1, TParam2, TContract>));
-            return new FactoryToChoiceIdBinder<TParam1, TParam2, TContract>(
-                bindInfo, typeof(Factory<TParam1, TParam2, TContract>), StartBinding());
+            return BindFactoryInternal<
+                TParam1, TParam2, TContract, IFactory<TParam1, TParam2, TContract>, Factory<TParam1, TParam2, TContract>>();
         }
 
         public FactoryToChoiceIdBinder<TParam1, TParam2, TContract> BindFactory<TParam1, TParam2, TContract, TFactory>()
             where TFactory : Factory<TParam1, TParam2, TContract>
         {
-            var bindInfo = new BindInfo(typeof(TFactory));
-            return new FactoryToChoiceIdBinder<TParam1, TParam2, TContract>(
-                bindInfo, typeof(TFactory), StartBinding());
+            return BindFactoryInternal<
+                TParam1, TParam2, TContract, TFactory, TFactory>();
+        }
+
+        FactoryToChoiceIdBinder<TParam1, TParam2, TParam3, TContract> BindFactoryInternal<TParam1, TParam2, TParam3, TContract, TFactoryContract, TFactoryConcrete>()
+            where TFactoryConcrete : TFactoryContract, IFactory
+            where TFactoryContract : IFactory
+        {
+            var bindInfo = new BindInfo(typeof(TFactoryContract));
+            var factoryBindInfo = new FactoryBindInfo(typeof(TFactoryConcrete));
+
+            StartBinding().SubFinalizer = new DynamicFactoryBindingFinalizer<TContract>(
+                bindInfo, factoryBindInfo);
+
+            return new FactoryToChoiceIdBinder<TParam1, TParam2, TParam3, TContract>(
+                bindInfo, factoryBindInfo);
         }
 
         public FactoryToChoiceIdBinder<TParam1, TParam2, TParam3, TContract> BindIFactory<TParam1, TParam2, TParam3, TContract>()
         {
-            var bindInfo = new BindInfo(typeof(IFactory<TParam1, TParam2, TParam3, TContract>));
-            return new FactoryToChoiceIdBinder<TParam1, TParam2, TParam3, TContract>(
-                bindInfo, typeof(Factory<TParam1, TParam2, TParam3, TContract>), StartBinding());
+            return BindFactoryInternal<
+                TParam1, TParam2, TParam3, TContract, IFactory<TParam1, TParam2, TParam3, TContract>, Factory<TParam1, TParam2, TParam3, TContract>>();
         }
 
         public FactoryToChoiceIdBinder<TParam1, TParam2, TParam3, TContract> BindFactory<TParam1, TParam2, TParam3, TContract, TFactory>()
             where TFactory : Factory<TParam1, TParam2, TParam3, TContract>
         {
-            var bindInfo = new BindInfo(typeof(TFactory));
-            return new FactoryToChoiceIdBinder<TParam1, TParam2, TParam3, TContract>(
-                bindInfo, typeof(TFactory), StartBinding());
+            return BindFactoryInternal<
+                TParam1, TParam2, TParam3, TContract, TFactory, TFactory>();
+        }
+
+        FactoryToChoiceIdBinder<TParam1, TParam2, TParam3, TParam4, TContract> BindFactoryInternal<TParam1, TParam2, TParam3, TParam4, TContract, TFactoryContract, TFactoryConcrete>()
+            where TFactoryConcrete : TFactoryContract, IFactory
+            where TFactoryContract : IFactory
+        {
+            var bindInfo = new BindInfo(typeof(TFactoryContract));
+            var factoryBindInfo = new FactoryBindInfo(typeof(TFactoryConcrete));
+
+            StartBinding().SubFinalizer = new DynamicFactoryBindingFinalizer<TContract>(
+                bindInfo, factoryBindInfo);
+
+            return new FactoryToChoiceIdBinder<TParam1, TParam2, TParam3, TParam4, TContract>(
+                bindInfo, factoryBindInfo);
         }
 
         public FactoryToChoiceIdBinder<TParam1, TParam2, TParam3, TParam4, TContract> BindIFactory<TParam1, TParam2, TParam3, TParam4, TContract>()
         {
-            var bindInfo = new BindInfo(typeof(IFactory<TParam1, TParam2, TParam3, TParam4, TContract>));
-            return new FactoryToChoiceIdBinder<TParam1, TParam2, TParam3, TParam4, TContract>(
-                bindInfo, typeof(Factory<TParam1, TParam2, TParam3, TParam4, TContract>), StartBinding());
+            return BindFactoryInternal<
+                TParam1, TParam2, TParam3, TParam4, TContract, IFactory<TParam1, TParam2, TParam3, TParam4, TContract>, Factory<TParam1, TParam2, TParam3, TParam4, TContract>>();
         }
 
         public FactoryToChoiceIdBinder<TParam1, TParam2, TParam3, TParam4, TContract> BindFactory<TParam1, TParam2, TParam3, TParam4, TContract, TFactory>()
             where TFactory : Factory<TParam1, TParam2, TParam3, TParam4, TContract>
         {
-            var bindInfo = new BindInfo(typeof(TFactory));
-            return new FactoryToChoiceIdBinder<TParam1, TParam2, TParam3, TParam4, TContract>(
-                bindInfo, typeof(TFactory), StartBinding());
+            return BindFactoryInternal<
+                TParam1, TParam2, TParam3, TParam4, TContract, TFactory, TFactory>();
+        }
+
+        FactoryToChoiceIdBinder<TParam1, TParam2, TParam3, TParam4, TParam5, TContract> BindFactoryInternal<TParam1, TParam2, TParam3, TParam4, TParam5, TContract, TFactoryContract, TFactoryConcrete>()
+            where TFactoryConcrete : TFactoryContract, IFactory
+            where TFactoryContract : IFactory
+        {
+            var bindInfo = new BindInfo(typeof(TFactoryContract));
+            var factoryBindInfo = new FactoryBindInfo(typeof(TFactoryConcrete));
+
+            StartBinding().SubFinalizer = new DynamicFactoryBindingFinalizer<TContract>(
+                bindInfo, factoryBindInfo);
+
+            return new FactoryToChoiceIdBinder<TParam1, TParam2, TParam3, TParam4, TParam5, TContract>(
+                bindInfo, factoryBindInfo);
         }
 
         public FactoryToChoiceIdBinder<TParam1, TParam2, TParam3, TParam4, TParam5, TContract> BindIFactory<TParam1, TParam2, TParam3, TParam4, TParam5, TContract>()
         {
-            var bindInfo = new BindInfo(typeof(IFactory<TParam1, TParam2, TParam3, TParam4, TParam5, TContract>));
-            return new FactoryToChoiceIdBinder<TParam1, TParam2, TParam3, TParam4, TParam5, TContract>(
-                bindInfo, typeof(Factory<TParam1, TParam2, TParam3, TParam4, TParam5, TContract>), StartBinding());
+            return BindFactoryInternal<
+                TParam1, TParam2, TParam3, TParam4, TParam5, TContract, IFactory<TParam1, TParam2, TParam3, TParam4, TParam5, TContract>, Factory<TParam1, TParam2, TParam3, TParam4, TParam5, TContract>>();
         }
 
         public FactoryToChoiceIdBinder<TParam1, TParam2, TParam3, TParam4, TParam5, TContract> BindFactory<TParam1, TParam2, TParam3, TParam4, TParam5, TContract, TFactory>()
             where TFactory : Factory<TParam1, TParam2, TParam3, TParam4, TParam5, TContract>
         {
-            var bindInfo = new BindInfo(typeof(TFactory));
-            return new FactoryToChoiceIdBinder<TParam1, TParam2, TParam3, TParam4, TParam5, TContract>(
-                bindInfo, typeof(TFactory), StartBinding());
+            return BindFactoryInternal<
+                TParam1, TParam2, TParam3, TParam4, TParam5, TContract, TFactory, TFactory>();
         }
 
         ////////////// Types ////////////////

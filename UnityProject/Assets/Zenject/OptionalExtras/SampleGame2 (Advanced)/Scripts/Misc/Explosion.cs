@@ -6,10 +6,13 @@ using Zenject;
 
 namespace Zenject.SpaceFighter
 {
-    public class Explosion : MonoBehaviour
+    public class Explosion : MonoBehaviour, IPoolable
     {
         [SerializeField]
         float _lifeTime;
+
+        [SerializeField]
+        ParticleSystem _particleSystem;
 
         [SerializeField]
         AudioClip _sound;
@@ -17,25 +20,44 @@ namespace Zenject.SpaceFighter
         [SerializeField]
         float _soundVolume;
 
+        AudioPlayer _audioPlayer;
+
         float _startTime;
+        Factory _selfFactory;
 
         [Inject]
-        public void Construct(AudioPlayer audioPlayer)
+        public void Construct(AudioPlayer audioPlayer, Factory selfFactory)
         {
+            _audioPlayer = audioPlayer;
+            _selfFactory = selfFactory;
+        }
+
+        public void OnSpawned()
+        {
+            gameObject.SetActive(true);
+
+            _particleSystem.Clear();
+            _particleSystem.Play();
+
             _startTime = Time.realtimeSinceStartup;
 
-            audioPlayer.Play(_sound, _soundVolume);
+            _audioPlayer.Play(_sound, _soundVolume);
+        }
+
+        public void OnDespawned()
+        {
+            gameObject.SetActive(false);
         }
 
         public void Update()
         {
             if (Time.realtimeSinceStartup - _startTime > _lifeTime)
             {
-                GameObject.Destroy(this.gameObject);
+                _selfFactory.Despawn(this);
             }
         }
 
-        public class Factory : Factory<Explosion>
+        public class Factory : PooledFactory<Explosion>
         {
         }
     }

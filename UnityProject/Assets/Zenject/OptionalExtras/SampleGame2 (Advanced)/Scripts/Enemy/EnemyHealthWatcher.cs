@@ -32,7 +32,7 @@ namespace Zenject.SpaceFighter
 
         void Die()
         {
-            var explosion = _explosionFactory.Create();
+            var explosion = _explosionFactory.Spawn();
             explosion.transform.position = _model.Position;
 
             GameObject.Destroy(_context.gameObject);

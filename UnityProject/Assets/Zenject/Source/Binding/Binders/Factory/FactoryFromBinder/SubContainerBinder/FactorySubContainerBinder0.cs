@@ -6,19 +6,18 @@ namespace Zenject
         : FactorySubContainerBinderBase<TContract>
     {
         public FactorySubContainerBinder(
-            BindInfo bindInfo, Type factoryType,
-            BindFinalizerWrapper finalizerWrapper, object subIdentifier)
-            : base(bindInfo, factoryType, finalizerWrapper, subIdentifier)
+            BindInfo bindInfo, FactoryBindInfo factoryBindInfo, object subIdentifier)
+            : base(bindInfo, factoryBindInfo, subIdentifier)
         {
         }
 
         public ConditionCopyNonLazyBinder ByMethod(Action<DiContainer> installerMethod)
         {
-            SubFinalizer = CreateFinalizer(
+            ProviderFunc = 
                 (container) => new SubContainerDependencyProvider(
                     ContractType, SubIdentifier,
                     new SubContainerCreatorByMethod(
-                        container, installerMethod)));
+                        container, installerMethod));
 
             return new ConditionCopyNonLazyBinder(BindInfo);
         }
@@ -31,13 +30,13 @@ namespace Zenject
 
             var gameObjectInfo = new GameObjectCreationParameters();
 
-            SubFinalizer = CreateFinalizer(
+            ProviderFunc = 
                 (container) => new SubContainerDependencyProvider(
                     ContractType, SubIdentifier,
                     new SubContainerCreatorByPrefab(
                         container,
                         new PrefabProvider(prefab),
-                        gameObjectInfo)));
+                        gameObjectInfo));
 
             return new NameTransformConditionCopyNonLazyBinder(BindInfo, gameObjectInfo);
         }
@@ -48,13 +47,13 @@ namespace Zenject
 
             var gameObjectInfo = new GameObjectCreationParameters();
 
-            SubFinalizer = CreateFinalizer(
+            ProviderFunc = 
                 (container) => new SubContainerDependencyProvider(
                     ContractType, SubIdentifier,
                     new SubContainerCreatorByPrefab(
                         container,
                         new PrefabProviderResource(resourcePath),
-                        gameObjectInfo)));
+                        gameObjectInfo));
 
             return new NameTransformConditionCopyNonLazyBinder(BindInfo, gameObjectInfo);
         }
