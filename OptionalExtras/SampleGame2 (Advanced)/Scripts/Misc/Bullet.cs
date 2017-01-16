@@ -10,7 +10,7 @@ namespace Zenject.SpaceFighter
         FromPlayer,
     }
 
-    public class Bullet : MonoBehaviour
+    public class Bullet : MonoBehaviour, IPoolable<float, float, BulletTypes>
     {
         float _startTime;
         BulletTypes _type;
@@ -26,10 +26,15 @@ namespace Zenject.SpaceFighter
         [SerializeField]
         Material _enemyMaterial = null;
 
-        // Since we are a MonoBehaviour, we can't use a constructor
-        // So use PostInject instead
+        Factory _selfFactory;
+
         [Inject]
-        public void Construct(float speed, float lifeTime, BulletTypes type)
+        void Construct(Factory selfFactory)
+        {
+            _selfFactory = selfFactory;
+        }
+
+        public void OnSpawned(float speed, float lifeTime, BulletTypes type)
         {
             _type = type;
             _speed = speed;
@@ -38,6 +43,13 @@ namespace Zenject.SpaceFighter
             _renderer.material = type == BulletTypes.FromEnemy ? _enemyMaterial : _playerMaterial;
 
             _startTime = Time.realtimeSinceStartup;
+
+            this.gameObject.SetActive(true);
+        }
+
+        public void OnDespawned()
+        {
+            this.gameObject.SetActive(false);
         }
 
         public BulletTypes Type
@@ -62,11 +74,11 @@ namespace Zenject.SpaceFighter
 
             if (Time.realtimeSinceStartup - _startTime > _lifeTime)
             {
-                GameObject.Destroy(this.gameObject);
+                _selfFactory.Despawn(this);
             }
         }
 
-        public class Factory : Factory<float, float, BulletTypes, Bullet>
+        public class Factory : PooledFactory<float, float, BulletTypes, Bullet>
         {
         }
     }

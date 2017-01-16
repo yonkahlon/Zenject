@@ -28,11 +28,11 @@ namespace Zenject.SpaceFighter
 
             Container.Bind<EnemyRegistry>().AsSingle();
 
-            Container.BindFactory<float, float, BulletTypes, Bullet, Bullet.Factory>()
+            Container.BindPooledFactory<Bullet, Bullet.Factory>().WithInitialSize(10).ExpandByDoubling()
                 .FromPrefab(_settings.BulletPrefab)
                 .UnderTransformGroup("Bullets");
 
-            Container.BindFactory<Explosion, Explosion.Factory>()
+            Container.BindPooledFactory<Explosion, Explosion.Factory>().WithInitialSize(3)
                 .FromPrefab(_settings.ExplosionPrefab)
                 .UnderTransformGroup("Explosions");
 

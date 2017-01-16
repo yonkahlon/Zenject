@@ -164,7 +164,11 @@ namespace Zenject
         {
             _container.DefaultParent = this.transform;
 
-            _container.Bind(typeof(TickableManager), typeof(InitializableManager), typeof(DisposableManager))
+            // Note that adding GuiRenderableManager here doesn't instantiate it by default
+            // You still have to add GuiRenderer manually
+            // We could add the contents of GuiRenderer into MonoKernel, but this adds
+            // undesirable per-frame allocations.  See comment in IGuiRenderable.cs for usage
+            _container.Bind(typeof(TickableManager), typeof(InitializableManager), typeof(DisposableManager), typeof(GuiRenderableManager))
                 .ToSelf().AsSingle().CopyIntoAllSubContainers();
 
             _container.Bind<Context>().FromInstance(this);

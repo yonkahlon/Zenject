@@ -60,7 +60,8 @@ namespace Zenject.Asteroids
             // Here, we're defining a generic factory to create asteroid objects using the given prefab
             // So any classes that want to create new asteroid objects can simply include an injected field
             // or constructor parameter of type Asteroid.Factory, then call Create() on that
-            Container.BindFactory<Asteroid, Asteroid.Factory>()
+            Container.BindPooledFactory<Asteroid, Asteroid.Factory>()
+                .WithInitialSize(25).ExpandByDoubling()
                 .FromPrefab(_settings.AsteroidPrefab)
                 // We can also tell Zenject what to name the new gameobject here
                 .WithGameObjectName("Asteroid")

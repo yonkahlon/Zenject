@@ -6,9 +6,7 @@ using ModestTree.Util;
 
 namespace Zenject
 {
-    // This class is only used inside EditorWindowDependencyRoot, since in most cases
-    // people aren't going to want it
-    // However, you can include it yourself if you want to use it
+    // See comment in IGuiRenderable.cs for usage
     public class GuiRenderableManager
     {
         List<RenderableInfo> _renderables;
@@ -29,7 +27,7 @@ namespace Zenject
                     .Where(x => renderable.GetType().DerivesFromOrEqual(x.First))
                     .Select(x => x.Second).ToList();
 
-                int priority = matches.IsEmpty() ? 0 : matches.Single();
+                int priority = matches.IsEmpty() ? 0 : matches.Distinct().Single();
 
                 _renderables.Add(
                     new RenderableInfo(renderable, priority));

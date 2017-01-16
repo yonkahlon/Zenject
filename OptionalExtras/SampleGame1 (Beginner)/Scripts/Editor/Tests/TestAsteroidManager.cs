@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
@@ -19,7 +20,7 @@ namespace Zenject.Asteroids
             GameSettingsInstaller.InstallFromResource(Container);
             var gameSettings = Container.Resolve<GameInstaller.Settings>();
             Container.Bind<AsteroidManager>().AsSingle();
-            Container.BindFactory<Asteroid, Asteroid.Factory>().FromPrefab(gameSettings.AsteroidPrefab);
+            Container.BindPooledFactory<Asteroid, Asteroid.Factory>().FromPrefab(gameSettings.AsteroidPrefab);
             Container.Bind<Camera>().WithId("Main").FromGameObject();
             Container.Bind<LevelHelper>().AsSingle();
 

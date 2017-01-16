@@ -5,30 +5,28 @@ namespace Zenject
 {
     public class DynamicFactoryBindingFinalizer<TContract> : ProviderBindingFinalizer
     {
-        readonly Func<DiContainer, IProvider> _providerFunc;
-        readonly Type _factoryType;
+        readonly FactoryBindInfo _factoryBindInfo;
 
         public DynamicFactoryBindingFinalizer(
-            BindInfo bindInfo, Type factoryType, Func<DiContainer, IProvider> providerFunc)
+            BindInfo bindInfo, FactoryBindInfo factoryBindInfo)
             : base(bindInfo)
         {
             // Note that it doesn't derive from Factory<TContract>
             // when used with To<>, so we can only check IDynamicFactory
-            Assert.That(factoryType.DerivesFrom<IDynamicFactory>());
+            Assert.That(factoryBindInfo.FactoryType.DerivesFrom<IDynamicFactory>());
 
-            _factoryType = factoryType;
-            _providerFunc = providerFunc;
+            _factoryBindInfo = factoryBindInfo;
         }
 
         protected override void OnFinalizeBinding(DiContainer container)
         {
-            var provider = _providerFunc(container);
+            var provider = _factoryBindInfo.ProviderFunc(container);
 
             RegisterProviderForAllContracts(
                 container,
                 new CachedProvider(
                     new TransientProvider(
-                        _factoryType,
+                        _factoryBindInfo.FactoryType,
                         container,
                         InjectUtil.CreateArgListExplicit(
                             provider,

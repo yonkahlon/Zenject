@@ -89,7 +89,7 @@ namespace Zenject.SpaceFighter
 
         void Fire()
         {
-            var bullet = _bulletFactory.Create(
+            var bullet = _bulletFactory.Spawn(
                 _settings.BulletSpeed, _settings.BulletLifetime, BulletTypes.FromEnemy);
 
             // Randomize our aim a bit
