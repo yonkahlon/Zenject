@@ -56,7 +56,7 @@ namespace Zenject
         public static void AssertIsNotComponent(Type type)
         {
             Assert.That(!type.DerivesFrom(typeof(Component)),
-                "Invalid type given during bind command.  Expected type '{0}' to NOT derive from UnityEngine.Component", type.Name());
+                "Invalid type given during bind command.  Expected type '{0}' to NOT derive from UnityEngine.Component", type);
         }
 
         public static void AssertDerivesFromUnityObject(IEnumerable<Type> types)
@@ -75,7 +75,7 @@ namespace Zenject
         public static void AssertDerivesFromUnityObject(Type type)
         {
             Assert.That(type.DerivesFrom<UnityEngine.Object>(),
-                "Invalid type given during bind command.  Expected type '{0}' to derive from UnityEngine.Object", type.Name());
+                "Invalid type given during bind command.  Expected type '{0}' to derive from UnityEngine.Object", type);
         }
 
         public static void AssertTypesAreNotComponents(IEnumerable<Type> types)
@@ -110,7 +110,7 @@ namespace Zenject
         public static void AssertIsAbstractOrComponent(Type type)
         {
             Assert.That(type.DerivesFrom(typeof(Component)) || type.IsInterface(),
-                "Invalid type given during bind command.  Expected type '{0}' to either derive from UnityEngine.Component or be an interface", type.Name());
+                "Invalid type given during bind command.  Expected type '{0}' to either derive from UnityEngine.Component or be an interface", type);
         }
 
         public static void AssertIsAbstractOrComponentOrGameObject(IEnumerable<Type> types)
@@ -129,7 +129,7 @@ namespace Zenject
         public static void AssertIsAbstractOrComponentOrGameObject(Type type)
         {
             Assert.That(type.DerivesFrom(typeof(Component)) || type.IsInterface() || type == typeof(GameObject) || type == typeof(UnityEngine.Object),
-                "Invalid type given during bind command.  Expected type '{0}' to either derive from UnityEngine.Component or be an interface or be GameObject", type.Name());
+                "Invalid type given during bind command.  Expected type '{0}' to either derive from UnityEngine.Component or be an interface or be GameObject", type);
         }
 
         public static void AssertIsComponent(IEnumerable<Type> types)
@@ -148,7 +148,7 @@ namespace Zenject
         public static void AssertIsComponent(Type type)
         {
             Assert.That(type.DerivesFrom(typeof(Component)),
-                "Invalid type given during bind command.  Expected type '{0}' to derive from UnityEngine.Component", type.Name());
+                "Invalid type given during bind command.  Expected type '{0}' to derive from UnityEngine.Component", type);
         }
 
         public static void AssertIsComponentOrGameObject(IEnumerable<Type> types)
@@ -167,7 +167,7 @@ namespace Zenject
         public static void AssertIsComponentOrGameObject(Type type)
         {
             Assert.That(type.DerivesFrom(typeof(Component)) || type == typeof(GameObject),
-                "Invalid type given during bind command.  Expected type '{0}' to derive from UnityEngine.Component", type.Name());
+                "Invalid type given during bind command.  Expected type '{0}' to derive from UnityEngine.Component", type);
         }
 #else
         public static void AssertTypesAreNotComponents(IEnumerable<Type> types)
@@ -217,7 +217,7 @@ namespace Zenject
         public static void AssertIsDerivedFromType(Type concreteType, Type parentType)
         {
             Assert.That(concreteType.DerivesFromOrEqual(parentType),
-                "Invalid type given during bind command.  Expected type '{0}' to derive from type '{1}'", concreteType.Name(), parentType.Name());
+                "Invalid type given during bind command.  Expected type '{0}' to derive from type '{1}'", concreteType, parentType.Name());
         }
 
         public static void AssertConcreteTypeListIsNotEmpty(IEnumerable<Type> concreteTypes)
@@ -271,7 +271,7 @@ namespace Zenject
             if (!ZenUtilInternal.IsNull(instance))
             {
                 Assert.That(instance.GetType().DerivesFromOrEqual(baseType),
-                    "Invalid type given during bind command.  Expected type '{0}' to derive from type '{1}'", instance.GetType().Name(), baseType.Name());
+                    "Invalid type given during bind command.  Expected type '{0}' to derive from type '{1}'", instance.GetType(), baseType.Name());
             }
         }
     }

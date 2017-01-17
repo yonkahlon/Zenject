@@ -18,7 +18,7 @@ namespace Zenject
         public static ZenjectTypeInfo GetInfo(Type type)
         {
             Assert.That(!type.IsAbstract(),
-                "Tried to analyze abstract type '{0}'.  This is not currently allowed.", type.Name());
+                "Tried to analyze abstract type '{0}'.  This is not currently allowed.", type);
 
             ZenjectTypeInfo info;
 
@@ -66,7 +66,7 @@ namespace Zenject
             var injectAttributes = paramInfo.AllAttributes<InjectAttributeBase>().ToList();
 
             Assert.That(injectAttributes.Count <= 1,
-                "Found multiple 'Inject' attributes on type parameter '{0}' of type '{1}'.  Parameter should only have one", paramInfo.Name, parentType.Name());
+                "Found multiple 'Inject' attributes on type parameter '{0}' of type '{1}'.  Parameter should only have one", paramInfo.Name, parentType);
 
             var injectAttr = injectAttributes.SingleOrDefault();
 
@@ -156,7 +156,7 @@ namespace Zenject
             var injectAttributes = memInfo.AllAttributes<InjectAttributeBase>().ToList();
 
             Assert.That(injectAttributes.Count <= 1,
-                "Found multiple 'Inject' attributes on type field '{0}' of type '{1}'.  Field should only container one Inject attribute", memInfo.Name, parentType.Name());
+                "Found multiple 'Inject' attributes on type field '{0}' of type '{1}'.  Field should only container one Inject attribute", memInfo.Name, parentType);
 
             var injectAttr = injectAttributes.SingleOrDefault();
 

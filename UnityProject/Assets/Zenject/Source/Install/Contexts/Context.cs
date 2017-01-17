@@ -132,7 +132,7 @@ namespace Zenject
 
             foreach (var installerPrefab in _installerPrefabs)
             {
-                Assert.IsNotNull(installerPrefab, "Found null installer prefab in '{0}'", this.GetType().Name());
+                Assert.IsNotNull(installerPrefab, "Found null installer prefab in '{0}'", this.GetType());
 
                 var installerGameObject = GameObject.Instantiate(installerPrefab.gameObject);
                 installerGameObject.transform.SetParent(this.transform, false);
@@ -146,7 +146,7 @@ namespace Zenject
             foreach (var installer in allInstallers)
             {
                 Assert.IsNotNull(installer,
-                    "Found null installer in '{0}'", this.GetType().Name());
+                    "Found null installer in '{0}'", this.GetType());
 
                 Container.Inject(installer);
                 installer.InstallBindings();

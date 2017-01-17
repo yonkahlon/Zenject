@@ -15,7 +15,7 @@ namespace Zenject
             this DiContainer container, Type type, int order)
         {
             Assert.That(type.DerivesFrom<ITickable>() || type.DerivesFrom<IInitializable>() || type.DerivesFrom<IDisposable>() || type.DerivesFrom<ILateDisposable>() || type.DerivesFrom<IFixedTickable>() || type.DerivesFrom<ILateTickable>(),
-                "Expected type '{0}' to derive from one or more of the following interfaces: ITickable, IInitializable, ILateTickable, IFixedTickable, IDisposable, ILateDisposable", type.Name());
+                "Expected type '{0}' to derive from one or more of the following interfaces: ITickable, IInitializable, ILateTickable, IFixedTickable, IDisposable, ILateDisposable", type);
 
             if (type.DerivesFrom<ITickable>())
             {
@@ -59,7 +59,7 @@ namespace Zenject
             this DiContainer container, Type type, int order)
         {
             Assert.That(type.DerivesFrom<ITickable>(),
-                "Expected type '{0}' to derive from ITickable", type.Name());
+                "Expected type '{0}' to derive from ITickable", type);
 
             container.BindInstance(
                 ModestTree.Util.ValuePair.New(type, order)).WhenInjectedInto<TickableManager>();
@@ -76,7 +76,7 @@ namespace Zenject
             this DiContainer container, Type type, int order)
         {
             Assert.That(type.DerivesFrom<IInitializable>(),
-                "Expected type '{0}' to derive from IInitializable", type.Name());
+                "Expected type '{0}' to derive from IInitializable", type);
 
             container.BindInstance(
                 ModestTree.Util.ValuePair.New(type, order)).WhenInjectedInto<InitializableManager>();
@@ -100,7 +100,7 @@ namespace Zenject
             this DiContainer container, Type type, int order)
         {
             Assert.That(type.DerivesFrom<IDisposable>(),
-                "Expected type '{0}' to derive from IDisposable", type.Name());
+                "Expected type '{0}' to derive from IDisposable", type);
 
             container.BindInstance(
                 ModestTree.Util.ValuePair.New(type, order)).WhenInjectedInto<DisposableManager>();
@@ -110,7 +110,7 @@ namespace Zenject
             this DiContainer container, Type type, int order)
         {
             Assert.That(type.DerivesFrom<ILateDisposable>(),
-            "Expected type '{0}' to derive from ILateDisposable", type.Name());
+            "Expected type '{0}' to derive from ILateDisposable", type);
 
             container.BindInstance(
                 ModestTree.Util.ValuePair.New(type, order)).WithId("Late").WhenInjectedInto<DisposableManager>();
@@ -127,7 +127,7 @@ namespace Zenject
             this DiContainer container, Type type, int order)
         {
             Assert.That(type.DerivesFrom<IFixedTickable>(),
-                "Expected type '{0}' to derive from IFixedTickable", type.Name());
+                "Expected type '{0}' to derive from IFixedTickable", type);
 
             container.Bind<ModestTree.Util.ValuePair<Type, int>>().WithId("Fixed")
                 .FromInstance(ModestTree.Util.ValuePair.New(type, order)).WhenInjectedInto<TickableManager>();
@@ -144,7 +144,7 @@ namespace Zenject
             this DiContainer container, Type type, int order)
         {
             Assert.That(type.DerivesFrom<ILateTickable>(),
-                "Expected type '{0}' to derive from ILateTickable", type.Name());
+                "Expected type '{0}' to derive from ILateTickable", type);
 
             container.Bind<ModestTree.Util.ValuePair<Type, int>>().WithId("Late")
                 .FromInstance(ModestTree.Util.ValuePair.New(type, order)).WhenInjectedInto<TickableManager>();

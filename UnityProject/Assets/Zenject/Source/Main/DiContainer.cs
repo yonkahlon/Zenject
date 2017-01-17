@@ -255,7 +255,7 @@ namespace Zenject
         {
             Assert.That(IsValidating);
 
-#if !NOT_UNITY3D
+#if !NOT_UNITY3D && !ZEN_TESTS_OUTSIDE_UNITY
             Assert.That(Application.isEditor);
 #endif
 
@@ -416,7 +416,7 @@ namespace Zenject
             }
 
             Assert.That(context.Optional,
-                "Could not find required dependency with type '{0}' \nObject graph:\n {1}", context.MemberType.Name(), context.GetObjectGraphString());
+                "Could not find required dependency with type '{0}' \nObject graph:\n {1}", context.MemberType, context.GetObjectGraphString());
 
             return ReflectionUtil.CreateGenericList(context.MemberType, new object[] {});
         }
@@ -451,7 +451,7 @@ namespace Zenject
 
             _hasDisplayedInstallWarning = true;
             // Feel free to comment this out if you are comfortable with this practice
-            Log.Warn("Zenject Warning: It is bad practice to call Inject/Resolve/Instantiate before all the Installers have completed!  This is important to ensure that all bindings have properly been installed in case they are needed when injecting/instantiating/resolving.  Detected when operating on type '{0}'.  If you don't care about this, you can just remove this warning.", rootContext.MemberType.Name());
+            Log.Warn("Zenject Warning: It is bad practice to call Inject/Resolve/Instantiate before all the Installers have completed!  This is important to ensure that all bindings have properly been installed in case they are needed when injecting/instantiating/resolving.  Detected when operating on type '{0}'.  If you don't care about this, you can just remove this warning.", rootContext.MemberType);
 #endif
         }
 
@@ -486,16 +486,16 @@ namespace Zenject
 
             Assert.That(result != ProviderLookupResult.Multiple,
                 "Found multiple matches when only one was expected for type '{0}'{1}. \nObject graph:\n {2}",
-                context.MemberType.Name(),
-                (context.ObjectType == null ? "" : " while building object with type '{0}'".Fmt(context.ObjectType.Name())),
+                context.MemberType,
+                (context.ObjectType == null ? "" : " while building object with type '{0}'".Fmt(context.ObjectType)),
                 context.GetObjectGraphString());
 
             if (result != ProviderLookupResult.Success)
             {
                 throw Assert.CreateException(
                     "Unable to resolve type '{0}'{1}. \nObject graph:\n{2}",
-                    context.MemberType.Name() + (context.Identifier == null ? "" : " with ID '{0}'".Fmt(context.Identifier.ToString())),
-                    (context.ObjectType == null ? "" : " while building object with type '{0}'".Fmt(context.ObjectType.Name())),
+                    context.MemberType.ToString() + (context.Identifier == null ? "" : " with ID '{0}'".Fmt(context.Identifier.ToString())),
+                    (context.ObjectType == null ? "" : " while building object with type '{0}'".Fmt(context.ObjectType)),
                     context.GetObjectGraphString());
             }
 
@@ -594,8 +594,8 @@ namespace Zenject
 
             Assert.That(result != ProviderLookupResult.Multiple,
                 "Found multiple matches when only one was expected for type '{0}'{1}. \nObject graph:\n {2}",
-                context.MemberType.Name(),
-                (context.ObjectType == null ? "" : " while building object with type '{0}'".Fmt(context.ObjectType.Name())),
+                context.MemberType,
+                (context.ObjectType == null ? "" : " while building object with type '{0}'".Fmt(context.ObjectType)),
                 context.GetObjectGraphString());
 
             if (result == ProviderLookupResult.None)
@@ -617,8 +617,8 @@ namespace Zenject
                 }
 
                 throw Assert.CreateException("Unable to resolve type '{0}'{1}. \nObject graph:\n{2}",
-                    context.MemberType.Name() + (context.Identifier == null ? "" : " with ID '{0}'".Fmt(context.Identifier.ToString())),
-                    (context.ObjectType == null ? "" : " while building object with type '{0}'".Fmt(context.ObjectType.Name())),
+                    context.MemberType.ToString() + (context.Identifier == null ? "" : " with ID '{0}'".Fmt(context.Identifier.ToString())),
+                    (context.ObjectType == null ? "" : " while building object with type '{0}'".Fmt(context.ObjectType)),
                     context.GetObjectGraphString());
             }
 
@@ -758,7 +758,7 @@ namespace Zenject
         {
 #if !NOT_UNITY3D
             Assert.That(!concreteType.DerivesFrom<UnityEngine.Component>(),
-                "Error occurred while instantiating object of type '{0}'. Instantiator should not be used to create new mono behaviours.  Must use InstantiatePrefabForComponent, InstantiatePrefab, or InstantiateComponent.", concreteType.Name());
+                "Error occurred while instantiating object of type '{0}'. Instantiator should not be used to create new mono behaviours.  Must use InstantiatePrefabForComponent, InstantiatePrefab, or InstantiateComponent.", concreteType);
 #endif
 
             Assert.That(!concreteType.IsAbstract(), "Expected type '{0}' to be non-abstract", concreteType);
@@ -818,7 +818,7 @@ namespace Zenject
 
                 if (!IsValidating || CanCreateOrInjectDuringValidation(concreteType))
                 {
-                    //Log.Debug("Zenject: Instantiating type '{0}'", concreteType.Name());
+                    //Log.Debug("Zenject: Instantiating type '{0}'", concreteType);
                     try
                     {
 #if PROFILING_ENABLED
@@ -831,7 +831,7 @@ namespace Zenject
                     catch (Exception e)
                     {
                         throw Assert.CreateException(
-                            e, "Error occurred while instantiating object with type '{0}'", concreteType.Name());
+                            e, "Error occurred while instantiating object with type '{0}'", concreteType);
                     }
                 }
                 else
@@ -848,7 +848,7 @@ namespace Zenject
             {
                 throw Assert.CreateException(
                     "Passed unnecessary parameters when injecting into type '{0}'. \nExtra Parameters: {1}\nObject graph:\n{2}",
-                    newObj.GetType().Name(), String.Join(",", args.ExtraArgs.Select(x => x.Type.Name()).ToArray()), args.Context.GetObjectGraphString());
+                    newObj.GetType(), String.Join(",", args.ExtraArgs.Select(x => x.Type.Name()).ToArray()), args.Context.GetObjectGraphString());
             }
 
             return newObj;
@@ -991,7 +991,7 @@ namespace Zenject
             {
                 throw Assert.CreateException(
                     "Passed unnecessary parameters when injecting into type '{0}'. \nExtra Parameters: {1}\nObject graph:\n{2}",
-                    injectableType.Name(), String.Join(",", args.ExtraArgs.Select(x => x.Type.Name()).ToArray()), args.Context.GetObjectGraphString());
+                    injectableType, String.Join(",", args.ExtraArgs.Select(x => x.Type.Name()).ToArray()), args.Context.GetObjectGraphString());
             }
         }
 
@@ -1182,7 +1182,7 @@ namespace Zenject
             Assert.That(prefab != null, "Null prefab found when instantiating game object");
 
             Assert.That(componentType.IsInterface() || componentType.DerivesFrom<Component>(),
-                "Expected type '{0}' to derive from UnityEngine.Component", componentType.Name());
+                "Expected type '{0}' to derive from UnityEngine.Component", componentType);
 
             GameObject prefabAsGameObject = GetPrefabAsGameObject(prefab);
 
@@ -1542,7 +1542,7 @@ namespace Zenject
             {
                 throw Assert.CreateException(
                     "Passed unnecessary parameters when injecting into game object '{0}'. \nExtra Parameters: {1}",
-                    gameObject.name, string.Join(",", extraArgs.Select(x => x.Type.Name()).ToArray()));
+                    gameObject.name, string.Join(",", extraArgs.Select(x => x.Type.ToString()).ToArray()));
             }
         }
 
@@ -1912,7 +1912,7 @@ namespace Zenject
         {
             // We must only have one dependency root per container
             // We need this when calling this with a GameObjectContext
-            return BindInternal(type.Interfaces().ToArray(), "BindAllInterfaces({0})".Fmt(type.Name()));
+            return BindInternal(type.Interfaces().ToArray(), "BindAllInterfaces({0})".Fmt(type));
         }
 
         // Same as BindAllInterfaces except also binds to self
@@ -1948,7 +1948,7 @@ namespace Zenject
             if (!allowNull)
             {
                 Assert.That(!ZenUtilInternal.IsNull(instance),
-                    "Found null instance with type '{0}' in BindInstance method", typeof(TContract).Name());
+                    "Found null instance with type '{0}' in BindInstance method", typeof(TContract));
             }
 
             var bindInfo = new BindInfo(typeof(TContract));
