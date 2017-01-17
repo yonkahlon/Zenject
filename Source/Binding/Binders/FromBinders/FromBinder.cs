@@ -29,18 +29,12 @@ namespace Zenject
 
         protected IBindingFinalizer SubFinalizer
         {
-            set
-            {
-                FinalizerWrapper.SubFinalizer = value;
-            }
+            set { FinalizerWrapper.SubFinalizer = value; }
         }
 
         protected IEnumerable<Type> AllParentTypes
         {
-            get
-            {
-                return BindInfo.ContractTypes.Concat(BindInfo.ToTypes);
-            }
+            get { return BindInfo.ContractTypes.Concat(BindInfo.ToTypes); }
         }
 
         protected IEnumerable<Type> ConcreteTypes

@@ -46,10 +46,7 @@ namespace Zenject
 
         public override DiContainer Container
         {
-            get
-            {
-                return _container;
-            }
+            get { return _container; }
         }
 
         public bool IsValidating
@@ -66,10 +63,7 @@ namespace Zenject
 
         public IEnumerable<string> ContractNames
         {
-            get
-            {
-                return _contractNames;
-            }
+            get { return _contractNames; }
             set
             {
                 _contractNames.Clear();
@@ -79,10 +73,7 @@ namespace Zenject
 
         public string ParentContractName
         {
-            get
-            {
-                return _parentContractName;
-            }
+            get { return _parentContractName; }
             set
             {
                 _parentContractName = value;
@@ -91,14 +82,8 @@ namespace Zenject
 
         public bool ParentNewObjectsUnderRoot
         {
-            get
-            {
-                return _parentNewObjectsUnderRoot;
-            }
-            set
-            {
-                _parentNewObjectsUnderRoot = value;
-            }
+            get { return _parentNewObjectsUnderRoot; }
+            set { _parentNewObjectsUnderRoot = value; }
         }
 
         public void Awake()

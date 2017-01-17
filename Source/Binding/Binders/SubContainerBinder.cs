@@ -24,10 +24,7 @@ namespace Zenject
 
         protected IBindingFinalizer SubFinalizer
         {
-            set
-            {
-                _finalizerWrapper.SubFinalizer = value;
-            }
+            set { _finalizerWrapper.SubFinalizer = value; }
         }
 
         public ScopeConditionCopyNonLazyBinder ByInstaller<TInstaller>()

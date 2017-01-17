@@ -31,12 +31,14 @@ namespace Zenject
 
         bool _isPaused;
 
+        [Inject]
+        public TickableManager()
+        {
+        }
+
         public IEnumerable<ITickable> Tickables
         {
-            get
-            {
-                return _tickables;
-            }
+            get { return _tickables; }
         }
 
         [Inject]

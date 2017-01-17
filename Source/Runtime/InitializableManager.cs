@@ -12,6 +12,7 @@ namespace Zenject
     {
         List<InitializableInfo> _initializables;
 
+        [Inject]
         public InitializableManager(
             [Inject(Optional = true, Source = InjectSources.Local)]
             List<IInitializable> initializables,

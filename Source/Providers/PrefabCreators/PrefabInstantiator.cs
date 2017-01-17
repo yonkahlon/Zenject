@@ -28,18 +28,12 @@ namespace Zenject
 
         public GameObjectCreationParameters GameObjectCreationParameters
         {
-            get
-            {
-                return _gameObjectBindInfo;
-            }
+            get { return _gameObjectBindInfo; }
         }
 
         public List<TypeValuePair> ExtraArguments
         {
-            get
-            {
-                return _extraArguments;
-            }
+            get { return _extraArguments; }
         }
 
         public UnityEngine.Object GetPrefab()

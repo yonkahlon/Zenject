@@ -15,6 +15,30 @@ namespace Zenject
 
     public interface IDynamicPooledFactory : IValidatable
     {
+        int NumCreated
+        {
+            get;
+        }
+
+        int NumActive
+        {
+            get;
+        }
+
+        int NumInactive
+        {
+            get;
+        }
+
+        Type ContractType
+        {
+            get;
+        }
+
+        Type ConcreteType
+        {
+            get;
+        }
     }
 
     public abstract class DynamicPooledFactory<TContract> : IDynamicPooledFactory
@@ -73,7 +97,12 @@ namespace Zenject
             get { return _pool.Count; }
         }
 
-        protected Type ConcreteType
+        public Type ContractType
+        {
+            get { return typeof(TContract); }
+        }
+
+        public Type ConcreteType
         {
             get { return _concreteType; }
         }

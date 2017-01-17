@@ -13,8 +13,6 @@ namespace Zenject.SpaceFighter
 
         public override void InstallBindings()
         {
-            Container.BindAllInterfaces<CameraHandler>().To<CameraHandler>().AsSingle();
-
             Container.Bind<GameEvents>().AsSingle();
 
             Container.BindAllInterfaces<EnemySpawner>().To<EnemySpawner>().AsSingle();

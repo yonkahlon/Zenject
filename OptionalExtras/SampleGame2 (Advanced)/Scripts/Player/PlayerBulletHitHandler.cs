@@ -41,7 +41,7 @@ namespace Zenject.SpaceFighter
 
             _model.TakeDamage(_settings.HealthLoss);
 
-            GameObject.Destroy(bullet.gameObject);
+            bullet.Despawn();
         }
 
         [Serializable]

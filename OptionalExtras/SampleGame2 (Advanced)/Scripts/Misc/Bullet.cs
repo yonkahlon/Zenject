@@ -74,8 +74,13 @@ namespace Zenject.SpaceFighter
 
             if (Time.realtimeSinceStartup - _startTime > _lifeTime)
             {
-                _selfFactory.Despawn(this);
+                Despawn();
             }
+        }
+
+        public void Despawn()
+        {
+            _selfFactory.Despawn(this);
         }
 
         public class Factory : PooledFactory<float, float, BulletTypes, Bullet>

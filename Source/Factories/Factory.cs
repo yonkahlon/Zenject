@@ -14,10 +14,7 @@ namespace Zenject
 
         protected sealed override IEnumerable<Type> ParamTypes
         {
-            get
-            {
-                yield break;
-            }
+            get { yield break; }
         }
     }
 
@@ -37,10 +34,7 @@ namespace Zenject
 
         protected sealed override IEnumerable<Type> ParamTypes
         {
-            get
-            {
-                yield return typeof(TParam1);
-            }
+            get { yield return typeof(TParam1); }
         }
     }
 

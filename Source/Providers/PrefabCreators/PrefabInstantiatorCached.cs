@@ -19,18 +19,12 @@ namespace Zenject
 
         public List<TypeValuePair> ExtraArguments
         {
-            get
-            {
-                return _subInstantiator.ExtraArguments;
-            }
+            get { return _subInstantiator.ExtraArguments; }
         }
 
         public GameObjectCreationParameters GameObjectCreationParameters
         {
-            get
-            {
-                return _subInstantiator.GameObjectCreationParameters;
-            }
+            get { return _subInstantiator.GameObjectCreationParameters; }
         }
 
         public UnityEngine.Object GetPrefab()

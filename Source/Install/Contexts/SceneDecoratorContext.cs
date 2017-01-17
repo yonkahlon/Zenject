@@ -19,10 +19,7 @@ namespace Zenject
 
         public string DecoratedContractName
         {
-            get
-            {
-                return _decoratedContractName;
-            }
+            get { return _decoratedContractName; }
         }
 
         public override DiContainer Container
