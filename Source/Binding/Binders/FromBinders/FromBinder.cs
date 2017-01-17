@@ -272,7 +272,7 @@ namespace Zenject
             {
                 Assert.That(!ZenUtilInternal.IsNull(instance),
                     "Found null instance for type '{0}' in FromInstance method",
-                    ConcreteTypes.First().Name());
+                    ConcreteTypes.First());
             }
 
             BindingUtil.AssertInstanceDerivesFromOrEqual(instance, AllParentTypes);

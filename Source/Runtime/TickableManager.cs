@@ -54,7 +54,7 @@ namespace Zenject
             foreach (var type in _fixedPriorities.Select(x => x.First))
             {
                 Assert.That(type.DerivesFrom<IFixedTickable>(),
-                    "Expected type '{0}' to drive from IFixedTickable while checking priorities in TickableHandler", type.Name());
+                    "Expected type '{0}' to drive from IFixedTickable while checking priorities in TickableHandler", type);
             }
 
             foreach (var tickable in _fixedTickables)
@@ -73,7 +73,7 @@ namespace Zenject
             foreach (var type in _priorities.Select(x => x.First))
             {
                 Assert.That(type.DerivesFrom<ITickable>(),
-                    "Expected type '{0}' to drive from ITickable while checking priorities in TickableHandler", type.Name());
+                    "Expected type '{0}' to drive from ITickable while checking priorities in TickableHandler", type);
             }
 
             foreach (var tickable in _tickables)
@@ -92,7 +92,7 @@ namespace Zenject
             foreach (var type in _latePriorities.Select(x => x.First))
             {
                 Assert.That(type.DerivesFrom<ILateTickable>(),
-                    "Expected type '{0}' to drive from ILateTickable while checking priorities in TickableHandler", type.Name());
+                    "Expected type '{0}' to drive from ILateTickable while checking priorities in TickableHandler", type);
             }
 
             foreach (var tickable in _lateTickables)

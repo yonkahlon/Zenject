@@ -48,7 +48,7 @@ namespace Zenject
                 try
                 {
 #if PROFILING_ENABLED
-                    using (ProfileBlock.Start("{0}.Initialize()", renderable.Renderable.GetType().Name()))
+                    using (ProfileBlock.Start("{0}.Initialize()", renderable.Renderable.GetType()))
 #endif
                     {
                         renderable.Renderable.GuiRender();
@@ -57,7 +57,7 @@ namespace Zenject
                 catch (Exception e)
                 {
                     throw Assert.CreateException(
-                        e, "Error occurred while initializing IGuiRenderable with type '{0}'", renderable.Renderable.GetType().Name());
+                        e, "Error occurred while initializing IGuiRenderable with type '{0}'", renderable.Renderable.GetType());
                 }
             }
         }

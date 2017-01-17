@@ -19,7 +19,7 @@ namespace Zenject
             _extraArgs = extraArgs;
 
             Assert.That(installerType.DerivesFrom<InstallerBase>(),
-                "Invalid installer type given during bind command.  Expected type '{0}' to derive from 'Installer<>'", installerType.Name());
+                "Invalid installer type given during bind command.  Expected type '{0}' to derive from 'Installer<>'", installerType);
         }
 
         public SubContainerCreatorByInstaller(

@@ -131,7 +131,7 @@ namespace Zenject
             {
                 throw new ZenjectException(
                     "Error during construction of type '{0}' via {1}.Create method!".Fmt(
-                        _concreteType.Name(), this.GetType().Name()), e);
+                        _concreteType, this.GetType().Name()), e);
             }
         }
 
@@ -144,7 +144,7 @@ namespace Zenject
             catch (Exception e)
             {
                 throw new ZenjectException(
-                    "Validation for factory '{0}' failed".Fmt(this.GetType().Name()), e);
+                    "Validation for factory '{0}' failed".Fmt(this.GetType()), e);
             }
         }
 
@@ -172,7 +172,7 @@ namespace Zenject
                 {
                     throw new PoolExceededFixedSizeException(
                         "Pool factory '{0}' exceeded its max size of '{1}'!"
-                        .Fmt(this.GetType().Name(), _numCreated));
+                        .Fmt(this.GetType(), _numCreated));
                 }
                 case PoolExpandMethods.OneAtATime:
                 {

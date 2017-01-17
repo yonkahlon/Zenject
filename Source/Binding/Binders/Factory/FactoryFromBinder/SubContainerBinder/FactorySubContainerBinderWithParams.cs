@@ -24,7 +24,7 @@ namespace Zenject
             BindingUtil.AssertIsValidPrefab(prefab);
 
             Assert.That(installerType.DerivesFrom<MonoInstaller>(),
-                "Invalid installer type given during bind command.  Expected type '{0}' to derive from 'MonoInstaller'", installerType.Name());
+                "Invalid installer type given during bind command.  Expected type '{0}' to derive from 'MonoInstaller'", installerType);
 
             var gameObjectInfo = new GameObjectCreationParameters();
 
