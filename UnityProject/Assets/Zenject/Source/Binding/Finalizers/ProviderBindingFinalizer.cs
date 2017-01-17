@@ -14,10 +14,7 @@ namespace Zenject
 
         public bool CopyIntoAllSubContainers
         {
-            get
-            {
-                return BindInfo.CopyIntoAllSubContainers;
-            }
+            get { return BindInfo.CopyIntoAllSubContainers; }
         }
 
         protected BindInfo BindInfo

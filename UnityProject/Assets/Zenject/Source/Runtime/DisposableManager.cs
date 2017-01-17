@@ -12,6 +12,7 @@ namespace Zenject
         bool _disposed;
         bool _lateDisposed;
 
+        [Inject]
         public DisposableManager(
             [Inject(Optional = true, Source = InjectSources.Local)]
             List<IDisposable> disposables,

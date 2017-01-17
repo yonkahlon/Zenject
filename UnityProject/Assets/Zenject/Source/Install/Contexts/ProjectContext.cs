@@ -26,18 +26,12 @@ namespace Zenject
 
         public override DiContainer Container
         {
-            get
-            {
-                return _container;
-            }
+            get { return _container; }
         }
 
         public static bool HasInstance
         {
-            get
-            {
-                return _instance != null;
-            }
+            get { return _instance != null; }
         }
 
         public static ProjectContext Instance
@@ -168,6 +162,10 @@ namespace Zenject
             // You still have to add GuiRenderer manually
             // We could add the contents of GuiRenderer into MonoKernel, but this adds
             // undesirable per-frame allocations.  See comment in IGuiRenderable.cs for usage
+            //
+            // Short answer is if you want to use IGuiRenderable then 
+            // you need to include the following in project context installer:
+            // `Container.Bind<GuiRenderer>().FromGameObject().AsSingle().CopyIntoAllSubContainers().NonLazy();`
             _container.Bind(typeof(TickableManager), typeof(InitializableManager), typeof(DisposableManager), typeof(GuiRenderableManager))
                 .ToSelf().AsSingle().CopyIntoAllSubContainers();
 

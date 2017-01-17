@@ -109,10 +109,7 @@ namespace Zenject
 
         public LazyInstanceInjector LazyInstanceInjector
         {
-            get
-            {
-                return _lazyInjector;
-            }
+            get { return _lazyInjector; }
         }
 
         // When true, this will throw exceptions whenever we create new game objects
@@ -126,18 +123,12 @@ namespace Zenject
 
         public SingletonMarkRegistry SingletonMarkRegistry
         {
-            get
-            {
-                return _singletonMarkRegistry;
-            }
+            get { return _singletonMarkRegistry; }
         }
 
         public SingletonProviderCreator SingletonProviderCreator
         {
-            get
-            {
-                return _singletonProviderCreator;
-            }
+            get { return _singletonProviderCreator; }
         }
 
 #if !NOT_UNITY3D
@@ -151,10 +142,7 @@ namespace Zenject
 
         public DiContainer ParentContainer
         {
-            get
-            {
-                return _parentContainer;
-            }
+            get { return _parentContainer; }
         }
 
         public bool ChecksForCircularDependencies
@@ -173,10 +161,7 @@ namespace Zenject
 
         public bool IsValidating
         {
-            get
-            {
-                return _isValidating;
-            }
+            get { return _isValidating; }
         }
 
         // When this is true, it will log warnings when Resolve or Instantiate
@@ -187,14 +172,8 @@ namespace Zenject
         // unexpected behaviour can occur
         public bool IsInstalling
         {
-            get
-            {
-                return _isInstalling;
-            }
-            set
-            {
-                _isInstalling = value;
-            }
+            get { return _isInstalling; }
+            set { _isInstalling = value; }
         }
 
         public IEnumerable<BindingId> AllContracts
@@ -2012,6 +1991,10 @@ namespace Zenject
             where TFactoryContract : IPooledFactory
         {
             var bindInfo = new BindInfo(typeof(TFactoryContract));
+
+            // This interface is used in the optional class PoolCleanupChecker
+            bindInfo.ContractTypes.Add(typeof(IDynamicPooledFactory));
+
             var factoryBindInfo = new FactoryBindInfo(typeof(TFactoryConcrete));
             var poolBindInfo = new PooledFactoryBindInfo();
 

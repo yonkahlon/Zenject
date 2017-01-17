@@ -14,18 +14,12 @@ namespace Zenject
 
         IEnumerable<TaskInfo> AllTasks
         {
-            get
-            {
-                return ActiveTasks.Concat(_queuedTasks);
-            }
+            get { return ActiveTasks.Concat(_queuedTasks); }
         }
 
         IEnumerable<TaskInfo> ActiveTasks
         {
-            get
-            {
-                return _tasks;
-            }
+            get { return _tasks; }
         }
 
         public void AddTask(TTask task, int priority)

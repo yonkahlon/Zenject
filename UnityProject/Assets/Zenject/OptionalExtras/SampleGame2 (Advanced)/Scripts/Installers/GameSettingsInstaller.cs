@@ -23,7 +23,6 @@ namespace Zenject.SpaceFighter
     //[CreateAssetMenu(menuName = "Space Fighter/Game Settings")]
     public class GameSettingsInstaller : ScriptableObjectInstaller<GameSettingsInstaller>
     {
-        public CameraHandler.Settings CameraHandler;
         public EnemySpawner.Settings EnemySpawner;
         public GameDifficultyHandler.Settings GameDifficultyHandler;
         public GameRestartHandler.Settings GameRestartHandler;
@@ -32,7 +31,6 @@ namespace Zenject.SpaceFighter
 
         public override void InstallBindings()
         {
-            Container.BindInstance(CameraHandler);
             Container.BindInstance(EnemySpawner);
             Container.BindInstance(GameDifficultyHandler);
             Container.BindInstance(GameRestartHandler);

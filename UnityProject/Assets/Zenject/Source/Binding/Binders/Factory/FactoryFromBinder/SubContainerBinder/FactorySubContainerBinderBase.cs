@@ -41,10 +41,7 @@ namespace Zenject
 
         protected Type ContractType
         {
-            get
-            {
-                return typeof(TContract);
-            }
+            get { return typeof(TContract); }
         }
 
         public ArgConditionCopyNonLazyBinder ByInstaller<TInstaller>()

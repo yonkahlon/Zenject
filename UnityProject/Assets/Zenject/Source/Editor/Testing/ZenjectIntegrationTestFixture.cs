@@ -24,10 +24,7 @@ namespace Zenject
 
         protected DiContainer Container
         {
-            get
-            {
-                return _sceneContext.Container;
-            }
+            get { return _sceneContext.Container; }
         }
 
         [SetUp]

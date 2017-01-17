@@ -26,34 +26,22 @@ namespace Zenject
 
         public Context Context
         {
-            get
-            {
-                return _context;
-            }
+            get { return _context; }
         }
 
         public Component[] Components
         {
-            get
-            {
-                return _components;
-            }
+            get { return _components; }
         }
 
         public string Identifier
         {
-            get
-            {
-                return _identifier;
-            }
+            get { return _identifier; }
         }
 
         public BindTypes BindType
         {
-            get
-            {
-                return _bindType;
-            }
+            get { return _bindType; }
         }
 
         public void Start()

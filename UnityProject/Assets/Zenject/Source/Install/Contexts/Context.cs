@@ -30,10 +30,7 @@ namespace Zenject
 
         public IEnumerable<MonoInstaller> Installers
         {
-            get
-            {
-                return _installers;
-            }
+            get { return _installers; }
             set
             {
                 _installers.Clear();
@@ -43,10 +40,7 @@ namespace Zenject
 
         public IEnumerable<MonoInstaller> InstallerPrefabs
         {
-            get
-            {
-                return _installerPrefabs;
-            }
+            get { return _installerPrefabs; }
             set
             {
                 _installerPrefabs.Clear();
@@ -56,10 +50,7 @@ namespace Zenject
 
         public IEnumerable<ScriptableObjectInstaller> ScriptableObjectInstallers
         {
-            get
-            {
-                return _scriptableObjectInstallers;
-            }
+            get { return _scriptableObjectInstallers; }
             set
             {
                 _scriptableObjectInstallers.Clear();
@@ -70,10 +61,7 @@ namespace Zenject
         // Unlike other installer types this has to be set through code
         public IEnumerable<InstallerBase> NormalInstallers
         {
-            get
-            {
-                return _normalInstallers;
-            }
+            get { return _normalInstallers; }
             set
             {
                 _normalInstallers.Clear();
