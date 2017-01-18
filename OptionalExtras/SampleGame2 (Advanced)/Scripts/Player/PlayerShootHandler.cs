@@ -6,6 +6,7 @@ namespace Zenject.SpaceFighter
 {
     public class PlayerShootHandler : ITickable
     {
+        readonly AudioPlayer _audioPlayer;
         readonly PlayerModel _player;
         readonly Settings _settings;
         readonly Bullet.Factory _bulletFactory;
@@ -17,8 +18,10 @@ namespace Zenject.SpaceFighter
             PlayerInputState inputState,
             Bullet.Factory bulletFactory,
             Settings settings,
-            PlayerModel player)
+            PlayerModel player,
+            AudioPlayer audioPlayer)
         {
+            _audioPlayer = audioPlayer;
             _player = player;
             _settings = settings;
             _bulletFactory = bulletFactory;
@@ -41,6 +44,8 @@ namespace Zenject.SpaceFighter
 
         void Fire()
         {
+            _audioPlayer.Play(_settings.Laser, _settings.LaserVolume);
+
             var bullet = _bulletFactory.Spawn(
                 _settings.BulletSpeed, _settings.BulletLifetime, BulletTypes.FromPlayer);
 
@@ -51,6 +56,9 @@ namespace Zenject.SpaceFighter
         [Serializable]
         public class Settings
         {
+            public AudioClip Laser;
+            public float LaserVolume = 1.0f;
+
             public float BulletLifetime;
             public float BulletSpeed;
             public float MaxShootInterval;

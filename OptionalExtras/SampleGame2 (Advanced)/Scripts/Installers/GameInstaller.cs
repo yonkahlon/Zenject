@@ -17,18 +17,16 @@ namespace Zenject.SpaceFighter
 
             Container.BindAllInterfaces<EnemySpawner>().To<EnemySpawner>().AsSingle();
 
-            Container.BindFactory<EnemyTunables, EnemyFacade, EnemyFacade.Factory>()
+            Container.BindPooledFactory<EnemyFacade, EnemyFacade.Factory>()
                 .FromSubContainerResolve()
-                .ByPrefab<EnemyInstaller>(_settings.EnemyFacadePrefab)
+                .ByPrefab(_settings.EnemyFacadePrefab)
                 .UnderTransformGroup("Enemies");
-
-            Container.BindAllInterfaces<GameDifficultyHandler>().To<GameDifficultyHandler>().AsSingle();
-
-            Container.Bind<EnemyRegistry>().AsSingle();
 
             Container.BindPooledFactory<Bullet, Bullet.Factory>().WithInitialSize(10).ExpandByDoubling()
                 .FromPrefab(_settings.BulletPrefab)
                 .UnderTransformGroup("Bullets");
+
+            Container.Bind<LevelBoundary>().AsSingle();
 
             Container.BindPooledFactory<Explosion, Explosion.Factory>().WithInitialSize(3)
                 .FromPrefab(_settings.ExplosionPrefab)

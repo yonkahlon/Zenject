@@ -4,58 +4,57 @@ using Zenject;
 
 namespace Zenject.SpaceFighter
 {
-    public class EnemyFacade : MonoBehaviour
+    public class EnemyFacade : MonoBehaviour, IPoolable<EnemyTunables>
     {
-        EnemyModel _model;
-        EnemyRegistry _enemyRegistry;
-        EnemyStateManager _stateManager;
+        Enemy _enemy;
+        EnemyTunables _tunables;
+        Factory _selfFactory;
+        EnemyDeathHandler _deathHandler;
 
         // We can't use a constructor here because MonoFacade derives from
         // MonoBehaviour
         [Inject]
         public void Construct(
-            EnemyModel model, EnemyRegistry registry, EnemyStateManager stateManager)
+            Enemy enemy, EnemyTunables tunables,
+            Factory selfFactory, EnemyDeathHandler deathHandler)
         {
-            _model = model;
-            _enemyRegistry = registry;
-            _stateManager = stateManager;
-
-            registry.AddEnemy(this);
+            _enemy = enemy;
+            _tunables = tunables;
+            _selfFactory = selfFactory;
+            _deathHandler = deathHandler;
         }
 
         // Here we can add some high-level methods to give some info to other
         // parts of the codebase outside of our enemy facade
-        public bool IsAttacking
-        {
-            get
-            {
-                return _stateManager.CurrentState == EnemyStates.Attack;
-            }
-        }
-
-        public bool IsChasing
-        {
-            get
-            {
-                return _stateManager.CurrentState == EnemyStates.Follow;
-            }
-        }
-
         public Vector3 Position
         {
-            get
-            {
-                return _model.Position;
-            }
-            set
-            {
-                _model.Position = value;
-            }
+            get { return _enemy.Position; }
+            set { _enemy.Position = value; }
         }
 
-        public void OnDestroy()
+        public void OnDespawned()
         {
-            _enemyRegistry.RemoveEnemy(this);
+            gameObject.SetActive(false);
+        }
+
+        public void Update()
+        {
+            // Always ensure we are on the main plane
+            _enemy.Position = new Vector3(_enemy.Position.x, _enemy.Position.y, 0);
+        }
+
+        public void OnSpawned(EnemyTunables tunables)
+        {
+            _tunables.Accuracy = tunables.Accuracy;
+            _tunables.Speed = tunables.Speed;
+
+            gameObject.SetActive(true);
+        }
+
+        public void Die()
+        {
+            _deathHandler.Die();
+            _selfFactory.Despawn(this);
         }
 
         // Here we declare a parameter to our facade factory of type EnemyTunables
@@ -63,7 +62,7 @@ namespace Zenject.SpaceFighter
         // an installer instead of the EnemyFacade class itself
         // It's done this way because in some cases we want to add the arguments
         // to the container for use by other classes within the facade
-        public class Factory : Factory<EnemyTunables, EnemyFacade>
+        public class Factory : PooledFactory<EnemyTunables, EnemyFacade>
         {
         }
     }

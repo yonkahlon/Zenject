@@ -19,10 +19,7 @@ namespace Zenject.SpaceFighter
 
         public MeshRenderer Renderer
         {
-            get
-            {
-                return _renderer;
-            }
+            get { return _renderer; }
         }
 
         public bool IsDead
@@ -33,50 +30,29 @@ namespace Zenject.SpaceFighter
 
         public float Health
         {
-            get
-            {
-                return _health;
-            }
+            get { return _health; }
         }
 
         public Vector3 LookDir
         {
-            get
-            {
-                return -_rigidBody.transform.right;
-            }
+            get { return -_rigidBody.transform.right; }
         }
 
         public Quaternion Rotation
         {
-            get
-            {
-                return _rigidBody.rotation;
-            }
-            set
-            {
-                _rigidBody.rotation = value;
-            }
+            get { return _rigidBody.rotation; }
+            set { _rigidBody.rotation = value; }
         }
 
         public Vector3 Position
         {
-            get
-            {
-                return _rigidBody.position;
-            }
-            set
-            {
-                _rigidBody.position = value;
-            }
+            get { return _rigidBody.position; }
+            set { _rigidBody.position = value; }
         }
 
         public Vector3 Velocity
         {
-            get
-            {
-                return _rigidBody.velocity;
-            }
+            get { return _rigidBody.velocity; }
         }
 
         public void TakeDamage(float healthLoss)

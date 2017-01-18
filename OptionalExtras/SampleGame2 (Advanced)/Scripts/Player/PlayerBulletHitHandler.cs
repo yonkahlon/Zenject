@@ -4,7 +4,7 @@ using Zenject;
 
 namespace Zenject.SpaceFighter
 {
-    public class PlayerBulletHitHandler : IInitializable, IDisposable
+    public class PlayerBulletHitHandler
     {
         readonly AudioPlayer _audioPlayer;
         readonly Settings _settings;
@@ -24,24 +24,13 @@ namespace Zenject.SpaceFighter
             _model = model;
         }
 
-        public void Initialize()
+        public void TakeDamage(Vector3 moveDirection)
         {
-            _gameEvents.PlayerHit += OnHit;
-        }
+            _audioPlayer.Play(_settings.HitSound, _settings.HitSoundVolume);
 
-        public void Dispose()
-        {
-            _gameEvents.PlayerHit -= OnHit;
-        }
-
-        void OnHit(Bullet bullet)
-        {
-            _audioPlayer.Play(_settings.HitSound, _settings.HitVolume);
-            _model.AddForce(-bullet.MoveDirection * _settings.HitForce);
+            _model.AddForce(-moveDirection * _settings.HitForce);
 
             _model.TakeDamage(_settings.HealthLoss);
-
-            bullet.Despawn();
         }
 
         [Serializable]
@@ -49,8 +38,9 @@ namespace Zenject.SpaceFighter
         {
             public float HealthLoss;
             public float HitForce;
+
             public AudioClip HitSound;
-            public float HitVolume;
+            public float HitSoundVolume = 1.0f;
         }
     }
 }
