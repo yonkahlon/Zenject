@@ -17,22 +17,13 @@ namespace Zenject.SpaceFighter
 
             Container.BindAllInterfaces<PlayerInputHandler>().To<PlayerInputHandler>().AsSingle();
             Container.BindAllInterfaces<PlayerMoveHandler>().To<PlayerMoveHandler>().AsSingle();
-            Container.BindAllInterfaces<PlayerBulletHitHandler>().To<PlayerBulletHitHandler>().AsSingle();
+            Container.BindAllInterfacesAndSelf<PlayerBulletHitHandler>().To<PlayerBulletHitHandler>().AsSingle();
             Container.BindAllInterfaces<PlayerDirectionHandler>().To<PlayerDirectionHandler>().AsSingle();
             Container.BindAllInterfaces<PlayerShootHandler>().To<PlayerShootHandler>().AsSingle();
 
             Container.Bind<PlayerInputState>().AsSingle();
 
             Container.BindAllInterfaces<PlayerHealthWatcher>().To<PlayerHealthWatcher>().AsSingle();
-
-            InstallSettings();
-        }
-
-        void InstallSettings()
-        {
-            Container.BindInstance(_settings.PlayerMoveHandler);
-            Container.BindInstance(_settings.PlayerShootHandler);
-            Container.BindInstance(_settings.PlayerCollisionHandler);
         }
 
         [Serializable]
@@ -40,10 +31,6 @@ namespace Zenject.SpaceFighter
         {
             public Rigidbody Rigidbody;
             public MeshRenderer MeshRenderer;
-
-            public PlayerMoveHandler.Settings PlayerMoveHandler;
-            public PlayerShootHandler.Settings PlayerShootHandler;
-            public PlayerBulletHitHandler.Settings PlayerCollisionHandler;
         }
     }
 }

@@ -51,7 +51,7 @@ namespace Zenject.SpaceFighter
             gameEvents.EnemyKilled += OnEnemyKilled;
         }
 
-        void OnEnemyKilled(EnemyModel enemy)
+        void OnEnemyKilled()
         {
             _killCount++;
         }

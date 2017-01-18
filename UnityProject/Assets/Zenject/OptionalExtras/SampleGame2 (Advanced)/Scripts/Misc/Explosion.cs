@@ -40,8 +40,6 @@ namespace Zenject.SpaceFighter
             _particleSystem.Play();
 
             _startTime = Time.realtimeSinceStartup;
-
-            _audioPlayer.Play(_sound, _soundVolume);
         }
 
         public void OnDespawned()

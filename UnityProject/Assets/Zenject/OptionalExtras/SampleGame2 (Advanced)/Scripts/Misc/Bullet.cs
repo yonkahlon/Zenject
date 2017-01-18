@@ -27,11 +27,13 @@ namespace Zenject.SpaceFighter
         Material _enemyMaterial = null;
 
         Factory _selfFactory;
+        GameEvents _gameEvents;
 
         [Inject]
-        void Construct(Factory selfFactory)
+        void Construct(Factory selfFactory, GameEvents gameEvents)
         {
             _selfFactory = selfFactory;
+            _gameEvents = gameEvents;
         }
 
         public void OnSpawned(float speed, float lifeTime, BulletTypes type)
@@ -54,17 +56,30 @@ namespace Zenject.SpaceFighter
 
         public BulletTypes Type
         {
-            get
-            {
-                return _type;
-            }
+            get { return _type; }
         }
 
         public Vector3 MoveDirection
         {
-            get
+            get { return transform.right; }
+        }
+
+        public void OnTriggerEnter(Collider other)
+        {
+            var enemy = other.GetComponent<EnemyFacade>();
+
+            if (enemy != null && _type == BulletTypes.FromPlayer)
             {
-                return transform.right;
+                enemy.Die();
+                this.Despawn();
+            }
+
+            var player = other.GetComponent<PlayerFacade>();
+
+            if (player != null && _type == BulletTypes.FromEnemy)
+            {
+                player.TakeDamage(this.MoveDirection);
+                this.Despawn();
             }
         }
 
