@@ -47,7 +47,7 @@ namespace Zenject
 
                 try
                 {
-#if PROFILING_ENABLED
+#if UNITY_EDITOR
                     using (ProfileBlock.Start("{0}.Initialize()", initializable.Initializable.GetType()))
 #endif
                     {

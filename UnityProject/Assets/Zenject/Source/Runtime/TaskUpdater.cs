@@ -146,8 +146,8 @@ namespace Zenject
     {
         protected override void UpdateItem(ITickable task)
         {
-#if PROFILING_ENABLED
-            using (ProfileBlock.Start("{0}.Tick()".Fmt(task.GetType())))
+#if UNITY_EDITOR
+            using (ProfileBlock.Start("{0}.Tick()", task.GetType()))
 #endif
             {
                 task.Tick();
@@ -159,8 +159,8 @@ namespace Zenject
     {
         protected override void UpdateItem(ILateTickable task)
         {
-#if PROFILING_ENABLED
-            using (ProfileBlock.Start("{0}.LateTick()".Fmt(task.GetType())))
+#if UNITY_EDITOR
+            using (ProfileBlock.Start("{0}.LateTick()", task.GetType()))
 #endif
             {
                 task.LateTick();
@@ -172,8 +172,8 @@ namespace Zenject
     {
         protected override void UpdateItem(IFixedTickable task)
         {
-#if PROFILING_ENABLED
-            using (ProfileBlock.Start("{0}.FixedTick()".Fmt(task.GetType())))
+#if UNITY_EDITOR
+            using (ProfileBlock.Start("{0}.FixedTick()", task.GetType()))
 #endif
             {
                 task.FixedTick();

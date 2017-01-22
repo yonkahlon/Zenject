@@ -27,8 +27,8 @@ namespace Zenject.Tests.Other
                 .ToSelf().AsSingle().CopyIntoAllSubContainers();
 
             // This is how you add ITickables / etc. within sub containers
-            container.BindAllInterfacesAndSelf<FooKernel>()
-                .To<FooKernel>().FromSubContainerResolve().ByMethod(InstallFoo).AsSingle();
+            container.BindInterfacesAndSelfTo<FooKernel>()
+                .FromSubContainerResolve().ByMethod(InstallFoo).AsSingle();
 
             var tickManager = container.Resolve<TickableManager>();
             var initManager = container.Resolve<InitializableManager>();

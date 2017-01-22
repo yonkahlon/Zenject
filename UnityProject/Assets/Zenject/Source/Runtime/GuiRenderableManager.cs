@@ -47,8 +47,8 @@ namespace Zenject
             {
                 try
                 {
-#if PROFILING_ENABLED
-                    using (ProfileBlock.Start("{0}.Initialize()", renderable.Renderable.GetType()))
+#if UNITY_EDITOR
+                    using (ProfileBlock.Start("{0}.GuiRender()", renderable.Renderable.GetType()))
 #endif
                     {
                         renderable.Renderable.GuiRender();

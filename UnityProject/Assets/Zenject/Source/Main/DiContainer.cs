@@ -71,8 +71,16 @@ namespace Zenject
             // By cloning it this also means that Ids, optional, etc. are forwarded properly
             var newContext = context.Clone();
             newContext.MemberType = context.MemberType.GenericArguments().Single();
-            return Activator.CreateInstance(
+
+            var result = Activator.CreateInstance(
                 typeof(Lazy<>).MakeGenericType(newContext.MemberType), new object[] { this, newContext });
+
+            if (_isValidating)
+            {
+                ((ILazy)result).Validate();
+            }
+
+            return result;
         }
 
         public DiContainer()
@@ -265,8 +273,6 @@ namespace Zenject
                 var providers = pair.Value;
 
                 List<ProviderInfo> validatableProviders;
-
-                Assert.That(!bindingId.Type.IsGenericTypeDefinition());
 
                 var injectContext = new InjectContext(
                     this, bindingId.Type, bindingId.Identifier);
@@ -735,7 +741,7 @@ namespace Zenject
         // See comment in IInstantiator.cs for description of this method
         public object InstantiateExplicit(Type concreteType, bool autoInject, InjectArgs args)
         {
-#if PROFILING_ENABLED
+#if UNITY_EDITOR
             using (ProfileBlock.Start("Zenject.Instantiate({0})", concreteType))
 #endif
             {
@@ -827,8 +833,8 @@ namespace Zenject
                     //Log.Debug("Zenject: Instantiating type '{0}'", concreteType);
                     try
                     {
-#if PROFILING_ENABLED
-                        using (ProfileBlock.Start("{0}.{0}()", concreteType))
+#if UNITY_EDITOR
+                        using (ProfileBlock.Start("{0}.{1}()", concreteType, concreteType.Name))
 #endif
                         {
                             newObj = typeInfo.InjectConstructor.Invoke(paramValues.ToArray());
@@ -959,7 +965,7 @@ namespace Zenject
 
             foreach (var method in typeInfo.PostInjectMethods)
             {
-#if PROFILING_ENABLED
+#if UNITY_EDITOR
                 using (ProfileBlock.Start("{0}.{1}()", injectableType, method.MethodInfo.Name))
 #endif
                 {
@@ -1865,7 +1871,7 @@ namespace Zenject
             var bindInfo = new BindInfo(contractTypesList);
 
             // This is nice because it allows us to do things like Bind(all interfaces).To<Foo>()
-            // (though of course it would be more efficient to use BindAllInterfaces in this case)
+            // (though of course it would be more efficient to use BindInterfacesTo in this case)
             bindInfo.InvalidBindResponse = InvalidBindResponses.Skip;
 
             return new ConcreteIdBinderNonGeneric(bindInfo, StartBinding());
@@ -1902,38 +1908,38 @@ namespace Zenject
         //    {
         //    }
         //
-        //    Container.BindAllInterfaces<Foo>().To<Foo>().AsSingle();
+        //    Container.BindInterfacesTo<Foo>().AsSingle();
         //
         //  This line above is equivalent to the following:
         //
         //    Container.Bind<ITickable>().ToSingle<Foo>();
         //    Container.Bind<IInitializable>().ToSingle<Foo>();
         //
-        // Note here that we do not bind Foo to itself.  For that, use BindAllInterfacesAndSelf
-        public ConcreteIdBinderNonGeneric BindAllInterfaces<T>()
+        // Note here that we do not bind Foo to itself.  For that, use BindInterfacesAndSelfTo
+        public FromBinderNonGeneric BindInterfacesTo<T>()
         {
-            return BindAllInterfaces(typeof(T));
+            return BindInterfacesTo(typeof(T));
         }
 
-        public ConcreteIdBinderNonGeneric BindAllInterfaces(Type type)
+        public FromBinderNonGeneric BindInterfacesTo(Type type)
         {
             // We must only have one dependency root per container
             // We need this when calling this with a GameObjectContext
-            return BindInternal(type.Interfaces().ToArray(), "BindAllInterfaces({0})".Fmt(type));
+            return BindInternal(type.Interfaces().ToArray(), "BindInterfacesTo({0})".Fmt(type)).To(type);
         }
 
-        // Same as BindAllInterfaces except also binds to self
-        public ConcreteIdBinderNonGeneric BindAllInterfacesAndSelf<T>()
+        // Same as BindInterfaces except also binds to self
+        public FromBinderNonGeneric BindInterfacesAndSelfTo<T>()
         {
-            return BindAllInterfacesAndSelf(typeof(T));
+            return BindInterfacesAndSelfTo(typeof(T));
         }
 
-        public ConcreteIdBinderNonGeneric BindAllInterfacesAndSelf(Type type)
+        public FromBinderNonGeneric BindInterfacesAndSelfTo(Type type)
         {
             // We must only have one dependency root per container
             // We need this when calling this with a GameObjectContext
             return Bind(
-                type.Interfaces().Append(type).ToArray());
+                type.Interfaces().Append(type).ToArray()).To(type);
         }
 
         //  This is simply a shortcut to using the FromInstance method.

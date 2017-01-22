@@ -29,10 +29,13 @@ namespace Zenject.Tests.Bindings
         [Test]
         public void Test2()
         {
-            Container.Bind<Foo>().AsSingle();
+            Container.Bind<Foo>().AsSingle().NonLazy();
 
             Assert.Throws(() => Container.Validate());
-            Assert.Throws(() => Container.Resolve<Foo>());
+
+            var foo = Container.Resolve<Foo>();
+
+            Assert.Throws(() => foo.DoIt());
         }
 
         public class Bar
