@@ -60,8 +60,7 @@ namespace Zenject.Asteroids
             // Here, we're defining a generic factory to create asteroid objects using the given prefab
             // So any classes that want to create new asteroid objects can simply include an injected field
             // or constructor parameter of type Asteroid.Factory, then call Create() on that
-            Container.BindPooledFactory<Asteroid, Asteroid.Factory>()
-                .WithInitialSize(25).ExpandByDoubling()
+            Container.BindFactory<Asteroid, Asteroid.Factory>()
                 .FromPrefab(_settings.AsteroidPrefab)
                 // We can also tell Zenject what to name the new gameobject here
                 .WithGameObjectName("Asteroid")
@@ -90,9 +89,9 @@ namespace Zenject.Asteroids
             // Note that the ship itself is bound using a ZenjectBinding component (see Ship
             // game object in scene heirarchy)
 
-            Container.BindFactory<ShipStateWaitingToStart, ShipStateWaitingToStart.Factory>();
-            Container.BindFactory<ShipStateDead, ShipStateDead.Factory>();
-            Container.BindFactory<ShipStateMoving, ShipStateMoving.Factory>();
+            Container.BindFactory<ShipStateWaitingToStart, ShipStateWaitingToStart.Factory>().WhenInjectedInto<ShipStateFactory>();
+            Container.BindFactory<ShipStateDead, ShipStateDead.Factory>().WhenInjectedInto<ShipStateFactory>();
+            Container.BindFactory<ShipStateMoving, ShipStateMoving.Factory>().WhenInjectedInto<ShipStateFactory>();
         }
 
         void InitExecutionOrder()

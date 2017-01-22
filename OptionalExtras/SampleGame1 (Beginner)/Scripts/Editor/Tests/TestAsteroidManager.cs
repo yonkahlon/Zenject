@@ -20,7 +20,7 @@ namespace Zenject.Asteroids
             GameSettingsInstaller.InstallFromResource(Container);
             var gameSettings = Container.Resolve<GameInstaller.Settings>();
             Container.Bind<AsteroidManager>().AsSingle();
-            Container.BindPooledFactory<Asteroid, Asteroid.Factory>().FromPrefab(gameSettings.AsteroidPrefab);
+            Container.BindFactory<Asteroid, Asteroid.Factory>().FromPrefab(gameSettings.AsteroidPrefab);
             Container.Bind<Camera>().WithId("Main").FromGameObject();
             Container.Bind<LevelHelper>().AsSingle();
 

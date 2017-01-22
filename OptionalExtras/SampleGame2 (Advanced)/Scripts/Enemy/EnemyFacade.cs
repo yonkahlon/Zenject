@@ -58,10 +58,6 @@ namespace Zenject.SpaceFighter
         }
 
         // Here we declare a parameter to our facade factory of type EnemyTunables
-        // Note that unlike for normal factories, this parameter gets injected into
-        // an installer instead of the EnemyFacade class itself
-        // It's done this way because in some cases we want to add the arguments
-        // to the container for use by other classes within the facade
         public class Factory : PooledFactory<EnemyTunables, EnemyFacade>
         {
         }

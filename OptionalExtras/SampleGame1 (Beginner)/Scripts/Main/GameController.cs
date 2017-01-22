@@ -33,18 +33,12 @@ namespace Zenject.Asteroids
 
         public float ElapsedTime
         {
-            get
-            {
-                return _elapsedTime;
-            }
+            get { return _elapsedTime; }
         }
 
         public GameStates State
         {
-            get
-            {
-                return _state;
-            }
+            get { return _state; }
         }
 
         public void Initialize()

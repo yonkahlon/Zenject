@@ -5,11 +5,11 @@ namespace Zenject.SpaceFighter
 {
     public class PlayerFacade : MonoBehaviour
     {
-        PlayerModel _model;
-        PlayerBulletHitHandler _hitHandler;
+        Player _model;
+        PlayerDamageHandler _hitHandler;
 
         [Inject]
-        public void Construct(PlayerModel player, PlayerBulletHitHandler hitHandler)
+        public void Construct(Player player, PlayerDamageHandler hitHandler)
         {
             _model = player;
             _hitHandler = hitHandler;

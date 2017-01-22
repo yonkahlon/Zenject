@@ -52,17 +52,6 @@ namespace Zenject.SpaceFighter
 
             var distanceToPlayer = (_player.Position - _enemy.Position).magnitude;
 
-            Assert.That(_settings.TeleportDistance > _settings.TeleportNewDistance);
-
-            // If they are far enough away, just teleport them to the other side of the player
-            // This is good because otherwise the best strategy is just to keep running away and shooting
-            // and it gets boring
-            if (distanceToPlayer > _settings.TeleportDistance)
-            {
-                var playerDir = (_player.Position - _enemy.Position).normalized;
-                _enemy.Position = _player.Position + playerDir * _settings.TeleportNewDistance;
-            }
-
             // Always look towards the player
             _enemy.DesiredLookDir = (_player.Position - _enemy.Position).normalized;
 
@@ -111,7 +100,6 @@ namespace Zenject.SpaceFighter
         {
             public float StrafeMultiplier;
             public float StrafeChangeInterval;
-            public float TeleportDistance;
             public float TeleportNewDistance;
         }
     }

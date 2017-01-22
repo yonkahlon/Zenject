@@ -9,12 +9,12 @@ namespace Zenject.SpaceFighter
     {
         readonly LevelBoundary _levelBoundary;
         readonly Settings _settings;
-        readonly PlayerModel _player;
+        readonly Player _player;
         readonly PlayerInputState _inputState;
 
         public PlayerMoveHandler(
             PlayerInputState inputState,
-            PlayerModel player,
+            Player player,
             Settings settings,
             LevelBoundary levelBoundary)
         {

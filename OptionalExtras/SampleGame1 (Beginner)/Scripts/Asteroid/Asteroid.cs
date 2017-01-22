@@ -6,7 +6,7 @@ using ModestTree;
 
 namespace Zenject.Asteroids
 {
-    public class Asteroid : MonoBehaviour, IPoolable
+    public class Asteroid : MonoBehaviour
     {
         LevelHelper _level;
         Rigidbody _rigidBody;
@@ -24,38 +24,16 @@ namespace Zenject.Asteroids
             _rigidBody = GetComponent<Rigidbody>();
         }
 
-        public void OnSpawned()
-        {
-            gameObject.SetActive(true);
-        }
-
-        public void OnDespawned()
-        {
-            gameObject.SetActive(false);
-        }
-
         public Vector3 Position
         {
-            get
-            {
-                return transform.position;
-            }
-            set
-            {
-                transform.position = value;
-            }
+            get { return transform.position; }
+            set { transform.position = value; }
         }
 
         public float Mass
         {
-            get
-            {
-                return _rigidBody.mass;
-            }
-            set
-            {
-                _rigidBody.mass = value;
-            }
+            get { return _rigidBody.mass; }
+            set { _rigidBody.mass = value; }
         }
 
         public float Scale
@@ -77,14 +55,8 @@ namespace Zenject.Asteroids
 
         public Vector3 Velocity
         {
-            get
-            {
-                return _rigidBody.velocity;
-            }
-            set
-            {
-                _rigidBody.velocity = value;
-            }
+            get { return _rigidBody.velocity; }
+            set { _rigidBody.velocity = value; }
         }
 
         public void FixedTick()
@@ -138,7 +110,7 @@ namespace Zenject.Asteroids
             public float maxSpeed;
         }
 
-        public class Factory : PooledFactory<Asteroid>
+        public class Factory : Factory<Asteroid>
         {
         }
     }

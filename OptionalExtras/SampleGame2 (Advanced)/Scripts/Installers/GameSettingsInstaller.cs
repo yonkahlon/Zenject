@@ -34,7 +34,7 @@ namespace Zenject.SpaceFighter
         {
             public PlayerMoveHandler.Settings PlayerMoveHandler;
             public PlayerShootHandler.Settings PlayerShootHandler;
-            public PlayerBulletHitHandler.Settings PlayerCollisionHandler;
+            public PlayerDamageHandler.Settings PlayerCollisionHandler;
             public PlayerHealthWatcher.Settings PlayerHealthWatcher;
         }
 

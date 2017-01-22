@@ -4,33 +4,29 @@ using Zenject;
 
 namespace Zenject.SpaceFighter
 {
-    public class PlayerBulletHitHandler
+    public class PlayerDamageHandler
     {
         readonly AudioPlayer _audioPlayer;
         readonly Settings _settings;
-        readonly PlayerModel _model;
+        readonly Player _player;
 
-        GameEvents _gameEvents;
-
-        public PlayerBulletHitHandler(
-            PlayerModel model,
+        public PlayerDamageHandler(
+            Player player,
             Settings settings,
-            AudioPlayer audioPlayer,
-            GameEvents gameEvents)
+            AudioPlayer audioPlayer)
         {
-            _gameEvents = gameEvents;
             _audioPlayer = audioPlayer;
             _settings = settings;
-            _model = model;
+            _player = player;
         }
 
         public void TakeDamage(Vector3 moveDirection)
         {
             _audioPlayer.Play(_settings.HitSound, _settings.HitSoundVolume);
 
-            _model.AddForce(-moveDirection * _settings.HitForce);
+            _player.AddForce(-moveDirection * _settings.HitForce);
 
-            _model.TakeDamage(_settings.HealthLoss);
+            _player.TakeDamage(_settings.HealthLoss);
         }
 
         [Serializable]

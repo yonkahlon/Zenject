@@ -10,10 +10,10 @@ namespace Zenject.SpaceFighter
         readonly Settings _settings;
         readonly GameEvents _gameEvents;
         readonly Explosion.Factory _explosionFactory;
-        readonly PlayerModel _model;
+        readonly Player _player;
 
         public PlayerHealthWatcher(
-            PlayerModel model,
+            Player player,
             Explosion.Factory explosionFactory,
             GameEvents gameEvents,
             Settings settings,
@@ -23,12 +23,12 @@ namespace Zenject.SpaceFighter
             _settings = settings;
             _gameEvents = gameEvents;
             _explosionFactory = explosionFactory;
-            _model = model;
+            _player = player;
         }
 
         public void Tick()
         {
-            if (_model.Health <= 0 && !_model.IsDead)
+            if (_player.Health <= 0 && !_player.IsDead)
             {
                 Die();
             }
@@ -36,12 +36,12 @@ namespace Zenject.SpaceFighter
 
         void Die()
         {
-            _model.IsDead = true;
+            _player.IsDead = true;
 
             var explosion = _explosionFactory.Spawn();
-            explosion.transform.position = _model.Position;
+            explosion.transform.position = _player.Position;
 
-            _model.Renderer.enabled = false;
+            _player.Renderer.enabled = false;
 
             _gameEvents.PlayerKilled();
 
