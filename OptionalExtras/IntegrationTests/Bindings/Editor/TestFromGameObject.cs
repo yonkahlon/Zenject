@@ -145,6 +145,54 @@ namespace Zenject.Tests.Bindings
             FixtureUtil.AssertNumGameObjects(Container, 2);
         }
 
+
+        [Test]
+        public void TestUnderTransformGroup()
+        {
+            Container.Bind<Foo>().FromGameObject()
+                .WithGameObjectName(GameObjName).UnderTransformGroup("Foo").AsSingle();
+            Container.BindRootResolve<Foo>();
+
+            Initialize();
+
+            var root = Container.Resolve<Context>().transform;
+            var child1 = root.GetChild(0);
+
+            Assert.IsEqual(child1.name, "Foo");
+
+            var child2 = child1.GetChild(0);
+
+            Assert.IsNotNull(child2.GetComponent<Foo>());
+        }
+
+        [Test]
+        public void TestUnderTransform()
+        {
+            var tempGameObject = new GameObject("Foo");
+
+            Container.Bind<Foo>().FromGameObject()
+                .WithGameObjectName(GameObjName).UnderTransform(tempGameObject.transform).AsSingle();
+            Container.BindRootResolve<Foo>();
+
+            Initialize();
+
+            Assert.IsNotNull(tempGameObject.transform.GetChild(0).GetComponent<Foo>());
+        }
+
+        [Test]
+        public void TestUnderTransformGetter()
+        {
+            var tempGameObject = new GameObject("Foo");
+
+            Container.Bind<Foo>().FromGameObject()
+                .WithGameObjectName(GameObjName).UnderTransform((context) => tempGameObject.transform).AsSingle();
+            Container.BindRootResolve<Foo>();
+
+            Initialize();
+
+            Assert.IsNotNull(tempGameObject.transform.GetChild(0).GetComponent<Foo>());
+        }
+
         public interface IBar
         {
         }

@@ -176,7 +176,7 @@ namespace Zenject.Tests.Bindings
         {
             // Jim and Bob both depend on each other
             Container.Bind(typeof(Jim), typeof(Bob)).FromPrefab(JimAndBobPrefab).AsCached().NonLazy();
-            Container.BindAllInterfaces<JimAndBobRunner>().To<JimAndBobRunner>().AsSingle().NonLazy();
+            Container.BindInterfacesTo<JimAndBobRunner>().AsSingle().NonLazy();
 
             Initialize();
         }
