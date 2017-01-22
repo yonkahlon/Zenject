@@ -36,10 +36,7 @@ namespace Zenject.Asteroids
 
         public IEnumerable<Asteroid> Asteroids
         {
-            get
-            {
-                return _asteroids;
-            }
+            get { return _asteroids; }
         }
 
         public void Start()
@@ -104,7 +101,7 @@ namespace Zenject.Asteroids
         {
             foreach (var asteroid in _asteroids)
             {
-                _asteroidFactory.Despawn(asteroid);
+                GameObject.Destroy(asteroid.gameObject);
             }
 
             _asteroids.Clear();
@@ -146,7 +143,7 @@ namespace Zenject.Asteroids
 
         public void SpawnNext()
         {
-            var asteroid = _asteroidFactory.Spawn();
+            var asteroid = _asteroidFactory.Create();
 
             var attributes = _cachedAttributes.Dequeue();
 

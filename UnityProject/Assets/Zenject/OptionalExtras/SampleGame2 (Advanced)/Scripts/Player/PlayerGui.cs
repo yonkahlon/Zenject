@@ -6,7 +6,7 @@ using Zenject;
 
 namespace Zenject.SpaceFighter
 {
-    public class PlayerHealthDisplay : MonoBehaviour
+    public class PlayerGui : MonoBehaviour
     {
         [SerializeField]
         float _leftPadding;
@@ -35,15 +35,15 @@ namespace Zenject.SpaceFighter
         [SerializeField]
         Color _backgroundColor;
 
-        PlayerModel _model;
+        Player _player;
         Texture2D _textureForeground;
         Texture2D _textureBackground;
         int _killCount;
 
         [Inject]
-        public void Construct(PlayerModel model, GameEvents gameEvents)
+        public void Construct(Player player, GameEvents gameEvents)
         {
-            _model = model;
+            _player = player;
 
             _textureForeground = CreateColorTexture(_foregroundColor);
             _textureBackground = CreateColorTexture(_backgroundColor);
@@ -67,7 +67,7 @@ namespace Zenject.SpaceFighter
         public void OnGUI()
         {
             var healthLabelBounds = new Rect(_leftPadding, Screen.height - _bottomPadding, _labelWidth, _labelHeight);
-            GUI.Label(healthLabelBounds, "Health: {0:0}".Fmt(_model.Health));
+            GUI.Label(healthLabelBounds, "Health: {0:0}".Fmt(_player.Health));
 
             var killLabelBounds = new Rect(healthLabelBounds.xMin, healthLabelBounds.yMin - _killCountOffset, _labelWidth, _labelHeight);
             GUI.Label(killLabelBounds, "Kill Count: {0}".Fmt(_killCount));
@@ -75,7 +75,7 @@ namespace Zenject.SpaceFighter
             var boundsBackground = new Rect(healthLabelBounds.xMax, healthLabelBounds.yMin, _textureWidth, _textureHeight);
             GUI.DrawTexture(boundsBackground, _textureBackground);
 
-            var boundsForeground = new Rect(boundsBackground.xMin, boundsBackground.yMin, (_model.Health / 100.0f) * _textureWidth, _textureHeight);
+            var boundsForeground = new Rect(boundsBackground.xMin, boundsBackground.yMin, (_player.Health / 100.0f) * _textureWidth, _textureHeight);
             GUI.DrawTexture(boundsForeground, _textureForeground);
         }
     }

@@ -42,6 +42,17 @@ namespace Zenject.Tests.BindFeatures
             Container.Resolve<IFoo>();
         }
 
+        [Test]
+        public void TestNullValues()
+        {
+            Container.Bind<Foo>().AsSingle().WithArguments(3, (string)null);
+
+            var foo = Container.Resolve<Foo>();
+
+            Assert.IsEqual(foo.Value, 3);
+            Assert.IsEqual(foo.Value2, null);
+        }
+
         interface IFoo
         {
         }
@@ -54,9 +65,16 @@ namespace Zenject.Tests.BindFeatures
                 string value2)
             {
                 Value = value;
+                Value2 = value2;
             }
 
             public int Value
+            {
+                get;
+                private set;
+            }
+
+            public string Value2
             {
                 get;
                 private set;

@@ -2,14 +2,14 @@ using UnityEngine;
 
 namespace Zenject.SpaceFighter
 {
-    public class PlayerModel
+    public class Player
     {
         readonly Rigidbody _rigidBody;
         readonly MeshRenderer _renderer;
 
         float _health = 100.0f;
 
-        public PlayerModel(
+        public Player(
             Rigidbody rigidBody,
             MeshRenderer renderer)
         {
@@ -24,8 +24,7 @@ namespace Zenject.SpaceFighter
 
         public bool IsDead
         {
-            get;
-            set;
+            get; set;
         }
 
         public float Health

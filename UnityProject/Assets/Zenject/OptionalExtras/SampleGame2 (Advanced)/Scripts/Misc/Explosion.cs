@@ -20,17 +20,10 @@ namespace Zenject.SpaceFighter
         [SerializeField]
         float _soundVolume;
 
-        AudioPlayer _audioPlayer;
-
         float _startTime;
-        Factory _selfFactory;
 
         [Inject]
-        public void Construct(AudioPlayer audioPlayer, Factory selfFactory)
-        {
-            _audioPlayer = audioPlayer;
-            _selfFactory = selfFactory;
-        }
+        Factory _selfFactory;
 
         public void OnSpawned()
         {

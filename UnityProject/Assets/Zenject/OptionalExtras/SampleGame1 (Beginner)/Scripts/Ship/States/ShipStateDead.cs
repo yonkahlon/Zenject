@@ -60,7 +60,7 @@ namespace Zenject.Asteroids
             _gameEvents.ShipCrashed();
         }
 
-        public override void Stop()
+        public override void Dispose()
         {
             _ship.MeshRenderer.enabled = true;
             _ship.ParticleEmitter.emit = true;

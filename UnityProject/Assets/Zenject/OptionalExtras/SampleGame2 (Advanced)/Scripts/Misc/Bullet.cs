@@ -26,14 +26,17 @@ namespace Zenject.SpaceFighter
         [SerializeField]
         Material _enemyMaterial = null;
 
-        Factory _selfFactory;
-        GameEvents _gameEvents;
-
         [Inject]
-        void Construct(Factory selfFactory, GameEvents gameEvents)
+        Factory _selfFactory;
+
+        public BulletTypes Type
         {
-            _selfFactory = selfFactory;
-            _gameEvents = gameEvents;
+            get { return _type; }
+        }
+
+        public Vector3 MoveDirection
+        {
+            get { return transform.right; }
         }
 
         public void OnSpawned(float speed, float lifeTime, BulletTypes type)
@@ -52,16 +55,6 @@ namespace Zenject.SpaceFighter
         public void OnDespawned()
         {
             this.gameObject.SetActive(false);
-        }
-
-        public BulletTypes Type
-        {
-            get { return _type; }
-        }
-
-        public Vector3 MoveDirection
-        {
-            get { return transform.right; }
         }
 
         public void OnTriggerEnter(Collider other)

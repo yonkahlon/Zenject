@@ -27,42 +27,24 @@ namespace Zenject.Asteroids
 
         public MeshRenderer MeshRenderer
         {
-            get
-            {
-                return _meshRenderer;
-            }
+            get { return _meshRenderer; }
         }
 
         public ParticleEmitter ParticleEmitter
         {
-            get
-            {
-                return _particleEmitter;
-            }
+            get { return _particleEmitter; }
         }
 
         public Vector3 Position
         {
-            get
-            {
-                return transform.position;
-            }
-            set
-            {
-                transform.position = value;
-            }
+            get { return transform.position; }
+            set { transform.position = value; }
         }
 
         public Quaternion Rotation
         {
-            get
-            {
-                return transform.rotation;
-            }
-            set
-            {
-                transform.rotation = value;
-            }
+            get { return transform.rotation; }
+            set { transform.rotation = value; }
         }
 
         public void Start()
@@ -84,7 +66,8 @@ namespace Zenject.Asteroids
         {
             if (_state != null)
             {
-                _state.Stop();
+                _state.Dispose();
+                _state = null;
             }
 
             _state = _stateFactory.CreateState(state);

@@ -266,6 +266,8 @@ namespace Zenject
 
                 List<ProviderInfo> validatableProviders;
 
+                Assert.That(!bindingId.Type.IsGenericTypeDefinition());
+
                 var injectContext = new InjectContext(
                     this, bindingId.Type, bindingId.Identifier);
 
@@ -607,6 +609,10 @@ namespace Zenject
 
                     var subContext = context.Clone();
                     subContext.MemberType = subType;
+                    // By making this optional this means that all injected fields of type List<>
+                    // will pass validation, which could be error prone, but I think this is better
+                    // than always requiring that they explicitly mark their list types as optional
+                    subContext.Optional = true;
 
                     return ResolveAll(subContext);
                 }
@@ -1815,6 +1821,7 @@ namespace Zenject
         {
             Assert.That(!typeof(TContract).DerivesFrom<IDynamicFactory>(),
                 "You should not use Container.Bind for factory classes.  Use Container.BindFactory instead.");
+            Assert.That(bindInfo.ContractTypes.Contains(typeof(TContract)));
 
             return new ConcreteIdBinderGeneric<TContract>(
                 bindInfo, StartBinding());

@@ -2,6 +2,7 @@ using System;
 
 namespace Zenject
 {
+    [ZenjectAllowDuringValidationAttribute]
     public class Lazy<T>
     {
         readonly DiContainer _container;
@@ -14,6 +15,11 @@ namespace Zenject
         {
             _container = container;
             _context = context;
+
+            if (container.IsValidating)
+            {
+                var value = this.Value;
+            }
         }
 
         public T Value

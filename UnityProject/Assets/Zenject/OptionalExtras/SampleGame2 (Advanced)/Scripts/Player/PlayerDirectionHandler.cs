@@ -4,20 +4,20 @@ using UnityEngine;
 
 namespace Zenject.SpaceFighter
 {
-    public class PlayerDirectionHandler : ILateTickable
+    public class PlayerDirectionHandler : ITickable
     {
-        readonly PlayerModel _player;
+        readonly Player _player;
         readonly Camera _mainCamera;
 
         public PlayerDirectionHandler(
             Camera mainCamera,
-            PlayerModel player)
+            Player player)
         {
             _player = player;
             _mainCamera = mainCamera;
         }
 
-        public void LateTick()
+        public void Tick()
         {
             var mouseRay = _mainCamera.ScreenPointToRay(Input.mousePosition);
 
