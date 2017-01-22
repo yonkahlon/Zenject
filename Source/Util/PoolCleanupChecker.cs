@@ -6,7 +6,7 @@ namespace Zenject
 {
     // If you want to ensure that all items are always returned to the pool, include the following
     // line in an installer on project context:
-    // Container.BindAllInterfaces<PoolCleanupChecker>().To<PoolCleanupChecker>().AsSingle().CopyIntoAllSubContainers().NonLazy()
+    // Container.BindInterfaces<PoolCleanupChecker>().To<PoolCleanupChecker>().AsSingle().CopyIntoAllSubContainers().NonLazy()
     public class PoolCleanupChecker : ILateDisposable
     {
         readonly List<IDynamicPooledFactory> _poolFactories;

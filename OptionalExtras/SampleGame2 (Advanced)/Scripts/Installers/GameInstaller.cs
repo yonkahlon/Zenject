@@ -15,7 +15,7 @@ namespace Zenject.SpaceFighter
         {
             Container.Bind<GameEvents>().AsSingle();
 
-            Container.BindAllInterfaces<EnemySpawner>().To<EnemySpawner>().AsSingle();
+            Container.BindInterfacesTo<EnemySpawner>().AsSingle();
 
             Container.BindPooledFactory<EnemyFacade, EnemyFacade.Factory>()
                 .FromSubContainerResolve()
@@ -34,7 +34,7 @@ namespace Zenject.SpaceFighter
 
             Container.Bind<AudioPlayer>().AsSingle();
 
-            Container.BindAllInterfaces<GameRestartHandler>().To<GameRestartHandler>().AsSingle();
+            Container.BindInterfacesTo<GameRestartHandler>().AsSingle();
         }
 
         [Serializable]

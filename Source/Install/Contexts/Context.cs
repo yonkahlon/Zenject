@@ -230,12 +230,12 @@ namespace Zenject
                     }
                     case ZenjectBinding.BindTypes.AllInterfaces:
                     {
-                        Container.BindAllInterfaces(componentType).WithId(identifier).FromInstance(component, true);
+                        Container.Bind(componentType.Interfaces().ToArray()).WithId(identifier).FromInstance(component, true);
                         break;
                     }
                     case ZenjectBinding.BindTypes.AllInterfacesAndSelf:
                     {
-                        Container.BindAllInterfacesAndSelf(componentType).WithId(identifier).FromInstance(component, true);
+                        Container.Bind(componentType.Interfaces().Append(componentType).ToArray()).WithId(identifier).FromInstance(component, true);
                         break;
                     }
                     default:

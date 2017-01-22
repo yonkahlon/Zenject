@@ -55,7 +55,7 @@ namespace Zenject.Asteroids
             Container.Bind<AsteroidManager>().AsSingle();
 
             // The above three lines are also identical to just doing this instead:
-            // Container.BindAllInterfacesAndSelf<AsteroidManager>().To<AsteroidManager>();
+            // Container.BindInterfacesAndSelfTo<AsteroidManager>();
 
             // Here, we're defining a generic factory to create asteroid objects using the given prefab
             // So any classes that want to create new asteroid objects can simply include an injected field
@@ -71,10 +71,10 @@ namespace Zenject.Asteroids
 
         void InstallMisc()
         {
-            Container.BindAllInterfacesAndSelf<GameController>().To<GameController>().AsSingle();
+            Container.BindInterfacesAndSelfTo<GameController>().AsSingle();
             Container.Bind<LevelHelper>().AsSingle();
 
-            Container.BindAllInterfaces<AudioHandler>().To<AudioHandler>().AsSingle();
+            Container.BindInterfacesTo<AudioHandler>().AsSingle();
 
             Container.BindFactory<GameObject, ExplosionFactory>().FromPrefab(_settings.ExplosionPrefab);
             Container.BindFactory<GameObject, BrokenShipFactory>().FromPrefab(_settings.BrokenShipPrefab);

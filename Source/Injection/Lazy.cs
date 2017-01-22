@@ -2,8 +2,13 @@ using System;
 
 namespace Zenject
 {
+    public interface ILazy
+    {
+        void Validate();
+    }
+
     [ZenjectAllowDuringValidationAttribute]
-    public class Lazy<T>
+    public class Lazy<T> : ILazy
     {
         readonly DiContainer _container;
         readonly InjectContext _context;
@@ -15,11 +20,11 @@ namespace Zenject
         {
             _container = container;
             _context = context;
+        }
 
-            if (container.IsValidating)
-            {
-                var value = this.Value;
-            }
+        void ILazy.Validate()
+        {
+            _container.Resolve<T>(_context);
         }
 
         public T Value

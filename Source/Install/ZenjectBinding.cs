@@ -20,7 +20,7 @@ namespace Zenject
         [FormerlySerializedAs("_compositionRoot")]
         Context _context = null;
 
-        [Tooltip("This value is used to determine how to bind this component.  When set to 'Self' is equivalent to calling Container.FromInstance inside an installer. When set to 'AllInterfaces' this is equivalent to calling 'Container.BindAllInterfaces<MyMonoBehaviour>().ToInstance', and similarly for AllInterfacesAndSelf")]
+        [Tooltip("This value is used to determine how to bind this component.  When set to 'Self' is equivalent to calling Container.FromInstance inside an installer. When set to 'AllInterfaces' this is equivalent to calling 'Container.BindInterfaces<MyMonoBehaviour>().ToInstance', and similarly for InterfacesAndSelf")]
         [SerializeField]
         BindTypes _bindType = BindTypes.Self;
 

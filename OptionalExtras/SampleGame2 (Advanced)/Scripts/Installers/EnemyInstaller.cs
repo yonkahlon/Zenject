@@ -16,14 +16,14 @@ namespace Zenject.SpaceFighter
             Container.Bind<Enemy>().AsSingle()
                 .WithArguments(_settings.Renderer, _settings.Collider, _settings.Rigidbody);
 
-            Container.BindAllInterfacesAndSelf<EnemyStateManager>().To<EnemyStateManager>().AsSingle();
+            Container.BindInterfacesAndSelfTo<EnemyStateManager>().AsSingle();
 
             Container.Bind<EnemyStateIdle>().AsSingle();
             Container.Bind<EnemyStateAttack>().AsSingle();
             Container.Bind<EnemyStateFollow>().AsSingle();
 
-            Container.BindAllInterfacesAndSelf<EnemyDeathHandler>().To<EnemyDeathHandler>().AsSingle();
-            Container.BindAllInterfaces<EnemyRotationHandler>().To<EnemyRotationHandler>().AsSingle();
+            Container.BindInterfacesAndSelfTo<EnemyDeathHandler>().AsSingle();
+            Container.BindInterfacesTo<EnemyRotationHandler>().AsSingle();
         }
 
         [Serializable]

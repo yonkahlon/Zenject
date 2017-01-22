@@ -28,7 +28,7 @@ namespace Zenject
             if (BindInfo.ContractTypes.IsEmpty())
             {
                 // We could assert her instead but it is nice when used with things like
-                // BindAllInterfaces() (and there aren't any interfaces) to allow
+                // BindInterfaces() (and there aren't any interfaces) to allow
                 // interfaces to be added later
                 return;
             }

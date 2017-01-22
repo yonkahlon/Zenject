@@ -55,7 +55,7 @@ namespace Zenject.Tests.BindFeatures
         [Test]
         public void TestAllInterfaces()
         {
-            Container.BindAllInterfaces<Foo>().To<Foo>().AsSingle().NonLazy();
+            Container.BindInterfacesTo<Foo>().AsSingle().NonLazy();
 
             Container.Validate();
 
@@ -67,24 +67,11 @@ namespace Zenject.Tests.BindFeatures
         [Test]
         public void TestAllInterfacesAndSelf()
         {
-            Container.BindAllInterfacesAndSelf<Foo>().To<Foo>().AsSingle().NonLazy();
+            Container.BindInterfacesAndSelfTo<Foo>().AsSingle().NonLazy();
 
             Container.Validate();
 
             Assert.IsNotNull(Container.Resolve<Foo>());
-            Assert.IsNotNull(Container.Resolve<IFoo>());
-            Assert.IsNotNull(Container.Resolve<IQux>());
-        }
-
-        [Test]
-        [ExpectedException]
-        public void TestAllInterfacesMistake()
-        {
-            Container.BindAllInterfaces<Foo>().AsSingle().NonLazy();
-            Container.FlushBindings();
-
-            Container.Validate();
-
             Assert.IsNotNull(Container.Resolve<IFoo>());
             Assert.IsNotNull(Container.Resolve<IQux>());
         }
