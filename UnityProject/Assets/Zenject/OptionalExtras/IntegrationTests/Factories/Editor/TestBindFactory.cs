@@ -244,6 +244,55 @@ namespace Zenject.Tests.Factories
             FixtureUtil.AssertNumGameObjects(Container, 1);
         }
 
+        [Test]
+        public void TestUnderTransformGroup()
+        {
+            Container.BindFactory<Foo, Foo.Factory>().FromGameObject().UnderTransformGroup("Foo");
+
+            Initialize();
+
+            FixtureUtil.CallFactoryCreateMethod<Foo, Foo.Factory>(Container);
+
+            var root = Container.Resolve<Context>().transform;
+            var child1 = root.GetChild(0);
+
+            Assert.IsEqual(child1.name, "Foo");
+
+            var child2 = child1.GetChild(0);
+
+            Assert.IsNotNull(child2.GetComponent<Foo>());
+        }
+
+        [Test]
+        public void TestUnderTransform()
+        {
+            var tempGameObject = new GameObject("Foo");
+
+            Container.BindFactory<Foo, Foo.Factory>().FromGameObject().
+                UnderTransform(tempGameObject.transform);
+
+            Initialize();
+
+            FixtureUtil.CallFactoryCreateMethod<Foo, Foo.Factory>(Container);
+
+            Assert.IsNotNull(tempGameObject.transform.GetChild(0).GetComponent<Foo>());
+        }
+
+        [Test]
+        public void TestUnderTransformGetter()
+        {
+            var tempGameObject = new GameObject("Foo");
+
+            Container.BindFactory<Foo, Foo.Factory>().FromGameObject()
+                .UnderTransform((context) => tempGameObject.transform);
+
+            Initialize();
+
+            FixtureUtil.CallFactoryCreateMethod<Foo, Foo.Factory>(Container);
+
+            Assert.IsNotNull(tempGameObject.transform.GetChild(0).GetComponent<Foo>());
+        }
+
         public class Foo3 : MonoBehaviour
         {
             public class Factory : Factory<Foo3>
