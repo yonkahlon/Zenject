@@ -65,8 +65,6 @@ namespace Zenject.Tests.Conditions
             Container.Bind<Test1>().AsSingle().NonLazy();
             Container.Bind<Test0>().AsSingle().When(c => c.AllObjectTypes.Contains(typeof(Test2)));
 
-            Assert.Throws(() => Container.Validate());
-
             Assert.Throws(
                 delegate { Container.Resolve<Test1>(); });
         }
@@ -76,8 +74,6 @@ namespace Zenject.Tests.Conditions
         {
             Container.Bind<Test1>().AsSingle().NonLazy();
             Container.Bind<Test0>().AsSingle().When(c => c.AllObjectTypes.Contains(typeof(Test1)));
-
-            Container.Validate();
 
             var test1 = Container.Resolve<Test1>();
             Assert.That(test1 != null);
@@ -111,8 +107,6 @@ namespace Zenject.Tests.Conditions
             Container.Bind<ITest1>().To<Test2>().AsSingle().NonLazy();
             Container.Bind<Test0>().AsSingle().When(c => c.AllObjectTypes.Contains(typeof(ITest1)));
 
-            Assert.Throws(() => Container.Validate());
-
             Assert.Throws(
                 delegate { Container.Resolve<ITest1>(); });
         }
@@ -123,8 +117,6 @@ namespace Zenject.Tests.Conditions
             Container.Bind<ITest1>().To<Test2>().AsSingle().NonLazy();
             Container.Bind<Test0>().AsSingle().When(c => c.AllObjectTypes.Contains(typeof(Test2)));
 
-            Container.Validate();
-
             var test1 = Container.Resolve<ITest1>();
             Assert.That(test1 != null);
         }
@@ -134,8 +126,6 @@ namespace Zenject.Tests.Conditions
         {
             Container.Bind<ITest1>().To<Test2>().AsSingle().NonLazy();
             Container.Bind<Test0>().AsSingle().When(c => c.AllObjectTypes.Where(x => typeof(ITest1).IsAssignableFrom(x)).Any());
-
-            Container.Validate();
 
             var test1 = Container.Resolve<ITest1>();
             Assert.That(test1 != null);

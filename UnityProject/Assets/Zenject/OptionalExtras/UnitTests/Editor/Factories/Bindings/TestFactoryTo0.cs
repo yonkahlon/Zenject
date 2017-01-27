@@ -16,8 +16,6 @@ namespace Zenject.Tests.Bindings
         {
             Container.BindFactory<Foo, Foo.Factory>().NonLazy();
 
-            Container.Validate();
-
             Assert.IsNotNull(Container.Resolve<Foo.Factory>().Create());
         }
 
@@ -25,8 +23,6 @@ namespace Zenject.Tests.Bindings
         public void TestSelf2()
         {
             Container.BindFactory<Foo, Foo.Factory>().NonLazy();
-
-            Container.Validate();
 
             Assert.IsNotNull(Container.Resolve<Foo.Factory>().Create());
         }
@@ -36,8 +32,6 @@ namespace Zenject.Tests.Bindings
         {
             Container.BindFactory<Foo, Foo.Factory>().FromNew().NonLazy();
 
-            Container.Validate();
-
             Assert.IsNotNull(Container.Resolve<Foo.Factory>().Create());
         }
 
@@ -45,8 +39,6 @@ namespace Zenject.Tests.Bindings
         public void TestConcrete()
         {
             Container.BindFactory<IFoo, IFooFactory>().To<Foo>().NonLazy();
-
-            Container.Validate();
 
             Assert.IsNotNull(Container.Resolve<IFooFactory>().Create());
 

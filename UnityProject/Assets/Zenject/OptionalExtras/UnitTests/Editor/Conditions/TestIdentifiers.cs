@@ -20,8 +20,6 @@ namespace Zenject.Tests.Conditions
         {
             Container.Bind<Test0>().WithId("foo").AsTransient().NonLazy();
 
-            Container.Validate();
-
             Assert.Throws(
                 delegate { Container.Resolve<Test0>(); });
 
@@ -32,8 +30,6 @@ namespace Zenject.Tests.Conditions
         public void TestBasic2()
         {
             Container.Bind<Test0>().WithId("foo").AsSingle().NonLazy();
-
-            Container.Validate();
 
             Assert.Throws(
                 delegate { Container.Resolve<Test0>(); });
@@ -46,8 +42,6 @@ namespace Zenject.Tests.Conditions
         {
             Container.Bind<Test0>().WithId("foo").FromMethod((ctx) => new Test0()).NonLazy();
 
-            Container.Validate();
-
             Assert.Throws(
                 delegate { Container.Resolve<Test0>(); });
 
@@ -59,8 +53,6 @@ namespace Zenject.Tests.Conditions
         {
             Container.Bind<Test0>().WithId("foo").AsTransient().NonLazy();
             Container.Bind<Test0>().WithId("foo").AsTransient().NonLazy();
-
-            Container.Validate();
 
             Assert.Throws(
                 delegate { Container.Resolve<Test0>(); });
@@ -75,8 +67,6 @@ namespace Zenject.Tests.Conditions
         public void TestFromMethodUntyped()
         {
             Container.Bind(typeof(Test0)).FromMethod((ctx) => new Test0()).NonLazy();
-
-            Container.Validate();
 
             Container.Resolve<Test0>();
         }

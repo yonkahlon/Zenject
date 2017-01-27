@@ -19,8 +19,6 @@ namespace Zenject.Tests.Bindings
             Container.Bind<IFoo>().FromInstance(foo).NonLazy();
             Container.Bind<Foo>().FromInstance(foo).NonLazy();
 
-            Container.Validate();
-
             Assert.IsEqual(Container.Resolve<Foo>(), Container.Resolve<IFoo>());
             Assert.IsEqual(Container.Resolve<Foo>(), foo);
         }
@@ -31,8 +29,6 @@ namespace Zenject.Tests.Bindings
         {
             Container.Bind<Foo>().FromInstance(new Foo()).AsSingle().NonLazy();
             Container.Bind<Foo>().AsSingle().NonLazy();
-
-            Container.Validate();
 
             Container.Resolve<Foo>();
         }
@@ -45,8 +41,6 @@ namespace Zenject.Tests.Bindings
 
             Container.Bind<IFoo>().FromInstance(foo).AsCached().NonLazy();
             Container.Bind<Foo>().FromInstance(foo).AsCached().NonLazy();
-
-            Container.Validate();
 
             Assert.IsEqual(Container.Resolve<Foo>(), Container.Resolve<IFoo>());
             Assert.IsEqual(Container.Resolve<Foo>(), foo);

@@ -18,8 +18,6 @@ namespace Zenject.Tests.Bindings
         {
             Container.BindFactory<Foo, Foo.Factory>().FromSubContainerResolve().ByMethod(InstallFoo).NonLazy();
 
-            Container.Validate();
-
             Assert.IsEqual(Container.Resolve<Foo.Factory>().Create(), ConstFoo);
         }
 
@@ -28,8 +26,6 @@ namespace Zenject.Tests.Bindings
         {
             Container.BindFactory<IFoo, IFooFactory>()
                 .To<Foo>().FromSubContainerResolve().ByMethod(InstallFoo).NonLazy();
-
-            Container.Validate();
 
             Assert.IsEqual(Container.Resolve<IFooFactory>().Create(), ConstFoo);
         }

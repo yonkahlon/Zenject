@@ -51,8 +51,6 @@ namespace Zenject.Tests.Conditions
             Container.Bind<IFoo>().To<Foo1>().AsSingle().NonLazy();
             Container.Bind<IFoo>().To<Foo2>().AsSingle().WhenInjectedInto<Bar2>().NonLazy();
 
-            Container.Validate();
-
             Assert.IsNotEqual(
                 Container.Resolve<Bar1>().Foo, Container.Resolve<Bar2>().Foo);
         }
@@ -64,8 +62,6 @@ namespace Zenject.Tests.Conditions
             Container.Bind<Bar2>().AsSingle().NonLazy();
             Container.Bind<IFoo>().To<Foo1>().AsSingle().NonLazy();
             Container.Bind<IFoo>().To<Foo2>().AsSingle().WhenNotInjectedInto<Bar1>().NonLazy();
-
-            Container.Validate();
 
             Assert.IsNotEqual(
                 Container.Resolve<Bar1>().Foo, Container.Resolve<Bar2>().Foo);

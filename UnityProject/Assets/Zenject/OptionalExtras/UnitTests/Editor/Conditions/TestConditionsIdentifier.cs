@@ -36,8 +36,6 @@ namespace Zenject.Tests.Conditions
             Container.Bind<Test1>().AsTransient().NonLazy();
             Container.Bind<Test0>().AsTransient().NonLazy();
 
-            Assert.Throws(() => Container.Validate());
-
             Assert.Throws(
                 delegate { Container.Resolve<Test1>(); });
         }
@@ -49,8 +47,6 @@ namespace Zenject.Tests.Conditions
             Container.Bind<Test2>().AsTransient().NonLazy();
 
             Container.Bind<Test0>().AsTransient().NonLazy();
-
-            Assert.Throws(() => Container.Validate());
 
             Assert.Throws(
                 delegate { Container.Resolve<Test2>(); });
@@ -64,8 +60,6 @@ namespace Zenject.Tests.Conditions
 
             Container.Bind<Test0>().FromInstance(new Test0()).NonLazy();
             Container.Bind<Test0>().WithId("foo").FromInstance(new Test0()).NonLazy();
-
-            Container.Validate();
 
             // Should not throw exceptions
             Container.Resolve<Test1>();
@@ -81,8 +75,6 @@ namespace Zenject.Tests.Conditions
 
             Container.Bind<Test0>().FromInstance(new Test0()).NonLazy();
             Container.Bind<Test0>().WithId("foo").FromInstance(new Test0()).NonLazy();
-
-            Container.Validate();
 
             Assert.IsNotNull(Container.Resolve<Test2>());
         }
@@ -111,8 +103,6 @@ namespace Zenject.Tests.Conditions
             Container.Bind<Test0>().FromInstance(new Test0()).NonLazy();
             Container.Bind<Test0>().WithId("TestValue1").FromInstance(new Test0()).NonLazy();
 
-            Assert.Throws(() => Container.Validate());
-
             Assert.Throws(
                 delegate { Container.Resolve<Test3>(); });
         }
@@ -124,8 +114,6 @@ namespace Zenject.Tests.Conditions
 
             Container.Bind<Test0>().FromInstance(new Test0()).NonLazy();
             Container.Bind<Test0>().WithId("TestValue2").FromInstance(new Test0()).NonLazy();
-
-            Container.Validate();
 
             // No exceptions
             Container.Resolve<Test3>();
@@ -143,8 +131,6 @@ namespace Zenject.Tests.Conditions
             Container.Bind<Test0>().FromInstance(new Test0()).NonLazy();
             Container.Bind<Test0>().WithId("TestValue1").FromInstance(new Test0()).NonLazy();
 
-            Assert.Throws(() => Container.Validate());
-
             Assert.Throws(
                 delegate { Container.Resolve<Test3>(); });
         }
@@ -156,8 +142,6 @@ namespace Zenject.Tests.Conditions
 
             Container.Bind<Test0>().FromInstance(new Test0()).NonLazy();
             Container.Bind<Test0>().WithId("TestValue3").FromInstance(new Test0()).NonLazy();
-
-            Container.Validate();
 
             Assert.IsNotNull(Container.Resolve<Test4>());
         }

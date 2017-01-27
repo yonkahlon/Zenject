@@ -30,8 +30,6 @@ namespace Zenject.Tests.Injection
 
             Container.Bind<Test1>().AsSingle().NonLazy();
 
-            Assert.Throws(() => Container.Validate());
-
             Assert.Throws(
                 delegate { Container.Resolve<Test1>(); });
         }

@@ -16,8 +16,6 @@ namespace Zenject.Tests.Bindings
         {
             Container.Bind<Foo>().FromSubContainerResolve().ByMethod(InstallFooFacade).AsSingle().NonLazy();
 
-            Container.Validate();
-
             Assert.IsNotNull(Container.Resolve<Foo>().Bar);
         }
 
@@ -25,8 +23,6 @@ namespace Zenject.Tests.Bindings
         public void TestMethodSelfTransient()
         {
             Container.Bind<Foo>().FromSubContainerResolve().ByMethod(InstallFooFacade).AsTransient().NonLazy();
-
-            Container.Validate();
 
             Assert.IsNotNull(Container.Resolve<Foo>().Bar);
         }
@@ -44,8 +40,6 @@ namespace Zenject.Tests.Bindings
         {
             Container.Bind<Foo>().FromSubContainerResolve().ByMethod(InstallFooFacade).AsCached().NonLazy();
 
-            Container.Validate();
-
             Assert.IsNotNull(Container.Resolve<Foo>().Bar);
         }
 
@@ -55,8 +49,6 @@ namespace Zenject.Tests.Bindings
             Container.Bind<Foo>().FromSubContainerResolve().ByMethod(InstallFooFacade).AsSingle().NonLazy();
             Container.Bind<Bar>().FromSubContainerResolve().ByMethod(InstallFooFacade).AsSingle().NonLazy();
 
-            Container.Validate();
-
             Assert.IsEqual(Container.Resolve<Foo>().Bar, Container.Resolve<Bar>());
         }
 
@@ -64,8 +56,6 @@ namespace Zenject.Tests.Bindings
         public void TestMethodSelfCachedMultipleContracts()
         {
             Container.Bind(typeof(Foo), typeof(Bar)).FromSubContainerResolve().ByMethod(InstallFooFacade).AsCached().NonLazy();
-
-            Container.Validate();
 
             Assert.IsEqual(Container.Resolve<Foo>().Bar, Container.Resolve<Bar>());
         }
@@ -75,8 +65,6 @@ namespace Zenject.Tests.Bindings
         {
             Container.Bind<IFoo>().To<Foo>().FromSubContainerResolve().ByMethod(InstallFooFacade).AsSingle().NonLazy();
 
-            Container.Validate();
-
             Assert.IsNotNull(Container.Resolve<IFoo>().Bar);
         }
 
@@ -85,8 +73,6 @@ namespace Zenject.Tests.Bindings
         {
             Container.Bind<IFoo>().To<Foo>().FromSubContainerResolve().ByMethod(InstallFooFacade).AsTransient().NonLazy();
 
-            Container.Validate();
-
             Assert.IsNotNull(Container.Resolve<IFoo>().Bar);
         }
 
@@ -94,8 +80,6 @@ namespace Zenject.Tests.Bindings
         public void TestMethodConcreteCached()
         {
             Container.Bind<IFoo>().To<Foo>().FromSubContainerResolve().ByMethod(InstallFooFacade).AsCached().NonLazy();
-
-            Container.Validate();
 
             Assert.IsNotNull(Container.Resolve<IFoo>().Bar);
         }
@@ -106,8 +90,6 @@ namespace Zenject.Tests.Bindings
             Container.Bind<IFoo>().To<Foo>().FromSubContainerResolve().ByMethod(InstallFooFacade).AsSingle().NonLazy();
             Container.Bind<Bar>().FromSubContainerResolve().ByMethod(InstallFooFacade).AsSingle().NonLazy();
 
-            Container.Validate();
-
             Assert.IsEqual(Container.Resolve<IFoo>().Bar, Container.Resolve<Bar>());
         }
 
@@ -115,8 +97,6 @@ namespace Zenject.Tests.Bindings
         public void TestMethodConcreteCachedMultipleContracts()
         {
             Container.Bind(typeof(Foo), typeof(IFoo)).To<Foo>().FromSubContainerResolve().ByMethod(InstallFooFacade).AsCached().NonLazy();
-
-            Container.Validate();
 
             Assert.IsEqual(Container.Resolve<IFoo>(), Container.Resolve<Foo>());
         }
@@ -126,8 +106,6 @@ namespace Zenject.Tests.Bindings
         {
             Container.Bind<Gorp>().FromSubContainerResolve().ByMethod(InstallFooFacade).AsSingle().NonLazy();
 
-            Assert.Throws(() => Container.Validate());
-
             Assert.Throws(() => Container.Resolve<Gorp>());
         }
 
@@ -135,8 +113,6 @@ namespace Zenject.Tests.Bindings
         public void TestMethodSelfIdentifiers()
         {
             Container.Bind<Gorp>().FromSubContainerResolve("gorp").ByMethod(InstallFooFacade).AsSingle().NonLazy();
-
-            Container.Validate();
 
             Assert.IsNotNull(Container.Resolve<Gorp>());
         }

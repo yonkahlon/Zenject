@@ -16,8 +16,6 @@ namespace Zenject.Tests.Bindings
         {
             Container.Bind<Foo>().AsSingle().NonLazy();
 
-            Container.Validate();
-
             Assert.IsNotNull(Container.Resolve<Foo>());
             Assert.IsEqual(Container.Resolve<Foo>(), Container.Resolve<Foo>());
         }
@@ -26,8 +24,6 @@ namespace Zenject.Tests.Bindings
         public void TestSelfSingleExplicit()
         {
             Container.Bind<Foo>().ToSelf().FromNew().AsSingle().NonLazy();
-
-            Container.Validate();
 
             Assert.IsNotNull(Container.Resolve<Foo>());
             Assert.IsEqual(Container.Resolve<Foo>(), Container.Resolve<Foo>());
@@ -38,8 +34,6 @@ namespace Zenject.Tests.Bindings
         {
             Container.Bind<Foo>().AsTransient().NonLazy();
 
-            Container.Validate();
-
             Assert.IsNotNull(Container.Resolve<Foo>());
             Assert.IsNotEqual(Container.Resolve<Foo>(), Container.Resolve<Foo>());
         }
@@ -48,8 +42,6 @@ namespace Zenject.Tests.Bindings
         public void TestSelfCached()
         {
             Container.Bind<Foo>().AsCached().NonLazy();
-
-            Container.Validate();
 
             Assert.IsNotNull(Container.Resolve<Foo>());
             Assert.IsEqual(Container.Resolve<Foo>(), Container.Resolve<Foo>());
@@ -60,8 +52,6 @@ namespace Zenject.Tests.Bindings
         {
             Container.Bind<Foo>().AsSingle().NonLazy();
             Container.Bind<IFoo>().To<Foo>().AsSingle().NonLazy();
-
-            Container.Validate();
 
             Assert.IsNotNull(Container.Resolve<Foo>());
             Assert.IsNotNull(Container.Resolve<IFoo>());
@@ -76,8 +66,6 @@ namespace Zenject.Tests.Bindings
         {
             Container.Bind<IFoo>().To<Foo>().AsTransient().NonLazy();
 
-            Container.Validate();
-
             Assert.IsNotNull(Container.Resolve<IFoo>());
             Assert.IsNotEqual(Container.Resolve<IFoo>(), Container.Resolve<IFoo>());
         }
@@ -86,8 +74,6 @@ namespace Zenject.Tests.Bindings
         public void TestConcreteTransient2()
         {
             Container.Bind<IFoo>().To<Foo>().NonLazy();
-
-            Container.Validate();
 
             Assert.IsNotNull(Container.Resolve<IFoo>());
             Assert.IsNotEqual(Container.Resolve<IFoo>(), Container.Resolve<IFoo>());
@@ -98,8 +84,6 @@ namespace Zenject.Tests.Bindings
         {
             Container.Bind<Foo>().AsCached().NonLazy();
             Container.Bind<IFoo>().To<Foo>().AsCached().NonLazy();
-
-            Container.Validate();
 
             Assert.IsNotNull(Container.Resolve<Foo>());
             Assert.IsNotNull(Container.Resolve<IFoo>());
@@ -115,8 +99,6 @@ namespace Zenject.Tests.Bindings
             Container.Bind<Foo>().AsSingle().NonLazy();
             Container.Bind<Foo>().AsSingle().NonLazy();
 
-            Container.Validate();
-
             Assert.Throws(
                 delegate { Container.Resolve<Foo>(); });
 
@@ -127,8 +109,6 @@ namespace Zenject.Tests.Bindings
         public void TestConcreteMultipleTransient()
         {
             Container.Bind<IFoo>().To(typeof(Foo), typeof(Bar)).AsTransient().NonLazy();
-
-            Container.Validate();
 
             var foos = Container.ResolveAll<IFoo>();
 
@@ -146,8 +126,6 @@ namespace Zenject.Tests.Bindings
         public void TestConcreteMultipleSingle()
         {
             Container.Bind<IFoo>().To(typeof(Foo), typeof(Bar)).AsSingle().NonLazy();
-
-            Container.Validate();
 
             var foos = Container.ResolveAll<IFoo>();
 
@@ -182,8 +160,6 @@ namespace Zenject.Tests.Bindings
         {
             Container.Bind(typeof(IFoo), typeof(IBar)).To<Foo>().AsSingle().NonLazy();
 
-            Container.Validate();
-
             Assert.IsEqual(Container.Resolve<IFoo>(), Container.Resolve<IBar>());
             Assert.That(Container.Resolve<IFoo>() is Foo);
         }
@@ -192,8 +168,6 @@ namespace Zenject.Tests.Bindings
         public void TestMultipleBindingsTransient()
         {
             Container.Bind(typeof(IFoo), typeof(IBar)).To<Foo>().AsTransient().NonLazy();
-
-            Container.Validate();
 
             Assert.That(Container.Resolve<IFoo>() is Foo);
             Assert.That(Container.Resolve<IBar>() is Foo);
@@ -207,8 +181,6 @@ namespace Zenject.Tests.Bindings
         {
             Container.Bind(typeof(IFoo), typeof(IBar)).To<Foo>().AsCached().NonLazy();
 
-            Container.Validate();
-
             Assert.IsEqual(Container.Resolve<IFoo>(), Container.Resolve<IFoo>());
             Assert.IsEqual(Container.Resolve<IFoo>(), Container.Resolve<IBar>());
         }
@@ -219,8 +191,6 @@ namespace Zenject.Tests.Bindings
             Container.Bind(typeof(IFoo), typeof(IBar)).To(new List<Type>() {typeof(Foo), typeof(Bar)}).AsSingle().NonLazy();
             Container.Bind<Foo>().AsSingle().NonLazy();
             Container.Bind<Bar>().AsSingle().NonLazy();
-
-            Container.Validate();
 
             var foos = Container.ResolveAll<IFoo>();
             var bars = Container.ResolveAll<IBar>();
@@ -243,8 +213,6 @@ namespace Zenject.Tests.Bindings
         {
             Container.Bind(typeof(IFoo), typeof(IBar)).To(new List<Type>() {typeof(Foo), typeof(Bar)}).AsTransient().NonLazy();
 
-            Container.Validate();
-
             var foos = Container.ResolveAll<IFoo>();
             var bars = Container.ResolveAll<IBar>();
 
@@ -264,8 +232,6 @@ namespace Zenject.Tests.Bindings
             Container.Bind(typeof(IFoo), typeof(IBar)).To(new List<Type>() {typeof(Foo), typeof(Bar)}).AsCached().NonLazy();
             Container.Bind<Foo>().AsSingle().NonLazy();
             Container.Bind<Bar>().AsSingle().NonLazy();
-
-            Container.Validate();
 
             var foos = Container.ResolveAll<IFoo>();
             var bars = Container.ResolveAll<IBar>();
@@ -290,8 +256,6 @@ namespace Zenject.Tests.Bindings
             Container.Bind<IFoo>().To<Foo>().AsSingle("foo").NonLazy();
             Container.Bind<Foo>().AsSingle("foo").NonLazy();
 
-            Container.Validate();
-
             Assert.IsEqual(Container.Resolve<Foo>(), Container.Resolve<IFoo>());
             Assert.IsEqual(Container.Resolve<Foo>(), Container.Resolve<IBar>());
         }
@@ -302,8 +266,6 @@ namespace Zenject.Tests.Bindings
             Container.Bind<IFoo>().To<Foo>().AsSingle("foo").NonLazy();
             Container.Bind<Foo>().AsSingle("bar").NonLazy();
 
-            Container.Validate();
-
             Assert.IsNotEqual(Container.Resolve<Foo>(), Container.Resolve<IFoo>());
         }
 
@@ -312,8 +274,6 @@ namespace Zenject.Tests.Bindings
         {
             Container.Bind<IFoo>().To<Foo>().AsSingle().NonLazy();
             Container.Bind<Foo>().AsSingle("bar").NonLazy();
-
-            Container.Validate();
 
             Assert.IsNotEqual(Container.Resolve<Foo>(), Container.Resolve<IFoo>());
         }
@@ -325,8 +285,6 @@ namespace Zenject.Tests.Bindings
             Container.Bind<IFoo>().To<Foo>().AsSingle("foo2").NonLazy();
             Container.Bind<IFoo>().To<Foo>().AsSingle("foo3").NonLazy();
             Container.Bind<IFoo>().To<Foo>().AsSingle("foo4").NonLazy();
-
-            Container.Validate();
 
             Assert.IsEqual(Container.ResolveAll<IFoo>().Count, 4);
         }

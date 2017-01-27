@@ -21,12 +21,10 @@ namespace Zenject.Tests.BindFeatures
             Container.Bind<ITest>().To<Test2>().AsSingle();
 
             Assert.IsNotNull(Container.Resolve<ITest>());
-            Container.Validate();
 
             Container.Unbind<ITest>();
 
             Assert.IsNull(Container.TryResolve<ITest>());
-            Container.Validate();
         }
     }
 }

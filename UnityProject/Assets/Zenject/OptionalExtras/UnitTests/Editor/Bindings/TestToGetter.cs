@@ -16,8 +16,6 @@ namespace Zenject.Tests.Bindings
             Container.Bind<Foo>().AsSingle().NonLazy();
             Container.Bind<Bar>().FromResolveGetter<Foo>(x => x.Bar).AsTransient().NonLazy();
 
-            Container.Validate();
-
             Assert.IsNotNull(Container.Resolve<Bar>());
             Assert.IsEqual(Container.Resolve<Bar>(), Container.Resolve<Foo>().Bar);
 
@@ -35,8 +33,6 @@ namespace Zenject.Tests.Bindings
         {
             Container.Bind<Foo>().AsSingle().NonLazy();
             Container.Bind<Bar>().FromResolveGetter<Foo>(x => x.Bar).AsCached().NonLazy();
-
-            Container.Validate();
 
             Foo.NumCalls = 0;
 
@@ -56,8 +52,6 @@ namespace Zenject.Tests.Bindings
 
             // Not sure why I need to specify the "<Bar,"
             Container.Bind<IBar>().To<Bar>().FromResolveGetter<Foo>(BarGetter).AsSingle().NonLazy();
-
-            Container.Validate();
 
             Foo.NumCalls = 0;
 

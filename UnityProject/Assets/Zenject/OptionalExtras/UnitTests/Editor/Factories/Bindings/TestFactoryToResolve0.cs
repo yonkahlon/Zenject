@@ -20,8 +20,6 @@ namespace Zenject.Tests.Bindings
 
             Container.BindFactory<Foo, Foo.Factory>().FromResolve().NonLazy();
 
-            Container.Validate();
-
             Assert.IsEqual(Container.Resolve<Foo.Factory>().Create(), foo);
         }
 
@@ -33,8 +31,6 @@ namespace Zenject.Tests.Bindings
             Container.BindInstance(foo).NonLazy();
 
             Container.BindFactory<IFoo, IFooFactory>().To<Foo>().FromResolve().NonLazy();
-
-            Container.Validate();
 
             Assert.IsEqual(Container.Resolve<IFooFactory>().Create(), foo);
         }
@@ -48,8 +44,6 @@ namespace Zenject.Tests.Bindings
 
             Container.BindFactory<Foo, Foo.Factory>().FromResolve("foo").NonLazy();
 
-            Container.Validate();
-
             Assert.IsEqual(Container.Resolve<Foo.Factory>().Create(), foo);
         }
 
@@ -61,8 +55,6 @@ namespace Zenject.Tests.Bindings
             Container.BindInstance(foo).WithId("foo").NonLazy();
 
             Container.BindFactory<IFoo, IFooFactory>().To<Foo>().FromResolve("foo").NonLazy();
-
-            Container.Validate();
 
             Assert.IsEqual(Container.Resolve<IFooFactory>().Create(), foo);
         }

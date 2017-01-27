@@ -25,12 +25,10 @@ namespace Zenject.Tests.BindFeatures
             Container.Bind<ITest>().To<Test2>().AsSingle();
 
             Assert.That(Container.Resolve<ITest>() is Test2);
-            Container.Validate();
 
             Container.Rebind<ITest>().To<Test3>().AsSingle();
 
             Assert.That(Container.Resolve<ITest>() is Test3);
-            Container.Validate();
         }
     }
 }

@@ -20,8 +20,6 @@ namespace Zenject.Tests.Bindings
 
             Container.Bind<Foo>().FromFactory<FooFactory>().AsSingle().NonLazy();
 
-            Container.Validate();
-
             Assert.IsEqual(Container.Resolve<Foo>(), StaticFoo);
 
             Container.Resolve<Foo>();
@@ -37,8 +35,6 @@ namespace Zenject.Tests.Bindings
             FooFactory.InstanceCount = 0;
 
             Container.Bind<IFoo>().To<Foo>().FromFactory<FooFactory>().AsSingle().NonLazy();
-
-            Container.Validate();
 
             Assert.IsEqual(Container.Resolve<IFoo>(), StaticFoo);
 
@@ -57,8 +53,6 @@ namespace Zenject.Tests.Bindings
             Container.Bind<Foo>().FromFactory<FooFactory>().AsSingle().NonLazy();
             Container.Bind<IFoo>().To<Foo>().FromFactory<FooFactory>().AsSingle().NonLazy();
 
-            Container.Validate();
-
             Assert.IsEqual(Container.Resolve<IFoo>(), StaticFoo);
             Assert.IsEqual(Container.Resolve<Foo>(), StaticFoo);
 
@@ -76,8 +70,6 @@ namespace Zenject.Tests.Bindings
 
             Container.Bind<Foo>().FromFactory<FooFactory>().AsTransient().NonLazy();
 
-            Container.Validate();
-
             Assert.IsEqual(Container.Resolve<Foo>(), StaticFoo);
 
             Container.Resolve<Foo>();
@@ -93,8 +85,6 @@ namespace Zenject.Tests.Bindings
             FooFactory.InstanceCount = 0;
 
             Container.Bind<IFoo>().To<Foo>().FromFactory<FooFactory>().AsTransient().NonLazy();
-
-            Container.Validate();
 
             Assert.IsEqual(Container.Resolve<IFoo>(), StaticFoo);
 
@@ -112,8 +102,6 @@ namespace Zenject.Tests.Bindings
 
             Container.Bind<Foo>().FromFactory<FooFactory>().AsCached().NonLazy();
 
-            Container.Validate();
-
             Assert.IsEqual(Container.Resolve<Foo>(), StaticFoo);
 
             Container.Resolve<Foo>();
@@ -129,8 +117,6 @@ namespace Zenject.Tests.Bindings
             FooFactory.InstanceCount = 0;
 
             Container.Bind<IFoo>().To<Foo>().FromFactory<FooFactory>().AsCached().NonLazy();
-
-            Container.Validate();
 
             Assert.IsEqual(Container.Resolve<IFoo>(), StaticFoo);
 

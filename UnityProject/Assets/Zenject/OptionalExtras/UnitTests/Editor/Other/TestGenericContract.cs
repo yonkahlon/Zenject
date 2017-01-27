@@ -28,8 +28,6 @@ namespace Zenject.Tests.Other
             Container.BindRootResolve<Test1<bool>>();
             Container.BindRootResolve<Test1<string>>();
 
-            Container.Validate();
-
             var test1 = Container.Resolve<Test1<int>>();
             Assert.That(test1.Data == 0);
             test1.Data = 5;
@@ -48,8 +46,6 @@ namespace Zenject.Tests.Other
             Container.BindRootResolve<Test1<int>>();
             Container.BindRootResolve<Test1<bool>>();
             Container.BindRootResolve<Test1<string>>();
-
-            Container.Validate();
 
             var test1 = Container.Resolve<Test1<int>>();
             Assert.That(test1.Data == 0);

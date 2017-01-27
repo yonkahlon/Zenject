@@ -16,8 +16,6 @@ namespace Zenject.Tests.Bindings
             Container.Bind<Foo>().AsSingle().NonLazy();
             Container.BindFactory<Bar, Bar.Factory>().FromResolveGetter<Foo>(x => x.Bar).NonLazy();
 
-            Container.Validate();
-
             Assert.IsNotNull(Container.Resolve<Bar.Factory>().Create());
             Assert.IsEqual(Container.Resolve<Bar.Factory>().Create(), Container.Resolve<Foo>().Bar);
         }
