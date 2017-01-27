@@ -27,7 +27,7 @@ namespace Zenject.Tests.Injection
             Container.Bind<Test1>().FromInstance(new Test1()).NonLazy();
             Container.Bind<Test2>().AsSingle().NonLazy();
 
-            Container.Validate();
+            Container.ResolveDependencyRoots();
 
             var t2 = Container.Resolve<Test2>();
 

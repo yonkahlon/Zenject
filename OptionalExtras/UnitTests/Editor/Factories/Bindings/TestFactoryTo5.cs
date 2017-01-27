@@ -16,8 +16,6 @@ namespace Zenject.Tests.Bindings
         {
             Container.BindFactory<string, int, string, float, int, Foo, Foo.Factory>().NonLazy();
 
-            Container.Validate();
-
             Assert.IsEqual(Container.Resolve<Foo.Factory>().Create("asdf", 2, "a", 4.2f, 6).P1, "asdf");
         }
 
@@ -26,8 +24,6 @@ namespace Zenject.Tests.Bindings
         {
             Container.BindFactory<string, int, string, float, int, Foo, Foo.Factory>().NonLazy();
 
-            Container.Validate();
-
             Assert.IsEqual(Container.Resolve<Foo.Factory>().Create("asdf", 2, "a", 4.2f, 6).P1, "asdf");
         }
 
@@ -35,8 +31,6 @@ namespace Zenject.Tests.Bindings
         public void TestConcrete()
         {
             Container.BindFactory<string, int, string, float, int, IFoo, IFooFactory>().To<Foo>().NonLazy();
-
-            Container.Validate();
 
             var ifoo = Container.Resolve<IFooFactory>().Create("asdf", 2, "a", 4.2f, 6);
 

@@ -17,8 +17,6 @@ namespace Zenject.Tests.Bindings
 
             var foo = Container.Resolve<Foo>();
 
-            Container.Validate();
-
             Assert.IsEqual(Bar.InstanceCount, 0);
 
             foo.DoIt();
@@ -30,8 +28,6 @@ namespace Zenject.Tests.Bindings
         public void Test2()
         {
             Container.Bind<Foo>().AsSingle().NonLazy();
-
-            Assert.Throws(() => Container.Validate());
 
             var foo = Container.Resolve<Foo>();
 

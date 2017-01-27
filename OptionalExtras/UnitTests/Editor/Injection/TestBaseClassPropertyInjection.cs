@@ -38,8 +38,6 @@ namespace Zenject.Tests.Injection
             Container.Bind<Test0>().AsSingle().NonLazy();
             Container.Bind<Test2>().AsSingle().NonLazy();
 
-            Container.Validate();
-
             var test1 = Container.Resolve<Test2>();
 
             Assert.That(test1.GetVal() != null);

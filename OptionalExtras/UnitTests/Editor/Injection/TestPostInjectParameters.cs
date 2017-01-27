@@ -54,8 +54,6 @@ namespace Zenject.Tests.Injection
 
             Container.Bind<Test0>().AsSingle().NonLazy();
 
-            Container.Validate();
-
             var test3 = Container.Resolve<Test3>();
 
             Assert.That(test3.HasInitialized);

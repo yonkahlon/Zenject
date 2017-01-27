@@ -15,8 +15,6 @@ namespace Zenject.Tests.BindFeatures
         {
             Container.Bind<Foo>().AsTransient().WithArguments(3).NonLazy();
 
-            Container.Validate();
-
             Assert.IsEqual(Container.Resolve<Foo>().Value, 3);
         }
 
@@ -25,8 +23,6 @@ namespace Zenject.Tests.BindFeatures
         {
             Container.Bind<IFoo>().To<Foo>().AsSingle().WithArguments(3).NonLazy();
             Container.Bind<Foo>().AsSingle().WithArguments(3).NonLazy();
-
-            Container.Validate();
 
             Assert.IsNotNull(Container.Resolve<IFoo>());
             Assert.IsEqual(Container.Resolve<IFoo>(), Container.Resolve<Foo>());

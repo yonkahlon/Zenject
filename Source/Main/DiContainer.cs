@@ -38,7 +38,9 @@ namespace Zenject
         readonly LazyInstanceInjector _lazyInjector;
 
         readonly Queue<IBindingFinalizer> _currentBindings = new Queue<IBindingFinalizer>();
-        readonly List<IBindingFinalizer> _processedBindings = new List<IBindingFinalizer>();
+        readonly List<IBindingFinalizer> _childBindings = new List<IBindingFinalizer>();
+
+        readonly List<ILazy> _lateBindingsToValidate = new List<ILazy>();
 
         bool _isFinalizingBinding;
         bool _isValidating;
@@ -56,8 +58,6 @@ namespace Zenject
             InstallDefaultBindings();
             FlushBindings();
             Assert.That(_currentBindings.IsEmpty());
-            // Clear the default bindings from history to avoid duplicating them in Clone below
-            _processedBindings.Clear();
         }
 
         void InstallDefaultBindings()
@@ -77,7 +77,10 @@ namespace Zenject
 
             if (_isValidating)
             {
-                ((ILazy)result).Validate();
+                // Unfortunately we can't validate each lazy binding here
+                // because that could result in circular reference exceptions
+                // And that might be exactly why you're using lazy in the first place
+                _lateBindingsToValidate.Add(((ILazy)result));
             }
 
             return result;
@@ -100,9 +103,9 @@ namespace Zenject
 #if !NOT_UNITY3D
                 DefaultParent = parentContainer.DefaultParent;
 #endif
-                foreach (var binding in parentContainer._processedBindings
-                        .Where(x => x.CopyIntoAllSubContainers))
+                foreach (var binding in parentContainer._childBindings)
                 {
+                    Assert.That(binding.CopyIntoAllSubContainers);
                     _currentBindings.Enqueue(binding);
                 }
 
@@ -193,27 +196,6 @@ namespace Zenject
             }
         }
 
-        // DO not run this within Unity!
-        // This is only really useful if you are not using any of the Unity bind methods such as
-        // FromGameObject, FromPrefab, etc.
-        // If you are using those, and you call this method, then it will have side effects like
-        // creating game objects
-        // Otherwise, it should be safe to call since all the fake instances will be limited to
-        // within a cloned copy of the DiContainer and should not have any side effects
-        public void Validate()
-        {
-            var container = CloneForValidate();
-
-            Assert.That(container.IsValidating);
-
-            // It's tempting here to iterate over all the BindingId's in _providers
-            // and make sure they can be resolved but that fails once we start
-            // using complex conditionals, so this is the best we can do
-            container.ResolveDependencyRoots();
-
-            container.ValidateIValidatables();
-        }
-
         public List<object> ResolveDependencyRoots()
         {
             var context = new InjectContext(
@@ -222,35 +204,6 @@ namespace Zenject
             context.Optional = true;
 
             return ResolveAll(context).Cast<object>().ToList();
-        }
-
-        DiContainer CloneForValidate()
-        {
-            FlushBindings();
-
-            DiContainer container;
-
-            if (this.ParentContainer == null)
-            {
-                container = new DiContainer(null, true);
-            }
-            else
-            {
-                // Need to clone all parents too
-                container = new DiContainer(
-                    this.ParentContainer.CloneForValidate(), true);
-            }
-
-            // Validating shouldn't have side effects, so assert if this occurs
-            container.AssertOnNewGameObjects = true;
-
-            foreach (var binding in _processedBindings)
-            {
-                container._currentBindings.Enqueue(binding);
-            }
-
-            container.FlushBindings();
-            return container;
         }
 
         // This will instantiate any binding that results in a type that derives from IValidatable
@@ -1788,7 +1741,10 @@ namespace Zenject
                     _isFinalizingBinding = false;
                 }
 
-                _processedBindings.Add(binding);
+                if (binding.CopyIntoAllSubContainers)
+                {
+                    _childBindings.Add(binding);
+                }
             }
         }
 

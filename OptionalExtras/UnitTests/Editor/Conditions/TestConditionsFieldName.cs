@@ -43,16 +43,12 @@ namespace Zenject.Tests.Conditions
 
             Assert.Throws(
                 delegate { Container.Resolve<Test2>(); });
-
-            Assert.Throws(() => Container.Validate());
         }
 
         [Test]
         public void TestNameConditionSuccess()
         {
             Container.Bind<Test1>().AsSingle().NonLazy();
-
-            Container.Validate();
 
             var test1 = Container.Resolve<Test1>();
 

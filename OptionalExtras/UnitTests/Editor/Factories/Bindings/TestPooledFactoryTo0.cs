@@ -183,8 +183,6 @@ namespace Zenject.Tests.Bindings
         {
             Container.BindPooledFactory<Qux, Qux.Factory>().FromSubContainerResolve().ByMethod(InstallQux).NonLazy();
 
-            Container.Validate();
-
             var factory = Container.Resolve<Qux.Factory>();
             var qux = factory.Spawn();
         }
