@@ -70,10 +70,10 @@ namespace Zenject
 
             if (_container.IsValidating)
             {
-                // The root-level Container has its ValidateIValidatables method
+                // The root-level Container has its ValidateValidatables method
                 // called explicitly - however, this is not so for sub-containers
                 // so call it here instead
-                _container.ValidateIValidatables();
+                _container.ValidateValidatables();
             }
 
             Log.Debug("GameObjectContext: Initialized successfully");

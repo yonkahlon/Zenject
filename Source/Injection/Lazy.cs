@@ -1,4 +1,5 @@
 using System;
+using ModestTree;
 
 namespace Zenject
 {
@@ -18,13 +19,15 @@ namespace Zenject
 
         public Lazy(DiContainer container, InjectContext context)
         {
+            Assert.IsEqual(typeof(T), context.MemberType);
+
             _container = container;
             _context = context;
         }
 
         void ILazy.Validate()
         {
-            _container.Resolve<T>(_context);
+            _container.Resolve(_context);
         }
 
         public T Value
