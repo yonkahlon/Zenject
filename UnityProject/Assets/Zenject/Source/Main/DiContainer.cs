@@ -212,7 +212,7 @@ namespace Zenject
         // and Foo derives from both IFoo and IValidatable, then Foo will be instantiated
         // and then Validate() will be called on it.  Note that this will happen even if Foo is not
         // referenced anywhere in the normally resolved object graph
-        public void ValidateIValidatables()
+        public void ValidateValidatables()
         {
             Assert.That(IsValidating);
 
@@ -247,6 +247,11 @@ namespace Zenject
 
                     validatable.Validate();
                 }
+            }
+
+            foreach (var lazy in _lateBindingsToValidate)
+            {
+                lazy.Validate();
             }
         }
 

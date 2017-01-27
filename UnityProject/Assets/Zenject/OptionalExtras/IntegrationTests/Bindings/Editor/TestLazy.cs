@@ -1,11 +1,16 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using NUnit.Framework;
+using UnityEngine;
+using ModestTree;
 using Assert=ModestTree.Assert;
+using Zenject.Tests.Bindings.FromPrefab;
 
 namespace Zenject.Tests.Bindings
 {
     [TestFixture]
-    public class TestLazy : ZenjectUnitTestFixture
+    public class TestLazy : ZenjectIntegrationTestFixture
     {
         [Test]
         public void Test1()
@@ -14,6 +19,8 @@ namespace Zenject.Tests.Bindings
 
             Container.Bind<Bar>().AsSingle();
             Container.Bind<Foo>().AsSingle();
+
+            Initialize();
 
             var foo = Container.Resolve<Foo>();
 
@@ -29,9 +36,28 @@ namespace Zenject.Tests.Bindings
         {
             Container.Bind<Foo>().AsSingle().NonLazy();
 
-            var foo = Container.Resolve<Foo>();
+            Initialize();
 
+            var foo = Container.Resolve<Foo>();
             Assert.Throws(() => foo.DoIt());
+        }
+
+        [Test]
+        [ValidateOnly]
+        [ExpectedException]
+        public void Test3()
+        {
+            Container.Bind<Foo>().AsSingle().NonLazy();
+            Initialize();
+        }
+
+        [Test]
+        [ValidateOnly]
+        public void Test4()
+        {
+            Container.Bind<Foo>().AsSingle().NonLazy();
+            Container.Bind<Bar>().AsSingle();
+            Initialize();
         }
 
         public class Bar
@@ -64,3 +90,4 @@ namespace Zenject.Tests.Bindings
         }
     }
 }
+

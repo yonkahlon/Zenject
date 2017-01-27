@@ -110,9 +110,7 @@ namespace Zenject
             Install();
             Resolve();
 
-            Assert.That(_container.IsValidating);
-
-            _container.ValidateIValidatables();
+            _container.ValidateValidatables();
         }
 #endif
 

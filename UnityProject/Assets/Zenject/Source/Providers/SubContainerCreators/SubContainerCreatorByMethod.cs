@@ -31,10 +31,10 @@ namespace Zenject
 
             if (subContainer.IsValidating)
             {
-                // The root-level Container has its ValidateIValidatables method
+                // The root-level Container has its ValidateValidatables method
                 // called explicitly - however, this is not so for sub-containers
                 // so call it here instead
-                subContainer.ValidateIValidatables();
+                subContainer.ValidateValidatables();
             }
 
             return subContainer;
@@ -69,10 +69,10 @@ namespace Zenject
 
             if (subContainer.IsValidating)
             {
-                // The root-level Container has its ValidateIValidatables method
+                // The root-level Container has its ValidateValidatables method
                 // called explicitly - however, this is not so for sub-containers
                 // so call it here instead
-                subContainer.ValidateIValidatables();
+                subContainer.ValidateValidatables();
             }
 
             return subContainer;
@@ -111,10 +111,10 @@ namespace Zenject
 
             if (subContainer.IsValidating)
             {
-                // The root-level Container has its ValidateIValidatables method
+                // The root-level Container has its ValidateValidatables method
                 // called explicitly - however, this is not so for sub-containers
                 // so call it here instead
-                subContainer.ValidateIValidatables();
+                subContainer.ValidateValidatables();
             }
 
             return subContainer;
@@ -155,10 +155,10 @@ namespace Zenject
 
             if (subContainer.IsValidating)
             {
-                // The root-level Container has its ValidateIValidatables method
+                // The root-level Container has its ValidateValidatables method
                 // called explicitly - however, this is not so for sub-containers
                 // so call it here instead
-                subContainer.ValidateIValidatables();
+                subContainer.ValidateValidatables();
             }
 
             return subContainer;
@@ -201,10 +201,10 @@ namespace Zenject
 
             if (subContainer.IsValidating)
             {
-                // The root-level Container has its ValidateIValidatables method
+                // The root-level Container has its ValidateValidatables method
                 // called explicitly - however, this is not so for sub-containers
                 // so call it here instead
-                subContainer.ValidateIValidatables();
+                subContainer.ValidateValidatables();
             }
 
             return subContainer;
@@ -249,10 +249,10 @@ namespace Zenject
 
             if (subContainer.IsValidating)
             {
-                // The root-level Container has its ValidateIValidatables method
+                // The root-level Container has its ValidateValidatables method
                 // called explicitly - however, this is not so for sub-containers
                 // so call it here instead
-                subContainer.ValidateIValidatables();
+                subContainer.ValidateValidatables();
             }
 
             return subContainer;

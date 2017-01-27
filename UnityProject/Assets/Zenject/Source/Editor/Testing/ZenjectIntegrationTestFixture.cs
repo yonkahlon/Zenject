@@ -54,7 +54,7 @@ namespace Zenject
 
             if (_isValidating)
             {
-                Container.ValidateIValidatables();
+                Container.ValidateValidatables();
             }
             else
             {
