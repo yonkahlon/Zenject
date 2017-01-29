@@ -24,7 +24,7 @@ namespace Zenject.Tests.Bindings
         [Test]
         public void TestGameObjectSelfSingle1()
         {
-            Container.Bind<GameObject>().FromGameObject().WithGameObjectName(GameObjName).AsSingle();
+            Container.Bind<GameObject>().FromNewComponentOnNewGameObject().WithGameObjectName(GameObjName).AsSingle();
             Container.BindRootResolve<GameObject>();
 
             Initialize();
@@ -36,9 +36,9 @@ namespace Zenject.Tests.Bindings
         [Test]
         public void TestGameObjectSelfSingle2()
         {
-            Container.Bind<GameObject>().FromGameObject().WithGameObjectName(GameObjName).AsSingle();
-            Container.Bind<GameObject>().FromGameObject().WithGameObjectName(GameObjName).AsSingle();
-            Container.Bind<GameObject>().WithId("asdf").FromGameObject().WithGameObjectName(GameObjName).AsSingle();
+            Container.Bind<GameObject>().FromNewComponentOnNewGameObject().WithGameObjectName(GameObjName).AsSingle();
+            Container.Bind<GameObject>().FromNewComponentOnNewGameObject().WithGameObjectName(GameObjName).AsSingle();
+            Container.Bind<GameObject>().WithId("asdf").FromNewComponentOnNewGameObject().WithGameObjectName(GameObjName).AsSingle();
 
             Container.BindRootResolve<GameObject>();
             Container.BindRootResolve<GameObject>("asdf");
@@ -53,8 +53,8 @@ namespace Zenject.Tests.Bindings
         [ExpectedException]
         public void TestGameObjectSelfSingleConflict()
         {
-            Container.Bind<GameObject>().FromGameObject().WithGameObjectName(GameObjName).AsSingle();
-            Container.Bind<GameObject>().FromGameObject().WithGameObjectName("asdf").AsSingle();
+            Container.Bind<GameObject>().FromNewComponentOnNewGameObject().WithGameObjectName(GameObjName).AsSingle();
+            Container.Bind<GameObject>().FromNewComponentOnNewGameObject().WithGameObjectName("asdf").AsSingle();
 
             Container.BindRootResolve<GameObject>();
 
@@ -64,9 +64,9 @@ namespace Zenject.Tests.Bindings
         [Test]
         public void TestGameObjectSelfTransient()
         {
-            Container.Bind<GameObject>().FromGameObject().WithGameObjectName(GameObjName).AsTransient();
-            Container.Bind<GameObject>().FromGameObject().WithGameObjectName(GameObjName).AsTransient();
-            Container.Bind<GameObject>().FromGameObject().WithGameObjectName("asdf").AsTransient();
+            Container.Bind<GameObject>().FromNewComponentOnNewGameObject().WithGameObjectName(GameObjName).AsTransient();
+            Container.Bind<GameObject>().FromNewComponentOnNewGameObject().WithGameObjectName(GameObjName).AsTransient();
+            Container.Bind<GameObject>().FromNewComponentOnNewGameObject().WithGameObjectName("asdf").AsTransient();
             Container.BindRootResolve<GameObject>();
 
             Initialize();
@@ -78,7 +78,7 @@ namespace Zenject.Tests.Bindings
         [Test]
         public void TestGameObjectConcreteSingle()
         {
-            Container.Bind<UnityEngine.Object>().To<GameObject>().FromGameObject().WithGameObjectName(GameObjName).AsSingle();
+            Container.Bind<UnityEngine.Object>().To<GameObject>().FromNewComponentOnNewGameObject().WithGameObjectName(GameObjName).AsSingle();
 
             Container.BindRootResolve<UnityEngine.Object>();
 
@@ -91,7 +91,7 @@ namespace Zenject.Tests.Bindings
         [Test]
         public void TestPrefabSelfSingle1()
         {
-            Container.Bind<GameObject>().FromPrefab(CubePrefab)
+            Container.Bind<GameObject>().FromComponentInPrefab(CubePrefab)
                 .WithGameObjectName(GameObjName).AsSingle().NonLazy();
 
             Initialize();
@@ -106,7 +106,7 @@ namespace Zenject.Tests.Bindings
         public void TestPrefabConcreteSingle1()
         {
             Container.Bind<UnityEngine.Object>().To<GameObject>()
-                .FromPrefab(CubePrefab).WithGameObjectName(GameObjName).AsSingle().NonLazy();
+                .FromComponentInPrefab(CubePrefab).WithGameObjectName(GameObjName).AsSingle().NonLazy();
 
             Initialize();
 
@@ -119,7 +119,7 @@ namespace Zenject.Tests.Bindings
         [Test]
         public void TestPrefabResourceSelfSingle1()
         {
-            Container.Bind<GameObject>().FromPrefabResource("TestBindGameObject/Cube").WithGameObjectName(GameObjName).AsSingle().NonLazy();
+            Container.Bind<GameObject>().FromComponentInPrefabResource("TestBindGameObject/Cube").WithGameObjectName(GameObjName).AsSingle().NonLazy();
 
             Initialize();
 
@@ -133,7 +133,7 @@ namespace Zenject.Tests.Bindings
         public void TestPrefabResourceConcreteSingle1()
         {
             Container.Bind<UnityEngine.Object>().To<GameObject>()
-                .FromPrefabResource("TestBindGameObject/Cube").WithGameObjectName(GameObjName).AsSingle().NonLazy();
+                .FromComponentInPrefabResource("TestBindGameObject/Cube").WithGameObjectName(GameObjName).AsSingle().NonLazy();
 
             Initialize();
 

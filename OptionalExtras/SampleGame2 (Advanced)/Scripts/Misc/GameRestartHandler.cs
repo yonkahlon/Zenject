@@ -23,12 +23,12 @@ namespace Zenject.SpaceFighter
 
         public void Initialize()
         {
-            _gameEvents.PlayerKilled += OnPlayerKilled;
+            _gameEvents.PlayerDied += OnPlayerDied;
         }
 
         public void Dispose()
         {
-            _gameEvents.PlayerKilled -= OnPlayerKilled;
+            _gameEvents.PlayerDied -= OnPlayerDied;
         }
 
         public void Tick()
@@ -42,7 +42,7 @@ namespace Zenject.SpaceFighter
             }
         }
 
-        void OnPlayerKilled()
+        void OnPlayerDied()
         {
             // Wait a bit before restarting the scene
             _delayStartTime = Time.realtimeSinceStartup;

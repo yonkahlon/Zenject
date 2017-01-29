@@ -9,11 +9,11 @@ namespace Zenject
     // Container.BindInterfaces<PoolCleanupChecker>().To<PoolCleanupChecker>().AsSingle().CopyIntoAllSubContainers().NonLazy()
     public class PoolCleanupChecker : ILateDisposable
     {
-        readonly List<IDynamicPooledFactory> _poolFactories;
+        readonly List<IMemoryPool> _poolFactories;
 
         public PoolCleanupChecker(
             [Inject(Optional = true, Source = InjectSources.Local)]
-            List<IDynamicPooledFactory> poolFactories)
+            List<IMemoryPool> poolFactories)
         {
             _poolFactories = poolFactories;
         }

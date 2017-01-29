@@ -1,6 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
-using System.Collections;
 using Zenject;
 
 namespace Zenject.SpaceFighter
@@ -17,19 +17,19 @@ namespace Zenject.SpaceFighter
 
             Container.BindInterfacesTo<EnemySpawner>().AsSingle();
 
-            Container.BindPooledFactory<EnemyFacade, EnemyFacade.Factory>()
+            Container.BindMemoryPool<EnemyFacade, EnemyFacade.Pool>()
                 .FromSubContainerResolve()
                 .ByPrefab(_settings.EnemyFacadePrefab)
                 .UnderTransformGroup("Enemies");
 
-            Container.BindPooledFactory<Bullet, Bullet.Factory>().WithInitialSize(10).ExpandByDoubling()
-                .FromPrefab(_settings.BulletPrefab)
+            Container.BindMemoryPool<Bullet, Bullet.Pool>().WithInitialSize(10).ExpandByDoubling()
+                .FromComponentInPrefab(_settings.BulletPrefab)
                 .UnderTransformGroup("Bullets");
 
             Container.Bind<LevelBoundary>().AsSingle();
 
-            Container.BindPooledFactory<Explosion, Explosion.Factory>().WithInitialSize(3)
-                .FromPrefab(_settings.ExplosionPrefab)
+            Container.BindMemoryPool<Explosion, Explosion.Pool>().WithInitialSize(3)
+                .FromComponentInPrefab(_settings.ExplosionPrefab)
                 .UnderTransformGroup("Explosions");
 
             Container.Bind<AudioPlayer>().AsSingle();

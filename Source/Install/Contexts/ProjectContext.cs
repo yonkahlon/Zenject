@@ -165,13 +165,13 @@ namespace Zenject
             //
             // Short answer is if you want to use IGuiRenderable then 
             // you need to include the following in project context installer:
-            // `Container.Bind<GuiRenderer>().FromGameObject().AsSingle().CopyIntoAllSubContainers().NonLazy();`
+            // `Container.Bind<GuiRenderer>().FromNewComponentOnNewGameObject().AsSingle().CopyIntoAllSubContainers().NonLazy();`
             _container.Bind(typeof(TickableManager), typeof(InitializableManager), typeof(DisposableManager), typeof(GuiRenderableManager))
                 .ToSelf().AsSingle().CopyIntoAllSubContainers();
 
             _container.Bind<Context>().FromInstance(this);
 
-            _container.Bind<ProjectKernel>().FromComponent(this.gameObject).AsSingle().NonLazy();
+            _container.Bind<ProjectKernel>().FromNewComponentOn(this.gameObject).AsSingle().NonLazy();
 
             InstallSceneBindings();
 

@@ -13,45 +13,14 @@ namespace Zenject
         }
     }
 
-    public interface IDynamicPooledFactory : IValidatable
+    public abstract class MemoryPoolBase<TContract> : IValidatable, IMemoryPool
     {
-        int NumCreated
-        {
-            get;
-        }
+        readonly HashSet<TContract> _activeItems = new HashSet<TContract>();
 
-        int NumActive
-        {
-            get;
-        }
-
-        int NumInactive
-        {
-            get;
-        }
-
-        Type ContractType
-        {
-            get;
-        }
-
-        Type ConcreteType
-        {
-            get;
-        }
-    }
-
-    public abstract class DynamicPooledFactory<TContract> : IDynamicPooledFactory
-        // don't add generic constraint 'where TContract : IPoolable' since
-        // we really only require that the concrete type implement that
-        where TContract : IPoolableBase
-    {
-        Stack<TContract> _pool;
+        Stack<TContract> _inactiveItems;
         Type _concreteType;
         InjectContext _injectContext;
         IProvider _provider;
-        int _numCreated;
-        int _numActive;
         PoolExpandMethods _expandMethod;
 
         [Inject]
@@ -69,32 +38,32 @@ namespace Zenject
             _concreteType = concreteType;
             _injectContext = new InjectContext(container, concreteType);
 
-            _pool = new Stack<TContract>(initialSize);
+            _inactiveItems = new Stack<TContract>(initialSize);
 
             for (int i = 0; i < initialSize; i++)
             {
-                _pool.Push(AllocNew());
+                _inactiveItems.Push(AllocNew());
             }
         }
 
         public IEnumerable<TContract> InactiveItems
         {
-            get { return _pool; }
+            get { return _inactiveItems; }
         }
 
-        public int NumCreated
+        public int NumTotal
         {
-            get { return _numCreated; }
-        }
-
-        public int NumActive
-        {
-            get { return _numActive; }
+            get { return NumInactive + NumActive; }
         }
 
         public int NumInactive
         {
-            get { return _pool.Count; }
+            get { return _inactiveItems.Count; }
+        }
+
+        public int NumActive
+        {
+            get { return _activeItems.Count; }
         }
 
         public Type ContractType
@@ -107,6 +76,29 @@ namespace Zenject
             get { return _concreteType; }
         }
 
+        public void DespawnAll()
+        {
+            foreach (var item in _activeItems.ToList())
+            {
+                Despawn(item);
+            }
+        }
+
+        public void Despawn(TContract item)
+        {
+            Assert.That(!_inactiveItems.Contains(item),
+            "Tried to return an item to pool {0} twice", this.GetType());
+
+            bool removed = _activeItems.Remove(item);
+
+            Assert.That(removed,
+                "Tried to return an item to the pool that was not originally created in pool");
+
+            _inactiveItems.Push(item);
+
+            OnDespawned(item);
+        }
+
         TContract AllocNew()
         {
             try
@@ -116,16 +108,9 @@ namespace Zenject
                 Assert.IsNotNull(resultObj);
                 Assert.That(resultObj.GetType().DerivesFromOrEqual(_concreteType));
 
-                _numCreated++;
-
-                var result = (TContract)resultObj;
-
-                // While it might seem a bit weird to call OnDespawned before OnSpawned,
-                // this is necessary to ensure that MonoBehaviour's get a chance to deactive
-                // their game object
-                result.OnDespawned();
-
-                return result;
+                var item = (TContract)resultObj;
+                OnCreated(item);
+                return item;
             }
             catch (Exception e)
             {
@@ -135,7 +120,7 @@ namespace Zenject
             }
         }
 
-        public virtual void Validate()
+        void IValidatable.Validate()
         {
             try
             {
@@ -152,15 +137,18 @@ namespace Zenject
         {
             TContract item;
 
-            if (_pool.IsEmpty())
+            if (_inactiveItems.IsEmpty())
             {
                 ExpandPool();
-                Assert.That(!_pool.IsEmpty());
+                Assert.That(!_inactiveItems.IsEmpty());
             }
 
-            item = _pool.Pop();
+            item = _inactiveItems.Pop();
 
-            _numActive++;
+            bool added = _activeItems.Add(item);
+            Assert.That(added);
+
+            OnSpawned(item);
             return item;
         }
 
@@ -172,26 +160,26 @@ namespace Zenject
                 {
                     throw new PoolExceededFixedSizeException(
                         "Pool factory '{0}' exceeded its max size of '{1}'!"
-                        .Fmt(this.GetType(), _numCreated));
+                        .Fmt(this.GetType(), NumTotal));
                 }
                 case PoolExpandMethods.OneAtATime:
                 {
-                    _pool.Push(AllocNew());
+                    _inactiveItems.Push(AllocNew());
                     break;
                 }
                 case PoolExpandMethods.Double:
                 {
-                    if (_numCreated == 0)
+                    if (NumTotal == 0)
                     {
-                        _pool.Push(AllocNew());
+                        _inactiveItems.Push(AllocNew());
                     }
                     else
                     {
-                        var oldSize = _numCreated;
+                        var oldSize = NumTotal;
 
                         for (int i = 0; i < oldSize; i++)
                         {
-                            _pool.Push(AllocNew());
+                            _inactiveItems.Push(AllocNew());
                         }
                     }
                     break;
@@ -203,18 +191,19 @@ namespace Zenject
             }
         }
 
-        public void Despawn(TContract item)
+        protected virtual void OnDespawned(TContract item)
         {
-            Assert.That(!_pool.Contains(item),
-                "Tried to return an item to pool {0} twice", this.GetType());
+            // Optional
+        }
 
-            _numActive--;
-            _pool.Push(item);
+        protected virtual void OnSpawned(TContract item)
+        {
+            // Optional
+        }
 
-            Assert.That(_numActive >= 0,
-                "Tried to return an item to the pool that was not originally created in pool");
-
-            item.OnDespawned();
+        protected virtual void OnCreated(TContract item)
+        {
+            // Optional
         }
     }
 }

@@ -29,7 +29,7 @@ namespace Zenject.Tests.Factories.BindFactoryFive
             Container.BindInstance(_param4, true).WhenInjectedInto<Foo>();
             Container.BindInstance(_param5, true).WhenInjectedInto<Foo>();
 
-            Container.Bind<Foo>().FromGameObject();
+            Container.Bind<Foo>().FromNewComponentOnNewGameObject();
         }
     }
 }

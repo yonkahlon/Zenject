@@ -25,7 +25,7 @@ namespace Zenject.Tests.Factories
         [Test]
         public void TestGameObjectSelf1()
         {
-            Container.BindFactory<GameObject, CubeFactory>().FromGameObject().WithGameObjectName(GameObjName);
+            Container.BindFactory<GameObject, CubeFactory>().FromNewComponentOnNewGameObject().WithGameObjectName(GameObjName);
 
             Initialize();
 
@@ -38,7 +38,7 @@ namespace Zenject.Tests.Factories
         [Test]
         public void TestGameObjectConcreteSingle()
         {
-            Container.BindFactory<UnityEngine.Object, ObjectFactory>().To<GameObject>().FromGameObject().WithGameObjectName(GameObjName);
+            Container.BindFactory<UnityEngine.Object, ObjectFactory>().To<GameObject>().FromNewComponentOnNewGameObject().WithGameObjectName(GameObjName);
 
             Initialize();
 
@@ -51,7 +51,7 @@ namespace Zenject.Tests.Factories
         [Test]
         public void TestPrefabSelfSingle1()
         {
-            Container.BindFactory<GameObject, CubeFactory>().FromPrefab(CubePrefab).WithGameObjectName(GameObjName);
+            Container.BindFactory<GameObject, CubeFactory>().FromComponentInPrefab(CubePrefab).WithGameObjectName(GameObjName);
 
             Initialize();
 
@@ -64,7 +64,7 @@ namespace Zenject.Tests.Factories
         [Test]
         public void TestPrefabConcreteSingle1()
         {
-            Container.BindFactory<UnityEngine.Object, ObjectFactory>().To<GameObject>().FromPrefab(CubePrefab).WithGameObjectName(GameObjName);
+            Container.BindFactory<UnityEngine.Object, ObjectFactory>().To<GameObject>().FromComponentInPrefab(CubePrefab).WithGameObjectName(GameObjName);
 
             Initialize();
 
@@ -78,7 +78,7 @@ namespace Zenject.Tests.Factories
         public void TestPrefabResourceSelfSingle1()
         {
             Container.BindFactory<GameObject, CubeFactory>()
-                .FromPrefabResource(ResourcePrefix + "/Cube").WithGameObjectName(GameObjName);
+                .FromComponentInPrefabResource(ResourcePrefix + "/Cube").WithGameObjectName(GameObjName);
 
             Initialize();
 
@@ -92,7 +92,7 @@ namespace Zenject.Tests.Factories
         public void TestPrefabResourceConcreteSingle1()
         {
             Container.BindFactory<UnityEngine.Object, ObjectFactory>()
-                .To<GameObject>().FromPrefabResource(ResourcePrefix + "/Cube").WithGameObjectName(GameObjName);
+                .To<GameObject>().FromComponentInPrefabResource(ResourcePrefix + "/Cube").WithGameObjectName(GameObjName);
 
             Initialize();
 

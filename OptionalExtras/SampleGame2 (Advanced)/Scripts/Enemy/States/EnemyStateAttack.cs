@@ -15,14 +15,14 @@ namespace Zenject.SpaceFighter
         readonly PlayerFacade _player;
         readonly Settings _settings;
         readonly Enemy _enemy;
-        readonly Bullet.Factory _bulletFactory;
+        readonly Bullet.Pool _bulletPool;
 
         float _lastShootTime;
         bool _strafeRight;
         float _lastStrafeChangeTime;
 
         public EnemyStateAttack(
-            Bullet.Factory bulletFactory,
+            Bullet.Pool bulletPool,
             Enemy enemy,
             Settings settings,
             PlayerFacade player,
@@ -38,7 +38,7 @@ namespace Zenject.SpaceFighter
             _player = player;
             _settings = settings;
             _enemy = enemy;
-            _bulletFactory = bulletFactory;
+            _bulletPool = bulletPool;
             _strafeRight = Random.Range(0.0f, 1.0f) < 0.5f;
         }
 
@@ -96,7 +96,7 @@ namespace Zenject.SpaceFighter
 
         void Fire()
         {
-            var bullet = _bulletFactory.Spawn(
+            var bullet = _bulletPool.Spawn(
                 _settings.BulletSpeed, _settings.BulletLifetime, BulletTypes.FromEnemy);
 
             // Randomize our aim a bit

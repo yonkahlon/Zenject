@@ -11,7 +11,7 @@ namespace Zenject.SpaceFighter
     {
         readonly GameEvents _gameEvents;
         readonly LevelBoundary _levelBoundary;
-        readonly EnemyFacade.Factory _enemyFactory;
+        readonly EnemyFacade.Pool _enemyFactory;
         readonly Settings _settings;
 
         float _desiredNumEnemies;
@@ -20,7 +20,7 @@ namespace Zenject.SpaceFighter
 
         public EnemySpawner(
             Settings settings,
-            EnemyFacade.Factory enemyFactory,
+            EnemyFacade.Pool enemyFactory,
             LevelBoundary levelBoundary,
             GameEvents gameEvents)
         {
