@@ -10,7 +10,7 @@ namespace Zenject.SpaceFighter
         FromPlayer,
     }
 
-    public class Bullet : MonoBehaviour, IPoolable<float, float, BulletTypes>
+    public class Bullet : MonoBehaviour
     {
         float _startTime;
         BulletTypes _type;
@@ -27,7 +27,7 @@ namespace Zenject.SpaceFighter
         Material _enemyMaterial = null;
 
         [Inject]
-        Factory _selfFactory;
+        Pool _bulletPool;
 
         public BulletTypes Type
         {
@@ -37,24 +37,6 @@ namespace Zenject.SpaceFighter
         public Vector3 MoveDirection
         {
             get { return transform.right; }
-        }
-
-        public void OnSpawned(float speed, float lifeTime, BulletTypes type)
-        {
-            _type = type;
-            _speed = speed;
-            _lifeTime = lifeTime;
-
-            _renderer.material = type == BulletTypes.FromEnemy ? _enemyMaterial : _playerMaterial;
-
-            _startTime = Time.realtimeSinceStartup;
-
-            this.gameObject.SetActive(true);
-        }
-
-        public void OnDespawned()
-        {
-            this.gameObject.SetActive(false);
         }
 
         public void OnTriggerEnter(Collider other)
@@ -88,11 +70,21 @@ namespace Zenject.SpaceFighter
 
         public void Despawn()
         {
-            _selfFactory.Despawn(this);
+            _bulletPool.Despawn(this);
         }
 
-        public class Factory : PooledFactory<float, float, BulletTypes, Bullet>
+        public class Pool : MonoMemoryPool<float, float, BulletTypes, Bullet>
         {
+            protected override void Reinitialize(Bullet bullet, float speed, float lifeTime, BulletTypes type)
+            {
+                bullet._type = type;
+                bullet._speed = speed;
+                bullet._lifeTime = lifeTime;
+
+                bullet._renderer.material = type == BulletTypes.FromEnemy ? bullet._enemyMaterial : bullet._playerMaterial;
+
+                bullet._startTime = Time.realtimeSinceStartup;
+            }
         }
     }
 }

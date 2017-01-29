@@ -124,7 +124,7 @@ namespace Zenject
             if (_kernel == null)
             {
                 _container.Bind<MonoKernel>()
-                    .To<DefaultGameObjectKernel>().FromComponent(this.gameObject).AsSingle().NonLazy();
+                    .To<DefaultGameObjectKernel>().FromNewComponentOn(this.gameObject).AsSingle().NonLazy();
             }
             else
             {

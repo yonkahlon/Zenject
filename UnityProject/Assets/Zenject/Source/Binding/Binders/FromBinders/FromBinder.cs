@@ -101,7 +101,7 @@ namespace Zenject
 
 #if !NOT_UNITY3D
 
-        public ScopeArgConditionCopyNonLazyBinder FromComponent(GameObject gameObject)
+        public ScopeArgConditionCopyNonLazyBinder FromNewComponentOn(GameObject gameObject)
         {
             BindingUtil.AssertIsValidGameObject(gameObject);
             BindingUtil.AssertIsComponent(ConcreteTypes);
@@ -115,7 +115,7 @@ namespace Zenject
             return new ScopeArgConditionCopyNonLazyBinder(BindInfo);
         }
 
-        public ArgConditionCopyNonLazyBinder FromSiblingComponent()
+        public ArgConditionCopyNonLazyBinder FromNewSiblingComponent()
         {
             BindingUtil.AssertIsComponent(ConcreteTypes);
             BindingUtil.AssertTypesAreNotAbstract(ConcreteTypes);
@@ -127,12 +127,12 @@ namespace Zenject
             return new ArgConditionCopyNonLazyBinder(BindInfo);
         }
 
-        public NameTransformScopeArgConditionCopyNonLazyBinder FromGameObject()
+        public NameTransformScopeArgConditionCopyNonLazyBinder FromNewComponentOnNewGameObject()
         {
-            return FromGameObject(new GameObjectCreationParameters());
+            return FromNewComponentOnNewGameObject(new GameObjectCreationParameters());
         }
 
-        public NameTransformScopeArgConditionCopyNonLazyBinder FromGameObject(
+        public NameTransformScopeArgConditionCopyNonLazyBinder FromNewComponentOnNewGameObject(
             GameObjectCreationParameters gameObjectInfo)
         {
             BindingUtil.AssertIsAbstractOrComponentOrGameObject(BindInfo.ContractTypes);
@@ -167,13 +167,13 @@ namespace Zenject
             return new NameTransformScopeArgConditionCopyNonLazyBinder(BindInfo, gameObjectInfo);
         }
 
-        public NameTransformScopeArgConditionCopyNonLazyBinder FromPrefab(UnityEngine.Object prefab)
+        public NameTransformScopeArgConditionCopyNonLazyBinder FromComponentInPrefab(UnityEngine.Object prefab)
         {
-            return FromPrefab(
+            return FromComponentInPrefab(
                 prefab, new GameObjectCreationParameters());
         }
 
-        public NameTransformScopeArgConditionCopyNonLazyBinder FromPrefab(
+        public NameTransformScopeArgConditionCopyNonLazyBinder FromComponentInPrefab(
             UnityEngine.Object prefab, GameObjectCreationParameters gameObjectInfo)
         {
             BindingUtil.AssertIsValidPrefab(prefab);
@@ -185,12 +185,12 @@ namespace Zenject
             return new NameTransformScopeArgConditionCopyNonLazyBinder(BindInfo, gameObjectInfo);
         }
 
-        public NameTransformScopeArgConditionCopyNonLazyBinder FromPrefabResource(string resourcePath)
+        public NameTransformScopeArgConditionCopyNonLazyBinder FromComponentInPrefabResource(string resourcePath)
         {
-            return FromPrefabResource(resourcePath, new GameObjectCreationParameters());
+            return FromComponentInPrefabResource(resourcePath, new GameObjectCreationParameters());
         }
 
-        public NameTransformScopeArgConditionCopyNonLazyBinder FromPrefabResource(
+        public NameTransformScopeArgConditionCopyNonLazyBinder FromComponentInPrefabResource(
             string resourcePath, GameObjectCreationParameters gameObjectInfo)
         {
             BindingUtil.AssertIsValidResourcePath(resourcePath);

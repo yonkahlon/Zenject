@@ -9,9 +9,9 @@ namespace Zenject
         Fixed,
     }
 
-    public class PooledFactoryBindInfo
+    public class MemoryPoolBindInfo
     {
-        public PooledFactoryBindInfo()
+        public MemoryPoolBindInfo()
         {
         }
 

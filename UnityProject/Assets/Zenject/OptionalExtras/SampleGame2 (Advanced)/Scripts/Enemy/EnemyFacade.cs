@@ -4,11 +4,10 @@ using Zenject;
 
 namespace Zenject.SpaceFighter
 {
-    public class EnemyFacade : MonoBehaviour, IPoolable<EnemyTunables>
+    public class EnemyFacade : MonoBehaviour
     {
         Enemy _enemy;
         EnemyTunables _tunables;
-        Factory _selfFactory;
         EnemyDeathHandler _deathHandler;
 
         // We can't use a constructor here because MonoFacade derives from
@@ -16,11 +15,10 @@ namespace Zenject.SpaceFighter
         [Inject]
         public void Construct(
             Enemy enemy, EnemyTunables tunables,
-            Factory selfFactory, EnemyDeathHandler deathHandler)
+            EnemyDeathHandler deathHandler)
         {
             _enemy = enemy;
             _tunables = tunables;
-            _selfFactory = selfFactory;
             _deathHandler = deathHandler;
         }
 
@@ -32,34 +30,24 @@ namespace Zenject.SpaceFighter
             set { _enemy.Position = value; }
         }
 
-        public void OnDespawned()
-        {
-            gameObject.SetActive(false);
-        }
-
         public void Update()
         {
             // Always ensure we are on the main plane
             _enemy.Position = new Vector3(_enemy.Position.x, _enemy.Position.y, 0);
         }
 
-        public void OnSpawned(EnemyTunables tunables)
-        {
-            _tunables.Accuracy = tunables.Accuracy;
-            _tunables.Speed = tunables.Speed;
-
-            gameObject.SetActive(true);
-        }
-
         public void Die()
         {
             _deathHandler.Die();
-            _selfFactory.Despawn(this);
         }
 
-        // Here we declare a parameter to our facade factory of type EnemyTunables
-        public class Factory : PooledFactory<EnemyTunables, EnemyFacade>
+        public class Pool : MonoMemoryPool<EnemyTunables, EnemyFacade>
         {
+            protected override void Reinitialize(EnemyFacade enemy, EnemyTunables tunables)
+            {
+                enemy._tunables.Accuracy = tunables.Accuracy;
+                enemy._tunables.Speed = tunables.Speed;
+            }
         }
     }
 }

@@ -4,7 +4,7 @@ namespace Zenject.SpaceFighter
 {
     public class GameEvents
     {
-        public Action PlayerKilled = delegate {};
+        public Action PlayerDied = delegate {};
         public Action EnemyKilled = delegate {};
     }
 }

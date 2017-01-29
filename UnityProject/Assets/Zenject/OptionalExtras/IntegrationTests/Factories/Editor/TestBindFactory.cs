@@ -31,7 +31,7 @@ namespace Zenject.Tests.Factories
         [Test]
         public void TestToGameObjectSelf()
         {
-            Container.BindFactory<Foo, Foo.Factory>().FromGameObject();
+            Container.BindFactory<Foo, Foo.Factory>().FromNewComponentOnNewGameObject();
 
             Initialize();
 
@@ -45,7 +45,7 @@ namespace Zenject.Tests.Factories
         [ExpectedException]
         public void TestToGameObjectSelfFail()
         {
-            Container.BindFactory<Foo2, Foo2.Factory>().FromGameObject();
+            Container.BindFactory<Foo2, Foo2.Factory>().FromNewComponentOnNewGameObject();
 
             Initialize();
 
@@ -55,7 +55,7 @@ namespace Zenject.Tests.Factories
         [Test]
         public void TestToGameObjectConcrete()
         {
-            Container.BindFactory<IFoo, IFooFactory>().To<Foo>().FromGameObject();
+            Container.BindFactory<IFoo, IFooFactory>().To<Foo>().FromNewComponentOnNewGameObject();
 
             Initialize();
 
@@ -69,7 +69,7 @@ namespace Zenject.Tests.Factories
         {
             var gameObject = Container.CreateEmptyGameObject("foo");
 
-            Container.BindFactory<Foo, Foo.Factory>().FromComponent(gameObject);
+            Container.BindFactory<Foo, Foo.Factory>().FromNewComponentOn(gameObject);
 
             Initialize();
 
@@ -82,7 +82,7 @@ namespace Zenject.Tests.Factories
         [ExpectedException]
         public void TestToMonoBehaviourSelfFail()
         {
-            Container.BindFactory<Foo2, Foo2.Factory>().FromComponent((GameObject)null);
+            Container.BindFactory<Foo2, Foo2.Factory>().FromNewComponentOn((GameObject)null);
 
             Initialize();
         }
@@ -92,7 +92,7 @@ namespace Zenject.Tests.Factories
         {
             var gameObject = Container.CreateEmptyGameObject("foo");
 
-            Container.BindFactory<IFoo, IFooFactory>().To<Foo>().FromComponent(gameObject);
+            Container.BindFactory<IFoo, IFooFactory>().To<Foo>().FromNewComponentOn(gameObject);
 
             Initialize();
 
@@ -104,7 +104,7 @@ namespace Zenject.Tests.Factories
         [Test]
         public void TestToPrefabSelf()
         {
-            Container.BindFactory<Foo, Foo.Factory>().FromPrefab(FooPrefab).WithGameObjectName("asdf");
+            Container.BindFactory<Foo, Foo.Factory>().FromComponentInPrefab(FooPrefab).WithGameObjectName("asdf");
 
             Initialize();
 
@@ -120,7 +120,7 @@ namespace Zenject.Tests.Factories
         public void TestToPrefabSelfFail()
         {
             // Foo3 is not on the prefab
-            Container.BindFactory<Foo3, Foo3.Factory>().FromPrefab(FooPrefab);
+            Container.BindFactory<Foo3, Foo3.Factory>().FromComponentInPrefab(FooPrefab);
 
             Initialize();
 
@@ -130,7 +130,7 @@ namespace Zenject.Tests.Factories
         [Test]
         public void TestToPrefabConcrete()
         {
-            Container.BindFactory<IFoo, IFooFactory>().To<Foo>().FromPrefab(FooPrefab).WithGameObjectName("asdf");
+            Container.BindFactory<IFoo, IFooFactory>().To<Foo>().FromComponentInPrefab(FooPrefab).WithGameObjectName("asdf");
 
             Initialize();
 
@@ -166,7 +166,7 @@ namespace Zenject.Tests.Factories
         [Test]
         public void TestToPrefabResourceSelf()
         {
-            Container.BindFactory<Foo, Foo.Factory>().FromPrefabResource("TestBindFactory/Foo").WithGameObjectName("asdf");
+            Container.BindFactory<Foo, Foo.Factory>().FromComponentInPrefabResource("TestBindFactory/Foo").WithGameObjectName("asdf");
 
             Initialize();
 
@@ -180,7 +180,7 @@ namespace Zenject.Tests.Factories
         [Test]
         public void TestToPrefabResourceConcrete()
         {
-            Container.BindFactory<Foo, Foo.Factory>().To<Foo>().FromPrefabResource("TestBindFactory/Foo").WithGameObjectName("asdf");
+            Container.BindFactory<Foo, Foo.Factory>().To<Foo>().FromComponentInPrefabResource("TestBindFactory/Foo").WithGameObjectName("asdf");
 
             Initialize();
 
@@ -247,7 +247,7 @@ namespace Zenject.Tests.Factories
         [Test]
         public void TestUnderTransformGroup()
         {
-            Container.BindFactory<Foo, Foo.Factory>().FromGameObject().UnderTransformGroup("Foo");
+            Container.BindFactory<Foo, Foo.Factory>().FromNewComponentOnNewGameObject().UnderTransformGroup("Foo");
 
             Initialize();
 
@@ -268,7 +268,7 @@ namespace Zenject.Tests.Factories
         {
             var tempGameObject = new GameObject("Foo");
 
-            Container.BindFactory<Foo, Foo.Factory>().FromGameObject().
+            Container.BindFactory<Foo, Foo.Factory>().FromNewComponentOnNewGameObject().
                 UnderTransform(tempGameObject.transform);
 
             Initialize();
@@ -283,7 +283,7 @@ namespace Zenject.Tests.Factories
         {
             var tempGameObject = new GameObject("Foo");
 
-            Container.BindFactory<Foo, Foo.Factory>().FromGameObject()
+            Container.BindFactory<Foo, Foo.Factory>().FromNewComponentOnNewGameObject()
                 .UnderTransform((context) => tempGameObject.transform);
 
             Initialize();

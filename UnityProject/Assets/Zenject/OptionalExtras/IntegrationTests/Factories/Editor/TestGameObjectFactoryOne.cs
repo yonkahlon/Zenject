@@ -25,7 +25,7 @@ namespace Zenject.Tests.Factories
         [Test]
         public void TestPrefabSelfSingle1()
         {
-            Container.BindFactory<string, GameObject, CubeFactory>().FromPrefab(CubePrefab).WithGameObjectName(GameObjName);
+            Container.BindFactory<string, GameObject, CubeFactory>().FromComponentInPrefab(CubePrefab).WithGameObjectName(GameObjName);
 
             AddFactoryUser<CubeFactoryTester>();
 
@@ -38,7 +38,7 @@ namespace Zenject.Tests.Factories
         [Test]
         public void TestPrefabConcreteSingle1()
         {
-            Container.BindFactory<string, UnityEngine.Object, ObjectFactory>().To<GameObject>().FromPrefab(CubePrefab).WithGameObjectName(GameObjName);
+            Container.BindFactory<string, UnityEngine.Object, ObjectFactory>().To<GameObject>().FromComponentInPrefab(CubePrefab).WithGameObjectName(GameObjName);
 
             AddFactoryUser<ObjectFactoryTester>();
 
@@ -51,7 +51,7 @@ namespace Zenject.Tests.Factories
         [Test]
         public void TestPrefabResourceSelfSingle1()
         {
-            Container.BindFactory<string, GameObject, CubeFactory>().FromPrefabResource("TestGameObjectFactoryOne/Cube").WithGameObjectName(GameObjName);
+            Container.BindFactory<string, GameObject, CubeFactory>().FromComponentInPrefabResource("TestGameObjectFactoryOne/Cube").WithGameObjectName(GameObjName);
 
             AddFactoryUser<CubeFactoryTester>();
 
@@ -64,7 +64,7 @@ namespace Zenject.Tests.Factories
         [Test]
         public void TestPrefabResourceConcreteSingle1()
         {
-            Container.BindFactory<string, UnityEngine.Object, ObjectFactory>().To<GameObject>().FromPrefabResource("TestGameObjectFactoryOne/Cube").WithGameObjectName(GameObjName);
+            Container.BindFactory<string, UnityEngine.Object, ObjectFactory>().To<GameObject>().FromComponentInPrefabResource("TestGameObjectFactoryOne/Cube").WithGameObjectName(GameObjName);
 
             AddFactoryUser<ObjectFactoryTester>();
 

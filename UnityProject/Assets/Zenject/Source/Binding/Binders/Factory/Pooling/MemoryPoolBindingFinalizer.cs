@@ -3,18 +3,18 @@ using ModestTree;
 
 namespace Zenject
 {
-    public class PooledFactoryBindingFinalizer<TContract> : ProviderBindingFinalizer
+    public class MemoryPoolBindingFinalizer<TContract> : ProviderBindingFinalizer
     {
-        readonly PooledFactoryBindInfo _poolBindInfo;
+        readonly MemoryPoolBindInfo _poolBindInfo;
         readonly FactoryBindInfo _factoryBindInfo;
 
-        public PooledFactoryBindingFinalizer(
-            BindInfo bindInfo, FactoryBindInfo factoryBindInfo, PooledFactoryBindInfo poolBindInfo)
+        public MemoryPoolBindingFinalizer(
+            BindInfo bindInfo, FactoryBindInfo factoryBindInfo, MemoryPoolBindInfo poolBindInfo)
             : base(bindInfo)
         {
-            // Note that it doesn't derive from PooledFactory<TContract>
-            // when used with To<>, so we can only check IDynamicPooledFactory
-            Assert.That(factoryBindInfo.FactoryType.DerivesFrom<IDynamicPooledFactory>());
+            // Note that it doesn't derive from MemoryPool<TContract>
+            // when used with To<>, so we can only check IMemoryPoolBase
+            Assert.That(factoryBindInfo.FactoryType.DerivesFrom<IMemoryPool>());
 
             _factoryBindInfo = factoryBindInfo;
             _poolBindInfo = poolBindInfo;

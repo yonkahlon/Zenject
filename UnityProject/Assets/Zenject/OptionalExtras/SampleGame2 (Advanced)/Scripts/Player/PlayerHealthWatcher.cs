@@ -9,12 +9,12 @@ namespace Zenject.SpaceFighter
         readonly AudioPlayer _audioPlayer;
         readonly Settings _settings;
         readonly GameEvents _gameEvents;
-        readonly Explosion.Factory _explosionFactory;
+        readonly Explosion.Pool _explosionPool;
         readonly Player _player;
 
         public PlayerHealthWatcher(
             Player player,
-            Explosion.Factory explosionFactory,
+            Explosion.Pool explosionPool,
             GameEvents gameEvents,
             Settings settings,
             AudioPlayer audioPlayer)
@@ -22,7 +22,7 @@ namespace Zenject.SpaceFighter
             _audioPlayer = audioPlayer;
             _settings = settings;
             _gameEvents = gameEvents;
-            _explosionFactory = explosionFactory;
+            _explosionPool = explosionPool;
             _player = player;
         }
 
@@ -38,12 +38,12 @@ namespace Zenject.SpaceFighter
         {
             _player.IsDead = true;
 
-            var explosion = _explosionFactory.Spawn();
+            var explosion = _explosionPool.Spawn();
             explosion.transform.position = _player.Position;
 
             _player.Renderer.enabled = false;
 
-            _gameEvents.PlayerKilled();
+            _gameEvents.PlayerDied();
 
             _audioPlayer.Play(_settings.DeathSound, _settings.DeathSoundVolume);
         }

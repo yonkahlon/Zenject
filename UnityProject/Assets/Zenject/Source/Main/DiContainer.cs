@@ -615,7 +615,7 @@ namespace Zenject
 
                 // Use the container associated with the provider to address some rare cases
                 // which would otherwise result in an infinite loop.  Like this:
-                // Container.Bind<ICharacter>().FromPrefab(Prefab).AsTransient()
+                // Container.Bind<ICharacter>().FromComponentInPrefab(Prefab).AsTransient()
                 // With the prefab being a GameObjectContext containing a script that has a
                 // ICharacter dependency.  In this case, we would otherwise use the _resolvesInProgress
                 // associated with the GameObjectContext container, which will allow the recursive
@@ -1960,35 +1960,31 @@ namespace Zenject
             return BindFactoryInternal<TContract, TFactory, TFactory>();
         }
 
-        PooledFactoryInitialSizeBinder<TContract> BindPooledFactoryInternal<TContract, TFactoryContract, TFactoryConcrete>()
-            where TFactoryConcrete : TFactoryContract, IPooledFactory
-            where TFactoryContract : IPooledFactory
+        MemoryPoolInitialSizeBinder<TContract> BindMemoryPoolInternal<TContract, TFactoryContract, TFactoryConcrete>()
+            where TFactoryConcrete : TFactoryContract, IMemoryPool
+            where TFactoryContract : IMemoryPool
         {
             var bindInfo = new BindInfo(typeof(TFactoryContract));
 
             // This interface is used in the optional class PoolCleanupChecker
-            bindInfo.ContractTypes.Add(typeof(IDynamicPooledFactory));
+            // And also allow people to manually call DespawnAll() for all IMemoryPool
+            // if they want
+            bindInfo.ContractTypes.Add(typeof(IMemoryPool));
 
             var factoryBindInfo = new FactoryBindInfo(typeof(TFactoryConcrete));
-            var poolBindInfo = new PooledFactoryBindInfo();
+            var poolBindInfo = new MemoryPoolBindInfo();
 
-            StartBinding().SubFinalizer = new PooledFactoryBindingFinalizer<TContract>(
+            StartBinding().SubFinalizer = new MemoryPoolBindingFinalizer<TContract>(
                 bindInfo, factoryBindInfo, poolBindInfo);
 
-            return new PooledFactoryInitialSizeBinder<TContract>(
+            return new MemoryPoolInitialSizeBinder<TContract>(
                 bindInfo, factoryBindInfo, poolBindInfo);
         }
 
-        public PooledFactoryInitialSizeBinder<TContract> BindPooledFactory<TContract, TFactory>()
-            where TFactory : IPooledFactory
+        public MemoryPoolInitialSizeBinder<TContract> BindMemoryPool<TContract, TFactory>()
+            where TFactory : IMemoryPool
         {
-            return BindPooledFactoryInternal<TContract, TFactory, TFactory>();
-        }
-
-        public PooledFactoryInitialSizeBinder<TContract> BindIPooledFactory<TContract>()
-            where TContract : IPoolable
-        {
-            return BindPooledFactoryInternal<TContract, IPooledFactory<TContract>, PooledFactory<TContract>>();
+            return BindMemoryPoolInternal<TContract, TFactory, TFactory>();
         }
 
         FactoryToChoiceIdBinder<TParam1, TContract> BindFactoryInternal<TParam1, TContract, TFactoryContract, TFactoryConcrete>()

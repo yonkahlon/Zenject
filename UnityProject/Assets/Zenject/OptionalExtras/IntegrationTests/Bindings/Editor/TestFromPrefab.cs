@@ -55,8 +55,8 @@ namespace Zenject.Tests.Bindings
         [Test]
         public void TestTransient()
         {
-            Container.Bind<Foo>().FromPrefab(FooPrefab).AsTransient();
-            Container.Bind<Foo>().FromPrefab(FooPrefab).AsTransient();
+            Container.Bind<Foo>().FromComponentInPrefab(FooPrefab).AsTransient();
+            Container.Bind<Foo>().FromComponentInPrefab(FooPrefab).AsTransient();
 
             Container.BindRootResolve<Foo>();
 
@@ -68,8 +68,8 @@ namespace Zenject.Tests.Bindings
         [Test]
         public void TestSingle()
         {
-            Container.Bind<IFoo>().To<Foo>().FromPrefab(FooPrefab).AsSingle().NonLazy();
-            Container.Bind<Foo>().FromPrefab(FooPrefab).AsSingle().NonLazy();
+            Container.Bind<IFoo>().To<Foo>().FromComponentInPrefab(FooPrefab).AsSingle().NonLazy();
+            Container.Bind<Foo>().FromComponentInPrefab(FooPrefab).AsSingle().NonLazy();
 
             Initialize();
 
@@ -80,8 +80,8 @@ namespace Zenject.Tests.Bindings
         public void TestSingle2()
         {
             // For ToPrefab, the 'AsSingle' applies to the prefab and not the type, so this is valid
-            Container.Bind<IFoo>().To<Foo>().FromPrefab(FooPrefab).AsSingle();
-            Container.Bind<Foo>().FromPrefab(FooPrefab2).AsSingle();
+            Container.Bind<IFoo>().To<Foo>().FromComponentInPrefab(FooPrefab).AsSingle();
+            Container.Bind<Foo>().FromComponentInPrefab(FooPrefab2).AsSingle();
             Container.Bind<Foo>().FromMethod(ctx => ctx.Container.CreateEmptyGameObject("Foo").AddComponent<Foo>());
 
             Container.BindRootResolve<Foo>();
@@ -96,8 +96,8 @@ namespace Zenject.Tests.Bindings
         [Test]
         public void TestSingleIdentifiers()
         {
-            Container.Bind<Foo>().FromPrefab(FooPrefab).WithGameObjectName("Foo").AsSingle().NonLazy();
-            Container.Bind<Bar>().FromPrefab(FooPrefab).WithGameObjectName("Foo").AsSingle().NonLazy();
+            Container.Bind<Foo>().FromComponentInPrefab(FooPrefab).WithGameObjectName("Foo").AsSingle().NonLazy();
+            Container.Bind<Bar>().FromComponentInPrefab(FooPrefab).WithGameObjectName("Foo").AsSingle().NonLazy();
 
             Initialize();
 
@@ -110,7 +110,7 @@ namespace Zenject.Tests.Bindings
         [Test]
         public void TestCached1()
         {
-            Container.Bind(typeof(Foo), typeof(Bar)).FromPrefab(FooPrefab).WithGameObjectName("Foo").AsCached().NonLazy();
+            Container.Bind(typeof(Foo), typeof(Bar)).FromComponentInPrefab(FooPrefab).WithGameObjectName("Foo").AsCached().NonLazy();
 
             Initialize();
 
@@ -125,7 +125,7 @@ namespace Zenject.Tests.Bindings
         public void TestWithArgumentsFail()
         {
             // They have required arguments
-            Container.Bind(typeof(Gorp), typeof(Qux)).FromPrefab(GorpAndQuxPrefab).AsCached().NonLazy();
+            Container.Bind(typeof(Gorp), typeof(Qux)).FromComponentInPrefab(GorpAndQuxPrefab).AsCached().NonLazy();
 
             Initialize();
         }
@@ -134,7 +134,7 @@ namespace Zenject.Tests.Bindings
         public void TestWithArguments()
         {
             Container.Bind(typeof(Gorp), typeof(Qux))
-                .FromPrefab(GorpAndQuxPrefab).WithGameObjectName("GorpAndQux").AsCached()
+                .FromComponentInPrefab(GorpAndQuxPrefab).WithGameObjectName("GorpAndQux").AsCached()
                 .WithArguments(5, "test1").NonLazy();
 
             Initialize();
@@ -150,7 +150,7 @@ namespace Zenject.Tests.Bindings
         {
             // There are three components that implement INorf on this prefab
             // and so this should result in a list of 3 INorf's
-            Container.Bind<INorf>().FromPrefab(NorfPrefab).NonLazy();
+            Container.Bind<INorf>().FromComponentInPrefab(NorfPrefab).NonLazy();
 
             Initialize();
 
@@ -163,7 +163,7 @@ namespace Zenject.Tests.Bindings
         public void TestAbstractBindingConcreteSearch()
         {
             // Should ignore the Norf2 component on it
-            Container.Bind<INorf>().To<Norf>().FromPrefab(NorfPrefab).NonLazy();
+            Container.Bind<INorf>().To<Norf>().FromComponentInPrefab(NorfPrefab).NonLazy();
 
             Initialize();
 
@@ -175,7 +175,7 @@ namespace Zenject.Tests.Bindings
         public void TestCircularDependencies()
         {
             // Jim and Bob both depend on each other
-            Container.Bind(typeof(Jim), typeof(Bob)).FromPrefab(JimAndBobPrefab).AsCached().NonLazy();
+            Container.Bind(typeof(Jim), typeof(Bob)).FromComponentInPrefab(JimAndBobPrefab).AsCached().NonLazy();
             Container.BindInterfacesTo<JimAndBobRunner>().AsSingle().NonLazy();
 
             Initialize();

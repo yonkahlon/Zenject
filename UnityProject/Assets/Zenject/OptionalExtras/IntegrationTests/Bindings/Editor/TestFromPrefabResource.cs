@@ -19,7 +19,7 @@ namespace Zenject.Tests.Bindings
         public void TestTransientError()
         {
             // Validation should detect that it doesn't exist
-            Container.Bind<Foo>().FromPrefabResource(PathPrefix + "asdfasdfas").AsTransient().NonLazy();
+            Container.Bind<Foo>().FromComponentInPrefabResource(PathPrefix + "asdfasdfas").AsTransient().NonLazy();
 
             Initialize();
         }
@@ -27,8 +27,8 @@ namespace Zenject.Tests.Bindings
         [Test]
         public void TestTransient()
         {
-            Container.Bind<Foo>().FromPrefabResource(PathPrefix + "Foo").AsTransient();
-            Container.Bind<Foo>().FromPrefabResource(PathPrefix + "Foo").AsTransient();
+            Container.Bind<Foo>().FromComponentInPrefabResource(PathPrefix + "Foo").AsTransient();
+            Container.Bind<Foo>().FromComponentInPrefabResource(PathPrefix + "Foo").AsTransient();
 
             Container.BindRootResolve<Foo>();
 
@@ -40,8 +40,8 @@ namespace Zenject.Tests.Bindings
         [Test]
         public void TestSingle()
         {
-            Container.Bind<IFoo>().To<Foo>().FromPrefabResource(PathPrefix + "Foo").AsSingle().NonLazy();
-            Container.Bind<Foo>().FromPrefabResource(PathPrefix + "Foo").AsSingle().NonLazy();
+            Container.Bind<IFoo>().To<Foo>().FromComponentInPrefabResource(PathPrefix + "Foo").AsSingle().NonLazy();
+            Container.Bind<Foo>().FromComponentInPrefabResource(PathPrefix + "Foo").AsSingle().NonLazy();
 
             Initialize();
 
@@ -52,8 +52,8 @@ namespace Zenject.Tests.Bindings
         public void TestSingle2()
         {
             // For ToPrefab, the 'AsSingle' applies to the prefab and not the type, so this is valid
-            Container.Bind<IFoo>().To<Foo>().FromPrefabResource(PathPrefix + "Foo").AsSingle();
-            Container.Bind<Foo>().FromPrefabResource(PathPrefix + "Foo2").AsSingle();
+            Container.Bind<IFoo>().To<Foo>().FromComponentInPrefabResource(PathPrefix + "Foo").AsSingle();
+            Container.Bind<Foo>().FromComponentInPrefabResource(PathPrefix + "Foo2").AsSingle();
             Container.Bind<Foo>().FromMethod(ctx => ctx.Container.CreateEmptyGameObject("Foo").AddComponent<Foo>());
 
             Container.BindRootResolve<Foo>();
@@ -68,8 +68,8 @@ namespace Zenject.Tests.Bindings
         [Test]
         public void TestSingleIdentifiers()
         {
-            Container.Bind<Foo>().FromPrefabResource(PathPrefix + "Foo").WithGameObjectName("Foo").AsSingle().NonLazy();
-            Container.Bind<Bar>().FromPrefabResource(PathPrefix + "Foo").WithGameObjectName("Foo").AsSingle().NonLazy();
+            Container.Bind<Foo>().FromComponentInPrefabResource(PathPrefix + "Foo").WithGameObjectName("Foo").AsSingle().NonLazy();
+            Container.Bind<Bar>().FromComponentInPrefabResource(PathPrefix + "Foo").WithGameObjectName("Foo").AsSingle().NonLazy();
 
             Initialize();
 
@@ -82,7 +82,7 @@ namespace Zenject.Tests.Bindings
         [Test]
         public void TestCached1()
         {
-            Container.Bind(typeof(Foo), typeof(Bar)).FromPrefabResource(PathPrefix + "Foo")
+            Container.Bind(typeof(Foo), typeof(Bar)).FromComponentInPrefabResource(PathPrefix + "Foo")
                 .WithGameObjectName("Foo").AsCached().NonLazy();
 
             Initialize();
@@ -98,7 +98,7 @@ namespace Zenject.Tests.Bindings
         public void TestWithArgumentsFail()
         {
             // They have required arguments
-            Container.Bind(typeof(Gorp), typeof(Qux)).FromPrefabResource(PathPrefix + "GorpAndQux").AsCached().NonLazy();
+            Container.Bind(typeof(Gorp), typeof(Qux)).FromComponentInPrefabResource(PathPrefix + "GorpAndQux").AsCached().NonLazy();
 
             Initialize();
         }
@@ -107,7 +107,7 @@ namespace Zenject.Tests.Bindings
         public void TestWithArguments()
         {
             Container.Bind(typeof(Gorp), typeof(Qux))
-                .FromPrefabResource(PathPrefix + "GorpAndQux").WithGameObjectName("GorpAndQux").AsCached()
+                .FromComponentInPrefabResource(PathPrefix + "GorpAndQux").WithGameObjectName("GorpAndQux").AsCached()
                 .WithArguments(5, "test1").NonLazy();
 
             Initialize();
@@ -123,7 +123,7 @@ namespace Zenject.Tests.Bindings
         {
             // There are three components that implement INorf on this prefab
             // and so this should result in a list of 3 INorf's
-            Container.Bind<INorf>().FromPrefabResource(PathPrefix + "Norf").NonLazy();
+            Container.Bind<INorf>().FromComponentInPrefabResource(PathPrefix + "Norf").NonLazy();
 
             Initialize();
 
@@ -136,7 +136,7 @@ namespace Zenject.Tests.Bindings
         public void TestAbstractBindingConcreteSearch()
         {
             // Should ignore the Norf2 component on it
-            Container.Bind<INorf>().To<Norf>().FromPrefabResource(PathPrefix + "Norf").NonLazy();
+            Container.Bind<INorf>().To<Norf>().FromComponentInPrefabResource(PathPrefix + "Norf").NonLazy();
 
             Initialize();
 
@@ -148,7 +148,7 @@ namespace Zenject.Tests.Bindings
         public void TestCircularDependencies()
         {
             // Jim and Bob both depend on each other
-            Container.Bind(typeof(Jim), typeof(Bob)).FromPrefabResource(PathPrefix + "JimAndBob").AsCached().NonLazy();
+            Container.Bind(typeof(Jim), typeof(Bob)).FromComponentInPrefabResource(PathPrefix + "JimAndBob").AsCached().NonLazy();
 
             Container.BindInterfacesTo<JimAndBobRunner>().AsSingle().NonLazy();
 

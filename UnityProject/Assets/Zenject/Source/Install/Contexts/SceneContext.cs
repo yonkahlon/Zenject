@@ -260,7 +260,7 @@ namespace Zenject
 
             InstallSceneBindings();
 
-            _container.Bind<SceneKernel>().FromComponent(this.gameObject).AsSingle().NonLazy();
+            _container.Bind<SceneKernel>().FromNewComponentOn(this.gameObject).AsSingle().NonLazy();
 
             _container.Bind<ZenjectSceneLoader>().AsSingle();
 
