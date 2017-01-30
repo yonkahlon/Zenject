@@ -38,11 +38,6 @@ namespace Zenject
         IProvider CreateProviderForType(
             Type contractType, IPrefabInstantiator instantiator)
         {
-            if (contractType == typeof(GameObject))
-            {
-                return new PrefabGameObjectProvider(instantiator);
-            }
-
             Assert.That(contractType.IsInterface() || contractType.DerivesFrom<Component>());
 
             return new GetFromPrefabComponentProvider(

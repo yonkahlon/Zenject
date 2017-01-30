@@ -26,7 +26,7 @@ namespace Zenject
         {
             _markRegistry.MarkSingleton(
                 resultType, concreteIdentifier,
-                SingletonTypes.ToSubContainerPrefabResource);
+                SingletonTypes.FromSubContainerPrefabResource);
 
             var customSingletonId = new CustomSingletonId(
                 concreteIdentifier, resourcePath);

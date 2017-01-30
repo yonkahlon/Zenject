@@ -38,11 +38,6 @@ namespace Zenject
         IProvider CreateProviderForType(
             Type contractType, IPrefabInstantiator instantiator)
         {
-            if (contractType == typeof(GameObject))
-            {
-                return new PrefabGameObjectProvider(instantiator);
-            }
-
             Assert.That(contractType.IsInterface() || contractType.DerivesFrom<Component>());
 
             return new GetFromPrefabComponentProvider(
@@ -111,7 +106,7 @@ namespace Zenject
                 case ScopeTypes.Singleton:
                 {
                     RegisterProviderPerContract(
-                        container, 
+                        container,
                         (_, contractType) => container.SingletonProviderCreator.CreateProviderForPrefabResource(
                             _resourcePath,
                             contractType,
@@ -123,7 +118,7 @@ namespace Zenject
                 case ScopeTypes.Transient:
                 {
                     RegisterProviderPerContract(
-                        container, 
+                        container,
                         (_, contractType) =>
                             CreateProviderForType(
                                 contractType,
@@ -144,7 +139,7 @@ namespace Zenject
                             new PrefabProviderResource(_resourcePath)));
 
                     RegisterProviderPerContract(
-                        container, 
+                        container,
                         (_, contractType) =>
                             new CachedProvider(
                                 CreateProviderForType(contractType, prefabCreator)));

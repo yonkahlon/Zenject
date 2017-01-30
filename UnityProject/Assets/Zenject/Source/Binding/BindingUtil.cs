@@ -94,42 +94,23 @@ namespace Zenject
             // a way to do this besides loading it
         }
 
-        public static void AssertIsAbstractOrComponent(IEnumerable<Type> types)
+        public static void AssertIsInterfaceOrComponent(IEnumerable<Type> types)
         {
             foreach (var type in types)
             {
-                AssertIsAbstractOrComponent(type);
+                AssertIsInterfaceOrComponent(type);
             }
         }
 
-        public static void AssertIsAbstractOrComponent<T>()
+        public static void AssertIsInterfaceOrComponent<T>()
         {
-            AssertIsAbstractOrComponent(typeof(T));
+            AssertIsInterfaceOrComponent(typeof(T));
         }
 
-        public static void AssertIsAbstractOrComponent(Type type)
+        public static void AssertIsInterfaceOrComponent(Type type)
         {
             Assert.That(type.DerivesFrom(typeof(Component)) || type.IsInterface(),
                 "Invalid type given during bind command.  Expected type '{0}' to either derive from UnityEngine.Component or be an interface", type);
-        }
-
-        public static void AssertIsAbstractOrComponentOrGameObject(IEnumerable<Type> types)
-        {
-            foreach (var type in types)
-            {
-                AssertIsAbstractOrComponentOrGameObject(type);
-            }
-        }
-
-        public static void AssertIsAbstractOrComponentOrGameObject<T>()
-        {
-            AssertIsAbstractOrComponentOrGameObject(typeof(T));
-        }
-
-        public static void AssertIsAbstractOrComponentOrGameObject(Type type)
-        {
-            Assert.That(type.DerivesFrom(typeof(Component)) || type.IsInterface() || type == typeof(GameObject) || type == typeof(UnityEngine.Object),
-                "Invalid type given during bind command.  Expected type '{0}' to either derive from UnityEngine.Component or be an interface or be GameObject", type);
         }
 
         public static void AssertIsComponent(IEnumerable<Type> types)
@@ -148,25 +129,6 @@ namespace Zenject
         public static void AssertIsComponent(Type type)
         {
             Assert.That(type.DerivesFrom(typeof(Component)),
-                "Invalid type given during bind command.  Expected type '{0}' to derive from UnityEngine.Component", type);
-        }
-
-        public static void AssertIsComponentOrGameObject(IEnumerable<Type> types)
-        {
-            foreach (var type in types)
-            {
-                AssertIsComponentOrGameObject(type);
-            }
-        }
-
-        public static void AssertIsComponentOrGameObject<T>()
-        {
-            AssertIsComponentOrGameObject(typeof(T));
-        }
-
-        public static void AssertIsComponentOrGameObject(Type type)
-        {
-            Assert.That(type.DerivesFrom(typeof(Component)) || type == typeof(GameObject),
                 "Invalid type given during bind command.  Expected type '{0}' to derive from UnityEngine.Component", type);
         }
 #else

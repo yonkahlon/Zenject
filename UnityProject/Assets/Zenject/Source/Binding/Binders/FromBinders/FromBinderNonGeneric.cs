@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace Zenject
 {
@@ -20,6 +21,11 @@ namespace Zenject
         public ScopeArgConditionCopyNonLazyBinder FromMethod<TConcrete>(Func<InjectContext, TConcrete> method)
         {
             return FromMethodBase<TConcrete>(method);
+        }
+
+        public ScopeArgConditionCopyNonLazyBinder FromMethodMultiple<TConcrete>(Func<InjectContext, IEnumerable<TConcrete>> method)
+        {
+            return FromMethodMultipleBase<TConcrete>(method);
         }
 
         public ScopeConditionCopyNonLazyBinder FromResolveGetter<TObj, TContract>(Func<TObj, TContract> method)

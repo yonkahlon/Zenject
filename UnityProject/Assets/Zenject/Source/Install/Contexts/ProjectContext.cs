@@ -59,6 +59,11 @@ namespace Zenject
         }
 #endif
 
+        public override IEnumerable<GameObject> GetRootGameObjects()
+        {
+            return new[] { this.gameObject };
+        }
+
         public static GameObject TryGetPrefab()
         {
             var prefab = (GameObject)Resources.Load(ProjectContextResourcePath);

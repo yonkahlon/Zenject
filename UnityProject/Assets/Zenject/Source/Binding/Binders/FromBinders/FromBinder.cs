@@ -69,7 +69,7 @@ namespace Zenject
         {
             SubFinalizer = new ScopableBindingFinalizer(
                 BindInfo,
-                SingletonTypes.ToResolve, subIdentifier,
+                SingletonTypes.FromResolve, subIdentifier,
                 (container, type) => new ResolveProvider(type, container, subIdentifier, false));
 
             return new ScopeConditionCopyNonLazyBinder(BindInfo);
@@ -92,7 +92,7 @@ namespace Zenject
 
             SubFinalizer = new ScopableBindingFinalizer(
                 BindInfo,
-                SingletonTypes.ToFactory, factoryType,
+                SingletonTypes.FromFactory, factoryType,
                 (container, type) => new UntypedFactoryProvider(
                     factoryType, container, BindInfo.Arguments));
 
@@ -108,7 +108,7 @@ namespace Zenject
             BindingUtil.AssertTypesAreNotAbstract(ConcreteTypes);
 
             SubFinalizer = new ScopableBindingFinalizer(
-                BindInfo, SingletonTypes.ToComponentGameObject, gameObject,
+                BindInfo, SingletonTypes.FromComponentGameObject, gameObject,
                 (container, type) => new AddToExistingGameObjectComponentProvider(
                     gameObject, container, type, BindInfo.ConcreteIdentifier, BindInfo.Arguments));
 
@@ -135,34 +135,17 @@ namespace Zenject
         public NameTransformScopeArgConditionCopyNonLazyBinder FromNewComponentOnNewGameObject(
             GameObjectCreationParameters gameObjectInfo)
         {
-            BindingUtil.AssertIsAbstractOrComponentOrGameObject(BindInfo.ContractTypes);
-            BindingUtil.AssertIsComponentOrGameObject(ConcreteTypes);
+            BindingUtil.AssertIsComponent(ConcreteTypes);
+            BindingUtil.AssertTypesAreNotAbstract(ConcreteTypes);
 
-            if (ConcreteTypes.All(x => x == typeof(GameObject)))
-            {
-                SubFinalizer = new ScopableBindingFinalizer(
-                    BindInfo, SingletonTypes.ToGameObject, gameObjectInfo,
-                    (container, type) =>
-                    {
-                        Assert.That(BindInfo.Arguments.IsEmpty(), "Cannot inject arguments into empty game object");
-                        return new EmptyGameObjectProvider(
-                            container, gameObjectInfo);
-                    });
-            }
-            else
-            {
-                BindingUtil.AssertIsComponent(ConcreteTypes);
-                BindingUtil.AssertTypesAreNotAbstract(ConcreteTypes);
-
-                SubFinalizer = new ScopableBindingFinalizer(
-                    BindInfo, SingletonTypes.ToGameObject, gameObjectInfo,
-                    (container, type) => new AddToNewGameObjectComponentProvider(
-                        container,
-                        type,
-                        BindInfo.ConcreteIdentifier,
-                        BindInfo.Arguments,
-                        gameObjectInfo));
-            }
+            SubFinalizer = new ScopableBindingFinalizer(
+                BindInfo, SingletonTypes.FromGameObject, gameObjectInfo,
+                (container, type) => new AddToNewGameObjectComponentProvider(
+                    container,
+                    type,
+                    BindInfo.ConcreteIdentifier,
+                    BindInfo.Arguments,
+                    gameObjectInfo));
 
             return new NameTransformScopeArgConditionCopyNonLazyBinder(BindInfo, gameObjectInfo);
         }
@@ -177,7 +160,7 @@ namespace Zenject
             UnityEngine.Object prefab, GameObjectCreationParameters gameObjectInfo)
         {
             BindingUtil.AssertIsValidPrefab(prefab);
-            BindingUtil.AssertIsAbstractOrComponentOrGameObject(AllParentTypes);
+            BindingUtil.AssertIsInterfaceOrComponent(AllParentTypes);
 
             SubFinalizer = new PrefabBindingFinalizer(
                 BindInfo, gameObjectInfo, prefab);
@@ -194,7 +177,7 @@ namespace Zenject
             string resourcePath, GameObjectCreationParameters gameObjectInfo)
         {
             BindingUtil.AssertIsValidResourcePath(resourcePath);
-            BindingUtil.AssertIsAbstractOrComponentOrGameObject(AllParentTypes);
+            BindingUtil.AssertIsInterfaceOrComponent(AllParentTypes);
 
             SubFinalizer = new PrefabResourceBindingFinalizer(
                 BindInfo, gameObjectInfo, resourcePath);
@@ -208,7 +191,7 @@ namespace Zenject
 
             SubFinalizer = new ScopableBindingFinalizer(
                 BindInfo,
-                SingletonTypes.ToResource,
+                SingletonTypes.FromResource,
                 resourcePath.ToLower(),
                 (_, type) => new ResourceProvider(resourcePath, type));
 
@@ -221,7 +204,7 @@ namespace Zenject
         {
             SubFinalizer = new ScopableBindingFinalizer(
                 BindInfo,
-                SingletonTypes.ToMethod, new SingletonImplIds.ToMethod(method),
+                SingletonTypes.FromMethod, new SingletonImplIds.ToMethod(method),
                 (container, type) => new MethodProviderUntyped(method, container));
 
             return this;
@@ -233,8 +216,20 @@ namespace Zenject
 
             SubFinalizer = new ScopableBindingFinalizer(
                 BindInfo,
-                SingletonTypes.ToMethod, new SingletonImplIds.ToMethod(method),
+                SingletonTypes.FromMethod, new SingletonImplIds.ToMethod(method),
                 (container, type) => new MethodProvider<TConcrete>(method, container));
+
+            return this;
+        }
+
+        protected ScopeArgConditionCopyNonLazyBinder FromMethodMultipleBase<TConcrete>(Func<InjectContext, IEnumerable<TConcrete>> method)
+        {
+            BindingUtil.AssertIsDerivedFromTypes(typeof(TConcrete), AllParentTypes);
+
+            SubFinalizer = new ScopableBindingFinalizer(
+                BindInfo,
+                SingletonTypes.FromMethod, new SingletonImplIds.ToMethod(method),
+                (container, type) => new MethodProviderMultiple<TConcrete>(method, container));
 
             return this;
         }
@@ -246,7 +241,7 @@ namespace Zenject
 
             SubFinalizer = new ScopableBindingFinalizer(
                 BindInfo,
-                SingletonTypes.ToFactory, typeof(TFactory),
+                SingletonTypes.FromFactory, typeof(TFactory),
                 (container, type) => new FactoryProvider<TConcrete, TFactory>(container, BindInfo.Arguments));
 
             return new ScopeArgConditionCopyNonLazyBinder(BindInfo);
@@ -259,7 +254,7 @@ namespace Zenject
 
             SubFinalizer = new ScopableBindingFinalizer(
                 BindInfo,
-                SingletonTypes.ToGetter,
+                SingletonTypes.FromGetter,
                 new SingletonImplIds.ToGetter(identifier, method),
                 (container, type) => new GetterProvider<TObj, TResult>(identifier, method, container));
 
@@ -278,7 +273,7 @@ namespace Zenject
             BindingUtil.AssertInstanceDerivesFromOrEqual(instance, AllParentTypes);
 
             SubFinalizer = new ScopableBindingFinalizer(
-                BindInfo, SingletonTypes.ToInstance, instance,
+                BindInfo, SingletonTypes.FromInstance, instance,
                 (container, type) => new InstanceProvider(container, type, instance));
 
             return new ScopeConditionCopyNonLazyBinder(BindInfo);
