@@ -28,9 +28,8 @@ namespace Zenject
         }
 
         [SetUp]
-        public void SetUp()
+        public virtual void SetUp()
         {
-            ClearScene();
             _hasStarted = false;
             _isValidating = CurrentTestHasAttribute<ValidateOnlyAttribute>();
 

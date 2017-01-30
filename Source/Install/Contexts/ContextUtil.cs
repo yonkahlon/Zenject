@@ -51,7 +51,13 @@ namespace Zenject
 
         public static IEnumerable<GameObject> GetRootGameObjects(Scene scene)
         {
-            // Note: We can't use activeScene.GetRootObjects() here because that apparently fails with an exception
+            if (scene.isLoaded)
+            {
+                return scene.GetRootGameObjects()
+                    .Where(x => x.GetComponent<ProjectContext>() == null);
+            }
+
+            // Note: We can't use scene.GetRootObjects() here because that apparently fails with an exception
             // about the scene not being loaded yet when executed in Awake
             // We also can't use GameObject.FindObjectsOfType<Transform>() because that does not include inactive game objects
             // So we use Resources.FindObjectsOfTypeAll, even though that may include prefabs.  However, our assumption here

@@ -28,6 +28,11 @@ namespace Zenject
             get { return _container; }
         }
 
+        public override IEnumerable<GameObject> GetRootGameObjects()
+        {
+            return new[] { this.gameObject };
+        }
+
         [Inject]
         public void Construct(
             DiContainer parentContainer,

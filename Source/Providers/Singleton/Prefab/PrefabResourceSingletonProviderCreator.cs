@@ -29,7 +29,7 @@ namespace Zenject
             IPrefabInstantiator creator;
 
             _markRegistry.MarkSingleton(
-                resultType, concreteIdentifier, SingletonTypes.ToPrefabResource);
+                resultType, concreteIdentifier, SingletonTypes.FromPrefabResource);
 
             var prefabId = new PrefabId(concreteIdentifier, resourcePath);
 

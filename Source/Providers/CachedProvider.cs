@@ -33,9 +33,12 @@ namespace Zenject
 
             // This should only happen with constructor injection
             // Field or property injection should allow circular dependencies
-            Assert.That(!_isCreatingInstance,
-                "Found circular dependency when creating type '{0}'. Object graph: {1}",
-                _creator.GetInstanceType(context), context.GetObjectGraphString());
+            if (_isCreatingInstance)
+            {
+                throw Assert.CreateException(
+                    "Found circular dependency when creating type '{0}'. Object graph: {1}",
+                    _creator.GetInstanceType(context), context.GetObjectGraphString());
+            }
 
             _isCreatingInstance = true;
 

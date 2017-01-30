@@ -121,6 +121,11 @@ namespace Zenject
             Resolve();
         }
 
+        public override IEnumerable<GameObject> GetRootGameObjects()
+        {
+            return ContextUtil.GetRootGameObjects(gameObject.scene);
+        }
+
         DiContainer GetParentContainer()
         {
             if (string.IsNullOrEmpty(_parentContractName))

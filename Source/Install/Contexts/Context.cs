@@ -79,6 +79,8 @@ namespace Zenject
             _normalInstallers.Add(installer);
         }
 
+        public abstract IEnumerable<GameObject> GetRootGameObjects();
+
         void CheckInstallerPrefabTypes()
         {
             foreach (var installer in _installers)

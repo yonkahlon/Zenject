@@ -164,6 +164,42 @@ namespace ModestTree.Util
 #endif
         }
 
+        public static string ToDebugString<TParam1>(this Func<TParam1> func)
+        {
+#if UNITY_WSA && ENABLE_DOTNET && !UNITY_EDITOR
+            return func.ToString();
+#else
+            return func.Method.ToDebugString();
+#endif
+        }
+
+        public static string ToDebugString<TParam1, TParam2>(this Func<TParam1, TParam2> func)
+        {
+#if UNITY_WSA && ENABLE_DOTNET && !UNITY_EDITOR
+            return func.ToString();
+#else
+            return func.Method.ToDebugString();
+#endif
+        }
+
+        public static string ToDebugString<TParam1, TParam2, TParam3>(this Func<TParam1, TParam2, TParam3> func)
+        {
+#if UNITY_WSA && ENABLE_DOTNET && !UNITY_EDITOR
+            return func.ToString();
+#else
+            return func.Method.ToDebugString();
+#endif
+        }
+
+        public static string ToDebugString<TParam1, TParam2, TParam3, TParam4>(this Func<TParam1, TParam2, TParam3, TParam4> func)
+        {
+#if UNITY_WSA && ENABLE_DOTNET && !UNITY_EDITOR
+            return func.ToString();
+#else
+            return func.Method.ToDebugString();
+#endif
+        }
+
         public interface IMemberInfo
         {
             Type MemberType

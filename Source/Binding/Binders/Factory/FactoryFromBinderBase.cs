@@ -76,24 +76,15 @@ namespace Zenject
 
         public NameTransformConditionCopyNonLazyBinder FromNewComponentOnNewGameObject()
         {
+            BindingUtil.AssertIsComponent(ContractType);
+            BindingUtil.AssertIsNotAbstract(ContractType);
+
             var gameObjectInfo = new GameObjectCreationParameters();
 
-            if (ContractType == typeof(GameObject))
-            {
-                ProviderFunc =
-                    (container) => new EmptyGameObjectProvider(
-                        container, gameObjectInfo);
-            }
-            else
-            {
-                BindingUtil.AssertIsComponent(ContractType);
-                BindingUtil.AssertIsNotAbstract(ContractType);
-
-                ProviderFunc =
-                    (container) => new AddToNewGameObjectComponentProvider(
-                        container, ContractType, null,
-                        new List<TypeValuePair>(), gameObjectInfo);
-            }
+            ProviderFunc =
+                (container) => new AddToNewGameObjectComponentProvider(
+                    container, ContractType, null,
+                    new List<TypeValuePair>(), gameObjectInfo);
 
             return new NameTransformConditionCopyNonLazyBinder(BindInfo, gameObjectInfo);
         }
@@ -115,28 +106,16 @@ namespace Zenject
         public NameTransformConditionCopyNonLazyBinder FromComponentInPrefab(UnityEngine.Object prefab)
         {
             BindingUtil.AssertIsValidPrefab(prefab);
+            BindingUtil.AssertIsInterfaceOrComponent(ContractType);
 
             var gameObjectInfo = new GameObjectCreationParameters();
 
-            if (ContractType == typeof(GameObject))
-            {
-                ProviderFunc =
-                    (container) => new PrefabGameObjectProvider(
-                        new PrefabInstantiator(
-                            container, gameObjectInfo,
-                            new List<TypeValuePair>(), new PrefabProvider(prefab)));
-            }
-            else
-            {
-                BindingUtil.AssertIsAbstractOrComponent(ContractType);
-
-                ProviderFunc =
-                    (container) => new GetFromPrefabComponentProvider(
-                        ContractType,
-                        new PrefabInstantiator(
-                            container, gameObjectInfo,
-                            new List<TypeValuePair>(), new PrefabProvider(prefab)));
-            }
+            ProviderFunc =
+                (container) => new GetFromPrefabComponentProvider(
+                    ContractType,
+                    new PrefabInstantiator(
+                        container, gameObjectInfo,
+                        new List<TypeValuePair>(), new PrefabProvider(prefab)));
 
             return new NameTransformConditionCopyNonLazyBinder(BindInfo, gameObjectInfo);
         }
@@ -144,28 +123,16 @@ namespace Zenject
         public NameTransformConditionCopyNonLazyBinder FromComponentInPrefabResource(string resourcePath)
         {
             BindingUtil.AssertIsValidResourcePath(resourcePath);
+            BindingUtil.AssertIsInterfaceOrComponent(ContractType);
 
             var gameObjectInfo = new GameObjectCreationParameters();
 
-            if (ContractType == typeof(GameObject))
-            {
-                ProviderFunc =
-                    (container) => new PrefabGameObjectProvider(
-                        new PrefabInstantiator(
-                            container, gameObjectInfo,
-                            new List<TypeValuePair>(), new PrefabProviderResource(resourcePath)));
-            }
-            else
-            {
-                BindingUtil.AssertIsAbstractOrComponent(ContractType);
-
-                ProviderFunc =
-                    (container) => new GetFromPrefabComponentProvider(
-                        ContractType,
-                        new PrefabInstantiator(
-                            container, gameObjectInfo,
-                            new List<TypeValuePair>(), new PrefabProviderResource(resourcePath)));
-            }
+            ProviderFunc =
+                (container) => new GetFromPrefabComponentProvider(
+                    ContractType,
+                    new PrefabInstantiator(
+                        container, gameObjectInfo,
+                        new List<TypeValuePair>(), new PrefabProviderResource(resourcePath)));
 
             return new NameTransformConditionCopyNonLazyBinder(BindInfo, gameObjectInfo);
         }

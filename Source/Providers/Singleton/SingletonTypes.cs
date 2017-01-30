@@ -2,22 +2,21 @@ namespace Zenject
 {
     public enum SingletonTypes
     {
-        To,
-        ToMethod,
-        ToSubContainerMethod,
-        ToSubContainerInstaller,
-        ToInstance,
-        ToPrefab,
-        ToPrefabResource,
-        ToFactory,
-        ToGameObject,
-        ToComponent,
-        ToComponentGameObject,
-        ToGetter,
-        ToResolve,
-        ToResource,
-        ToSubContainerPrefab,
-        ToSubContainerPrefabResource,
+        FromNew,
+        FromMethod,
+        FromSubContainerMethod,
+        FromSubContainerInstaller,
+        FromInstance,
+        FromPrefab,
+        FromPrefabResource,
+        FromFactory,
+        FromGameObject,
+        FromComponent,
+        FromComponentGameObject,
+        FromGetter,
+        FromResolve,
+        FromResource,
+        FromSubContainerPrefab,
+        FromSubContainerPrefabResource,
     }
 }
-

@@ -32,7 +32,7 @@ namespace Zenject
             var prefabId = new PrefabId(concreteIdentifier, prefab);
 
             _markRegistry.MarkSingleton(
-                resultType, concreteIdentifier, SingletonTypes.ToPrefab);
+                resultType, concreteIdentifier, SingletonTypes.FromPrefab);
 
             if (_prefabCreators.TryGetValue(prefabId, out creator))
             {
