@@ -1211,6 +1211,8 @@ public class Bar
 
 Also, if the empty list is valid, then you should mark your List constructor parameter (or [Inject] field) as optional (see <a href="#optional-binding">here</a> for details).
 
+The order of the list will be the same as the order in which they were added with a Bind method.  The list will also be sorted by subcontainer, with the first set of instances taken from the bottom most subcontainer, and then the parent, then the grandparent, etc.
+
 ## <a id="global-bindings"></a>Global Bindings Using Project Context
 
 This all works great for each individual scene, but what if you have dependencies that you wish to persist permanently across all scenes?  In Zenject you can do this by adding installers to a ProjectContext object.
