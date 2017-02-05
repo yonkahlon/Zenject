@@ -49,32 +49,18 @@ namespace Zenject.Internal
         }
 
         // NOTE: This method will not return components that are within a GameObjectContext
-        public static IEnumerable<Component> GetInjectableComponentsBottomUp(
-            GameObject gameObject, bool recursive)
+        public static List<MonoBehaviour> GetInjectableComponents(GameObject gameObject)
         {
-            var context = gameObject.GetComponent<GameObjectContext>();
+            var childMonoBehaviours = gameObject.GetComponentsInChildren<MonoBehaviour>();
 
-            if (context != null)
-            {
-                yield return context;
-                yield break;
-            }
+            var subContexts = childMonoBehaviours.OfType<GameObjectContext>().Select(x => x.transform).ToList();
 
-            if (recursive)
-            {
-                foreach (Transform child in gameObject.transform)
-                {
-                    foreach (var component in GetInjectableComponentsBottomUp(child.gameObject, recursive))
-                    {
-                        yield return component;
-                    }
-                }
-            }
-
-            foreach (var component in gameObject.GetComponents<Component>())
-            {
-                yield return component;
-            }
+            // Need to make sure we don't inject on any MonoBehaviour's that are below a GameObjectContext
+            // Since that is the responsibility of the GameObjectContext
+            // BUT we do want to inject on the GameObjectContext itself
+            return childMonoBehaviours.Where(x => x != null && x.transform.GetParents().Intersect(subContexts).IsEmpty()
+                    && (x.GetComponent<GameObjectContext>() == null || x is GameObjectContext))
+                .ToList();
         }
 #endif
     }
