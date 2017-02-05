@@ -14,7 +14,13 @@ namespace Zenject
             return this;
         }
 
-        // Would this be useful?
+        // Would these variations be useful?
+
+        // Only copy the binding into children and not grandchildren
         //public NonLazyBinder CopyIntoDirectSubContainers()
+
+        // Do not apply the binding on the current container
+        //public NonLazyBinder MoveIntoAllSubContainers()
+        //public NonLazyBinder MoveIntoDirectSubContainers()
     }
 }

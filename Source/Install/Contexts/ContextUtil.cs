@@ -26,7 +26,7 @@ namespace Zenject
 
         public static IEnumerable<Component> GetInjectableComponents(GameObject gameObject)
         {
-            foreach (var component in ZenUtilInternal.GetInjectableComponentsBottomUp(gameObject, true))
+            foreach (var component in ZenUtilInternal.GetInjectableComponents(gameObject))
             {
                 if (component == null)
                 {

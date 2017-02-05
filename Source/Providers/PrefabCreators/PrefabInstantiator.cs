@@ -49,8 +49,7 @@ namespace Zenject
             // Return it before inject so we can do circular dependencies
             yield return gameObject;
 
-            _container.InjectGameObjectExplicit(
-                gameObject, true, _extraArguments.Concat(args).ToList());
+            _container.InjectGameObjectExplicit(gameObject, _extraArguments.Concat(args).ToList());
         }
     }
 }

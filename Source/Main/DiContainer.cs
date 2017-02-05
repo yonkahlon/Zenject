@@ -1054,8 +1054,7 @@ namespace Zenject
 
             var gameObj = CreateAndParentPrefab(prefab, gameObjectBindInfo);
 
-            InjectGameObjectExplicit(
-                gameObj, true, extraArgs, useAllArgs);
+            InjectGameObjectExplicit(gameObj, extraArgs, useAllArgs);
 
             return gameObj;
         }
@@ -1472,45 +1471,34 @@ namespace Zenject
 
 #if !NOT_UNITY3D
         // Inject dependencies into any and all child components on the given game object
-        public void InjectGameObject(
-            GameObject gameObject)
+        public void InjectGameObject(GameObject gameObject)
         {
-            InjectGameObject(gameObject, true);
+            InjectGameObject(gameObject, new object[0]);
         }
 
         public void InjectGameObject(
-            GameObject gameObject, bool recursive)
-        {
-            InjectGameObject(gameObject, recursive, new object[0]);
-        }
-
-        public void InjectGameObject(
-            GameObject gameObject, bool recursive, IEnumerable<object> extraArgs)
+            GameObject gameObject, IEnumerable<object> extraArgs)
         {
             InjectGameObjectExplicit(
-                gameObject, recursive,
-                InjectUtil.CreateArgList(extraArgs));
+                gameObject, InjectUtil.CreateArgList(extraArgs));
         }
 
         public void InjectGameObjectExplicit(
-            GameObject gameObject, bool recursive,
-            List<TypeValuePair> extraArgs)
+            GameObject gameObject, List<TypeValuePair> extraArgs)
         {
             // We have to pass in a null InjectContext here because we aren't
             // asking for any particular type
             InjectGameObjectExplicit(
-                gameObject, recursive, extraArgs, true);
+                gameObject, extraArgs, true);
         }
 
         public void InjectGameObjectExplicit(
-            GameObject gameObject, bool recursive,
-            List<TypeValuePair> extraArgs, bool useAllArgs)
+            GameObject gameObject, List<TypeValuePair> extraArgs, bool useAllArgs)
         {
             FlushBindings();
 
             // Inject on the children first since the parent objects are more likely to use them in their post inject methods
-            foreach (var component in ZenUtilInternal.GetInjectableComponentsBottomUp(
-                gameObject, recursive).ToList())
+            foreach (var component in ZenUtilInternal.GetInjectableComponents(gameObject))
             {
                 if (component == null)
                 {
@@ -1549,8 +1537,7 @@ namespace Zenject
             Component requestedScript = null;
 
             // Inject on the children first since the parent objects are more likely to use them in their post inject methods
-            foreach (var component in ZenUtilInternal.GetInjectableComponentsBottomUp(
-                gameObject, true).ToList())
+            foreach (var component in ZenUtilInternal.GetInjectableComponents(gameObject))
             {
                 if (component == null)
                 {

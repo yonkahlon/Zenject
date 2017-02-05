@@ -31,6 +31,7 @@ namespace Zenject
                 yield break;
             }
 
+#if !ZEN_MULTITHREADING
             // This should only happen with constructor injection
             // Field or property injection should allow circular dependencies
             if (_isCreatingInstance)
@@ -39,6 +40,7 @@ namespace Zenject
                     "Found circular dependency when creating type '{0}'. Object graph: {1}",
                     _creator.GetInstanceType(context), context.GetObjectGraphString());
             }
+#endif
 
             _isCreatingInstance = true;
 
