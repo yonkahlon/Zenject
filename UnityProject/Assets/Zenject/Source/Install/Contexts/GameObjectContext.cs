@@ -7,6 +7,7 @@ using ModestTree;
 using ModestTree.Util;
 using UnityEngine;
 using UnityEngine.Serialization;
+using Zenject.Internal;
 
 #pragma warning disable 649
 
@@ -84,37 +85,35 @@ namespace Zenject
             Log.Debug("GameObjectContext: Initialized successfully");
         }
 
-        protected override IEnumerable<Component> GetInjectableComponents()
+        protected override IEnumerable<MonoBehaviour> GetInjectableComponents()
         {
             // We inject on all components on the root except ourself
-            foreach (var component in GetComponents<Component>())
+            foreach (var monoBehaviour in GetComponents<MonoBehaviour>())
             {
-                if (component == null)
+                if (monoBehaviour == null)
                 {
-                    Log.Warn("Zenject: Found null component on game object '{0}'.  Possible missing script.", gameObject.name);
+                    // Missing script
                     continue;
                 }
 
-                if (component.GetType().DerivesFrom<MonoInstaller>())
+                if (monoBehaviour.GetType().DerivesFrom<MonoInstaller>())
                 {
                     // Do not inject on installers since these are always injected before they are installed
                     continue;
                 }
 
-                if (component == this)
+                if (monoBehaviour == this)
                 {
                     continue;
                 }
 
-                yield return component;
+                yield return monoBehaviour;
             }
 
-            foreach (var gameObject in UnityUtil.GetDirectChildren(this.gameObject))
+            foreach (var monoBehaviour in UnityUtil.GetDirectChildren(this.gameObject)
+                .SelectMany(ZenUtilInternal.GetInjectableComponents))
             {
-                foreach (var component in ContextUtil.GetInjectableComponents(gameObject))
-                {
-                    yield return component;
-                }
+                yield return monoBehaviour;
             }
         }
 

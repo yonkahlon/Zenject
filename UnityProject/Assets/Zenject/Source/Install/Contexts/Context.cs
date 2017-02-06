@@ -248,7 +248,7 @@ namespace Zenject
             }
         }
 
-        protected abstract IEnumerable<Component> GetInjectableComponents();
+        protected abstract IEnumerable<MonoBehaviour> GetInjectableComponents();
     }
 }
 

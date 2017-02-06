@@ -6,6 +6,7 @@ using ModestTree;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.Serialization;
+using Zenject.Internal;
 
 namespace Zenject
 {
@@ -58,9 +59,9 @@ namespace Zenject
             InstallInstallers();
         }
 
-        protected override IEnumerable<Component> GetInjectableComponents()
+        protected override IEnumerable<MonoBehaviour> GetInjectableComponents()
         {
-            return ContextUtil.GetInjectableComponents(this.gameObject.scene);
+            return ZenUtilInternal.GetInjectableComponents(this.gameObject.scene);
         }
     }
 }

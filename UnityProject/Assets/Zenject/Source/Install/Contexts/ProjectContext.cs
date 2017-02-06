@@ -4,6 +4,7 @@ using ModestTree;
 
 using System.Collections.Generic;
 using System.Linq;
+using Zenject.Internal;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -154,9 +155,9 @@ namespace Zenject
             _dependencyRoots.AddRange(_container.ResolveDependencyRoots());
         }
 
-        protected override IEnumerable<Component> GetInjectableComponents()
+        protected override IEnumerable<MonoBehaviour> GetInjectableComponents()
         {
-            return ContextUtil.GetInjectableComponents(this.gameObject);
+            return ZenUtilInternal.GetInjectableComponents(this.gameObject);
         }
 
         void InstallBindings()
