@@ -8,6 +8,7 @@ using ModestTree.Util;
 using UnityEngine;
 using UnityEngine.Serialization;
 using UnityEngine.SceneManagement;
+using Zenject.Internal;
 
 namespace Zenject
 {
@@ -123,7 +124,7 @@ namespace Zenject
 
         public override IEnumerable<GameObject> GetRootGameObjects()
         {
-            return ContextUtil.GetRootGameObjects(gameObject.scene);
+            return ZenUtilInternal.GetRootGameObjects(gameObject.scene);
         }
 
         DiContainer GetParentContainer()
@@ -286,9 +287,9 @@ namespace Zenject
             InstallInstallers();
         }
 
-        protected override IEnumerable<Component> GetInjectableComponents()
+        protected override IEnumerable<MonoBehaviour> GetInjectableComponents()
         {
-            return ContextUtil.GetInjectableComponents(this.gameObject.scene);
+            return ZenUtilInternal.GetInjectableComponents(this.gameObject.scene);
         }
 
         // These methods can be used for cases where you need to create the SceneContext entirely in code
