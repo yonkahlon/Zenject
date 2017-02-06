@@ -6,11 +6,11 @@ using Random=UnityEngine.Random;
 
 namespace Zenject.Asteroids
 {
-    public class ExplosionFactory : Factory<GameObject>
+    public class ExplosionFactory : GameObjectFactory
     {
     }
 
-    public class BrokenShipFactory : Factory<GameObject>
+    public class BrokenShipFactory : GameObjectFactory
     {
     }
 
@@ -76,8 +76,6 @@ namespace Zenject.Asteroids
         [Serializable]
         public class Settings
         {
-            public GameObject brokenTemplate;
-            public GameObject explosionTemplate;
             public float explosionForce;
         }
 
