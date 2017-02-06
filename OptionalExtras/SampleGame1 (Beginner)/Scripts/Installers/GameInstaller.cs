@@ -76,8 +76,8 @@ namespace Zenject.Asteroids
 
             Container.BindInterfacesTo<AudioHandler>().AsSingle();
 
-            Container.BindFactory<GameObject, ExplosionFactory>().FromComponentInPrefab(_settings.ExplosionPrefab);
-            Container.BindFactory<GameObject, BrokenShipFactory>().FromComponentInPrefab(_settings.BrokenShipPrefab);
+            Container.Bind<ExplosionFactory>().AsSingle().WithArguments(_settings.ExplosionPrefab);
+            Container.Bind<BrokenShipFactory>().AsSingle().WithArguments(_settings.BrokenShipPrefab);
         }
 
         void InstallShip()
