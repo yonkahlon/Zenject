@@ -106,16 +106,15 @@ namespace Zenject.Tests.Bindings
         [Test]
         public void TestWithArguments()
         {
-            Container.Bind(typeof(Gorp), typeof(Qux))
-                .FromComponentInPrefabResource(PathPrefix + "GorpAndQux").WithGameObjectName("GorpAndQux").AsCached()
-                .WithArguments(5, "test1").NonLazy();
+            Container.Bind(typeof(Gorp))
+                .FromComponentInPrefabResource(PathPrefix + "Gorp").WithGameObjectName("Gorp").AsCached()
+                .WithArguments("test1").NonLazy();
 
             Initialize();
 
             FixtureUtil.AssertNumGameObjects(Container, 1);
             FixtureUtil.AssertComponentCount<Gorp>(Container, 1);
-            FixtureUtil.AssertComponentCount<Qux>(Container, 1);
-            FixtureUtil.AssertNumGameObjectsWithName(Container, "GorpAndQux", 1);
+            FixtureUtil.AssertNumGameObjectsWithName(Container, "Gorp", 1);
         }
 
         [Test]

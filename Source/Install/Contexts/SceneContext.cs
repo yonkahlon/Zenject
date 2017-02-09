@@ -218,7 +218,7 @@ namespace Zenject
             // InitialComponentsInjecter will also guarantee that any component that is injected into
             // another component has itself been injected
             _container.LazyInstanceInjector
-                .AddInstances(GetInjectableComponents().Cast<object>());
+                .AddInstances(GetInjectableMonoBehaviours().Cast<object>());
 
             foreach (var decoratorContext in _decoratorContexts)
             {
@@ -287,9 +287,9 @@ namespace Zenject
             InstallInstallers();
         }
 
-        protected override IEnumerable<MonoBehaviour> GetInjectableComponents()
+        protected override IEnumerable<MonoBehaviour> GetInjectableMonoBehaviours()
         {
-            return ZenUtilInternal.GetInjectableComponents(this.gameObject.scene);
+            return ZenUtilInternal.GetInjectableMonoBehaviours(this.gameObject.scene);
         }
 
         // These methods can be used for cases where you need to create the SceneContext entirely in code

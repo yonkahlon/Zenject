@@ -77,9 +77,7 @@
     <Compile Include="Factories\Pooling\IMemoryPool.cs" />
     <Compile Include="Factories\Pooling\MemoryPool.cs" />
     <Compile Include="Factories\Pooling\MemoryPoolBase.cs" />
-    <Compile Include="Factories\Pooling\MonoMemoryPool.cs" />
     <Compile Include="Injection\Lazy.cs" />
-    <Compile Include="Install\Contexts\ContextUtil.cs" />
     <Compile Include="Install\InstallerBase.cs" />
     <Compile Include="Install\MonoInstallerBase.cs" />
     <Compile Include="Install\ScriptableObjectInstallerBase.cs" />
@@ -135,7 +133,6 @@
     <Compile Include="Providers\PrefabProviders\PrefabProviderResource.cs" />
     <Compile Include="Providers\UntypedFactoryProvider.cs" />
     <Compile Include="Runtime\GuiRenderableManager.cs" />
-    <Compile Include="Runtime\GuiRenderer.cs" />
     <Compile Include="Runtime\Kernels\DefaultGameObjectKernel.cs" />
     <Compile Include="Runtime\Kernels\Kernel.cs" />
     <Compile Include="Runtime\Kernels\MonoKernel.cs" />

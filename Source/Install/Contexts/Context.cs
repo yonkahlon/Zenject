@@ -157,7 +157,7 @@ namespace Zenject
 
         protected void InstallSceneBindings()
         {
-            foreach (var binding in GetInjectableComponents().OfType<ZenjectBinding>())
+            foreach (var binding in GetInjectableMonoBehaviours().OfType<ZenjectBinding>())
             {
                 if (binding == null)
                 {
@@ -248,7 +248,7 @@ namespace Zenject
             }
         }
 
-        protected abstract IEnumerable<MonoBehaviour> GetInjectableComponents();
+        protected abstract IEnumerable<MonoBehaviour> GetInjectableMonoBehaviours();
     }
 }
 

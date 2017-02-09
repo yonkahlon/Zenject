@@ -4,7 +4,7 @@ using Zenject;
 
 #pragma warning disable 649
 
-namespace Zenject.Tests.Bindings.FromPrefab
+namespace Zenject.Tests.Bindings.DiContainerMethods
 {
     public class Gorp : MonoBehaviour
     {

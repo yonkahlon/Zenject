@@ -47,6 +47,7 @@ namespace Zenject
                 creator = new PrefabInstantiatorCached(
                     new PrefabInstantiator(
                         _container, gameObjectBindInfo,
+                        resultType,
                         extraArguments,
                         new PrefabProviderResource(resourcePath)));
 

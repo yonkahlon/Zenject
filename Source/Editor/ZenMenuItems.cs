@@ -238,10 +238,9 @@ namespace Zenject
         static void AddCSharpClassTemplate(
             string friendlyName, string defaultFileName, bool editorOnly, string templateStr)
         {
-            var currentDir = ZenUnityEditorUtil.ConvertFullAbsolutePathToAssetPath(
-                ZenUnityEditorUtil.TryGetSelectedFolderPathInProjectsTab());
+            var folderPath = ZenUnityEditorUtil.GetCurrentDirectoryAssetPathFromSelection();
 
-            if (editorOnly && !currentDir.Contains("/Editor"))
+            if (editorOnly && !folderPath.Contains("/Editor"))
             {
                 EditorUtility.DisplayDialog("Error",
                     "Editor window classes must have a parent folder above them named 'Editor'.  Please create or find an Editor folder and try again", "Ok");
@@ -250,7 +249,7 @@ namespace Zenject
 
             var absolutePath = EditorUtility.SaveFilePanel(
                 "Choose name for " + friendlyName,
-                currentDir,
+                folderPath,
                 defaultFileName + ".cs",
                 "cs");
 

@@ -72,16 +72,26 @@ namespace Zenject
                                 new PrefabInstantiator(
                                     container,
                                     _gameObjectBindInfo,
+                                    concreteType,
                                     BindInfo.Arguments,
                                     new PrefabProvider(_prefab))));
                     break;
                 }
                 case ScopeTypes.Cached:
                 {
+                    var argumentTarget = concreteTypes.OnlyOrDefault();
+
+                    if (argumentTarget == null)
+                    {
+                        Assert.That(BindInfo.Arguments.IsEmpty(),
+                            "Cannot provide arguments to prefab instantiator when using more than one concrete type");
+                    }
+
                     var prefabCreator = new PrefabInstantiatorCached(
                         new PrefabInstantiator(
                             container,
                             _gameObjectBindInfo,
+                            argumentTarget,
                             BindInfo.Arguments,
                             new PrefabProvider(_prefab)));
 
@@ -125,16 +135,26 @@ namespace Zenject
                                 new PrefabInstantiator(
                                     container,
                                     _gameObjectBindInfo,
+                                    contractType,
                                     BindInfo.Arguments,
                                     new PrefabProvider(_prefab))));
                     break;
                 }
                 case ScopeTypes.Cached:
                 {
+                    var argumentTarget = BindInfo.ContractTypes.OnlyOrDefault();
+
+                    if (argumentTarget == null)
+                    {
+                        Assert.That(BindInfo.Arguments.IsEmpty(),
+                            "Cannot provide arguments to prefab instantiator when using more than one concrete type");
+                    }
+
                     var prefabCreator = new PrefabInstantiatorCached(
                         new PrefabInstantiator(
                             container,
                             _gameObjectBindInfo,
+                            argumentTarget,
                             BindInfo.Arguments,
                             new PrefabProvider(_prefab)));
 

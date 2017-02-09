@@ -25,8 +25,7 @@ namespace Zenject
             Assert.That(args.IsEmpty());
 
             var prefab = _prefabProvider.GetPrefab();
-            var gameObject = _container.InstantiatePrefab(
-                prefab, new object[0], _gameObjectBindInfo);
+            var gameObject = _container.InstantiatePrefab(prefab, _gameObjectBindInfo);
 
             var context = gameObject.GetComponent<GameObjectContext>();
 

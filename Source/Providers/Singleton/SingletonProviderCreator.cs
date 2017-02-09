@@ -70,8 +70,7 @@ namespace Zenject
             List<TypeValuePair> extraArguments, object concreteIdentifier)
         {
             return _prefabResourceProviderCreator.CreateProvider(
-                resourcePath, resultType, gameObjectBindInfo,
-                extraArguments, concreteIdentifier);
+                resourcePath, resultType, gameObjectBindInfo, extraArguments, concreteIdentifier);
         }
 
         public IProvider CreateProviderForSubContainerPrefab(
