@@ -1,5 +1,6 @@
 #if !NOT_UNITY3D
 
+using System;
 using System.Collections.Generic;
 using ModestTree;
 using UnityEngine;
@@ -20,6 +21,11 @@ namespace Zenject
         public List<TypeValuePair> ExtraArguments
         {
             get { return _subInstantiator.ExtraArguments; }
+        }
+
+        public Type ArgumentTarget
+        {
+            get { return _subInstantiator.ArgumentTarget; }
         }
 
         public GameObjectCreationParameters GameObjectCreationParameters

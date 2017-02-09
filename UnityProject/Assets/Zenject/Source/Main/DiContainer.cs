@@ -23,8 +23,9 @@ namespace Zenject
     }
 
     // Responsibilities:
-    // - Expose methods to configure object graph via Bind() methods
-    // - Build object graphs via Resolve() method
+    // - Expose methods to configure object graph via BindX() methods
+    // - Look up bound values via Resolve() method
+    // - Instantiate new values via InstantiateX() methods
     public class DiContainer : IInstantiator
     {
         public const string DependencyRootIdentifier = "DependencyRoot";
@@ -701,38 +702,6 @@ namespace Zenject
             }
         }
 
-        public T InstantiateExplicit<T>(List<TypeValuePair> extraArgs)
-        {
-            return (T)InstantiateExplicit(typeof(T), extraArgs);
-        }
-
-        public object InstantiateExplicit(Type concreteType, List<TypeValuePair> extraArgs)
-        {
-            bool autoInject = true;
-
-            return InstantiateExplicit(
-                concreteType,
-                autoInject,
-                new InjectArgs()
-                {
-                    ExtraArgs = extraArgs,
-                    Context = new InjectContext(this, concreteType, null),
-                    ConcreteIdentifier = null,
-                    UseAllArgs = true,
-                });
-        }
-
-        // See comment in IInstantiator.cs for description of this method
-        public object InstantiateExplicit(Type concreteType, bool autoInject, InjectArgs args)
-        {
-#if UNITY_EDITOR
-            using (ProfileBlock.Start("Zenject.Instantiate({0})", concreteType))
-#endif
-            {
-                return InstantiateInternal(concreteType, autoInject, args);
-            }
-        }
-
         public static bool CanCreateOrInjectDuringValidation(Type type)
         {
             // During validation, do not instantiate or inject anything except for
@@ -993,72 +962,6 @@ namespace Zenject
 
 #if !NOT_UNITY3D
 
-        public GameObject InstantiatePrefabResourceExplicit(
-            string resourcePath, List<TypeValuePair> extraArgs)
-        {
-            return InstantiatePrefabResourceExplicit(
-                resourcePath, extraArgs, null);
-        }
-
-        public GameObject InstantiatePrefabResourceExplicit(
-            string resourcePath, List<TypeValuePair> extraArgs, string groupName)
-        {
-            return InstantiatePrefabResourceExplicit(
-                resourcePath, extraArgs, groupName, true);
-        }
-
-        // Note: extraArgs must be non null
-        public GameObject InstantiatePrefabResourceExplicit(
-            string resourcePath, List<TypeValuePair> extraArgs,
-            string groupName, bool useAllArgs)
-        {
-            var prefab = (GameObject)Resources.Load(resourcePath);
-            Assert.IsNotNull(prefab, "Could not find prefab at resource location '{0}'".Fmt(resourcePath));
-
-            return InstantiatePrefabExplicit(
-                prefab, extraArgs, groupName, useAllArgs);
-        }
-
-        // Note: extraArgs must be non null
-        public GameObject InstantiatePrefabExplicit(
-            UnityEngine.Object prefab, List<TypeValuePair> extraArgs)
-        {
-            return InstantiatePrefabExplicit(
-                prefab, extraArgs, null);
-        }
-
-        // Note: extraArgs must be non null
-        public GameObject InstantiatePrefabExplicit(
-            UnityEngine.Object prefab, List<TypeValuePair> extraArgs,
-            string groupName)
-        {
-            return InstantiatePrefabExplicit(
-                prefab, extraArgs, groupName, true);
-        }
-
-        // Note: extraArgs must be non null
-        public GameObject InstantiatePrefabExplicit(
-            UnityEngine.Object prefab, List<TypeValuePair> extraArgs,
-            string groupName, bool useAllArgs)
-        {
-            return InstantiatePrefabExplicit(
-                prefab, extraArgs, new GameObjectCreationParameters() { GroupName = groupName }, useAllArgs);
-        }
-
-        // Note: extraArgs must be non null
-        public GameObject InstantiatePrefabExplicit(
-            UnityEngine.Object prefab, List<TypeValuePair> extraArgs,
-            GameObjectCreationParameters gameObjectBindInfo, bool useAllArgs)
-        {
-            FlushBindings();
-
-            var gameObj = CreateAndParentPrefab(prefab, gameObjectBindInfo);
-
-            InjectGameObjectExplicit(gameObj, extraArgs, useAllArgs);
-
-            return gameObj;
-        }
-
         // Don't use this unless you know what you're doing
         // You probably want to use InstantiatePrefab instead
         // This one will only create the prefab and will not inject into it
@@ -1126,69 +1029,6 @@ namespace Zenject
             return gameObj;
         }
 
-        public T InstantiatePrefabForComponentExplicit<T>(
-            UnityEngine.Object prefab, List<TypeValuePair> extraArgs)
-        {
-            return (T)InstantiatePrefabForComponentExplicit(
-                typeof(T), prefab, extraArgs);
-        }
-
-        // Note: Any arguments that are used will be removed from extraArgs
-        public object InstantiatePrefabForComponentExplicit(
-            Type componentType, UnityEngine.Object prefab, List<TypeValuePair> extraArgs)
-        {
-            return InstantiatePrefabForComponentExplicit(
-                componentType, prefab, extraArgs, null);
-        }
-
-        public object InstantiatePrefabForComponentExplicit(
-            Type componentType, UnityEngine.Object prefab, List<TypeValuePair> extraArgs,
-            string groupName)
-        {
-            return InstantiatePrefabForComponentExplicit(
-                componentType, prefab, groupName,
-                new InjectArgs()
-                {
-                    ExtraArgs = extraArgs,
-                    Context = new InjectContext(this, componentType, null),
-                    ConcreteIdentifier = null,
-                    UseAllArgs = true,
-                });
-        }
-
-        // Note: Any arguments that are used will be removed from extraArgs
-        public object InstantiatePrefabForComponentExplicit(
-            Type componentType, UnityEngine.Object prefab, string groupName, InjectArgs args)
-        {
-            return InstantiatePrefabForComponentExplicit(
-                componentType, prefab, new GameObjectCreationParameters() { GroupName = groupName }, args);
-        }
-
-        // Note: Any arguments that are used will be removed from extraArgs
-        public object InstantiatePrefabForComponentExplicit(
-            Type componentType, UnityEngine.Object prefab,
-            GameObjectCreationParameters gameObjectBindInfo, InjectArgs args)
-        {
-            Assert.That(!AssertOnNewGameObjects,
-                "Given DiContainer does not support creating new game objects");
-
-            FlushBindings();
-
-            Assert.That(prefab != null, "Null prefab found when instantiating game object");
-
-            Assert.That(componentType.IsInterface() || componentType.DerivesFrom<Component>(),
-                "Expected type '{0}' to derive from UnityEngine.Component", componentType);
-
-            GameObject prefabAsGameObject = GetPrefabAsGameObject(prefab);
-
-            var gameObj = (GameObject)GameObject.Instantiate(prefabAsGameObject);
-
-            gameObj.transform.SetParent(GetTransformGroup(gameObjectBindInfo), false);
-
-            return InjectGameObjectForComponentExplicit(
-                gameObj, componentType, args);
-        }
-
         Transform GetTransformGroup(GameObjectCreationParameters gameObjectBindInfo)
         {
             Assert.That(!AssertOnNewGameObjects,
@@ -1248,7 +1088,6 @@ namespace Zenject
             return Instantiate<T>(new object[0]);
         }
 
-        // See comment in IInstantiator.cs for description of this method
         public T Instantiate<T>(IEnumerable<object> extraArgs)
         {
             var result = Instantiate(typeof(T), extraArgs);
@@ -1267,7 +1106,6 @@ namespace Zenject
             return Instantiate(concreteType, new object[0]);
         }
 
-        // See comment in IInstantiator.cs for description of this method
         public object Instantiate(
             Type concreteType, IEnumerable<object> extraArgs)
         {
@@ -1278,15 +1116,50 @@ namespace Zenject
                 concreteType, InjectUtil.CreateArgList(extraArgs));
         }
 
+        public T InstantiateExplicit<T>(List<TypeValuePair> extraArgs)
+        {
+            return (T)InstantiateExplicit(typeof(T), extraArgs);
+        }
+
+        public object InstantiateExplicit(Type concreteType, List<TypeValuePair> extraArgs)
+        {
+            bool autoInject = true;
+
+            return InstantiateExplicit(
+                concreteType,
+                autoInject,
+                new InjectArgs()
+                {
+                    ExtraArgs = extraArgs,
+                    Context = new InjectContext(this, concreteType, null),
+                    ConcreteIdentifier = null,
+                    UseAllArgs = true,
+                });
+        }
+
+        public object InstantiateExplicit(Type concreteType, bool autoInject, InjectArgs args)
+        {
+#if UNITY_EDITOR
+            using (ProfileBlock.Start("Zenject.Instantiate({0})", concreteType))
+#endif
+            {
+                return InstantiateInternal(concreteType, autoInject, args);
+            }
+        }
+
 #if !NOT_UNITY3D
-        // See comment in IInstantiator.cs for description of this method
+        // Add new component to existing game object and fill in its dependencies
+        // This is the same as AddComponent except the [Inject] fields will be filled in
+        // NOTE: Gameobject here is not a prefab prototype, it is an instance
         public TContract InstantiateComponent<TContract>(GameObject gameObject)
             where TContract : Component
         {
             return InstantiateComponent<TContract>(gameObject, new object[0]);
         }
 
-        // See comment in IInstantiator.cs for description of this method
+        // Add new component to existing game object and fill in its dependencies
+        // This is the same as AddComponent except the [Inject] fields will be filled in
+        // NOTE: Gameobject here is not a prefab prototype, it is an instance
         public TContract InstantiateComponent<TContract>(
             GameObject gameObject, IEnumerable<object> extraArgs)
             where TContract : Component
@@ -1294,86 +1167,24 @@ namespace Zenject
             return (TContract)InstantiateComponent(typeof(TContract), gameObject, extraArgs);
         }
 
+        // Add new component to existing game object and fill in its dependencies
+        // This is the same as AddComponent except the [Inject] fields will be filled in
+        // NOTE: Gameobject here is not a prefab prototype, it is an instance
         public Component InstantiateComponent(
             Type componentType, GameObject gameObject)
         {
             return InstantiateComponent(componentType, gameObject, new object[0]);
         }
 
-        // See comment in IInstantiator.cs for description of this method
+        // Add new component to existing game object and fill in its dependencies
+        // This is the same as AddComponent except the [Inject] fields will be filled in
+        // NOTE: Gameobject here is not a prefab prototype, it is an instance
         public Component InstantiateComponent(
             Type componentType, GameObject gameObject, IEnumerable<object> extraArgs)
         {
             return InstantiateComponentExplicit(
                 componentType, gameObject, InjectUtil.CreateArgList(extraArgs));
         }
-
-        public Component InstantiateComponentExplicit(
-            Type componentType, GameObject gameObject, List<TypeValuePair> extraArgs)
-        {
-            Assert.That(componentType.DerivesFrom<Component>());
-
-            FlushBindings();
-
-            var monoBehaviour = (Component)gameObject.AddComponent(componentType);
-            InjectExplicit(monoBehaviour, extraArgs);
-            return monoBehaviour;
-        }
-
-        // Note: extraArgs must be non null
-        public GameObject InstantiatePrefab(UnityEngine.Object prefab)
-        {
-            return InstantiatePrefab(prefab, new object[0]);
-        }
-
-        // Note: extraArgs must be non null
-        public GameObject InstantiatePrefab(
-            UnityEngine.Object prefab, IEnumerable<object> extraArgs)
-        {
-            return InstantiatePrefab(prefab, extraArgs, (string)null);
-        }
-
-        // Note: extraArgs must be non null
-        public GameObject InstantiatePrefab(
-            UnityEngine.Object prefab, IEnumerable<object> extraArgs, string groupName)
-        {
-            return InstantiatePrefab(prefab, extraArgs,
-                new GameObjectCreationParameters() { GroupName = groupName });
-        }
-
-        // Note: extraArgs must be non null
-        internal GameObject InstantiatePrefab(
-            UnityEngine.Object prefab, IEnumerable<object> extraArgs,
-            GameObjectCreationParameters gameObjectBindInfo)
-        {
-            return InstantiatePrefabExplicit(
-                prefab, InjectUtil.CreateArgList(extraArgs), gameObjectBindInfo, true);
-        }
-
-        // See comment in IInstantiator.cs for description of this method
-        public GameObject InstantiatePrefabResource(string resourcePath)
-        {
-            return InstantiatePrefabResource(resourcePath, new object[0]);
-        }
-
-        // See comment in IInstantiator.cs for description of this method
-        public GameObject InstantiatePrefabResource(
-            string resourcePath, IEnumerable<object> extraArgs)
-        {
-            return InstantiatePrefabResource(
-                resourcePath, extraArgs, null);
-        }
-
-        // See comment in IInstantiator.cs for description of this method
-        public GameObject InstantiatePrefabResource(
-            string resourcePath, IEnumerable<object> extraArgs, string groupName)
-        {
-            return InstantiatePrefabResourceExplicit(
-                resourcePath, InjectUtil.CreateArgList(extraArgs),
-                groupName);
-        }
-
-        /////////////// InstantiatePrefabForComponent
 
         public T InstantiateComponentOnNewGameObject<T>()
             where T : Component
@@ -1388,11 +1199,72 @@ namespace Zenject
                 CreateEmptyGameObject(new GameObjectCreationParameters() { Name = gameObjectName }));
         }
 
+        public Component InstantiateComponentExplicit(
+            Type componentType, GameObject gameObject, List<TypeValuePair> extraArgs)
+        {
+            Assert.That(componentType.DerivesFrom<Component>());
+
+            FlushBindings();
+
+            var monoBehaviour = (Component)gameObject.AddComponent(componentType);
+            InjectExplicit(monoBehaviour, extraArgs);
+            return monoBehaviour;
+        }
+
+        // Create a new game object from a prefab and fill in dependencies for all children
+        public GameObject InstantiatePrefab(UnityEngine.Object prefab)
+        {
+            return InstantiatePrefab(prefab, (string)null);
+        }
+
+        // Create a new game object from a prefab and fill in dependencies for all children
+        public GameObject InstantiatePrefab(
+            UnityEngine.Object prefab, string groupName)
+        {
+            return InstantiatePrefab(
+                prefab, new GameObjectCreationParameters() { GroupName = groupName });
+        }
+
+        // Create a new game object from a prefab and fill in dependencies for all children
+        public GameObject InstantiatePrefab(
+            UnityEngine.Object prefab, GameObjectCreationParameters gameObjectBindInfo)
+        {
+            FlushBindings();
+
+            var gameObj = CreateAndParentPrefab(prefab, gameObjectBindInfo);
+
+            InjectGameObject(gameObj);
+
+            return gameObj;
+        }
+
+        // Create a new game object from a resource path and fill in dependencies for all children
+        public GameObject InstantiatePrefabResource(string resourcePath)
+        {
+            return InstantiatePrefabResource(resourcePath, null);
+        }
+
+        // Create a new game object from a resource path and fill in dependencies for all children
+        public GameObject InstantiatePrefabResource(
+            string resourcePath, string groupName)
+        {
+            var prefab = (GameObject)Resources.Load(resourcePath);
+
+            Assert.IsNotNull(prefab,
+                "Could not find prefab at resource location '{0}'".Fmt(resourcePath));
+
+            return InstantiatePrefab(prefab, groupName);
+        }
+
+        // Same as InstantiatePrefab but returns a component after it's initialized
+        // and optionally allows extra arguments for the given component type
         public T InstantiatePrefabForComponent<T>(UnityEngine.Object prefab)
         {
             return InstantiatePrefabForComponent<T>(prefab, new object[0]);
         }
 
+        // Same as InstantiatePrefab but returns a component after it's initialized
+        // and optionally allows extra arguments for the given component type
         public T InstantiatePrefabForComponent<T>(
             UnityEngine.Object prefab, IEnumerable<object> extraArgs)
         {
@@ -1400,6 +1272,8 @@ namespace Zenject
                 typeof(T), prefab, extraArgs);
         }
 
+        // Same as InstantiatePrefab but returns a component after it's initialized
+        // and optionally allows extra arguments for the given component type
         public object InstantiatePrefabForComponent(
             Type concreteType, UnityEngine.Object prefab, IEnumerable<object> extraArgs)
         {
@@ -1408,22 +1282,23 @@ namespace Zenject
                 InjectUtil.CreateArgList(extraArgs));
         }
 
-        /////////////// InstantiatePrefabForComponent
-
-        // See comment in IInstantiator.cs for description of this method
+        // Same as InstantiatePrefabResource but returns a component after it's initialized
+        // and optionally allows extra arguments for the given component type
         public T InstantiatePrefabResourceForComponent<T>(string resourcePath)
         {
             return InstantiatePrefabResourceForComponent<T>(resourcePath, new object[0]);
         }
 
-        // See comment in IInstantiator.cs for description of this method
+        // Same as InstantiatePrefabResource but returns a component after it's initialized
+        // and optionally allows extra arguments for the given component type
         public T InstantiatePrefabResourceForComponent<T>(
             string resourcePath, IEnumerable<object> extraArgs)
         {
             return (T)InstantiatePrefabResourceForComponent(typeof(T), resourcePath, extraArgs);
         }
 
-        // See comment in IInstantiator.cs for description of this method
+        // Same as InstantiatePrefabResource but returns a component after it's initialized
+        // and optionally allows extra arguments for the given component type
         public object InstantiatePrefabResourceForComponent(
             Type concreteType, string resourcePath, IEnumerable<object> extraArgs)
         {
@@ -1434,6 +1309,8 @@ namespace Zenject
                 concreteType, resourcePath, InjectUtil.CreateArgList(extraArgs));
         }
 
+        // Same as InstantiatePrefabResourceForComponent except allows null values
+        // to be included in the argument list.  Also see InjectUtil.CreateArgList
         public T InstantiatePrefabResourceForComponentExplicit<T>(
             string resourcePath, List<TypeValuePair> extraArgs)
         {
@@ -1441,7 +1318,8 @@ namespace Zenject
                 typeof(T), resourcePath, extraArgs);
         }
 
-        // Note: Any arguments that are used will be removed from extraArgs
+        // Same as InstantiatePrefabResourceForComponent except allows null values
+        // to be included in the argument list.  Also see InjectUtil.CreateArgList
         public object InstantiatePrefabResourceForComponentExplicit(
             Type componentType, string resourcePath, List<TypeValuePair> extraArgs)
         {
@@ -1456,7 +1334,9 @@ namespace Zenject
                 });
         }
 
-        // Note: Any arguments that are used will be removed from extraArgs
+
+        // Same as InstantiatePrefabResourceForComponent except allows null values
+        // to be included in the argument list.  Also see InjectUtil.CreateArgList
         public object InstantiatePrefabResourceForComponentExplicit(
             Type componentType, string resourcePath, string groupName, InjectArgs args)
         {
@@ -1467,111 +1347,155 @@ namespace Zenject
                 componentType, prefab, groupName, args);
         }
 
-#endif
+        // Same as InstantiatePrefabForComponent except allows null values
+        // to be included in the argument list.  Also see InjectUtil.CreateArgList
+        public T InstantiatePrefabForComponentExplicit<T>(
+            UnityEngine.Object prefab, List<TypeValuePair> extraArgs)
+        {
+            return (T)InstantiatePrefabForComponentExplicit(
+                typeof(T), prefab, extraArgs);
+        }
 
-#if !NOT_UNITY3D
+        // Same as InstantiatePrefabForComponent except allows null values
+        // to be included in the argument list.  Also see InjectUtil.CreateArgList
+        public object InstantiatePrefabForComponentExplicit(
+            Type componentType, UnityEngine.Object prefab, List<TypeValuePair> extraArgs)
+        {
+            return InstantiatePrefabForComponentExplicit(
+                componentType, prefab, extraArgs, null);
+        }
+
+        // Same as InstantiatePrefabForComponent except allows null values
+        // to be included in the argument list.  Also see InjectUtil.CreateArgList
+        public object InstantiatePrefabForComponentExplicit(
+            Type componentType, UnityEngine.Object prefab, List<TypeValuePair> extraArgs,
+            string groupName)
+        {
+            return InstantiatePrefabForComponentExplicit(
+                componentType, prefab, groupName,
+                new InjectArgs()
+                {
+                    ExtraArgs = extraArgs,
+                    Context = new InjectContext(this, componentType, null),
+                    ConcreteIdentifier = null,
+                    UseAllArgs = true,
+                });
+        }
+
+        // Same as InstantiatePrefabForComponent except allows null values
+        // to be included in the argument list.  Also see InjectUtil.CreateArgList
+        public object InstantiatePrefabForComponentExplicit(
+            Type componentType, UnityEngine.Object prefab, string groupName, InjectArgs args)
+        {
+            return InstantiatePrefabForComponentExplicit(
+                componentType, prefab, new GameObjectCreationParameters() { GroupName = groupName }, args);
+        }
+
+        // Same as InstantiatePrefabForComponent except allows null values
+        // to be included in the argument list.  Also see InjectUtil.CreateArgList
+        public object InstantiatePrefabForComponentExplicit(
+            Type componentType, UnityEngine.Object prefab,
+            GameObjectCreationParameters gameObjectBindInfo, InjectArgs args)
+        {
+            Assert.That(!AssertOnNewGameObjects,
+                "Given DiContainer does not support creating new game objects");
+
+            FlushBindings();
+
+            Assert.That(prefab != null, "Null prefab found when instantiating game object");
+
+            Assert.That(componentType.IsInterface() || componentType.DerivesFrom<Component>(),
+                "Expected type '{0}' to derive from UnityEngine.Component", componentType);
+
+            GameObject prefabAsGameObject = GetPrefabAsGameObject(prefab);
+
+            var gameObj = (GameObject)GameObject.Instantiate(prefabAsGameObject);
+
+            gameObj.transform.SetParent(GetTransformGroup(gameObjectBindInfo), false);
+
+            return InjectGameObjectForComponentExplicit(
+                gameObj, componentType, args);
+        }
+
         // Inject dependencies into any and all child components on the given game object
         public void InjectGameObject(GameObject gameObject)
         {
-            InjectGameObject(gameObject, new object[0]);
-        }
-
-        public void InjectGameObject(
-            GameObject gameObject, IEnumerable<object> extraArgs)
-        {
-            InjectGameObjectExplicit(
-                gameObject, InjectUtil.CreateArgList(extraArgs));
-        }
-
-        public void InjectGameObjectExplicit(
-            GameObject gameObject, List<TypeValuePair> extraArgs)
-        {
-            // We have to pass in a null InjectContext here because we aren't
-            // asking for any particular type
-            InjectGameObjectExplicit(
-                gameObject, extraArgs, true);
-        }
-
-        public void InjectGameObjectExplicit(
-            GameObject gameObject, List<TypeValuePair> extraArgs, bool useAllArgs)
-        {
             FlushBindings();
 
-            // Inject on the children first since the parent objects are more likely to use them in their post inject methods
-            foreach (var component in ZenUtilInternal.GetInjectableComponents(gameObject))
+            foreach (var monoBehaviour in ZenUtilInternal.GetInjectableMonoBehaviours(gameObject))
             {
-                if (component == null)
-                {
-                    Log.Warn("Found null component while injecting game object '{0}'.  Possible missing script.", gameObject.name);
-                    continue;
-                }
-
-                if (component.GetType().DerivesFrom<MonoInstaller>())
-                {
-                    // Do not inject on installers since these are always injected before they are installed
-                    continue;
-                }
-
-                InjectExplicit(component, component.GetType(),
-                    new InjectArgs()
-                    {
-                        ExtraArgs = extraArgs,
-                        Context = new InjectContext(this, component.GetType()),
-                        ConcreteIdentifier = null,
-                        UseAllArgs = false,
-                    });
-            }
-
-            if (useAllArgs && !extraArgs.IsEmpty())
-            {
-                throw Assert.CreateException(
-                    "Passed unnecessary parameters when injecting into game object '{0}'. \nExtra Parameters: {1}",
-                    gameObject.name, string.Join(",", extraArgs.Select(x => x.Type.ToString()).ToArray()));
+                Inject(monoBehaviour);
             }
         }
 
-        public Component InjectGameObjectForComponentExplicit(
-            GameObject gameObject, Type componentType,
-            InjectArgs args)
+        // Same as InjectGameObject except it will also search the game object for the
+        // given component, and also optionally allow passing extra inject arguments into the
+        // given component
+        public T InjectGameObjectForComponent<T>(GameObject gameObject)
+            where T : Component
         {
-            Component requestedScript = null;
+            return InjectGameObjectForComponent<T>(gameObject, new object[0]);
+        }
 
-            // Inject on the children first since the parent objects are more likely to use them in their post inject methods
-            foreach (var component in ZenUtilInternal.GetInjectableComponents(gameObject))
+        // Same as InjectGameObject except it will also search the game object for the
+        // given component, and also optionally allow passing extra inject arguments into the
+        // given component
+        public T InjectGameObjectForComponent<T>(
+            GameObject gameObject, IEnumerable<object> extraArgs)
+            where T : Component
+        {
+            return (T)InjectGameObjectForComponent(gameObject, typeof(T), extraArgs);
+        }
+
+        // Same as InjectGameObject except it will also search the game object for the
+        // given component, and also optionally allow passing extra inject arguments into the
+        // given component
+        public object InjectGameObjectForComponent(
+            GameObject gameObject, Type componentType, IEnumerable<object> extraArgs)
+        {
+            return InjectGameObjectForComponentExplicit(
+                gameObject, componentType,
+                new InjectArgs()
+                {
+                    ExtraArgs = InjectUtil.CreateArgList(extraArgs),
+                    Context = new InjectContext(this, componentType, null),
+                    ConcreteIdentifier = null,
+                    UseAllArgs = true,
+                });
+        }
+
+        // Same as InjectGameObjectForComponent except allows null values
+        // to be included in the argument list.  Also see InjectUtil.CreateArgList
+        public Component InjectGameObjectForComponentExplicit(
+            GameObject gameObject, Type componentType, InjectArgs args)
+        {
+            if (!componentType.DerivesFrom<MonoBehaviour>() && !args.ExtraArgs.IsEmpty())
             {
-                if (component == null)
-                {
-                    Log.Warn("Found null component while injecting into game object '{0}'.  Possible missing script.", gameObject.name);
-                    continue;
-                }
+                throw Assert.CreateException(
+                    "Cannot inject into non-monobehaviours!  Argument list must be zero length");
+            }
 
-                if (component.GetType().DerivesFrom<MonoInstaller>())
+            foreach (var monoBehaviour in ZenUtilInternal.GetInjectableMonoBehaviours(gameObject))
+            {
+                if (monoBehaviour.GetType().DerivesFromOrEqual(componentType))
                 {
-                    // Do not inject on installers since these are always injected before they are installed
-                    continue;
-                }
-
-                if (component.GetType().DerivesFromOrEqual(componentType))
-                {
-                    Assert.IsNull(requestedScript,
-                        "Found multiple matches with type '{0}' when injecting into game object '{1}'", componentType, gameObject.name);
-                    requestedScript = component;
-
-                    InjectExplicit(component, component.GetType(), args);
+                    InjectExplicit(monoBehaviour, monoBehaviour.GetType(), args);
                 }
                 else
                 {
-                    Inject(component);
+                    Inject(monoBehaviour);
                 }
             }
 
-            if (requestedScript == null)
-            {
-                throw Assert.CreateException(
-                    "Could not find component with type '{0}' when instantiating new game object", componentType);
-            }
+            var matches = gameObject.GetComponentsInChildren(componentType);
 
-            return requestedScript;
+            Assert.That(!matches.IsEmpty(),
+                "Expected to find component with type '{0}' when injecting into game object '{1}'", componentType, gameObject.name);
+
+            Assert.That(matches.Length == 1,
+                "Found multiple component with type '{0}' when injecting into game object '{1}'", componentType, gameObject.name);
+
+            return matches[0];
         }
 #endif
 
@@ -1584,6 +1508,7 @@ namespace Zenject
             Inject(injectable, new object[0]);
         }
 
+        // Same as Inject(injectable) except allows adding extra values to be injected
         public void Inject(object injectable, IEnumerable<object> extraArgs)
         {
             InjectExplicit(
@@ -1631,6 +1556,7 @@ namespace Zenject
             return Resolve(new InjectContext(this, contractType, identifier, true));
         }
 
+        // Non generic version
         public object Resolve(Type contractType)
         {
             return Resolve(new InjectContext(this, contractType, null));
@@ -1700,12 +1626,14 @@ namespace Zenject
             return ResolveAll(context);
         }
 
+        // Removes all bindings
         public void UnbindAll()
         {
             FlushBindings();
             _providers.Clear();
         }
 
+        // Remove all bindings bound to the given contract type
         public bool Unbind<TContract>()
         {
             return Unbind<TContract>(null);

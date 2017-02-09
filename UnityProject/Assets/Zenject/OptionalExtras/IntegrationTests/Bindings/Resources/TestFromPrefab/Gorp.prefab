@@ -9,9 +9,8 @@ GameObject:
   m_Component:
   - component: {fileID: 496146}
   - component: {fileID: 11470700}
-  - component: {fileID: 114629866799586768}
   m_Layer: 0
-  m_Name: GorpAndQux
+  m_Name: Gorp
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -52,14 +51,3 @@ Prefab:
   m_ParentPrefab: {fileID: 0}
   m_RootGameObject: {fileID: 154292}
   m_IsPrefabParent: 1
---- !u!114 &114629866799586768
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 154292}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 914f813dee2b8b248bce3b21eafa7b6e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 

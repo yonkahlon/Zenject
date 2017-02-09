@@ -48,9 +48,10 @@ For general troubleshooting / support, please use the [zenject subreddit](http:/
 * Support for global, project-wide bindings to add dependencies for all scenes
 * Convention based binding, based on class name, namespace, or any other criteria
 * Ability to validate object graphs at editor time (including dynamic object graphs created via factories)
-* Commands and Signals
 * Automatic binding on components in the scene using the `ZenjectBinding` component
 * Auto-Mocking using the Moq library
+* Built-in support for memory pools
+* Just-in-time resolving using the Lazy<> construct
 
 ## <a id="installation"></a>Installation
 

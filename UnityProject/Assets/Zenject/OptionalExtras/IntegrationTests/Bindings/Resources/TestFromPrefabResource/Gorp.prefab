@@ -8,10 +8,9 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 496146}
-  - component: {fileID: 11470700}
-  - component: {fileID: 114629866799586768}
+  - component: {fileID: 11419060}
   m_Layer: 0
-  m_Name: GorpAndQux
+  m_Name: Gorp
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -30,7 +29,7 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &11470700
+--- !u!114 &11419060
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
@@ -38,7 +37,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 154292}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cc679fbba1bf0a645957d68235c4771d, type: 3}
+  m_Script: {fileID: 11500000, guid: 93bd1149166ed44478c2e59b34fbfc9b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1001 &100100000
@@ -52,14 +51,3 @@ Prefab:
   m_ParentPrefab: {fileID: 0}
   m_RootGameObject: {fileID: 154292}
   m_IsPrefabParent: 1
---- !u!114 &114629866799586768
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 154292}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 914f813dee2b8b248bce3b21eafa7b6e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 

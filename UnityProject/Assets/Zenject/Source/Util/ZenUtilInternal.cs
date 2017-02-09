@@ -49,7 +49,7 @@ namespace Zenject.Internal
         }
 
         // NOTE: This method will not return components that are within a GameObjectContext
-        public static List<MonoBehaviour> GetInjectableComponents(GameObject gameObject)
+        public static List<MonoBehaviour> GetInjectableMonoBehaviours(GameObject gameObject)
         {
             var childMonoBehaviours = gameObject.GetComponentsInChildren<MonoBehaviour>();
 
@@ -68,10 +68,10 @@ namespace Zenject.Internal
                 .ToList();
         }
 
-        public static IEnumerable<MonoBehaviour> GetInjectableComponents(Scene scene)
+        public static IEnumerable<MonoBehaviour> GetInjectableMonoBehaviours(Scene scene)
         {
             return GetRootGameObjects(scene)
-                .SelectMany(ZenUtilInternal.GetInjectableComponents);
+                .SelectMany(ZenUtilInternal.GetInjectableMonoBehaviours);
         }
 
         public static IEnumerable<GameObject> GetRootGameObjects(Scene scene)

@@ -54,24 +54,18 @@ namespace Zenject
         // Create a new game object from a prefab and fill in dependencies for all children
         GameObject InstantiatePrefab(UnityEngine.Object prefab);
         GameObject InstantiatePrefab(
-            UnityEngine.Object prefab, IEnumerable<object> extraArgs);
-
+            UnityEngine.Object prefab, string groupName);
         GameObject InstantiatePrefab(
-            UnityEngine.Object prefab, IEnumerable<object> extraArgs, string groupName);
+            UnityEngine.Object prefab, GameObjectCreationParameters gameObjectBindInfo);
 
         // Create a new game object from a resource path and fill in dependencies for all children
         GameObject InstantiatePrefabResource(string resourcePath);
 
         GameObject InstantiatePrefabResource(
-            string resourcePath, IEnumerable<object> extraArgs);
-
-        GameObject InstantiatePrefabResource(
-            string resourcePath, IEnumerable<object> extraArgs, string groupName);
-
-        /////////////// InstantiatePrefabForComponent
+            string resourcePath, string groupName);
 
         // Same as InstantiatePrefab but returns a component after it's initialized
-
+        // and optionally allows extra arguments for the given component type
         T InstantiatePrefabForComponent<T>(UnityEngine.Object prefab);
 
         T InstantiatePrefabForComponent<T>(
@@ -80,8 +74,8 @@ namespace Zenject
         object InstantiatePrefabForComponent(
             Type concreteType, UnityEngine.Object prefab, IEnumerable<object> extraArgs);
 
-        /////////////// InstantiatePrefabResourceForComponent
-
+        // Same as InstantiatePrefabResource but returns a component after it's initialized
+        // and optionally allows extra arguments for the given component type
         T InstantiatePrefabResourceForComponent<T>(string resourcePath);
 
         T InstantiatePrefabResourceForComponent<T>(
@@ -90,66 +84,35 @@ namespace Zenject
         object InstantiatePrefabResourceForComponent(
             Type concreteType, string resourcePath, IEnumerable<object> extraArgs);
 
-        // Create a new game object from a given prefab
-        // Without returning any particular component
-        // If you want to retrieve a specific component use InstantiatePrefabForComponent
-        GameObject InstantiatePrefabExplicit(
-            UnityEngine.Object prefab, List<TypeValuePair> extraArgs);
-
-        GameObject InstantiatePrefabExplicit(
-            UnityEngine.Object prefab, List<TypeValuePair> extraArgs,
-            string groupName);
-
-        GameObject InstantiatePrefabExplicit(
-            UnityEngine.Object prefab, List<TypeValuePair> extraArgs,
-            string groupName, bool useAllArgs);
-
-        ////
-
-        GameObject InstantiatePrefabResourceExplicit(
+        // Same as InstantiatePrefabResourceForComponent except allows null values
+        // to be included in the argument list.  Also see InjectUtil.CreateArgList
+        T InstantiatePrefabResourceForComponentExplicit<T>(
             string resourcePath, List<TypeValuePair> extraArgs);
 
-        GameObject InstantiatePrefabResourceExplicit(
-            string resourcePath, List<TypeValuePair> extraArgs,
-            string groupName);
+        object InstantiatePrefabResourceForComponentExplicit(
+            Type concreteType, string resourcePath, List<TypeValuePair> extraArgs);
 
-        GameObject InstantiatePrefabResourceExplicit(
-            string resourcePath, List<TypeValuePair> extraArgs,
-            string groupName, bool useAllArgs);
+        object InstantiatePrefabResourceForComponentExplicit(
+            Type concreteType, string resourcePath, string groupName, InjectArgs args);
 
-        // Instantiate the given prefab, inject on all components, then return the instance of 'componentType'
-        // Any arguments supplied are assumed to be used as extra parameters into 'componentType'
-
-        // This is used instead of Instantiate to support specifying null values
-        // Note: Any arguments that are used will be removed from extraArgs
+        // Same as InstantiatePrefabForComponent except allows null values
+        // to be included in the argument list.  Also see InjectUtil.CreateArgList
         T InstantiatePrefabForComponentExplicit<T>(
             UnityEngine.Object prefab, List<TypeValuePair> extraArgs);
 
-        // Note: Any arguments that are used will be removed from extraArgs
         object InstantiatePrefabForComponentExplicit(
             Type componentType, UnityEngine.Object prefab, List<TypeValuePair> extraArgs);
 
-        // Note: Any arguments that are used will be removed from extraArgs
         object InstantiatePrefabForComponentExplicit(
             Type componentType, UnityEngine.Object prefab, List<TypeValuePair> extraArgs,
             string groupName);
 
-        // Note: Any arguments that are used will be removed from extraArgs
         object InstantiatePrefabForComponentExplicit(
             Type componentType, UnityEngine.Object prefab, string groupName, InjectArgs args);
 
-        // This is used instead of Instantiate to support specifying null values
-        // Note: Any arguments that are used will be removed from extraArgs
-        T InstantiatePrefabResourceForComponentExplicit<T>(
-            string resourcePath, List<TypeValuePair> extraArgs);
-
-        // Note: Any arguments that are used will be removed from extraArgs
-        object InstantiatePrefabResourceForComponentExplicit(
-            Type concreteType, string resourcePath, List<TypeValuePair> extraArgs);
-
-        // Note: Any arguments that are used will be removed from extraArgs
-        object InstantiatePrefabResourceForComponentExplicit(
-            Type concreteType, string resourcePath, string groupName, InjectArgs args);
+        object InstantiatePrefabForComponentExplicit(
+            Type componentType, UnityEngine.Object prefab,
+            GameObjectCreationParameters gameObjectBindInfo, InjectArgs args);
 
         GameObject CreateEmptyGameObject(string name);
 #endif

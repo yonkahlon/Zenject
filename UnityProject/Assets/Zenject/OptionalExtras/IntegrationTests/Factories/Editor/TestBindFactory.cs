@@ -14,46 +14,78 @@ namespace Zenject.Tests.Factories
     {
         GameObject FooPrefab
         {
-            get
-            {
-                return FixtureUtil.GetPrefab("TestBindFactory/Foo");
-            }
+            get { return FixtureUtil.GetPrefab("TestBindFactory/Foo"); }
+        }
+
+        GameObject CameraPrefab
+        {
+            get { return FixtureUtil.GetPrefab("TestBindFactory/Camera"); }
         }
 
         GameObject FooSubContainerPrefab
         {
-            get
-            {
-                return FixtureUtil.GetPrefab("TestBindFactory/FooSubContainer");
-            }
+            get { return FixtureUtil.GetPrefab("TestBindFactory/FooSubContainer"); }
         }
 
         [Test]
-        public void TestToGameObjectSelf()
+        public void TestFromNewComponentOnNewGameObject()
         {
             Container.BindFactory<Foo, Foo.Factory>().FromNewComponentOnNewGameObject();
 
             Initialize();
 
             FixtureUtil.CallFactoryCreateMethod<Foo, Foo.Factory>(Container);
-
             FixtureUtil.AssertComponentCount<Foo>(Container, 1);
             FixtureUtil.AssertNumGameObjects(Container, 1);
         }
 
         [Test]
-        [ExpectedException]
-        public void TestToGameObjectSelfFail()
+        public void TestFromNewComponentOnNewGameObjectComponent()
+        {
+            Container.BindFactory<Camera, CameraFactory>().FromNewComponentOnNewGameObject();
+
+            Initialize();
+
+            FixtureUtil.CallFactoryCreateMethod<Camera, CameraFactory>(Container);
+            FixtureUtil.AssertComponentCount<Camera>(Container, 1);
+            FixtureUtil.AssertNumGameObjects(Container, 1);
+        }
+
+        [Test]
+        public void TestFromNewComponentOnNewGameObjectComponentFailure()
+        {
+            Container.BindFactory<string, Camera, CameraFactory2>().FromNewComponentOnNewGameObject();
+
+            Initialize();
+
+            Assert.Throws(() => Container.Resolve<CameraFactory2>().Create("asdf"));
+        }
+
+        [Test]
+        public void TestFromNewComponentOnNewGameObjectWithParamsSuccess()
+        {
+            Container.BindFactory<int, Foo2, Foo2.Factory2>().FromNewComponentOnNewGameObject();
+
+            Initialize();
+
+            Container.Resolve<Foo2.Factory2>().Create(5);
+
+            FixtureUtil.AssertComponentCount<Foo2>(Container, 1);
+            FixtureUtil.AssertNumGameObjects(Container, 1);
+        }
+
+        [Test]
+        public void TestFromNewComponentOnNewGameObjectWithParamsFailure()
         {
             Container.BindFactory<Foo2, Foo2.Factory>().FromNewComponentOnNewGameObject();
 
             Initialize();
 
-            FixtureUtil.CallFactoryCreateMethod<Foo, Foo.Factory>(Container);
+            Assert.Throws(() => Container.Resolve<Foo2.Factory>().Create());
         }
 
         [Test]
-        public void TestToGameObjectConcrete()
+        public void TestFromNewComponentOnNewGameObjectConcrete()
         {
             Container.BindFactory<IFoo, IFooFactory>().To<Foo>().FromNewComponentOnNewGameObject();
 
@@ -65,7 +97,7 @@ namespace Zenject.Tests.Factories
         }
 
         [Test]
-        public void TestToMonoBehaviourSelf()
+        public void TestFromNewComponentOnSelf()
         {
             var gameObject = Container.CreateEmptyGameObject("foo");
 
@@ -80,7 +112,7 @@ namespace Zenject.Tests.Factories
 
         [Test]
         [ExpectedException]
-        public void TestToMonoBehaviourSelfFail()
+        public void TestFromNewComponentOnSelfFail()
         {
             Container.BindFactory<Foo2, Foo2.Factory>().FromNewComponentOn((GameObject)null);
 
@@ -88,7 +120,7 @@ namespace Zenject.Tests.Factories
         }
 
         [Test]
-        public void TestToMonoBehaviourConcrete()
+        public void TestFromNewComponentOnConcrete()
         {
             var gameObject = Container.CreateEmptyGameObject("foo");
 
@@ -102,7 +134,7 @@ namespace Zenject.Tests.Factories
         }
 
         [Test]
-        public void TestToPrefabSelf()
+        public void TestFromComponentInPrefab()
         {
             Container.BindFactory<Foo, Foo.Factory>().FromComponentInPrefab(FooPrefab).WithGameObjectName("asdf");
 
@@ -111,6 +143,20 @@ namespace Zenject.Tests.Factories
             FixtureUtil.CallFactoryCreateMethod<Foo, Foo.Factory>(Container);
 
             FixtureUtil.AssertComponentCount<Foo>(Container, 1);
+            FixtureUtil.AssertNumGameObjects(Container, 1);
+            FixtureUtil.AssertNumGameObjectsWithName(Container, "asdf", 1);
+        }
+
+        [Test]
+        public void TestFromComponentInPrefabComponent()
+        {
+            Container.BindFactory<Camera, CameraFactory>().FromComponentInPrefab(CameraPrefab).WithGameObjectName("asdf");
+
+            Initialize();
+
+            FixtureUtil.CallFactoryCreateMethod<Camera, CameraFactory>(Container);
+
+            FixtureUtil.AssertComponentCount<Camera>(Container, 1);
             FixtureUtil.AssertNumGameObjects(Container, 1);
             FixtureUtil.AssertNumGameObjectsWithName(Container, "asdf", 1);
         }
@@ -293,6 +339,14 @@ namespace Zenject.Tests.Factories
             Assert.IsNotNull(tempGameObject.transform.GetChild(0).GetComponent<Foo>());
         }
 
+        public class CameraFactory2 : Factory<string, Camera>
+        {
+        }
+
+        public class CameraFactory : Factory<Camera>
+        {
+        }
+
         public class Foo3 : MonoBehaviour
         {
             public class Factory : Factory<Foo3>
@@ -306,6 +360,10 @@ namespace Zenject.Tests.Factories
             int _value;
 
             public class Factory : Factory<Foo2>
+            {
+            }
+
+            public class Factory2 : Factory<int, Foo2>
             {
             }
         }

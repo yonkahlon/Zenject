@@ -45,7 +45,7 @@ namespace Zenject
             _container = container;
 
             container.LazyInstanceInjector
-                .AddInstances(GetInjectableComponents().Cast<object>());
+                .AddInstances(GetInjectableMonoBehaviours().Cast<object>());
         }
 
         public void InstallDecoratorSceneBindings()
@@ -59,9 +59,9 @@ namespace Zenject
             InstallInstallers();
         }
 
-        protected override IEnumerable<MonoBehaviour> GetInjectableComponents()
+        protected override IEnumerable<MonoBehaviour> GetInjectableMonoBehaviours()
         {
-            return ZenUtilInternal.GetInjectableComponents(this.gameObject.scene);
+            return ZenUtilInternal.GetInjectableMonoBehaviours(this.gameObject.scene);
         }
     }
 }

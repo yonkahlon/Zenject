@@ -45,7 +45,7 @@ namespace Zenject
             _container = parentContainer.CreateSubContainer();
 
             _container.LazyInstanceInjector
-                .AddInstances(GetInjectableComponents().Cast<object>());
+                .AddInstances(GetInjectableMonoBehaviours().Cast<object>());
 
             foreach (var instance in _container.LazyInstanceInjector.Instances)
             {
@@ -85,7 +85,7 @@ namespace Zenject
             Log.Debug("GameObjectContext: Initialized successfully");
         }
 
-        protected override IEnumerable<MonoBehaviour> GetInjectableComponents()
+        protected override IEnumerable<MonoBehaviour> GetInjectableMonoBehaviours()
         {
             // We inject on all components on the root except ourself
             foreach (var monoBehaviour in GetComponents<MonoBehaviour>())
@@ -111,7 +111,7 @@ namespace Zenject
             }
 
             foreach (var monoBehaviour in UnityUtil.GetDirectChildren(this.gameObject)
-                .SelectMany(ZenUtilInternal.GetInjectableComponents))
+                .SelectMany(ZenUtilInternal.GetInjectableMonoBehaviours))
             {
                 yield return monoBehaviour;
             }

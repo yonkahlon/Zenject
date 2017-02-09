@@ -14,42 +14,32 @@ namespace Zenject.Tests.Bindings
     {
         GameObject FooPrefab
         {
-            get
-            {
-                return GetPrefab("Foo");
-            }
+            get { return GetPrefab("Foo"); }
         }
 
         GameObject FooPrefab2
         {
-            get
-            {
-                return GetPrefab("Foo2");
-            }
+            get { return GetPrefab("Foo2"); }
+        }
+
+        GameObject GorpPrefab
+        {
+            get { return GetPrefab("Gorp"); }
         }
 
         GameObject GorpAndQuxPrefab
         {
-            get
-            {
-                return GetPrefab("GorpAndQux");
-            }
+            get { return GetPrefab("GorpAndQux"); }
         }
 
         GameObject NorfPrefab
         {
-            get
-            {
-                return GetPrefab("Norf");
-            }
+            get { return GetPrefab("Norf"); }
         }
 
         GameObject JimAndBobPrefab
         {
-            get
-            {
-                return GetPrefab("JimAndBob");
-            }
+            get { return GetPrefab("JimAndBob"); }
         }
 
         [Test]
@@ -131,18 +121,28 @@ namespace Zenject.Tests.Bindings
         }
 
         [Test]
-        public void TestWithArguments()
+        [ExpectedException]
+        public void TestWithArgumentsFail2()
         {
             Container.Bind(typeof(Gorp), typeof(Qux))
-                .FromComponentInPrefab(GorpAndQuxPrefab).WithGameObjectName("GorpAndQux").AsCached()
+                .FromComponentInPrefab(GorpAndQuxPrefab).WithGameObjectName("Gorp").AsCached()
                 .WithArguments(5, "test1").NonLazy();
+
+            Initialize();
+        }
+
+        [Test]
+        public void TestWithArgumentsSuccess()
+        {
+            Container.Bind<Gorp>().FromComponentInPrefab(GorpPrefab)
+                .WithGameObjectName("Gorp").AsCached()
+                .WithArguments("test1").NonLazy();
 
             Initialize();
 
             FixtureUtil.AssertNumGameObjects(Container, 1);
             FixtureUtil.AssertComponentCount<Gorp>(Container, 1);
-            FixtureUtil.AssertComponentCount<Qux>(Container, 1);
-            FixtureUtil.AssertNumGameObjectsWithName(Container, "GorpAndQux", 1);
+            FixtureUtil.AssertNumGameObjectsWithName(Container, "Gorp", 1);
         }
 
         [Test]

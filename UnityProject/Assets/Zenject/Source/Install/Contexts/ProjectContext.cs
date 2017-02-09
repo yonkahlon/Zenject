@@ -135,7 +135,7 @@ namespace Zenject
                 StaticContext.Container, isValidating);
 
             _container.LazyInstanceInjector.AddInstances(
-                GetInjectableComponents().Cast<object>());
+                GetInjectableMonoBehaviours().Cast<object>());
 
             _container.IsInstalling = true;
 
@@ -155,9 +155,9 @@ namespace Zenject
             _dependencyRoots.AddRange(_container.ResolveDependencyRoots());
         }
 
-        protected override IEnumerable<MonoBehaviour> GetInjectableComponents()
+        protected override IEnumerable<MonoBehaviour> GetInjectableMonoBehaviours()
         {
-            return ZenUtilInternal.GetInjectableComponents(this.gameObject);
+            return ZenUtilInternal.GetInjectableMonoBehaviours(this.gameObject);
         }
 
         void InstallBindings()
