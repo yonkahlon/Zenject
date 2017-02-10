@@ -47,14 +47,16 @@ namespace Zenject
         // Create a new game object from a prefab and fill in dependencies for all children
         GameObject InstantiatePrefab(UnityEngine.Object prefab);
         GameObject InstantiatePrefab(
-            UnityEngine.Object prefab, string groupName);
+            UnityEngine.Object prefab, Transform parentTransform);
         GameObject InstantiatePrefab(
             UnityEngine.Object prefab, GameObjectCreationParameters gameObjectBindInfo);
 
         // Create a new game object from a resource path and fill in dependencies for all children
         GameObject InstantiatePrefabResource(string resourcePath);
         GameObject InstantiatePrefabResource(
-            string resourcePath, string groupName);
+            string resourcePath, Transform parentTransform);
+        GameObject InstantiatePrefabResource(
+            string resourcePath, GameObjectCreationParameters creationInfo);
 
         // Same as InstantiatePrefab but returns a component after it's initialized
         // and optionally allows extra arguments for the given component type
@@ -106,7 +108,8 @@ namespace Zenject
         object InstantiatePrefabResourceForComponentExplicit(
             Type concreteType, string resourcePath, List<TypeValuePair> extraArgs);
         object InstantiatePrefabResourceForComponentExplicit(
-            Type concreteType, string resourcePath, string groupName, InjectArgs args);
+            Type concreteType, string resourcePath,
+            GameObjectCreationParameters creationInfo, InjectArgs args);
 
         // Same as InstantiatePrefabForComponent except allows null values
         // to be included in the argument list.  Also see InjectUtil.CreateArgList
@@ -116,9 +119,7 @@ namespace Zenject
             Type componentType, UnityEngine.Object prefab, List<TypeValuePair> extraArgs);
         object InstantiatePrefabForComponentExplicit(
             Type componentType, UnityEngine.Object prefab, List<TypeValuePair> extraArgs,
-            string groupName);
-        object InstantiatePrefabForComponentExplicit(
-            Type componentType, UnityEngine.Object prefab, string groupName, InjectArgs args);
+            GameObjectCreationParameters creationInfo);
         object InstantiatePrefabForComponentExplicit(
             Type componentType, UnityEngine.Object prefab,
             GameObjectCreationParameters gameObjectBindInfo, InjectArgs args);

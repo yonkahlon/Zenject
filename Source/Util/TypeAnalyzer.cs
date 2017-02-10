@@ -17,23 +17,28 @@ namespace Zenject
 
         public static ZenjectTypeInfo GetInfo(Type type)
         {
-            Assert.That(!type.IsAbstract(),
-                "Tried to analyze abstract type '{0}'.  This is not currently allowed.", type);
-
-            ZenjectTypeInfo info;
-
-#if ZEN_MULTITHREADING
-            lock (_typeInfo)
+#if UNITY_EDITOR
+            using (ProfileBlock.Start("Zenject Reflection"))
 #endif
             {
-                if (!_typeInfo.TryGetValue(type, out info))
-                {
-                    info = CreateTypeInfo(type);
-                    _typeInfo.Add(type, info);
-                }
-            }
+                Assert.That(!type.IsAbstract(),
+                    "Tried to analyze abstract type '{0}'.  This is not currently allowed.", type);
 
-            return info;
+                ZenjectTypeInfo info;
+
+#if ZEN_MULTITHREADING
+                lock (_typeInfo)
+#endif
+                {
+                    if (!_typeInfo.TryGetValue(type, out info))
+                    {
+                        info = CreateTypeInfo(type);
+                        _typeInfo.Add(type, info);
+                    }
+                }
+
+                return info;
+            }
         }
 
         static ZenjectTypeInfo CreateTypeInfo(Type type)
