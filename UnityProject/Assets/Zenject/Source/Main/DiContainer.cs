@@ -998,10 +998,8 @@ namespace Zenject
 
             var prefabAsGameObject = GetPrefabAsGameObject(prefab);
 
-            var gameObj = (GameObject)GameObject.Instantiate(prefabAsGameObject);
-
-            gameObj.transform.SetParent(
-                GetTransformGroup(gameObjectBindInfo), false);
+            var gameObj = (GameObject)GameObject.Instantiate(
+                prefabAsGameObject, GetTransformGroup(gameObjectBindInfo));
 
             if (gameObjectBindInfo.Name != null)
             {
@@ -1184,15 +1182,15 @@ namespace Zenject
         // Create a new game object from a prefab and fill in dependencies for all children
         public GameObject InstantiatePrefab(UnityEngine.Object prefab)
         {
-            return InstantiatePrefab(prefab, (string)null);
+            return InstantiatePrefab(
+                prefab, new GameObjectCreationParameters());
         }
 
         // Create a new game object from a prefab and fill in dependencies for all children
-        public GameObject InstantiatePrefab(
-            UnityEngine.Object prefab, string groupName)
+        public GameObject InstantiatePrefab(UnityEngine.Object prefab, Transform parentTransform)
         {
             return InstantiatePrefab(
-                prefab, new GameObjectCreationParameters() { GroupName = groupName });
+                prefab, new GameObjectCreationParameters() { ParentTransform = parentTransform });
         }
 
         // Create a new game object from a prefab and fill in dependencies for all children
@@ -1211,19 +1209,25 @@ namespace Zenject
         // Create a new game object from a resource path and fill in dependencies for all children
         public GameObject InstantiatePrefabResource(string resourcePath)
         {
-            return InstantiatePrefabResource(resourcePath, null);
+            return InstantiatePrefabResource(resourcePath, new GameObjectCreationParameters());
+        }
+
+        // Create a new game object from a resource path and fill in dependencies for all children
+        public GameObject InstantiatePrefabResource(string resourcePath, Transform parentTransform)
+        {
+            return InstantiatePrefabResource(resourcePath, new GameObjectCreationParameters() { ParentTransform = parentTransform });
         }
 
         // Create a new game object from a resource path and fill in dependencies for all children
         public GameObject InstantiatePrefabResource(
-            string resourcePath, string groupName)
+            string resourcePath, GameObjectCreationParameters creationInfo)
         {
             var prefab = (GameObject)Resources.Load(resourcePath);
 
             Assert.IsNotNull(prefab,
                 "Could not find prefab at resource location '{0}'".Fmt(resourcePath));
 
-            return InstantiatePrefab(prefab, groupName);
+            return InstantiatePrefab(prefab, creationInfo);
         }
 
         // Same as InstantiatePrefab but returns a component after it's initialized
@@ -2037,7 +2041,7 @@ namespace Zenject
             Type componentType, string resourcePath, List<TypeValuePair> extraArgs)
         {
             return InstantiatePrefabResourceForComponentExplicit(
-                componentType, resourcePath, null,
+                componentType, resourcePath, new GameObjectCreationParameters(),
                 new InjectArgs()
                 {
                     ExtraArgs = extraArgs,
@@ -2050,13 +2054,14 @@ namespace Zenject
         // Same as InstantiatePrefabResourceForComponent except allows null values
         // to be included in the argument list.  Also see InjectUtil.CreateArgList
         public object InstantiatePrefabResourceForComponentExplicit(
-            Type componentType, string resourcePath, string groupName, InjectArgs args)
+            Type componentType, string resourcePath,
+            GameObjectCreationParameters creationInfo, InjectArgs args)
         {
             var prefab = (GameObject)Resources.Load(resourcePath);
             Assert.IsNotNull(prefab,
                 "Could not find prefab at resource location '{0}'".Fmt(resourcePath));
             return InstantiatePrefabForComponentExplicit(
-                componentType, prefab, groupName, args);
+                componentType, prefab, creationInfo, args);
         }
 
         // Same as InstantiatePrefabForComponent except allows null values
@@ -2074,32 +2079,23 @@ namespace Zenject
             Type componentType, UnityEngine.Object prefab, List<TypeValuePair> extraArgs)
         {
             return InstantiatePrefabForComponentExplicit(
-                componentType, prefab, extraArgs, null);
+                componentType, prefab, extraArgs, new GameObjectCreationParameters());
         }
 
         // Same as InstantiatePrefabForComponent except allows null values
         // to be included in the argument list.  Also see InjectUtil.CreateArgList
         public object InstantiatePrefabForComponentExplicit(
             Type componentType, UnityEngine.Object prefab, List<TypeValuePair> extraArgs,
-            string groupName)
+            GameObjectCreationParameters creationInfo)
         {
             return InstantiatePrefabForComponentExplicit(
-                componentType, prefab, groupName,
+                componentType, prefab, creationInfo,
                 new InjectArgs()
                 {
                     ExtraArgs = extraArgs,
                     Context = new InjectContext(this, componentType, null),
                     ConcreteIdentifier = null,
                 });
-        }
-
-        // Same as InstantiatePrefabForComponent except allows null values
-        // to be included in the argument list.  Also see InjectUtil.CreateArgList
-        public object InstantiatePrefabForComponentExplicit(
-            Type componentType, UnityEngine.Object prefab, string groupName, InjectArgs args)
-        {
-            return InstantiatePrefabForComponentExplicit(
-                componentType, prefab, new GameObjectCreationParameters() { GroupName = groupName }, args);
         }
 
         // Same as InstantiatePrefabForComponent except allows null values
@@ -2120,9 +2116,8 @@ namespace Zenject
 
             GameObject prefabAsGameObject = GetPrefabAsGameObject(prefab);
 
-            var gameObj = (GameObject)GameObject.Instantiate(prefabAsGameObject);
-
-            gameObj.transform.SetParent(GetTransformGroup(gameObjectBindInfo), false);
+            var gameObj = (GameObject)GameObject.Instantiate(
+                prefabAsGameObject, GetTransformGroup(gameObjectBindInfo));
 
             return InjectGameObjectForComponentExplicit(
                 gameObj, componentType, args);
