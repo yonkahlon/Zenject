@@ -88,7 +88,7 @@ namespace Zenject.Tests.Bindings
         public void TestMultipleConcreteTransient1()
         {
             Container.Bind<IFoo>().To(typeof(Foo), typeof(Bar)).FromNewComponentOnNewGameObject()
-                .WithGameObjectName(GameObjName);
+                .WithGameObjectName(GameObjName).AsTransient();
 
             Container.BindRootResolve<IFoo>();
 

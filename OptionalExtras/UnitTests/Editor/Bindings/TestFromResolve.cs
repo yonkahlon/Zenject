@@ -78,7 +78,7 @@ namespace Zenject.Tests.Bindings
         [Test]
         public void TestResolveManyTransient()
         {
-            Container.Bind<Foo>().NonLazy();
+            Container.Bind<Foo>().AsTransient().NonLazy();
             Container.Bind<Foo>().FromInstance(new Foo()).NonLazy();
 
             Container.Bind<IFoo>().To<Foo>().FromResolve().NonLazy();
@@ -89,7 +89,7 @@ namespace Zenject.Tests.Bindings
         [Test]
         public void TestResolveManyTransient2()
         {
-            Container.Bind<Foo>().NonLazy();
+            Container.Bind<Foo>().AsTransient().NonLazy();
             Container.Bind<Foo>().FromInstance(new Foo()).NonLazy();
 
             Container.Bind(typeof(IFoo), typeof(IBar)).To<Foo>().FromResolve().NonLazy();
@@ -101,8 +101,8 @@ namespace Zenject.Tests.Bindings
         [Test]
         public void TestResolveManyCached()
         {
-            Container.Bind<Foo>().NonLazy();
-            Container.Bind<Foo>().NonLazy();
+            Container.Bind<Foo>().AsTransient().NonLazy();
+            Container.Bind<Foo>().AsTransient().NonLazy();
 
             Container.Bind<IFoo>().To<Foo>().FromResolve().AsCached().NonLazy();
 
@@ -113,8 +113,8 @@ namespace Zenject.Tests.Bindings
         [Test]
         public void TestResolveManyCached2()
         {
-            Container.Bind<Foo>().NonLazy();
-            Container.Bind<Foo>().NonLazy();
+            Container.Bind<Foo>().AsTransient().NonLazy();
+            Container.Bind<Foo>().AsTransient().NonLazy();
 
             Container.Bind(typeof(IFoo), typeof(IBar)).To<Foo>().FromResolve().AsCached().NonLazy();
 
@@ -126,8 +126,8 @@ namespace Zenject.Tests.Bindings
         [Test]
         public void TestResolveManyCached3()
         {
-            Container.Bind<Foo>().NonLazy();
-            Container.Bind<Foo>().NonLazy();
+            Container.Bind<Foo>().AsTransient().NonLazy();
+            Container.Bind<Foo>().AsTransient().NonLazy();
 
             Container.Bind<IFoo>().To<Foo>().FromResolve().AsCached().NonLazy();
             Container.Bind<IBar>().To<Foo>().FromResolve().AsCached().NonLazy();
@@ -140,8 +140,8 @@ namespace Zenject.Tests.Bindings
         [Test]
         public void TestResolveManySingle()
         {
-            Container.Bind<Foo>().NonLazy();
-            Container.Bind<Foo>().NonLazy();
+            Container.Bind<Foo>().AsTransient().NonLazy();
+            Container.Bind<Foo>().AsTransient().NonLazy();
 
             // This is a bit weird since it's a singleton but matching multiple... but valid
             Container.Bind<IFoo>().To<Foo>().FromResolve().AsSingle().NonLazy();

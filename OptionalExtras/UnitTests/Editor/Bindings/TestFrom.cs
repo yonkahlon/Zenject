@@ -73,7 +73,7 @@ namespace Zenject.Tests.Bindings
         [Test]
         public void TestConcreteTransient2()
         {
-            Container.Bind<IFoo>().To<Foo>().NonLazy();
+            Container.Bind<IFoo>().To<Foo>().AsTransient().NonLazy();
 
             Assert.IsNotNull(Container.Resolve<IFoo>());
             Assert.IsNotEqual(Container.Resolve<IFoo>(), Container.Resolve<IFoo>());

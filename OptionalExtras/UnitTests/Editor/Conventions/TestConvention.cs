@@ -17,7 +17,7 @@ namespace Zenject.Tests.Convention
         public void TestDerivingFrom()
         {
             Container.Bind<IFoo>()
-                .To(x => x.AllTypes().DerivingFrom<IFoo>().FromThisAssembly());
+                .To(x => x.AllTypes().DerivingFrom<IFoo>().FromThisAssembly()).AsTransient();
 
             Assert.IsEqual(Container.ResolveAll<IFoo>().Count(), 4);
         }
@@ -26,7 +26,7 @@ namespace Zenject.Tests.Convention
         public void TestDerivingFrom2()
         {
             Container.Bind<IFoo>()
-                .To(x => x.AllTypes().DerivingFrom<IFoo>());
+                .To(x => x.AllTypes().DerivingFrom<IFoo>()).AsTransient();
 
             Assert.IsEqual(Container.ResolveAll<IFoo>().Count(), 4);
         }
@@ -35,7 +35,7 @@ namespace Zenject.Tests.Convention
         public void TestMatchAll()
         {
             // Should automatically filter by contract types
-            Container.Bind<IFoo>().To(x => x.AllNonAbstractClasses());
+            Container.Bind<IFoo>().To(x => x.AllNonAbstractClasses()).AsTransient();
 
             Assert.IsEqual(Container.ResolveAll<IFoo>().Count(), 4);
         }
@@ -45,7 +45,7 @@ namespace Zenject.Tests.Convention
         public void TestDerivingFromFail()
         {
             Container.Bind<IFoo>()
-                .To(x => x.AllTypes().DerivingFrom<IFoo>().FromAssemblyContaining<UnityEngine.Vector3>());
+                .To(x => x.AllTypes().DerivingFrom<IFoo>().FromAssemblyContaining<UnityEngine.Vector3>()).AsTransient();
 
             Assert.That(Container.ResolveAll<IFoo>().IsEmpty());
         }
@@ -55,7 +55,7 @@ namespace Zenject.Tests.Convention
         public void TestAttributeFilter()
         {
             Container.Bind<IFoo>()
-                .To(x => x.AllTypes().WithAttribute<ConventionTestAttribute>());
+                .To(x => x.AllTypes().WithAttribute<ConventionTestAttribute>()).AsTransient();
 
             Assert.IsEqual(Container.ResolveAll<IFoo>().Count(), 2);
         }
@@ -64,7 +64,7 @@ namespace Zenject.Tests.Convention
         public void TestAttributeWhereFilter()
         {
             Container.Bind<IFoo>()
-                .To(x => x.AllTypes().WithAttributeWhere<ConventionTestAttribute>(a => a.Num == 1));
+                .To(x => x.AllTypes().WithAttributeWhere<ConventionTestAttribute>(a => a.Num == 1)).AsTransient();
 
             Assert.IsEqual(Container.ResolveAll<IFoo>().Count(), 1);
         }
@@ -73,7 +73,7 @@ namespace Zenject.Tests.Convention
         public void TestInNamespace()
         {
             Container.Bind<IFoo>()
-                .To(x => x.AllTypes().DerivingFrom<IFoo>().InNamespace("Zenject.Tests.Convention.NamespaceTest"));
+                .To(x => x.AllTypes().DerivingFrom<IFoo>().InNamespace("Zenject.Tests.Convention.NamespaceTest")).AsTransient();
 
             Assert.IsEqual(Container.ResolveAll<IFoo>().Count(), 1);
         }

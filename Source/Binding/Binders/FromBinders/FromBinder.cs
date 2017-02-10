@@ -67,6 +67,7 @@ namespace Zenject
 
         public ScopeConditionCopyNonLazyBinder FromResolve(object subIdentifier)
         {
+            BindInfo.RequireExplicitScope = false;
             SubFinalizer = new ScopableBindingFinalizer(
                 BindInfo,
                 SingletonTypes.FromResolve, subIdentifier,
@@ -82,6 +83,10 @@ namespace Zenject
 
         public SubContainerBinder FromSubContainerResolve(object subIdentifier)
         {
+            // It's unlikely they will want to create the whole subcontainer with each binding
+            // (aka transient) which is the default so require that they specify it
+            BindInfo.RequireExplicitScope = true;
+
             return new SubContainerBinder(
                 BindInfo, FinalizerWrapper, subIdentifier);
         }
@@ -90,6 +95,7 @@ namespace Zenject
         {
             Assert.That(factoryType.DerivesFrom<IFactory>());
 
+            BindInfo.RequireExplicitScope = true;
             SubFinalizer = new ScopableBindingFinalizer(
                 BindInfo,
                 SingletonTypes.FromFactory, factoryType,
@@ -107,6 +113,7 @@ namespace Zenject
             BindingUtil.AssertIsComponent(ConcreteTypes);
             BindingUtil.AssertTypesAreNotAbstract(ConcreteTypes);
 
+            BindInfo.RequireExplicitScope = true;
             SubFinalizer = new ScopableBindingFinalizer(
                 BindInfo, SingletonTypes.FromComponentGameObject, gameObject,
                 (container, type) => new AddToExistingGameObjectComponentProvider(
@@ -120,6 +127,7 @@ namespace Zenject
             BindingUtil.AssertIsComponent(ConcreteTypes);
             BindingUtil.AssertTypesAreNotAbstract(ConcreteTypes);
 
+            BindInfo.RequireExplicitScope = true;
             SubFinalizer = new SingleProviderBindingFinalizer(
                 BindInfo, (container, type) => new AddToCurrentGameObjectComponentProvider(
                     container, type, BindInfo.ConcreteIdentifier, BindInfo.Arguments));
@@ -138,6 +146,7 @@ namespace Zenject
             BindingUtil.AssertIsComponent(ConcreteTypes);
             BindingUtil.AssertTypesAreNotAbstract(ConcreteTypes);
 
+            BindInfo.RequireExplicitScope = true;
             SubFinalizer = new ScopableBindingFinalizer(
                 BindInfo, SingletonTypes.FromGameObject, gameObjectInfo,
                 (container, type) => new AddToNewGameObjectComponentProvider(
@@ -162,6 +171,7 @@ namespace Zenject
             BindingUtil.AssertIsValidPrefab(prefab);
             BindingUtil.AssertIsInterfaceOrComponent(AllParentTypes);
 
+            BindInfo.RequireExplicitScope = true;
             SubFinalizer = new PrefabBindingFinalizer(
                 BindInfo, gameObjectInfo, prefab);
 
@@ -179,6 +189,7 @@ namespace Zenject
             BindingUtil.AssertIsValidResourcePath(resourcePath);
             BindingUtil.AssertIsInterfaceOrComponent(AllParentTypes);
 
+            BindInfo.RequireExplicitScope = true;
             SubFinalizer = new PrefabResourceBindingFinalizer(
                 BindInfo, gameObjectInfo, resourcePath);
 
@@ -190,6 +201,7 @@ namespace Zenject
             BindingUtil.AssertIsValidResourcePath(resourcePath);
             BindingUtil.AssertIsInterfaceOrScriptableObject(AllParentTypes);
 
+            BindInfo.RequireExplicitScope = true;
             SubFinalizer = new ScopableBindingFinalizer(
                 BindInfo,
                 SingletonTypes.FromScriptableObjectResource,
@@ -204,6 +216,7 @@ namespace Zenject
         {
             BindingUtil.AssertDerivesFromUnityObject(ConcreteTypes);
 
+            BindInfo.RequireExplicitScope = false;
             SubFinalizer = new ScopableBindingFinalizer(
                 BindInfo,
                 SingletonTypes.FromResource,
@@ -217,6 +230,7 @@ namespace Zenject
 
         public ScopeArgConditionCopyNonLazyBinder FromMethodUntyped(Func<InjectContext, object> method)
         {
+            BindInfo.RequireExplicitScope = false;
             SubFinalizer = new ScopableBindingFinalizer(
                 BindInfo,
                 SingletonTypes.FromMethod, new SingletonImplIds.ToMethod(method),
@@ -229,6 +243,7 @@ namespace Zenject
         {
             BindingUtil.AssertIsDerivedFromTypes(typeof(TConcrete), AllParentTypes);
 
+            BindInfo.RequireExplicitScope = false;
             SubFinalizer = new ScopableBindingFinalizer(
                 BindInfo,
                 SingletonTypes.FromMethod, new SingletonImplIds.ToMethod(method),
@@ -241,6 +256,7 @@ namespace Zenject
         {
             BindingUtil.AssertIsDerivedFromTypes(typeof(TConcrete), AllParentTypes);
 
+            BindInfo.RequireExplicitScope = false;
             SubFinalizer = new ScopableBindingFinalizer(
                 BindInfo,
                 SingletonTypes.FromMethod, new SingletonImplIds.ToMethod(method),
@@ -254,6 +270,8 @@ namespace Zenject
         {
             BindingUtil.AssertIsDerivedFromTypes(typeof(TConcrete), AllParentTypes);
 
+            // This is kind of like a look up method like FromMethod so don't enforce specifying scope
+            BindInfo.RequireExplicitScope = false;
             SubFinalizer = new ScopableBindingFinalizer(
                 BindInfo,
                 SingletonTypes.FromFactory, typeof(TFactory),
@@ -267,6 +285,7 @@ namespace Zenject
         {
             BindingUtil.AssertIsDerivedFromTypes(typeof(TResult), AllParentTypes);
 
+            BindInfo.RequireExplicitScope = false;
             SubFinalizer = new ScopableBindingFinalizer(
                 BindInfo,
                 SingletonTypes.FromGetter,
@@ -287,6 +306,7 @@ namespace Zenject
 
             BindingUtil.AssertInstanceDerivesFromOrEqual(instance, AllParentTypes);
 
+            BindInfo.RequireExplicitScope = false;
             SubFinalizer = new ScopableBindingFinalizer(
                 BindInfo, SingletonTypes.FromInstance, instance,
                 (container, type) => new InstanceProvider(container, type, instance));
