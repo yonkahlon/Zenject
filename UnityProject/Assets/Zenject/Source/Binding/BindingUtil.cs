@@ -94,6 +94,25 @@ namespace Zenject
             // a way to do this besides loading it
         }
 
+        public static void AssertIsInterfaceOrScriptableObject(IEnumerable<Type> types)
+        {
+            foreach (var type in types)
+            {
+                AssertIsInterfaceOrScriptableObject(type);
+            }
+        }
+
+        public static void AssertIsInterfaceOrScriptableObject<T>()
+        {
+            AssertIsInterfaceOrScriptableObject(typeof(T));
+        }
+
+        public static void AssertIsInterfaceOrScriptableObject(Type type)
+        {
+            Assert.That(type.DerivesFrom(typeof(ScriptableObject)) || type.IsInterface(),
+                "Invalid type given during bind command.  Expected type '{0}' to either derive from UnityEngine.ScriptableObject or be an interface", type);
+        }
+
         public static void AssertIsInterfaceOrComponent(IEnumerable<Type> types)
         {
             foreach (var type in types)

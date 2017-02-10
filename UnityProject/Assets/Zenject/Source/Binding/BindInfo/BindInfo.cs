@@ -5,6 +5,7 @@ namespace Zenject
 {
     public enum ScopeTypes
     {
+        Unset,
         Transient,
         Singleton,
         Cached,
@@ -34,7 +35,7 @@ namespace Zenject
             ToChoice = ToChoices.Self;
             CopyIntoAllSubContainers = false;
             NonLazy = false;
-            Scope = ScopeTypes.Transient;
+            Scope = ScopeTypes.Unset;
             InvalidBindResponse = InvalidBindResponses.Assert;
         }
 
@@ -57,6 +58,12 @@ namespace Zenject
         {
             get;
             private set;
+        }
+
+        public bool RequireExplicitScope
+        {
+            get;
+            set;
         }
 
         public object Identifier

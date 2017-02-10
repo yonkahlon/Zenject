@@ -75,7 +75,6 @@ namespace Zenject
                 var injectArgs = new InjectArgs()
                 {
                     ExtraArgs = allArgs,
-                    UseAllArgs = true,
                     Context = new InjectContext(_container, _argumentTarget, null),
                     ConcreteIdentifier = null,
                 };

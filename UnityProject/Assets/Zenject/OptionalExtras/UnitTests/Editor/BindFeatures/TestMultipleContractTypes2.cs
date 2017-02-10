@@ -51,6 +51,15 @@ namespace Zenject.Tests.BindFeatures
         }
 
         [Test]
+        public void TestAllInterfacesMistake()
+        {
+            Container.BindInterfacesTo<Foo>();
+
+            // Should require setting scope
+            Assert.Throws(() => Container.FlushBindings());
+        }
+
+        [Test]
         public void TestAllInterfaces()
         {
             Container.BindInterfacesTo<Foo>().AsSingle().NonLazy();
@@ -68,6 +77,15 @@ namespace Zenject.Tests.BindFeatures
             Assert.IsNotNull(Container.Resolve<Foo>());
             Assert.IsNotNull(Container.Resolve<IFoo>());
             Assert.IsNotNull(Container.Resolve<IQux>());
+        }
+
+        [Test]
+        public void TestAllInterfacesAndSelfMistake()
+        {
+            Container.BindInterfacesToSelf<Foo>();
+
+            // Should require setting scope
+            Assert.Throws(() => Container.FlushBindings());
         }
     }
 }
