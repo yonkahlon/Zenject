@@ -40,7 +40,7 @@ namespace Zenject.Tests.Bindings
 
             public override void InstallBindings()
             {
-                Container.Bind<Foo>().WithArgumentsExplicit(
+                Container.Bind<Foo>().AsTransient().WithArgumentsExplicit(
                     InjectUtil.CreateArgListExplicit(_value));
             }
         }

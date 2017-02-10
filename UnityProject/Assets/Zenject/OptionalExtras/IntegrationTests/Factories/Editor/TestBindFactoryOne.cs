@@ -101,7 +101,8 @@ namespace Zenject.Tests.Factories
         [Test]
         public void TestToPrefabConcrete()
         {
-            Container.BindFactory<string, IFoo, IFooFactory>().To<Foo>().FromComponentInPrefab(FooPrefab).WithGameObjectName("asdf");
+            Container.BindFactory<string, IFoo, IFooFactory>().To<Foo>()
+                .FromComponentInPrefab(FooPrefab).WithGameObjectName("asdf");
 
             AddFactoryUser<IFoo, IFooFactory>();
 
@@ -129,7 +130,8 @@ namespace Zenject.Tests.Factories
         [Test]
         public void TestToPrefabResourceConcrete()
         {
-            Container.BindFactory<string, IFoo, IFooFactory>().To<Foo>().FromComponentInPrefabResource("TestBindFactoryOne/Foo").WithGameObjectName("asdf");
+            Container.BindFactory<string, IFoo, IFooFactory>().To<Foo>()
+                .FromComponentInPrefabResource("TestBindFactoryOne/Foo").WithGameObjectName("asdf");
 
             AddFactoryUser<IFoo, IFooFactory>();
 
@@ -143,7 +145,8 @@ namespace Zenject.Tests.Factories
         [Test]
         public void TestToSubContainerPrefabSelf()
         {
-            Container.BindFactory<string, Foo, Foo.Factory>().FromSubContainerResolve().ByPrefab<FooInstaller>(FooSubContainerPrefab);
+            Container.BindFactory<string, Foo, Foo.Factory>()
+                .FromSubContainerResolve().ByPrefab<FooInstaller>(FooSubContainerPrefab);
 
             AddFactoryUser<Foo, Foo.Factory>();
 

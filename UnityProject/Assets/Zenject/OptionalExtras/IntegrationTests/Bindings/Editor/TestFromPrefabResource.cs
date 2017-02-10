@@ -122,7 +122,7 @@ namespace Zenject.Tests.Bindings
         {
             // There are three components that implement INorf on this prefab
             // and so this should result in a list of 3 INorf's
-            Container.Bind<INorf>().FromComponentInPrefabResource(PathPrefix + "Norf").NonLazy();
+            Container.Bind<INorf>().FromComponentInPrefabResource(PathPrefix + "Norf").AsTransient().NonLazy();
 
             Initialize();
 
@@ -135,7 +135,7 @@ namespace Zenject.Tests.Bindings
         public void TestAbstractBindingConcreteSearch()
         {
             // Should ignore the Norf2 component on it
-            Container.Bind<INorf>().To<Norf>().FromComponentInPrefabResource(PathPrefix + "Norf").NonLazy();
+            Container.Bind<INorf>().To<Norf>().FromComponentInPrefabResource(PathPrefix + "Norf").AsTransient().NonLazy();
 
             Initialize();
 

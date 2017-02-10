@@ -79,7 +79,8 @@ namespace Zenject.Tests.Bindings
         [Test]
         public void TestMethodConcreteCached()
         {
-            Container.Bind<IFoo>().To<Foo>().FromSubContainerResolve().ByMethod(InstallFooFacade).AsCached().NonLazy();
+            Container.Bind<IFoo>().To<Foo>()
+                .FromSubContainerResolve().ByMethod(InstallFooFacade).AsCached().NonLazy();
 
             Assert.IsNotNull(Container.Resolve<IFoo>().Bar);
         }
@@ -152,7 +153,7 @@ namespace Zenject.Tests.Bindings
             container.Bind<Foo>().AsSingle();
             container.Bind<Bar>().AsSingle();
 
-            container.Bind<Gorp>().WithId("gorp");
+            container.Bind<Gorp>().WithId("gorp").AsTransient();
         }
     }
 }

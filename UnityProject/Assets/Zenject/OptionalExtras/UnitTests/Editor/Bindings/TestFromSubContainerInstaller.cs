@@ -113,10 +113,10 @@ namespace Zenject.Tests.Bindings
                 Container.Bind<Foo>().AsSingle();
                 Container.Bind<Bar>().AsSingle();
 
-                Container.Bind<Qux>();
+                Container.Bind<Qux>().AsTransient();
                 Container.Bind<Qux>().FromInstance(new Qux());
 
-                Container.Bind<Gorp>().WithId("gorp");
+                Container.Bind<Gorp>().WithId("gorp").AsTransient();
             }
         }
     }

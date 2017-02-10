@@ -20,6 +20,7 @@ namespace Zenject
         {
             Assert.IsEqual(BindInfo.ToChoice, ToChoices.Self);
 
+            BindInfo.RequireExplicitScope = true;
             SubFinalizer = new ScopableBindingFinalizer(
                 BindInfo, SingletonTypes.FromNew, null,
                 (container, type) => new TransientProvider(

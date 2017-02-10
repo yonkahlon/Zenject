@@ -82,7 +82,7 @@ namespace Zenject.Tests.BindFeatures
         [Test]
         public void TestAllInterfacesAndSelfMistake()
         {
-            Container.BindInterfacesToSelf<Foo>();
+            Container.BindInterfacesAndSelfTo<Foo>();
 
             // Should require setting scope
             Assert.Throws(() => Container.FlushBindings());

@@ -18,7 +18,7 @@ namespace Zenject.Tests.Convention.Two
         {
             var container = new DiContainer();
 
-            container.Bind(x => x.AllInterfaces()).To<Foo>();
+            container.Bind(x => x.AllInterfaces()).To<Foo>().AsTransient();
 
             Assert.That(container.Resolve<IFoo>() is Foo);
             Assert.That(container.Resolve<IBar>() is Foo);
@@ -30,7 +30,7 @@ namespace Zenject.Tests.Convention.Two
             var container = new DiContainer();
 
             container.Bind(x => x.AllInterfaces())
-                .To(x => x.AllNonAbstractClasses().InNamespace("Zenject.Tests.Convention.Two"));
+                .To(x => x.AllNonAbstractClasses().InNamespace("Zenject.Tests.Convention.Two")).AsTransient();
 
             Assert.IsEqual(container.ResolveAll<IFoo>().Count, 2);
             Assert.IsEqual(container.ResolveAll<IBar>().Count, 2);

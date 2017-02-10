@@ -21,7 +21,7 @@ namespace Zenject.Asteroids
             var gameSettings = Container.Resolve<GameInstaller.Settings>();
             Container.Bind<AsteroidManager>().AsSingle();
             Container.BindFactory<Asteroid, Asteroid.Factory>().FromComponentInPrefab(gameSettings.AsteroidPrefab);
-            Container.Bind<Camera>().WithId("Main").FromNewComponentOnNewGameObject();
+            Container.Bind<Camera>().WithId("Main").FromNewComponentOnNewGameObject().AsTransient();
             Container.Bind<LevelHelper>().AsSingle();
 
             Initialize();
