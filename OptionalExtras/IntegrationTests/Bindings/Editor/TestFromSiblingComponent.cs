@@ -15,7 +15,7 @@ namespace Zenject.Tests.Bindings
         public void TestBasic()
         {
             Container.Bind<Bar>().FromNewComponentOnNewGameObject().AsSingle().NonLazy();
-            Container.Bind<Foo>().FromNewSiblingComponent();
+            Container.Bind<Foo>().FromNewComponentSibling();
 
             Initialize();
 
@@ -27,7 +27,7 @@ namespace Zenject.Tests.Bindings
         public void TestInvalidUse()
         {
             Container.Bind<Qux>().NonLazy();
-            Container.Bind<Foo>().FromNewSiblingComponent();
+            Container.Bind<Foo>().FromNewComponentSibling();
 
             Initialize();
         }
@@ -40,7 +40,7 @@ namespace Zenject.Tests.Bindings
             Container.Bind<Gorp>().FromNewComponentOn(gameObject).AsSingle().NonLazy();
             Container.Bind<Bar>().FromNewComponentOn(gameObject).AsSingle().NonLazy();
 
-            Container.Bind<Foo>().FromNewSiblingComponent();
+            Container.Bind<Foo>().FromNewComponentSibling();
 
             Initialize();
 

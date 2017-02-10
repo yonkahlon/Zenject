@@ -3,17 +3,17 @@ using ModestTree;
 
 namespace Zenject
 {
-    public class DynamicFactoryBindingFinalizer<TContract> : ProviderBindingFinalizer
+    public class PlaceholderFactoryBindingFinalizer<TContract> : ProviderBindingFinalizer
     {
         readonly FactoryBindInfo _factoryBindInfo;
 
-        public DynamicFactoryBindingFinalizer(
+        public PlaceholderFactoryBindingFinalizer(
             BindInfo bindInfo, FactoryBindInfo factoryBindInfo)
             : base(bindInfo)
         {
             // Note that it doesn't derive from Factory<TContract>
-            // when used with To<>, so we can only check IDynamicFactory
-            Assert.That(factoryBindInfo.FactoryType.DerivesFrom<IDynamicFactory>());
+            // when used with To<>, so we can only check IPlaceholderFactory
+            Assert.That(factoryBindInfo.FactoryType.DerivesFrom<IPlaceholderFactory>());
 
             _factoryBindInfo = factoryBindInfo;
         }

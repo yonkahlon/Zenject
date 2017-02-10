@@ -23,6 +23,18 @@ namespace Zenject
             private set;
         }
 
+        protected ScopeTypes GetScope()
+        {
+            if (BindInfo.Scope == ScopeTypes.Unset)
+            {
+                Assert.That(!BindInfo.RequireExplicitScope,
+                    "Scope must be set for the given binding {0}!  Please either specify AsTransient, AsCached, or AsSingle.", BindInfo.ContextInfo ?? "");
+                return ScopeTypes.Transient;
+            }
+
+            return BindInfo.Scope;
+        }
+
         public void FinalizeBinding(DiContainer container)
         {
             if (BindInfo.ContractTypes.IsEmpty())

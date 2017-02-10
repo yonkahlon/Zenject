@@ -12,6 +12,8 @@ namespace Zenject.Tests.Bindings
     [TestFixture]
     public class TestDiContainerMethods : ZenjectIntegrationTestFixture
     {
+        const string ResourcePrefix = "TestDiContainerMethods/";
+
         GameObject FooPrefab
         {
             get { return GetPrefab("Foo"); }
@@ -28,7 +30,129 @@ namespace Zenject.Tests.Bindings
         }
 
         [Test]
-        public void InjectGameObject()
+        public void TestInstantiateComponent()
+        {
+            Initialize();
+
+            var gameObject = new GameObject();
+
+            var foo = Container.InstantiateComponent<Foo>(gameObject);
+
+            Assert.That(foo.WasInjected);
+        }
+
+        [Test]
+        public void TestInstantiateComponentArgs()
+        {
+            Initialize();
+
+            var gameObject = new GameObject();
+
+            Assert.Throws(() => Container.InstantiateComponent<Gorp>(gameObject));
+
+            var gorp = Container.InstantiateComponent<Gorp>(gameObject, new object[] { "zxcv" });
+
+            Assert.IsEqual(gorp.Arg, "zxcv");
+        }
+
+        [Test]
+        public void TestInstantiateComponentOnNewGameObject()
+        {
+            Initialize();
+
+            var foo = Container.InstantiateComponentOnNewGameObject<Foo>();
+
+            Assert.That(foo.WasInjected);
+        }
+
+        [Test]
+        public void TestInstantiateComponentOnNewGameObjectArgs()
+        {
+            Initialize();
+
+            Assert.Throws(() => Container.InstantiateComponentOnNewGameObject<Gorp>());
+
+            var gorp = Container.InstantiateComponentOnNewGameObject<Gorp>("sdf", new object[] { "zxcv" });
+
+            Assert.IsEqual(gorp.Arg, "zxcv");
+        }
+
+        [Test]
+        public void TestInstantiatePrefab()
+        {
+            Initialize();
+
+            var go = Container.InstantiatePrefab(FooPrefab);
+
+            var foo = go.GetComponentInChildren<Foo>();
+
+            Assert.That(foo.WasInjected);
+        }
+
+        [Test]
+        public void TestInstantiatePrefabForMonoBehaviour()
+        {
+            Initialize();
+
+            Assert.Throws(() => Container.InstantiatePrefab(GorpPrefab));
+
+            var gorp = Container.InstantiatePrefabForComponent<Gorp>(GorpPrefab, new object[] { "asdf" });
+
+            Assert.IsEqual(gorp.Arg, "asdf");
+        }
+
+        [Test]
+        public void TestInstantiatePrefabResource()
+        {
+            Initialize();
+
+            Assert.Throws(() => Container.InstantiatePrefabResource(ResourcePrefix + "Gorp"));
+
+            var gorp = Container.InstantiatePrefabResourceForComponent<Gorp>(ResourcePrefix + "Gorp", new object[] { "asdf" });
+
+            Assert.IsEqual(gorp.Arg, "asdf");
+        }
+
+        [Test]
+        public void TestInstantiatePrefabForComponent()
+        {
+            Initialize();
+
+            var camera = Container.InstantiatePrefabForComponent<Camera>(CameraPrefab, new object[0]);
+            Assert.IsNotNull(camera);
+        }
+
+        [Test]
+        public void TestInstantiatePrefabForComponentMistake()
+        {
+            Initialize();
+
+            Assert.Throws(() => Container.InstantiatePrefabForComponent<Camera>(CameraPrefab, new object[] { "sdf" }));
+        }
+
+        [Test]
+        public void TestInstantiateScriptableObjectResource()
+        {
+            Initialize();
+
+            var foo = Container.InstantiateScriptableObjectResource<Foo2>(ResourcePrefix + "Foo2");
+            Assert.That(foo.WasInjected);
+        }
+
+        [Test]
+        public void TestInstantiateScriptableObjectResourceArgs()
+        {
+            Initialize();
+
+            Assert.Throws(() => Container.InstantiateScriptableObjectResource<Gorp2>(ResourcePrefix + "Gorp2"));
+
+            var gorp = Container.InstantiateScriptableObjectResource<Gorp2>(ResourcePrefix + "Gorp2", new object[] { "asdf" });
+
+            Assert.IsEqual(gorp.Arg, "asdf");
+        }
+
+        [Test]
+        public void TestInjectGameObject()
         {
             Initialize();
 
@@ -42,7 +166,7 @@ namespace Zenject.Tests.Bindings
         }
 
         [Test]
-        public void InjectGameObjectForMonoBehaviour()
+        public void TestInjectGameObjectForMonoBehaviour()
         {
             Initialize();
 
@@ -56,7 +180,7 @@ namespace Zenject.Tests.Bindings
         }
 
         [Test]
-        public void InjectGameObjectForComponent()
+        public void TestInjectGameObjectForComponent()
         {
             Initialize();
 
@@ -66,7 +190,7 @@ namespace Zenject.Tests.Bindings
         }
 
         [Test]
-        public void InjectGameObjectForComponentMistake()
+        public void TestInjectGameObjectForComponentMistake()
         {
             Initialize();
 
@@ -75,50 +199,9 @@ namespace Zenject.Tests.Bindings
             Assert.Throws(() => Container.InjectGameObjectForComponent<Camera>(go, new object[] { "sdf" }));
         }
 
-        [Test]
-        public void InstantiatePrefab()
-        {
-            Initialize();
-
-            var go = Container.InstantiatePrefab(FooPrefab);
-
-            var foo = go.GetComponentInChildren<Foo>();
-
-            Assert.That(foo.WasInjected);
-        }
-
-        [Test]
-        public void InstantiatePrefabForMonoBehaviour()
-        {
-            Initialize();
-
-            Assert.Throws(() => Container.InstantiatePrefab(GorpPrefab));
-
-            var gorp = Container.InstantiatePrefabForComponent<Gorp>(GorpPrefab, new object[] { "asdf" });
-
-            Assert.IsEqual(gorp.Arg, "asdf");
-        }
-
-        [Test]
-        public void InstantiatePrefabForComponent()
-        {
-            Initialize();
-
-            var camera = Container.InstantiatePrefabForComponent<Camera>(CameraPrefab, new object[0]);
-            Assert.IsNotNull(camera);
-        }
-
-        [Test]
-        public void InstantiatePrefabForComponentMistake()
-        {
-            Initialize();
-
-            Assert.Throws(() => Container.InstantiatePrefabForComponent<Camera>(CameraPrefab, new object[] { "sdf" }));
-        }
-
         GameObject GetPrefab(string name)
         {
-            return FixtureUtil.GetPrefab("TestDiContainerMethods/{0}".Fmt(name));
+            return FixtureUtil.GetPrefab(ResourcePrefix + name);
         }
     }
 }

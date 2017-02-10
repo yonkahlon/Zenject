@@ -72,7 +72,6 @@ namespace Zenject
             var injectArgs = new InjectArgs()
             {
                 ExtraArgs = _extraArguments.Concat(args).ToList(),
-                UseAllArgs = true,
                 Context = context,
                 ConcreteIdentifier = _concreteIdentifier,
             };

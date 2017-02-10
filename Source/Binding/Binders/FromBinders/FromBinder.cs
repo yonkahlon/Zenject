@@ -115,7 +115,7 @@ namespace Zenject
             return new ScopeArgConditionCopyNonLazyBinder(BindInfo);
         }
 
-        public ArgConditionCopyNonLazyBinder FromNewSiblingComponent()
+        public ArgConditionCopyNonLazyBinder FromNewComponentSibling()
         {
             BindingUtil.AssertIsComponent(ConcreteTypes);
             BindingUtil.AssertTypesAreNotAbstract(ConcreteTypes);
@@ -183,6 +183,21 @@ namespace Zenject
                 BindInfo, gameObjectInfo, resourcePath);
 
             return new NameTransformScopeArgConditionCopyNonLazyBinder(BindInfo, gameObjectInfo);
+        }
+
+        public ScopeArgConditionCopyNonLazyBinder FromScriptableObjectResource(string resourcePath)
+        {
+            BindingUtil.AssertIsValidResourcePath(resourcePath);
+            BindingUtil.AssertIsInterfaceOrScriptableObject(AllParentTypes);
+
+            SubFinalizer = new ScopableBindingFinalizer(
+                BindInfo,
+                SingletonTypes.FromScriptableObjectResource,
+                resourcePath.ToLower(),
+                (container, type) => new ScriptableObjectResourceProvider(
+                    resourcePath, type, container, BindInfo.ConcreteIdentifier, BindInfo.Arguments));
+
+            return new ScopeArgConditionCopyNonLazyBinder(BindInfo);
         }
 
         public ScopeConditionCopyNonLazyBinder FromResource(string resourcePath)

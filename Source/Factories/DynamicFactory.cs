@@ -5,12 +5,12 @@ using ModestTree;
 
 namespace Zenject
 {
-    public interface IDynamicFactory : IValidatable
+    public interface IPlaceholderFactory : IValidatable
     {
     }
 
-    // Dynamic factories can be used to choose a creation method in an installer, using FactoryBinder
-    public abstract class DynamicFactory<TValue> : IDynamicFactory
+    // Placeholder factories can be used to choose a creation method in an installer, using FactoryBinder
+    public abstract class PlaceholderFactory<TValue> : IPlaceholderFactory
     {
         IProvider _provider;
         InjectContext _injectContext;
