@@ -67,7 +67,8 @@ namespace Zenject
         {
             ProviderFunc =
                 (container) => new ResolveProvider(
-                    ContractType, container, subIdentifier, false);
+                    ContractType, container,
+                    subIdentifier, false, InjectSources.Any);
 
             return this;
         }

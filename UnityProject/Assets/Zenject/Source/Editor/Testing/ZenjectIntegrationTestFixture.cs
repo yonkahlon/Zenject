@@ -33,7 +33,7 @@ namespace Zenject
             // Don't clear the scene to allow tests to initialize the scene how they
             // want to set it up manually in their own [Setup] method (eg. TestFromComponentInChildren)
             // Also, I think unity might already clear the scene anyway?
-            // ClearScene();
+            //ClearScene();
 
             _hasStarted = false;
             _isValidating = CurrentTestHasAttribute<ValidateOnlyAttribute>();

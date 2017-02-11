@@ -59,7 +59,10 @@ namespace Zenject
                 {
                     container.RegisterProvider(
                         bindingId, null, new ResolveProvider(
-                            contractType, container, BindInfo.Identifier, false));
+                            contractType, container, BindInfo.Identifier, false,
+                            // We always want to only use local here so that we can use
+                            // NonLazy() inside subcontainers
+                            InjectSources.Local));
                 }
             }
         }
