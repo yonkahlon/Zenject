@@ -120,7 +120,6 @@ The tests may also be helpful to show usage for each specific feature (which you
         * <a href="#identifiers">Identifiers</a>
         * <a href="#non-generic-bindings">Non Generic bindings</a>
         * <a href="#convention-based-bindings">Convention Based Binding</a>
-        * <a href="#unbind-rebind">Unbind / Rebind</a>
         * <a href="#singleton-identifiers">Singleton Identifiers</a>
     * <a href="#scriptableobject-installer">Scriptable Object Installer</a>
     * <a href="#runtime-parameters-for-installers">Runtime Parameters For Installers</a>
@@ -129,6 +128,14 @@ The tests may also be helpful to show usage for each specific feature (which you
     * <a href="#zenject-order-of-operations">Zenject Order Of Operations</a>
     * <a href="#injecting-data-across-scenes">Injecting data across scenes</a>
     * <a href="#scene-parenting">Scene Parenting Using Contract Names</a>
+    * <a href="#dicontainer-methods">DiContainer Methods</a>
+        * <a href="#dicontainer-methods-instantiate">DiContainer.Instantiate</a>
+        * <a href="#binding">DiContainer.Bind</a>
+        * <a href="#dicontainer-methods-resolve">DiContainer.Resolve</a>
+        * <a href="#dicontainer-methods-inject">DiContainer.Inject</a>
+        * <a href="#dicontainer-methods-queueforinject">DiContainer.QueueForInject</a>
+        * <a href="#dicontainer-methods-rebind">DiContainer Unbind / Rebind</a>
+        * <a href="#dicontainer-methods-other">Other DiContainer methods</a>
     * <a href="#scenes-decorator">Scene Decorators</a>
     * <a href="#sub-containers-and-facades">Sub-Containers And Facades</a>
     * <a href="#writing-tests">Writing Automated Unit Tests / Integration Tests</a>
@@ -274,13 +281,13 @@ public class TestInstaller : MonoInstaller
     public override void InstallBindings()
     {
         Container.Bind<string>().FromInstance("Hello World!");
-        Container.Bind<TestRunner>().NonLazy();
+        Container.Bind<Greeter>().NonLazy();
     }
 }
 
-public class TestRunner
+public class Greeter
 {
-    public TestRunner(string message)
+    public Greeter(string message)
     {
         Debug.Log(message);
     }
@@ -291,7 +298,7 @@ You can run this example by doing the following:
 
 * Create a new scene in Unity
 * Right Click inside the Hierarchy tab and select `Zenject -> Scene Context`
-* Right Click in a folder within the Scene Heirarchy and Choose `Create -> Zenject -> MonoInstaller`.  Name it TestInstaller.cs.  (Note that you can also just directly create this file too without using this template).
+* Right Click in a folder within the Project Tab and Choose `Create -> Zenject -> MonoInstaller`.  Name it TestInstaller.cs.  (Note that you can also just directly create this file too without using this template).
 * Add your TestInstaller script to the scene (as its own GameObject or on the same GameObject as the SceneContext, it doesn't matter)
 * Add a reference to your TestInstaller to the properties of the SceneContext by adding a new row in the inspector of the "Installers" property (press the + button) and then dragging the TestInstaller GameObject to it
 * Open up TestInstaller and paste the above code into it
@@ -300,11 +307,11 @@ You can run this example by doing the following:
 * Note also, that you can use the shortcut CTRL+SHIFT+R to "validate then run".  Validation is usually fast enough that this does not add a noticeable overhead to running your game, and when it does detect errors it is much faster to iterate on since you avoid the startup time.
 * Observe unity console for output
 
-The SceneContext MonoBehaviour is the entry point of the application, where Zenject sets up all the various dependencies before kicking off your scene.  To add content to your Zenject scene, you need to write what is referred to in Zenject as an 'Installer', which declares all the dependencies used in your scene and their relationships with each other.  All dependencies that are marked as "NonLazy" are automatically created at this point, as well as any dependencies that implement the standard Zenject interfaces such as `IInitializable`, `ITickable`, etc.  If the above doesn't make sense to you yet, keep reading!
+The SceneContext MonoBehaviour is the entry point of the application, where Zenject sets up all the various dependencies before kicking off your scene.  To add content to your Zenject scene, you need to write what is referred to in Zenject as an 'Installer', which declares all the dependencies used in your scene and their relationships with each other.  All dependencies that are marked as "NonLazy" are automatically created at this point, which is why the Greeter class that we added above gets created on startup.  If the above doesn't make sense to you yet, keep reading!
 
 ## <a id="injection"></a>Injection
 
-There are many different ways of binding types on the container, which are documented in the <a href="#binding">next section</a>.  There are also several ways of having these dependencies injected into your classes. These are:
+There are many different ways of declaring dependencies on the container, which are documented in the <a href="#binding">next section</a>.  There are also several ways of having these dependencies injected into your classes. These are:
 
 1 - **Constructor Injection**
 
@@ -367,11 +374,11 @@ public class Foo
 
 Method Inject injection works very similarly to constructor injection.
 
-Note that these methods are called after all other injection types.  It is designed this way so that these methods can be used to execute initialization logic which might make use of one of these dependencies.  Note also that you can leave the parameter list empty if you just want to do some initialization logic only.
+Note that inject methods are called after all other injection types.  It is designed this way so that these methods can be used to execute initialization logic which might make use of one of these dependencies.  Note also that you can leave the parameter list empty if you just want to do some initialization logic only.
 
 Note that there can be any number of inject methods.  In this case, they are called in the order of Base class to Derived class.  This can be useful to avoid the need to forward many dependencies from derived classes to the base class via constructor parameters, while also guaranteeing that the base class inject methods complete first, just like how constructors work.
 
-Note that the dependencies that you receive via inject methods should themselves have already been injected.  This can be important if you use inject methods to perform some basic initialization, since you may need the given dependencies to themselves be initialized via their Inject methods.
+Note that the dependencies that you receive via inject methods should themselves have already been injected (the only exception to this is in the case where you have circular dependencies).  This can be important if you use inject methods to perform some basic initialization, since you may need the given dependencies to themselves be initialized via their Inject methods.
 
 Using [Inject] methods to inject dependencies is the recommended approach for MonoBehaviours, since MonoBehaviours cannot have constructors.
 
@@ -381,7 +388,7 @@ Using [Inject] methods to inject dependencies is the recommended approach for Mo
     * Constructor injection forces the dependency to only be resolved once, at class creation, which is usually what you want.  In most cases you don't want to expose a public property for your initial dependencies because this suggests that it's open to changing.
     * Constructor injection guarantees no circular dependencies between classes, which is generally a bad thing to do.  You can do this however using method injection or field injection if necessary.
     * Constructor/Method injection is more portable for cases where you decide to re-use the code without a DI framework such as Zenject.  You can do the same with public properties but it's more error prone (it's easier to forget to initialize one field and leave the object in an invalid state)
-    * Finally, Constructor/Method injection makes it clear what all the dependencies of a class are when another programmer is reading the code.  They can simply look at the parameter list of the method.  This is also good because it will be more obvious when a class has too many dependencies and should therefore be split up (since it's constructor parameter list will be too long)
+    * Finally, Constructor/Method injection makes it clear what all the dependencies of a class are when another programmer is reading the code.  They can simply look at the parameter list of the method.  This is also good because it will be more obvious when a class has too many dependencies and should therefore be split up (since it's constructor parameter list will start to seem long)
 
 ## <a id="binding"></a>Binding
 
@@ -424,7 +431,7 @@ Container.Bind&lt;<b>ContractType</b>&gt;()
     .As<b>Scope</b>()
     .WithArguments(<b>Arguments</b>)
     .When(<b>Condition</b>)
-    .InheritInSubContainers()
+    .CopyIntoAllSubContainers()
     .NonLazy();
 </pre>
 
@@ -452,7 +459,7 @@ Where:
     * It can be one of the following:
         1. **AsTransient** - Will not re-use the instance at all.  Every time **ContractType** is requested, the DiContainer will return a brand new instance of type **ResultType**
         2. **AsCached** - Will re-use the same instance of **ResultType** every time **ContractType** is requested, which it will lazily generate upon first use
-        3. **AsSingle** - Will re-use the same instance of **ResultType** across the entire DiContainer, which it will lazily generate upon first use.  It can be thought of as a stronger version of AsCached, because it allows you to bind to the same instance across multiple bind commands.  It will also ensure that there is only ever exactly one instance of **ResultType** in the DiContainer (ie. it will enforce **ResultType** to be a 'Singleton' hence the name).
+        3. **AsSingle** - Will re-use the same instance of **ResultType** across the entire DiContainer, which it will lazily generate upon first use.  It can be thought of as a stronger version of AsCached, because it allows you to bind to the same instance across multiple bind commands.  It will also ensure that there is only ever exactly one instance of **ResultType** in the DiContainer (ie. it will enforce **ResultType** to be a 'Singleton' hence the name).  Note however that it will only guarantee that there is only one instance across the given container, which means that using AsSingle with the same binding in a sub-container could generate a second instance.
 
     * In most cases, you will likely want to just use AsSingle, however AsTransient and AsCached have their uses too.
     * To illustrate the difference between the different scope types, see the following example:
@@ -506,9 +513,9 @@ Where:
         Container.Bind<IBar>().To<Bar>().AsSingle();
         ```
 
-* **Arguments** = A list of objects to use when constructing the new instance of type **ResultType**.  This can be useful as an alternative to `Container.BindInstance(arg).WhenInjectedInto<ResultType>()`
+* **Arguments** = A list of objects to use when constructing the new instance of type **ResultType**.  This can be useful as an alternative to adding other bindings for the arguments in the form `Container.BindInstance(arg).WhenInjectedInto<ResultType>()`
 * **Condition** = The condition that must be true for this binding to be chosen.  See <a href="#conditional-bindings">here</a> for more details.
-* **InheritInSubContainers** = If supplied, then this binding will automatically be inherited from any subcontainers that are created from it.  In other words, the result will be equivalent to copying and pasting the `Container.Bind` statement into the installer for every sub-container.
+* **CopyIntoAllSubContainers** = If supplied, then this binding will automatically be inherited from any subcontainers that are created from it.  In other words, the result will be equivalent to copying and pasting the `Container.Bind` statement into the installer for every sub-container.
 * **NonLazy** = Normally, the **ResultType** is only ever instantiated when the binding is first used (aka "lazily").  However, when NonLazy is used, **ResultType** will immediately by created on startup.
 
 ## <a id="construction-methods"></a>Construction Methods
@@ -521,7 +528,7 @@ Where:
     Container.Bind<Foo>().FromNew();
     ```
 
-1. **FromInstance** - Use a given instance
+1. **FromInstance** - Add a given instance to the container.  Note that the given instance will not be injected in this case.  If you also want your instance to be injected at startup, see <a href="#dicontainer-methods-queueforinject">QueueForInject</a>
 
     ```csharp
     Container.Bind<Foo>().FromInstance(new Foo());
@@ -1507,17 +1514,20 @@ Any ITickables, IInitializables, or `IDisposable`'s that are not assigned a prio
 
 ## <a id="zenject-order-of-operations"></a>Zenject Order Of Operations
 
-A Zenject driven application is executed by the following steps:
+What follows below is a more detailed view of what happens when running a scene that uses Zenject.  This can be useful to know to fully understand exactly how Zenject works.
 
 * Unity Awake() phase begins
     * SceneContext.Awake() method is called.  This should always be the first thing executed in your scene.  It should work this way by default (see <a href="#bad-execution-order">here</a> if you are noticing otherwise).
-    * If this is the first scene to be loaded during this play session, SceneContext will create the ProjectContext prefab.  If ProjectContext has already been created by a previous scene, we skip this step and directly initialize the SceneContext
-    * ProjectContext iterates through all the Installers that have been added to its prefab via the Unity Inspector, updates them to point to its DiContainer, then calls InstallBindings() on each.  Each Installer calls some number of Bind<> methods on the DiContainer.
-    * ProjectContext then injects all MonoBehaviours attached to its game object as well as its children
-    * ProjectContext then constructs all the non-lazy root objects, which includes any classes that derive from ITickable / IInitializable or IDisposable, as well as those classes that are added with a `NonLazy()` binding.
-    * SceneContext iterates through all the Installers that have been added to it via the Unity Inspector, updates them to point to its DiContainer, then calls InstallBindings() on each.  Each Installer calls some number of Bind<> methods on the DiContainer.
-    * SceneContext then injects all objects in the scene (except those objects that are parented to the ProjectContext)
-    * SceneContext then constructs all the non-lazy root objects, which includes any classes that derive from ITickable / IInitializable or IDisposable, as well as those classes that are added with a `NonLazy()` binding.
+    * Project Context is initialized. Note that this only happens once per play session.  If a previous scene already initialized the ProjectContext, then this step is skipped
+        * All injectable MonoBehaviour's on the ProjectContext prefab are passed to the container via <a href="#dicontainer-methods-queueforinject">DiContainer.QueueForInject</a>
+        * ProjectContext iterates through all the Installers that have been added to its prefab via the Unity Inspector, updates them to point to its DiContainer, then calls InstallBindings() on each.  Each Installer calls some number of Bind methods on the DiContainer.
+        * All instances that were added via <a href="#dicontainer-methods-queueforinject">DiContainer.QueueForInject</a> are injected
+        * ProjectContext then constructs all the non-lazy root objects, which includes any classes that derive from ITickable / IInitializable or IDisposable, as well as those classes that are added with a `NonLazy()` binding.
+    * Scene Context is initialized.
+        * All injectable MonoBehaviour's in the entire scene are passed to the SceneContext container via <a href="#dicontainer-methods-queueforinject">DiContainer.QueueForInject</a>
+        * SceneContext iterates through all the Installers that have been added to it via the Unity Inspector, updates them to point to its DiContainer, then calls InstallBindings() on each.  Each Installer calls some number of Bind<> methods on the DiContainer.
+        * All instances that were added via <a href="#dicontainer-methods-queueforinject">DiContainer.QueueForInject</a> are injected
+        * SceneContext then constructs all the non-lazy root objects, which includes any classes that derive from ITickable / IInitializable or IDisposable, as well as those classes that are added with a `NonLazy()` binding.
     * If any required dependencies cannot be resolved, a ZenjectResolveException is thrown
     * All other MonoBehaviour's in the scene have their Awake() method called
 * Unity Start() phase begins
@@ -1734,6 +1744,327 @@ See <a href="Documentation/SubContainers.md">here</a>.
 
 See <a href="Documentation/WritingAutomatedTests.md">here</a>.
 
+## <a id="dicontainer-methods"></a>DiContainer Methods
+
+In addition to the bind methods documented above, there are also some other methods you might want to occasionally use on DiContainer.  For example, if you are writing a custom factory, you might want to directly call one of the `DiContainer.Instantaite` methods.  Or you might have a situation where another library is creating instances of your classes (for example, a networking library) and you need to manually call DiContainer.Inject.
+
+DiContainer is always added to itself, so you can always get it injected into any class.  However, note that this is usually a sign of bad practice, since there is almost always a better way to design your code such that you don't need to reference DiContainer directly.  Once again, best practice with dependency injection is to only reference the DiContainer in the "composition root layer" which includes any custom factories you might have as well as the installers.  However there are exceptions to this rule.
+
+### <a id="dicontainer-methods-instantiate"></a>DiContainer.Instantiate
+
+These instantiate methods might be useful for example when creating a custom factory.  Note however that in most cases, you can probably get away with using a normal <a href="#creating-objects-dynamically">Factory</a> instead without needing to directly reference DiContainer.
+
+When instantiating objects directly, you can either use DiContainer or you can use IInstantiator, which DiContainer inherits from.  IInstantiator exists because often, in custom factories, you are only interested in the instantiate operation so you don't need the Bind, Resolve, etc. methods
+
+1. **Instantiate&lt;T&gt;** - Create the given class using the new operator and then inject it.  Note that this method should not be used for Components/MonoBehaviours.  However, it can be used for ScriptableObject derived classes (in which case Zenject will automatically call ScriptableObject.CreateInstance).
+
+    ```csharp
+    Foo foo = Container.Instantiate<Foo>();
+    ```
+
+    You can also pass extra arguments to it like this:
+
+    ```csharp
+    Foo foo = Container.Instantiate<Foo>(new object[] { "foo", 5 });
+    ```
+
+    There is also non-generic versions:
+
+    ```csharp
+    Foo foo = (Foo)Container.Instantiate(typeof(Foo));
+    Foo foo = (Foo)Container.Instantiate(typeof(Foo), new object[] { "foo", 5 });
+    ```
+
+1. **InstantiatePrefab** - Instantiate the given prefab and then inject into any MonoBehaviour's that are on it.
+
+    ```csharp
+    GameObject gameObject = Container.InstantiatePrefab(MyPrefab);
+    ```
+
+    This method is equivalent to calling `var gameObject = GameObject.Instantiate(MyPrefab)` yourself and then calling `DiContainer.Inject(gameObject)`.  Note that MyPrefab above can either be a GameObject or it can be a direct reference to a component on the prefab.
+
+    Similar to `GameObject.Instantiate`, you can also pass an initial parent transform to use:
+
+    ```csharp
+    GameObject gameObject = Container.InstantiatePrefab(MyPrefab, MyParentTransform);
+    ```
+
+1. **InstantiatePrefabResource** - Same as InstantiatePrefab except instead of passing a prefab, you pass a path within the unity Resources folder where the prefab exists.
+
+    ```csharp
+    GameObject gameObject = Container.InstantiatePrefabResource("path/to/myprefab");
+    ```
+
+    This method is simply a shortcut to calling `Container.InstantiatePrefab(Resources.Load("path/to/myprefab"));`
+
+1. **InstantiatePrefabForComponent&lt;T&gt;** - Instantiates the given prefab, injects on the prefab, and then returns the given component which is assumed to exist somewhere in the heirarchy of the prefab.
+
+    ```csharp
+    var foo = Container.InstantiatePrefabForComponent<Foo>(FooPrefab)
+    ```
+
+    Unlike the InstantiatePrefab methods above, this method also allows passing parameters to the given component:
+
+    ```csharp
+    var foo = Container.InstantiatePrefabForComponent<Foo>(FooPrefab, new object[] { "asdf", 6.0f })
+    ```
+
+1. **InstantiatePrefabResourceForComponent&lt;T&gt;** - Same as InstantiatePrefabForComponent, except the prefab is provided as a resource path instead of as a direct reference
+
+    ```csharp
+    var foo = Container.InstantiatePrefabResourceForComponent<Foo>("path/to/fooprefab")
+    var foo = Container.InstantiatePrefabResourceForComponent<Foo>("path/to/fooprefab", new object[] { "asdf", 6.0f })
+    ```
+
+1. **InstantiateComponent&lt;T&gt;** - Add the given component to a given game object.
+
+    ```csharp
+    var foo = Container.InstantiateComponent<Foo>(gameObject);
+    var foo = Container.InstantiateComponent<Foo>(gameObject, new object[] { "asdf", 6.0f });
+    ```
+
+    Note that this is equivalent to calling GameObject.AddComponent yourself then immediatly calling DiContainer.Inject on the new component instance.
+
+1. **InstantiateComponentOnNewGameObject&lt;T&gt;** - Create a new empty game object then instantiate a new component of the given type on it
+
+    ```csharp
+    var foo = Container.InstantiateComponentOnNewGameObject<Foo>();
+    var foo = Container.InstantiateComponentOnNewGameObject<Foo>(new object[] { "zxcv" });
+    ```
+
+    This is similar to calling `new GameObject()`, then call DiContainer.InstantiateComponent on the result.
+
+1. **InstantiateScriptableObjectResource&lt;T&gt;** - Instantiate the given ScriptableObject type which is assumed to exist at the given resource path.  Note that if you want to create an entirely new ScriptableObject, you can just use DiContainer.Instantiate.
+
+    ```csharp
+    var foo = Container.InstantiateScriptableObjectResource<Foo>("path/to/fooscriptableobject")
+    var foo = Container.InstantiateScriptableObjectResource<Foo>("path/to/fooscriptableobject", new object[] { "asdf", 6.0f })
+    ```
+
+### DiContainer.Bind
+
+See <a href="#binding">here</a>
+
+### <a id="dicontainer-methods-resolve"></a>DiContainer.Resolve
+
+1.  **DiContainer.Resolve** - Get instance to match the given type.  This may involve creating a new instance or it might return an existing instance, depending on how the given type was bound.
+
+    ```csharp
+    Container.Bind<Foo>().AsSingle();
+    ...
+    var foo = Container.Resolve<Foo>();
+    ```
+
+    You can also pass an identifier as a parameter:
+
+    ```csharp
+    Container.Bind<Foo>().WithId("foo1").AsSingle();
+    ...
+    var foo = Container.Resolve<Foo>("foo1");
+    ```
+
+    An exception will be thrown if no bindings were found for the given type/identifier, or if multiple bindings were found.  See TryResolve / ResolveAll for those cases.
+
+1.  **DiContainer.TryResolve** - Same as DiContainer.Resolve except instead of throwing an exception when a match is not found, a null value is returned.
+
+    ```csharp
+    var foo = Container.TryResolve<Foo>();
+
+    if (foo != null)
+    {
+        ...
+    }
+    ```
+
+1.  **DiContainer.ResolveAll** - Same as DiContainer.Resolve except it will return all matches instead of assuming just one.
+
+    ```csharp
+    List<Foo> foos = Container.ResolveAll<Foo>();
+    List<Foo> foos = Container.ResolveAll<Foo>("foo1");
+    ```
+
+1.  **DiContainer.ResolveType** - Returns the type that would be retrieved/instantiated if Resolve is called with the same type/identifier.
+
+    ```csharp
+    if (Container.ResolveType<IFoo>() == typeof(Foo))
+    {
+        ...
+    }
+    ```
+
+    This is safe to call during install phase since nothing will be instantiated by calling this.  Note also that if there are multiple matches found or zero matches then an exception will be thrown.
+
+1.  **DiContainer.ResolveTypeAll** - Same as ResolveType except returns all matches instead of assuming a single match.
+
+### <a id="dicontainer-methods-inject"></a>DiContainer.Inject
+
+1.  **DiContainer.Inject** - Inject on the given instance.
+
+    ```csharp
+    Container.Inject(foo);
+    ```
+
+    Note that you can also pass extra arguments to inject:
+
+    ```csharp
+    Container.Inject(foo, new object[] { "asdf", 6 });
+    ```
+
+    This will inject in the following order:
+
+    1. Fields
+    1. Properties
+    1. Inject methods
+
+1.  **DiContainer.InjectGameObject** - Inject into all MonoBehaviour's attached to the given game object as well as any children.
+
+    ```csharp
+    Container.InjectGameObject(gameObject);
+    ```
+
+    Note that it will inject in a bottom-up fashion.  So the root transforms in the given game object will always be injected last.
+
+1.  **DiContainer.InjectGameObjectForComponent** - Same as InjectGameObject except it will return the given component after injection completes.
+
+    ```csharp
+    var foo = Container.InjectGameObjectForComponent<Foo>(gameObject);
+    ```
+
+    Also, unlike InjectGameObject, this method supports passing extra arguments to the given component:
+
+    ```csharp
+    var foo = Container.InjectGameObjectForComponent<Foo>(gameObject, new object[] { "asdf", 5.1f });
+    ```
+
+    Note however that it is assumed here that there is only one match for the given component.  Multiple matches (or zero matches) will generate an exception.
+
+### <a id="dicontainer-methods-queueforinject"></a>DiContainer.QueueForInject
+
+**DiContainer.QueueForInject** will queue the given instance for injection once the initial object graph is constructed.
+
+Sometimes, there are instances that are not created by Zenject and which exist at startup, and which you want to be injected.  In these cases you will often add them to the container like this:
+
+```csharp
+var foo = new Foo();
+...
+Container.Bind<Foo>().FromInstance(foo);
+```
+
+Or, equivalently, using this shortcut:
+
+```csharp
+Container.BindInstance(foo);
+```
+
+However, using FromInstance will not cause the given instance to be injected.
+
+One approach would be to inject on the instance immediately like this:
+
+```csharp
+Container.BindInstance(foo);
+Container.Inject(foo);
+```
+
+However, this is bad practice.   You do not ever want to instantiate or inject during the install phase, because the objects that you are injecting could require bindings that have not yet been added.
+
+Therefore the correct way to handle these cases is to use QueueForInject:
+
+```csharp
+Container.BindInstance(foo);
+Container.QueueForInject(foo);
+```
+
+This way, our `foo` object will be injected at the same time the initial object graph is constructed, immediately after the install phase.
+
+Another important advantage of using QueueForInject is that Zenject will guarantee that your instances are injected in the correct order.  In other words, if you have the following classes:
+
+```csharp
+class A
+{
+    [Inject]
+    public void Init()
+    {
+        ...
+    }
+}
+
+class B
+{
+    [Inject]
+    public void Init(A a)
+    {
+        ...
+    }
+}
+```
+
+And they are added to the container this way:
+
+```csharp
+var a = new A();
+var b = new B();
+
+Container.BindInstance(a);
+Container.BindInstance(b);
+
+Container.QueueForInject(a);
+Container.QueueForInject(b);
+```
+
+Then, you can assume that A will have its inject method called before B, regardless of the order that they were added to the container.  This is nice in the case where you have some initialization logic that occurs in the [Inject] method for B, and which requires that A has been initialized.
+
+This is also precisely how the initial MonoBehaviour's in the scene are injected.  They are all simply added to the container with the QueueForInject method.
+
+### <a id="dicontainer-methods-rebind"></a>DiContainer Unbind / Rebind
+
+It is possible to remove or replace bindings that were added in a previous bind statement.
+
+1. Unbind - Remove all bindings matching the given type/id from container.
+
+    ```csharp
+    Container.Bind<IFoo>().To<Foo>();
+
+    // This will nullify the above statement
+    Container.Unbind<IFoo>();
+    ```
+
+1. Rebind - Override existing bindings with a new one.  This is equivalent to calling unbind with the given type and then immediately calling bind afterwards.
+
+    ```csharp
+    Container.Bind<IFoo>().To<Foo>();
+
+    Container.Rebind<IFoo>().To<Bar>();
+    ```
+
+### <a id="dicontainer-methods-other"></a>Other DiContainer methods
+
+1.  **DiContainer.ParentContainer** - The parent container for the given DiContainer.  For example, for the DiContainer associated with SceneContext, this will usually be the DiContainer associated with the ProjectContext (unless you're using Scene Parenting in which case it will be another SceneContext)
+1.  **DiContainer.IsValidating** - Returns true if the container is being run for validation.  This can be useful in some edge cases where special logic needs to be added during the validation step only.
+1.  **DiContainer.CreateSubContainer** - Creates a new container as a child of the current container.  This might be useful for custom factories that involve creating objects with complex inter-dependencies.  For example:
+
+    ```csharp
+    var subContainer = Container.CreateSubContainer();
+
+    subContainer.Bind<Foo>();
+    subContainer.Bind<Bar>();
+    subContainer.Bind<Qux>();
+
+    var foo = subContainer.Resolve<Foo>();
+    ```
+
+    Although in most cases you should probably use the FromSubContainerResolve methods rather than doing it this way.
+
+1.  **DiContainer.HasBinding** - Returns true if a binding that matches the given type/id has already been added.  This can be useful if you want to avoid adding a duplicate binding that may have been added in a previous installer
+
+    ```csharp
+    if (!Container.HasBinding<IFoo>())
+    {
+        Container.Bind<IFoo>().To<Foo>().AsSingle();
+    }
+    ```
+
+1.  **DiContainer.GetDependencyContracts** - Returns a list of all the types that the given type depends on.  This might be useful, for exmaple, if you wanted to do some static analysis of your project, or if you wanted to automatically generate a dependency diagram, etc.
+
 ## <a id="non-generic-bindings"></a>Non Generic bindings
 
 In some cases you may not know the exact type you want to bind at compile time.  In these cases you can use the overload of the `Bind` method which takes a `System.Type` value instead of a generic parameter.
@@ -1897,28 +2228,6 @@ Note that you can chain together any combination of the below conditionals in th
     ```
 
     This is equivalent to calling `Container.BindAllInterfaces<T>().To<T>()` for every type in the namespace "MyGame.Things".  This works because, as touched on above, Zenject will skip any bindings in which the concrete type does not actually derive from the base type.  So even though we are using `AllInterfaces` which matches every single interface in every single loaded assembly, this is ok because it will not try and bind an interface to a type that doesn't implement this interface.
-
-## <a id="unbind-rebind"></a>Unbind / Rebind
-
-It is also possible to remove or replace bindings that were added in another bind statement.
-
-1. Unbind - Remove binding from container.
-
-    ```csharp
-    Container.Bind<IFoo>().To<Foo>();
-
-    // This will nullify the above statement
-    Container.Unbind<IFoo>();
-    ```
-
-1. Rebind - Override an existing binding with a new one.  This is equivalent to calling unbind with the given type and then immediately calling bind afterwards.
-
-    ```csharp
-    Container.Bind<IFoo>().To<Foo>();
-
-    // 
-    Container.Rebind<IFoo>().To<Bar>();
-    ```
 
 ## <a id="singleton-identifiers"></a>Singleton Identifiers
 
