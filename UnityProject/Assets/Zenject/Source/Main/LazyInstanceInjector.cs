@@ -30,6 +30,11 @@ namespace Zenject
             get { return _instancesToInject; }
         }
 
+        public void AddInstance(object instance)
+        {
+            _instancesToInject.Add(instance);
+        }
+
         public void AddInstances(IEnumerable<object> instances)
         {
             _instancesToInject.UnionWith(instances);

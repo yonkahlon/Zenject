@@ -310,7 +310,7 @@ namespace Zenject
             BindInfo.RequireExplicitScope = false;
             SubFinalizer = new ScopableBindingFinalizer(
                 BindInfo, SingletonTypes.FromInstance, instance,
-                (container, type) => new InstanceProvider(container, type, instance));
+                (container, type) => new InstanceProvider(type, instance, container));
 
             return new ScopeConditionCopyNonLazyBinder(BindInfo);
         }

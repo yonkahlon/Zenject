@@ -134,8 +134,10 @@ namespace Zenject
             _container = new DiContainer(
                 StaticContext.Container, isValidating);
 
-            _container.LazyInstanceInjector.AddInstances(
-                GetInjectableMonoBehaviours().Cast<object>());
+            foreach (var instance in GetInjectableMonoBehaviours().Cast<object>())
+            {
+                _container.QueueForInject(instance);
+            }
 
             _container.IsInstalling = true;
 
@@ -148,7 +150,7 @@ namespace Zenject
                 _container.IsInstalling = false;
             }
 
-            _container.LazyInstanceInjector.LazyInjectAll();
+            _container.FlushInjectQueue();
 
             Assert.That(_dependencyRoots.IsEmpty());
 
@@ -169,7 +171,7 @@ namespace Zenject
             // We could add the contents of GuiRenderer into MonoKernel, but this adds
             // undesirable per-frame allocations.  See comment in IGuiRenderable.cs for usage
             //
-            // Short answer is if you want to use IGuiRenderable then 
+            // Short answer is if you want to use IGuiRenderable then
             // you need to include the following in project context installer:
             // `Container.Bind<GuiRenderer>().FromNewComponentOnNewGameObject().AsSingle().CopyIntoAllSubContainers().NonLazy();`
             _container.Bind(typeof(TickableManager), typeof(InitializableManager), typeof(DisposableManager), typeof(GuiRenderableManager))

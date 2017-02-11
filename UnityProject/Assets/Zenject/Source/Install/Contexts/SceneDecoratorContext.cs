@@ -44,8 +44,10 @@ namespace Zenject
             Assert.IsNull(_container);
             _container = container;
 
-            container.LazyInstanceInjector
-                .AddInstances(GetInjectableMonoBehaviours().Cast<object>());
+            foreach (var instance in GetInjectableMonoBehaviours().Cast<object>())
+            {
+                container.QueueForInject(instance);
+            }
         }
 
         public void InstallDecoratorSceneBindings()

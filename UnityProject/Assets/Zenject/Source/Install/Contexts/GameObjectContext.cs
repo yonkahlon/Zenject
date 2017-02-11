@@ -44,16 +44,15 @@ namespace Zenject
 
             _container = parentContainer.CreateSubContainer();
 
-            _container.LazyInstanceInjector
-                .AddInstances(GetInjectableMonoBehaviours().Cast<object>());
-
-            foreach (var instance in _container.LazyInstanceInjector.Instances)
+            foreach (var instance in GetInjectableMonoBehaviours().Cast<object>())
             {
                 if (instance is MonoKernel)
                 {
                     Assert.That(ReferenceEquals(instance, _kernel),
                         "Found MonoKernel derived class that is not hooked up to GameObjectContext.  If you use MonoKernel, you must indicate this to GameObjectContext by dragging and dropping it to the Kernel field in the inspector");
                 }
+
+                _container.QueueForInject(instance);
             }
 
             _container.IsInstalling = true;
@@ -69,7 +68,7 @@ namespace Zenject
 
             Log.Debug("GameObjectContext: Injecting into child components...");
 
-            _container.LazyInstanceInjector.LazyInjectAll();
+            _container.FlushInjectQueue();
 
             Assert.That(_dependencyRoots.IsEmpty());
             _dependencyRoots.AddRange(_container.ResolveDependencyRoots());

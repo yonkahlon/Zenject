@@ -36,6 +36,7 @@ namespace Zenject
                 _installerType, args.Concat(_extraArgs).ToList());
             installer.InstallBindings();
 
+            subContainer.FlushInjectQueue();
             subContainer.ResolveDependencyRoots();
 
             if (subContainer.IsValidating)
