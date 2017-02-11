@@ -30,6 +30,11 @@ namespace Zenject
         [SetUp]
         public virtual void SetUp()
         {
+            // Don't clear the scene to allow tests to initialize the scene how they
+            // want to set it up manually in their own [Setup] method (eg. TestFromComponentInChildren)
+            // Also, I think unity might already clear the scene anyway?
+            // ClearScene();
+
             _hasStarted = false;
             _isValidating = CurrentTestHasAttribute<ValidateOnlyAttribute>();
 
@@ -95,7 +100,7 @@ namespace Zenject
                 .Cast<Attribute>().OfType<T>().Any();
         }
 
-        void ClearScene()
+        protected void ClearScene()
         {
             var scene = EditorSceneManager.GetActiveScene();
 
