@@ -37,10 +37,12 @@ namespace Zenject.Tests.Bindings
         {
             Container.Bind<Qux>().FromComponentSibling();
             Container.Bind<Bar>().FromComponentSibling();
+            Container.Bind<IBar>().FromComponentSibling();
 
             Initialize();
 
             Assert.IsEqual(_foo.Bar, _bar);
+            Assert.IsEqual(_foo.IBar, _bar);
             Assert.IsEqual(_foo.Qux[0], _qux1);
             Assert.IsEqual(_foo.Qux[1], _qux2);
 
@@ -55,7 +57,11 @@ namespace Zenject.Tests.Bindings
             public Qux OtherQux;
         }
 
-        public class Bar : MonoBehaviour
+        public interface IBar
+        {
+        }
+
+        public class Bar : MonoBehaviour, IBar
         {
         }
 
@@ -63,6 +69,9 @@ namespace Zenject.Tests.Bindings
         {
             [Inject]
             public Bar Bar;
+
+            [Inject]
+            public IBar IBar;
 
             [Inject]
             public List<Qux> Qux;

@@ -65,7 +65,21 @@ namespace Zenject.Internal
                     // BUT we do want to inject on the GameObjectContext itself
                     && UnityUtil.GetParents(x.transform).Intersect(subContexts).IsEmpty()
                     && (x.GetComponent<GameObjectContext>() == null || x is GameObjectContext))
+                .OrderByDescending(x => GetParentCount(x.transform))
                 .ToList();
+        }
+
+        static int GetParentCount(Transform transform)
+        {
+            int result = 0;
+
+            while (transform.parent != null)
+            {
+                transform = transform.parent;
+                result++;
+            }
+
+            return result;
         }
 
         public static IEnumerable<MonoBehaviour> GetInjectableMonoBehaviours(Scene scene)

@@ -36,7 +36,7 @@ namespace Zenject
             {
                 if (!_hasValue)
                 {
-                    _value = _container.Resolve<T>(_context);
+                    _value = (T)_container.Resolve(_context);
                     _hasValue = true;
                 }
 

@@ -217,8 +217,10 @@ namespace Zenject
             // so that it doesn't inject on the game object twice
             // InitialComponentsInjecter will also guarantee that any component that is injected into
             // another component has itself been injected
-            _container.LazyInstanceInjector
-                .AddInstances(GetInjectableMonoBehaviours().Cast<object>());
+            foreach (var instance in GetInjectableMonoBehaviours().Cast<object>())
+            {
+                _container.QueueForInject(instance);
+            }
 
             foreach (var decoratorContext in _decoratorContexts)
             {
@@ -245,7 +247,7 @@ namespace Zenject
             Assert.That(!_hasResolved);
             _hasResolved = true;
 
-            _container.LazyInstanceInjector.LazyInjectAll();
+            _container.FlushInjectQueue();
 
             Log.Debug("SceneContext: Resolving dependency roots...");
 

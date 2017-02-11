@@ -199,6 +199,48 @@ namespace Zenject.Tests.Bindings
             Assert.Throws(() => Container.InjectGameObjectForComponent<Camera>(go, new object[] { "sdf" }));
         }
 
+        [Test]
+        public void TestLazyInstanceInjectorFail()
+        {
+            Qux.WasInjected = false;
+
+            var qux = new Qux();
+            Container.BindInstance(qux);
+
+            Assert.That(!Qux.WasInjected);
+            Initialize();
+            Assert.That(!Qux.WasInjected);
+        }
+
+        [Test]
+        public void TestLazyInstanceInjectorSuccess()
+        {
+            Qux.WasInjected = false;
+
+            var qux = new Qux();
+            Container.BindInstance(qux);
+            Container.QueueForInject(qux);
+
+            Assert.That(!Qux.WasInjected);
+            Initialize();
+            Assert.That(Qux.WasInjected);
+        }
+
+        public class Qux
+        {
+            public static bool WasInjected
+            {
+                get;
+                set;
+            }
+
+            [Inject]
+            public void Construct()
+            {
+                WasInjected = true;
+            }
+        }
+
         GameObject GetPrefab(string name)
         {
             return FixtureUtil.GetPrefab(ResourcePrefix + name);
