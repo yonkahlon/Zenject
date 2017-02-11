@@ -71,7 +71,8 @@ namespace Zenject
             SubFinalizer = new ScopableBindingFinalizer(
                 BindInfo,
                 SingletonTypes.FromResolve, subIdentifier,
-                (container, type) => new ResolveProvider(type, container, subIdentifier, false));
+                (container, type) => new ResolveProvider(
+                    type, container, subIdentifier, false, InjectSources.Any));
 
             return new ScopeConditionCopyNonLazyBinder(BindInfo);
         }
