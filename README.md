@@ -1834,7 +1834,66 @@ See <a href="Documentation/WritingAutomatedTests.md">here</a>.
 
 ## <a id="just-in-time-resolve"></a>Just-In-Time Resolving Using Lazy&lt;&gt;
 
-TBD
+In some cases it can be useful to delay the creation of certain dependencies until after startup.  You can use the `Lazy<>` construct for this.
+
+For example, let's imagine a scenario like this:
+
+```csharp
+public class Foo
+{
+    public void Run()
+    {
+        ...
+    }
+}
+
+public class Bar
+{
+    Foo _foo;
+
+    public Bar(Foo foo)
+    {
+        _foo = foo;
+    }
+
+    public void Run()
+    {
+        _foo.Run();
+    }
+}
+
+public class TestInstaller : MonoInstaller<TestInstaller>
+{
+    public override void InstallBindings()
+    {
+        Container.Bind<Foo>().AsSingle();
+        Container.Bind<Bar>().AsSingle();
+    }
+}
+```
+
+Let's also imagine that we would only like to create an instance of Foo if it's actually used (that is, when the Bar.Run method is called).  As it stands above, Foo would always be created every time that Bar is created, even if Bar.Run is never called.  We can fix this by changing Bar to the following:
+
+```csharp
+public class Bar
+{
+    Lazy<Foo> _foo;
+
+    public Bar(Lazy<Foo> foo)
+    {
+        _foo = foo;
+    }
+
+    public void DoThing()
+    {
+        _foo.Value.DoThing();
+    }
+}
+```
+
+Now, by using `Lazy<>` instead, the Foo class will not be created until Bar.DoThing is first called.  After that, it will use the same instance of Foo.
+
+Note that the installers remain the same in both cases.  Any injected dependency can be made lazy by simply wrapping it in `Lazy<>`.
 
 ## <a id="dicontainer-methods"></a>DiContainer Methods
 
