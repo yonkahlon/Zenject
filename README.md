@@ -1936,15 +1936,15 @@ See <a href="#binding">here</a>
     var foo = Container.Resolve<Foo>();
     ```
 
-    You can also pass an identifier as a parameter:
+    An exception will be thrown if no bindings were found for the given type or if multiple bindings were found.  See TryResolve / ResolveAll for those cases.
+
+1.  **DiContainer.ResolveId** - Same as resolve except includes an identifier
 
     ```csharp
     Container.Bind<Foo>().WithId("foo1").AsSingle();
     ...
-    var foo = Container.Resolve<Foo>("foo1");
+    var foo = Container.ResolveId<Foo>("foo1");
     ```
-
-    An exception will be thrown if no bindings were found for the given type/identifier, or if multiple bindings were found.  See TryResolve / ResolveAll for those cases.
 
 1.  **DiContainer.TryResolve** - Same as DiContainer.Resolve except instead of throwing an exception when a match is not found, a null value is returned.
 
@@ -1957,12 +1957,15 @@ See <a href="#binding">here</a>
     }
     ```
 
+1.  **DiContainer.TryResolveId** - Same as DiContainer.TryResolve except also takes an identifier
+
 1.  **DiContainer.ResolveAll** - Same as DiContainer.Resolve except it will return all matches instead of assuming just one.
 
     ```csharp
     List<Foo> foos = Container.ResolveAll<Foo>();
-    List<Foo> foos = Container.ResolveAll<Foo>("foo1");
     ```
+
+1.  **DiContainer.ResolveIdAll** - Same as DiContainer.ResolveAll except also takes an identifier
 
 1.  **DiContainer.ResolveType** - Returns the type that would be retrieved/instantiated if Resolve is called with the same type/identifier.
 

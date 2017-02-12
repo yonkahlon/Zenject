@@ -8,6 +8,13 @@ New Features
 - Added menu option "Validate All Active Scenes"
 - Added support for memory pools.  This includes a fluent interface similar to how factories work
 - Added DiContainer.QueueForInject method to support adding pre-made instances to the initial inject list
+- Added new construction methods
+    - FromMethodMultiple
+    - FromComponentInHierarchy
+    - FromComponentSibling
+    - FromComponentInParents
+    - FromComponentInChildren 
+    - FromScriptableObjectResource
 
 Changes
 - Updated sample projects to be easier to understand
@@ -24,6 +31,14 @@ Breaking changes
 - Renamed BindAllInterfaces to BindInterfacesTo and BindAllInterfacesAndSelf to BindInterfacesAndSelfTo to avoid the extremely common mistake of forgetting the To
 - Removed support for passing arguments to InjectGameObject and InstantiatePrefab methods (issue #125)
 - Removed UnityEventManager since it isn't core to keep things lightweight
+- Renamed the Resolve overload that included an ID to ResolveId to avoid the ambiguity with the non generic version of Resolve
+- Renamed the following construction methods.  This was motivated by the fact that with the new construction methods it's unclear which ones are "look ups" versus creating new instances
+    - FromComponent => FromNewComponentOn
+    - FromSiblingComponent => FromNewComponentSibling 
+    - FromGameObject => FromNewComponentOnNewGameObject 
+    - FromPrefab => FromComponentInNewPrefab
+    - FromPrefabResource => FromComponentInNewPrefabResource
+    - FromSubContainerResolve.ByPrefab => FromSubContainerResolve.ByNewPrefab
 
 Bug fixes
 - Fixed extremely rare bug that would cause an infinite loop when using complex subcontainer setups
