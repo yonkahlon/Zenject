@@ -118,16 +118,19 @@ The tests may also be helpful to show usage for each specific feature (which you
         * <a href="#list-bindings">List Bindings</a>
         * <a href="#global-bindings">Global Bindings Using Project Context</a>
         * <a href="#identifiers">Identifiers</a>
+        * <a href="#decorator-bind">Decorator Bind</a>
         * <a href="#non-generic-bindings">Non Generic bindings</a>
         * <a href="#convention-based-bindings">Convention Based Binding</a>
         * <a href="#singleton-identifiers">Singleton Identifiers</a>
     * <a href="#scriptableobject-installer">Scriptable Object Installer</a>
     * <a href="#runtime-parameters-for-installers">Runtime Parameters For Installers</a>
     * <a href="#creating-objects-dynamically">Creating Objects Dynamically Using Factories</a>
+    * <a href="#memory-pools">Memory Pools</a>
     * <a href="#update--initialization-order">Update / Initialization Order</a>
     * <a href="#zenject-order-of-operations">Zenject Order Of Operations</a>
     * <a href="#injecting-data-across-scenes">Injecting data across scenes</a>
     * <a href="#scene-parenting">Scene Parenting Using Contract Names</a>
+    * <a href="#just-in-time-resolve">Just-In-Time Resolving Using Lazy&lt;&gt;</a>
     * <a href="#dicontainer-methods">DiContainer Methods</a>
         * <a href="#dicontainer-methods-instantiate">DiContainer.Instantiate</a>
         * <a href="#binding">DiContainer.Bind</a>
@@ -1535,11 +1538,15 @@ public class MainInstaller : MonoInstaller
 
 ## <a id="commands-and-signals"></a>Commands And Signals
 
-See <a href="Documentation/CommandsAndSignals.md">here</a>.
+As of version 5.0, in an effort to keep things lightweight, Zenject no longer includes an implementation of commands and signals.  The previous commands and signals package has been moved to <a href="https://github.com/modesttree/ZenjectCommandsAndSignals">another github repository</a>.
 
 ## <a id="creating-objects-dynamically"></a>Creating Objects Dynamically Using Factories
 
 See <a href="Documentation/Factories.md">here</a>.
+
+## <a id="memory-pools"></a>Memory Pools
+
+See <a href="Documentation/MemoryPools.md">here</a>.
 
 ## <a id="update--initialization-order"></a>Update / Initialization Order
 
@@ -1824,6 +1831,10 @@ See <a href="Documentation/SubContainers.md">here</a>.
 ## <a id="writing-tests"></a>Writing Automated Unit Tests / Integration Tests
 
 See <a href="Documentation/WritingAutomatedTests.md">here</a>.
+
+## <a id="just-in-time-resolve"></a>Just-In-Time Resolving Using Lazy&lt;&gt;
+
+TBD
 
 ## <a id="dicontainer-methods"></a>DiContainer Methods
 
@@ -2148,6 +2159,10 @@ It is possible to remove or replace bindings that were added in a previous bind 
     ```
 
 1.  **DiContainer.GetDependencyContracts** - Returns a list of all the types that the given type depends on.  This might be useful, for exmaple, if you wanted to do some static analysis of your project, or if you wanted to automatically generate a dependency diagram, etc.
+
+## <a id="decorator-bind"></a>Decorator Bind
+
+TBD
 
 ## <a id="non-generic-bindings"></a>Non Generic bindings
 
