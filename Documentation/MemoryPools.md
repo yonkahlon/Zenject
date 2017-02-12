@@ -428,3 +428,69 @@ Therefore, if you override one of these methods you will have to make sure to ca
 
 Also, worth noting is the fact that for this logic to work, our MonoBehaviour must be at the root of the prefab, since otherwise only the transform associated with Foo and any children will be disabled.
 
+## <a id="abstract-pools"></a>Abstract Memory Pools
+
+Just like <a href="Factories.md#abstract-factories">abstract factories</a>, sometimes you might want to create a memory pool that returns an interface, with the concrete type decided inside an installer.  This works very similarly to abstract factories.  For example:
+
+```csharp
+public interface IFoo
+{
+}
+
+public class Foo1 : IFoo
+{
+}
+
+public class Foo2 : IFoo
+{
+}
+
+public class FooPool : MemoryPool<IFoo>
+{
+}
+
+public class Bar
+{
+    readonly FooPool _fooPool;
+    readonly List<IFoo> _foos = new List<IFoo>();
+
+    public Bar(FooPool fooPool)
+    {
+        _fooPool = fooPool;
+    }
+
+    public void AddFoo()
+    {
+        _foos.Add(_fooPool.Spawn());
+    }
+
+    public void RemoveFoo()
+    {
+        var foo = _foos[0];
+        _fooPool.Despawn(foo);
+        _foos.Remove(foo);
+    }
+}
+
+public class TestInstaller : MonoInstaller<TestInstaller>
+{
+    public bool Use1;
+
+    public override void InstallBindings()
+    {
+        Container.Bind<Bar>().AsSingle();
+
+        if (Use1)
+        {
+            Container.BindMemoryPool<IFoo, FooPool>().WithInitialSize(10).To<Foo1>();
+        }
+        else
+        {
+            Container.BindMemoryPool<IFoo, FooPool>().WithInitialSize(10).To<Foo2>();
+        }
+    }
+}
+```
+
+We might also want to add a Reset() method to the IFoo interface as well here, and call that on Reinitialize()
+
