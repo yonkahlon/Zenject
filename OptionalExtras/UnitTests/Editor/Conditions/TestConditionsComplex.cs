@@ -35,8 +35,8 @@ namespace Zenject.Tests.Conditions
             Container.BindInstance(foo1).When(c => c.ParentContexts.Where(x => x.MemberType == typeof(Bar) && object.Equals(x.Identifier, "Bar1")).Any());
             Container.BindInstance(foo2).When(c => c.ParentContexts.Where(x => x.MemberType == typeof(Bar) && object.Equals(x.Identifier, "Bar2")).Any());
 
-            Assert.IsEqual(Container.Resolve<Bar>("Bar1").Foo, foo1);
-            Assert.IsEqual(Container.Resolve<Bar>("Bar2").Foo, foo2);
+            Assert.IsEqual(Container.ResolveId<Bar>("Bar1").Foo, foo1);
+            Assert.IsEqual(Container.ResolveId<Bar>("Bar2").Foo, foo2);
         }
     }
 }

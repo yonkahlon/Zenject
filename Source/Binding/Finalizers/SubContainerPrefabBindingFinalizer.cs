@@ -61,14 +61,14 @@ namespace Zenject
                         concreteTypes,
                         (_, concreteType) => new SubContainerDependencyProvider(
                             concreteType, _subIdentifier,
-                            new SubContainerCreatorByPrefab(
+                            new SubContainerCreatorByNewPrefab(
                                 container, new PrefabProvider(_prefab), _gameObjectBindInfo)));
                     break;
                 }
                 case ScopeTypes.Cached:
                 {
                     var containerCreator = new SubContainerCreatorCached(
-                        new SubContainerCreatorByPrefab(
+                        new SubContainerCreatorByNewPrefab(
                             container, new PrefabProvider(_prefab), _gameObjectBindInfo));
 
                     RegisterProvidersForAllContractsPerConcreteType(
@@ -108,14 +108,14 @@ namespace Zenject
                         container,
                         (_, contractType) => new SubContainerDependencyProvider(
                             contractType, _subIdentifier,
-                            new SubContainerCreatorByPrefab(
+                            new SubContainerCreatorByNewPrefab(
                                 container, new PrefabProvider(_prefab), _gameObjectBindInfo)));
                     break;
                 }
                 case ScopeTypes.Cached:
                 {
                     var containerCreator = new SubContainerCreatorCached(
-                        new SubContainerCreatorByPrefab(
+                        new SubContainerCreatorByNewPrefab(
                             container, new PrefabProvider(_prefab), _gameObjectBindInfo));
 
                     RegisterProviderPerContract(

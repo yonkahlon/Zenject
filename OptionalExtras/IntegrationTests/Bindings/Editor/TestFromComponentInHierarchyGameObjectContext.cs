@@ -35,7 +35,7 @@ namespace Zenject.Tests.Bindings.FromComponentInHierarchyGameObjectContext
         public void TestCorrectHierarchy()
         {
             Container.Bind<Foo>().FromSubContainerResolve()
-                .ByPrefab(FooPrefab).AsSingle().NonLazy();
+                .ByNewPrefab(FooPrefab).AsSingle().NonLazy();
 
             Initialize();
 

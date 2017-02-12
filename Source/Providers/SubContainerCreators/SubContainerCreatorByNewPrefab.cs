@@ -5,13 +5,13 @@ using ModestTree;
 
 namespace Zenject
 {
-    public class SubContainerCreatorByPrefab : ISubContainerCreator
+    public class SubContainerCreatorByNewPrefab : ISubContainerCreator
     {
         readonly GameObjectCreationParameters _gameObjectBindInfo;
         readonly IPrefabProvider _prefabProvider;
         readonly DiContainer _container;
 
-        public SubContainerCreatorByPrefab(
+        public SubContainerCreatorByNewPrefab(
             DiContainer container, IPrefabProvider prefabProvider,
             GameObjectCreationParameters gameObjectBindInfo)
         {

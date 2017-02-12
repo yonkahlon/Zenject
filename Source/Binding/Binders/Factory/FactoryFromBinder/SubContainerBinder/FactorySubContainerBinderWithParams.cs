@@ -13,13 +13,13 @@ namespace Zenject
 
 #if !NOT_UNITY3D
 
-        public NameTransformConditionCopyNonLazyBinder ByPrefab<TInstaller>(UnityEngine.Object prefab)
+        public NameTransformConditionCopyNonLazyBinder ByNewPrefab<TInstaller>(UnityEngine.Object prefab)
             where TInstaller : IInstaller
         {
-            return ByPrefab(typeof(TInstaller), prefab);
+            return ByNewPrefab(typeof(TInstaller), prefab);
         }
 
-        public NameTransformConditionCopyNonLazyBinder ByPrefab(Type installerType, UnityEngine.Object prefab)
+        public NameTransformConditionCopyNonLazyBinder ByNewPrefab(Type installerType, UnityEngine.Object prefab)
         {
             BindingUtil.AssertIsValidPrefab(prefab);
 
@@ -31,7 +31,7 @@ namespace Zenject
             ProviderFunc = 
                 (container) => new SubContainerDependencyProvider(
                     ContractType, SubIdentifier,
-                    new SubContainerCreatorByPrefabWithParams(
+                    new SubContainerCreatorByNewPrefabWithParams(
                         installerType,
                         container,
                         new PrefabProvider(prefab),
@@ -40,13 +40,13 @@ namespace Zenject
             return new NameTransformConditionCopyNonLazyBinder(BindInfo, gameObjectInfo);
         }
 
-        public NameTransformConditionCopyNonLazyBinder ByPrefabResource<TInstaller>(string resourcePath)
+        public NameTransformConditionCopyNonLazyBinder ByNewPrefabResource<TInstaller>(string resourcePath)
             where TInstaller : IInstaller
         {
-            return ByPrefabResource(typeof(TInstaller), resourcePath);
+            return ByNewPrefabResource(typeof(TInstaller), resourcePath);
         }
 
-        public NameTransformConditionCopyNonLazyBinder ByPrefabResource(
+        public NameTransformConditionCopyNonLazyBinder ByNewPrefabResource(
             Type installerType, string resourcePath)
         {
             BindingUtil.AssertIsValidResourcePath(resourcePath);
@@ -56,7 +56,7 @@ namespace Zenject
             ProviderFunc = 
                 (container) => new SubContainerDependencyProvider(
                     ContractType, SubIdentifier,
-                    new SubContainerCreatorByPrefabWithParams(
+                    new SubContainerCreatorByNewPrefabWithParams(
                         installerType,
                         container,
                         new PrefabProviderResource(resourcePath),

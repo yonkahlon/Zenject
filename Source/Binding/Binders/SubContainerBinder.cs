@@ -54,7 +54,7 @@ namespace Zenject
 
 #if !NOT_UNITY3D
 
-        public NameTransformScopeConditionCopyNonLazyBinder ByPrefab(UnityEngine.Object prefab)
+        public NameTransformScopeConditionCopyNonLazyBinder ByNewPrefab(UnityEngine.Object prefab)
         {
             BindingUtil.AssertIsValidPrefab(prefab);
 
@@ -66,7 +66,7 @@ namespace Zenject
             return new NameTransformScopeConditionCopyNonLazyBinder(_bindInfo, gameObjectInfo);
         }
 
-        public NameTransformScopeConditionCopyNonLazyBinder ByPrefabResource(string resourcePath)
+        public NameTransformScopeConditionCopyNonLazyBinder ByNewPrefabResource(string resourcePath)
         {
             BindingUtil.AssertIsValidResourcePath(resourcePath);
 

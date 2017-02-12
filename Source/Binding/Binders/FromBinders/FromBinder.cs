@@ -160,13 +160,13 @@ namespace Zenject
             return new NameTransformScopeArgConditionCopyNonLazyBinder(BindInfo, gameObjectInfo);
         }
 
-        public NameTransformScopeArgConditionCopyNonLazyBinder FromComponentInPrefab(UnityEngine.Object prefab)
+        public NameTransformScopeArgConditionCopyNonLazyBinder FromComponentInNewPrefab(UnityEngine.Object prefab)
         {
-            return FromComponentInPrefab(
+            return FromComponentInNewPrefab(
                 prefab, new GameObjectCreationParameters());
         }
 
-        public NameTransformScopeArgConditionCopyNonLazyBinder FromComponentInPrefab(
+        public NameTransformScopeArgConditionCopyNonLazyBinder FromComponentInNewPrefab(
             UnityEngine.Object prefab, GameObjectCreationParameters gameObjectInfo)
         {
             BindingUtil.AssertIsValidPrefab(prefab);
@@ -179,12 +179,12 @@ namespace Zenject
             return new NameTransformScopeArgConditionCopyNonLazyBinder(BindInfo, gameObjectInfo);
         }
 
-        public NameTransformScopeArgConditionCopyNonLazyBinder FromComponentInPrefabResource(string resourcePath)
+        public NameTransformScopeArgConditionCopyNonLazyBinder FromComponentInNewPrefabResource(string resourcePath)
         {
-            return FromComponentInPrefabResource(resourcePath, new GameObjectCreationParameters());
+            return FromComponentInNewPrefabResource(resourcePath, new GameObjectCreationParameters());
         }
 
-        public NameTransformScopeArgConditionCopyNonLazyBinder FromComponentInPrefabResource(
+        public NameTransformScopeArgConditionCopyNonLazyBinder FromComponentInNewPrefabResource(
             string resourcePath, GameObjectCreationParameters gameObjectInfo)
         {
             BindingUtil.AssertIsValidResourcePath(resourcePath);

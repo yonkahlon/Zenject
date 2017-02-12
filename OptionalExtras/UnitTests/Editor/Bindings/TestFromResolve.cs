@@ -31,7 +31,7 @@ namespace Zenject.Tests.Bindings
             Container.Bind<Foo>().WithId("foo").FromInstance(foo).NonLazy();
             Container.Bind<IFoo>().To<Foo>().FromResolve("foo").NonLazy();
 
-            Assert.IsEqual(Container.Resolve<IFoo>(), Container.Resolve<Foo>("foo"));
+            Assert.IsEqual(Container.Resolve<IFoo>(), Container.ResolveId<Foo>("foo"));
             Assert.IsEqual(Container.Resolve<IFoo>(), foo);
         }
 
