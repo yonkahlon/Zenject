@@ -142,7 +142,7 @@ The tests may also be helpful to show usage for each specific feature (which you
     * <a href="#scenes-decorator">Scene Decorators</a>
     * <a href="#sub-containers-and-facades">Sub-Containers And Facades</a>
     * <a href="#writing-tests">Writing Automated Unit Tests / Integration Tests</a>
-    * <a href="#commands-and-signals">Commands And Signals</a>
+    * <a href="#signals">Signals</a>
     * <a href="#auto-mocking-using-moq">Auto-Mocking using Moq</a>
     * <a href="#editor-windows">Creating Unity EditorWindow's with Zenject</a>
 * <a href="#questions">Frequently Asked Questions</a>
@@ -1536,9 +1536,9 @@ public class MainInstaller : MonoInstaller
 }
 ```
 
-## <a id="commands-and-signals"></a>Commands And Signals
+## <a id="signals"></a>Signals
 
-As of version 5.0, in an effort to keep things lightweight, Zenject no longer includes an implementation of commands and signals.  The previous commands and signals package has been moved to <a href="https://github.com/modesttree/ZenjectCommandsAndSignals">another github repository</a>.
+See <a href="Documentation/Signals.md">here</a>.
 
 ## <a id="creating-objects-dynamically"></a>Creating Objects Dynamically Using Factories
 
