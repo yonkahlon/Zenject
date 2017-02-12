@@ -451,7 +451,7 @@ Where:
 * **ConstructionMethod** = The method by which an instance of **ResultType** is created/retrieved.  See <a href="#construction-methods">this section</a> for more details on the various construction methods.
 
     * Default: FromNew()
-    * Examples: eg. FromGetter, FromMethod, FromPrefab, FromResolve, FromSubContainerResolve, FromInstance, etc.
+    * Examples: eg. FromGetter, FromMethod, FromResolve, FromComponentInNewPrefab, FromSubContainerResolve, FromInstance, etc.
 
 * **Scope** = This value determines how often (or if at all) the generated instance is re-used across multiple injections.
 
@@ -553,45 +553,141 @@ Where:
     }
     ```
 
-1. **FromComponent** - Create as a new component on an existing game object.  **ResultType** must derive from UnityEngine.MonoBehaviour / UnityEngine.Component in this case
+1. **FromMethodMultiple** - Same as FromMethod except allows returning multiple instances at once.
+
+    ```csharp
+    Container.Bind<Foo>().FromMethodMultiple(GetFoos);
+
+    IEnumerable<Foo> GetFoos(InjectContext context)
+    {
+        ...
+        return new Foo[]
+        {
+            new Foo(),
+            new Foo(),
+            new Foo(),
+        }
+    }
+    ```
+
+1. **FromFactory** - Create instance using a custom factory class.  This construction method is similar to `FromMethod` except can be cleaner in cases where the logic is more complicated or requires dependencies (the factory itself can have dependencies injected)
+
+    ```csharp
+    class FooFactory : IFactory<Foo>
+    {
+        public Foo Create()
+        {
+            // ...
+            return new Foo();
+        }
+    }
+
+    Container.Bind<Foo>().FromFactory<FooFactory>()
+    ```
+
+1. **FromComponentInNewPrefab** - Instantiate the given prefab as a new game object, inject any MonoBehaviour's on it, and then search the result for type **ResultType**.
+
+    ```csharp
+    Container.Bind<Foo>().FromComponentInNewPrefab(somePrefab);
+    ```
+
+    **ResultType** must either be an interface or derive from UnityEngine.MonoBehaviour / UnityEngine.Component in this case
+
+1. **FromComponentInNewPrefabResource** - Instantiate the given prefab at the given resource path as a new game object, inject any MonoBehaviour's on it, and then search the result for type **ResultType**.
+
+    ```csharp
+    Container.Bind<Foo>().FromComponentInNewPrefabResource("Some/Path/Foo");
+    ```
+
+    **ResultType** must either be an interface or derive from UnityEngine.MonoBehaviour / UnityEngine.Component in this case
+
+1. **FromNewComponentOnNewGameObject** - Create a new empty game object and then instantiate a new component of the given type on it.
+
+    ```csharp
+    Container.Bind<Foo>().FromNewComponentOnNewGameObject();
+    ```
+
+    **ResultType** must derive from UnityEngine.MonoBehaviour / UnityEngine.Component in this case
+
+1. **FromNewComponentOn** - Add a new component of the given type on the given game object then inject on it.
 
     ```csharp
     Container.Bind<Foo>().FromComponent(someGameObject);
     ```
 
-1. **FromSiblingComponent** - Create as a new component on the same game object where the component is being injected into.  **ResultType** must derive from UnityEngine.MonoBehaviour / UnityEngine.Component in this case
+    **ResultType** must derive from UnityEngine.MonoBehaviour / UnityEngine.Component in this case
+
+1. **FromNewComponentSibling** - Add a new component on the current transform and inject on it.  The current transform here is taken from the object being injected, which must therefore be a MonoBehaviour derived type.
 
     ```csharp
-    Container.Bind<Foo>().FromSiblingComponent(someGameObject);
+    Container.Bind<Foo>().FromNewComponentSibling();
     ```
 
-1. **FromGameObject** - Create as a new component on a new game object.  **ResultType** must derive from UnityEngine.MonoBehaviour / UnityEngine.Component in this case
+    **ResultType** must derive from UnityEngine.MonoBehaviour / UnityEngine.Component in this case
+
+    Also note that if a non-MonoBehaviour requests the given type, an exception will be thrown, since there is no current transform in that case.
+
+1. **FromComponentInHierarchy** - Look up the component within the scene hierarchy associated with the current context, as well as the hierarchy associated with any parent contexts.
 
     ```csharp
-    Container.Bind<Foo>().FromGameObject();
+    Container.Bind<Foo>().FromComponentInHierarchy();
     ```
 
-1. **FromPrefab** - Create by instantiating the given prefab and then searching it for type **ResultType**.  **ResultType** must derive from UnityEngine.MonoBehaviour / UnityEngine.Component in this case
+    **ResultType** must either be an interface or derive from UnityEngine.MonoBehaviour / UnityEngine.Component in this case
+
+    In the most common case where the context is a SceneContext, this will search the entire scene hierarchy (except any sub-contexts such as GameObjectContext).  In other words, when the current context is a scene context, it will behave similar to `GameObject.FindObjectsOfType`.  Note that since this could be a big search, it should be used with caution, just like `GameObject.FindObjectsOfType` should be used with caution.
+
+    In the case where the context is GameObjectContext, it will only search within and underneath the game object root (and any parent contexts).
+
+    In the case where the context is ProjectContext, it will only search within the project context prefab
+
+1. **FromComponentSibling** - Look up the given component type by searching over the components that are attached to the current transform.  The current transform here is taken from the object being injected, which must therefore be a MonoBehaviour derived type. 
 
     ```csharp
-    Container.Bind<Foo>().FromPrefab(somePrefab);
+    Container.Bind<Foo>().FromComponentSibling();
     ```
 
-1. **FromPrefabResource** - Create by instantiating the prefab at the given resource path and then searching it for type **ResultType**.   **ResultType** must derive from UnityEngine.MonoBehaviour / UnityEngine.Component in this case
+    **ResultType** must either be an interface or derive from UnityEngine.MonoBehaviour / UnityEngine.Component in this case
+
+    Note that if a non-MonoBehaviour requests the given type, an exception will be thrown, since there is no current transform in that case.
+
+1. **FromComponentInParents** - Look up the component by searching the current transform or any parent for the given component type.  The current transform here is taken from the object being injected, which must therefore be a MonoBehaviour derived type. 
 
     ```csharp
-    Container.Bind<Foo>().FromPrefabResource("Some/Path/Foo");
+    Container.Bind<Foo>().FromComponentInParents();
     ```
 
-1. **FromResource** - Create by calling the Unity3d function `Resources.Load` for **ResultType**.  This can be used to load any type that `Resources.Load` can load, such as textures, sounds, prefabs, custom classes deriving from ScriptableObject, etc.
+    **ResultType** must either be an interface or derive from UnityEngine.MonoBehaviour / UnityEngine.Component in this case
+
+    Note that if a non-MonoBehaviour requests the given type, an exception will be thrown, since there is no current transform in that case.
+
+1. **FromComponentInChildren** - Look up the component by searching the current transform or any child transform for the given component type.  The current transform here is taken from the object being injected, which must therefore be a MonoBehaviour derived type. 
+
+    ```csharp
+    Container.Bind<Foo>().FromComponentInChildren();
+    ```
+
+    **ResultType** must either be an interface or derive from UnityEngine.MonoBehaviour / UnityEngine.Component in this case
+
+    Note that if a non-MonoBehaviour requests the given type, an exception will be thrown, since there is no current transform in that case.
+
+1. **FromResource** - Create by calling the Unity3d function `Resources.Load` for **ResultType**.  This can be used to load any type that `Resources.Load` can load, such as textures, sounds, prefabs, etc.
+
+    ```csharp
+    Container.Bind<Texture>().WithId("Glass").FromResource("Some/Path/Glass");
+    ```
+
+1. **FromScriptableObjectResource** - Create a new ScriptableObject class by cloning a previously created instance saved to the resources folder.
 
     ```csharp
     public class Foo : ScriptableObject
     {
     }
 
-    Container.Bind<Foo>().FromResource("Some/Path/Foo");
+    Container.Bind<Foo>().FromScriptableObjectResource("Some/Path/Foo");
     ```
+
+    Note that unlike FromResource, the value returned from Resources.Load in this case will be cloned by calling ScriptableObject.Instantiate.  This is necessary to allow multiple instances of the same scriptable object resource.
 
 1. **FromResolve** - Get instance by doing another lookup on the container (in other words, calling `DiContainer.Resolve<ResultType>()`).  Note that for this to work, **ResultType** must be bound in a separate bind statement.  This construction method can be especially useful when you want to bind an interface to another interface, as shown in the below example
 
@@ -612,22 +708,7 @@ Where:
     Container.Bind<IBar>().To<Foo>();
     ```
 
-1. **FromFactory** - Create instance using a custom factory class.  This construction method is similar to `FromMethod` except can be cleaner in cases where the logic is more complicated or requires dependencies (the factory itself can have dependencies injected)
-
-    ```csharp
-    class FooFactory : IFactory<Foo>
-    {
-        public Foo Create()
-        {
-            // ...
-            return new Foo();
-        }
-    }
-
-    Container.Bind<Foo>().FromFactory<FooFactory>()
-    ```
-
-1. **FromResolveGetter<ObjectType>** - Get instance from the property of another dependency which is obtained by doing another lookup on the container (in other words, calling `DiContainer.Resolve<ObjectType>()` and then accessing a value on the returned instance of type **ResultType**).  Note that for this to work, **ObjectType** must be bound in a separate bind statement.
+1. **FromResolveGetter&lt;ObjectType&gt;** - Get instance from the property of another dependency which is obtained by doing another lookup on the container (in other words, calling `DiContainer.Resolve<ObjectType>()` and then accessing a value on the returned instance of type **ResultType**).  Note that for this to work, **ObjectType** must be bound in a separate bind statement.
 
     ```csharp
     public class Bar
@@ -659,7 +740,7 @@ Where:
         }
         ```
 
-    1. **ByInstaller** - Initialize the subcontainer by using a class derived from `Installer`.  This can be a cleaner and less error-prone alternative than using `ByMethod`, especially if you need to inject data into the installer itself.  Less error prone because when using ByMethod it is common to accidentally use Container instead of subContainer in your method.
+    1. **ByInstaller** - Initialize the subcontainer by using a class derived from `Installer`.  This can be a cleaner and less error-prone alternative than `ByMethod`, especially if you need to inject data into the installer itself.  Less error prone because when using ByMethod it is common to accidentally use Container instead of subContainer in your method.
 
         ```csharp
         Container.Bind<Foo>().FromSubContainerResolve().ByInstaller<FooFacadeInstaller>();
@@ -673,10 +754,10 @@ Where:
         }
         ```
 
-    1. **ByPrefab** - Initialize subcontainer using a prefab.  Note that the prefab must contain a `GameObjectContext` component attached to the root game object.  For details on `GameObjectContext` see <a href="#sub-containers-and-facades">this section</a>.
+    1. **ByNewPrefab** - Initialize subcontainer by instantiating a new prefab.  Note that the prefab must contain a `GameObjectContext` component attached to the root game object.  For details on `GameObjectContext` see <a href="#sub-containers-and-facades">this section</a>.
 
         ```csharp
-        Container.Bind<Foo>().FromSubContainerResolve().ByPrefab(MyPrefab);
+        Container.Bind<Foo>().FromSubContainerResolve().ByNewPrefab(MyPrefab);
 
         // Assuming here that this installer is added to the GameObjectContext at the root
         // of the prefab.  You could also use a ZenjectBinding in the case where Foo is a MonoBehaviour
@@ -689,10 +770,10 @@ Where:
         }
         ```
 
-    1. **ByPrefabResource** - Initialize subcontainer using a prefab obtained via `Resources.Load`.  Note that the prefab must contain a `GameObjectContext` component attached to the root game object.
+    1. **ByNewPrefabResource** - Initialize subcontainer instantiating a new prefab obtained via `Resources.Load`.  Note that the prefab must contain a `GameObjectContext` component attached to the root game object.
 
         ```csharp
-        Container.Bind<Foo>().FromSubContainerResolve().ByPrefabResource("Path/To/MyPrefab");
+        Container.Bind<Foo>().FromSubContainerResolve().ByNewPrefabResource("Path/To/MyPrefab");
         ```
 
 ## <a id="installers"></a>Installers
@@ -1064,12 +1145,12 @@ Please feel free to submit any other sources of confusion to sfvermeulen@gmail.c
 
 ## <a id="game-object-bind-methods"></a>Game Object Bind Methods
 
-For bindings that create new game objects (eg. FromPrefab or FromGameObject) there are also two extra bind methods
+For bindings that create new game objects (eg. FromComponentInNewPrefab or FromGameObject) there are also two extra bind methods
 
 * **WithGameObjectName** = The name to give the new Game Object associated with this binding.
 
     ```csharp
-    Container.Bind<Foo>().FromPrefabResource("Some/Path/Foo").WithGameObjectName("Foo1");
+    Container.Bind<Foo>().FromComponentInNewPrefabResource("Some/Path/Foo").WithGameObjectName("Foo1");
     Container.Bind<Foo>().FromGameObject().WithGameObjectName("Foo2");
     ```
 
@@ -1077,7 +1158,7 @@ For bindings that create new game objects (eg. FromPrefab or FromGameObject) the
 
     ```csharp
     Container.BindFactory<Bullet, Bullet.Factory>()
-        .FromPrefab(BulletPrefab)
+        .FromComponentInNewPrefab(BulletPrefab)
         .UnderTransformGroup("Bullets");
     ```
 
@@ -1085,7 +1166,7 @@ For bindings that create new game objects (eg. FromPrefab or FromGameObject) the
 
     ```csharp
     Container.BindFactory<Bullet, Bullet.Factory>()
-        .FromPrefab(BulletPrefab)
+        .FromComponentInNewPrefab(BulletPrefab)
         .UnderTransform(BulletTransform);
     ```
 
@@ -2253,15 +2334,15 @@ In this case however, two instances will be created.
 Another use case for this is to allow creating multiple singletons from the same prefab.  For example, Given the following:
 
 ```csharp
-Container.Bind<Foo>().FromPrefab(MyPrefab).AsSingle();
-Container.Bind<Bar>().FromPrefab(MyPrefab).AsSingle();
+Container.Bind<Foo>().FromComponentInNewPrefab(MyPrefab).AsSingle();
+Container.Bind<Bar>().FromComponentInNewPrefab(MyPrefab).AsSingle();
 ```
 
-It will only instantiate the prefab MyPrefab once, since the singleton is identified solely by the prefab when using `FromPrefab`.  The concrete type given can be interpreted as "Search the instantiated prefab for this component".  But, if instead you want Zenject to instantiate a new instance of the prefab for each `FromPrefab` binding, then you can do that as well by supplying an identifier to the `AsSingle` function like this:
+It will only instantiate the prefab MyPrefab once, since the singleton is identified solely by the prefab when using `FromComponentInNewPrefab`.  The concrete type given can be interpreted as "Search the instantiated prefab for this component".  But, if instead you want Zenject to instantiate a new instance of the prefab for each `FromComponentInNewPrefab` binding, then you can do that as well by supplying an identifier to the `AsSingle` function like this:
 
 ```csharp
-Container.Bind<Foo>().FromPrefab(MyPrefab).AsSingle("foo");
-Container.Bind<Bar>().FromPrefab(MyPrefab).AsSingle("bar");
+Container.Bind<Foo>().FromComponentInNewPrefab(MyPrefab).AsSingle("foo");
+Container.Bind<Bar>().FromComponentInNewPrefab(MyPrefab).AsSingle("bar");
 ```
 
 Now two instances of the prefab will be created.
