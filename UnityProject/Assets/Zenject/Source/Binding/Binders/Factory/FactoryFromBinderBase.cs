@@ -104,7 +104,7 @@ namespace Zenject
             return this;
         }
 
-        public NameTransformConditionCopyNonLazyBinder FromComponentInPrefab(UnityEngine.Object prefab)
+        public NameTransformConditionCopyNonLazyBinder FromComponentInNewPrefab(UnityEngine.Object prefab)
         {
             BindingUtil.AssertIsValidPrefab(prefab);
             BindingUtil.AssertIsInterfaceOrComponent(ContractType);
@@ -121,7 +121,7 @@ namespace Zenject
             return new NameTransformConditionCopyNonLazyBinder(BindInfo, gameObjectInfo);
         }
 
-        public NameTransformConditionCopyNonLazyBinder FromComponentInPrefabResource(string resourcePath)
+        public NameTransformConditionCopyNonLazyBinder FromComponentInNewPrefabResource(string resourcePath)
         {
             BindingUtil.AssertIsValidResourcePath(resourcePath);
             BindingUtil.AssertIsInterfaceOrComponent(ContractType);

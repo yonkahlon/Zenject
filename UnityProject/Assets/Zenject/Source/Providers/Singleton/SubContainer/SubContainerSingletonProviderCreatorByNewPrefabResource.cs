@@ -6,14 +6,14 @@ using ModestTree;
 
 namespace Zenject
 {
-    public class SubContainerSingletonProviderCreatorByPrefabResource
+    public class SubContainerSingletonProviderCreatorByNewPrefabResource
     {
         readonly SingletonMarkRegistry _markRegistry;
         readonly DiContainer _container;
         readonly Dictionary<CustomSingletonId, CreatorInfo> _subContainerCreators =
             new Dictionary<CustomSingletonId, CreatorInfo>();
 
-        public SubContainerSingletonProviderCreatorByPrefabResource(
+        public SubContainerSingletonProviderCreatorByNewPrefabResource(
             DiContainer container,
             SingletonMarkRegistry markRegistry)
         {
@@ -41,7 +41,7 @@ namespace Zenject
             else
             {
                 var creator = new SubContainerCreatorCached(
-                    new SubContainerCreatorByPrefab(
+                    new SubContainerCreatorByNewPrefab(
                         _container, new PrefabProviderResource(resourcePath), gameObjectBindInfo));
 
                 creatorInfo = new CreatorInfo(

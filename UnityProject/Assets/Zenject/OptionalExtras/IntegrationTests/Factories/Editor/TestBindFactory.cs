@@ -134,9 +134,9 @@ namespace Zenject.Tests.Factories
         }
 
         [Test]
-        public void TestFromComponentInPrefab()
+        public void TestFromComponentInNewPrefab()
         {
-            Container.BindFactory<Foo, Foo.Factory>().FromComponentInPrefab(FooPrefab).WithGameObjectName("asdf");
+            Container.BindFactory<Foo, Foo.Factory>().FromComponentInNewPrefab(FooPrefab).WithGameObjectName("asdf");
 
             Initialize();
 
@@ -150,7 +150,7 @@ namespace Zenject.Tests.Factories
         [Test]
         public void TestFromComponentInPrefabComponent()
         {
-            Container.BindFactory<Camera, CameraFactory>().FromComponentInPrefab(CameraPrefab).WithGameObjectName("asdf");
+            Container.BindFactory<Camera, CameraFactory>().FromComponentInNewPrefab(CameraPrefab).WithGameObjectName("asdf");
 
             Initialize();
 
@@ -166,7 +166,7 @@ namespace Zenject.Tests.Factories
         public void TestToPrefabSelfFail()
         {
             // Foo3 is not on the prefab
-            Container.BindFactory<Foo3, Foo3.Factory>().FromComponentInPrefab(FooPrefab);
+            Container.BindFactory<Foo3, Foo3.Factory>().FromComponentInNewPrefab(FooPrefab);
 
             Initialize();
 
@@ -176,7 +176,7 @@ namespace Zenject.Tests.Factories
         [Test]
         public void TestToPrefabConcrete()
         {
-            Container.BindFactory<IFoo, IFooFactory>().To<Foo>().FromComponentInPrefab(FooPrefab).WithGameObjectName("asdf");
+            Container.BindFactory<IFoo, IFooFactory>().To<Foo>().FromComponentInNewPrefab(FooPrefab).WithGameObjectName("asdf");
 
             Initialize();
 
@@ -212,7 +212,7 @@ namespace Zenject.Tests.Factories
         [Test]
         public void TestToPrefabResourceSelf()
         {
-            Container.BindFactory<Foo, Foo.Factory>().FromComponentInPrefabResource("TestBindFactory/Foo").WithGameObjectName("asdf");
+            Container.BindFactory<Foo, Foo.Factory>().FromComponentInNewPrefabResource("TestBindFactory/Foo").WithGameObjectName("asdf");
 
             Initialize();
 
@@ -226,7 +226,7 @@ namespace Zenject.Tests.Factories
         [Test]
         public void TestToPrefabResourceConcrete()
         {
-            Container.BindFactory<Foo, Foo.Factory>().To<Foo>().FromComponentInPrefabResource("TestBindFactory/Foo").WithGameObjectName("asdf");
+            Container.BindFactory<Foo, Foo.Factory>().To<Foo>().FromComponentInNewPrefabResource("TestBindFactory/Foo").WithGameObjectName("asdf");
 
             Initialize();
 
@@ -240,7 +240,7 @@ namespace Zenject.Tests.Factories
         [Test]
         public void TestToSubContainerPrefabSelf()
         {
-            Container.BindFactory<Foo, Foo.Factory>().FromSubContainerResolve().ByPrefab(FooSubContainerPrefab);
+            Container.BindFactory<Foo, Foo.Factory>().FromSubContainerResolve().ByNewPrefab(FooSubContainerPrefab);
 
             Initialize();
 
@@ -254,7 +254,7 @@ namespace Zenject.Tests.Factories
         public void TestToSubContainerPrefabConcrete()
         {
             Container.BindFactory<IFoo, IFooFactory>()
-                .To<Foo>().FromSubContainerResolve().ByPrefab(FooSubContainerPrefab);
+                .To<Foo>().FromSubContainerResolve().ByNewPrefab(FooSubContainerPrefab);
 
             Initialize();
 
@@ -267,7 +267,7 @@ namespace Zenject.Tests.Factories
         public void TestToSubContainerPrefabResourceSelf()
         {
             Container.BindFactory<Foo, Foo.Factory>()
-                .FromSubContainerResolve().ByPrefabResource("TestBindFactory/FooSubContainer");
+                .FromSubContainerResolve().ByNewPrefabResource("TestBindFactory/FooSubContainer");
 
             Initialize();
 
@@ -281,7 +281,7 @@ namespace Zenject.Tests.Factories
         public void TestToSubContainerPrefabResourceConcrete()
         {
             Container.BindFactory<IFoo, IFooFactory>()
-                .To<Foo>().FromSubContainerResolve().ByPrefabResource("TestBindFactory/FooSubContainer");
+                .To<Foo>().FromSubContainerResolve().ByNewPrefabResource("TestBindFactory/FooSubContainer");
 
             Initialize();
 

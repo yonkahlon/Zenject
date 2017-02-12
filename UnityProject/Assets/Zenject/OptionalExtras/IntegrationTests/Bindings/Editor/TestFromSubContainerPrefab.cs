@@ -34,7 +34,7 @@ namespace Zenject.Tests.Bindings
         public void TestSelfSingle()
         {
             Container.Bind<Foo>().FromSubContainerResolve()
-                .ByPrefab(FooPrefab).AsSingle();
+                .ByNewPrefab(FooPrefab).AsSingle();
 
             Container.BindRootResolve<Foo>();
             Container.BindRootResolve<Foo>();
@@ -51,7 +51,7 @@ namespace Zenject.Tests.Bindings
         public void TestSelfSingleValidate()
         {
             Container.Bind<Foo>().FromSubContainerResolve()
-                .ByPrefab(FooPrefab).AsSingle().NonLazy();
+                .ByNewPrefab(FooPrefab).AsSingle().NonLazy();
 
             Initialize();
         }
@@ -62,7 +62,7 @@ namespace Zenject.Tests.Bindings
         public void TestSelfSingleValidateFails()
         {
             Container.Bind<Foo>().FromSubContainerResolve()
-                .ByPrefab(FooPrefab2).AsSingle().NonLazy();
+                .ByNewPrefab(FooPrefab2).AsSingle().NonLazy();
 
             Initialize();
         }
@@ -70,7 +70,7 @@ namespace Zenject.Tests.Bindings
         [Test]
         public void TestSelfTransient()
         {
-            Container.Bind<Foo>().FromSubContainerResolve().ByPrefab(FooPrefab).AsTransient();
+            Container.Bind<Foo>().FromSubContainerResolve().ByNewPrefab(FooPrefab).AsTransient();
 
             Container.BindRootResolve<Foo>();
             Container.BindRootResolve<Foo>();
@@ -85,7 +85,7 @@ namespace Zenject.Tests.Bindings
         [Test]
         public void TestSelfCached()
         {
-            Container.Bind<Foo>().FromSubContainerResolve().ByPrefab(FooPrefab).AsCached();
+            Container.Bind<Foo>().FromSubContainerResolve().ByNewPrefab(FooPrefab).AsCached();
 
             Container.BindRootResolve<Foo>();
             Container.BindRootResolve<Foo>();
@@ -100,8 +100,8 @@ namespace Zenject.Tests.Bindings
         [Test]
         public void TestSelfSingleMultipleContracts()
         {
-            Container.Bind<Foo>().FromSubContainerResolve().ByPrefab(FooPrefab).AsSingle();
-            Container.Bind<Bar>().FromSubContainerResolve().ByPrefab(FooPrefab).AsSingle();
+            Container.Bind<Foo>().FromSubContainerResolve().ByNewPrefab(FooPrefab).AsSingle();
+            Container.Bind<Bar>().FromSubContainerResolve().ByNewPrefab(FooPrefab).AsSingle();
 
             Container.BindRootResolve<Foo>();
             Container.BindRootResolve<Bar>();
@@ -116,7 +116,7 @@ namespace Zenject.Tests.Bindings
         [Test]
         public void TestSelfCachedMultipleContracts()
         {
-            Container.Bind(typeof(Foo), typeof(Bar)).FromSubContainerResolve().ByPrefab(FooPrefab).AsCached();
+            Container.Bind(typeof(Foo), typeof(Bar)).FromSubContainerResolve().ByNewPrefab(FooPrefab).AsCached();
 
             Container.BindRootResolve<Foo>();
             Container.BindRootResolve<Bar>();
@@ -131,7 +131,7 @@ namespace Zenject.Tests.Bindings
         [Test]
         public void TestSelfTransientMultipleContracts()
         {
-            Container.Bind(typeof(Foo), typeof(Bar)).FromSubContainerResolve().ByPrefab(FooPrefab).AsTransient();
+            Container.Bind(typeof(Foo), typeof(Bar)).FromSubContainerResolve().ByNewPrefab(FooPrefab).AsTransient();
 
             Container.BindRootResolve<Foo>();
             Container.BindRootResolve<Bar>();
@@ -146,7 +146,7 @@ namespace Zenject.Tests.Bindings
         [Test]
         public void TestConcreteSingle()
         {
-            Container.Bind<IFoo>().To<Foo>().FromSubContainerResolve().ByPrefab(FooPrefab).AsSingle();
+            Container.Bind<IFoo>().To<Foo>().FromSubContainerResolve().ByNewPrefab(FooPrefab).AsSingle();
 
             Container.BindRootResolve<IFoo>();
             Container.BindRootResolve<IFoo>();
@@ -161,7 +161,7 @@ namespace Zenject.Tests.Bindings
         [Test]
         public void TestConcreteTransient()
         {
-            Container.Bind<IFoo>().To<Foo>().FromSubContainerResolve().ByPrefab(FooPrefab).AsTransient();
+            Container.Bind<IFoo>().To<Foo>().FromSubContainerResolve().ByNewPrefab(FooPrefab).AsTransient();
 
             Container.BindRootResolve<IFoo>();
             Container.BindRootResolve<IFoo>();
@@ -176,7 +176,7 @@ namespace Zenject.Tests.Bindings
         [Test]
         public void TestConcreteCached()
         {
-            Container.Bind<IFoo>().To<Foo>().FromSubContainerResolve().ByPrefab(FooPrefab).AsCached();
+            Container.Bind<IFoo>().To<Foo>().FromSubContainerResolve().ByNewPrefab(FooPrefab).AsCached();
 
             Container.BindRootResolve<IFoo>();
             Container.BindRootResolve<IFoo>();
@@ -191,8 +191,8 @@ namespace Zenject.Tests.Bindings
         [Test]
         public void TestConcreteSingleMultipleContracts()
         {
-            Container.Bind<IFoo>().To<Foo>().FromSubContainerResolve().ByPrefab(FooPrefab).AsSingle();
-            Container.Bind<Bar>().FromSubContainerResolve().ByPrefab(FooPrefab).AsSingle();
+            Container.Bind<IFoo>().To<Foo>().FromSubContainerResolve().ByNewPrefab(FooPrefab).AsSingle();
+            Container.Bind<Bar>().FromSubContainerResolve().ByNewPrefab(FooPrefab).AsSingle();
 
             Container.BindRootResolve<IFoo>();
             Container.BindRootResolve<IFoo>();
@@ -210,7 +210,7 @@ namespace Zenject.Tests.Bindings
         [Test]
         public void TestConcreteCachedMultipleContracts()
         {
-            Container.Bind(typeof(Foo), typeof(IFoo)).To<Foo>().FromSubContainerResolve().ByPrefab(FooPrefab).AsCached();
+            Container.Bind(typeof(Foo), typeof(IFoo)).To<Foo>().FromSubContainerResolve().ByNewPrefab(FooPrefab).AsCached();
 
             Container.BindRootResolve<IFoo>();
             Container.BindRootResolve<IFoo>();
@@ -228,7 +228,7 @@ namespace Zenject.Tests.Bindings
         [ExpectedException]
         public void TestSelfIdentifiersFails()
         {
-            Container.Bind<Gorp>().FromSubContainerResolve().ByPrefab(FooPrefab).AsSingle();
+            Container.Bind<Gorp>().FromSubContainerResolve().ByNewPrefab(FooPrefab).AsSingle();
 
             Container.BindRootResolve<Gorp>();
 
@@ -238,7 +238,7 @@ namespace Zenject.Tests.Bindings
         [Test]
         public void TestSelfIdentifiers()
         {
-            Container.Bind<Gorp>().FromSubContainerResolve("gorp").ByPrefab(FooPrefab).AsSingle();
+            Container.Bind<Gorp>().FromSubContainerResolve("gorp").ByNewPrefab(FooPrefab).AsSingle();
 
             Container.BindRootResolve<Gorp>();
             Container.BindRootResolve<Gorp>();

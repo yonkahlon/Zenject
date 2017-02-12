@@ -488,7 +488,12 @@ namespace Zenject
 
         public List<Type> ResolveTypeAll(Type type)
         {
-            return ResolveTypeAll(new InjectContext(this, type, null));
+            return ResolveTypeAll(type, null);
+        }
+
+        public List<Type> ResolveTypeAll(Type type, object identifier)
+        {
+            return ResolveTypeAll(new InjectContext(this, type, identifier));
         }
 
         // Returns all the types that would be returned if ResolveAll was called with the given values
@@ -648,7 +653,7 @@ namespace Zenject
 
                 // Use the container associated with the provider to address some rare cases
                 // which would otherwise result in an infinite loop.  Like this:
-                // Container.Bind<ICharacter>().FromComponentInPrefab(Prefab).AsTransient()
+                // Container.Bind<ICharacter>().FromComponentInNewPrefab(Prefab).AsTransient()
                 // With the prefab being a GameObjectContext containing a script that has a
                 // ICharacter dependency.  In this case, we would otherwise use the _resolvesInProgress
                 // associated with the GameObjectContext container, which will allow the recursive
@@ -1473,12 +1478,23 @@ namespace Zenject
         //
         public TContract Resolve<TContract>()
         {
-            return Resolve<TContract>(null);
+            return (TContract)Resolve(typeof(TContract));
         }
 
-        public TContract Resolve<TContract>(object identifier)
+        public object Resolve(Type contractType)
         {
-            return (TContract)Resolve(new InjectContext(this, typeof(TContract), identifier));
+            return ResolveId(contractType, null);
+        }
+
+        public TContract ResolveId<TContract>(object identifier)
+        {
+            return (TContract)ResolveId(typeof(TContract), identifier);
+        }
+
+        public object ResolveId(Type contractType, object identifier)
+        {
+            return Resolve(
+                new InjectContext(this, contractType, identifier));
         }
 
         // Same as Resolve<> except it will return null if a value for the given type cannot
@@ -1486,51 +1502,47 @@ namespace Zenject
         public TContract TryResolve<TContract>()
             where TContract : class
         {
-            return TryResolve<TContract>(null);
-        }
-
-        public TContract TryResolve<TContract>(object identifier)
-            where TContract : class
-        {
-            return (TContract)TryResolve(typeof(TContract), identifier);
+            return (TContract)TryResolve(typeof(TContract));
         }
 
         public object TryResolve(Type contractType)
         {
-            return TryResolve(contractType, null);
+            return TryResolveId(contractType, null);
         }
 
-        public object TryResolve(Type contractType, object identifier)
+        public TContract TryResolveId<TContract>(object identifier)
+            where TContract : class
         {
-            return Resolve(new InjectContext(this, contractType, identifier, true));
+            return (TContract)TryResolveId(
+                typeof(TContract), identifier);
         }
 
-        // Non generic version
-        public object Resolve(Type contractType)
+        public object TryResolveId(Type contractType, object identifier)
         {
-            return Resolve(new InjectContext(this, contractType, null));
-        }
-
-        public object Resolve(Type contractType, object identifier)
-        {
-            return Resolve(new InjectContext(this, contractType, identifier));
+            return Resolve(
+                new InjectContext(this, contractType, identifier, true));
         }
 
         // Same as Resolve<> except it will return all bindings that are associated with the given type
         public List<TContract> ResolveAll<TContract>()
         {
-            return ResolveAll<TContract>(null);
+            return (List<TContract>)ResolveAll(typeof(TContract));
         }
 
-        public List<TContract> ResolveAll<TContract>(object identifier)
+        public IList ResolveAll(Type contractType)
         {
-            return ResolveAll<TContract>(identifier, true);
+            return ResolveIdAll(contractType, null);
         }
 
-        public List<TContract> ResolveAll<TContract>(object identifier, bool optional)
+        public List<TContract> ResolveIdAll<TContract>(object identifier)
         {
-            var context = new InjectContext(this, typeof(TContract), identifier, optional);
-            return (List<TContract>)ResolveAll(context);
+            return (List<TContract>)ResolveIdAll(typeof(TContract), identifier);
+        }
+
+        public IList ResolveIdAll(Type contractType, object identifier)
+        {
+            return ResolveAll(
+                new InjectContext(this, contractType, identifier, true));
         }
 
         // Removes all bindings
@@ -1543,14 +1555,24 @@ namespace Zenject
         // Remove all bindings bound to the given contract type
         public bool Unbind<TContract>()
         {
-            return Unbind<TContract>(null);
+            return Unbind(typeof(TContract));
         }
 
-        public bool Unbind<TContract>(object identifier)
+        public bool Unbind(Type contractType)
+        {
+            return UnbindId(contractType, null);
+        }
+
+        public bool UnbindId<TContract>(object identifier)
+        {
+            return UnbindId(typeof(TContract), identifier);
+        }
+
+        public bool UnbindId(Type contractType, object identifier)
         {
             FlushBindings();
 
-            var bindingId = new BindingId(typeof(TContract), identifier);
+            var bindingId = new BindingId(contractType, identifier);
 
             return _providers.Remove(bindingId);
         }
@@ -1567,13 +1589,23 @@ namespace Zenject
 
         public bool HasBinding<TContract>()
         {
-            return HasBinding<TContract>(null);
+            return HasBinding(typeof(TContract));
         }
 
-        public bool HasBinding<TContract>(object identifier)
+        public bool HasBinding(Type contractType)
+        {
+            return HasBindingId(contractType, null);
+        }
+
+        public bool HasBindingId<TContract>(object identifier)
+        {
+            return HasBindingId(typeof(TContract), identifier);
+        }
+
+        public bool HasBindingId(Type contractType, object identifier)
         {
             return HasBinding(
-                new InjectContext(this, typeof(TContract), identifier));
+                new InjectContext(this, contractType, identifier));
         }
 
         // Do not use this - it is for internal use only
@@ -1615,13 +1647,24 @@ namespace Zenject
 
         public ConcreteBinderGeneric<TContract> Rebind<TContract>()
         {
-            return Rebind<TContract>(null);
+            return RebindId<TContract>(null);
         }
 
-        public ConcreteBinderGeneric<TContract> Rebind<TContract>(object identifier)
+        public ConcreteBinderGeneric<TContract> RebindId<TContract>(object identifier)
         {
-            Unbind<TContract>(identifier);
+            UnbindId<TContract>(identifier);
             return Bind<TContract>().WithId(identifier);
+        }
+
+        public ConcreteBinderNonGeneric Rebind(Type contractType)
+        {
+            return RebindId(contractType, null);
+        }
+
+        public ConcreteBinderNonGeneric RebindId(Type contractType, object identifier)
+        {
+            UnbindId(contractType, identifier);
+            return Bind(contractType).WithId(identifier);
         }
 
         // Map the given type to a way of obtaining it
@@ -1695,20 +1738,20 @@ namespace Zenject
         // It's only in rare cases where you need to call this instead of NonLazy()
         public void BindRootResolve<TContract>()
         {
-            BindRootResolve<TContract>(null);
-        }
-
-        public void BindRootResolve<TContract>(object identifier)
-        {
-            BindRootResolve(identifier, new Type[] { typeof(TContract) });
+            BindRootResolveId<TContract>(null);
         }
 
         public void BindRootResolve(IEnumerable<Type> rootTypes)
         {
-            BindRootResolve(null, rootTypes);
+            BindRootResolveId(rootTypes, null);
         }
 
-        public void BindRootResolve(object identifier, IEnumerable<Type> rootTypes)
+        public void BindRootResolveId<TContract>(object identifier)
+        {
+            BindRootResolveId(new Type[] { typeof(TContract) }, identifier);
+        }
+
+        public void BindRootResolveId(IEnumerable<Type> rootTypes, object identifier)
         {
             Bind<object>().WithId(DependencyRootIdentifier).To(rootTypes).FromResolve(identifier);
         }
@@ -2009,6 +2052,7 @@ namespace Zenject
             }
         }
 
+#if !NOT_UNITY3D
         public Component InstantiateComponentExplicit(
             Type componentType, GameObject gameObject, List<TypeValuePair> extraArgs)
         {
@@ -2110,6 +2154,7 @@ namespace Zenject
             return InjectGameObjectForComponentExplicit(
                 gameObj, componentType, args);
         }
+#endif
 
         ////////////// Types ////////////////
 

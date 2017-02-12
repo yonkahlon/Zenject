@@ -14,7 +14,7 @@ namespace Zenject.Tests.SceneDecorators
     [TestFixture]
     public class TestSceneDecorators
     {
-        const string CommonFolderPath = "Assets/Zenject/OptionalExtras/IntegrationTests/SceneLoading/Decorators";
+        const string CommonFolderPath = "Assets/Mtm.Zenject-IntegrationTests/SceneLoading/Decorators";
         const string DecoratorScenePath = CommonFolderPath + "/DecoratorScene.unity";
         const string MainScenePath = CommonFolderPath + "/MainScene.unity";
 

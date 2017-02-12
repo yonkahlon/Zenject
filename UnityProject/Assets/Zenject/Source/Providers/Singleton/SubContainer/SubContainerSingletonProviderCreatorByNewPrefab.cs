@@ -7,14 +7,14 @@ using Zenject.Internal;
 
 namespace Zenject
 {
-    public class SubContainerSingletonProviderCreatorByPrefab
+    public class SubContainerSingletonProviderCreatorByNewPrefab
     {
         readonly SingletonMarkRegistry _markRegistry;
         readonly DiContainer _container;
         readonly Dictionary<CustomSingletonId, CreatorInfo> _subContainerCreators =
             new Dictionary<CustomSingletonId, CreatorInfo>();
 
-        public SubContainerSingletonProviderCreatorByPrefab(
+        public SubContainerSingletonProviderCreatorByNewPrefab(
             DiContainer container,
             SingletonMarkRegistry markRegistry)
         {
@@ -43,7 +43,7 @@ namespace Zenject
             else
             {
                 var creator = new SubContainerCreatorCached(
-                    new SubContainerCreatorByPrefab(_container, new PrefabProvider(prefab), gameObjectBindInfo));
+                    new SubContainerCreatorByNewPrefab(_container, new PrefabProvider(prefab), gameObjectBindInfo));
 
                 creatorInfo = new CreatorInfo(gameObjectBindInfo, creator);
 

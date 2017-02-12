@@ -19,17 +19,17 @@ namespace Zenject.SpaceFighter
 
             Container.BindMemoryPool<EnemyFacade, EnemyFacade.Pool>()
                 .FromSubContainerResolve()
-                .ByPrefab(_settings.EnemyFacadePrefab)
+                .ByNewPrefab(_settings.EnemyFacadePrefab)
                 .UnderTransformGroup("Enemies");
 
             Container.BindMemoryPool<Bullet, Bullet.Pool>().WithInitialSize(10).ExpandByDoubling()
-                .FromComponentInPrefab(_settings.BulletPrefab)
+                .FromComponentInNewPrefab(_settings.BulletPrefab)
                 .UnderTransformGroup("Bullets");
 
             Container.Bind<LevelBoundary>().AsSingle();
 
             Container.BindMemoryPool<Explosion, Explosion.Pool>().WithInitialSize(3)
-                .FromComponentInPrefab(_settings.ExplosionPrefab)
+                .FromComponentInNewPrefab(_settings.ExplosionPrefab)
                 .UnderTransformGroup("Explosions");
 
             Container.Bind<AudioPlayer>().AsSingle();
