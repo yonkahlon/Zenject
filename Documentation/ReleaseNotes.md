@@ -1,7 +1,7 @@
 
 ## <a id="release-notes"></a>Release Notes
 
-###5.0 (February 11, 2017)
+###5.0 (February 13, 2017)
 
 Summary
 

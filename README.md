@@ -5,7 +5,7 @@
 
 [![Join the chat at https://gitter.im/Zenject/Lobby](https://badges.gitter.im/Zenject/Lobby.svg)](https://gitter.im/Zenject/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
-If you are looking for the older documentation for Zenject 3.X click <a href="https://github.com/modesttree/Zenject/tree/f0dd30ad451dcbc3eb17e636455a6c89b14ad537">here</a>.
+If you are looking for the older documentation for Zenject 3.X click <a href="https://github.com/modesttree/Zenject/tree/f0dd30ad451dcbc3eb17e636455a6c89b14ad537">here</a> and for 4.x click <a href="https://github.com/modesttree/Zenject/tree/0b4a15b1e6e680c94fd34a2d7420eb41e320b21b">here</a>.
 
 Many hours have gone into the creation of this framework and many more will go to continue maintaining it.  If you or your team have found it useful, consider <a href="http://svermeulen.github.io/DonateToZenject.html">buying me a coffee</a>!  Every donation makes me significantly more likely to find time for it.
 
