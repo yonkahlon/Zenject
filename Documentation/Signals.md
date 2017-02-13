@@ -21,36 +21,11 @@ public class UserJoinedSignal : Signal<string, UserJoinedSignal>
 {
 }
 
-public class Greeter1
+public class Greeter
 {
     public void SayHello(string userName)
     {
         Debug.Log("Hello " + userName + "!");
-    }
-}
-
-public class Greeter2 : IInitializable, IDisposable
-{
-    UserJoinedSignal _userJoinedSignal;
-
-    public Greeter2(UserJoinedSignal userJoinedSignal)
-    {
-        _userJoinedSignal = userJoinedSignal;
-    }
-
-    public void Initialize()
-    {
-        _userJoinedSignal += OnUserJoined;
-    }
-
-    public void Dispose()
-    {
-        _userJoinedSignal -= OnUserJoined;
-    }
-
-    void OnUserJoined(string username)
-    {
-        Debug.Log("Hello again " + username + "!");
     }
 }
 
@@ -76,10 +51,8 @@ public class GameInstaller : MonoInstaller<GameInstaller>
         Container.Bind<SignalManager>().AsSingle();
         Container.DeclareSignal<UserJoinedSignal>();
 
-        Container.BindInterfacesTo<Greeter2>().AsSingle();
-
         Container.BindSignal<string, UserJoinedSignal>()
-            .To<Greeter1>(x => x.SayHello).AsSingle();
+            .To<Greeter>(x => x.SayHello).AsSingle();
 
         Container.BindInterfacesTo<GameInitializer>().AsSingle();
     }
@@ -88,7 +61,48 @@ public class GameInstaller : MonoInstaller<GameInstaller>
 
 To run, just create copy and paste the code above into a new file named GameInstaller then create an empty scene with a new scene context and attach the new installer.
 
-As you can see in the the above example, there are two ways of creating signal handlers.  You can either directly bind a handler method to a signal in an installer (Greeter1) or you can have your signal handler attach and detach itself to the signal (Greeter2).
+There are several ways of creating signal handlers.  Another approach would be the following
+
+```csharp
+public class Greeter : IInitializable, IDisposable
+{
+    UserJoinedSignal _userJoinedSignal;
+
+    public Greeter(UserJoinedSignal userJoinedSignal)
+    {
+        _userJoinedSignal = userJoinedSignal;
+    }
+
+    public void Initialize()
+    {
+        _userJoinedSignal += OnUserJoined;
+    }
+
+    public void Dispose()
+    {
+        _userJoinedSignal -= OnUserJoined;
+    }
+
+    void OnUserJoined(string username)
+    {
+        Debug.Log("Hello again " + username + "!");
+    }
+}
+
+public class GameInstaller : MonoInstaller<GameInstaller>
+{
+    public override void InstallBindings()
+    {
+        Container.Bind<SignalManager>().AsSingle();
+        Container.DeclareSignal<UserJoinedSignal>();
+
+        Container.BindInterfacesTo<GameInitializer>().AsSingle();
+        Container.BindInterfacesTo<Greeter>().AsSingle();
+    }
+}
+```
+
+As you can see in the the above examples, you can either directly bind a handler method to a signal in an installer (first example) or you can have your signal handler attach and detach itself to the signal (second example).
 
 For more details on what's going on above see the following sections.
 
@@ -131,6 +145,7 @@ The format of the DeclareSignal statement is the following:
 
 <pre>
 Container.DeclareSignal&lt;<b>SignalType</b>&gt;()
+    .WithId(<b>Identifier</b>)
     .<b>RequireHandler</b>()
     .When(<b>Condition</b>);
 </pre>
@@ -139,7 +154,9 @@ The When Condition can be any Zenject condition just like any other binding (see
 
 The `RequireHandler()` method is optional.  If not included, then the signal will be allowed to fire with zero handlers attached.  If `RequireHandler()` is added to the binding, then an exception will be thrown if the signal is fired and there isn't any handlers attached.
 
-Then in the firing class:
+## <a id="firing"></a>Signal Firing
+
+Firing the signal is as simple as just adding a reference to it and calling Fire
 
 ```csharp
 public class Bar : ITickable
@@ -312,7 +329,7 @@ Or, you could add signal handlers in the ProjectContext and then declare the sig
 
 For example, You might use this to implement your GUI entirely in its own scene, loaded alongside the main backend scene.  Then you could have the GUI scene strictly fire Signals, which would then have method bindings in the game scene.
 
-Something else you'll have noticed in the ExitGameSignal example above is that we also needed to install the SignalManager class:
+Something else you'll have noticed in the examples above is that we also needed to install the SignalManager class:
 
 ```csharp
 Container.Bind<SignalManager>().AsSingle();

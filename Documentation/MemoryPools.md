@@ -286,7 +286,7 @@ public class Foo
 
     public class Pool : MemoryPool<Vector3, Foo>
     {
-        protected override void Reinitialize(Foo foo, Vector3 velocity)
+        protected override void Reinitialize(Vector3 velocity, Foo foo)
         {
             foo.Reset();
             foo._velocity = velocity;
@@ -350,7 +350,7 @@ public class Foo : MonoBehaviour
 
     public class Pool : MonoMemoryPool<Vector3, Foo>
     {
-        protected override void Reinitialize(Foo foo, Vector3 velocity)
+        protected override void Reinitialize(Vector3 velocity, Foo foo)
         {
             foo.Reset();
             foo._velocity = velocity;
