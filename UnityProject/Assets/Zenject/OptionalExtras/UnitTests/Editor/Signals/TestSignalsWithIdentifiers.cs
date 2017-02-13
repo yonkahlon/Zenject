@@ -61,7 +61,7 @@ namespace ZenjectSignalsAndSignals.Tests
             barSpecial.Dispose();
         }
 
-        public class SomethingHappenedSignal : Signal<SomethingHappenedSignal, string>
+        public class SomethingHappenedSignal : Signal<string, SomethingHappenedSignal>
         {
         }
 

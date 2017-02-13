@@ -17,7 +17,7 @@ As a third option, in some cases it might actually be better for neither one to 
 If you just want to get up and running immediately, see the following example which shows basic usage:
 
 ```csharp
-public class UserJoinedSignal : Signal<UserJoinedSignal, string>
+public class UserJoinedSignal : Signal<string, UserJoinedSignal>
 {
 }
 
@@ -109,7 +109,7 @@ Classes that derive from Signal should always be left empty - their only purpose
 Any parameters passed along with the signal need to be included as more generic arguments:
 
 ```csharp
-public class DoSomethingSignal : Signal<DoSomethingSignal, string, int>
+public class DoSomethingSignal : Signal<string, int, DoSomethingSignal>
 {
 }
 ```

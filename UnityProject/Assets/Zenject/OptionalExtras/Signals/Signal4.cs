@@ -15,8 +15,8 @@ namespace Zenject
         void Fire(TParam1 p1, TParam2 p2, TParam3 p3, TParam4 p4);
     }
 
-    public abstract class Signal<TDerived, TParam1, TParam2, TParam3, TParam4> : SignalBase, ISignal<TParam1, TParam2, TParam3, TParam4>
-        where TDerived : Signal<TDerived, TParam1, TParam2, TParam3, TParam4>
+    public abstract class Signal<TParam1, TParam2, TParam3, TParam4, TDerived> : SignalBase, ISignal<TParam1, TParam2, TParam3, TParam4>
+        where TDerived : Signal<TParam1, TParam2, TParam3, TParam4, TDerived>
     {
         readonly List<Action<TParam1, TParam2, TParam3, TParam4>> _listeners = new List<Action<TParam1, TParam2, TParam3, TParam4>>();
 #if ZEN_SIGNALS_ADD_UNIRX
@@ -54,13 +54,13 @@ namespace Zenject
                 .Fmt(listener.ToDebugString(), this.GetType()));
         }
 
-        public static TDerived operator + (Signal<TDerived, TParam1, TParam2, TParam3, TParam4> signal, Action<TParam1, TParam2, TParam3, TParam4> listener)
+        public static TDerived operator + (Signal<TParam1, TParam2, TParam3, TParam4, TDerived> signal, Action<TParam1, TParam2, TParam3, TParam4> listener)
         {
             signal.Listen(listener);
             return (TDerived)signal;
         }
 
-        public static TDerived operator - (Signal<TDerived, TParam1, TParam2, TParam3, TParam4> signal, Action<TParam1, TParam2, TParam3, TParam4> listener)
+        public static TDerived operator - (Signal<TParam1, TParam2, TParam3, TParam4, TDerived> signal, Action<TParam1, TParam2, TParam3, TParam4> listener)
         {
             signal.Unlisten(listener);
             return (TDerived)signal;

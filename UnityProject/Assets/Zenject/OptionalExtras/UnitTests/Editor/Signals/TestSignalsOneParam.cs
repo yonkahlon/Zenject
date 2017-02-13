@@ -39,7 +39,7 @@ namespace ZenjectSignalsAndSignals.Tests
             bar.Dispose();
         }
 
-        public class SomethingHappenedSignal : Signal<SomethingHappenedSignal, string>
+        public class SomethingHappenedSignal : Signal<string, SomethingHappenedSignal>
         {
         }
 

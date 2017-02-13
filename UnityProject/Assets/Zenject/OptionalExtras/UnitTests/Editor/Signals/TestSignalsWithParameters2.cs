@@ -116,10 +116,10 @@ namespace ZenjectSignalsAndSignals.Tests
             Assert.IsEqual(Bar4.Value4, 'z');
         }
 
-        public class DoSomethingSignal1 : Signal<DoSomethingSignal1, string> { }
-        public class DoSomethingSignal2 : Signal<DoSomethingSignal2, string, int> { }
-        public class DoSomethingSignal3 : Signal<DoSomethingSignal3, string, int, float> { }
-        public class DoSomethingSignal4 : Signal<DoSomethingSignal4, string, int, float, char> { }
+        public class DoSomethingSignal1 : Signal<string, DoSomethingSignal1> { }
+        public class DoSomethingSignal2 : Signal<string, int, DoSomethingSignal2> { }
+        public class DoSomethingSignal3 : Signal<string, int, float, DoSomethingSignal3> { }
+        public class DoSomethingSignal4 : Signal<string, int, float, char, DoSomethingSignal4> { }
 
         public class Bar1
         {
