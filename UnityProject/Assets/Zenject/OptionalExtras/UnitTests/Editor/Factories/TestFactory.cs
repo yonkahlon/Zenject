@@ -16,8 +16,6 @@ namespace Zenject.Tests.AbstractFactory
         {
             Container.BindFactory<Foo, Foo.Factory>().NonLazy();
 
-            Container.Validate();
-
             Assert.IsNotNull(Container.Resolve<Foo.Factory>().Create());
         }
 

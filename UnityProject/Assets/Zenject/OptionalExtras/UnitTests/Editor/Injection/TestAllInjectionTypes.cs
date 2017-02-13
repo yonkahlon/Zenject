@@ -17,8 +17,6 @@ namespace Zenject.Tests.Injection
             Container.Bind<Test0>().FromInstance(new Test0()).NonLazy();
             Container.Bind<IFoo>().To<FooDerived>().AsSingle().NonLazy();
 
-            Container.Validate();
-
             var foo = Container.Resolve<IFoo>();
 
             Assert.That(foo.DidPostInjectBase);

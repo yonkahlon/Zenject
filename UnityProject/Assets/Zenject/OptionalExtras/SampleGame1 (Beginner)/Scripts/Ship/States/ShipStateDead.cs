@@ -6,11 +6,11 @@ using Random=UnityEngine.Random;
 
 namespace Zenject.Asteroids
 {
-    public class ExplosionFactory : Factory<GameObject>
+    public class ExplosionFactory : GameObjectFactory
     {
     }
 
-    public class BrokenShipFactory : Factory<GameObject>
+    public class BrokenShipFactory : GameObjectFactory
     {
     }
 
@@ -19,7 +19,7 @@ namespace Zenject.Asteroids
         readonly BrokenShipFactory _brokenShipFactory;
         readonly ExplosionFactory _explosionFactory;
         readonly Settings _settings;
-        readonly Signals.ShipCrashed _shipCrashed;
+        readonly GameEvents _gameEvents;
         readonly Ship _ship;
 
         GameObject _shipBroken;
@@ -27,14 +27,14 @@ namespace Zenject.Asteroids
 
         public ShipStateDead(
             Settings settings, Ship ship,
-            Signals.ShipCrashed shipCrashed,
+            GameEvents gameEvents,
             ExplosionFactory explosionFactory,
             BrokenShipFactory brokenShipFactory)
         {
             _brokenShipFactory = brokenShipFactory;
             _explosionFactory = explosionFactory;
             _settings = settings;
-            _shipCrashed = shipCrashed;
+            _gameEvents = gameEvents;
             _ship = ship;
         }
 
@@ -57,10 +57,10 @@ namespace Zenject.Asteroids
                 rigidBody.AddForce(randomDir * _settings.explosionForce);
             }
 
-            _shipCrashed.Fire();
+            _gameEvents.ShipCrashed();
         }
 
-        public override void Stop()
+        public override void Dispose()
         {
             _ship.MeshRenderer.enabled = true;
             _ship.ParticleEmitter.emit = true;
@@ -76,8 +76,6 @@ namespace Zenject.Asteroids
         [Serializable]
         public class Settings
         {
-            public GameObject brokenTemplate;
-            public GameObject explosionTemplate;
             public float explosionForce;
         }
 

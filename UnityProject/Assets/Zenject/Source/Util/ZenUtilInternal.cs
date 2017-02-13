@@ -49,32 +49,70 @@ namespace Zenject.Internal
         }
 
         // NOTE: This method will not return components that are within a GameObjectContext
-        public static IEnumerable<Component> GetInjectableComponentsBottomUp(
-            GameObject gameObject, bool recursive)
+        public static List<MonoBehaviour> GetInjectableMonoBehaviours(GameObject gameObject)
         {
-            var context = gameObject.GetComponent<GameObjectContext>();
+            var childMonoBehaviours = gameObject.GetComponentsInChildren<MonoBehaviour>();
 
-            if (context != null)
+            var subContexts = childMonoBehaviours.OfType<GameObjectContext>().Select(x => x.transform).ToList();
+
+            return childMonoBehaviours.Where(x =>
+                    // Can be null for broken component references
+                    x != null
+                    // Do not inject on installers since these are always injected before they are installed
+                    && !x.GetType().DerivesFrom<MonoInstaller>()
+                    // Need to make sure we don't inject on any MonoBehaviour's that are below a GameObjectContext
+                    // Since that is the responsibility of the GameObjectContext
+                    // BUT we do want to inject on the GameObjectContext itself
+                    && UnityUtil.GetParents(x.transform).Intersect(subContexts).IsEmpty()
+                    && (x.GetComponent<GameObjectContext>() == null || x is GameObjectContext))
+                .OrderByDescending(x => GetParentCount(x.transform))
+                .ToList();
+        }
+
+        static int GetParentCount(Transform transform)
+        {
+            int result = 0;
+
+            while (transform.parent != null)
             {
-                yield return context;
-                yield break;
+                transform = transform.parent;
+                result++;
             }
 
-            if (recursive)
+            return result;
+        }
+
+        public static IEnumerable<MonoBehaviour> GetInjectableMonoBehaviours(Scene scene)
+        {
+            return GetRootGameObjects(scene)
+                .SelectMany(ZenUtilInternal.GetInjectableMonoBehaviours);
+        }
+
+        public static IEnumerable<GameObject> GetRootGameObjects(Scene scene)
+        {
+            if (scene.isLoaded)
             {
-                foreach (Transform child in gameObject.transform)
-                {
-                    foreach (var component in GetInjectableComponentsBottomUp(child.gameObject, recursive))
-                    {
-                        yield return component;
-                    }
-                }
+                return scene.GetRootGameObjects()
+                    .Where(x => x.GetComponent<ProjectContext>() == null);
             }
 
-            foreach (var component in gameObject.GetComponents<Component>())
-            {
-                yield return component;
-            }
+            // Note: We can't use scene.GetRootObjects() here because that apparently fails with an exception
+            // about the scene not being loaded yet when executed in Awake
+            // We also can't use GameObject.FindObjectsOfType<Transform>() because that does not include inactive game objects
+            // So we use Resources.FindObjectsOfTypeAll, even though that may include prefabs.  However, our assumption here
+            // is that prefabs do not have their "scene" property set correctly so this should work
+            //
+            // It's important here that we only inject into root objects that are part of our scene, to properly support
+            // multi-scene editing features of Unity 5.x
+            //
+            // Also, even with older Unity versions, if there is an object that is marked with DontDestroyOnLoad, then it will
+            // be injected multiple times when another scene is loaded
+            //
+            // We also make sure not to inject into the project root objects which are injected by ProjectContext.
+            return Resources.FindObjectsOfTypeAll<GameObject>()
+                .Where(x => x.transform.parent == null
+                    && x.GetComponent<ProjectContext>() == null
+                    && x.scene == scene);
         }
 #endif
     }

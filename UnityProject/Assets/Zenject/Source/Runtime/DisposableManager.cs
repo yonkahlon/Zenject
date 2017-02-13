@@ -12,6 +12,7 @@ namespace Zenject
         bool _disposed;
         bool _lateDisposed;
 
+        [Inject]
         public DisposableManager(
             [Inject(Optional = true, Source = InjectSources.Local)]
             List<IDisposable> disposables,
@@ -86,7 +87,7 @@ namespace Zenject
                 catch (Exception e)
                 {
                     throw Assert.CreateException(
-                        e, "Error occurred while late disposing ILateDisposable with type '{0}'", disposable.LateDisposable.GetType().Name());
+                        e, "Error occurred while late disposing ILateDisposable with type '{0}'", disposable.LateDisposable.GetType());
                 }
             }
 
@@ -117,7 +118,7 @@ namespace Zenject
                 catch (Exception e)
                 {
                     throw Assert.CreateException(
-                        e, "Error occurred while disposing IDisposable with type '{0}'", disposable.Disposable.GetType().Name());
+                        e, "Error occurred while disposing IDisposable with type '{0}'", disposable.Disposable.GetType());
                 }
             }
 

@@ -97,7 +97,7 @@ class Runner:
 
         self._log.info('Copying Zenject dlls')
         self._sys.copyFile('{0}/Zenject.dll'.format(binDir), '{0}/Zenject.dll'.format(tempDir))
-        self._sys.copyFile('{0}/Zenject.Commands.dll'.format(binDir), '{0}/Zenject.Commands.dll'.format(tempDir))
+        self._sys.copyFile('{0}/Zenject.Signals.dll'.format(binDir), '{0}/Zenject.Signals.dll'.format(tempDir))
 
         self._zipHelper.createZipFile(tempDir, zipPath)
 
@@ -129,7 +129,7 @@ class Runner:
             self._sys.removeFile('[ZenTempDir]/OptionalExtras/AutoMocking.meta')
 
             self._sys.removeFile('[ZenTempDir]/Source/Zenject.csproj')
-            self._sys.removeFile('[ZenTempDir]/OptionalExtras/CommandsAndSignals/Zenject.Commands.csproj')
+            self._sys.removeFile('[ZenTempDir]/OptionalExtras/Signals/Zenject.Signals.csproj')
 
             if not includeSample:
                 self._sys.deleteDirectory('[ZenTempDir]/OptionalExtras/SampleGame1 (Beginner)')
@@ -151,7 +151,7 @@ def installBindings():
 
     config = {
         'PathVars': {
-            'UnityExePath': 'C:/Utils/Unity/Unity5.4.1f1/Editor/Unity.exe',
+            'UnityExePath': 'C:/Utils/Unity/PrimaryLink/Editor/Unity.exe',
             'LogPath': os.path.join(BuildDir, 'Log.txt'),
             'MsBuildExePath': 'C:/Windows/Microsoft.NET/Framework/v4.0.30319/msbuild.exe'
         },

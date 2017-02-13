@@ -21,17 +21,14 @@ namespace Zenject
 
         bool _isDestroyed;
 
+        protected bool IsDestroyed
+        {
+            get { return _isDestroyed; }
+        }
+
         public virtual void Start()
         {
             _initializableManager.Initialize();
-        }
-
-        protected bool IsDestroyed
-        {
-            get
-            {
-                return _isDestroyed;
-            }
         }
 
         public virtual void Update()

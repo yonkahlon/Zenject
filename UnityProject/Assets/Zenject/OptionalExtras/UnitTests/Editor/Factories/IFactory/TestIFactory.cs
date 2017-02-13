@@ -26,8 +26,6 @@ namespace Zenject.Tests.Bindings
         {
             Container.BindIFactory<FooTwo>();
 
-            Assert.Throws(() => Container.Validate());
-
             var factory = Container.Resolve<IFactory<FooTwo>>();
 
             Assert.Throws(() => factory.Create());
@@ -38,8 +36,6 @@ namespace Zenject.Tests.Bindings
         {
             Container.BindIFactory<string, FooTwo>();
 
-            Container.Validate();
-
             var factory = Container.Resolve<IFactory<string, FooTwo>>();
 
             Assert.IsEqual(factory.Create("asdf").Value, "asdf");
@@ -49,8 +45,6 @@ namespace Zenject.Tests.Bindings
         public void Test5()
         {
             Container.BindIFactory<string, int, char, long, double, IFooFive>().To<FooFive>();
-
-            Container.Validate();
 
             var factory = Container.Resolve<IFactory<string, int, char, long, double, IFooFive>>();
 

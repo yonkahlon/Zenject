@@ -37,8 +37,6 @@ namespace Zenject.Tests.BindFeatures
 
             Container.Bind(types).AsSingle().NonLazy();
 
-            Container.Validate();
-
             Container.Resolve<Bar>();
             Container.Resolve<Foo>();
         }
@@ -49,15 +47,22 @@ namespace Zenject.Tests.BindFeatures
         {
             Container.Bind<IFoo>().AsSingle().NonLazy();
 
-            Container.Validate();
+            Container.Resolve<IFoo>();
+        }
+
+        [Test]
+        public void TestAllInterfacesMistake()
+        {
+            Container.BindInterfacesTo<Foo>();
+
+            // Should require setting scope
+            Assert.Throws(() => Container.FlushBindings());
         }
 
         [Test]
         public void TestAllInterfaces()
         {
-            Container.BindAllInterfaces<Foo>().To<Foo>().AsSingle().NonLazy();
-
-            Container.Validate();
+            Container.BindInterfacesTo<Foo>().AsSingle().NonLazy();
 
             Assert.IsNull(Container.TryResolve<Foo>());
             Assert.IsNotNull(Container.Resolve<IFoo>());
@@ -67,9 +72,7 @@ namespace Zenject.Tests.BindFeatures
         [Test]
         public void TestAllInterfacesAndSelf()
         {
-            Container.BindAllInterfacesAndSelf<Foo>().To<Foo>().AsSingle().NonLazy();
-
-            Container.Validate();
+            Container.BindInterfacesAndSelfTo<Foo>().AsSingle().NonLazy();
 
             Assert.IsNotNull(Container.Resolve<Foo>());
             Assert.IsNotNull(Container.Resolve<IFoo>());
@@ -77,16 +80,12 @@ namespace Zenject.Tests.BindFeatures
         }
 
         [Test]
-        [ExpectedException]
-        public void TestAllInterfacesMistake()
+        public void TestAllInterfacesAndSelfMistake()
         {
-            Container.BindAllInterfaces<Foo>().AsSingle().NonLazy();
-            Container.FlushBindings();
+            Container.BindInterfacesAndSelfTo<Foo>();
 
-            Container.Validate();
-
-            Assert.IsNotNull(Container.Resolve<IFoo>());
-            Assert.IsNotNull(Container.Resolve<IQux>());
+            // Should require setting scope
+            Assert.Throws(() => Container.FlushBindings());
         }
     }
 }

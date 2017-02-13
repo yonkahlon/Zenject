@@ -7,15 +7,23 @@ using ModestTree;
 using Assert=ModestTree.Assert;
 using Zenject;
 
-namespace Zenject.Tests
+namespace ZenjectSignalsAndSignals.Tests
 {
     [TestFixture]
-    public class TestTriggers1 : ZenjectUnitTestFixture
+    public class TestTriggers1 : ZenjectIntegrationTestFixture
     {
+        [SetUp]
+        public void CommonInstall()
+        {
+            Container.BindInterfacesAndSelfTo<SignalManager>().AsSingle();
+        }
+
         [Test]
         public void Test1()
         {
-            Container.BindSignal<FooSignal>();
+            Container.DeclareSignal<FooSignal>();
+
+            Initialize();
 
             var signal = Container.Resolve<FooSignal>();
 

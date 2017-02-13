@@ -19,7 +19,7 @@ namespace Zenject.Tests.Bindings
         {
             Container.Bind<Texture>().FromResource(ResourcePath);
 
-            Container.Bind<Runner>().FromGameObject().AsSingle().WithArguments(1).NonLazy();
+            Container.Bind<Runner>().FromNewComponentOnNewGameObject().AsSingle().WithArguments(1).NonLazy();
 
             Initialize();
         }
@@ -31,7 +31,7 @@ namespace Zenject.Tests.Bindings
             Container.Bind<Texture>().FromResource(ResourcePath);
             Container.Bind<Texture>().To<Texture>().FromResource(ResourcePath);
 
-            Container.Bind<Runner>().FromGameObject().AsSingle().WithArguments(3).NonLazy();
+            Container.Bind<Runner>().FromNewComponentOnNewGameObject().AsSingle().WithArguments(3).NonLazy();
 
             Initialize();
         }
@@ -41,7 +41,7 @@ namespace Zenject.Tests.Bindings
         {
             Container.Bind<Texture>().FromResource(ResourcePath).AsCached();
 
-            Container.Bind<Runner>().FromGameObject().AsSingle().WithArguments(1).NonLazy();
+            Container.Bind<Runner>().FromNewComponentOnNewGameObject().AsSingle().WithArguments(1).NonLazy();
 
             Initialize();
         }
@@ -52,7 +52,7 @@ namespace Zenject.Tests.Bindings
             Container.Bind<Texture>().FromResource(ResourcePath).AsSingle();
             Container.Bind<Texture>().FromResource(ResourcePath).AsSingle();
 
-            Container.Bind<Runner>().FromGameObject().AsSingle().WithArguments(2).NonLazy();
+            Container.Bind<Runner>().FromNewComponentOnNewGameObject().AsSingle().WithArguments(2).NonLazy();
 
             Initialize();
         }
@@ -64,7 +64,7 @@ namespace Zenject.Tests.Bindings
             Container.Bind<Texture>().FromResource(ResourcePath).AsSingle();
             Container.Bind<Texture>().FromResource(ResourcePath2).AsSingle();
 
-            Container.Bind<Runner>().FromGameObject().AsSingle().WithArguments(2).NonLazy();
+            Container.Bind<Runner>().FromNewComponentOnNewGameObject().AsSingle().WithArguments(2).NonLazy();
 
             Initialize();
         }

@@ -11,6 +11,11 @@ namespace Zenject.Tests.Bindings.FromPrefab
         [Inject]
         string _arg;
 
+        public string Arg
+        {
+            get { return _arg; }
+        }
+
         [Inject]
         public void Initialize()
         {

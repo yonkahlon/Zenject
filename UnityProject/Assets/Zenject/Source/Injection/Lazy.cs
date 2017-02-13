@@ -1,8 +1,15 @@
 using System;
+using ModestTree;
 
 namespace Zenject
 {
-    public class Lazy<T>
+    public interface ILazy
+    {
+        void Validate();
+    }
+
+    [ZenjectAllowDuringValidationAttribute]
+    public class Lazy<T> : ILazy
     {
         readonly DiContainer _container;
         readonly InjectContext _context;
@@ -12,8 +19,15 @@ namespace Zenject
 
         public Lazy(DiContainer container, InjectContext context)
         {
+            Assert.IsEqual(typeof(T), context.MemberType);
+
             _container = container;
             _context = context;
+        }
+
+        void ILazy.Validate()
+        {
+            _container.Resolve(_context);
         }
 
         public T Value
@@ -22,7 +36,7 @@ namespace Zenject
             {
                 if (!_hasValue)
                 {
-                    _value = _container.Resolve<T>(_context);
+                    _value = (T)_container.Resolve(_context);
                     _hasValue = true;
                 }
 

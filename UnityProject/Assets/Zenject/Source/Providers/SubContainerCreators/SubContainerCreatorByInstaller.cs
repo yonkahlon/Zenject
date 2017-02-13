@@ -19,7 +19,7 @@ namespace Zenject
             _extraArgs = extraArgs;
 
             Assert.That(installerType.DerivesFrom<InstallerBase>(),
-                "Invalid installer type given during bind command.  Expected type '{0}' to derive from 'Installer<>'", installerType.Name());
+                "Invalid installer type given during bind command.  Expected type '{0}' to derive from 'Installer<>'", installerType);
         }
 
         public SubContainerCreatorByInstaller(
@@ -36,14 +36,15 @@ namespace Zenject
                 _installerType, args.Concat(_extraArgs).ToList());
             installer.InstallBindings();
 
+            subContainer.FlushInjectQueue();
             subContainer.ResolveDependencyRoots();
 
             if (subContainer.IsValidating)
             {
-                // The root-level Container has its ValidateIValidatables method
+                // The root-level Container has its ValidateValidatables method
                 // called explicitly - however, this is not so for sub-containers
                 // so call it here instead
-                subContainer.ValidateIValidatables();
+                subContainer.ValidateValidatables();
             }
 
             return subContainer;

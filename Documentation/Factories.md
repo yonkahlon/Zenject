@@ -69,7 +69,7 @@ public class EnemySpawner
 }
 ```
 
-This will not work however, since in our case the Enemy class requires a reference to the Player class in its constructor.  We could add a dependency to the Player class to the EnemySpawner class, but then we have the problem described <a href="#theory">above</a>.  The EnemySpawner class doesn't care about filling in the dependencies for the Enemy class.  All the EnemySpawner class cares about is getting a new Enemy instance.
+This will not work however, since in our case the Enemy class requires a reference to the Player class in its constructor.  We could add a dependency to the Player class to the EnemySpawner class, but then we have the problem described <a href="../README.md#theory">above</a>.  The EnemySpawner class doesn't care about filling in the dependencies for the Enemy class.  All the EnemySpawner class cares about is getting a new Enemy instance.
 
 The recommended way to do this in Zenject is the following:
 
@@ -115,7 +115,7 @@ public class TestInstaller : MonoInstaller
 {
     public override void InstallBindings()
     {
-        Container.BindAllInterfaces<EnemySpawner>().To<EnemySpawner>().AsSingle();
+        Container.BindInterfacesTo<EnemySpawner>().AsSingle();
         Container.Bind<Player>().AsSingle();
         Container.BindFactory<Enemy, Enemy.Factory>();
     }
@@ -165,7 +165,7 @@ public class TestInstaller : MonoInstaller
 {
     public override void InstallBindings()
     {
-        Container.BindAllInterfaces<EnemySpawner>().To<EnemySpawner>().AsSingle();
+        Container.BindInterfacesTo<EnemySpawner>().AsSingle();
         Container.Bind<Player>().AsSingle();
         Container.BindFactory<float, Enemy, Enemy.Factory>();
     }
@@ -207,9 +207,9 @@ public class TestInstaller : MonoInstaller
 
     public override void InstallBindings()
     {
-        Container.BindAllInterfaces<EnemySpawner>().To<EnemySpawner>().AsSingle();
+        Container.BindInterfacesTo<EnemySpawner>().AsSingle();
         Container.Bind<Player>().AsSingle();
-        Container.BindFactory<Enemy, Enemy.Factory>().FromPrefab(EnemyPrefab);
+        Container.BindFactory<Enemy, Enemy.Factory>().FromComponentInNewPrefab(EnemyPrefab);
     }
 }
 
@@ -275,7 +275,7 @@ public class GameInstaller : MonoInstaller
 
     public override void InstallBindings()
     {
-        Container.BindAllInterfaces<GameController>().To<GameController>().AsSingle();
+        Container.BindInterfacesTo<GameController>().AsSingle();
 
         if (UseAStar)
         {
@@ -293,7 +293,7 @@ public class GameInstaller : MonoInstaller
 
 *Ok, but what if I don't know what type I want to create until after the application has started?  Or what if I have special requirements for constructing instances of the Enemy class that are not covered by any of the construction methods?* 
 
-In these cases you can create a custom factory, and directly call `new Enemy` or directly use the `DiContainer` class to create your object.  For example, continuing the previous factory example, let's say that you wanted to be able to change a runtime value (difficulty) that determines what kinds of enemies get created.
+In these cases you can create a custom factory, and directly call `new Enemy` or directly use the <a href="../README.md#dicontainer-methods">methods on DiContainer</a> to create your object.  For example, continuing the previous factory example, let's say that you wanted to be able to change a runtime value (difficulty) that determines what kinds of enemies get created.
 
 ```csharp
 public enum Difficulties
@@ -369,7 +369,7 @@ public class TestInstaller : MonoInstaller
 {
     public override void InstallBindings()
     {
-        Container.BindAllInterfaces<GameController>().To<GameController>().AsSingle();
+        Container.BindInterfacesTo<GameController>().AsSingle();
         Container.Bind<DifficultyManager>().AsSingle();
         Container.BindFactory<IEnemy, EnemyFactory>().FromFactory<CustomEnemyFactory>();
     }
