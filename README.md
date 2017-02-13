@@ -629,6 +629,8 @@ Where:
     Container.Bind<Foo>().FromNewComponentSibling();
     ```
 
+    Note that if the given component type is already attached to the current transform that this will just return that instead of creating a new component.  As a result, this bind statement functions similar to Unity's [RequireComponent] attribute.
+
     **ResultType** must derive from UnityEngine.MonoBehaviour / UnityEngine.Component in this case
 
     Also note that if a non-MonoBehaviour requests the given type, an exception will be thrown, since there is no current transform in that case.
