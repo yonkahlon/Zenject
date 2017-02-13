@@ -3,6 +3,10 @@
 
 ###5.0 (February 11, 2017)
 
+Summary
+
+Notable parts of this release includes the long awaited support for Memory Pools and support for late resolve via Lazy<> construct.  It also includes some API breaking changes to make it easier for new users.  Some of the bind methods were renamed to better represent what they mean, and in some cases the scope is now required to be made explicit, to avoid accidentally using transient scope.  Finally, there was also some significant performance improvements for when using Zenject in scenes with many transforms.
+
 New Features
 - Added Lazy<> construct so that you can have the resolve occur upon first usage
 - Added menu option "Validate All Active Scenes"
@@ -20,14 +24,7 @@ Changes
 - Updated sample projects to be easier to understand
 - Improved error messages to include full type names
 - Changed list bindings to default to optional so that you don't have to do this explicitly constantly
-
-Optimizations
-- Fixed major performance issue for scenes that have a lot of transforms Re issue #188.
-- Fixed to avoid the extra performance costs of calling SetParent by directly passing the parent to the GameObject.Instantiate method issue #188
-
-Breaking changes
 - Changed to require that the scope be explicitly set for some of the bind methods to avoid extremely common errors of accidentally leaving it as transient.  Bind methods that are more like "look ups" (eg. FromMethod, FromComponentInParents, etc.) have it as optional, however bind methods that create new instances require that it be set explicitly
-- Moved commands and signals packages into a seperate repo
 - Renamed BindAllInterfaces to BindInterfacesTo and BindAllInterfacesAndSelf to BindInterfacesAndSelfTo to avoid the extremely common mistake of forgetting the To
 - Removed support for passing arguments to InjectGameObject and InstantiatePrefab methods (issue #125)
 - Removed UnityEventManager since it isn't core to keep things lightweight
@@ -41,6 +38,8 @@ Breaking changes
     - FromSubContainerResolve.ByPrefab => FromSubContainerResolve.ByNewPrefab
 
 Bug fixes
+- (optimization) Fixed major performance issue for scenes that have a lot of transforms Re issue #188.
+- (optimization) Fixed to avoid the extra performance costs of calling SetParent by directly passing the parent to the GameObject.Instantiate method issue #188
 - Fixed extremely rare bug that would cause an infinite loop when using complex subcontainer setups
 - Fixed to work with nunit test case attributes
 - Fixed to instantiate prefabs without always changing them to be active
