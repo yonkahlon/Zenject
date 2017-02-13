@@ -1835,6 +1835,19 @@ namespace Zenject
             return new IdScopeConditionCopyNonLazyBinder(bindInfo);
         }
 
+        // Unfortunately we can't support setting scope / condition / etc. here since all the
+        // bindings are finalized one at a time
+        public void BindInstances(params object[] instances)
+        {
+            foreach (var instance in instances)
+            {
+                Assert.That(!ZenUtilInternal.IsNull(instance),
+                    "Found null instance provided to BindInstances method");
+
+                Bind(instance.GetType()).FromInstance(instance);
+            }
+        }
+
         FactoryToChoiceIdBinder<TContract> BindFactoryInternal<TContract, TFactoryContract, TFactoryConcrete>()
             where TFactoryConcrete : TFactoryContract, IFactory
             where TFactoryContract : IFactory
