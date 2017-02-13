@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <title>SubContainers.md - Grip</title>
+  <title>MemoryPools.md - Grip</title>
   <link rel="icon" href="data:image/x-icon;base64,AAABAAEAEBAAAAEACABoBQAAFgAAACgAAAAQAAAAIAAAAAEACAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAKCgr/FRUX/xYWGP8YGBr/GRkb/xsbHP8dHR7/Hh4f/x4eIP8fHyD/ICAh/yMjJP8kJCX/JiYo/ygoKv8pKSr/LCwu/y0tLv80NDT/QUFC/0ZGR/9MTE7/UFBR/1JSUv9bW1v/XFxc/2BgYP9hYWP/aGhp/2xsbP9ycnL/d3d3/3l5e/98fHz/f3+A/2dn/P9z3a//cNX8/4CAgP+Xl5f/nZ2e/56en/+fn5//n5+h/6amp/+rq6v/rKys/7CvsP+zs7T/uLi5/7u7u/+8vLz/wMDA/8fHx//Kysr/zc3N/9HR0f/d3d3/3t7e/+Xl5f/q6ur/6+vr/+3t7f/z8/P/9fX1//b29v/39/f/+Pj4//n5+f/6+vr/+/v7//z8/P/9/f3//v7+//////8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/NCYmJiYmJiYmJiYmJiYmNCZKSkpKSkpKSkpKSkpKSiYmSkpKRisdRkMbMklKSkomJkpKSSEiNUhEEQwpSUpKJiZKSi8LHhhAPAwBDDZKSiYmSkoWACA7SEc6HAEaSkomJkpKBxI/SkpKSj4ICkpKJiZKSgUTR0pKSkpGDwZKSiYmSkoTED1KSkpKOQQVSkomJkpKKgowMy4sNycIMUpKJiZKSkEZDgkDAgsNH0VKSiYmSkpKQigUBgkXLUhKSkomJkpKSkpKSkpKSkpKSkpKJiYmJiYmJiYmJiYmJiYmJiYmIyUkNDQ0NDQ0NDQ0NDQmOCYmJiYmJiYmJiYmJiYmOAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=" />
   <link rel="stylesheet" href="/__/grip/static/octicons/octicons.css" />
   <style>
@@ -45,506 +45,496 @@
               
                 <h3>
                   <span class="octicon octicon-book"></span>
-                  SubContainers.md
+                  MemoryPools.md
                 </h3>
               
               <article class="markdown-body entry-content" itemprop="text" id="grip-content">
                 <h2>
-<a id="user-content-sub-containers-and-facades" class="anchor" href="#sub-containers-and-facades" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a><a id="user-content-sub-containers-and-facades"></a>Sub-Containers And Facades</h2>
+<a id="user-content-memory-pools" class="anchor" href="#memory-pools" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a><a id="user-content-memory-pools"></a>Memory Pools</h2>
 
-<p>In some cases it can be very useful to use multiple containers in the same application.  For example, if you are creating a word processor it may be useful to have a sub-container for each tab that represents a separate document.  This way, you could bind a bunch of classes <code>AsSingle()</code> within the sub-container and they could all easily reference each other as if they were all singletons.  Then you could instantiate multiple sub-containers to be used for each document, with each sub-container having unique instances of all the classes that handle each specific document.</p>
+<h3>
+<a id="user-content-introduction" class="anchor" href="#introduction" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a><a id="user-content-introduction"></a>Introduction</h3>
 
-<p>Another example might be if you are designing an open-world space ship game, you might want each space ship to have it's own container that contains all the class instances responsible for running that specific spaceship.</p>
+<p>Before understanding memory pools it would be helpful to understand factories, so please read the <a href="Factories.md">docs on factories</a> first.</p>
 
-<p>This is actually how ProjectContext bindings work.  There is one container for the entire project, and when a unity scene starts up, it container within each SceneContext is created "underneath" the ProjectContext container.  All the bindings that you add in your scene MonoInstaller are bound to your SceneContext container.  This allows the dependencies in your scene to automatically get injected with ProjectContext bindings, because sub-containers automatically inherit all the bindings in their parent (and grandparent, etc.).</p>
+<p>It doesn't take long when developing games in Unity before you realize that proper memory management is very important if you want your game to run smoothly (especially on mobile).  Depending on the constraints of the platform and the type of game you are working on, it might be very important to avoid unnecessary heap allocations as much as possible.  One very effective way to do this is to use memory pools.</p>
 
-<p>A common design pattern that we like to use in relation to sub-containers is the <a href="https://en.wikipedia.org/wiki/Facade_pattern">Facade pattern</a>.  This pattern is used to abstract away a related group of dependencies so that it can be used at a higher level when used by other modules in the code base.  This is relevant here because often when you are defining sub-containers in your application it is very useful to also define a Facade class that is used to interact with this sub-container as a whole.  So, to apply it to the spaceship example above, you might have a SpaceshipFacade class that represents very high-level operations on a spaceship such as "Start Engine", "Take Damage", "Fly to destination", etc.  And then internally, the SpaceshipFacade class can delegate the specific handling of all the parts of these requests to the relevant single-responsibility dependencies that exist within the sub-container.</p>
+<p>As an example let's look at at a case where we are dynamically creating a class:</p>
 
-<p>Let's do some examples in the following sections.</p>
-
-<h2>
-<a id="user-content-hello-world-example-for-sub-containersfacade" class="anchor" href="#hello-world-example-for-sub-containersfacade" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a><a id="user-content-hello-world-for-facades"></a>Hello World Example For Sub-Containers/Facade</h2>
-
-<div class="highlight highlight-source-cs"><pre><span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-en">Greeter</span>
+<div class="highlight highlight-source-cs"><pre><span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-en">Foo</span>
 {
-    <span class="pl-k">readonly </span><span class="pl-k">string</span> <span class="pl-en">_message</span>;
-
-    <span class="pl-k">public</span> <span class="pl-en">Greeter</span>(string message)
+    <span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-en">Factory</span> : <span class="pl-en">Factory</span>&lt;<span class="pl-en">Foo</span>&gt;
     {
-        _message = message;
-    }
-
-    <span class="pl-k">public</span> <span class="pl-k">void</span> <span class="pl-en">DisplayGreeting</span>()
-    {
-        Debug.Log(_message);
     }
 }
 
-<span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-en">GameController</span> : <span class="pl-en">IInitializable</span>
+<span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-en">Bar</span>
 {
-    <span class="pl-k">readonly </span><span class="pl-en">Greeter</span> <span class="pl-en">_greeter</span>;
+    <span class="pl-en">readonly</span> Foo.Factory _fooFactory;
+    <span class="pl-k">readonly </span><span class="pl-en">List</span>&lt;<span class="pl-en">Foo</span>&gt; <span class="pl-en">_foos</span> = <span class="pl-k">new</span> <span class="pl-en">List</span>&lt;Foo&gt;();
 
-    <span class="pl-k">public</span> <span class="pl-en">GameController</span>(Greeter greeter)
+    <span class="pl-k">public</span> <span class="pl-en">Bar</span>(Foo.Factory fooFactory)
     {
-        _greeter = greeter;
+        _fooFactory = fooFactory;
     }
 
-    <span class="pl-k">public</span> <span class="pl-k">void</span> <span class="pl-en">Initialize</span>()
+    <span class="pl-k">public</span> <span class="pl-k">void</span> <span class="pl-en">AddFoo</span>()
     {
-        _greeter.DisplayGreeting();
+        _foos.Add(_fooFactory.Create());
+    }
+
+    <span class="pl-k">public</span> <span class="pl-k">void</span> <span class="pl-en">RemoveFoo</span>()
+    {
+        _foos.RemoveAt(<span class="pl-c1">0</span>);
     }
 }
 
-<span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-en">TestInstaller</span> : <span class="pl-en">MonoInstaller</span>
+<span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-en">TestInstaller</span> : <span class="pl-en">MonoInstaller</span>&lt;<span class="pl-en">TestInstaller</span>&gt;
 {
     <span class="pl-k">public</span> <span class="pl-k">override</span> <span class="pl-k">void</span> <span class="pl-en">InstallBindings</span>()
     {
-        Container.BindInterfacesTo&lt;GameController&gt;().AsSingle();
-        Container.Bind&lt;Greeter&gt;().FromSubContainerResolve().ByMethod(InstallGreeter).AsSingle();
-    }
-
-    <span class="pl-k">void</span> <span class="pl-en">InstallGreeter</span>(<span class="pl-en">DiContainer</span> <span class="pl-smi">subContainer</span>)
-    {
-        subContainer.Bind&lt;Greeter&gt;().AsSingle();
-        subContainer.BindInstance(<span class="pl-s"><span class="pl-pds">"</span>Hello world!<span class="pl-pds">"</span></span>);
+        Container.Bind&lt;Bar&gt;().AsSingle();
+        Container.BindFactory&lt;Foo, Foo.Factory&gt;();
     }
 }</pre></div>
 
-<p>The important thing to understand here is that any bindings that we add inside the <code>InstallGreeter</code> method will only be visible to objects within this sub-container.  The only exception is the Facade class (in this case, Greeter) since it is bound to the parent container using the FromSubContainerResolve binding.  In other words, in this example, the string "Hello World" is only visible by the Greeter class.</p>
+<p>Here, every time we call Bar.AddFoo it will always allocate new heap memory. And every time we call Bar.RemoveFoo, the Bar class will stop referencing one of the instances of Foo, and therefore the memory for that instance will be marked for garbage collection.  If this happens enough times, then eventually the garbage collector will kick in and you will get a (sometimes very noticeable) spike in your game.</p>
 
-<p>Note that you should always add a bind statement for whatever class is given to FromSubContainerResolve within the sub-container install method - otherwise you'll get exceptions and validation will fail.</p>
+<p>We can fix this spike by using memory pools instead:</p>
 
-<p>Note also that unlike the above example, it is often better to use <code>ByInstaller</code> instead of <code>ByMethod</code>.  This is because when you use <code>ByMethod</code> it is easy to accidentally reference the Container instead of the subContainer.  Also, by using <code>ByInstaller</code> you can pass arguments into the Installer itself.</p>
-
-<h2>
-<a id="user-content-using-iinitializable--itickable--idisposable-within-sub-containers" class="anchor" href="#using-iinitializable--itickable--idisposable-within-sub-containers" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a><a id="user-content-using-tickables-within-sub-containers"></a>Using IInitializable / ITickable / IDisposable within Sub-Containers</h2>
-
-<p>One issue with the Hello World example above is that if I wanted to add some ITickable's or IInitializable's or IDisposable's to my sub-container it would not work.  For example, I might try doing this:</p>
-
-<div class="highlight highlight-source-cs"><pre><span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-en">GoodbyeHandler</span> : <span class="pl-en">IDisposable</span>
+<div class="highlight highlight-source-cs"><pre><span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-en">Foo</span>
 {
-    <span class="pl-k">public</span> <span class="pl-k">void</span> <span class="pl-en">Dispose</span>()
+    <span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-en">Pool</span> : <span class="pl-en">MemoryPool</span>&lt;<span class="pl-en">Foo</span>&gt;
     {
-        Log.Trace(<span class="pl-s"><span class="pl-pds">"</span>Goodbye World!<span class="pl-pds">"</span></span>);
     }
 }
 
-<span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-en">HelloHandler</span> : <span class="pl-en">IInitializable</span>
+<span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-en">Bar</span>
 {
-    <span class="pl-k">public</span> <span class="pl-k">void</span> <span class="pl-en">Initialize</span>()
+    <span class="pl-en">readonly</span> Foo.Pool _fooPool;
+    <span class="pl-k">readonly </span><span class="pl-en">List</span>&lt;<span class="pl-en">Foo</span>&gt; <span class="pl-en">_foos</span> = <span class="pl-k">new</span> <span class="pl-en">List</span>&lt;Foo&gt;();
+
+    <span class="pl-k">public</span> <span class="pl-en">Bar</span>(Foo.Pool fooPool)
     {
-        Log.Trace(<span class="pl-s"><span class="pl-pds">"</span>Hello world!<span class="pl-pds">"</span></span>);
+        _fooPool = fooPool;
+    }
+
+    <span class="pl-k">public</span> <span class="pl-k">void</span> <span class="pl-en">AddFoo</span>()
+    {
+        _foos.Add(_fooPool.Spawn());
+    }
+
+    <span class="pl-k">public</span> <span class="pl-k">void</span> <span class="pl-en">RemoveFoo</span>()
+    {
+        <span class="pl-k">var</span> <span class="pl-en">foo </span>= _foos[<span class="pl-c1">0</span>];
+        _fooPool.Despawn(foo);
+        _foos.Remove(foo);
     }
 }
 
-<span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-en">Greeter</span>
-{
-    <span class="pl-k">public</span> <span class="pl-en">Greeter</span>()
-    {
-        Debug.Log(<span class="pl-s"><span class="pl-pds">"</span>Created Greeter!<span class="pl-pds">"</span></span>);
-    }
-}
-
-<span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-en">TestInstaller</span> : <span class="pl-en">MonoInstaller</span>
+<span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-en">TestInstaller</span> : <span class="pl-en">MonoInstaller</span>&lt;<span class="pl-en">TestInstaller</span>&gt;
 {
     <span class="pl-k">public</span> <span class="pl-k">override</span> <span class="pl-k">void</span> <span class="pl-en">InstallBindings</span>()
     {
-        Container.Bind&lt;Greeter&gt;().FromSubContainerResolve().ByMethod(InstallGreeter).AsSingle().NonLazy();
-    }
-
-    <span class="pl-k">void</span> <span class="pl-en">InstallGreeter</span>(<span class="pl-en">DiContainer</span> <span class="pl-smi">subContainer</span>)
-    {
-        subContainer.Bind&lt;Greeter&gt;().AsSingle();
-
-        subContainer.BindInterfacesTo&lt;GoodbyeHandler&gt;().AsSingle();
-        subContainer.BindInterfacesTo&lt;HelloHandler&gt;().AsSingle();
+        Container.Bind&lt;Bar&gt;().AsSingle();
+        Container.BindMemoryPool&lt;Foo, Foo.Pool&gt;();
     }
 }</pre></div>
 
-<p>However, while we will find that our <code>Greeter</code> class is created (due to the fact we're using <code>NonLazy</code>) and the text "Created Greeter!" is printed to the console, the Hello and Goodbye messages are not.  To get this working we need to change it to the following:</p>
+<p>As you can see, this works very similarly to factories, except that the terminology is a bit different (Pool instead of Factory, Spawn instead of Create) and unlike factories, you have to return the instance to the pool rather than just stop referencing it.</p>
 
-<div class="highlight highlight-source-cs"><pre><span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-en">GoodbyeHandler</span> : <span class="pl-en">IDisposable</span>
-{
-    <span class="pl-k">public</span> <span class="pl-k">void</span> <span class="pl-en">Dispose</span>()
-    {
-        Debug.Log(<span class="pl-s"><span class="pl-pds">"</span>Goodbye World!<span class="pl-pds">"</span></span>);
-    }
-}
+<p>With this new implementation above, there will be some initial heap allocation with every call to AddFoo(), but if you call RemoveFoo() then AddFoo() in sequence this will re-use the previous instance and therefore save you a heap allocation.</p>
 
-<span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-en">HelloHandler</span> : <span class="pl-en">IInitializable</span>
-{
-    <span class="pl-k">public</span> <span class="pl-k">void</span> <span class="pl-en">Initialize</span>()
-    {
-        Debug.Log(<span class="pl-s"><span class="pl-pds">"</span>Hello world!<span class="pl-pds">"</span></span>);
-    }
-}
+<p>This is better, but we might still want to avoid the spikes from the initial heap allocations as well.  One way to do this is to do all the heap allocations all at once as your game is starting up:</p>
 
-<span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-en">Greeter</span> : <span class="pl-en">Kernel</span>
-{
-    <span class="pl-k">public</span> <span class="pl-en">Greeter</span>()
-    {
-        Debug.Log(<span class="pl-s"><span class="pl-pds">"</span>Created Greeter<span class="pl-pds">"</span></span>);
-    }
-}
-
-<span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-en">TestInstaller</span> : <span class="pl-en">MonoInstaller</span>
+<div class="highlight highlight-source-cs"><pre><span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-en">TestInstaller</span> : <span class="pl-en">MonoInstaller</span>&lt;<span class="pl-en">TestInstaller</span>&gt;
 {
     <span class="pl-k">public</span> <span class="pl-k">override</span> <span class="pl-k">void</span> <span class="pl-en">InstallBindings</span>()
     {
-        Container.BindInterfacesAndSelfTo&lt;Greeter&gt;()
-            .FromSubContainerResolve().ByMethod(InstallGreeter).AsSingle().NonLazy();
+        Container.Bind&lt;Bar&gt;().AsSingle();
+        Container.BindMemoryPool&lt;Foo, Foo.Pool&gt;().WithInitialSize(<span class="pl-c1">10</span>);
     }
+}</pre></div>
 
-    <span class="pl-k">void</span> <span class="pl-en">InstallGreeter</span>(<span class="pl-en">DiContainer</span> <span class="pl-smi">subContainer</span>)
-    {
-        subContainer.Bind&lt;Greeter&gt;().AsSingle();
-
-        subContainer.BindInterfacesTo&lt;GoodbyeHandler&gt;().AsSingle();
-        subContainer.BindInterfacesTo&lt;HelloHandler&gt;().AsSingle();
-    }
-}
-</pre></div>
-
-<p>Now if we run it, we should see the Hello message, then if we stop playing we should see the Goodbye message.</p>
-
-<p>The reason this works is because we are now binding IInitializable, IDisposable, and ITickable on the root container to the Greeter class given by <code>Container.BindInterfacesAndSelfTo&lt;Greeter&gt;()</code>.  Greeter now inherits from Kernel, which inherits from all these interfaces and also handles forwarding these calls to the IInitializable's / ITickable's / IDisposable's in our sub container.  Note that we use AsSingle() here, which is important otherwise it will create a new sub-container for every interface which is not what we want.</p>
+<p>When we use WithInitialSize like this in the Bind statement for our pool, 10 instances of Foo will be created immediately on startup to seed the pool.</p>
 
 <h2>
-<a id="user-content-creating-sub-containers-on-gameobjects-by-using-game-object-context" class="anchor" href="#creating-sub-containers-on-gameobjects-by-using-game-object-context" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a><a id="user-content-using-game-object-contexts"></a>Creating Sub-Containers on GameObject's by using Game Object Context</h2>
+<a id="user-content-syntax" class="anchor" href="#syntax" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a><a id="user-content-syntax"></a>Syntax</h2>
 
-<p>Another issue with the <a href="#hello-world-for-facades">sub-container hello world example</a> above is that it does not work very well for MonoBehaviour classes.  There is nothing preventing us from adding MonoBehaviour bindings such as FromComponentInNewPrefab, FromNewComponentOnNewGameObject, etc. to our sub-container, however these will cause these new game objects to be added to the root of the scene heirarchy, so we'll have to manually track the lifetime of these objects ourselves by calling GameObject.Destroy on them when the Facade is destroyed.  Also, there is no way to have GameObject's that exist in our scene at the start but also exist within our sub-container.  These problems can be solved by using Game Object Context.</p>
+<p>The syntax for memory pools are almost identical to factories.  The recommended convention is to use a public nested class named Pool (though this is just a convention).</p>
 
-<p>For this example, let's try to actually implement something similar to the open world space ship game described in <a href="#sub-containers-and-facades">the sub-container introduction</a>:</p>
+<div class="highlight highlight-source-cs"><pre><span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-en">Foo</span>
+{
+    <span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-en">Pool</span> : <span class="pl-en">MemoryPool</span>&lt;<span class="pl-en">Foo</span>&gt;
+    {
+    }
+}</pre></div>
+
+<p>Parameters are added by adding generic arguments:</p>
+
+<div class="highlight highlight-source-cs"><pre><span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-en">Foo</span>
+{
+    <span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-en">Pool</span> : <span class="pl-en">MemoryPool</span>&lt;<span class="pl-k">string</span>, <span class="pl-k">int</span>, <span class="pl-en">Foo</span>&gt;
+    {
+    }
+}</pre></div>
+
+<p>The full format of the binding is the following:</p>
+
+<pre>
+Container.BindMemoryPool&lt;<b>Param1Type, Param2Type, etc..., ObjectType, MemoryPoolType</b>&gt;()
+    .With<b>(InitialSize|FixedSize)</b>()
+    .ExpandBy<b>(OneAtATime|Doubling)</b>()
+    .To&lt;<b>ResultType</b>&gt;()
+    .WithId(<b>Identifier</b>)
+    .From<b>ConstructionMethod</b>()
+    .WithArguments(<b>Arguments</b>)
+    .When(<b>Condition</b>)
+    .CopyIntoAllSubContainers()
+    .NonLazy();
+</pre>
+
+<p>Where:</p>
 
 <ul>
-<li>Create a new scene</li>
-<li>Add the following files to your project:</li>
+<li>
+<p><strong>With</strong> = Determines the number of instances that the pool is seeded with.  When not specified, the pool starts with zero instances.  The options are:</p>
+
+<ul>
+<li>WithInitializeSize(x) - Create x instances immediately when the pool is created.  The pool is also allowed to grow as necessary if it exceeds that amount</li>
+<li>WithFixedSize(x) - Create x instances immediately when the pool is created.  If the pool size is exceeded then an exception is thrown.</li>
+</ul>
+</li>
+<li>
+<p><strong>ExpandBy</strong> = Determines the behaviour to invoke when the pool reaches its maximum size.  Note that when specifying WithFixedSize, this option is not available.  The options are:</p>
+
+<ul>
+<li>ExpandByOneAtATime - Only allocate new instances one at a time as necessary</li>
+<li>ExpandByDoubling - When the pool is full and a new instance is requested, the pool will double in size before returning the requested instance.  This approach can be useful if you prefer having large infrequent allocations to many small frequent allocations</li>
+</ul>
+</li>
 </ul>
 
-<div class="highlight highlight-source-cs"><pre><span class="pl-k">using</span> <span class="pl-en">Zenject</span>;
-<span class="pl-k">using</span> <span class="pl-en">UnityEngine</span>;
+<p>The rest of the bind methods behave the same as the normal bind methods documented <a href="../README.md#binding">here</a></p>
 
-<span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-en">Ship</span> : <span class="pl-en">MonoBehaviour</span>
+<h2>
+<a id="user-content-resetting" class="anchor" href="#resetting" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a><a id="user-content-resetting"></a>Resetting</h2>
+
+<p>One very important thing to be aware of when using memory pools instead of factories is that you must make sure to completely "refresh" the given instance.  This is necessary otherwise you might have state a previous "life" of the instance bleeding in to the behaviour of the new instance.</p>
+
+<p>You can refresh the object by implementing any of the following methods in your memory pool derived class:</p>
+
+<div class="highlight highlight-source-cs"><pre><span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-en">Foo</span>
 {
-    <span class="pl-en">ShipHealthHandler</span> <span class="pl-en">_healthHandler</span>;
-
-    [Inject]
-    <span class="pl-k">public</span> <span class="pl-k">void</span> <span class="pl-en">Construct</span>(<span class="pl-en">ShipHealthHandler</span> <span class="pl-smi">healthHandler</span>)
+    <span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-en">Pool</span> : <span class="pl-en">MemoryPool</span>&lt;<span class="pl-en">Foo</span>&gt;
     {
-        _healthHandler = healthHandler;
-    }
-
-    <span class="pl-k">public</span> <span class="pl-k">void</span> <span class="pl-en">TakeDamage</span>(<span class="pl-k">float</span> <span class="pl-smi">damage</span>)
-    {
-        _healthHandler.TakeDamage(damage);
-    }
-}</pre></div>
-
-<div class="highlight highlight-source-cs"><pre><span class="pl-k">using</span> <span class="pl-en">UnityEngine</span>;
-<span class="pl-k">using</span> <span class="pl-en">Zenject</span>;
-
-<span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-en">GameRunner</span> : <span class="pl-en">ITickable</span>
-{
-    <span class="pl-k">readonly </span><span class="pl-en">Ship</span> <span class="pl-en">_ship</span>;
-
-    <span class="pl-k">public</span> <span class="pl-en">GameRunner</span>(Ship ship)
-    {
-        _ship = ship;
-    }
-
-    <span class="pl-k">public</span> <span class="pl-k">void</span> <span class="pl-en">Tick</span>()
-    {
-        <span class="pl-k">if</span> (Input.GetKeyDown(KeyCode.Space))
+        <span class="pl-k">protected</span> <span class="pl-k">override</span> <span class="pl-k">void</span> <span class="pl-en">OnCreated</span>(<span class="pl-en">Foo</span> <span class="pl-smi">item</span>)
         {
-            _ship.TakeDamage(<span class="pl-c1">10</span>);
+            <span class="pl-c">// Called immediately after the item is first added to the pool</span>
+        }
+
+        <span class="pl-k">protected</span> <span class="pl-k">override</span> <span class="pl-k">void</span> <span class="pl-en">OnSpawned</span>(<span class="pl-en">Foo</span> <span class="pl-smi">item</span>)
+        {
+            <span class="pl-c">// Called immediately after the item is removed from the pool</span>
+        }
+
+        <span class="pl-k">protected</span> <span class="pl-k">override</span> <span class="pl-k">void</span> <span class="pl-en">OnDespawned</span>(<span class="pl-en">Foo</span> <span class="pl-smi">item</span>)
+        {
+            <span class="pl-c">// Called immediately after the item is returned to the pool</span>
+        }
+
+        <span class="pl-k">protected</span> <span class="pl-k">override</span> <span class="pl-k">void</span> <span class="pl-en">Reinitialize</span>(<span class="pl-en">Foo</span> <span class="pl-smi">foo</span>)
+        {
+            <span class="pl-c">// Similar to OnSpawned</span>
+            <span class="pl-c">// Called immediately after the item is removed from the pool</span>
+            <span class="pl-c">// This method will also contain any parameters that are passed along</span>
+            <span class="pl-c">// to the memory pool from the spawning code</span>
         }
     }
 }</pre></div>
 
-<div class="highlight highlight-source-cs"><pre><span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-en">GameInstaller</span> : <span class="pl-en">MonoInstaller</span>
+<p>In most cases, you will probably only have to implement the Reinitialize method.   For example, let's introduce some state to our first example by adding a Position value to Foo:</p>
+
+<div class="highlight highlight-source-cs"><pre><span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-en">Foo</span>
 {
-    <span class="pl-k">public</span> <span class="pl-k">override</span> <span class="pl-k">void</span> <span class="pl-en">InstallBindings</span>()
+    <span class="pl-en">Vector3</span> <span class="pl-en">_position</span> = Vector3.zero;
+
+    <span class="pl-k">public</span> <span class="pl-k">void</span> <span class="pl-en">Move</span>(<span class="pl-en">Vector3</span> <span class="pl-smi">delta</span>)
     {
-        Container.BindInterfacesTo&lt;GameRunner&gt;().AsSingle();
+        _position += delta;
+    }
+
+    <span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-en">Pool</span> : <span class="pl-en">MemoryPool</span>&lt;<span class="pl-en">Foo</span>&gt;
+    {
+        <span class="pl-k">protected</span> <span class="pl-k">override</span> <span class="pl-k">void</span> <span class="pl-en">Reinitialize</span>(<span class="pl-en">Foo</span> <span class="pl-smi">foo</span>)
+        {
+            foo._position = Vector3.zero;
+        }
     }
 }</pre></div>
 
-<div class="highlight highlight-source-cs"><pre><span class="pl-k">using</span> <span class="pl-en">Zenject</span>;
-<span class="pl-k">using</span> <span class="pl-en">UnityEngine</span>;
+<p>Note that our pool class is free to access private variables inside Foo because of the fact that it is a nested class.</p>
 
-<span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-en">ShipHealthHandler</span> : <span class="pl-en">MonoBehaviour</span>
+<p>Or, if we wanted to avoid the duplication in Foo and Foo.Pool, we could do it this way:</p>
+
+<div class="highlight highlight-source-cs"><pre><span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-en">Foo</span>
 {
-    <span class="pl-k">float</span> <span class="pl-en">_health</span> = <span class="pl-c1">100</span>;
+    <span class="pl-en">Vector3</span> <span class="pl-en">_position</span>;
 
-    <span class="pl-k">public</span> <span class="pl-k">void</span> <span class="pl-en">OnGUI</span>()
+    <span class="pl-k">public</span> <span class="pl-en">Foo</span>()
     {
-        GUI.Label(<span class="pl-k">new</span> <span class="pl-en">Rect</span>(Screen.width / <span class="pl-c1">2</span>, Screen.height / <span class="pl-c1">2</span>, <span class="pl-c1">200</span>, <span class="pl-c1">100</span>), <span class="pl-s"><span class="pl-pds">"</span>Health: <span class="pl-pds">"</span></span> + _health);
+        Reset();
     }
 
-    <span class="pl-k">public</span> <span class="pl-k">void</span> <span class="pl-en">TakeDamage</span>(<span class="pl-k">float</span> <span class="pl-smi">damage</span>)
+    <span class="pl-k">public</span> <span class="pl-k">void</span> <span class="pl-en">Move</span>(<span class="pl-en">Vector3</span> <span class="pl-smi">delta</span>)
     {
-        _health -= damage;
+        _position += delta;
+    }
+
+    <span class="pl-k">void</span> <span class="pl-en">Reset</span>()
+    {
+        _position = Vector3.zero;
+    }
+
+    <span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-en">Pool</span> : <span class="pl-en">MemoryPool</span>&lt;<span class="pl-en">Foo</span>&gt;
+    {
+        <span class="pl-k">protected</span> <span class="pl-k">override</span> <span class="pl-k">void</span> <span class="pl-en">Reinitialize</span>(<span class="pl-en">Foo</span> <span class="pl-smi">foo</span>)
+        {
+            foo.Reset();
+        }
     }
 }</pre></div>
 
-<div class="highlight highlight-source-cs"><pre><span class="pl-k">using</span> <span class="pl-en">UnityEngine</span>;
-<span class="pl-k">using</span> <span class="pl-en">System.Collections</span>;
+<h2>
+<a id="user-content-parameters" class="anchor" href="#parameters" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a><a id="user-content-parameters"></a>Parameters</h2>
 
-<span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-en">ShipInputHandler</span> : <span class="pl-en">MonoBehaviour</span>
+<p>Just like Factories, you can also pass runtime parameters when spawning new instances of your pooled classes.  The difference is, instead of the parameters being injected into the class, they are passed to the Reinitialize method:</p>
+
+<div class="highlight highlight-source-cs"><pre><span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-en">Foo</span>
 {
-    [SerializeField]
-    <span class="pl-k">float</span> <span class="pl-en">_speed</span> = <span class="pl-c1">2</span>;
+    <span class="pl-en">Vector3</span> <span class="pl-en">_position</span>;
+    <span class="pl-en">Vector3</span> <span class="pl-en">_velocity</span>;
+
+    <span class="pl-k">public</span> <span class="pl-en">Foo</span>()
+    {
+        Reset();
+    }
+
+    <span class="pl-k">public</span> <span class="pl-k">void</span> <span class="pl-en">Tick</span>()
+    {
+        _position += _velocity * Time.deltaTime;
+    }
+
+    <span class="pl-k">void</span> <span class="pl-en">Reset</span>()
+    {
+        _position = Vector3.zero;
+        _velocity = Vector3.zero;
+    }
+
+    <span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-en">Pool</span> : <span class="pl-en">MemoryPool</span>&lt;<span class="pl-en">Vector3</span>, <span class="pl-en">Foo</span>&gt;
+    {
+        <span class="pl-k">protected</span> <span class="pl-k">override</span> <span class="pl-k">void</span> <span class="pl-en">Reinitialize</span>(<span class="pl-en">Vector3</span> <span class="pl-smi">velocity</span>, <span class="pl-en">Foo</span> <span class="pl-smi">foo</span>)
+        {
+            foo.Reset();
+            foo._velocity = velocity;
+        }
+    }
+}
+
+<span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-en">Bar</span>
+{
+    <span class="pl-en">readonly</span> Foo.Pool _fooPool;
+    <span class="pl-k">readonly </span><span class="pl-en">List</span>&lt;<span class="pl-en">Foo</span>&gt; <span class="pl-en">_foos</span> = <span class="pl-k">new</span> <span class="pl-en">List</span>&lt;Foo&gt;();
+
+    <span class="pl-k">public</span> <span class="pl-en">Bar</span>(Foo.Pool fooPool)
+    {
+        _fooPool = fooPool;
+    }
+
+    <span class="pl-k">public</span> <span class="pl-k">void</span> <span class="pl-en">AddFoo</span>()
+    {
+        <span class="pl-k">float</span> <span class="pl-en">maxSpeed</span> = <span class="pl-c1">10.0f</span>;
+        <span class="pl-k">float</span> <span class="pl-en">minSpeed</span> = <span class="pl-c1">1.0f</span>;
+
+        _foos.Add(_fooPool.Spawn(
+            Random.onUnitSphere * Random.Range(minSpeed, maxSpeed)));
+    }
+
+    <span class="pl-k">public</span> <span class="pl-k">void</span> <span class="pl-en">RemoveFoo</span>()
+    {
+        <span class="pl-k">var</span> <span class="pl-en">foo </span>= _foos[<span class="pl-c1">0</span>];
+        _fooPool.Despawn(foo);
+        _foos.Remove(foo);
+    }
+}</pre></div>
+
+<h2>
+<a id="user-content-memory-pools-for-monobehaviours" class="anchor" href="#memory-pools-for-monobehaviours" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a><a id="user-content-monomemorypool"></a>Memory Pools for MonoBehaviours</h2>
+
+<p>Memory pools for GameObjects works similarly.  For example:</p>
+
+<div class="highlight highlight-source-cs"><pre><span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-en">Foo</span> : <span class="pl-en">MonoBehaviour</span>
+{
+    <span class="pl-en">Vector3</span> <span class="pl-en">_velocity</span>;
+
+    [Inject]
+    <span class="pl-k">public</span> <span class="pl-k">void</span> <span class="pl-en">Construct</span>()
+    {
+        Reset();
+    }
 
     <span class="pl-k">public</span> <span class="pl-k">void</span> <span class="pl-en">Update</span>()
     {
-        <span class="pl-k">if</span> (Input.GetKey(KeyCode.UpArrow))
-        {
-            <span class="pl-c1">this</span>.transform.position += Vector3.forward * _speed * Time.deltaTime;
-        }
+        transform.position += _velocity * Time.deltaTime;
+    }
 
-        <span class="pl-k">if</span> (Input.GetKey(KeyCode.DownArrow))
+    <span class="pl-k">void</span> <span class="pl-en">Reset</span>()
+    {
+        transform.position = Vector3.zero;
+        _velocity = Vector3.zero;
+    }
+
+    <span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-en">Pool</span> : <span class="pl-en">MonoMemoryPool</span>&lt;<span class="pl-en">Vector3</span>, <span class="pl-en">Foo</span>&gt;
+    {
+        <span class="pl-k">protected</span> <span class="pl-k">override</span> <span class="pl-k">void</span> <span class="pl-en">Reinitialize</span>(<span class="pl-en">Vector3</span> <span class="pl-smi">velocity</span>, <span class="pl-en">Foo</span> <span class="pl-smi">foo</span>)
         {
-            <span class="pl-c1">this</span>.transform.position -= Vector3.forward * _speed * Time.deltaTime;
+            foo.Reset();
+            foo._velocity = velocity;
         }
+    }
+}
+
+<span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-en">Bar</span>
+{
+    <span class="pl-en">readonly</span> Foo.Pool _fooPool;
+    <span class="pl-k">readonly </span><span class="pl-en">List</span>&lt;<span class="pl-en">Foo</span>&gt; <span class="pl-en">_foos</span> = <span class="pl-k">new</span> <span class="pl-en">List</span>&lt;Foo&gt;();
+
+    <span class="pl-k">public</span> <span class="pl-en">Bar</span>(Foo.Pool fooPool)
+    {
+        _fooPool = fooPool;
+    }
+
+    <span class="pl-k">public</span> <span class="pl-k">void</span> <span class="pl-en">AddFoo</span>()
+    {
+        <span class="pl-k">float</span> <span class="pl-en">maxSpeed</span> = <span class="pl-c1">10.0f</span>;
+        <span class="pl-k">float</span> <span class="pl-en">minSpeed</span> = <span class="pl-c1">1.0f</span>;
+
+        _foos.Add(_fooPool.Spawn(
+            Random.onUnitSphere * Random.Range(minSpeed, maxSpeed)));
+    }
+
+    <span class="pl-k">public</span> <span class="pl-k">void</span> <span class="pl-en">RemoveFoo</span>()
+    {
+        <span class="pl-k">var</span> <span class="pl-en">foo </span>= _foos[<span class="pl-c1">0</span>];
+        _fooPool.Despawn(foo);
+        _foos.Remove(foo);
+    }
+}
+
+<span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-en">TestInstaller</span> : <span class="pl-en">MonoInstaller</span>&lt;<span class="pl-en">TestInstaller</span>&gt;
+{
+    <span class="pl-k">public </span><span class="pl-en">GameObject</span> <span class="pl-en">FooPrefab</span>;
+
+    <span class="pl-k">public</span> <span class="pl-k">override</span> <span class="pl-k">void</span> <span class="pl-en">InstallBindings</span>()
+    {
+        Container.Bind&lt;Bar&gt;().AsSingle();
+
+        Container.BindMemoryPool&lt;Foo, Foo.Pool&gt;()
+            .WithInitialSize(<span class="pl-c1">2</span>)
+            .FromComponentInNewPrefab(FooPrefab)
+            .UnderTransformGroup(<span class="pl-s"><span class="pl-pds">"</span>Foos<span class="pl-pds">"</span></span>);
     }
 }</pre></div>
 
-<ul>
-<li>Right Click inside the Hierarchy tab and select <code>Zenject -&gt; Scene Context</code>
-</li>
-<li>Drag the GameInstaller class to the SceneContext game object</li>
-<li>Add a new row to the Installers property of the SceneContext</li>
-<li>Drag the GameInstaller component to the new row under Installers</li>
-<li>Right Click again inside the Hierarchy tab and select <code>Zenject -&gt; Game Object Context</code>
-</li>
-<li>Rename the new game object GameObjectContext to Ship</li>
-<li>Drag the Ship MonoBehaviour to the Ship GameObject in our Scene. The Ship class will be used as a <a href="https://en.wikipedia.org/wiki/Facade_pattern">Facade</a> for our ship and will be used by other systems to interact with the ship at a high level</li>
-<li>Also add the <code>ShipInputHandler</code> component to the Ship game object</li>
-<li>Right click on the Ship GameObject and select 3D Object -&gt; Cube.  This will serve as the placeholder model for our ship.</li>
-<li>Add new game object under ship called HealthHandler, and add the <code>ShipHealthHandler</code> component to it</li>
-<li>Your scene should look like this:</li>
-</ul>
+<p>The main difference here is that Foo.Pool now derives from MonoMemoryPool instead of MemoryPool.  MonoMemoryPool is a helper class that will automatically enable and disable the game object for us when it is added/removed from the pool.  The implementation for MonoMemoryPool is simply this:</p>
 
-<p><a href="../UnityProject/Assets/Zenject/Documentation/ShipFacadeExample1.png?raw=true" target="_blank"><img src="../UnityProject/Assets/Zenject/Documentation/ShipFacadeExample1.png?raw=true" alt="Ship Facade Example" style="max-width:100%;"></a></p>
+<div class="highlight highlight-source-cs"><pre><span class="pl-k">public</span> abstract <span class="pl-k">class</span> <span class="pl-en">MonoMemoryPool</span>&lt;<span class="pl-en">TParam1</span>, <span class="pl-en">TValue</span>&gt; : <span class="pl-en">MemoryPool</span>&lt;<span class="pl-en">TParam1</span>, <span class="pl-en">TValue</span>&gt;
+    <span class="pl-k">where</span> <span class="pl-en">TValue</span> : <span class="pl-en">Component</span>
+{
+    <span class="pl-k">protected</span> <span class="pl-k">override</span> <span class="pl-k">void</span> <span class="pl-en">OnCreated</span>(<span class="pl-en">TValue</span> <span class="pl-smi">item</span>)
+    {
+        item.gameObject.SetActive(<span class="pl-c1">false</span>);
+    }
 
-<ul>
-<li>The idea here is that everything at or underneath the Ship game object should be considered inside it's own sub-container.  When we're done, we should be able to add multiple ships to our scene, each with their own components ShipHealthHandler, ShipInputHandler, etc. that can treat each other as singletons.</li>
-<li>Try to validate your scene by pressing CTRL+SHIFT+V.  You should get an error that looks like this: <code>Unable to resolve type 'ShipHealthHandler' while building object with type 'Ship'.</code>
-</li>
-<li>This is because the ShipHealthHandler component has not been added to our sub-container.  To address this:
+    <span class="pl-k">protected</span> <span class="pl-k">override</span> <span class="pl-k">void</span> <span class="pl-en">OnSpawned</span>(<span class="pl-en">TValue</span> <span class="pl-smi">item</span>)
+    {
+        item.gameObject.SetActive(<span class="pl-c1">true</span>);
+    }
 
-<ul>
-<li>Click on the HealthHandler game object and then click Add Component and type Zenject Binding (if you don't know what that is read the scene bindings section on the main page)</li>
-<li>Drag the Ship Health Handler Component to the Components field of Zenject Binding</li>
-</ul>
-</li>
-<li>Validate again by pressing CTRL+SHIFT+V.  You should now get this error instead: <code>Unable to resolve type 'Ship' while building object with type 'GameRunner'.</code> </li>
-<li>Our Ship component also needs to be added to the container.  To address this, once again:
+    <span class="pl-k">protected</span> <span class="pl-k">override</span> <span class="pl-k">void</span> <span class="pl-en">OnDespawned</span>(<span class="pl-en">TValue</span> <span class="pl-smi">item</span>)
+    {
+        item.gameObject.SetActive(<span class="pl-c1">false</span>);
+    }
+}</pre></div>
 
-<ul>
-<li>Click on the Ship game object and then click Add Component and type Zenject Binding</li>
-<li>Drag the Ship Component to the Components field of Zenject Binding</li>
-</ul>
-</li>
-<li>If we attempt to validate again you should notice the same error occurs.  This is because by default, ZenjectBinding only adds its components to the nearest container - in this case Ship.  This is not what we want though.  We want Ship to be added to the scene container because we want to use it as the Facade for our sub-container.  To address this we can explicitly tell ZenjectBinding which context to apply the binding to by dragging the SceneContext game object and dropping it on to the Context property of the Zenject binding</li>
-<li>Validation should now pass succesfully.</li>
-<li>If you run the scene now, you should see a health display in the middle of the screen, and you should be able to press Space bar to apply damage, and the up/down arrows to move the ship</li>
-</ul>
+<p>Therefore, if you override one of these methods you will have to make sure to call the base version as well.</p>
 
-<p>Also note that we can add installers to our ship sub-container in the same way that we add installers to our Scene Context - just by dropping them into the Installers property of GameObjectContext.  In this example we used MonoBehaviour's for everything but we can also add however many plain C# classes we want here and have those classes available everywhere in the sub-container just like we do here for MonoBehaviour's by using ZenjectBinding.</p>
+<p>Also, worth noting is the fact that for this logic to work, our MonoBehaviour must be at the root of the prefab, since otherwise only the transform associated with Foo and any children will be disabled.</p>
 
 <h2>
-<a id="user-content-creating-game-object-contexts-dynamically" class="anchor" href="#creating-game-object-contexts-dynamically" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a><a id="user-content-dynamic-game-object-contexts"></a>Creating Game Object Context's Dynamically</h2>
+<a id="user-content-abstract-memory-pools" class="anchor" href="#abstract-memory-pools" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a><a id="user-content-abstract-pools"></a>Abstract Memory Pools</h2>
 
-<p>Continuing with the ship example <a href="#using-game-object-contexts">above</a>, let's pretend that we now want to create ships dynamically, after the game has started.</p>
+<p>Just like <a href="Factories.md#abstract-factories">abstract factories</a>, sometimes you might want to create a memory pool that returns an interface, with the concrete type decided inside an installer.  This works very similarly to abstract factories.  For example:</p>
 
-<ul>
-<li>First, create a prefab for the entire <code>Ship</code> GameObject that we created above and then delete it from the Scene.</li>
-<li>Then just add the following changes</li>
-</ul>
-
-<div class="highlight highlight-source-cs"><pre><span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-en">GameRunner</span> : <span class="pl-en">ITickable</span>
+<div class="highlight highlight-source-cs"><pre><span class="pl-k">public</span> <span class="pl-k">interface</span> <span class="pl-en">IFoo</span>
 {
-    <span class="pl-en">readonly</span> Ship.Factory _shipFactory;
+}
 
-    <span class="pl-en">Vector3</span> <span class="pl-en">lastShipPosition</span>;
+<span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-en">Foo1</span> : <span class="pl-en">IFoo</span>
+{
+}
 
-    <span class="pl-k">public</span> <span class="pl-en">GameRunner</span>(Ship.Factory shipFactory)
+<span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-en">Foo2</span> : <span class="pl-en">IFoo</span>
+{
+}
+
+<span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-en">FooPool</span> : <span class="pl-en">MemoryPool</span>&lt;<span class="pl-en">IFoo</span>&gt;
+{
+}
+
+<span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-en">Bar</span>
+{
+    <span class="pl-k">readonly </span><span class="pl-en">FooPool</span> <span class="pl-en">_fooPool</span>;
+    <span class="pl-k">readonly </span><span class="pl-en">List</span>&lt;<span class="pl-en">IFoo</span>&gt; <span class="pl-en">_foos</span> = <span class="pl-k">new</span> <span class="pl-en">List</span>&lt;IFoo&gt;();
+
+    <span class="pl-k">public</span> <span class="pl-en">Bar</span>(FooPool fooPool)
     {
-        _shipFactory = shipFactory;
+        _fooPool = fooPool;
     }
 
-    <span class="pl-k">public</span> <span class="pl-k">void</span> <span class="pl-en">Tick</span>()
+    <span class="pl-k">public</span> <span class="pl-k">void</span> <span class="pl-en">AddFoo</span>()
     {
-        <span class="pl-k">if</span> (Input.GetKeyDown(KeyCode.Space))
-        {
-            <span class="pl-k">var</span> <span class="pl-en">ship </span>= _shipFactory.Create();
-            ship.transform.position = lastShipPosition;
+        _foos.Add(_fooPool.Spawn());
+    }
 
-            lastShipPosition += Vector3.forward * <span class="pl-c1">2</span>;
+    <span class="pl-k">public</span> <span class="pl-k">void</span> <span class="pl-en">RemoveFoo</span>()
+    {
+        <span class="pl-k">var</span> <span class="pl-en">foo </span>= _foos[<span class="pl-c1">0</span>];
+        _fooPool.Despawn(foo);
+        _foos.Remove(foo);
+    }
+}
+
+<span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-en">TestInstaller</span> : <span class="pl-en">MonoInstaller</span>&lt;<span class="pl-en">TestInstaller</span>&gt;
+{
+    <span class="pl-k">public </span><span class="pl-k">bool</span> <span class="pl-en">Use1</span>;
+
+    <span class="pl-k">public</span> <span class="pl-k">override</span> <span class="pl-k">void</span> <span class="pl-en">InstallBindings</span>()
+    {
+        Container.Bind&lt;Bar&gt;().AsSingle();
+
+        <span class="pl-k">if</span> (<span class="pl-en">Use1</span>)
+        {
+            Container.BindMemoryPool&lt;IFoo, FooPool&gt;().WithInitialSize(<span class="pl-c1">10</span>).To&lt;Foo1&gt;();
+        }
+        <span class="pl-k">else</span>
+        {
+            Container.BindMemoryPool&lt;IFoo, FooPool&gt;().WithInitialSize(<span class="pl-c1">10</span>).To&lt;Foo2&gt;();
         }
     }
 }</pre></div>
 
-<div class="highlight highlight-source-cs"><pre><span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-en">GameInstaller</span> : <span class="pl-en">MonoInstaller</span>
-{
-    [SerializeField]
-    <span class="pl-en">GameObject</span> <span class="pl-en">ShipPrefab</span>;
-
-    <span class="pl-k">public</span> <span class="pl-k">override</span> <span class="pl-k">void</span> <span class="pl-en">InstallBindings</span>()
-    {
-        Container.BindInterfacesTo&lt;GameRunner&gt;().AsSingle();
-
-        Container.BindFactory&lt;Ship, Ship.Factory&gt;().FromSubContainerResolve().ByNewPrefab(ShipPrefab);
-    }
-}</pre></div>
-
-<ul>
-<li>After doing this, make sure to drag and drop the newly created Ship prefab into the ShipPrefab property of GameInstaller in the inspector</li>
-<li>Now if we run our scene, we can hit Space to add multiple Ship's to our scene.</li>
-</ul>
-
-<h2>
-<a id="user-content-creating-game-object-contexts-dynamically-with-parameters" class="anchor" href="#creating-game-object-contexts-dynamically-with-parameters" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a><a id="user-content-dynamic-game-object-contexts"></a>Creating Game Object Context's Dynamically With Parameters</h2>
-
-<p>Let's make this even more interesting by passing a parameter into our ship facade.  Let's make the speed of the ship configurable from within the GameController class.</p>
-
-<ul>
-<li>Change our classes to the following:</li>
-</ul>
-
-<div class="highlight highlight-source-cs"><pre><span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-en">GameRunner</span> : <span class="pl-en">ITickable</span>
-{
-    <span class="pl-en">readonly</span> Ship.Factory _shipFactory;
-
-    <span class="pl-en">Vector3</span> <span class="pl-en">lastShipPosition</span>;
-
-    <span class="pl-k">public</span> <span class="pl-en">GameRunner</span>(Ship.Factory shipFactory)
-    {
-        _shipFactory = shipFactory;
-    }
-
-    <span class="pl-k">public</span> <span class="pl-k">void</span> <span class="pl-en">Tick</span>()
-    {
-        <span class="pl-k">if</span> (Input.GetKeyDown(KeyCode.Space))
-        {
-            <span class="pl-k">var</span> <span class="pl-en">ship </span>= _shipFactory.Create(Random.RandomRange(<span class="pl-c1">2</span>, <span class="pl-c1">20</span>));
-            ship.transform.position = lastShipPosition;
-
-            lastShipPosition += Vector3.forward * <span class="pl-c1">2</span>;
-        }
-    }
-}</pre></div>
-
-<div class="highlight highlight-source-cs"><pre><span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-en">GameInstaller</span> : <span class="pl-en">MonoInstaller</span>
-{
-    [SerializeField]
-    <span class="pl-en">GameObject</span> <span class="pl-en">ShipPrefab</span>;
-
-    <span class="pl-k">public</span> <span class="pl-k">override</span> <span class="pl-k">void</span> <span class="pl-en">InstallBindings</span>()
-    {
-        Container.BindInterfacesTo&lt;GameRunner&gt;().AsSingle();
-
-        Container.BindFactory&lt;<span class="pl-k">float</span>, Ship, Ship.Factory&gt;().FromSubContainerResolve().ByNewPrefab&lt;ShipInstaller&gt;(<span class="pl-en">ShipPrefab</span>);
-    }
-}</pre></div>
-
-<div class="highlight highlight-source-cs"><pre><span class="pl-k">using</span> <span class="pl-en">Zenject</span>;
-<span class="pl-k">using</span> <span class="pl-en">UnityEngine</span>;
-
-<span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-en">Ship</span> : <span class="pl-en">MonoBehaviour</span>
-{
-    <span class="pl-en">ShipHealthHandler</span> <span class="pl-en">_healthHandler</span>;
-
-    [Inject]
-    <span class="pl-k">public</span> <span class="pl-k">void</span> <span class="pl-en">Construct</span>(<span class="pl-en">ShipHealthHandler</span> <span class="pl-smi">healthHandler</span>)
-    {
-        _healthHandler = healthHandler;
-    }
-
-    <span class="pl-k">public</span> <span class="pl-k">void</span> <span class="pl-en">TakeDamage</span>(<span class="pl-k">float</span> <span class="pl-smi">damage</span>)
-    {
-        _healthHandler.TakeDamage(damage);
-    }
-
-    <span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-en">Factory</span> : <span class="pl-en">Factory</span>&lt;<span class="pl-k">float</span>, <span class="pl-en">Ship</span>&gt;
-    {
-    }
-}</pre></div>
-
-<div class="highlight highlight-source-cs"><pre><span class="pl-k">using</span> <span class="pl-en">UnityEngine</span>;
-<span class="pl-k">using</span> <span class="pl-en">System.Collections</span>;
-<span class="pl-k">using</span> <span class="pl-en">Zenject</span>;
-
-<span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-en">ShipInputHandler</span> : <span class="pl-en">MonoBehaviour</span>
-{
-    [Inject]
-    <span class="pl-k">float</span> <span class="pl-en">_speed</span>;
-
-    <span class="pl-k">public</span> <span class="pl-k">void</span> <span class="pl-en">Update</span>()
-    {
-        <span class="pl-k">if</span> (Input.GetKey(KeyCode.UpArrow))
-        {
-            <span class="pl-c1">this</span>.transform.position += Vector3.forward * _speed * Time.deltaTime;
-        }
-
-        <span class="pl-k">if</span> (Input.GetKey(KeyCode.DownArrow))
-        {
-            <span class="pl-c1">this</span>.transform.position -= Vector3.forward * _speed * Time.deltaTime;
-        }
-    }
-}</pre></div>
-
-<p>Also, add this new file:</p>
-
-<div class="highlight highlight-source-cs"><pre><span class="pl-k">using</span> <span class="pl-en">System</span>;
-<span class="pl-k">using</span> <span class="pl-en">Zenject</span>;
-
-<span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-en">ShipInstaller</span> : <span class="pl-en">MonoInstaller</span>
-{
-    [Inject]
-    <span class="pl-k">float</span> <span class="pl-en">_speed</span>;
-
-    <span class="pl-k">public</span> <span class="pl-k">override</span> <span class="pl-k">void</span> <span class="pl-en">InstallBindings</span>()
-    {
-        Container.BindInstance(_speed).WhenInjectedInto&lt;ShipInputHandler&gt;();
-    }
-}</pre></div>
-
-<p>After that compiles, add ShipInstaller to the Ship prefab and also drag it to the Installers field of the GameObjectContext.</p>
-
-<p>Note the changes that we made here:</p>
-
-<ul>
-<li>ShipInputHandler now has the speed injected instead of using Unity's SerializeField.</li>
-<li>The nested Factory class in Ship has a float parameter added to it</li>
-<li>In GameInstaller, the binding for the factory is different</li>
-<li>In GameRunner, we now need to pass a float parameter to the factory's create method</li>
-</ul>
-
-<p>One important difference with creating a Sub-Container using a factory, is that the parameters you supply to the factory are not necessarily forwarded to the facade class.  In this example, the parameter is a float value for speed, which we want to forward to the ShipInputHandler class instead.  That is why these parameters are always forwarded to an installer for the sub-container, so that you can decide for yourself at install time what to do with the parameter.  Another reason for this is that in some cases the parameter might be used to choose different bindings.</p>
-
-<p>You might also want to be able to drop Ship prefabs into the scene at design time.  This way, you can have some Ships that start in the scene, but you can also create them dynamically.  One way to do that would be to change ShipInstaller to the following:</p>
-
-<div class="highlight highlight-source-cs"><pre><span class="pl-k">using</span> <span class="pl-en">System</span>;
-<span class="pl-k">using</span> <span class="pl-en">Zenject</span>;
-<span class="pl-k">using</span> <span class="pl-en">UnityEngine</span>;
-
-<span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-en">ShipInstaller</span> : <span class="pl-en">MonoInstaller</span>
-{
-    [SerializeField]
-    [InjectOptional]
-    <span class="pl-k">float</span> <span class="pl-en">_speed</span>;
-
-    <span class="pl-k">public</span> <span class="pl-k">override</span> <span class="pl-k">void</span> <span class="pl-en">InstallBindings</span>()
-    {
-        Container.BindInstance(_speed).WhenInjectedInto&lt;ShipInputHandler&gt;();
-    }
-}</pre></div>
-
-<p>This way, you can drop the Ship prefab into the scene and control the speed in the inspector, but you can also create them dynamically and pass the speed into the factory as a parameter.</p>
-
-<p>For a more real-world example see the SpaceFighter sample project which makes heavy use of Game Object Contexts.</p>
+<p>We might also want to add a Reset() method to the IFoo interface as well here, and call that on Reinitialize()</p>
 
               </article>
             </div>
