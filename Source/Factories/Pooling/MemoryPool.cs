@@ -27,11 +27,11 @@ namespace Zenject
         public TValue Spawn(TParam1 param)
         {
             var item = GetInternal();
-            Reinitialize(item, param);
+            Reinitialize(param, item);
             return item;
         }
 
-        protected virtual void Reinitialize(TValue item, TParam1 p1)
+        protected virtual void Reinitialize(TParam1 p1, TValue item)
         {
             // Optional
         }
@@ -44,11 +44,11 @@ namespace Zenject
         public TValue Spawn(TParam1 param1, TParam2 param2)
         {
             var item = GetInternal();
-            Reinitialize(item, param1, param2);
+            Reinitialize(param1, param2, item);
             return item;
         }
 
-        protected abstract void Reinitialize(TValue item, TParam1 p1, TParam2 p2);
+        protected abstract void Reinitialize(TParam1 p1, TParam2 p2, TValue item);
     }
 
     // Three parameters
@@ -58,11 +58,11 @@ namespace Zenject
         public TValue Spawn(TParam1 param1, TParam2 param2, TParam3 param3)
         {
             var item = GetInternal();
-            Reinitialize(item, param1, param2, param3);
+            Reinitialize(param1, param2, param3, item);
             return item;
         }
 
-        protected abstract void Reinitialize(TValue item, TParam1 p1, TParam2 p2, TParam3 p3);
+        protected abstract void Reinitialize(TParam1 p1, TParam2 p2, TParam3 p3, TValue item);
     }
 
     // Four parameters
@@ -72,11 +72,11 @@ namespace Zenject
         public TValue Spawn(TParam1 param1, TParam2 param2, TParam3 param3, TParam4 param4)
         {
             var item = GetInternal();
-            Reinitialize(item, param1, param2, param3, param4);
+            Reinitialize(param1, param2, param3, param4, item);
             return item;
         }
 
-        protected abstract void Reinitialize(TValue item, TParam1 p1, TParam2 p2, TParam3 p3, TParam4 p4);
+        protected abstract void Reinitialize(TParam1 p1, TParam2 p2, TParam3 p3, TParam4 p4, TValue item);
     }
 
     // Five parameters
@@ -86,10 +86,10 @@ namespace Zenject
         public TValue Spawn(TParam1 param1, TParam2 param2, TParam3 param3, TParam4 param4, TParam5 param5)
         {
             var item = GetInternal();
-            Reinitialize(item, param1, param2, param3, param4, param5);
+            Reinitialize(param1, param2, param3, param4, param5, item);
             return item;
         }
 
-        protected abstract void Reinitialize(TValue item, TParam1 p1, TParam2 p2, TParam3 p3, TParam4 p4, TParam5 p5);
+        protected abstract void Reinitialize(TParam1 p1, TParam2 p2, TParam3 p3, TParam4 p4, TParam5 p5, TValue item);
     }
 }

@@ -40,9 +40,12 @@ namespace Zenject
 
             _inactiveItems = new Stack<TContract>(initialSize);
 
-            for (int i = 0; i < initialSize; i++)
+            if (!container.IsValidating)
             {
-                _inactiveItems.Push(AllocNew());
+                for (int i = 0; i < initialSize; i++)
+                {
+                    _inactiveItems.Push(AllocNew());
+                }
             }
         }
 
