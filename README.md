@@ -2577,10 +2577,6 @@ Something else to note is that the rate at which the ITickable.Tick method gets 
 
     Yet another option is to use a coroutine library that implements similar functionality to what Unity provides.  See [here](https://github.com/svermeulen/UnityCoroutinesWithoutMonoBehaviours) for one example that we've used in the past at Modest Tree
 
-* **<a id="memorypools"></a>How do I use Zenject with pools to minimize memory allocations?**
-
-    Currently, Zenject does not support memory pooling.  When you bind something to transient or use a factory, Zenject will always create a brand new instance from scratch.  We realize that this can be inefficient in cases where you are creating many objects (especially on mobile) so it is something we want to address in future versions.
-
 * **<a id="what-games-are-using-zenject"></a>What games/tools/libraries are using Zenject?**
 
     If you know of other projects that are using Zenject, please add a comment [here](https://github.com/modesttree/Zenject/issues/153) so that I can add it to this list.
@@ -2595,6 +2591,8 @@ Something else to note is that the rate at which the ITickable.Tick method gets 
     * [Farm Away!](http://www.farmawaygame.com/) (iOS and Android)
     * [Build Away!](http://www.buildawaygame.com/) (iOS and Android)
     * Stick Soccer 2 ([iOS](https://itunes.apple.com/gb/app/stick-soccer-2/id1104214157?mt=8) and [Android](https://play.google.com/store/apps/details?id=com.sticksports.soccer2&hl=en_GB))
+    * [Untethered](https://play.google.com/store/apps/details?id=com.numinousgames.Untethered&hl=en) (Google VR)
+    * [Toy Clash](https://toyclash.com/) - ([GearVR](https://www.oculus.com/experiences/gear-vr/1407846952568081/))
 
     Libraries
 
