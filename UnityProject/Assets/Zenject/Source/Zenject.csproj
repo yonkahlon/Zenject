@@ -53,6 +53,7 @@
     <Compile Include="Binding\Binders\Factory\FactoryToChoiceIdBinder\FactoryToChoiceIdBinder3.cs" />
     <Compile Include="Binding\Binders\Factory\FactoryToChoiceIdBinder\FactoryToChoiceIdBinder4.cs" />
     <Compile Include="Binding\Binders\Factory\FactoryToChoiceIdBinder\FactoryToChoiceIdBinder5.cs" />
+    <Compile Include="Binding\Binders\Factory\PlaceholderFactoryBindingFinalizer.cs" />
     <Compile Include="Binding\Binders\Factory\Pooling\MemoryPoolBindingFinalizer.cs" />
     <Compile Include="Binding\Binders\Factory\Pooling\MemoryPoolExpandBinder.cs" />
     <Compile Include="Binding\Binders\Factory\Pooling\MemoryPoolInitialSizeBinder.cs" />
@@ -74,6 +75,7 @@
     <Compile Include="Binding\BindInfo\GameObjectCreationParameters.cs" />
     <Compile Include="Binding\BindInfo\MemoryPoolBindInfo.cs" />
     <Compile Include="Binding\Finalizers\NullBindingFinalizer.cs" />
+    <Compile Include="Factories\PlaceholderFactory.cs" />
     <Compile Include="Factories\Pooling\IMemoryPool.cs" />
     <Compile Include="Factories\Pooling\MemoryPool.cs" />
     <Compile Include="Factories\Pooling\MemoryPoolBase.cs" />
@@ -166,7 +168,6 @@
     <Compile Include="Injection\InjectContext.cs" />
     <Compile Include="Runtime\TaskUpdater.cs" />
     <Compile Include="Runtime\TickableManager.cs" />
-    <Compile Include="Runtime\UnityEventManager.cs" />
     <Compile Include="Providers\GetterProvider.cs" />
     <Compile Include="Providers\InstanceProvider.cs" />
     <Compile Include="Providers\MethodProvider.cs" />
@@ -214,10 +215,6 @@
     <Compile Include="Providers\CachedProvider.cs" />
     <Compile Include="Providers\FactoryProvider.cs" />
     <Compile Include="Factories\IFactory.cs" />
-    <Compile Include="Factories\DynamicFactory.cs" />
-    <Compile Include="Providers\SubContainerCreators\SubContainerCreatorByPrefab.cs" />
-    <Compile Include="Providers\Singleton\SubContainer\SubContainerSingletonProviderCreatorByPrefab.cs" />
-    <Compile Include="Providers\Singleton\SubContainer\SubContainerSingletonProviderCreatorByPrefabResource.cs" />
     <Compile Include="Providers\PrefabProviders\IPrefabProvider.cs" />
     <Compile Include="Binding\BindInfo\BindInfo.cs" />
     <Compile Include="Binding\Binders\FromBinders\FromBinderGeneric.cs" />
@@ -226,7 +223,6 @@
     <Compile Include="Binding\Finalizers\ProviderBindingFinalizer.cs" />
     <Compile Include="Binding\Finalizers\IBindingFinalizer.cs" />
     <Compile Include="Binding\Finalizers\BindFinalizerWrapper.cs" />
-    <Compile Include="Binding\Binders\Factory\DynamicFactoryBindingFinalizer.cs" />
     <Compile Include="Binding\Finalizers\SingleProviderBindingFinalizer.cs" />
     <Compile Include="Binding\Binders\SubContainerBinder.cs" />
     <Compile Include="Binding\Finalizers\SubContainerInstallerBindingFinalizer.cs" />
@@ -240,7 +236,6 @@
     <Compile Include="Binding\Binders\Factory\FactoryFromBinder\SubContainerBinder\FactorySubContainerBinderBase.cs" />
     <Compile Include="Binding\Binders\Factory\FactoryFromBinder\SubContainerBinder\FactorySubContainerBinderWithParams.cs" />
     <Compile Include="Binding\Binders\Factory\FactoryFromBinder\SubContainerBinder\FactorySubContainerBinder1.cs" />
-    <Compile Include="Providers\SubContainerCreators\SubContainerCreatorByPrefabWithParams.cs" />
     <Compile Include="Install\ScriptableObjectInstaller.cs" />
     <Compile Include="Util\ZenjectSceneLoader.cs" />
     <Compile Include="Util\ValidationUtil.cs" />
