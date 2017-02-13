@@ -43,7 +43,7 @@ namespace Zenject.SpaceFighter
 
         public class Pool : MonoMemoryPool<EnemyTunables, EnemyFacade>
         {
-            protected override void Reinitialize(EnemyFacade enemy, EnemyTunables tunables)
+            protected override void Reinitialize(EnemyTunables tunables, EnemyFacade enemy)
             {
                 enemy._tunables.Accuracy = tunables.Accuracy;
                 enemy._tunables.Speed = tunables.Speed;

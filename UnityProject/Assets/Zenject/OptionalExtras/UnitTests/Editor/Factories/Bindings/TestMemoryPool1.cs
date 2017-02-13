@@ -7,12 +7,14 @@ using Assert=ModestTree.Assert;
 namespace Zenject.Tests.Bindings
 {
     [TestFixture]
-    public class TestMemoryPool1 : ZenjectUnitTestFixture
+    public class TestMemoryPool1 : ZenjectIntegrationTestFixture
     {
         [Test]
         public void TestFactoryProperties()
         {
             Container.BindMemoryPool<Foo, Foo.Pool>();
+
+            Initialize();
 
             var pool = Container.Resolve<Foo.Pool>();
 
@@ -98,7 +100,7 @@ namespace Zenject.Tests.Bindings
 
             public class Pool : MemoryPool<string, Foo>
             {
-                protected override void Reinitialize(Foo foo, string value)
+                protected override void Reinitialize(string value, Foo foo)
                 {
                     foo.Value = value;
                     foo.ResetCount++;
@@ -107,15 +109,29 @@ namespace Zenject.Tests.Bindings
         }
 
         [Test]
+        public void TestAbstractMemoryPoolValidate()
+        {
+            TestAbstractMemoryPoolInternal();
+        }
+
+        [Test]
         public void TestAbstractMemoryPool()
         {
-            Container.BindMemoryPool<IBar, BarPool>().To<Bar>();
+            TestAbstractMemoryPoolInternal();
 
             var pool = Container.Resolve<BarPool>();
 
             var foo = pool.Spawn(5);
 
             Assert.IsEqual(foo.GetType(), typeof(Bar));
+        }
+
+        void TestAbstractMemoryPoolInternal()
+        {
+            Container.BindMemoryPool<IBar, BarPool>()
+                .WithInitialSize(3).To<Bar>().NonLazy();
+
+            Initialize();
         }
 
         public interface IBar

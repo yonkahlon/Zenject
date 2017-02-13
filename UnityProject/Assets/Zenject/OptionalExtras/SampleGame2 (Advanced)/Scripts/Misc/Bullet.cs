@@ -75,7 +75,7 @@ namespace Zenject.SpaceFighter
 
         public class Pool : MonoMemoryPool<float, float, BulletTypes, Bullet>
         {
-            protected override void Reinitialize(Bullet bullet, float speed, float lifeTime, BulletTypes type)
+            protected override void Reinitialize(float speed, float lifeTime, BulletTypes type, Bullet bullet)
             {
                 bullet._type = type;
                 bullet._speed = speed;
