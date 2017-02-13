@@ -22,50 +22,32 @@ namespace ModestTree.Util
 
         public static IEnumerable<Scene> AllLoadedScenes
         {
-            get
-            {
-                return AllScenes.Where(scene => scene.isLoaded);
-            }
+            get { return AllScenes.Where(scene => scene.isLoaded); }
         }
 
         public static bool IsAltKeyDown
         {
-            get
-            {
-                return Input.GetKey(KeyCode.LeftAlt) || Input.GetKey(KeyCode.RightAlt);
-            }
+            get { return Input.GetKey(KeyCode.LeftAlt) || Input.GetKey(KeyCode.RightAlt); }
         }
 
         public static bool IsControlKeyDown
         {
-            get
-            {
-                return Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl);
-            }
+            get { return Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl); }
         }
 
         public static bool IsShiftKeyDown
         {
-            get
-            {
-                return Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift);
-            }
+            get { return Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift); }
         }
 
         public static bool WasShiftKeyJustPressed
         {
-            get
-            {
-                return Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.RightShift);
-            }
+            get { return Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.RightShift); }
         }
 
         public static bool WasAltKeyJustPressed
         {
-            get
-            {
-                return Input.GetKeyDown(KeyCode.LeftAlt) || Input.GetKeyDown(KeyCode.RightAlt);
-            }
+            get { return Input.GetKeyDown(KeyCode.LeftAlt) || Input.GetKeyDown(KeyCode.RightAlt); }
         }
 
         public static int GetDepthLevel(Transform transform)

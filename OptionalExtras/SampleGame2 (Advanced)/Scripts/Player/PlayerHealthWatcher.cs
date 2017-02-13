@@ -6,23 +6,29 @@ namespace Zenject.SpaceFighter
 {
     public class PlayerHealthWatcher : ITickable
     {
-        readonly PlayerKilledSignal _killedSignal;
-        readonly Explosion.Factory _explosionFactory;
-        readonly PlayerModel _model;
+        readonly AudioPlayer _audioPlayer;
+        readonly Settings _settings;
+        readonly GameEvents _gameEvents;
+        readonly Explosion.Pool _explosionPool;
+        readonly Player _player;
 
         public PlayerHealthWatcher(
-            PlayerModel model,
-            Explosion.Factory explosionFactory,
-            PlayerKilledSignal killedSignal)
+            Player player,
+            Explosion.Pool explosionPool,
+            GameEvents gameEvents,
+            Settings settings,
+            AudioPlayer audioPlayer)
         {
-            _killedSignal = killedSignal;
-            _explosionFactory = explosionFactory;
-            _model = model;
+            _audioPlayer = audioPlayer;
+            _settings = settings;
+            _gameEvents = gameEvents;
+            _explosionPool = explosionPool;
+            _player = player;
         }
 
         public void Tick()
         {
-            if (_model.Health <= 0 && !_model.IsDead)
+            if (_player.Health <= 0 && !_player.IsDead)
             {
                 Die();
             }
@@ -30,14 +36,23 @@ namespace Zenject.SpaceFighter
 
         void Die()
         {
-            _model.IsDead = true;
+            _player.IsDead = true;
 
-            var explosion = _explosionFactory.Create();
-            explosion.transform.position = _model.Position;
+            var explosion = _explosionPool.Spawn();
+            explosion.transform.position = _player.Position;
 
-            _model.Renderer.enabled = false;
+            _player.Renderer.enabled = false;
 
-            _killedSignal.Fire();
+            _gameEvents.PlayerDied();
+
+            _audioPlayer.Play(_settings.DeathSound, _settings.DeathSoundVolume);
+        }
+
+        [Serializable]
+        public class Settings
+        {
+            public AudioClip DeathSound;
+            public float DeathSoundVolume = 1.0f;
         }
     }
 }

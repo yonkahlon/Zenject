@@ -47,34 +47,9 @@ namespace Zenject.Tests.BindFeatures
             Container.Bind<Test1>().To<Test3>().AsSingle().NonLazy();
             Container.Bind<TestImpl1>().AsSingle().NonLazy();
 
-            Container.Validate();
-
             var test1 = Container.Resolve<TestImpl1>();
 
             Assert.That(test1.tests.Count == 2);
-        }
-
-        [Test]
-        public void TestMultiBind2()
-        {
-            Container.Bind<TestImpl1>().AsSingle().NonLazy();
-
-            Assert.Throws(() => Container.Validate());
-
-            // optional list dependencies should be declared as optional
-            Assert.Throws(
-                delegate { Container.Resolve<TestImpl1>(); });
-        }
-
-        [Test]
-        public void TestMultiBind2Validate()
-        {
-            Container.Bind<TestImpl1>().AsSingle().NonLazy();
-
-            Assert.Throws(() => Container.Validate());
-
-            Assert.Throws(
-                delegate { Container.Resolve<TestImpl1>(); });
         }
 
         [Test]
@@ -83,8 +58,6 @@ namespace Zenject.Tests.BindFeatures
             Container.Bind<Test1>().To<Test2>().AsSingle().NonLazy();
             Container.Bind<Test1>().To<Test3>().AsSingle().NonLazy();
             Container.Bind<TestImpl2>().AsSingle().NonLazy();
-
-            Container.Validate();
 
             var test = Container.Resolve<TestImpl2>();
             Assert.That(test.tests.Count == 2);

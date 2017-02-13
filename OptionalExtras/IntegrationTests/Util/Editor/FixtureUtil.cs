@@ -70,7 +70,7 @@ namespace Zenject.Tests
         public static void AssertResolveCount<TContract>(
             DiContainer container, int expectedNum)
         {
-            var actualCount = container.ResolveAll<TContract>(true).Count;
+            var actualCount = container.ResolveAll<TContract>().Count;
             Assert.That(actualCount == expectedNum,
                 "Expected to find '{0}' instances of type '{1}' but instead found '{2}'",
                 expectedNum, typeof(TContract).Name(), actualCount);

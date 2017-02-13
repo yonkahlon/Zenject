@@ -54,23 +54,12 @@
       <Project>{46f25a62-2e29-48cb-95f3-bdbcb0976ddc}</Project>
       <Name>Zenject</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\CommandsAndSignals\Zenject.Commands.csproj">
-      <Project>{b543a0b8-2630-424e-b628-53457be4884b}</Project>
-      <Name>Zenject.Commands</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Bindings\TestTo.cs" />
     <Compile Include="BindFeatures\TestMultipleContractTypes.cs" />
     <Compile Include="BindFeatures\TestMultipleContractTypes2.cs" />
     <Compile Include="BindFeatures\TestMultipleContractTypes3.cs" />
     <Compile Include="BindFeatures\TestWithArguments.cs" />
-    <Compile Include="Bindings\TestToFactory.cs" />
-    <Compile Include="Bindings\TestToGetter.cs" />
-    <Compile Include="Bindings\TestToInstance.cs" />
-    <Compile Include="Bindings\TestToResolve.cs" />
-    <Compile Include="Bindings\TestToSubContainerInstaller.cs" />
-    <Compile Include="Bindings\TestToSubContainerMethod.cs" />
     <Compile Include="Conditions\TestConditionsBasic.cs" />
     <Compile Include="Conditions\TestConditionsComplex.cs" />
     <Compile Include="Conditions\TestConditionsFieldName.cs" />
@@ -81,13 +70,6 @@
     <Compile Include="Conditions\TestIdentifiers.cs" />
     <Compile Include="Conventions\Foo.cs" />
     <Compile Include="Conventions\TestConvention.cs" />
-    <Compile Include="Factories\Bindings\TestFactoryTo0.cs" />
-    <Compile Include="Factories\Bindings\TestFactoryToGetter0.cs" />
-    <Compile Include="Factories\Bindings\TestFactoryToInstance0.cs" />
-    <Compile Include="Factories\Bindings\TestFactoryToMethod0.cs" />
-    <Compile Include="Factories\Bindings\TestFactoryToResolve0.cs" />
-    <Compile Include="Factories\Bindings\TestFactoryToSubContainerInstaller0.cs" />
-    <Compile Include="Factories\Bindings\TestFactoryToSubContainerMethod0.cs" />
     <Compile Include="Factories\TestFactory.cs" />
     <Compile Include="Injection\TestAllInjectionTypes.cs" />
     <Compile Include="Injection\TestBaseClassPropertyInjection.cs" />
@@ -114,22 +96,11 @@
     <Compile Include="Other\TestTaskUpdater.cs" />
     <Compile Include="Other\TestTestUtil.cs" />
     <Compile Include="Other\TestTransientMockProvider.cs" />
-    <Compile Include="Other\TestValidateInstaller.cs" />
     <Compile Include="Other\ZenjectProfileTest.cs" />
     <Compile Include="Util\TestListComparer.cs" />
     <Compile Include="Other\TestCircularDependencies.cs" />
     <Compile Include="Other\TestConflictingToSingletonUses.cs" />
-    <Compile Include="Factories\Bindings\TestFactoryTo1.cs" />
-    <Compile Include="Factories\Bindings\TestFactoryToMethod1.cs" />
-    <Compile Include="Factories\Bindings\TestFactoryToSubContainerInstaller1.cs" />
-    <Compile Include="Factories\Bindings\TestFactoryToSubContainerMethod1.cs" />
-    <Compile Include="Factories\Bindings\TestFactoryToFactory0.cs" />
-    <Compile Include="Factories\Bindings\TestFactoryToFactory1.cs" />
-    <Compile Include="Factories\Bindings\TestFactoryTo5.cs" />
-    <Compile Include="Bindings\TestToMethod.cs" />
     <Compile Include="Other\TestFacadeSubContainer.cs" />
-    <Compile Include="Validation\TestValidate1.cs" />
-    <Compile Include="Validation\TestValidateFactories.cs" />
     <Compile Include="BindFeatures\TestNonLazy.cs" />
     <Compile Include="Factories\IFactory\TestIFactory.cs" />
     <Compile Include="Conventions\FooMore.cs" />

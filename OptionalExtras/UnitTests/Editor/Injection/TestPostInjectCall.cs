@@ -65,8 +65,6 @@ namespace Zenject.Tests.Injection
             Container.Bind<Test2>().AsSingle().NonLazy();
             Container.Bind<Test3>().AsSingle().NonLazy();
 
-            Container.Validate();
-
             var test3 = Container.Resolve<Test3>();
             Assert.That(test3.HasInitialized);
             Assert.That(test3.HasInitialized2);
@@ -92,8 +90,6 @@ namespace Zenject.Tests.Injection
         {
             Container.Bind<SimpleBase>().To<SimpleDerived>().AsSingle().NonLazy();
 
-            Container.Validate();
-
             var simple = Container.Resolve<SimpleBase>();
 
             Assert.That(simple.WasCalled);
@@ -103,8 +99,6 @@ namespace Zenject.Tests.Injection
         public void TestInheritance()
         {
             Container.Bind<IFoo>().To<FooDerived>().AsSingle().NonLazy();
-
-            Container.Validate();
 
             var foo = Container.Resolve<IFoo>();
 
@@ -124,8 +118,6 @@ namespace Zenject.Tests.Injection
             FooBase.BaseCallOrder = 0;
             FooDerived.DerivedCallOrder = 0;
             FooDerived2.Derived2CallOrder = 0;
-
-            Container.Validate();
 
             Container.Resolve<IFoo>();
 

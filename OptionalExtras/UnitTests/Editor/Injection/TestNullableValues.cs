@@ -38,8 +38,6 @@ namespace Zenject.Tests.Injection
             Container.Bind<Test1>().AsSingle().NonLazy();
             Container.Bind<int>().FromInstance(1).NonLazy();
 
-            Container.Validate();
-
             Assert.IsEqual(Container.Resolve<Test1>().val, 1);
         }
 
@@ -47,8 +45,6 @@ namespace Zenject.Tests.Injection
         public void RunTest2()
         {
             Container.Bind<Test2>().AsSingle().NonLazy();
-
-            Container.Validate();
 
             Assert.IsEqual(Container.Resolve<Test2>().val, null);
         }

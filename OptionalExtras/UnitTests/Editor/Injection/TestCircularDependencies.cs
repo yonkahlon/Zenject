@@ -46,9 +46,6 @@ namespace Zenject.Tests.Injection
             Container.Bind<Test1>().AsSingle();
             Container.Bind<Test2>().AsSingle();
 
-            // TODO: Validation does not support circular dependencies
-            Container.Validate();
-
             var test1 = Container.Resolve<Test1>();
             var test2 = Container.Resolve<Test2>();
 
@@ -103,10 +100,6 @@ namespace Zenject.Tests.Injection
             Container.Bind<Test3>().AsSingle();
             Container.Bind<Test4>().AsSingle();
 
-            // TODO - validation does not support circular dependencies
-            // which is valid for properties
-            Container.Validate();
-
             var test1 = Container.Resolve<Test3>();
             var test2 = Container.Resolve<Test4>();
 
@@ -139,8 +132,6 @@ namespace Zenject.Tests.Injection
             {
                 Container.Bind<Test5>().AsSingle().NonLazy();
                 Container.Bind<Test6>().AsSingle().NonLazy();
-
-                Assert.Throws(() => Container.Validate());
 
                 Assert.Throws(() => Container.Resolve<Test5>());
                 Assert.Throws(() => Container.Resolve<Test6>());

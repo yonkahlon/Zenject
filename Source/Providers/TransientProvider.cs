@@ -57,7 +57,6 @@ namespace Zenject
                 ExtraArgs = _extraArguments.Concat(args).ToList(),
                 Context = context,
                 ConcreteIdentifier = _concreteIdentifier,
-                UseAllArgs = false,
             };
 
             var instance = _container.InstantiateExplicit(
@@ -65,8 +64,6 @@ namespace Zenject
 
             // Return before property/field/method injection to allow circular dependencies
             yield return new List<object>() { instance };
-
-            injectArgs.UseAllArgs = true;
 
             _container.InjectExplicit(instance, instanceType, injectArgs);
         }

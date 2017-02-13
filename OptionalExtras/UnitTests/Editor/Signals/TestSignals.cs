@@ -7,18 +7,26 @@ using ModestTree;
 using Assert=ModestTree.Assert;
 using Zenject;
 
-namespace Zenject.Tests
+namespace ZenjectSignalsAndSignals.Tests
 {
     [TestFixture]
-    public class TestSignals : ZenjectUnitTestFixture
+    public class TestSignals : ZenjectIntegrationTestFixture
     {
+        [SetUp]
+        public void CommonInstall()
+        {
+            Container.BindInterfacesAndSelfTo<SignalManager>().AsSingle();
+        }
+
         [Test]
         public void RunTest()
         {
             Container.Bind<Foo>().AsSingle();
             Container.Bind<Bar>().AsSingle();
 
-            Container.BindSignal<SomethingHappenedSignal>();
+            Container.DeclareSignal<SomethingHappenedSignal>();
+
+            Initialize();
 
             var foo = Container.Resolve<Foo>();
             var bar = Container.Resolve<Bar>();
@@ -34,12 +42,14 @@ namespace Zenject.Tests
         [Test]
         public void RunTestSignalInterfaces()
         {
-            Container.BindSignal<SomethingHappenedSignal>();
+            Container.DeclareSignal<SomethingHappenedSignal>();
 
-            Container.BindSignal<AnotherSignal>();
+            Container.DeclareSignal<AnotherSignal>();
 
             Container.Bind<IFooSignal>()
                 .To(typeof(AnotherSignal), typeof(SomethingHappenedSignal)).FromResolve();
+
+            Initialize();
 
             var fooSignals = Container.ResolveAll<IFooSignal>();
 

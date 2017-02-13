@@ -27,14 +27,15 @@ namespace Zenject
 
             _installMethod(subContainer);
 
+            subContainer.FlushInjectQueue();
             subContainer.ResolveDependencyRoots();
 
             if (subContainer.IsValidating)
             {
-                // The root-level Container has its ValidateIValidatables method
+                // The root-level Container has its ValidateValidatables method
                 // called explicitly - however, this is not so for sub-containers
                 // so call it here instead
-                subContainer.ValidateIValidatables();
+                subContainer.ValidateValidatables();
             }
 
             return subContainer;
@@ -65,14 +66,15 @@ namespace Zenject
 
             _installMethod(subContainer, (TParam1)args[0].Value);
 
+            subContainer.FlushInjectQueue();
             subContainer.ResolveDependencyRoots();
 
             if (subContainer.IsValidating)
             {
-                // The root-level Container has its ValidateIValidatables method
+                // The root-level Container has its ValidateValidatables method
                 // called explicitly - however, this is not so for sub-containers
                 // so call it here instead
-                subContainer.ValidateIValidatables();
+                subContainer.ValidateValidatables();
             }
 
             return subContainer;
@@ -107,14 +109,15 @@ namespace Zenject
                 (TParam1)args[0].Value,
                 (TParam2)args[1].Value);
 
+            subContainer.FlushInjectQueue();
             subContainer.ResolveDependencyRoots();
 
             if (subContainer.IsValidating)
             {
-                // The root-level Container has its ValidateIValidatables method
+                // The root-level Container has its ValidateValidatables method
                 // called explicitly - however, this is not so for sub-containers
                 // so call it here instead
-                subContainer.ValidateIValidatables();
+                subContainer.ValidateValidatables();
             }
 
             return subContainer;
@@ -151,14 +154,15 @@ namespace Zenject
                 (TParam2)args[1].Value,
                 (TParam3)args[2].Value);
 
+            subContainer.FlushInjectQueue();
             subContainer.ResolveDependencyRoots();
 
             if (subContainer.IsValidating)
             {
-                // The root-level Container has its ValidateIValidatables method
+                // The root-level Container has its ValidateValidatables method
                 // called explicitly - however, this is not so for sub-containers
                 // so call it here instead
-                subContainer.ValidateIValidatables();
+                subContainer.ValidateValidatables();
             }
 
             return subContainer;
@@ -197,14 +201,15 @@ namespace Zenject
                 (TParam3)args[2].Value,
                 (TParam4)args[3].Value);
 
+            subContainer.FlushInjectQueue();
             subContainer.ResolveDependencyRoots();
 
             if (subContainer.IsValidating)
             {
-                // The root-level Container has its ValidateIValidatables method
+                // The root-level Container has its ValidateValidatables method
                 // called explicitly - however, this is not so for sub-containers
                 // so call it here instead
-                subContainer.ValidateIValidatables();
+                subContainer.ValidateValidatables();
             }
 
             return subContainer;
@@ -245,14 +250,15 @@ namespace Zenject
                 (TParam4)args[3].Value,
                 (TParam5)args[4].Value);
 
+            subContainer.FlushInjectQueue();
             subContainer.ResolveDependencyRoots();
 
             if (subContainer.IsValidating)
             {
-                // The root-level Container has its ValidateIValidatables method
+                // The root-level Container has its ValidateValidatables method
                 // called explicitly - however, this is not so for sub-containers
                 // so call it here instead
-                subContainer.ValidateIValidatables();
+                subContainer.ValidateValidatables();
             }
 
             return subContainer;

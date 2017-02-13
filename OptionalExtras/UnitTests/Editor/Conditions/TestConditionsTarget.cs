@@ -40,8 +40,6 @@ namespace Zenject.Tests.Conditions
         {
             Container.Bind<Test1>().AsSingle().NonLazy();
 
-            Assert.Throws(() => Container.Validate());
-
             Assert.Throws(
                 delegate { Container.Resolve<Test1>(); });
         }
@@ -50,8 +48,6 @@ namespace Zenject.Tests.Conditions
         public void TestTargetConditionSuccess()
         {
             Container.Bind<Test2>().AsSingle().NonLazy();
-
-            Container.Validate();
 
             var test2 = Container.Resolve<Test2>();
 

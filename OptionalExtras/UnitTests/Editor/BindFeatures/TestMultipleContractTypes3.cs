@@ -51,8 +51,6 @@ namespace Zenject.Tests.BindFeatures
             Container.Bind<Test0>().To<Test4>().AsSingle().NonLazy();
             Container.Bind<Test2>().AsSingle().NonLazy();
 
-            Container.Validate();
-
             Container.Resolve<Test2>();
         }
     }

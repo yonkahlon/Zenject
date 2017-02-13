@@ -77,7 +77,7 @@ namespace Zenject.Asteroids
             _ship.ParticleEmitter.emit = true;
         }
 
-        public override void Stop()
+        public override void Dispose()
         {
             _ship.ParticleEmitter.emit = false;
         }
