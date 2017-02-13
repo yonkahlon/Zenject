@@ -115,7 +115,7 @@ public class TestInstaller : MonoInstaller
 {
     public override void InstallBindings()
     {
-        Container.BindAllInterfaces<EnemySpawner>().To<EnemySpawner>().AsSingle();
+        Container.BindInterfacesTo<EnemySpawner>().AsSingle();
         Container.Bind<Player>().AsSingle();
         Container.BindFactory<Enemy, Enemy.Factory>();
     }
@@ -165,7 +165,7 @@ public class TestInstaller : MonoInstaller
 {
     public override void InstallBindings()
     {
-        Container.BindAllInterfaces<EnemySpawner>().To<EnemySpawner>().AsSingle();
+        Container.BindInterfacesTo<EnemySpawner>().AsSingle();
         Container.Bind<Player>().AsSingle();
         Container.BindFactory<float, Enemy, Enemy.Factory>();
     }
@@ -207,7 +207,7 @@ public class TestInstaller : MonoInstaller
 
     public override void InstallBindings()
     {
-        Container.BindAllInterfaces<EnemySpawner>().To<EnemySpawner>().AsSingle();
+        Container.BindInterfacesTo<EnemySpawner>().AsSingle();
         Container.Bind<Player>().AsSingle();
         Container.BindFactory<Enemy, Enemy.Factory>().FromPrefab(EnemyPrefab);
     }
@@ -275,7 +275,7 @@ public class GameInstaller : MonoInstaller
 
     public override void InstallBindings()
     {
-        Container.BindAllInterfaces<GameController>().To<GameController>().AsSingle();
+        Container.BindInterfacesTo<GameController>().AsSingle();
 
         if (UseAStar)
         {
@@ -369,7 +369,7 @@ public class TestInstaller : MonoInstaller
 {
     public override void InstallBindings()
     {
-        Container.BindAllInterfaces<GameController>().To<GameController>().AsSingle();
+        Container.BindInterfacesTo<GameController>().AsSingle();
         Container.Bind<DifficultyManager>().AsSingle();
         Container.BindFactory<IEnemy, EnemyFactory>().FromFactory<CustomEnemyFactory>();
     }

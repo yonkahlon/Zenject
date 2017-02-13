@@ -40,10 +40,10 @@ Container.Bind<IFoo2>().To<Foo>().AsSingle();
 Container.Bind(typeof(Foo)).AsSingle();
 Container.Bind(typeof(IFoo)).AsSingle(typeof(Foo));
 
-///////////// BindAllInterfaces
+///////////// BindInterfaces
 
 // Bind all interfaces that Foo implements to a new singleton of type Foo
-Container.BindAllInterfaces<Foo>().To<Foo>().AsSingle();
+Container.BindInterfacesTo<Foo>().AsSingle();
 
 // So for example if Foo implements ITickable and IInitializable then the above
 // line is equivalent to this:

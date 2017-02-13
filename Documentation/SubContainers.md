@@ -48,7 +48,7 @@ public class TestInstaller : MonoInstaller
 {
     public override void InstallBindings()
     {
-        Container.BindAllInterfaces<GameController>().To<GameController>().AsSingle();
+        Container.BindInterfacesTo<GameController>().AsSingle();
         Container.Bind<Greeter>().FromSubContainerResolve().ByMethod(InstallGreeter).AsSingle();
     }
 
@@ -106,8 +106,8 @@ public class TestInstaller : MonoInstaller
     {
         subContainer.Bind<Greeter>().AsSingle();
 
-        subContainer.BindAllInterfaces<GoodbyeHandler>().To<GoodbyeHandler>().AsSingle();
-        subContainer.BindAllInterfaces<HelloHandler>().To<HelloHandler>().AsSingle();
+        subContainer.BindInterfacesTo<GoodbyeHandler>().AsSingle();
+        subContainer.BindInterfacesTo<HelloHandler>().AsSingle();
     }
 }
 ```
@@ -143,16 +143,16 @@ public class TestInstaller : MonoInstaller
 {
     public override void InstallBindings()
     {
-        Container.BindAllInterfacesAndSelf<Greeter>()
-            .To<Greeter>().FromSubContainerResolve().ByMethod(InstallGreeter).AsSingle().NonLazy();
+        Container.BindInterfacesAndSelfTo<Greeter>()
+            .FromSubContainerResolve().ByMethod(InstallGreeter).AsSingle().NonLazy();
     }
 
     void InstallGreeter(DiContainer subContainer)
     {
         subContainer.Bind<Greeter>().AsSingle();
 
-        subContainer.BindAllInterfaces<GoodbyeHandler>().To<GoodbyeHandler>().AsSingle();
-        subContainer.BindAllInterfaces<HelloHandler>().To<HelloHandler>().AsSingle();
+        subContainer.BindInterfacesTo<GoodbyeHandler>().AsSingle();
+        subContainer.BindInterfacesTo<HelloHandler>().AsSingle();
     }
 }
 
@@ -160,7 +160,7 @@ public class TestInstaller : MonoInstaller
 
 Now if we run it, we should see the Hello message, then if we stop playing we should see the Goodbye message.
 
-The reason this works is because we are now binding IInitializable, IDisposable, and ITickable on the root container to the Greeter class given by `Container.BindAllInterfacesAndSelf<Greeter>().To<Greeter>()`.  Greeter now inherits from Kernel, which inherits from all these interfaces and also handles forwarding these calls to the IInitializable's / ITickable's / IDisposable's in our sub container.  Note that we use AsSingle() here, which is important otherwise it will create a new sub-container for every interface which is not what we want.
+The reason this works is because we are now binding IInitializable, IDisposable, and ITickable on the root container to the Greeter class given by `Container.BindInterfacesAndSelfTo<Greeter>()`.  Greeter now inherits from Kernel, which inherits from all these interfaces and also handles forwarding these calls to the IInitializable's / ITickable's / IDisposable's in our sub container.  Note that we use AsSingle() here, which is important otherwise it will create a new sub-container for every interface which is not what we want.
 
 ## <a id="using-game-object-contexts"></a>Creating Sub-Containers on GameObject's by using Game Object Context
 
@@ -220,7 +220,7 @@ public class GameInstaller : MonoInstaller
 {
     public override void InstallBindings()
     {
-        Container.BindAllInterfaces<GameRunner>().To<GameRunner>().AsSingle();
+        Container.BindInterfacesTo<GameRunner>().AsSingle();
     }
 }
 ```
@@ -338,7 +338,7 @@ public class GameInstaller : MonoInstaller
 
     public override void InstallBindings()
     {
-        Container.BindAllInterfaces<GameRunner>().To<GameRunner>().AsSingle();
+        Container.BindInterfacesTo<GameRunner>().AsSingle();
 
         Container.BindFactory<Ship, Ship.Factory>().FromSubContainerResolve().ByPrefab(ShipPrefab);
     }
@@ -387,7 +387,7 @@ public class GameInstaller : MonoInstaller
 
     public override void InstallBindings()
     {
-        Container.BindAllInterfaces<GameRunner>().To<GameRunner>().AsSingle();
+        Container.BindInterfacesTo<GameRunner>().AsSingle();
 
         Container.BindFactory<float, Ship, Ship.Factory>().FromSubContainerResolve().ByPrefab<ShipInstaller>(ShipPrefab);
     }
