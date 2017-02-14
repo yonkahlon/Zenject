@@ -23,6 +23,7 @@ Tested in Unity 3D on the following platforms:
 * Android
 * Webplayer
 * WebGL
+* PS4 (with IL2CPP backend)
 * Windows Store (including 8.1, Phone 8.1, Universal 8.1 and Universal 10 - both .NET and IL2CPP backend)
 
 IL2CPP is supported, however there are some gotchas - see <a href="#aot-support">here</a> for details
