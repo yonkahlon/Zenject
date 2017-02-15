@@ -153,7 +153,7 @@ namespace ZenjectSignalsAndSignals.Tests
 
             bool received = false;
 
-            var subscription = signal.Stream.Subscribe(() => received = true);
+            var subscription = signal.AsObservable.Subscribe((x) => received = true);
 
             Assert.That(!received);
             signal.Fire();
