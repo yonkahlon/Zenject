@@ -9,7 +9,7 @@
 
 Summary
 
-Notable parts of this release includes the long awaited support for Memory Pools and support for late resolve via Lazy<> construct.  It also includes some API breaking changes to make it easier for new users.  Some of the bind methods were renamed to better represent what they mean, and in some cases the scope is now required to be made explicit, to avoid accidentally using transient scope.  Finally, there was also some significant performance improvements for when using Zenject in scenes with many transforms.
+Notable parts of this release includes the long awaited support for Memory Pools, a re-design of Commands/Signals, and support for late resolve via Lazy<> construct.  It also includes some API breaking changes to make it easier for new users.  Some of the bind methods were renamed to better represent what they mean, and in some cases the scope is now required to be made explicit, to avoid accidentally using transient scope.  Finally, there was also some significant performance improvements for when using Zenject in scenes with many transforms.
 
 New Features
 - Significant changes to commands and signals.  The functionality of commands was merged into Signals, and some more features were added to it to support subcontainers (see docs)
