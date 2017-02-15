@@ -1,6 +1,10 @@
 
 ## <a id="release-notes"></a>Release Notes
 
+###5.1 (February 15, 2017)
+
+- Fixed UniRx integration to work with the right version of Unirx
+
 ###5.0 (February 13, 2017)
 
 Summary
@@ -8,6 +12,7 @@ Summary
 Notable parts of this release includes the long awaited support for Memory Pools and support for late resolve via Lazy<> construct.  It also includes some API breaking changes to make it easier for new users.  Some of the bind methods were renamed to better represent what they mean, and in some cases the scope is now required to be made explicit, to avoid accidentally using transient scope.  Finally, there was also some significant performance improvements for when using Zenject in scenes with many transforms.
 
 New Features
+- Significant changes to commands and signals.  The functionality of commands was merged into Signals, and some more features were added to it to support subcontainers (see docs)
 - Added Lazy<> construct so that you can have the resolve occur upon first usage
 - Added menu option "Validate All Active Scenes"
 - Added support for memory pools.  This includes a fluent interface similar to how factories work
