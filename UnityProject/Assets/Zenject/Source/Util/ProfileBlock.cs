@@ -7,7 +7,9 @@ using ModestTree;
 
 #if !NOT_UNITY3D
 using UnityEngine;
+#if UNITY_5_5
 using UnityEngine.Profiling;
+#endif
 #endif
 
 namespace Zenject

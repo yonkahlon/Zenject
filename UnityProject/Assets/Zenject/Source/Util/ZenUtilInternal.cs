@@ -85,7 +85,7 @@ namespace Zenject.Internal
         public static IEnumerable<MonoBehaviour> GetInjectableMonoBehaviours(Scene scene)
         {
             return GetRootGameObjects(scene)
-                .SelectMany(ZenUtilInternal.GetInjectableMonoBehaviours);
+                .SelectMany<GameObject, MonoBehaviour>(ZenUtilInternal.GetInjectableMonoBehaviours);
         }
 
         public static IEnumerable<GameObject> GetRootGameObjects(Scene scene)
