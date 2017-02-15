@@ -3,7 +3,7 @@
 
 ###5.1 (February 15, 2017)
 
-- Fixed UniRx integration to work with the right version of Unirx
+- Hotfix.  Signal UniRx integration was completely broken
 
 ###5.0 (February 13, 2017)
 
