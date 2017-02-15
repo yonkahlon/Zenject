@@ -2633,6 +2633,7 @@ Something else to note is that the rate at which the ITickable.Tick method gets 
     * Stick Soccer 2 ([iOS](https://itunes.apple.com/gb/app/stick-soccer-2/id1104214157?mt=8) and [Android](https://play.google.com/store/apps/details?id=com.sticksports.soccer2&hl=en_GB))
     * [Untethered](https://play.google.com/store/apps/details?id=com.numinousgames.Untethered&hl=en) (Google VR)
     * [Toy Clash](https://toyclash.com/) - ([GearVR](https://www.oculus.com/experiences/gear-vr/1407846952568081/))
+    * [Bedtime Math App](http://bedtimemath.org/apps) - ([iOS](https://itunes.apple.com/us/app/bedtimemath/id637910701) and [Android](https://play.google.com/store/apps/details?id=com.twofours.bedtimemath))
 
     Libraries
 

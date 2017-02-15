@@ -227,7 +227,7 @@ Container.DeclareSignal&lt;<b>SignalType</b>&gt;()
 
 <ol>
 <li>C# events</li>
-<li>UniRx Stream</li>
+<li>UniRx Observable</li>
 <li>Installer Binding</li>
 </ol>
 
@@ -291,7 +291,7 @@ Container.DeclareSignal&lt;<b>SignalType</b>&gt;()
 <h3>
 <a id="user-content-unirx-signal-handler" class="anchor" href="#unirx-signal-handler" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a><a id="user-content-handler-unirx"></a>UniRx Signal Handler</h3>
 
-<p>If you are a fan of <a href="https://github.com/neuecc/UniRx">UniRx</a>, as we are, then you might also want to treat the signal as a UniRx stream.  For example:</p>
+<p>If you are a fan of <a href="https://github.com/neuecc/UniRx">UniRx</a>, as we are, then you might also want to treat the signal as a UniRx observable.  For example:</p>
 
 <div class="highlight highlight-source-cs"><pre><span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-en">Greeter</span> : <span class="pl-en">MonoBehaviour</span>
 {
@@ -300,7 +300,7 @@ Container.DeclareSignal&lt;<b>SignalType</b>&gt;()
 
     <span class="pl-k">public</span> <span class="pl-k">void</span> <span class="pl-en">Start</span>()
     {
-        _appStartedSignal.Stream.Subscribe(OnAppStarted).AddTo(<span class="pl-c1">this</span>);
+        _appStartedSignal.AsObservable.Subscribe(OnAppStarted).AddTo(<span class="pl-c1">this</span>);
     }
 
     <span class="pl-k">void</span> <span class="pl-en">OnAppStarted</span>()
