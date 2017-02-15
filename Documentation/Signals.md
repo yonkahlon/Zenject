@@ -180,7 +180,7 @@ public class Bar : ITickable
 There are three ways of adding handlers to a signal:
 
 1. C# events
-2. UniRx Stream
+2. UniRx Observable
 3. Installer Binding
 
 ### <a id="handler-events"></a>C# Event Signal Handler
@@ -245,7 +245,7 @@ public class Greeter : IInitializable, IDisposable
 
 ### <a id="handler-unirx"></a>UniRx Signal Handler
 
-If you are a fan of <a href="https://github.com/neuecc/UniRx">UniRx</a>, as we are, then you might also want to treat the signal as a UniRx stream.  For example:
+If you are a fan of <a href="https://github.com/neuecc/UniRx">UniRx</a>, as we are, then you might also want to treat the signal as a UniRx observable.  For example:
 
 ```csharp
 public class Greeter : MonoBehaviour
@@ -255,7 +255,7 @@ public class Greeter : MonoBehaviour
 
     public void Start()
     {
-        _appStartedSignal.Stream.Subscribe(OnAppStarted).AddTo(this);
+        _appStartedSignal.AsObservable.Subscribe(OnAppStarted).AddTo(this);
     }
 
     void OnAppStarted()

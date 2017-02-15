@@ -20,15 +20,15 @@ namespace Zenject
     {
         readonly List<Action<TParam1>> _listeners = new List<Action<TParam1>>();
 #if ZEN_SIGNALS_ADD_UNIRX
-        readonly Subject<TParam1> _stream = new Subject<TParam1>();
+        readonly Subject<TParam1> _observable = new Subject<TParam1>();
 #endif
 
 #if ZEN_SIGNALS_ADD_UNIRX
-        public IObservableRx<TParam1> Stream
+        public IObservable<TParam1> AsObservable
         {
             get
             {
-                return _stream;
+                return _observable;
             }
         }
 #endif
@@ -89,12 +89,12 @@ namespace Zenject
                 }
 
 #if ZEN_SIGNALS_ADD_UNIRX
-                wasHandled |= _stream.HasObservers;
+                wasHandled |= _observable.HasObservers;
 #if UNITY_EDITOR
                 using (ProfileBlock.Start("UniRx Stream"))
 #endif
                 {
-                    _stream.OnNext(p1);
+                    _observable.OnNext(p1);
                 }
 #endif
 
