@@ -110,7 +110,7 @@ namespace Zenject
             }
 
             foreach (var monoBehaviour in UnityUtil.GetDirectChildren(this.gameObject)
-                .SelectMany(ZenUtilInternal.GetInjectableMonoBehaviours))
+                .SelectMany<GameObject, MonoBehaviour>(ZenUtilInternal.GetInjectableMonoBehaviours))
             {
                 yield return monoBehaviour;
             }
