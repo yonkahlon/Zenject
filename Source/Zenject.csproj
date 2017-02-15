@@ -89,7 +89,6 @@
     <Compile Include="Internal\Log.cs" />
     <Compile Include="Internal\MiscExtensions.cs" />
     <Compile Include="Internal\PreserveAttribute.cs" />
-    <Compile Include="Internal\ProfileBlock.cs" />
     <Compile Include="Internal\ReflectionUtil.cs" />
     <Compile Include="Internal\TypeExtensions.cs" />
     <Compile Include="Binding\Binders\ConcreteBinders\ConcreteIdBinderGeneric.cs" />
