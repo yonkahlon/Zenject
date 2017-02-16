@@ -1015,7 +1015,7 @@ namespace Zenject
             var prefabAsGameObject = GetPrefabAsGameObject(prefab);
 
             var gameObj = (GameObject)GameObject.Instantiate(
-                prefabAsGameObject, GetTransformGroup(gameObjectBindInfo));
+                prefabAsGameObject, GetTransformGroup(gameObjectBindInfo), false);
 
             if (gameObjectBindInfo.Name != null)
             {
@@ -1441,7 +1441,7 @@ namespace Zenject
                 }
             }
 
-            var matches = gameObject.GetComponentsInChildren(componentType, true);
+            var matches = gameObject.GetComponentsInChildren(componentType);
 
             Assert.That(!matches.IsEmpty(),
                 "Expected to find component with type '{0}' when injecting into game object '{1}'", componentType, gameObject.name);
