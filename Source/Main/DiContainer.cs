@@ -1441,7 +1441,7 @@ namespace Zenject
                 }
             }
 
-            var matches = gameObject.GetComponentsInChildren(componentType);
+            var matches = gameObject.GetComponentsInChildren(componentType, true);
 
             Assert.That(!matches.IsEmpty(),
                 "Expected to find component with type '{0}' when injecting into game object '{1}'", componentType, gameObject.name);
