@@ -73,7 +73,7 @@ namespace Zenject
                     Assert.That(ctx.ObjectType.DerivesFromOrEqual<MonoBehaviour>());
                     Assert.IsNotNull(ctx.ObjectInstance);
 
-                    return ((MonoBehaviour)ctx.ObjectInstance).GetComponentsInChildren<TContract>()
+                    return ((MonoBehaviour)ctx.ObjectInstance).GetComponentsInChildren<TContract>(true)
                         .Where(x => !ReferenceEquals(x, ctx.ObjectInstance));
                 });
         }
@@ -87,7 +87,7 @@ namespace Zenject
                     Assert.That(ctx.ObjectType.DerivesFromOrEqual<MonoBehaviour>());
                     Assert.IsNotNull(ctx.ObjectInstance);
 
-                    return ((MonoBehaviour)ctx.ObjectInstance).GetComponentsInParent<TContract>()
+                    return ((MonoBehaviour)ctx.ObjectInstance).GetComponentsInParent<TContract>(true)
                         .Where(x => !ReferenceEquals(x, ctx.ObjectInstance));
                 });
         }
@@ -113,7 +113,7 @@ namespace Zenject
             return FromMethodMultiple((ctx) =>
                 {
                     return ctx.Container.Resolve<Context>().GetRootGameObjects()
-                        .SelectMany(x => x.GetComponentsInChildren<TContract>())
+                        .SelectMany(x => x.GetComponentsInChildren<TContract>(true))
                         .Where(x => !ReferenceEquals(x, ctx.ObjectInstance));
                 });
         }

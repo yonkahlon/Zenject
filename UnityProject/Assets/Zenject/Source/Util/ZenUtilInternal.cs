@@ -51,7 +51,7 @@ namespace Zenject.Internal
         // NOTE: This method will not return components that are within a GameObjectContext
         public static List<MonoBehaviour> GetInjectableMonoBehaviours(GameObject gameObject)
         {
-            var childMonoBehaviours = gameObject.GetComponentsInChildren<MonoBehaviour>();
+            var childMonoBehaviours = gameObject.GetComponentsInChildren<MonoBehaviour>(true);
 
             var subContexts = childMonoBehaviours.OfType<GameObjectContext>().Select(x => x.transform).ToList();
 
