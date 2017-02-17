@@ -19,6 +19,21 @@ namespace ZenjectSignalsAndSignals.Tests
         }
 
         [Test]
+        public void RunBasic()
+        {
+            bool received = false;
+            Container.DeclareSignal<SomethingHappenedSignal>();
+
+            Container.BindSignal<SomethingHappenedSignal>().To(() => received = true);
+
+            Initialize();
+
+            Assert.That(!received);
+            Container.Resolve<SomethingHappenedSignal>().Fire();
+            Assert.That(received);
+        }
+
+        [Test]
         public void RunTest()
         {
             Container.Bind<Foo>().AsSingle();
