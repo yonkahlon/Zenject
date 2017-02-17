@@ -2162,7 +2162,7 @@ namespace Zenject
             GameObject prefabAsGameObject = GetPrefabAsGameObject(prefab);
 
             var gameObj = (GameObject)GameObject.Instantiate(
-                prefabAsGameObject, GetTransformGroup(gameObjectBindInfo));
+                prefabAsGameObject, GetTransformGroup(gameObjectBindInfo), false);
 
             return InjectGameObjectForComponentExplicit(
                 gameObj, componentType, args);
