@@ -384,6 +384,12 @@ namespace Zenject
             {
                 var instances = matches.SelectMany(x => SafeGetInstances(x, context)).ToArray();
 
+                if (instances.Length == 0 && !context.Optional)
+                {
+                    throw Assert.CreateException(
+                        "Could not find required dependency with type '{0}'.  Found providers but they returned zero results!", context.MemberType);
+                }
+
                 if (IsValidating)
                 {
                     instances = instances.Select(x => x is ValidationMarker ? context.MemberType.GetDefaultValue() : x).ToArray();
@@ -1675,7 +1681,7 @@ namespace Zenject
                 new BindInfo(typeof(TContract)));
         }
 
-        public ConcreteIdBinderGeneric<TContract> Bind<TContract>(BindInfo bindInfo)
+        internal ConcreteIdBinderGeneric<TContract> Bind<TContract>(BindInfo bindInfo)
         {
             Assert.That(!typeof(TContract).DerivesFrom<IPlaceholderFactory>(),
                 "You should not use Container.Bind for factory classes.  Use Container.BindFactory instead.");

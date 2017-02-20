@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace Zenject.Tests.Bindings.FromScriptableObjectResource
+namespace Zenject.Tests.Bindings.FromNewScriptableObjectResource
 {
     public interface IFoo
     {

@@ -3,7 +3,7 @@ using Zenject;
 
 namespace Zenject.Tests.Installers.ScriptableObjectInstallers
 {
-    [CreateAssetMenu(fileName = "QuxInstaller", menuName = "Installers/QuxInstaller")]
+    //[CreateAssetMenu(fileName = "QuxInstaller", menuName = "Installers/QuxInstaller")]
     public class QuxInstaller : ScriptableObjectInstaller<string, float, int, QuxInstaller>
     {
         string _p1;
