@@ -211,7 +211,7 @@ namespace Zenject
         {
             Assert.That(IsValidating);
 
-#if !NOT_UNITY3D && !ZEN_TESTS_OUTSIDE_UNITY
+#if !NOT_UNITY3D
             Assert.That(Application.isEditor);
 #endif
 
