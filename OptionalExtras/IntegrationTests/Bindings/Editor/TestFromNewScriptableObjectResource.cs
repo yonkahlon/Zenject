@@ -5,21 +5,21 @@ using NUnit.Framework;
 using UnityEngine;
 using ModestTree;
 using Assert=ModestTree.Assert;
-using Zenject.Tests.Bindings.FromScriptableObjectResource;
+using Zenject.Tests.Bindings.FromNewScriptableObjectResource;
 
 namespace Zenject.Tests.Bindings
 {
     [TestFixture]
-    public class TestFromScriptableObjectResource : ZenjectIntegrationTestFixture
+    public class TestFromNewScriptableObjectResource : ZenjectIntegrationTestFixture
     {
-        const string PathPrefix = "TestFromScriptableObjectResource/";
+        const string PathPrefix = "TestFromNewScriptableObjectResource/";
 
         [Test]
         [ExpectedException]
         public void TestTransientError()
         {
             // Validation should detect that it doesn't exist
-            Container.Bind<Foo>().FromScriptableObjectResource(PathPrefix + "asdfasdfas").AsTransient().NonLazy();
+            Container.Bind<Foo>().FromNewScriptableObjectResource(PathPrefix + "asdfasdfas").AsTransient().NonLazy();
 
             Initialize();
         }
@@ -28,7 +28,7 @@ namespace Zenject.Tests.Bindings
         public void TestTransient()
         {
             Foo.InstanceCount = 0;
-            Container.Bind<Foo>().FromScriptableObjectResource(PathPrefix + "Foo").AsTransient();
+            Container.Bind<Foo>().FromNewScriptableObjectResource(PathPrefix + "Foo").AsTransient();
 
             Initialize();
 
@@ -47,8 +47,8 @@ namespace Zenject.Tests.Bindings
         {
             Foo.InstanceCount = 0;
 
-            Container.Bind<IFoo>().To<Foo>().FromScriptableObjectResource(PathPrefix + "Foo").AsSingle();
-            Container.Bind<Foo>().FromScriptableObjectResource(PathPrefix + "Foo").AsSingle();
+            Container.Bind<IFoo>().To<Foo>().FromNewScriptableObjectResource(PathPrefix + "Foo").AsSingle();
+            Container.Bind<Foo>().FromNewScriptableObjectResource(PathPrefix + "Foo").AsSingle();
 
             Initialize();
 
@@ -62,7 +62,7 @@ namespace Zenject.Tests.Bindings
             Foo.InstanceCount = 0;
 
             Container.Bind<IFoo>().To<Foo>()
-                .FromScriptableObjectResource(PathPrefix + "Foo").AsSingle().NonLazy();
+                .FromNewScriptableObjectResource(PathPrefix + "Foo").AsSingle().NonLazy();
 
             Initialize();
 
@@ -75,7 +75,7 @@ namespace Zenject.Tests.Bindings
         public void TestWithArgumentsFail()
         {
             Container.Bind<Bob>()
-                .FromScriptableObjectResource(PathPrefix + "Bob").AsCached().NonLazy();
+                .FromNewScriptableObjectResource(PathPrefix + "Bob").AsCached().NonLazy();
 
             Initialize();
         }
@@ -84,7 +84,7 @@ namespace Zenject.Tests.Bindings
         public void TestWithArguments()
         {
             Container.Bind<Bob>()
-                .FromScriptableObjectResource(PathPrefix + "Bob").AsCached()
+                .FromNewScriptableObjectResource(PathPrefix + "Bob").AsCached()
                 .WithArguments("test1").NonLazy();
 
             Initialize();

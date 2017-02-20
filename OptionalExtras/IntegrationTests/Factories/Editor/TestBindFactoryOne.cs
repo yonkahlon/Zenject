@@ -29,7 +29,49 @@ namespace Zenject.Tests.Factories
         }
 
         [Test]
-        public void TestToGameObjectSelf()
+        public void TestFromNewComponentOn()
+        {
+            var go = new GameObject();
+
+            Container.BindFactory<string, Foo, Foo.Factory>().FromNewComponentOn(go);
+
+            Initialize();
+
+            var factory = Container.Resolve<Foo.Factory>();
+
+            Assert.IsNull(go.GetComponent<Foo>());
+            var foo = factory.Create("asdf");
+            Assert.IsEqual(foo.Value, "asdf");
+            Assert.IsNotNull(go.GetComponent<Foo>());
+            Assert.IsEqual(go.GetComponent<Foo>(), foo);
+
+            var foo2 = factory.Create("zxcv");
+
+            Assert.IsNotEqual(foo2, foo);
+
+            var allFoos = go.GetComponents<Foo>();
+            Assert.IsEqual(allFoos.Length, 2);
+            Assert.IsEqual(allFoos[0], foo);
+            Assert.IsEqual(allFoos[1], foo2);
+        }
+
+        [Test]
+        public void TestFromNewScriptableObjectResource()
+        {
+            Container.BindFactory<string, Bar, Bar.Factory>()
+                .FromNewScriptableObjectResource("TestBindFactoryOne/Bar");
+
+            Initialize();
+
+            var factory = Container.Resolve<Bar.Factory>();
+            var bar = factory.Create("asdf");
+            Assert.IsNotNull(bar);
+            Assert.IsEqual(bar.Value, "asdf");
+            Assert.IsNotEqual(bar, factory.Create("zxcv"));
+        }
+
+        [Test]
+        public void TestFromNewComponentOnNewGameObjectSelf()
         {
             Container.BindFactory<string, Foo, Foo.Factory>().FromNewComponentOnNewGameObject();
 
@@ -42,7 +84,7 @@ namespace Zenject.Tests.Factories
         }
 
         [Test]
-        public void TestToGameObjectConcrete()
+        public void TestFromNewComponentOnNewGameObjectConcrete()
         {
             Container.BindFactory<string, IFoo, IFooFactory>().To<Foo>().FromNewComponentOnNewGameObject();
 
@@ -55,7 +97,7 @@ namespace Zenject.Tests.Factories
         }
 
         [Test]
-        public void TestToMonoBehaviourSelf()
+        public void TestFromNewComponentOnSelf()
         {
             var gameObject = Container.CreateEmptyGameObject("foo");
 
@@ -70,7 +112,7 @@ namespace Zenject.Tests.Factories
         }
 
         [Test]
-        public void TestToMonoBehaviourConcrete()
+        public void TestFromNewComponentOnConcrete()
         {
             var gameObject = Container.CreateEmptyGameObject("foo");
 
@@ -85,7 +127,7 @@ namespace Zenject.Tests.Factories
         }
 
         [Test]
-        public void TestToPrefabSelf()
+        public void TestFromComponentInNewPrefabSelf()
         {
             Container.BindFactory<string, Foo, Foo.Factory>().FromComponentInNewPrefab(FooPrefab).WithGameObjectName("asdf");
 
@@ -99,7 +141,7 @@ namespace Zenject.Tests.Factories
         }
 
         [Test]
-        public void TestToPrefabConcrete()
+        public void TestFromComponentInNewPrefabConcrete()
         {
             Container.BindFactory<string, IFoo, IFooFactory>().To<Foo>()
                 .FromComponentInNewPrefab(FooPrefab).WithGameObjectName("asdf");
@@ -114,7 +156,7 @@ namespace Zenject.Tests.Factories
         }
 
         [Test]
-        public void TestToPrefabResourceSelf()
+        public void TestFromComponentInNewPrefabResourceSelf()
         {
             Container.BindFactory<string, Foo, Foo.Factory>().FromComponentInNewPrefabResource("TestBindFactoryOne/Foo").WithGameObjectName("asdf");
 
@@ -128,7 +170,7 @@ namespace Zenject.Tests.Factories
         }
 
         [Test]
-        public void TestToPrefabResourceConcrete()
+        public void TestFromComponentInNewPrefabResourceConcrete()
         {
             Container.BindFactory<string, IFoo, IFooFactory>().To<Foo>()
                 .FromComponentInNewPrefabResource("TestBindFactoryOne/Foo").WithGameObjectName("asdf");
@@ -143,7 +185,7 @@ namespace Zenject.Tests.Factories
         }
 
         [Test]
-        public void TestToSubContainerPrefabSelf()
+        public void TestFromSubContainerResolveByNewPrefabSelf()
         {
             Container.BindFactory<string, Foo, Foo.Factory>()
                 .FromSubContainerResolve().ByNewPrefab<FooInstaller>(FooSubContainerPrefab);
@@ -157,7 +199,7 @@ namespace Zenject.Tests.Factories
         }
 
         [Test]
-        public void TestToSubContainerPrefabConcrete()
+        public void TestFromSubContainerResolveByNewPrefabConcrete()
         {
             Container.BindFactory<string, IFoo, IFooFactory>()
                 .To<Foo>().FromSubContainerResolve().ByNewPrefab<FooInstaller>(FooSubContainerPrefab);
@@ -171,7 +213,7 @@ namespace Zenject.Tests.Factories
         }
 
         [Test]
-        public void TestToSubContainerPrefabResourceSelf()
+        public void TestFromSubContainerResolveByNewPrefabResourceSelf()
         {
             Container.BindFactory<string, Foo, Foo.Factory>()
                 .FromSubContainerResolve().ByNewPrefabResource<FooInstaller>("TestBindFactoryOne/FooSubContainer");
@@ -185,7 +227,7 @@ namespace Zenject.Tests.Factories
         }
 
         [Test]
-        public void TestToSubContainerPrefabResourceConcrete()
+        public void TestFromSubContainerResolveByNewPrefabResourceConcrete()
         {
             Container.BindFactory<string, IFoo, IFooFactory>()
                 .To<Foo>().FromSubContainerResolve().ByNewPrefabResource<FooInstaller>("TestBindFactoryOne/FooSubContainer");

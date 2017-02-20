@@ -25,7 +25,7 @@ namespace ZenjectSignalsAndSignals.Tests
         [Test]
         public void TestToSingle1()
         {
-            Bar.WasTriggered = false;
+            Bar.TriggeredCount = 0;
             Bar.InstanceCount = 0;
 
             Container.Bind<Bar>().AsSingle();
@@ -40,18 +40,18 @@ namespace ZenjectSignalsAndSignals.Tests
             var cmd = Container.Resolve<DoSomethingSignal>();
 
             Assert.IsEqual(Bar.InstanceCount, 1);
-            Assert.That(!Bar.WasTriggered);
+            Assert.IsEqual(Bar.TriggeredCount, 0);
 
             cmd.Fire();
 
-            Assert.That(Bar.WasTriggered);
-            Assert.IsEqual(Bar.InstanceCount, 1);
+            Assert.IsEqual(Bar.TriggeredCount, 1);
+            Assert.IsEqual(Bar.TriggeredCount, 1);
         }
 
         [Test]
         public void TestToCached1()
         {
-            Bar.WasTriggered = false;
+            Bar.TriggeredCount = 0;
             Bar.InstanceCount = 0;
 
             Container.Bind<Bar>().AsCached();
@@ -66,15 +66,16 @@ namespace ZenjectSignalsAndSignals.Tests
             var cmd = Container.Resolve<DoSomethingSignal>();
 
             Assert.IsEqual(Bar.InstanceCount, 1);
-            Assert.That(!Bar.WasTriggered);
+            Assert.IsEqual(Bar.TriggeredCount, 0);
 
             cmd.Fire();
 
-            Assert.That(Bar.WasTriggered);
+            Assert.IsEqual(Bar.TriggeredCount, 1);
             Assert.IsEqual(Bar.InstanceCount, 2);
 
             cmd.Fire();
             Assert.IsEqual(Bar.InstanceCount, 2);
+            Assert.IsEqual(Bar.TriggeredCount, 2);
         }
 
         [Test]
@@ -206,6 +207,147 @@ namespace ZenjectSignalsAndSignals.Tests
             Assert.That(wasCalled2);
         }
 
+        [Test]
+        public void TestFromNewTransient()
+        {
+            Bar.TriggeredCount = 0;
+            Bar.InstanceCount = 0;
+
+            Container.DeclareSignal<DoSomethingSignal>();
+            Container.BindSignal<DoSomethingSignal>()
+                .To<Bar>(x => x.Execute).AsTransient();
+
+            Initialize();
+
+            TestBarHandlerTransient();
+        }
+
+        [Test]
+        public void TestFromNewCached()
+        {
+            Bar.TriggeredCount = 0;
+            Bar.InstanceCount = 0;
+
+            Container.DeclareSignal<DoSomethingSignal>();
+            Container.BindSignal<DoSomethingSignal>()
+                .To<Bar>(x => x.Execute).AsCached();
+
+            Initialize();
+
+            TestBarHandlerCached();
+        }
+
+        [Test]
+        public void TestFromNewSingle()
+        {
+            Bar.TriggeredCount = 0;
+            Bar.InstanceCount = 0;
+
+            Container.DeclareSignal<DoSomethingSignal>();
+            Container.BindSignal<DoSomethingSignal>()
+                .To<Bar>(x => x.Execute).AsSingle();
+
+            Initialize();
+
+            TestBarHandlerCached();
+        }
+
+        [Test]
+        public void TestFromMethod()
+        {
+            Bar.TriggeredCount = 0;
+            Bar.InstanceCount = 0;
+
+            Container.DeclareSignal<DoSomethingSignal>();
+            Container.BindSignal<DoSomethingSignal>()
+                .To<Bar>(x => x.Execute).FromMethod(_ => new Bar());
+
+            Initialize();
+
+            TestBarHandlerTransient();
+        }
+
+        [Test]
+        public void TestFromMethodMultiple()
+        {
+            Bar.TriggeredCount = 0;
+            Bar.InstanceCount = 0;
+
+            Container.DeclareSignal<DoSomethingSignal>();
+            Container.BindSignal<DoSomethingSignal>()
+                .To<Bar>(x => x.Execute).FromMethodMultiple(_ => new[] { new Bar(), new Bar() });
+
+            Initialize();
+
+            var cmd = Container.Resolve<DoSomethingSignal>();
+
+            Assert.IsEqual(Bar.TriggeredCount, 0);
+            Assert.IsEqual(Bar.InstanceCount, 0);
+
+            cmd.Fire();
+
+            Assert.IsEqual(Bar.TriggeredCount, 2);
+            Assert.IsEqual(Bar.InstanceCount, 2);
+
+            cmd.Fire();
+
+            Assert.IsEqual(Bar.TriggeredCount, 4);
+            Assert.IsEqual(Bar.InstanceCount, 4);
+        }
+
+        [Test]
+        public void TestFromMethodMultipleEmpty()
+        {
+            Bar.TriggeredCount = 0;
+            Bar.InstanceCount = 0;
+
+            Container.DeclareSignal<DoSomethingSignal>();
+            Container.BindSignal<DoSomethingSignal>()
+                .To<Bar>(x => x.Execute).FromMethodMultiple(_ => new Bar[] {});
+
+            Initialize();
+
+            var signal = Container.Resolve<DoSomethingSignal>();
+
+            Assert.Throws(() => signal.Fire());
+        }
+
+        void TestBarHandlerTransient()
+        {
+            var cmd = Container.Resolve<DoSomethingSignal>();
+
+            Assert.IsEqual(Bar.TriggeredCount, 0);
+            Assert.IsEqual(Bar.InstanceCount, 0);
+
+            cmd.Fire();
+
+            Assert.IsEqual(Bar.TriggeredCount, 1);
+            Assert.IsEqual(Bar.InstanceCount, 1);
+
+            cmd.Fire();
+
+            Assert.IsEqual(Bar.InstanceCount, 2);
+            Assert.IsEqual(Bar.TriggeredCount, 2);
+        }
+
+        void TestBarHandlerCached()
+        {
+            var cmd = Container.Resolve<DoSomethingSignal>();
+
+            Assert.IsEqual(Bar.TriggeredCount, 0);
+            Assert.IsEqual(Bar.InstanceCount, 0);
+
+            cmd.Fire();
+
+            Assert.IsEqual(Bar.TriggeredCount, 1);
+            Assert.IsEqual(Bar.InstanceCount, 1);
+
+            cmd.Fire();
+
+            Assert.IsEqual(Bar.InstanceCount, 1);
+            Assert.IsEqual(Bar.TriggeredCount, 2);
+        }
+
         public class DoSomethingSignal : Signal<DoSomethingSignal>
         {
         }
@@ -216,10 +358,10 @@ namespace ZenjectSignalsAndSignals.Tests
 
             public Bar()
             {
-                InstanceCount ++;
+                InstanceCount++;
             }
 
-            public static bool WasTriggered
+            public static int TriggeredCount
             {
                 get;
                 set;
@@ -227,7 +369,7 @@ namespace ZenjectSignalsAndSignals.Tests
 
             public void Execute()
             {
-                WasTriggered = true;
+                TriggeredCount++;
             }
         }
     }

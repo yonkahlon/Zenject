@@ -7,7 +7,7 @@ namespace Zenject.Tests.Installers.ScriptableObjectInstallers
     {
     }
 
-    [CreateAssetMenu(fileName = "FooInstaller", menuName = "Installers/FooInstaller")]
+    //[CreateAssetMenu(fileName = "FooInstaller", menuName = "Installers/FooInstaller")]
     public class FooInstaller : ScriptableObjectInstaller<FooInstaller>
     {
         public override void InstallBindings()

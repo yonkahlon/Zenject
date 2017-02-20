@@ -28,6 +28,84 @@ namespace Zenject.Tests.Factories
         }
 
         [Test]
+        public void TestFromNewScriptableObjectResource()
+        {
+            Container.BindFactory<Bar, Bar.Factory>()
+                .FromNewScriptableObjectResource("TestBindFactory/Bar");
+
+            Initialize();
+
+            var factory = Container.Resolve<Bar.Factory>();
+            var bar = factory.Create();
+            Assert.IsNotNull(bar);
+            Assert.IsNotEqual(bar, factory.Create());
+        }
+
+        [Test]
+        public void TestFromComponentInHierarchy()
+        {
+            var foo = new GameObject().AddComponent<Foo>();
+
+            Container.BindFactory<Foo, Foo.Factory>().FromComponentInHierarchy();
+
+            Initialize();
+
+            var factory = Container.Resolve<Foo.Factory>();
+            var foo2 = factory.Create();
+            Assert.IsNotNull(foo2);
+            Assert.IsEqual(foo, foo2);
+            Assert.IsEqual(foo, factory.Create());
+        }
+
+        [Test]
+        public void TestFromComponentInHierarchyErrors()
+        {
+            Container.BindFactory<Foo, Foo.Factory>().FromComponentInHierarchy();
+
+            Initialize();
+
+            var factory = Container.Resolve<Foo.Factory>();
+
+            // zero matches
+            Assert.Throws(() => factory.Create());
+
+            new GameObject().AddComponent<Foo>();
+
+            var foo = factory.Create();
+
+            new GameObject().AddComponent<Foo>();
+
+            // Multiple
+            Assert.Throws(() => factory.Create());
+        }
+
+        [Test]
+        public void TestFromNewComponentOn()
+        {
+            var go = new GameObject();
+
+            Container.BindFactory<Foo, Foo.Factory>().FromNewComponentOn(go);
+
+            Initialize();
+
+            var factory = Container.Resolve<Foo.Factory>();
+
+            Assert.IsNull(go.GetComponent<Foo>());
+            var foo = factory.Create();
+            Assert.IsNotNull(go.GetComponent<Foo>());
+            Assert.IsEqual(go.GetComponent<Foo>(), foo);
+
+            var foo2 = factory.Create();
+
+            Assert.IsNotEqual(foo2, foo);
+
+            var allFoos = go.GetComponents<Foo>();
+            Assert.IsEqual(allFoos.Length, 2);
+            Assert.IsEqual(allFoos[0], foo);
+            Assert.IsEqual(allFoos[1], foo2);
+        }
+
+        [Test]
         public void TestFromNewComponentOnNewGameObject()
         {
             Container.BindFactory<Foo, Foo.Factory>().FromNewComponentOnNewGameObject();
