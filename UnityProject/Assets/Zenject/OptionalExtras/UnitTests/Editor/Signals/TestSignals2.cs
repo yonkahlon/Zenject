@@ -49,6 +49,32 @@ namespace ZenjectSignalsAndSignals.Tests
         }
 
         [Test]
+        [ValidateOnly]
+        [ExpectedException]
+        public void TestValidationFailure()
+        {
+            Container.Bind<Qux>().AsSingle();
+            Container.DeclareSignal<DoSomethingSignal>();
+            Container.BindSignal<DoSomethingSignal>()
+                .To<Bar>(x => x.Execute).FromResolve();
+
+            Initialize();
+        }
+
+        [Test]
+        [ValidateOnly]
+        public void TestValidationSuccess()
+        {
+            Container.Bind<Qux>().AsSingle();
+            Container.Bind<Bar>().AsSingle();
+            Container.DeclareSignal<DoSomethingSignal>();
+            Container.BindSignal<DoSomethingSignal>()
+                .To<Bar>(x => x.Execute).FromResolve();
+
+            Initialize();
+        }
+
+        [Test]
         public void TestToCached1()
         {
             Bar.TriggeredCount = 0;
@@ -350,6 +376,13 @@ namespace ZenjectSignalsAndSignals.Tests
 
         public class DoSomethingSignal : Signal<DoSomethingSignal>
         {
+        }
+
+        public class Qux
+        {
+            public Qux(Bar bar)
+            {
+            }
         }
 
         public class Bar

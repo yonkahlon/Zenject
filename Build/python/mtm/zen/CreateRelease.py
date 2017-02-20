@@ -97,7 +97,6 @@ class Runner:
 
         self._log.info('Copying Zenject dlls')
         self._sys.copyFile('{0}/Zenject.dll'.format(binDir), '{0}/Zenject.dll'.format(tempDir))
-        self._sys.copyFile('{0}/Zenject.Signals.dll'.format(binDir), '{0}/Zenject.Signals.dll'.format(tempDir))
 
         self._zipHelper.createZipFile(tempDir, zipPath)
 
@@ -129,7 +128,6 @@ class Runner:
             self._sys.removeFile('[ZenTempDir]/OptionalExtras/AutoMocking.meta')
 
             self._sys.removeFile('[ZenTempDir]/Source/Zenject.csproj')
-            self._sys.removeFile('[ZenTempDir]/OptionalExtras/Signals/Zenject.Signals.csproj')
 
             if not includeSample:
                 self._sys.deleteDirectory('[ZenTempDir]/OptionalExtras/SampleGame1 (Beginner)')

@@ -20,6 +20,11 @@ namespace Zenject
             _lookupContext = lookupContext;
         }
 
+        public override void Validate()
+        {
+            _lookupContext.Container.ResolveAll(_lookupContext);
+        }
+
         public override void Execute(object[] args)
         {
             foreach (var match in _lookupContext.Container.ResolveAll(_lookupContext))
