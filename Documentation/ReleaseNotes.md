@@ -34,6 +34,9 @@ Changes
 - Removed support for passing arguments to InjectGameObject and InstantiatePrefab methods (issue #125)
 - Removed UnityEventManager since it isn't core to keep things lightweight
 - Renamed the Resolve overload that included an ID to ResolveId to avoid the ambiguity with the non generic version of Resolve
+- Signals package received significant changes
+    - The order of generic arguments to the Signal<> base class was changed to have parameters first to be consistent with everything else
+    - The functionality of commands was merged into signals
 - Renamed the following construction methods.  This was motivated by the fact that with the new construction methods it's unclear which ones are "look ups" versus creating new instances
     - FromComponent => FromNewComponentOn
     - FromSiblingComponent => FromNewComponentSibling 
