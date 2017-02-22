@@ -803,7 +803,7 @@ public class FooInstaller : MonoInstaller
 
 You add bindings by overriding the InstallBindings method, which is called by whatever `Context` the installer has been added to (usually this is `SceneContext`).  MonoInstaller is a MonoBehaviour so you can add FooInstaller by attaching it to a GameObject.  Since it is a GameObject you can also add public members to it to configure your installer from the Unity inspector.  This allows you to add references within the scene, references to assets, or simply tuning data (see <a href="#using-the-unity-inspector-to-configure-settings">here</a> for more information on tuning data).
 
-Note that in order for your installer to be triggered it must be attached to the Installers property of the `SceneContext` object.  The installers are executed in the order given to `SceneContext` however this order should not usually matter (since nothing should be instantiated during the install process)
+Note that in order for your installer to be triggered it must be attached to the Installers property of the `SceneContext` object.  Installers in the order given to `SceneContext` (with scriptable object installers first, then mono installers, then prefab installers) however this order should not usually matter (since nothing should be instantiated during the install process).
 
 In many cases you want to have your installer derive from MonoInstaller, so that you can have inspector settings.  There is also another base class called simply `Installer` which you can use in cases where you do not need it to be a MonoBehaviour.
 
