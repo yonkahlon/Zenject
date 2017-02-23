@@ -93,7 +93,7 @@ namespace Zenject
             // immediately - but only when the GameObjectContext is created dynamically.  For any
             // GameObjectContext's that are placed in the scene, we still want to execute
             // IInitializable.Initialize during Start()
-            if (gameObject.scene.isLoaded)
+            if (gameObject.scene.isLoaded && !_container.IsValidating)
             {
                 _kernel = _container.Resolve<MonoKernel>();
                 _kernel.ForceInitialize();
