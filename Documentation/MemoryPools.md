@@ -139,7 +139,7 @@ public class Foo
 The full format of the binding is the following:
 
 <pre>
-Container.BindMemoryPool&lt;<b>Param1Type, Param2Type, etc..., ObjectType, MemoryPoolType</b>&gt;()
+Container.BindMemoryPool&lt;<b>ObjectType, MemoryPoolType</b>&gt;()
     .With<b>(InitialSize|FixedSize)</b>()
     .ExpandBy<b>(OneAtATime|Doubling)</b>()
     .To&lt;<b>ResultType</b>&gt;()
