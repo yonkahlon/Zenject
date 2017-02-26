@@ -1900,6 +1900,11 @@ namespace Zenject
                 bindInfo, factoryBindInfo, poolBindInfo);
         }
 
+        public MemoryPoolInitialSizeBinder<TContract> BindMemoryPool<TContract>()
+        {
+            return BindMemoryPool<TContract, MemoryPool<TContract>>();
+        }
+
         public MemoryPoolInitialSizeBinder<TContract> BindMemoryPool<TContract, TFactory>()
             where TFactory : IMemoryPool
         {
