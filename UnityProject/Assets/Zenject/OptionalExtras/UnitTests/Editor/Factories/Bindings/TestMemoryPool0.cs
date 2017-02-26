@@ -63,6 +63,54 @@ namespace Zenject.Tests.Bindings
         }
 
         [Test]
+        public void TestFactoryPropertiesDefault()
+        {
+            Container.BindMemoryPool<Foo>();
+
+            var factory = Container.Resolve<MemoryPool<Foo>>();
+
+            Assert.IsEqual(factory.NumActive, 0);
+            Assert.IsEqual(factory.NumTotal, 0);
+            Assert.IsEqual(factory.NumInactive, 0);
+
+            var foo = factory.Spawn();
+
+            Assert.IsEqual(factory.NumActive, 1);
+            Assert.IsEqual(factory.NumTotal, 1);
+            Assert.IsEqual(factory.NumInactive, 0);
+
+            factory.Despawn(foo);
+
+            Assert.IsEqual(factory.NumActive, 0);
+            Assert.IsEqual(factory.NumTotal, 1);
+            Assert.IsEqual(factory.NumInactive, 1);
+
+            foo = factory.Spawn();
+
+            Assert.IsEqual(factory.NumActive, 1);
+            Assert.IsEqual(factory.NumTotal, 1);
+            Assert.IsEqual(factory.NumInactive, 0);
+
+            var foo2 = factory.Spawn();
+
+            Assert.IsEqual(factory.NumActive, 2);
+            Assert.IsEqual(factory.NumTotal, 2);
+            Assert.IsEqual(factory.NumInactive, 0);
+
+            factory.Despawn(foo);
+
+            Assert.IsEqual(factory.NumActive, 1);
+            Assert.IsEqual(factory.NumTotal, 2);
+            Assert.IsEqual(factory.NumInactive, 1);
+
+            factory.Despawn(foo2);
+
+            Assert.IsEqual(factory.NumActive, 0);
+            Assert.IsEqual(factory.NumTotal, 2);
+            Assert.IsEqual(factory.NumInactive, 2);
+        }
+
+        [Test]
         public void TestExpandDouble()
         {
             Container.BindMemoryPool<Foo, Foo.Pool>().ExpandByDoubling();
