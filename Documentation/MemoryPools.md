@@ -494,3 +494,27 @@ public class TestInstaller : MonoInstaller<TestInstaller>
 
 We might also want to add a Reset() method to the IFoo interface as well here, and call that on Reinitialize()
 
+### <a id="instantiating-directory"></a>Instantiating Memory Pools Directly
+
+For complex scenarios involing custom factories, it might be desirable to directly instantiate memory pools.  In this case, you just have to make sure to provide an IFactory<> derived class to be used for creating new instances and all the settings information that would normally be provided via the bind statements.  For example:
+
+```csharp
+public class BarFactory : IFactory<Bar>
+{
+    public Bar Create()
+    {
+        ...
+        [Custom creation logic]
+        ...
+    }
+}
+
+var settings = new MemoryPoolSettings()
+{
+    InitialSize = 1,
+    ExpandMethod = PoolExpandMethods.Double,
+};
+
+var pool = _container.Instantiate<MemoryPool<Bar>>(
+    new object[] { settings, new MyBarFactory<Bar>() });
+```
