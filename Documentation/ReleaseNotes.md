@@ -1,7 +1,21 @@
 
 ## <a id="release-notes"></a>Release Notes
 
-###5.1 (February 15, 2017)
+###5.0.2 (March 5, 2017)
+
+- Fixed to allow parameterized tests using double parameters in ZenjectIntegrationTestFixtures
+- Added another overload to BindMemoryPool to allow creating them directly without creating an empty subclass
+- Changed memory pools to take an IFactory<> instead of a provider so that they can be instantiated directly by anyone that wants to do some custom stuff with it without needing to use BindMemoryPool
+- Bug fix to validation for game object contexts
+- Fixed script execution order to ensure that tickables, initializables, etc. are executed before MonoBehaviours in the scene (this is how it was in older versions)
+- Changed to call IInitializable.Initialize immediately for GameObjextContext prefabs that are created dynamically. This is nice because otherwise, when you create a GameObjectContext via a factory, you can't use it immediately Unity waits until the end of the frame to call Start() to trigger Initialize
+- Changed to use a runtime check inside profiler blocks to allow creating unit tests outside unity
+- Fixed signals to validate properly
+- Renamed FromScriptableObjectResource to FromNewScriptableObjectResource for consistency.
+- Added a few missing factory bindings (FromComponentInHierarchy and FromNewScriptableObjectResource)
+- Fixed signal installer bindings to work properly with AsTransient and multi-bindings
+
+###5.0.1 (February 15, 2017)
 
 - Hotfix.  Signal UniRx integration was completely broken
 
