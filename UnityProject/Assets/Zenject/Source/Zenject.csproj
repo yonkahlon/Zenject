@@ -75,6 +75,7 @@
     <Compile Include="Binding\BindInfo\GameObjectCreationParameters.cs" />
     <Compile Include="Binding\BindInfo\MemoryPoolBindInfo.cs" />
     <Compile Include="Binding\Finalizers\NullBindingFinalizer.cs" />
+    <Compile Include="Factories\FactoryProviderWrapper.cs" />
     <Compile Include="Factories\PlaceholderFactory.cs" />
     <Compile Include="Factories\Pooling\IMemoryPool.cs" />
     <Compile Include="Factories\Pooling\MemoryPool.cs" />
