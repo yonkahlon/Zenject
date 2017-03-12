@@ -174,7 +174,9 @@ public class TestInstaller : MonoInstaller
 
 The dynamic parameters that are provided to the Enemy constructor are declared by using generic arguments to the Factory<> base class of Enemy.Factory.  This will add a method to Enemy.Factory that takes the parameters with the given types, which is called by EnemySpawner.
 
-Note: You can have multiple parameters declared with the same type.  In this case, they will be injected in the same order that they are declared in your class.
+Note: You can have multiple parameters declared with the same type.  In this case, the order that the values are given to the factory will match the parameter order - assuming that you are using constructor or method injection.  However, if you are using field or property injection, then the order that values are injected is not guaranteed to follow the declaration order, since these fields are retrieved using Type.GetFields which does not guarantee order as described <a href="https://msdn.microsoft.com/en-us/library/ch9714z3.aspx">here</a>
+
+In this case, they will be injected in the same order that they are declared in your class.  In the case of constructor/inject-method parameters, this will be the order the parameters are given in, or in the case of fields the order will be from top to bottom that they are declared in.  Constructor parameters are processed first, then fields, then properties, then inject methods.
 
 There is no requirement that the `Enemy.Factory` class be a nested class within Enemy, however we have found this to be a very useful convention.  `Enemy.Factory` is always intentionally left empty and simply derives from the built-in Zenject `Factory<>` class, which handles the work of using the DiContainer to construct a new instance of Enemy.
 
