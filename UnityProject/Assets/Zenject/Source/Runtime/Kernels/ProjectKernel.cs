@@ -57,17 +57,6 @@ namespace Zenject
                     GameObject.Destroy(sceneContext.gameObject);
                 }
             }
-
-            if (immediate)
-            {
-                Assert.That(!IsDestroyed);
-                GameObject.DestroyImmediate(this.gameObject);
-                Assert.That(IsDestroyed);
-            }
-            else
-            {
-                GameObject.Destroy(this.gameObject);
-            }
         }
     }
 }
