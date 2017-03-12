@@ -174,6 +174,8 @@ public class TestInstaller : MonoInstaller
 
 The dynamic parameters that are provided to the Enemy constructor are declared by using generic arguments to the Factory<> base class of Enemy.Factory.  This will add a method to Enemy.Factory that takes the parameters with the given types, which is called by EnemySpawner.
 
+Note: You can have multiple parameters declared with the same type.  In this case, they will be injected in the same order that they are declared in your class.
+
 There is no requirement that the `Enemy.Factory` class be a nested class within Enemy, however we have found this to be a very useful convention.  `Enemy.Factory` is always intentionally left empty and simply derives from the built-in Zenject `Factory<>` class, which handles the work of using the DiContainer to construct a new instance of Enemy.
 
 The reason that we don't use the `Factory<Enemy>` class directly is because this can become error prone when adding/removing parameters and also can get verbose since the parameter types must be declared whenever you refer to this class.  This is error prone because if for example you add a parameter to enemy and change the factory from `Factory<Enemy>` to `Factory<float, Enemy>`, any references to `Factory<Enemy>` will not be resolved.  And this will not be caught at compile time and instead will only be seen during validation or runtime.  So we recommend always using an empty class that derives from `Factory<>` instead.
