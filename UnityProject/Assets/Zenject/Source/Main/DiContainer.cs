@@ -630,6 +630,11 @@ namespace Zenject
 
             if (instances.IsEmpty())
             {
+                if (context.Optional)
+                {
+                    return context.FallBackValue;
+                }
+
                 throw Assert.CreateException("Provider returned zero instances when one was expected!  While resolving type '{0}'{1}. \nObject graph:\n{2}",
                     context.MemberType.ToString() + (context.Identifier == null ? "" : " with ID '{0}'".Fmt(context.Identifier.ToString())),
                     (context.ObjectType == null ? "" : " while building object with type '{0}'".Fmt(context.ObjectType)),
@@ -1447,7 +1452,7 @@ namespace Zenject
                 }
             }
 
-            var matches = gameObject.GetComponentsInChildren(componentType);
+            var matches = gameObject.GetComponentsInChildren(componentType, true);
 
             Assert.That(!matches.IsEmpty(),
                 "Expected to find component with type '{0}' when injecting into game object '{1}'", componentType, gameObject.name);
