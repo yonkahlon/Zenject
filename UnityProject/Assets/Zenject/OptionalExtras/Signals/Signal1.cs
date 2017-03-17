@@ -13,6 +13,8 @@ namespace Zenject
     public interface ISignal<TParam1> : ISignalBase
     {
         void Fire(TParam1 p1);
+        void Listen(Action<TParam1> listener);
+        void Unlisten(Action<TParam1> listener);
     }
 
     public abstract class Signal<TParam1, TDerived> : SignalBase, ISignal<TParam1>
