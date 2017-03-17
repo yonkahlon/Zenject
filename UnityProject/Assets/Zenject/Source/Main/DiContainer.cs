@@ -1884,36 +1884,36 @@ namespace Zenject
             return BindFactoryInternal<TContract, TFactory, TFactory>();
         }
 
-        MemoryPoolInitialSizeBinder<TContract> BindMemoryPoolInternal<TContract, TFactoryContract, TFactoryConcrete>()
-            where TFactoryConcrete : TFactoryContract, IMemoryPool
-            where TFactoryContract : IMemoryPool
+        public MemoryPoolInitialSizeBinder<TItemContract> BindMemoryPool<TItemContract>()
         {
-            var bindInfo = new BindInfo(typeof(TFactoryContract));
+            return BindMemoryPool<TItemContract, MemoryPool<TItemContract>>();
+        }
+
+        public MemoryPoolInitialSizeBinder<TItemContract> BindMemoryPool<TItemContract, TPool>()
+            where TPool : IMemoryPool
+        {
+            return BindMemoryPool<TItemContract, TPool, TPool>();
+        }
+
+        public MemoryPoolInitialSizeBinder<TItemContract> BindMemoryPool<TItemContract, TPoolConcrete, TPoolContract>()
+            where TPoolConcrete : TPoolContract, IMemoryPool
+            where TPoolContract : IMemoryPool
+        {
+            var bindInfo = new BindInfo(typeof(TPoolContract));
 
             // This interface is used in the optional class PoolCleanupChecker
             // And also allow people to manually call DespawnAll() for all IMemoryPool
             // if they want
             bindInfo.ContractTypes.Add(typeof(IMemoryPool));
 
-            var factoryBindInfo = new FactoryBindInfo(typeof(TFactoryConcrete));
+            var factoryBindInfo = new FactoryBindInfo(typeof(TPoolConcrete));
             var poolBindInfo = new MemoryPoolBindInfo();
 
-            StartBinding().SubFinalizer = new MemoryPoolBindingFinalizer<TContract>(
+            StartBinding().SubFinalizer = new MemoryPoolBindingFinalizer<TItemContract>(
                 bindInfo, factoryBindInfo, poolBindInfo);
 
-            return new MemoryPoolInitialSizeBinder<TContract>(
+            return new MemoryPoolInitialSizeBinder<TItemContract>(
                 bindInfo, factoryBindInfo, poolBindInfo);
-        }
-
-        public MemoryPoolInitialSizeBinder<TContract> BindMemoryPool<TContract>()
-        {
-            return BindMemoryPool<TContract, MemoryPool<TContract>>();
-        }
-
-        public MemoryPoolInitialSizeBinder<TContract> BindMemoryPool<TContract, TFactory>()
-            where TFactory : IMemoryPool
-        {
-            return BindMemoryPoolInternal<TContract, TFactory, TFactory>();
         }
 
         FactoryToChoiceIdBinder<TParam1, TContract> BindFactoryInternal<TParam1, TContract, TFactoryContract, TFactoryConcrete>()
@@ -2252,3 +2252,4 @@ namespace Zenject
         }
     }
 }
+
