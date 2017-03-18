@@ -1237,7 +1237,7 @@ Please feel free to submit any other sources of confusion to sfvermeulen@gmail.c
 
 ## <a id="game-object-bind-methods"></a>Game Object Bind Methods
 
-For bindings that create new game objects (eg. FromComponentInNewPrefab or FromGameObject) there are also two extra bind methods.
+For bindings that create new game objects (eg. FromComponentInNewPrefab or FromNewComponentOnNewGameObject) there are also two extra bind methods.
 
 * **WithGameObjectName** = The name to give the new Game Object associated with this binding.
 
@@ -2609,7 +2609,7 @@ Something else to note is that the rate at which the ITickable.Tick method gets 
             public override void InstallBindings()
             {
                 Container.Bind<IInitializable>().To<Foo>().AsSingle();
-                Container.Bind<AsyncProcessor>().FromGameObject().AsSingle();
+                Container.Bind<AsyncProcessor>().FromNewComponentOnNewGameObject().AsSingle();
             }
         }
 
