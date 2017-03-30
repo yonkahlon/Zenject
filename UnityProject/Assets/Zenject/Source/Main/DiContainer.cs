@@ -973,7 +973,20 @@ namespace Zenject
 
                     if (!isDryRun)
                     {
-                        method.MethodInfo.Invoke(injectable, paramValues.ToArray());
+						//Handle IEnumerators (Coroutines) as a special case by calling StartCoroutine() instead of invoking directly.
+	                    if (method.MethodInfo.ReturnType == typeof(IEnumerator)) {
+							var injectableAsMonoBehaviour = injectable as MonoBehaviour;
+
+		                    if (injectableAsMonoBehaviour == null)
+			                    throw Assert.CreateException(
+			                                                 "Can't inject IEnumerator method '{0}' on '{1}'. '{1}' is not a MonoBehaviour.",
+															 method.MethodInfo.Name, method.MethodInfo.DeclaringType);
+
+							var result = method.MethodInfo.Invoke(injectable, paramValues.ToArray()) as IEnumerator;
+		                    injectableAsMonoBehaviour.StartCoroutine(result);
+	                    } else {
+		                    method.MethodInfo.Invoke(injectable, paramValues.ToArray());
+	                    }
                     }
                 }
             }
