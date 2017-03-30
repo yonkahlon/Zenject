@@ -975,15 +975,7 @@ namespace Zenject
                     {
 						//Handle IEnumerators (Coroutines) as a special case by calling StartCoroutine() instead of invoking directly.
 	                    if (method.MethodInfo.ReturnType == typeof(IEnumerator)) {
-							var injectableAsMonoBehaviour = injectable as MonoBehaviour;
-
-		                    if (injectableAsMonoBehaviour == null)
-			                    throw Assert.CreateException(
-			                                                 "Can't inject IEnumerator method '{0}' on '{1}'. '{1}' is not a MonoBehaviour.",
-															 method.MethodInfo.Name, method.MethodInfo.DeclaringType);
-
-							var result = method.MethodInfo.Invoke(injectable, paramValues.ToArray()) as IEnumerator;
-		                    injectableAsMonoBehaviour.StartCoroutine(result);
+							StartCoroutine(injectable, method, paramValues);
 	                    } else {
 		                    method.MethodInfo.Invoke(injectable, paramValues.ToArray());
 	                    }
@@ -998,6 +990,30 @@ namespace Zenject
                     injectableType, String.Join(",", args.ExtraArgs.Select(x => x.Type.Name()).ToArray()), args.Context.GetObjectGraphString());
             }
         }
+
+	    private static void StartCoroutine( object injectable, PostInjectableInfo method, List<object> paramValues ) {
+		    var startCoroutineOn = injectable as MonoBehaviour;
+
+			//If the injectable isn't a MonoBehaviour, then start the coroutine on ProjectContext or on SceneContext.
+			if (startCoroutineOn == null) {
+			    if (ProjectContext.HasInstance) {
+				    startCoroutineOn = ProjectContext.Instance;
+			    } else {
+				    foreach (var sceneContext in ZenUtilInternal.GetAllSceneContexts()) {
+					    startCoroutineOn = sceneContext;
+					    break;
+				    }
+			    }
+		    }
+
+		    if (startCoroutineOn == null)
+			    throw Assert.CreateException("Unable to find a suitable MonoBehaviour to start the '{0}.{1}' coroutine on.",
+							method.MethodInfo.DeclaringType, method.MethodInfo.Name);
+
+		    var result = method.MethodInfo.Invoke(injectable, paramValues.ToArray()) as IEnumerator;
+
+		    startCoroutineOn.StartCoroutine(result);
+	    }
 
 #if !NOT_UNITY3D
 
