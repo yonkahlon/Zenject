@@ -27,6 +27,11 @@ namespace Zenject
             get { return _sceneContext.Container; }
         }
 
+        protected SceneContext SceneContext
+        {
+            get { return _sceneContext; }
+        }
+
         [SetUp]
         public virtual void SetUp()
         {
