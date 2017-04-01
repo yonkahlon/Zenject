@@ -973,12 +973,15 @@ namespace Zenject
 
                     if (!isDryRun)
                     {
-						//Handle IEnumerators (Coroutines) as a special case by calling StartCoroutine() instead of invoking directly.
-	                    if (method.MethodInfo.ReturnType == typeof(IEnumerator)) {
-							StartCoroutine(injectable, method, paramValues);
-	                    } else {
-		                    method.MethodInfo.Invoke(injectable, paramValues.ToArray());
-	                    }
+                        // Handle IEnumerators (Coroutines) as a special case by calling StartCoroutine() instead of invoking directly.
+                        if (method.MethodInfo.ReturnType == typeof(IEnumerator))
+                        {
+                            StartCoroutine(injectable, method, paramValues);
+                        }
+                        else
+                        {
+                            method.MethodInfo.Invoke(injectable, paramValues.ToArray());
+                        }
                     }
                 }
             }
@@ -991,29 +994,28 @@ namespace Zenject
             }
         }
 
-	    private static void StartCoroutine( object injectable, PostInjectableInfo method, List<object> paramValues ) {
-		    var startCoroutineOn = injectable as MonoBehaviour;
+        static void StartCoroutine(object injectable, PostInjectableInfo method, List<object> paramValues)
+        {
+            var startCoroutineOn = injectable as MonoBehaviour;
 
-			//If the injectable isn't a MonoBehaviour, then start the coroutine on ProjectContext or on SceneContext.
-			if (startCoroutineOn == null) {
-			    if (ProjectContext.HasInstance) {
-				    startCoroutineOn = ProjectContext.Instance;
-			    } else {
-				    foreach (var sceneContext in ZenUtilInternal.GetAllSceneContexts()) {
-					    startCoroutineOn = sceneContext;
-					    break;
-				    }
-			    }
-		    }
+            // If the injectable isn't a MonoBehaviour, then start the coroutine on the context associated
+            // with this container
+            if (startCoroutineOn == null)
+            {
+                startCoroutineOn = TryResolve<Context>();
+            }
 
-		    if (startCoroutineOn == null)
-			    throw Assert.CreateException("Unable to find a suitable MonoBehaviour to start the '{0}.{1}' coroutine on.",
-							method.MethodInfo.DeclaringType, method.MethodInfo.Name);
+            if (startCoroutineOn == null)
+            {
+                throw Assert.CreateException(
+                    "Unable to find a suitable MonoBehaviour to start the '{0}.{1}' coroutine on.",
+                    method.MethodInfo.DeclaringType, method.MethodInfo.Name);
+            }
 
-		    var result = method.MethodInfo.Invoke(injectable, paramValues.ToArray()) as IEnumerator;
+            var result = method.MethodInfo.Invoke(injectable, paramValues.ToArray()) as IEnumerator;
 
-		    startCoroutineOn.StartCoroutine(result);
-	    }
+            startCoroutineOn.StartCoroutine(result);
+        }
 
 #if !NOT_UNITY3D
 

@@ -386,6 +386,8 @@ Note that the dependencies that you receive via inject methods should themselves
 
 Using [Inject] methods to inject dependencies is the recommended approach for MonoBehaviours, since MonoBehaviours cannot have constructors.
 
+Also note that you can define your inject methods to have return type IEnumerator.  In this case, they will be started as a coroutine.  In the case where the object is a MonoBehaviour, it will be started as a coroutine on itself, and otherwise it will use the "Context" MonoBehaviour that the object is in (that is, either ProjectContext, SceneContext or GameObjectContext)
+
 **Recommendations**
 
 Best practice is to prefer constructor injection or method injection to field or property injection.
