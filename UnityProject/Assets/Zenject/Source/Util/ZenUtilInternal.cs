@@ -36,6 +36,34 @@ namespace Zenject.Internal
             return left.Target == right.Target && left.Method() == right.Method();
         }
 
+        // Taken from here:
+        // http://stackoverflow.com/questions/28937324/in-c-how-could-i-get-a-classs-inheritance-distance-to-base-class/28937542#28937542
+        public static int GetInheritanceDelta(Type derived, Type parent)
+        {
+            Assert.That(derived.DerivesFromOrEqual(parent));
+
+            if (parent.IsInterface)
+            {
+                // Not sure if we can calculate this so just return 1
+                return 1;
+            }
+
+            if (derived == parent)
+            {
+                return 0;
+            }
+
+            int distance = 1;
+            Type child = derived;
+
+            while ((child = child.BaseType) != parent)
+            {
+                distance++;
+            }
+
+            return distance;
+        }
+
 #if !NOT_UNITY3D
         public static IEnumerable<SceneContext> GetAllSceneContexts()
         {
