@@ -994,7 +994,7 @@ namespace Zenject
             }
         }
 
-        static void StartCoroutine(object injectable, PostInjectableInfo method, List<object> paramValues)
+        void StartCoroutine(object injectable, PostInjectableInfo method, List<object> paramValues)
         {
             var startCoroutineOn = injectable as MonoBehaviour;
 
