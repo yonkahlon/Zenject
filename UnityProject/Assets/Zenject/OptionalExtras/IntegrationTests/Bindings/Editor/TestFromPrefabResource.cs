@@ -15,13 +15,12 @@ namespace Zenject.Tests.Bindings
         const string PathPrefix = "TestFromPrefabResource/";
 
         [Test]
-        [ExpectedException]
         public void TestTransientError()
         {
             // Validation should detect that it doesn't exist
             Container.Bind<Foo>().FromComponentInNewPrefabResource(PathPrefix + "asdfasdfas").AsTransient().NonLazy();
 
-            Initialize();
+            Assert.Throws(() => Initialize());
         }
 
         [Test]
@@ -94,13 +93,12 @@ namespace Zenject.Tests.Bindings
         }
 
         [Test]
-        [ExpectedException]
         public void TestWithArgumentsFail()
         {
             // They have required arguments
             Container.Bind(typeof(Gorp), typeof(Qux)).FromComponentInNewPrefabResource(PathPrefix + "GorpAndQux").AsCached().NonLazy();
 
-            Initialize();
+            Assert.Throws(() => Initialize());
         }
 
         [Test]

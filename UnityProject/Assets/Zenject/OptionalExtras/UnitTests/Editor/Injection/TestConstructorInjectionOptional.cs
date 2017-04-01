@@ -45,14 +45,11 @@ namespace Zenject.Tests.Injection
         }
 
         [Test]
-        [ExpectedException]
         public void TestCase2()
         {
             Container.Bind<Test3>().AsSingle();
 
-            var test1 = Container.Instantiate<Test3>();
-
-            Assert.That(test1.val == null);
+            Assert.Throws(() => Container.Instantiate<Test3>());
         }
 
         [Test]

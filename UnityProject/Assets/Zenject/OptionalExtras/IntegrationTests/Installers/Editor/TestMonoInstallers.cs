@@ -13,10 +13,9 @@ namespace Zenject.Tests.Installers
     public class TestMonoInstallers : ZenjectIntegrationTestFixture
     {
         [Test]
-        [ExpectedException]
         public void TestBadResourcePath()
         {
-            FooInstaller.InstallFromResource("TestMonoInstallers/SDFSDFSDF", Container);
+            Assert.Throws(() => FooInstaller.InstallFromResource("TestMonoInstallers/SDFSDFSDF", Container));
             Initialize();
         }
 

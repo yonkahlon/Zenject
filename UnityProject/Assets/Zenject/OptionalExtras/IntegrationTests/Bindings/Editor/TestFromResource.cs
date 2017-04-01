@@ -58,13 +58,12 @@ namespace Zenject.Tests.Bindings
         }
 
         [Test]
-        [ExpectedException]
         public void TestSingleWithError()
         {
             Container.Bind<Texture>().FromResource(ResourcePath).AsSingle();
             Container.Bind<Texture>().FromResource(ResourcePath2).AsSingle();
 
-            Container.Bind<Runner>().FromNewComponentOnNewGameObject().AsSingle().WithArguments(2).NonLazy();
+            Assert.Throws(() => Container.FlushBindings());
 
             Initialize();
         }

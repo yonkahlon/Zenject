@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
+using NUnit.Framework.Interfaces;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using ModestTree;
@@ -74,14 +75,9 @@ namespace Zenject
         [TearDown]
         public void TearDown()
         {
-            if (TestContext.CurrentContext.Result.Status == TestStatus.Passed)
+            if (TestContext.CurrentContext.Result.Outcome == ResultState.Success)
             {
-                // If we expected an exception then initialize would normally not be called
-                // Unless the initialize method itself is what caused the exception
-                if (!CurrentTestHasAttribute<ExpectedExceptionAttribute>())
-                {
-                    Assert.That(_hasStarted, "ZenjectIntegrationTestFixture.Initialize was not called by current test");
-                }
+                Assert.That(_hasStarted, "ZenjectIntegrationTestFixture.Initialize was not called by current test");
             }
 
             ClearScene();

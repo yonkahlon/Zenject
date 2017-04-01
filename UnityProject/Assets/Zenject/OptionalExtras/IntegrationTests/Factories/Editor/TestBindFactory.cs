@@ -189,10 +189,9 @@ namespace Zenject.Tests.Factories
         }
 
         [Test]
-        [ExpectedException]
         public void TestFromNewComponentOnSelfFail()
         {
-            Container.BindFactory<Foo2, Foo2.Factory>().FromNewComponentOn((GameObject)null);
+            Assert.Throws(() => Container.BindFactory<Foo2, Foo2.Factory>().FromNewComponentOn((GameObject)null));
 
             Initialize();
         }
@@ -240,7 +239,6 @@ namespace Zenject.Tests.Factories
         }
 
         [Test]
-        [ExpectedException]
         public void TestToPrefabSelfFail()
         {
             // Foo3 is not on the prefab
@@ -248,7 +246,7 @@ namespace Zenject.Tests.Factories
 
             Initialize();
 
-            FixtureUtil.CallFactoryCreateMethod<Foo3, Foo3.Factory>(Container);
+            Assert.Throws(() => FixtureUtil.CallFactoryCreateMethod<Foo3, Foo3.Factory>(Container));
         }
 
         [Test]

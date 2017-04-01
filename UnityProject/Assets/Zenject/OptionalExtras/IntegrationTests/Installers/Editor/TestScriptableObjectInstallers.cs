@@ -13,10 +13,9 @@ namespace Zenject.Tests.Installers
     public class TestScriptableObjectInstallers : ZenjectIntegrationTestFixture
     {
         [Test]
-        [ExpectedException]
         public void TestBadResourcePath()
         {
-            FooInstaller.InstallFromResource("TestScriptableObjectInstallers/SDFSDFSDF", Container);
+            Assert.Throws(() => FooInstaller.InstallFromResource("TestScriptableObjectInstallers/SDFSDFSDF", Container));
             Initialize();
         }
 

@@ -16,13 +16,12 @@ namespace Zenject.Tests.Bindings
         const string FooResourcePath = PathPrefix + "FooSubContainer";
 
         [Test]
-        [ExpectedException]
         public void TestTransientError()
         {
             // Validation should detect that it doesn't exist
             Container.Bind<Foo>().FromSubContainerResolve().ByNewPrefabResource(PathPrefix + "asdfasdfas").AsTransient().NonLazy();
 
-            Initialize();
+            Assert.Throws(() => Initialize());
         }
 
         [Test]
@@ -189,12 +188,11 @@ namespace Zenject.Tests.Bindings
         }
 
         [Test]
-        [ExpectedException]
         public void TestSelfIdentifiersFails()
         {
             Container.Bind<Gorp>().FromSubContainerResolve().ByNewPrefabResource(FooResourcePath).AsSingle().NonLazy();
 
-            Initialize();
+            Assert.Throws(() => Initialize());
         }
 
         [Test]

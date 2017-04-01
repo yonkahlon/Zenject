@@ -58,13 +58,12 @@ namespace Zenject.Tests.Bindings
         }
 
         [Test]
-        [ExpectedException]
         public void TestSingleFailure()
         {
             Container.Bind<Foo>().AsSingle().NonLazy();
             Container.Bind<IFoo>().To<Foo>().FromResolve().AsSingle().NonLazy();
 
-            Container.Resolve<IFoo>();
+            Assert.Throws(() => Container.Resolve<IFoo>());
         }
 
         [Test]

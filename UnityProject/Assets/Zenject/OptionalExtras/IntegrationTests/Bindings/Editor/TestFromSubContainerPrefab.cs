@@ -58,13 +58,12 @@ namespace Zenject.Tests.Bindings
 
         [Test]
         [ValidateOnly]
-        [ExpectedException]
         public void TestSelfSingleValidateFails()
         {
             Container.Bind<Foo>().FromSubContainerResolve()
                 .ByNewPrefab(FooPrefab2).AsSingle().NonLazy();
 
-            Initialize();
+            Assert.Throws(() => Initialize());
         }
 
         [Test]
@@ -225,14 +224,11 @@ namespace Zenject.Tests.Bindings
         }
 
         [Test]
-        [ExpectedException]
         public void TestSelfIdentifiersFails()
         {
-            Container.Bind<Gorp>().FromSubContainerResolve().ByNewPrefab(FooPrefab).AsSingle();
+            Container.Bind<Gorp>().FromSubContainerResolve().ByNewPrefab(FooPrefab).AsSingle().NonLazy();
 
-            Container.BindRootResolve<Gorp>();
-
-            Initialize();
+            Assert.Throws(() => Initialize());
         }
 
         [Test]

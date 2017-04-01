@@ -24,13 +24,12 @@ namespace Zenject.Tests.Bindings
         }
 
         [Test]
-        [ExpectedException]
         public void TestSingle()
         {
             Container.Bind<Foo>().FromInstance(new Foo()).AsSingle().NonLazy();
             Container.Bind<Foo>().AsSingle().NonLazy();
 
-            Container.Resolve<Foo>();
+            Assert.Throws(() => Container.FlushBindings());
         }
 
         // There's really no good reason to do this but it is part of the api

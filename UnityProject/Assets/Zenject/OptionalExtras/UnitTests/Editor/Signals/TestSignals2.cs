@@ -50,7 +50,6 @@ namespace ZenjectSignalsAndSignals.Tests
 
         [Test]
         [ValidateOnly]
-        [ExpectedException]
         public void TestValidationFailure()
         {
             Container.Bind<Qux>().AsSingle();
@@ -58,7 +57,7 @@ namespace ZenjectSignalsAndSignals.Tests
             Container.BindSignal<DoSomethingSignal>()
                 .To<Bar>(x => x.Execute).FromResolve();
 
-            Initialize();
+            Assert.Throws(() => Initialize());
         }
 
         [Test]

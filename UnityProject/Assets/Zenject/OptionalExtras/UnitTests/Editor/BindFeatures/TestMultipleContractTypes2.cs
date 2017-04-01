@@ -42,12 +42,11 @@ namespace Zenject.Tests.BindFeatures
         }
 
         [Test]
-        [ExpectedException]
         public void TestInterfaces()
         {
             Container.Bind<IFoo>().AsSingle().NonLazy();
 
-            Container.Resolve<IFoo>();
+            Assert.Throws(() => Container.FlushBindings());
         }
 
         [Test]

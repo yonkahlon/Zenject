@@ -111,24 +111,22 @@ namespace Zenject.Tests.Bindings
         }
 
         [Test]
-        [ExpectedException]
         public void TestWithArgumentsFail()
         {
             // They have required arguments
             Container.Bind(typeof(Gorp), typeof(Qux)).FromComponentInNewPrefab(GorpAndQuxPrefab).AsCached().NonLazy();
 
-            Initialize();
+            Assert.Throws(() => Initialize());
         }
 
         [Test]
-        [ExpectedException]
         public void TestWithArgumentsFail2()
         {
             Container.Bind(typeof(Gorp), typeof(Qux))
                 .FromComponentInNewPrefab(GorpAndQuxPrefab).WithGameObjectName("Gorp").AsCached()
                 .WithArguments(5, "test1").NonLazy();
 
-            Initialize();
+            Assert.Throws(() => Initialize());
         }
 
         [Test]

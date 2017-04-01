@@ -23,13 +23,12 @@ namespace Zenject.Tests.Bindings
         }
 
         [Test]
-        [ExpectedException]
         public void TestInvalidUse()
         {
-            Container.Bind<Qux>().NonLazy();
+            Container.Bind<Qux>().AsSingle().NonLazy();
             Container.Bind<Foo>().FromNewComponentSibling();
 
-            Initialize();
+            Assert.Throws(() => Initialize());
         }
 
         [Test]

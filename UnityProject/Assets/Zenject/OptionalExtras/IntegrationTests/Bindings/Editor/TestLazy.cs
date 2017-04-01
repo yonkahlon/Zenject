@@ -44,11 +44,11 @@ namespace Zenject.Tests.Bindings
 
         [Test]
         [ValidateOnly]
-        [ExpectedException]
         public void Test3()
         {
             Container.Bind<Foo>().AsSingle().NonLazy();
-            Initialize();
+
+            Assert.Throws(() => Initialize());
         }
 
         [Test]

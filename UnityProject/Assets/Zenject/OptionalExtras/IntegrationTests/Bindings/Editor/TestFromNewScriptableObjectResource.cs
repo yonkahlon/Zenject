@@ -15,13 +15,12 @@ namespace Zenject.Tests.Bindings
         const string PathPrefix = "TestFromNewScriptableObjectResource/";
 
         [Test]
-        [ExpectedException]
         public void TestTransientError()
         {
             // Validation should detect that it doesn't exist
             Container.Bind<Foo>().FromNewScriptableObjectResource(PathPrefix + "asdfasdfas").AsTransient().NonLazy();
 
-            Initialize();
+            Assert.Throws(() => Initialize());
         }
 
         [Test]
@@ -71,13 +70,12 @@ namespace Zenject.Tests.Bindings
         }
 
         [Test]
-        [ExpectedException]
         public void TestWithArgumentsFail()
         {
             Container.Bind<Bob>()
                 .FromNewScriptableObjectResource(PathPrefix + "Bob").AsCached().NonLazy();
 
-            Initialize();
+            Assert.Throws(() => Initialize());
         }
 
         [Test]

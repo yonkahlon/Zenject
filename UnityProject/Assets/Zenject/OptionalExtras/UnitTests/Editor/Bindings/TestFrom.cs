@@ -140,19 +140,17 @@ namespace Zenject.Tests.Bindings
         }
 
         [Test]
-        [ExpectedException]
         public void TestMultipleBindingsSingleFail1()
         {
             Container.Bind(typeof(IFoo), typeof(IBar)).AsSingle();
-            Container.Resolve<IFoo>();
+
+            Assert.Throws(() => Container.FlushBindings());
         }
 
         [Test]
-        [ExpectedException]
         public void TestMultipleBindingsSingleFail2()
         {
-            Container.Bind(typeof(IFoo), typeof(IBar)).To<Qux>().AsSingle();
-            Container.Resolve<IFoo>();
+            Assert.Throws(() => Container.Bind(typeof(IFoo), typeof(IBar)).To<Qux>().AsSingle());
         }
 
         [Test]

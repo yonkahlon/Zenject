@@ -43,7 +43,6 @@ namespace Zenject.Tests.BindFeatures
         }
 
         [Test]
-        [ExpectedException]
         public void TestMultiBind2()
         {
             // Multi-binds should not map to single-binds
@@ -51,7 +50,7 @@ namespace Zenject.Tests.BindFeatures
             Container.Bind<Test0>().To<Test4>().AsSingle().NonLazy();
             Container.Bind<Test2>().AsSingle().NonLazy();
 
-            Container.Resolve<Test2>();
+            Assert.Throws(() => Container.Resolve<Test2>());
         }
     }
 }

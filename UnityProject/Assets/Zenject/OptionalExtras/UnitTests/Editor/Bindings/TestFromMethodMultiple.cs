@@ -86,13 +86,12 @@ namespace Zenject.Tests.Bindings
         }
 
         [Test]
-        [ExpectedException]
         public void TestSingleConflict()
         {
             Container.Bind<Foo>().FromMethodMultiple((ctx) => new[] { new Foo() }).AsSingle().NonLazy();
             Container.Bind<Foo>().AsSingle().NonLazy();
 
-            Container.ResolveAll<Foo>();
+            Assert.Throws(() => Container.FlushBindings());
         }
 
         [Test]

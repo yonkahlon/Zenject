@@ -29,13 +29,12 @@ namespace Zenject.Tests.BindFeatures
         }
 
         [Test]
-        [ExpectedException]
         public void TestSingleDifferentArguments()
         {
             Container.Bind<IFoo>().To<Foo>().AsSingle().WithArguments(3);
             Container.Bind<Foo>().AsSingle().WithArguments(2);
 
-            Container.Resolve<IFoo>();
+            Assert.Throws(() => Container.FlushBindings());
         }
 
         [Test]
