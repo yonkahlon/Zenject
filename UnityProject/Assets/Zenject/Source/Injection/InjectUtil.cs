@@ -30,9 +30,7 @@ namespace Zenject
 
         public static TypeValuePair CreateTypePair<T>(T param)
         {
-            // Use the most derived type that we can find here
-            return new TypeValuePair(
-                param == null ? typeof(T) : param.GetType(), param);
+            return new TypeValuePair(typeof(T), param);
         }
 
         public static List<TypeValuePair> CreateArgListExplicit<T>(T param)
