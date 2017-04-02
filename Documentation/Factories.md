@@ -223,6 +223,8 @@ And similarly for FromInstance, FromMethod, FromSubContainerResolve, or any of t
 
 Using FromSubContainerResolve can be particularly useful if your dynamically created object has a lot of its own dependencies.  You can have it behave like a Facade.  See the Subcontainers section for details on nested containers / facades.
 
+Also note that you for dynamically instantiated MonoBehaviours (for example when using FromComponentInNewPrefab with BindFactory) injection should always occur before Awake and Start, so you can use Awake and Start for initialization logic and use the inject method strictly for saving dependencies (ie. similar to constructors for non-monobehaviours)
+
 ## <a id="abstract-factories"></a>Abstract Factories
 
 The above description of factories is great for most cases, however, there are times you do not want to depend directly on a concrete class and instead want your factory to return an interface instead.  This kind of factory is called an Abstract Factory.

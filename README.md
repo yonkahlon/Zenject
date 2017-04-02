@@ -388,6 +388,8 @@ Using [Inject] methods to inject dependencies is the recommended approach for Mo
 
 Also note that you can define your inject methods to have return type IEnumerator.  In this case, they will be started as a coroutine.  In the case where the object is a MonoBehaviour, it will be started as a coroutine on itself, and otherwise it will use the "Context" MonoBehaviour that the object is in (that is, either ProjectContext, SceneContext or GameObjectContext)
 
+Note however that we would recommend minimizing the initialization logic in [Inject] methods however.  You can use Start() or Awake() to have initialization logic instead (this should work for both dynamically instantiated prefabs and objects added to the scene during edit time).
+
 **Recommendations**
 
 Best practice is to prefer constructor injection or method injection to field or property injection.
