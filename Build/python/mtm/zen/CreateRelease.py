@@ -51,7 +51,7 @@ class Runner:
         self._varMgr.set('PythonDir', '[BuildDir]/python')
         self._varMgr.set('TempDir', '[BuildDir]/Temp')
         self._varMgr.set('AssetsDir', '[RootDir]/UnityProject/Assets')
-        self._varMgr.set('ZenjectDir', '[AssetsDir]/Zenject')
+        self._varMgr.set('ZenjectDir', '[AssetsDir]/Plugins/Zenject')
         self._varMgr.set('DistDir', '[BuildDir]/Dist')
         self._varMgr.set('BinDir', '[RootDir]/NonUnityBuild/Bin')
 

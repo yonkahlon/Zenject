@@ -973,12 +973,14 @@ namespace Zenject
 
                     if (!isDryRun)
                     {
+#if !NOT_UNITY3D
                         // Handle IEnumerators (Coroutines) as a special case by calling StartCoroutine() instead of invoking directly.
                         if (method.MethodInfo.ReturnType == typeof(IEnumerator))
                         {
                             StartCoroutine(injectable, method, paramValues);
                         }
                         else
+#endif
                         {
                             method.MethodInfo.Invoke(injectable, paramValues.ToArray());
                         }
@@ -993,6 +995,8 @@ namespace Zenject
                     injectableType, String.Join(",", args.ExtraArgs.Select(x => x.Type.Name()).ToArray()), args.Context.GetObjectGraphString());
             }
         }
+
+#if !NOT_UNITY3D
 
         void StartCoroutine(object injectable, PostInjectableInfo method, List<object> paramValues)
         {
@@ -1016,8 +1020,6 @@ namespace Zenject
 
             startCoroutineOn.StartCoroutine(result);
         }
-
-#if !NOT_UNITY3D
 
         // Don't use this unless you know what you're doing
         // You probably want to use InstantiatePrefab instead

@@ -17,9 +17,9 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <IntermediateOutputPath>..\..\..\..\..\..\NonUnityBuild\Temp\Debug\</IntermediateOutputPath>
-    <BaseIntermediateOutputPath>..\..\..\..\..\..\NonUnityBuild\Temp\Debug\</BaseIntermediateOutputPath>
-    <OutputPath>..\..\..\..\..\..\NonUnityBuild\Bin\Debug\</OutputPath>
+    <IntermediateOutputPath>..\..\..\..\..\..\..\NonUnityBuild\Temp\Debug\</IntermediateOutputPath>
+    <BaseIntermediateOutputPath>..\..\..\..\..\..\..\NonUnityBuild\Temp\Debug\</BaseIntermediateOutputPath>
+    <OutputPath>..\..\..\..\..\..\..\NonUnityBuild\Bin\Debug\</OutputPath>
     <DefineConstants>TRACE;DEBUG;NOT_UNITY3D</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -27,20 +27,20 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <IntermediateOutputPath>..\..\..\..\..\..\NonUnityBuild\Temp\Release\</IntermediateOutputPath>
-    <BaseIntermediateOutputPath>..\..\..\..\..\..\NonUnityBuild\Temp\Release\</BaseIntermediateOutputPath>
-    <OutputPath>..\..\..\..\..\..\NonUnityBuild\Bin\Release\</OutputPath>
+    <IntermediateOutputPath>..\..\..\..\..\..\..\NonUnityBuild\Temp\Release\</IntermediateOutputPath>
+    <BaseIntermediateOutputPath>..\..\..\..\..\..\..\NonUnityBuild\Temp\Release\</BaseIntermediateOutputPath>
+    <OutputPath>..\..\..\..\..\..\..\NonUnityBuild\Bin\Release\</OutputPath>
     <DefineConstants>TRACE;NOT_UNITY3D</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="nunit.core">
-      <HintPath>..\..\..\..\..\..\NonUnityBuild\Libraries\NUnit\nunit.core.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\..\NonUnityBuild\Libraries\NUnit\nunit.core.dll</HintPath>
     </Reference>
     <Reference Include="nunit.framework, Version=2.6.0.12051, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\..\NonUnityBuild\Libraries\NUnit\nunit.framework.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\..\NonUnityBuild\Libraries\NUnit\nunit.framework.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
