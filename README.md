@@ -1581,7 +1581,7 @@ public class MainInstaller : MonoInstaller
 ScriptableObjectInstaller works the same as MonoInstaller in this regard.
 
 ## <a id="signals"></a>Signals
-AsObservableee <a href="Documentation/Signals.md">here</a>.
+See <a href="Documentation/Signals.md">here</a>.
 
 ## <a id="creating-objects-dynamically"></a>Creating Objects Dynamically Using Factories
 
