@@ -105,7 +105,7 @@ class Runner:
         self._log.heading('Creating {0}'.format(os.path.basename(outputPath)))
 
         self._varMgr.set('PackageTempDir', '[TempDir]/Packager')
-        self._varMgr.set('ZenTempDir', '[PackageTempDir]/Assets/Zenject')
+        self._varMgr.set('ZenTempDir', '[PackageTempDir]/Assets/Plugins/Zenject')
 
         self._sys.createDirectory('[PackageTempDir]')
         self._sys.createDirectory('[PackageTempDir]/ProjectSettings')
