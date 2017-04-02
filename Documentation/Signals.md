@@ -48,7 +48,6 @@ public class GameInstaller : MonoInstaller<GameInstaller>
 {
     public override void InstallBindings()
     {
-        Container.Bind<SignalManager>().AsSingle();
         Container.DeclareSignal<UserJoinedSignal>();
 
         Container.BindSignal<string, UserJoinedSignal>()
@@ -93,7 +92,6 @@ public class GameInstaller : MonoInstaller<GameInstaller>
 {
     public override void InstallBindings()
     {
-        Container.Bind<SignalManager>().AsSingle();
         Container.DeclareSignal<UserJoinedSignal>();
 
         Container.BindInterfacesTo<GameInitializer>().AsSingle();
@@ -328,14 +326,6 @@ For example, you can declare a signal in your ProjectContext and then add signal
 Or, you could add signal handlers in the ProjectContext and then declare the signal in some particular scene.
 
 For example, You might use this to implement your GUI entirely in its own scene, loaded alongside the main backend scene.  Then you could have the GUI scene strictly fire Signals, which would then have method bindings in the game scene.
-
-Something else you'll have noticed in the examples above is that we also needed to install the SignalManager class:
-
-```csharp
-Container.Bind<SignalManager>().AsSingle();
-```
-
-This needs to be installed somewhere, and it doesn't matter which container this is installed to, as long as the container is "above" or equal to every place that either signals or signal handlers are used.  Therefore, the ideal place to put this line would be in the ProjectContext since this is the highest level container that exists.
 
 ### Signals With Identifiers
 
