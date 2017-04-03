@@ -2595,7 +2595,7 @@ Something else to note is that the rate at which the ITickable.Tick method gets 
         }
     ```
 
-    Normally, in a case like above where a constructor is being stripped out, we can force-include it by adding the `[Inject]` attribute on the Foo constructor, however this does not work for classes with generic types that include a value type.  Therefore, the recommended workaround here is to either explicitly reference the constructor similar to what you see in the _AotWorkaround, or avoid using value type generic arguments.
+    Normally, in a case like above where a constructor is being stripped out, we can force-include it by adding the `[Inject]` attribute on the Foo constructor, however this does not work for classes with generic types that include a value type.  Therefore, the recommended workarounds here are to either explicitly reference the constructor similar to what you see in the _AotWorkaround, or avoid using value type generic arguments.
 
 * **<a id="faq-performance"></a>How is performance?**
 
