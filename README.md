@@ -1,5 +1,5 @@
 
-<img src="UnityProject/Assets/Zenject/Documentation/ZenjectLogo.png?raw=true" alt="Zenject" width="600px" height="134px"/>
+<img src="UnityProject/Assets/Plugins/Zenject/Documentation/ZenjectLogo.png?raw=true" alt="Zenject" width="600px" height="134px"/>
 
 ## Dependency Injection Framework for Unity3D
 
@@ -70,7 +70,7 @@ You can install Zenject using any of the following methods
 
 1. From Source
 
-    * You can also just clone this repo and copy the `UnityProject/Assets/Zenject` directory to your own Unity3D project.  In this case, make note of the folders underneath "OptionalExtras" and choose only the ones you want.
+    * You can also just clone this repo and copy the `UnityProject/Assets/Plugins/Zenject` directory to your own Unity3D project.  In this case, make note of the folders underneath "OptionalExtras" and choose only the ones you want.
 
 ## <a id="history"></a>History
 
@@ -1134,7 +1134,7 @@ So another way to do this is to use the `ZenjectBinding` component.  You can do 
 
 For example, if I have a MonoBehaviour of type `Foo` in my scene, I can just add `ZenjectBinding` alongside it, and then drag the Foo component into the Component property of the ZenjectBinding component.
 
-<img src="UnityProject/Assets/Zenject/Documentation/AutoBind1.png?raw=true" alt="ZenjectBinding"/>
+<img src="UnityProject/Assets/Plugins/Zenject/Documentation/AutoBind1.png?raw=true" alt="ZenjectBinding"/>
 
 Then our installer becomes:
 
