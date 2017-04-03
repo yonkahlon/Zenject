@@ -1,6 +1,31 @@
 
 ## <a id="release-notes"></a>Release Notes
 
+###5.1.0 (April 3, 2017)
+
+Notable
+- Fixes related to upgrading to Unity 5.6
+- Moved Zenject folder to plugins directory
+- Changed to trigger injection before Awake / OnEnable / Start for dynamically instantaited prefabs. This is nice because you can treat [Inject] methods more like constructors, and then use Awake/Start for initialization logic, for both dynamically created objects and objects in the scene at the start
+- Marked the [Inject] attribute with MeansImplicitUseAttribute to improve integration with JetBrains Resharper
+- Fixed bug that was happening when using ZenjectSceneLoader with LoadSceneMode.Single (it was destroying ProjectContext)
+- Added support for declaring [Inject] methods with return type IEnumerator similar to Start
+- Changed UnderTransform bind method overload to accept InjectContext instead of just DiContainer to be consistent with the other action overloads
+- Added new bind method FromComponentOn that takes an Action<> instead of a specific game object
+- Changed to just always include SignalManager in the project context since this is where it should always be declared anyway
+- Changed to require that all signal parameters be reference types when on IL2CPP platforms.  See docs for why this is necessary.
+- Added new signal bind method that gets both parameters and a handler class (so you can perform an operation on the parameters before forwarding to the handler for example)
+
+Minor
+- Fixed bug where some fields marked as InjectOptional were still producing errors
+- Changed to allow doing Bind<Transform>().FromNewComponentOnNewGameObject()
+- [Memory pools] Minor change to allow specifying an explicit interface for the memory pool itself
+- [Memory pools] Fixed bug where validation was failing
+- [Memory pools] Added Listen and Unlisten methods to ISignal
+- Changed Pause/Resume methods on TickableManager to be inherited from parents
+- Added an option to exclude self (current object) in FromComponentInChildren and FromComponentInParents
+- Fixed minor issue when using FromSubContainerResolve with factories
+
 ###5.0.2 (March 5, 2017)
 
 - Fixed to allow parameterized tests using double parameters in ZenjectIntegrationTestFixtures
