@@ -2557,7 +2557,45 @@ Something else to note is that the rate at which the ITickable.Tick method gets 
 
 * **<a id="aot-support"></a>Does this work on AOT platforms such as iOS and WebGL?**
 
-    Yes.  However, there are a few things that you should be aware.  One of the things that Unity's IL2CPP compiler does is strip out any code that is not used.  It calculates what code is used by statically analyzing the code to find usage.  This is great, except that this will miss any methods/types that are not used explicitly.  In particular, any classes that are created solely through Zenject will have their constructors ignored by the IL2CPP compiler.  In order to address this, the [Inject] attribute that is sometimes applied to constructors also serves to automatically mark the constructor to IL2CPP to not strip out.   In other words, to fix this issue all you have to do is mark every constructor that you create through Zenject with an [Inject] attribute when compiling for WebGL / iOS.
+    Yes.  However, there are a few things that you should be aware of.  One of the things that Unity's IL2CPP compiler does is strip out any code that is not used.  It calculates what code is used by statically analyzing the code to find usage.  This is great, except that this will miss any methods/types that are not used explicitly.  In particular, any classes that are created solely through Zenject will have their constructors ignored by the IL2CPP compiler.  In order to address this, the [Inject] attribute that is sometimes applied to constructors also serves to automatically mark the constructor to IL2CPP to not strip out.   In other words, to fix this issue all you have to do is mark every constructor that you create through Zenject with an [Inject] attribute when compiling for WebGL / iOS.
+
+    Sometimes, an exception to this rule is classes that have generic arguments and which are instantiated with a "value type" generic argument (eg. int, float, enums, anything deriving from struct, etc.).  In this case, compiling with AOT will sometimes strip out the constructor, so Zenject will not be able to create the class and you will get a runtime error.  For example:
+
+```csharp
+    public class Foo<T1>
+    {
+        public Foo()
+        {
+            Debug.Log("Successfully created Foo!");
+        }
+    }
+
+    public class Runner2 : MonoBehaviour
+    {
+        public void OnGUI()
+        {
+            if (GUI.Button(new Rect(100, 100, 500, 100), "Attempt to Create Foo"))
+            {
+                var container = new DiContainer();
+
+                // This will throw exceptions on AOT platforms because the constructor for Foo<int> is stripped out of the build
+                container.Instantiate<Foo<int>>();
+
+                // This will run fine however, because string is not value type
+                //container.Instantiate<Foo<string>>();
+            }
+        }
+
+        static void _AotWorkaround()
+        {
+            // As a workaround, we can explicitly reference the constructor here to force the AOT
+            // compiler to leave it in the build
+            // new Foo<int>();
+        }
+    }
+```
+
+    Normally, in a case like above where a constructor is being stripped out, we can force-include it by adding the `[Inject]` attribute on the Foo constructor, however this does not work for classes with generic types that include a value type.  Therefore, the recommended workaround here is to either explicitly reference the constructor similar to what you see in the _AotWorkaround, or avoid using value type generic arguments.
 
 * **<a id="faq-performance"></a>How is performance?**
 
