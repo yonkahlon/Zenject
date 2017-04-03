@@ -587,7 +587,7 @@ PlayerSettings:
   metroCertificatePassword: 
   metroCertificateSubject: ModestTree
   metroCertificateIssuer: ModestTree
-  metroCertificateNotAfter: 80ac827823cbd301
+  metroCertificateNotAfter: 008894612ccbd301
   metroApplicationDescription: Game1
   wsaImages: {}
   metroTileShortName: 

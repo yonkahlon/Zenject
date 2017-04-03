@@ -10,7 +10,9 @@ Given two classes A and B that need to communicate, your options are usually:
 
 So, often you have to ask yourself, should A know about B or should B know about A?
 
-As a third option, in some cases it might actually be better for neither one to know about the other. This way your code is kept as loosely coupled as possible.  You can achieve this by having A and B interact with an intermediary object instead of directly with each other.  In Zenject this intermediary object is called a Signal.
+As a third option, in some cases it might actually be better for neither one to know about the other. This way your code is kept as loosely coupled as possible.  You can achieve this by having A and B interact with an intermediary object instead of directly with each other.  You can use Zenject Signals to act as this intermediary object.
+
+Note also that while the result will be more loosely coupled, this isn't always going to be better.  Signals can be misused just like any programming pattern, so you have to consider each case for whether it's a good candidate for them or not.
 
 ## <a id="quick-start"></a>Signals Quick Start
 
@@ -267,53 +269,130 @@ NOTE:  Integration with UniRx is disabled by default.  To enable, you must add t
 
 ### <a id="handler-binding"></a>Installer Binding Signal Handler
 
-Finally, you can also add signal handlers directly within an installer.  For example:
+Finally, you can also add signal handlers directly within an installer.
 
-```csharp
-public class Greeter1
-{
-    public void SayHello()
+There are three ways to hook up a signal handler in an installer:
+
+1.  Instance Method
+
+    ```csharp
+    public class Greeter1
     {
-        Debug.Log("Hello!");
+        public void SayHello()
+        {
+            Debug.Log("Hello!");
+        }
     }
-}
 
-public class GreeterInstaller : MonoInstaller<GreeterInstaller>
-{
-    public override void InstallBindings()
+    public class GreeterInstaller : MonoInstaller<GreeterInstaller>
     {
-        Container.BindSignal<AppStartedSignal>()
-            .To<Greeter1>(x => x.SayHello).AsSingle();
+        public override void InstallBindings()
+        {
+            Container.BindSignal<AppStartedSignal>()
+                .To<Greeter1>(x => x.SayHello).AsSingle();
+        }
     }
-}
-```
+    ```
 
-Or, when the signal has parameters:
+    Or, when the signal has parameters:
 
-```csharp
-public class Greeter1
-{
-    public void SayHello(string name)
+    ```csharp
+    public class Greeter1
     {
-        Debug.Log("Hello " + name + "!");
+        public void SayHello(string name)
+        {
+            Debug.Log("Hello " + name + "!");
+        }
     }
-}
 
-public class GreeterInstaller : MonoInstaller<GreeterInstaller>
-{
-    public override void InstallBindings()
+    public class GreeterInstaller : MonoInstaller<GreeterInstaller>
     {
-        Container.BindSignal<string, AppStartedSignal>()
-            .To<Greeter1>(x => x.SayHello).AsSingle();
+        public override void InstallBindings()
+        {
+            Container.BindSignal<string, AppStartedSignal>()
+                .To<Greeter1>(x => x.SayHello).AsSingle();
+        }
     }
-}
-```
+    ```
 
-This approach has the following advantages:
+2.  Static Method
+
+    ```csharp
+
+    public class GreeterInstaller : MonoInstaller<GreeterInstaller>
+    {
+        public override void InstallBindings()
+        {
+            Container.BindSignal<AppStartedSignal>()
+                .To(() => Debug.Log("Hello!")).AsSingle();
+        }
+    }
+    ```
+
+    Or, when the signal has parameters:
+
+    ```csharp
+    public class GreeterInstaller : MonoInstaller<GreeterInstaller>
+    {
+        public override void InstallBindings()
+        {
+            Container.BindSignal<string, AppStartedSignal>()
+                .To(name => Debug.Log("Hello " + name + "!")).AsSingle();
+        }
+    }
+    ```
+
+3.  Static Method With Instance
+
+    This approach is similar to 1 except allows you to implement a static method that contains both the list of parameters, and a handler class that you can either call or make use of somehow in the method.  This approach is particularly useful if you need to apply some kind of transformation to the parameters before forwarding it to the handler class
+
+    ```csharp
+    public class Greeter1
+    {
+        public void SayHello()
+        {
+            Debug.Log("Hello!");
+        }
+    }
+
+    public class GreeterInstaller : MonoInstaller<GreeterInstaller>
+    {
+        public override void InstallBindings()
+        {
+            Container.BindSignal<AppStartedSignal>()
+                .To<Greeter1>(x => x.SayHello(x)).AsSingle();
+        }
+    }
+    ```
+
+    Or, when the signal has parameters:
+
+    ```csharp
+    public class Greeter1
+    {
+        public void SayHello(string name)
+        {
+            Debug.Log("Hello " + name + "!");
+        }
+    }
+
+    public class GreeterInstaller : MonoInstaller<GreeterInstaller>
+    {
+        public override void InstallBindings()
+        {
+            Container.BindSignal<string, AppStartedSignal>()
+                .To<Greeter1>((x, name) => x.SayHello(name)).AsSingle();
+        }
+    }
+    ```
+
+Installer bindings for signals have the following advantages:
 - More flexible, because you can wire it up in the installer and can have multiple installer configurations
 - More loosely coupled, because the handler class can remain completely ignorant of the signal
 - Less error prone, because you don't have to remember to unsubscribe.  The signal will automatically be unsubscribed when the 'context' is disposed of.  This means that if you add a handler within a sub-container, the handler will automatically unsubscribe when the sub-container is disposed of
 - You can more easily control which classes are allowed to fire the signal.  You can do this by adding a When() conditional to the declaration.  (You can't do this with the other handler types because the listener also needs access to the signal to add itself to it)
+
+However, it might also be harder to follow just by reading the code, because you will have to check the installers to see what handlers a given has.
 
 Which approach to signal handlers depends on the specifics of each case and personal preference.
 
@@ -360,4 +439,11 @@ public class Qux
     }
 }
 ```
+
+### AOT considerations
+
+If you are targeting a platform that uses AOT (eg. iOS, WSA, PS4, XBox, etc.), you might discover that Zenject disallows using value types such as int, bool, enums, etc. directly as Signal parameters.  This is due to a limitation of AOT with the current version of Mono that Unity is using (for details see the discussion <a href="https://github.com/modesttree/Zenject/issues/219">here</a>).
+
+The suggested workaround in these cases is to either use a Parameter Object (in which case you wrap all your value type parameters in a custom class) or wrap all the individual value type parameters in a reference type wrapper.  For example:
+
 
