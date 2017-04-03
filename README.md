@@ -2561,41 +2561,41 @@ Something else to note is that the rate at which the ITickable.Tick method gets 
 
     Sometimes, an exception to this rule is classes that have generic arguments and which are instantiated with a "value type" generic argument (eg. int, float, enums, anything deriving from struct, etc.).  In this case, compiling with AOT will sometimes strip out the constructor, so Zenject will not be able to create the class and you will get a runtime error.  For example:
 
-```csharp
-    public class Foo<T1>
-    {
-        public Foo()
+    ```csharp
+        public class Foo<T1>
         {
-            Debug.Log("Successfully created Foo!");
-        }
-    }
-
-    public class Runner2 : MonoBehaviour
-    {
-        public void OnGUI()
-        {
-            if (GUI.Button(new Rect(100, 100, 500, 100), "Attempt to Create Foo"))
+            public Foo()
             {
-                var container = new DiContainer();
-
-                // This will throw exceptions on AOT platforms because the constructor for Foo<int> is stripped out of the build
-                container.Instantiate<Foo<int>>();
-
-                // This will run fine however, because string is not value type
-                //container.Instantiate<Foo<string>>();
+                Debug.Log("Successfully created Foo!");
             }
         }
 
-        static void _AotWorkaround()
+        public class Runner2 : MonoBehaviour
         {
-            // As a workaround, we can explicitly reference the constructor here to force the AOT
-            // compiler to leave it in the build
-            // new Foo<int>();
-        }
-    }
-```
+            public void OnGUI()
+            {
+                if (GUI.Button(new Rect(100, 100, 500, 100), "Attempt to Create Foo"))
+                {
+                    var container = new DiContainer();
 
-Normally, in a case like above where a constructor is being stripped out, we can force-include it by adding the `[Inject]` attribute on the Foo constructor, however this does not work for classes with generic types that include a value type.  Therefore, the recommended workaround here is to either explicitly reference the constructor similar to what you see in the _AotWorkaround, or avoid using value type generic arguments.
+                    // This will throw exceptions on AOT platforms because the constructor for Foo<int> is stripped out of the build
+                    container.Instantiate<Foo<int>>();
+
+                    // This will run fine however, because string is not value type
+                    //container.Instantiate<Foo<string>>();
+                }
+            }
+
+            static void _AotWorkaround()
+            {
+                // As a workaround, we can explicitly reference the constructor here to force the AOT
+                // compiler to leave it in the build
+                // new Foo<int>();
+            }
+        }
+    ```
+
+    Normally, in a case like above where a constructor is being stripped out, we can force-include it by adding the `[Inject]` attribute on the Foo constructor, however this does not work for classes with generic types that include a value type.  Therefore, the recommended workaround here is to either explicitly reference the constructor similar to what you see in the _AotWorkaround, or avoid using value type generic arguments.
 
 * **<a id="faq-performance"></a>How is performance?**
 
